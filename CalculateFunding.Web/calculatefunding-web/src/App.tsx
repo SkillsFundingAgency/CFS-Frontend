@@ -55,31 +55,23 @@ import {LoadingStatus} from "./components/LoadingStatus";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
-    const userState: IUserState = useSelector<IStoreState, IUserState>(state => state.userState);
+    let hasConfirmedSkills: boolean | undefined = useSelector((state: IStoreState) => state.userState && state.userState.hasConfirmedSkills);
     const dispatch = useDispatch();
 
     initialiseAxios();
 
     useEffect(() => {
-        const initialise = () => {
-            dispatch(getHasUserConfirmedSkills());
-        };
-
-        initialise();
+        dispatch(getHasUserConfirmedSkills());
     }, []);
 
     useEffect(() => {
-        const load = () => {
+        if (hasConfirmedSkills) {
             dispatch(getFeatureFlags());
             dispatch(getUserFundingStreamPermissions());
-        };
-
-        if (userState.hasConfirmedSkills) {
-            load();
         }
-    }, [userState.hasConfirmedSkills]);
+    }, [hasConfirmedSkills]);
 
-    if (userState.hasConfirmedSkills === undefined) {
+    if (hasConfirmedSkills === undefined) {
         return (
             <div>
                 <LoadingStatus title={"Loading"}
@@ -88,7 +80,7 @@ const App: React.FunctionComponent = () => {
             </div>
         );
     }
-    if (userState.hasConfirmedSkills === true) {
+    if (hasConfirmedSkills === true) {
         return (
             <BrowserRouter basename="/app"
                            getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>

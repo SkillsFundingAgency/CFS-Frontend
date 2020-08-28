@@ -217,7 +217,6 @@ namespace CalculateFunding.Frontend
             {
                 app.UseAuthentication();
                 app.UseAuthorization();
-
                 app.UseMiddleware<SkillsCheckMiddleware>();
             }
 

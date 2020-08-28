@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
@@ -26,7 +25,7 @@ namespace CalculateFunding.Frontend.Core.Middleware
             if (context.User.Identity.IsAuthenticated)
             {
                 bool haveCookieForConfirmedSkills = context.Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName);
-                
+
                 if (!haveCookieForConfirmedSkills && DoesRequestRequireSkills(context.Request))
                 {
                     IUsersApiClient usersApiClient = context.RequestServices.GetService<IUsersApiClient>();
@@ -35,13 +34,20 @@ namespace CalculateFunding.Frontend.Core.Middleware
 
                     ApiResponse<User> apiResponse = await usersApiClient.GetUserByUserId(profile.Id);
 
-                    if (apiResponse.StatusCode != HttpStatusCode.OK || !apiResponse.Content.HasConfirmedSkills)
+                    if (apiResponse.StatusCode != HttpStatusCode.OK)
                     {
-                        context.Response.StatusCode = 451;
+                        context.Response.StatusCode = (int) apiResponse.StatusCode;
                         context.Response.WriteAsync("Could not verify that user has confirmed skills").Wait();
                         return;
                     }
-                    
+
+                    if (!apiResponse.Content.HasConfirmedSkills)
+                    {
+                        context.Response.StatusCode = 451;
+                        context.Response.WriteAsync("User has not confirmed skills").Wait();
+                        return;
+                    }
+
                     CookieOptions option = new CookieOptions
                     {
                         Expires = DateTime.Now.AddDays(1),
@@ -61,10 +67,10 @@ namespace CalculateFunding.Frontend.Core.Middleware
             path = path.EndsWith("/") ? path.Substring(0, path.Length - 1) : path;
 
             return path.Length > 0 &&
-                   !path.EndsWith("/app") && 
-                   !path.Contains("assets/") && 
-                   !path.Contains("api/account") && 
-                   !path.EndsWith("api/featureflags") && 
+                   !path.EndsWith("/app") &&
+                   !path.Contains("assets/") &&
+                   !path.Contains("api/account") &&
+                   !path.EndsWith("api/featureflags") &&
                    !path.EndsWith("api/users/permissions/fundingstreams");
         }
     }
