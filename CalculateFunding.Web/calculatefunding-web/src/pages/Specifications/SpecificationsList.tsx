@@ -40,7 +40,6 @@ export function SpecificationsList() {
         pageSize: 50,
         page: 1
     };
-    const [singleFire, setSingleFire] = useState(false);
     const [searchCriteria, setSearchCriteria] = useState(initialSearch);
     const [filterFundingPeriods, setFundingPeriods] = useState<FacetValue[]>([]);
     const [filterFundingStreams, setFundingStreams] = useState<FacetValue[]>([]);
@@ -67,12 +66,6 @@ export function SpecificationsList() {
     });
 
     useEffect(() => {
-        if (!singleFire && specificationListResults.totalCount > 0) {
-            setSingleFire(true);
-        }
-    }, [specificationListResults.totalCount]);
-
-    useEffect(() => {
         if (specificationListResults.facets.length > 0) {
             setStatus(specificationListResults.facets[0].facetValues);
             setFundingPeriods(specificationListResults.facets[1].facetValues);
@@ -81,11 +74,7 @@ export function SpecificationsList() {
             setInitialFundingPeriods(specificationListResults.facets[1].facetValues);
             setInitialFundingStreams(specificationListResults.facets[2].facetValues);
         }
-    }, [singleFire]);
-
-    useEffect(() => {
-
-    }, [specificationListResults.items])
+    }, [specificationListResults]);
 
     function movePage(pageNumber: number) {
         setSearchCriteria(prevState => {
