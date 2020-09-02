@@ -96,6 +96,7 @@ export async function getCodeContextService(specificationId: string) {
 
     return response.data;
 }
+
 export async function getCalculationVersionHistoryService(calculationId: string) {
     return axios(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
         method: 'GET',
@@ -114,6 +115,15 @@ export async function approveCalculationService(publishStatusModel: PublishStatu
         data: publishStatusModel
     })
 }
+export async function getMultipleVersionsByCalculationIdService(calculationId: string, versions: number[]) {
+    return axios(`/api/calcs/getmultipleversions`, {
+        method: 'GET',
+        params: {
+            calculationId,
+            versions: [versions[0], versions[1]]
+        }});
+}
+
 
 export async function getIsUserAllowedToApproveCalculationService(calculationId: string) {
     return axios(`/api/calcs/${calculationId}/approvepermission`, {

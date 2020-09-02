@@ -1,6 +1,6 @@
-import {RouteComponentProps, useHistory} from "react-router";
-import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
+import React, {useEffect, useState} from "react";
+import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
 import {Calculation} from "../../types/CalculationSummary";
 import {getCalculationByIdService, getCalculationVersionHistoryService} from "../../services/calculationService";
@@ -54,24 +54,14 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
     let history = useHistory();
 
     function populateCalculation() {
-        const getCalculationData = async () => {
-            let request = getCalculationByIdService(calculationId);
-            return request;
-        }
-
-        getCalculationData().then((result) => {
+        getCalculationByIdService(calculationId).then((result) => {
             const response = result.data as Calculation;
             setCalculation(response);
-        })
+        });
     }
 
     function populateSpecification(specificationId: string) {
-        const getSpecificationData = async () => {
-            let request = getSpecificationSummaryService(specificationId);
-            return request;
-        }
-
-        getSpecificationData().then((result) => {
+        getSpecificationSummaryService(specificationId).then((result) => {
             const response = result.data as SpecificationSummary;
             setSpecification(response);
             setIsLoading(false);
@@ -79,12 +69,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
     }
 
     function populateCalculationVersionHistory(calculationId: string) {
-        const getCalculationVersionHistory = async () => {
-            let request = getCalculationVersionHistoryService(calculationId);
-            return request;
-        }
-
-        getCalculationVersionHistory().then((result) => {
+        getCalculationVersionHistoryService(calculationId).then((result) => {
             const response = result.data as CalculationVersionHistorySummary[];
             setCalculationVersionHistory(response);
         })
@@ -110,12 +95,11 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
         if (!e.target.checked) {
 
             for (let i = 0; i < checkedVersions.length; i++) {
-
                 if (versions[i] === selectedVersion) {
                     versions.splice(i, 1);
                 }
-
             }
+
             setCheckedVersions(versions);
 
         } else {
@@ -128,7 +112,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
 
     function compareVersions() {
         if (!disableCompare) {
-            history.push(`/app/Calculations/CompareCalculationVersions/${checkedVersions[0]}/${checkedVersions[1]}`);
+            history.push(`/Calculations/CompareCalculationVersions/${calculationId}/${checkedVersions[0]}/${checkedVersions[1]}`);
         }
     }
 
@@ -136,13 +120,17 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
         <LoadingStatus title={"Loading calculation version history"}
                        description={"Please wait whilst calculation versions are loaded"} hidden={!isLoading}/>
         <div className="govuk-width-container" hidden={isLoading}>
-            <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
-                <Breadcrumb name={calculation.name} />
-                <Breadcrumb name={"Calculation version history"} />
-            </Breadcrumbs>
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                    <Breadcrumbs>
+                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                        <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
+                        <Breadcrumb name={calculation.name}/>
+                        <Breadcrumb name={"Calculation version history"}/>
+                    </Breadcrumbs>
+                </div>
+            </div>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <h1 className="govuk-heading-xl">{calculation.name}</h1>
@@ -183,8 +171,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                                 </th>
                                 <td className="govuk-table__cell">{cvh.publishStatus}</td>
                                 <td className="govuk-table__cell">{cvh.version}</td>
-                                <td className="govuk-table__cell">
-                                    <DateFormatter date={cvh.lastUpdated} utc={false}/>
+                                <td className="govuk-table__cell"><DateFormatter date={cvh.lastUpdated} utc={false}/>
                                 </td>
                                 <td className="govuk-table__cell">{cvh.author.name}</td>
                             </tr>

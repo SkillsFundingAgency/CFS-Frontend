@@ -19,6 +19,8 @@ const store: Store<IStoreState> = createStore(
     composeWithDevTools(applyMiddleware(...middleware))
 );
 
+
+
 ReactDOM.render(
     <Provider store={store}>
         <AppContainer />

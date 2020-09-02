@@ -431,6 +431,31 @@ namespace CalculateFunding.Frontend.Controllers
             return new BadRequestObjectResult(response.Content);
         }
 
+        [HttpGet]
+        [Route("api/calcs/getmultipleversions")]
+        public async Task<IActionResult> GetMulitpleCalculationVersions([FromQuery] string calculationId,
+            [FromQuery(Name = "versions[]")] int[] versions)
+        {
+            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
+            Guard.ArgumentNotNull(versions, nameof(versions));
+
+
+            ApiResponse<IEnumerable<CalculationVersion>> response = await _calcClient.GetMultipleVersionsByCalculationId(versions, calculationId);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadGateway)
+            {
+                return BadRequest();
+            }
+            
+            return new StatusCodeResult(500);
+
+        }
+
         private async Task<bool> CanUserApproveCalculation(Calculation calculation)
         {
             if (await _authorizationHelper.DoesUserHavePermission(User, calculation.SpecificationId, SpecificationActionTypes.CanApproveAnyCalculations))

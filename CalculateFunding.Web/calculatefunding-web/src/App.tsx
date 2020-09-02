@@ -51,6 +51,7 @@ import {ViewProviderResults} from "./pages/ViewResults/ViewProviderResults";
 import {UserConfirmLeavePageModal} from "./components/UserConfirmLeavePageModal";
 import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
+import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculationVersions";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -127,6 +128,7 @@ const App: React.FunctionComponent = () => {
                     <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation}/>
                     <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints}/>
                     <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
+                    <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
                     <Route path="*">
                         <NoMatch/>
                     </Route>
