@@ -1,23 +1,22 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
-import {SelectDataSource, SelectDataSourceRouteProps} from "../../../pages/Datasets/SelectDataSource";
+import {SelectDataSourceRouteProps} from "../../../pages/Datasets/SelectDataSource";
 import {EffectiveSpecificationPermission} from "../../../types/EffectiveSpecificationPermission";
 import {render, waitFor} from "@testing-library/react";
-import {getDatasourcesByRelationshipIdService} from "../../../services/datasetService";
 import '@testing-library/jest-dom/extend-expect';
-/*const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});*/
+
+jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
 const history = createMemoryHistory();
-const location = createLocation("","","");
-const matchMock : match<SelectDataSourceRouteProps> = {
+const location = createLocation("", "", "");
+const matchMock: match<SelectDataSourceRouteProps> = {
     params: {
         datasetRelationshipId: "123"
     },
-    path:"",
+    path: "",
     isExact: true,
+    url: ""
 };
 const permissionsState: EffectiveSpecificationPermission = {
     specificationId: "555",
@@ -107,13 +106,13 @@ describe("SelectDataSource without mapping permissions", () => {
         renderPage();
         await waitFor(() => expect(getDatasourcesByRelationshipIdService).toBeCalled());
     });
-    
+
     it("fetches specification permissions", async () => {
         const {getUserPermissionsService} = require('../../../services/userService');
         renderPage();
         await waitFor(() => expect(getUserPermissionsService).toBeCalled());
     });
-    
+
     it("renders permissions alert", async () => {
         const {getByTestId} = renderPage();
         await waitFor(() => {
@@ -132,24 +131,26 @@ describe("SelectDataSource with permissions", () => {
         renderPage();
         await waitFor(() => expect(getDatasourcesByRelationshipIdService).toBeCalled());
     });
-    
+
     it("fetches specification permissions", async () => {
         const {getUserPermissionsService} = require('../../../services/userService');
         renderPage();
         await waitFor(() => expect(getUserPermissionsService).toBeCalled());
     });
-    
+
     it("does not render permissions alert", async () => {
         const {queryByTestId} = renderPage();
         await waitFor(() => {
             expect(queryByTestId('permission-alert-message')).toBeNull();
         });
     });
-    
+
     it('renders correct breadcrumbs', async () => {
         const {container} = renderPage();
-        const breadcrumbs = container.querySelector(".govuk-breadcrumbs__list");
-        expect(breadcrumbs).not.toBeNull();
-        expect(breadcrumbs.children.length).toBe(5);
+        await waitFor(() => {
+            const breadcrumbs = container.querySelector(".govuk-breadcrumbs__list");
+            expect(breadcrumbs).not.toBeNull();
+            expect(breadcrumbs.children.length).toBe(5);
+        });
     });
 });

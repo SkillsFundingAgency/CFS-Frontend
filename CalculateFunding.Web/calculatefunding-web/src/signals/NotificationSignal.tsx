@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {HubConnection, HubConnectionBuilder} from "@aspnet/signalr";
+import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../types/jobMessage";
 import {LoadingStatus} from "../components/LoadingStatus";
 

@@ -21,7 +21,7 @@ import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
-import {HubConnectionBuilder, HubConnection} from "@aspnet/signalr";
+import {HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import {ErrorMessage} from "../../types/ErrorMessage";

@@ -20,7 +20,7 @@ import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 import {SearchMode} from "../types/SearchMode";
 import {getLatestJobForSpecificationService} from "../services/jobService";
 import {JobSummary} from "../types/jobSummary";
-import {HubConnectionBuilder} from "@aspnet/signalr";
+import {HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../types/jobMessage";
 import {JobSummaryDetails} from "../components/JobSummaryDetails";
 import {FacetValue} from "../types/Facet";

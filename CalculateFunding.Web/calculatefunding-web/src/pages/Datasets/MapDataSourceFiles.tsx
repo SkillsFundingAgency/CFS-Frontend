@@ -116,7 +116,7 @@ export function MapDataSourceFiles() {
     }
 
     function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-        let filters: string [] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
+        let filters: string[] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
         if (enableFilter) {
             if (filters.indexOf(filterValue) === -1) {
                 filters.push(filterValue);
@@ -130,14 +130,12 @@ export function MapDataSourceFiles() {
             const index = filters.indexOf(filterValue);
             if (index !== -1) {
                 filters.splice(index, 1)
-                if (filters.length === 0)
-                {
+                if (filters.length === 0) {
                     setSearchRequest(prevState => {
                         return {...prevState, filters: initialSearchRequest.filters, pageNumber: 1}
                     });
                 }
-                else
-                {
+                else {
                     let newFiltersValue: any = {};
                     newFiltersValue[filterKey] = filters;
                     setSearchRequest(prevState => {
@@ -190,14 +188,14 @@ export function MapDataSourceFiles() {
     }
 
     return <div>
-        <Header location={Section.Datasets}/>
+        <Header location={Section.Datasets} />
         <div className="govuk-width-container">
             <div className="govuk-grid-row  govuk-!-margin-bottom-9">
                 <div className="govuk-grid-column-full">
                     <Breadcrumbs>
-                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"}/>
-                        <Breadcrumb name={"Map data sources to data sets for a specification"}/>
+                        <Breadcrumb name={"Calculate funding"} url={"/"} />
+                        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+                        <Breadcrumb name={"Map data sources to data sets for a specification"} />
                     </Breadcrumbs>
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Map data source files</h1>
                     <span className="govuk-caption-xl">Map data source files to data sets for a specification</span>
@@ -212,7 +210,7 @@ export function MapDataSourceFiles() {
                                     <label className="govuk-label filterLabel" htmlFor="filter-by-type">
                                         Search
                                     </label>
-                                    <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off" name="search" type="text" onChange={(e) => searchText(e)}/>
+                                    <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off" name="search" type="text" onChange={(e) => searchText(e)} />
                                 </div>
                             </fieldset>
                         </CollapsiblePanel>
@@ -221,20 +219,20 @@ export function MapDataSourceFiles() {
                                 <div className="govuk-form-group">
                                     <label className="govuk-label">Search</label>
                                     <input className="govuk-input" type="text"
-                                           onChange={(e) => searchFundingStreamFilters(e)}/>
+                                        onChange={(e) => searchFundingStreamFilters(e)} />
                                 </div>
                                 <div className="govuk-checkboxes">
                                     {filterFundingStreams.map((f, index) =>
                                         <div key={index} className="govuk-checkboxes__item">
                                             <input className="govuk-checkboxes__input"
-                                                   key={`fundingstream-${f}`}
-                                                   id={`fundingstream-${f}`}
-                                                   name={`fundingstream-${f}`}
-                                                   type="checkbox" value={f}
-                                                   checked={searchRequest.filters["fundingStreamNames"] !== undefined &&  searchRequest.filters["fundingStreamNames"].includes(f)}
-                                                   onChange={(e) => filterByFundingStream(e)}/>
+                                                key={`fundingstream-${f}`}
+                                                id={`fundingstream-${f}`}
+                                                name={`fundingstream-${f}`}
+                                                type="checkbox" value={f}
+                                                checked={searchRequest.filters["fundingStreamNames"] !== undefined && searchRequest.filters["fundingStreamNames"].includes(f)}
+                                                onChange={(e) => filterByFundingStream(e)} />
                                             <label className="govuk-label govuk-checkboxes__label"
-                                                   htmlFor={`fundingstream-${f}`}>
+                                                htmlFor={`fundingstream-${f}`}>
                                                 {f}
                                             </label>
                                         </div>)
@@ -247,20 +245,20 @@ export function MapDataSourceFiles() {
                                 <div className="govuk-form-group">
                                     <label className="govuk-label">Search</label>
                                     <input className="govuk-input" type="text"
-                                           onChange={(e) => searchFundingPeriodFilters(e)}/>
+                                        onChange={(e) => searchFundingPeriodFilters(e)} />
                                 </div>
                                 <div className="govuk-checkboxes">
                                     {filterFundingPeriods.map((f, index) =>
                                         <div key={index} className="govuk-checkboxes__item">
                                             <input className="govuk-checkboxes__input"
-                                                   key={`fundingperiod-${f}`}
-                                                   id={`fundingperiod-${f}`}
-                                                   name={`fundingperiod-${f}`}
-                                                   type="checkbox" value={f}
-                                                   checked={searchRequest.filters["fundingPeriodName"] !== undefined &&  searchRequest.filters["fundingPeriodName"].includes(f)}
-                                                   onChange={(e) => filterByFundingPeriod(e)}/>
+                                                key={`fundingperiod-${f}`}
+                                                id={`fundingperiod-${f}`}
+                                                name={`fundingperiod-${f}`}
+                                                type="checkbox" value={f}
+                                                checked={searchRequest.filters["fundingPeriodName"] !== undefined && searchRequest.filters["fundingPeriodName"].includes(f)}
+                                                onChange={(e) => filterByFundingPeriod(e)} />
                                             <label className="govuk-label govuk-checkboxes__label"
-                                                   htmlFor={`fundingperiod-${f}`}>
+                                                htmlFor={`fundingperiod-${f}`}>
                                                 {f}
                                             </label>
                                         </div>)
@@ -269,36 +267,36 @@ export function MapDataSourceFiles() {
                             </fieldset>
                         </CollapsiblePanel>
                         <button type="button" className="govuk-button"
-                                onClick={() => clearFilters()}>Clear filters
+                            onClick={() => clearFilters()}>Clear filters
                         </button>
                     </form>
                 </div>
 
                 <div className="govuk-grid-column-two-thirds">
-                    <LoadingStatus title={"Loading data source file results"} hidden={!isLoading}/>
-                    <NoData hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading}/>
+                    <LoadingStatus title={"Loading data source file results"} hidden={!isLoading} />
+                    <NoData hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading} />
                     <table className="govuk-table" hidden={isLoading || datasetRelationships.items.length === 0}>
                         <thead className="govuk-table__head">
-                        <tr className="govuk-table__row">
-                            <th scope="col"
-                                className="govuk-table__header govuk-!-width-one-half">Specification
+                            <tr className="govuk-table__row">
+                                <th scope="col"
+                                    className="govuk-table__header govuk-!-width-one-half">Specification
                             </th>
-                            <th scope="col" className="govuk-table__header"></th>
-                        </tr>
+                                <th scope="col" className="govuk-table__header"></th>
+                            </tr>
                         </thead>
                         <tbody className="govuk-table__body" id="mainContentResults">
-                        {datasetRelationships.items.map((dr, index) =>
-                            <tr className="govuk-table__row" key={index}>
-                                <th scope="row" className="govuk-table__header">
-                                    <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
-                                        {dr.specificationName}
-                                    </Link>
-                                    {
-                                        dr.definitionRelationshipCount > 0 ?
-                                            <p className="govuk-body govuk-!-margin-top-2">
-                                                {dr.totalMappedDataSets} of {dr.definitionRelationshipCount} data sets mapped for specification
+                            {datasetRelationships.items.map((dr, index) =>
+                                <tr className="govuk-table__row" key={index}>
+                                    <th scope="row" className="govuk-table__header">
+                                        <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
+                                            {dr.specificationName}
+                                        </Link>
+                                        {
+                                            dr.definitionRelationshipCount > 0 ?
+                                                <p className="govuk-body govuk-!-margin-top-2">
+                                                    {dr.totalMappedDataSets} of {dr.definitionRelationshipCount} data sets mapped for specification
                                             </p>
-                                            : <span>
+                                                : <span>
                                                     <p className="govuk-body govuk-!-margin-top-2">
                                                         No data sets exist for specification
                                                     </p>
@@ -306,28 +304,28 @@ export function MapDataSourceFiles() {
                                                         <Link to={`/Datasets/CreateDataset/${dr.specificationId}`}>Create new data set</Link>
                                                     </p>
                                                 </span>
-                                    }
-                                    {
-                                        dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ?
-                                            <p className="govuk-body"> Last mapped <DateFormatter date={dr.mapDatasetLastUpdated} utc={true}/></p>
-                                            : null
-                                    }
-                                </th>
-                                <td className="govuk-table__cell"></td>
-                            </tr>
-                        )}
+                                        }
+                                        {
+                                            dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ?
+                                                <p className="govuk-body"> Last mapped <DateFormatter date={dr.mapDatasetLastUpdated} utc={true} /></p>
+                                                : null
+                                        }
+                                    </th>
+                                    <td className="govuk-table__cell"></td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
-                    <BackToTop id={"top"}/>
+                    <BackToTop id={"top"} />
                     {!isLoading && datasetRelationships.totalCount > 0 &&
-                    <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
-                         aria-label="Pagination">
-                        <div className="pagination__summary">Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of {datasetRelationships.totalCount} results</div>
-                        <Pagination currentPage={datasetRelationships.pagerState.currentPage} lastPage={datasetRelationships.pagerState.lastPage} callback={pageChange}/>
-                    </nav>}
+                        <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
+                            aria-label="Pagination">
+                            <div className="pagination__summary">Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of {datasetRelationships.totalCount} results</div>
+                            <Pagination currentPage={datasetRelationships.pagerState.currentPage} lastPage={datasetRelationships.pagerState.lastPage} callback={pageChange} />
+                        </nav>}
                 </div>
             </div>
         </div>
-        <Footer/>
+        <Footer />
     </div>
 }

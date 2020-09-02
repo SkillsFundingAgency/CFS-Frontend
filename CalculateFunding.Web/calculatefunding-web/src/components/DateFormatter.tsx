@@ -1,6 +1,8 @@
 import React from 'react';
 
 export function DateFormatter(props: { date: Date, utc: boolean }) {
+    if (!props.date) return <span></span>;
+
     const date: Date = new Date(props.date);
     const day: number = date.getDate();
     const month: string = date.toLocaleString('default', {month: 'long'});
