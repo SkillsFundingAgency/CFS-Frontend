@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.FundingDataZone;
+using CalculateFunding.Common.ApiClient.FundingDataZone.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
@@ -20,11 +22,14 @@ namespace CalculateFunding.Frontend.Controllers
     {
         private IProvidersApiClient _providersApiClient;
         private IResultsApiClient _resultsApiClient;
+        private readonly IFundingDataZoneApiClient _fundingDataZoneApiClient;
 
-        public ProviderController(IProvidersApiClient providersApiClient, IResultsApiClient resultsApiClient)
+        public ProviderController(IProvidersApiClient providersApiClient, IResultsApiClient resultsApiClient,
+            IFundingDataZoneApiClient fundingDataZoneApiClient)
         {
             _providersApiClient = providersApiClient;
             _resultsApiClient = resultsApiClient;
+            _fundingDataZoneApiClient = fundingDataZoneApiClient;
         }
 
         [HttpGet]
@@ -117,6 +122,24 @@ namespace CalculateFunding.Frontend.Controllers
             }
             
             return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+        }
+
+        [HttpGet]
+        [Route("api/providers/fundingStreams/{fundingStreamId}/snapshots")]
+        public async Task<IActionResult> GetProviderSnapshotsForFundingStream(string fundingStreamId)
+        {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<ProviderSnapshot>> providerSnapshotsResponse = await _fundingDataZoneApiClient.GetProviderSnapshotsForFundingStream(fundingStreamId);
+
+            IActionResult providerSnapshotsErrorResult =
+                providerSnapshotsResponse.IsSuccessOrReturnFailureResult("GetFundingStructuresByProviderId");
+            if (providerSnapshotsErrorResult != null)
+            {
+                return providerSnapshotsErrorResult;
+            }
+
+            return Ok(providerSnapshotsResponse.Content);
         }
     }
 }

@@ -102,7 +102,9 @@ namespace CalculateFunding.Frontend.UnitTests
                 { "policiesClient:ApiEndpoint", "https://localhost:7013/api/policies" },
                 { "policiesClient:ApiKey", "Local" },
                 { "publishingClient:ApiEndpoint", "https://localhost:7012/api" },
-                { "publishingClient:ApiKey", "Local" }
+                { "publishingClient:ApiKey", "Local" },
+                { "fdzClient:ApiEndpoint", "https://localhost:7109/api" },
+                { "fdzClient:ApiKey", "Local" }
             };
 
             var cb = new ConfigurationBuilder()

@@ -4,6 +4,7 @@ export interface EditSpecificationViewModel {
     fundingPeriod: FundingPeriod;
     fundingStreams: FundingStream[];
     providerVersionId: string;
+    providerSnapshotId?: number;
     description: string;
     isSelectedForFunding: boolean;
     approvalStatus: string;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.ViewModels.Specs
 {
@@ -13,8 +14,9 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingStreamRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string FundingStreamId { get; set; }
 
-        [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationProviderVersionRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string ProviderVersionId { get; set; }
+
+        public int? ProviderSnapshotId { get; set; }
 
         public string Description { get; set; }
 

@@ -9,12 +9,13 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
 import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {CoreProviderSummary} from "../../types/CoreProviderSummary";
+import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
 import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpecificationViewModel";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
-import {getTemplatesService} from "../../services/policyService";
+import {getProviderSourceService, getTemplatesService} from "../../services/policyService";
+import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -51,6 +52,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [templateVersionData, setTemplateVersionData] = useState<EditSpecificationTemplateVersion[]>([]);
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
+    const [selectedProviderSnapshotId, setSelectedProviderSnapshotId] = useState<any>(null);
+    const [providerSource, setProviderSource] = useState<ProviderSource>();
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [loadingMessage, setLoadingMessage] = useState({
@@ -66,7 +69,6 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         error: ""
     });
     const [isLoading, setIsLoading] = useState(false);
-
     let history = useHistory();
 
     useEffectOnce(() => {
@@ -102,15 +104,31 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             try {
                 const fundingStreamId = specificationSummary.fundingStreams[0].id;
 
-                const coreProviderResult = await getProviderByFundingStreamIdService(fundingStreamId);
-                const coreProviderSummaries = coreProviderResult.data as CoreProviderSummary[];
-                const providerData = coreProviderSummaries.map(coreProviderItem => ({
-                    name: coreProviderItem.name,
-                    value: coreProviderItem.providerVersionId
-                }));
-                setCoreProviderData(providerData);
-                const selectedProviderVersion = providerData.find(p => p.value === specificationSummary.providerVersionId);
-                selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
+                let providerSource: any;
+                const providerSourceData = await getProviderSourceService(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id);
+                providerSource = providerSourceData.data as ProviderSource;
+                setProviderSource(providerSource);
+
+                if (providerSource.valueOf() === ProviderSource[ProviderSource.CFS]) {
+                    const coreProviderResult = await getProviderByFundingStreamIdService(fundingStreamId);
+                    const coreProviderSummaries = coreProviderResult.data as CoreProviderSummary[];
+                    const providerData = coreProviderSummaries.map(coreProviderItem => ({
+                        name: coreProviderItem.name,
+                        value: coreProviderItem.providerVersionId
+                    }));
+                    setCoreProviderData(providerData);
+                    const selectedProviderVersion = providerData.find(p => p.value === specificationSummary.providerVersionId);
+                    selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
+                } else if (providerSource.valueOf() === ProviderSource[ProviderSource.FDZ]) {
+                    const coreProviderSnapshotsResult = await getProviderSnapshotsForFundingStreamService(specificationSummary.fundingStreams[0].id);
+                    const coreProviderSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
+                    const providerData = coreProviderSnapshots.map(coreProviderItem => ({
+                        name: coreProviderItem.name,
+                        value: coreProviderItem.providerSnapshotId
+                    }));
+                    const selectedProviderSnapshot = providerData.find(p => p.value === specificationSummary.providerSnapshotId);
+                    selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value.toString());
+                }
 
                 const templatesResult = await getTemplatesService(fundingStreamId, specificationSummary.fundingPeriod.id);
                 const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
@@ -143,7 +161,14 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
-        setSelectedProviderVersionId(coreProviderId);
+        if (providerSource === ProviderSource.CFS)
+        {
+            setSelectedProviderVersionId(coreProviderId as string);
+        }
+        else if (providerSource === ProviderSource.FDZ)
+        {
+            setSelectedProviderSnapshotId(parseInt(coreProviderId));
+        }
     }
 
     function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -170,9 +195,18 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 fundingPeriodId: specificationSummary.fundingPeriod.id,
                 fundingStreamId: specificationSummary.fundingStreams[0].id,
                 name: selectedName,
-                providerVersionId: selectedProviderVersionId,
+                providerVersionId: "",
                 assignedTemplateIds: assignedTemplateIdsValue,
             };
+
+            if (providerSource === ProviderSource.CFS)
+            {
+                updateSpecificationViewModel.providerVersionId = selectedProviderVersionId;
+            }
+            else if (providerSource === ProviderSource.FDZ)
+            {
+                updateSpecificationViewModel.providerSnapshotId = selectedProviderSnapshotId
+            }
 
             try {
                 await updateSpecificationService(updateSpecificationViewModel, specificationId);

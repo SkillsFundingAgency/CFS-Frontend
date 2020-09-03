@@ -279,7 +279,8 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingPeriodId = viewModel.FundingPeriodId,
                 FundingStreamIds = fundingStreamIds,
                 ProviderVersionId = viewModel.ProviderVersionId,
-                AssignedTemplateIds = viewModel.AssignedTemplateIds
+                AssignedTemplateIds = viewModel.AssignedTemplateIds,
+                ProviderSnapshotId = viewModel.ProviderSnapshotId
             };
 
             var fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);

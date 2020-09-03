@@ -58,3 +58,12 @@ export async function getProviderResultsService(providerId: string) {
         }
     });
 }
+
+export async function getProviderSnapshotsForFundingStreamService(fundingStreamId:string) {
+    return axios(`/api/providers/fundingStreams/${fundingStreamId}/snapshots`, {
+        method: 'GET',
+        headers: {
+            'Content-Type':'application/json'
+        }
+    })
+}

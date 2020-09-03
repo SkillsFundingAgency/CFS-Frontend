@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {
@@ -7,11 +7,13 @@ import {
 } from "../../services/specificationService";
 import {
     getDefaultTemplateVersionService,
-    getFundingStreamsService, getTemplatesService
+    getFundingStreamsService,
+    getProviderSourceService,
+    getTemplatesService
 } from "../../services/policyService";
 import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
-import {CoreProviderSummary} from "../../types/CoreProviderSummary";
+import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
 import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpecificationViewModel";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ErrorSummary} from "../../components/ErrorSummary";
@@ -25,16 +27,20 @@ import {HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import {ErrorMessage} from "../../types/ErrorMessage";
+import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
+import {FundingStructureType} from "../../types/FundingStructureItem";
 
 export function CreateSpecification() {
     const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
     const [fundingPeriodData, setFundingPeriodData] = useState<FundingPeriod[]>([]);
     const [coreProviderData, setCoreProviderData] = useState<CoreProviderSummary[]>([]);
+    const [providerSnapshots, setProviderSnapshots] = useState<ProviderSnapshot[]>([]);
     const [templateVersionData, setTemplateVersionData] = useState<PublishedFundingTemplate[]>([]);
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<string>("");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
+    const [selectedProviderSnapshotId, setSelectedProviderSnapshotId] = useState<any>(null);
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [formValid, setFormValid] = useState({
@@ -45,6 +51,7 @@ export function CreateSpecification() {
     const [fundingPeriodIsLoading, setFundingPeriodIsLoading] = useState<boolean>(false);
     const [newSpecificationId, setNewSpecificationId] = useState<string>('');
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
+    const [providerSource, setProviderSource] = useState<ProviderSource>();
     let history = useHistory();
 
     useEffect(() => {
@@ -76,21 +83,8 @@ export function CreateSpecification() {
             }
         };
 
-        const updateCoreProviderData = async () => {
-            try {
-                setCoreProviderData([]);
-                const coreProviderResult = await getProviderByFundingStreamIdService(selectedFundingStream);
-                setCoreProviderData(coreProviderResult.data);
-            } catch (err) {
-                if (err.response.status !== 404) {
-                    addErrorMessage("There was a problem loading the core providers. Please try again.");
-                }
-            }
-        };
-
         if (selectedFundingStream !== "") {
             updateFundingPeriods();
-            updateCoreProviderData();
         }
     }, [selectedFundingStream]);
 
@@ -108,9 +102,39 @@ export function CreateSpecification() {
             };
         };
 
+        const updateCoreProviderData = async () => {
+            let providerSource: any;
+            try {
+                const providerSourceData = await getProviderSourceService(selectedFundingStream, selectedFundingPeriod);
+                providerSource = providerSourceData.data as ProviderSource;
+                setProviderSource(providerSource);
+            } catch (err) {
+                if (err.response != null && err.response.status !== 404) {
+                    addErrorMessage("There was a problem determining the provider source. Please try again.");
+                }
+            }
+            try {
+                if (providerSource.valueOf() === ProviderSource[ProviderSource.CFS]) {
+                    const coreProviderResult = await getProviderByFundingStreamIdService(selectedFundingStream);
+                    setCoreProviderData(coreProviderResult.data as CoreProviderSummary[]);
+                } else if (providerSource.valueOf() === ProviderSource[ProviderSource.FDZ]) {
+                    const coreProviderSnapshotsResult = await getProviderSnapshotsForFundingStreamService(selectedFundingStream);
+                    const providerSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
+                    setProviderSnapshots(providerSnapshots);
+                }
+            } catch (err) {
+                if (err.response != null && err.response.status !== 404) {
+                    addErrorMessage("There was a problem loading the core providers. Please try again.");
+                }
+            }
+        };
+
         if (selectedFundingPeriod !== "" && selectedFundingStream !== "") {
             updateTemplateVersions();
+            updateCoreProviderData();
         }
+
+
     }, [selectedFundingPeriod]);
 
     useEffect(() => {
@@ -206,8 +230,15 @@ export function CreateSpecification() {
     }
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
-        const coreProviderId = e.target.value;
-        setSelectedProviderVersionId(coreProviderId);
+        const coreProviderId : string = e.target.value as string;
+        if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
+        {
+            setSelectedProviderVersionId(coreProviderId);
+        }
+        else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
+        {
+            setSelectedProviderSnapshotId(parseInt(coreProviderId));
+        }
     }
 
     function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -222,21 +253,32 @@ export function CreateSpecification() {
 
     async function submitSaveSpecification() {
         if (selectedName !== "" && selectedFundingStream !== "" &&
-            selectedFundingPeriod !== "" && selectedProviderVersionId !== "" && selectedDescription !== "") {
+            selectedFundingPeriod !== "" && (selectedProviderVersionId !== "" || selectedProviderSnapshotId !== null)
+            && selectedDescription !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setIsLoading(true);
             clearErrorMessages();
             setNewSpecificationId('');
             let assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
+
             let createSpecificationViewModel: CreateSpecificationViewModel = {
                 description: selectedDescription,
                 fundingPeriodId: selectedFundingPeriod,
                 fundingStreamId: selectedFundingStream,
                 name: selectedName,
-                providerVersionId: selectedProviderVersionId,
+                providerVersionId: "",
                 assignedTemplateIds: assignedTemplateIdsValue
             };
+
+            if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
+            {
+                createSpecificationViewModel.providerVersionId = selectedProviderVersionId;
+            }
+            else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
+            {
+                createSpecificationViewModel.providerSnapshotId = selectedProviderSnapshotId
+            }
 
             try {
                 const createSpecificationResult = await createSpecificationService(createSpecificationViewModel);
@@ -329,10 +371,20 @@ export function CreateSpecification() {
                             Core provider data
                         </label>
                         <select className="govuk-select" id="core-provider-data" name="core-provider-data"
-                            disabled={coreProviderData.length === 0} onChange={selectCoreProvider}>
+                            disabled={coreProviderData.length === 0 && providerSnapshots.length === 0} onChange={selectCoreProvider}>
                             <option value="">Select core provider</option>
-                            {coreProviderData.map((cp, index) => <option key={index}
-                                value={cp.providerVersionId}>{cp.name}</option>)}
+                            {
+                                coreProviderData.length > 0 ?
+                                    coreProviderData.map((cp, index) => <option key={index}
+                                                                                value={cp.providerVersionId}>{cp.name}</option>)
+                                    : null
+                            }
+                            {
+                                providerSnapshots.length > 0 ?
+                                    providerSnapshots.map((cp, index) => <option key={index}
+                                                                                value={cp.providerSnapshotId}>{cp.name}</option>)
+                                    : null
+                            }
                         </select>
                     </div>
 

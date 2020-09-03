@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using CalculateFunding.Common.ApiClient.FundingDataZone;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
@@ -19,13 +20,15 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private ProviderController _sut;
         private Mock<IProvidersApiClient> _mockProvidersApiClient;
         private Mock<IResultsApiClient> _mockResultsApiClient;
+        private Mock<IFundingDataZoneApiClient> _mockFundingDataZoneApiClient;
 
 
         [TestInitialize]
         public void Initialize()
         {
             _mockProvidersApiClient = new Mock<IProvidersApiClient>();
-_mockResultsApiClient = new Mock<IResultsApiClient>();
+            _mockResultsApiClient = new Mock<IResultsApiClient>();
+            _mockFundingDataZoneApiClient = new Mock<IFundingDataZoneApiClient>();
 
             ApiResponse<ProviderVersionSearchResult> data = new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, Builder<ProviderVersionSearchResult>.CreateNew().Build());
 
@@ -33,7 +36,7 @@ _mockResultsApiClient = new Mock<IResultsApiClient>();
             _mockProvidersApiClient.Setup(x => x.GetProviderByIdFromProviderVersion("providerVersionId", "providerId"))
                 .ReturnsAsync(data);
 
-            _sut = new ProviderController(_mockProvidersApiClient.Object, _mockResultsApiClient.Object);
+            _sut = new ProviderController(_mockProvidersApiClient.Object, _mockResultsApiClient.Object, _mockFundingDataZoneApiClient.Object);
         }
 
         [TestMethod]

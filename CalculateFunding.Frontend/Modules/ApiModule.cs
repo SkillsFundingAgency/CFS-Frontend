@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using CalculateFunding.Common.ApiClient;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.FundingDataZone;
 using CalculateFunding.Common.ApiClient.Graph;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Jobs;
@@ -175,6 +176,18 @@ namespace CalculateFunding.Frontend.Modules
                 .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
+
+            services.AddHttpClient(HttpClientKeys.FDZ,
+                c =>
+                {
+                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("fdzClient");
+
+                    SetDefaultApiClientConfigurationOptions(c, opts, services);
+                })
+                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
+                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
+                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
+
             services
 	            .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
@@ -183,6 +196,9 @@ namespace CalculateFunding.Frontend.Modules
 
             services
                 .AddSingleton<IProvidersApiClient, ProvidersApiClient>();
+            
+            services
+                .AddSingleton<IFundingDataZoneApiClient, FundingDataZoneApiClient>();
 
             services
                 .AddSingleton<IPoliciesApiClient, PoliciesApiClient>();

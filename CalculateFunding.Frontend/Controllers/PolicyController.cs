@@ -62,6 +62,21 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
+        [Route("api/policy/configuration/{fundingStreamId}/{fundingPeriodId}/providersource")]
+        public async Task<IActionResult> GetProviderSource(string fundingStreamId, string fundingPeriodId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<FundingConfiguration> apiResponse =
+	            await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
+
+		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
+
+		    return errorResult ?? Ok(apiResponse.Content.ProviderSource);
+        }
+
+        [HttpGet]
         [Route("api/policy/configuration/{fundingStreamId}/{fundingPeriodId}")]
         public async Task<IActionResult> GetDefaultTemplateVersion(string fundingStreamId, string fundingPeriodId)
         {

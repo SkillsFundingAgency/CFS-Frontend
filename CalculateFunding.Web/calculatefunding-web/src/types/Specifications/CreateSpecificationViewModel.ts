@@ -5,5 +5,6 @@ export interface CreateSpecificationViewModel {
     description: string;
     fundingPeriodId: string;
     assignedTemplateIds: { [key: string]: string[] };
+    providerSnapshotId?: number;
 }
 

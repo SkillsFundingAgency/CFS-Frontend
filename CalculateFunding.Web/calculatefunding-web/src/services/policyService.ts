@@ -37,3 +37,12 @@ export async function getFundingStreamByIdService(fundingStreamId: string) {
         },
     });
 }
+
+export async function getProviderSourceService(fundingStreamId: string, fundingPeriodId: string) {
+    return axios(`${baseURL}/configuration/${fundingStreamId}/${fundingPeriodId}/providersource`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}
