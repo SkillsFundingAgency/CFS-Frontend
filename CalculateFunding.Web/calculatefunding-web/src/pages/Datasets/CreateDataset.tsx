@@ -11,6 +11,8 @@ import {getSpecificationSummaryService} from "../../services/specificationServic
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 import {Footer} from "../../components/Footer";
+import {AxiosException} from "../../types/AxiosException";
+import {ErrorSummary} from "../../components/ErrorSummary";
 
 interface CreateDatasetPageRoute {
     specificationId: string
@@ -60,6 +62,8 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
     });
     const [isLoading, setIsLoading] = useState(false);
     const [addAnother, setAddAnother] = useState(false);
+
+    const [errorMessage, setErrorMessage] = useState<string>();
 
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
@@ -138,37 +142,42 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
     function saveDataset(addAnother: boolean) {
         setAddAnother(false);
         setIsLoading(true);
+        setErrorMessage("")
+        setSaveDatasetResult({
+            attempted: false,
+            result: false
+        })
         const valid = checkSubmission();
 
         if (valid) {
-            const result = async (): Promise<boolean> => {
-                const response = await assignDatasetSchemaUpdateService(datasetName.name, datasetDescription.description, datasetDataschema.value, specificationId, datasetAsDataProvider);
-                return response.data;
-            };
+            assignDatasetSchemaUpdateService(datasetName.name, datasetDescription.description, datasetDataschema.value, specificationId, datasetAsDataProvider).then((response) => {
+                if (response.status === 200) {
+                    const result = response.data as boolean;
+                    setSaveDatasetResult({
+                        result: result,
+                        attempted: true
 
-            result().then((success) => {
-                setSaveDatasetResult(prevState => {
-                    return {
-                        ...prevState, result: success, attempted: true
+                    });
+
+                    if (addAnother) {
+                        clearFormData();
+                        setAddAnother(true);
+                    } else {
+                        history.push(`/ViewSpecification/${specificationId}`)
                     }
-                });
-                if (addAnother) {
-                    clearFormData();
-                    setAddAnother(true);
-                } else {
-                    history.push(`/ViewSpecification/${specificationId}`)
                 }
-            }).catch(() => {
-                setSaveDatasetResult(prevState => {
-                    return {
-                        ...prevState, result: false, attempted: true
-                    }
-                });
+            }).catch((err) => {
+                    setErrorMessage(err.response.statusText)
+                    setSaveDatasetResult(prevState => {
+                        return {
+                            ...prevState, result: false, attempted: true
+                        }
+                    });
+
             }).finally(() => {
                 setIsLoading(false)
             })
         }
-        setIsLoading(false);
     }
 
     function checkSubmission() {
@@ -216,6 +225,9 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                 <Breadcrumb name={"Create dataset"}/>
             </Breadcrumbs>
             <ConfirmationPanel title={"Dataset created"} body={"Your dataset has been created."} hidden={!addAnother}/>
+            <div hidden={(!saveDatasetResult.result && !saveDatasetResult.attempted) || (saveDatasetResult.result && saveDatasetResult.attempted)}>
+                <ErrorSummary title={"An error has occurred"} error={`${errorMessage}`} suggestion={"Please check and try again"}/>
+            </div>
             <LoadingStatus title={"Creating Dataset"} hidden={!isLoading} id={"create-dataset-loader"}
                            subTitle={"Please wait whilst your dataset is created"}
                            description={"This can take a few minutes"}/>
