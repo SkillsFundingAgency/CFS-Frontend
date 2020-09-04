@@ -62,12 +62,6 @@ export function Header(props: {location:Section}) {
                                     Manage data
                                 </Link>
                             </li>
-                            {/*<li className={"govuk-header__navigation-item" + (props.location === Section.Tests ? " govuk-header__navigation-item--active" : "")}>*/}
-                            {/*    <Link className="govuk-header__link"*/}
-                            {/*       to="/scenarios">*/}
-                            {/*        Quality assurance tests*/}
-                            {/*    </Link>*/}
-                            {/*</li>*/}
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Results ? " govuk-header__navigation-item--active" : "")}>
                                 <Link className="govuk-header__link" to="/results">
                                     View results
@@ -76,6 +70,11 @@ export function Header(props: {location:Section}) {
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Approvals ? " govuk-header__navigation-item--active" : "")}>
                                 <Link className="govuk-header__link" to="/ViewFunding">
                                     Funding approvals
+                                </Link>
+                            </li>
+                            <li className={"govuk-header__navigation-item" + (props.location === Section.Templates ? " govuk-header__navigation-item--active" : "")}>
+                                <Link className="govuk-header__link" to="/Templates/List">
+                                    Templates
                                 </Link>
                             </li>
                         </ul>

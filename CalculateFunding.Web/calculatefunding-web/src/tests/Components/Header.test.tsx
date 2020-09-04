@@ -1,5 +1,6 @@
 import React from 'react';
 import {Header} from "../../components/Header";
+import {Section} from "../../types/Sections";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -8,7 +9,7 @@ const {shallow} = enzyme;
 
 
 it('shows the Beta panel', () => {
-    const wrapper = shallow(<Header />);
+    const wrapper = shallow(<Header location={Section.Home} />);
 
     let actual = wrapper.find('strong.govuk-phase-banner__content__tag');
 
@@ -16,7 +17,7 @@ it('shows the Beta panel', () => {
 });
 
 it('shows Calculate funding in the service name', ()=>{
-   const wrapper = shallow(<Header/>);
+   const wrapper = shallow(<Header location={Section.Home} />);
 
    let actual = wrapper.find('govuk-header__link--service-name');
 
@@ -24,7 +25,7 @@ it('shows Calculate funding in the service name', ()=>{
 });
 
 it('shows GOV.UK in the logotype text area', ()=>{
-   const wrapper = shallow(<Header/>);
+   const wrapper = shallow(<Header location={Section.Home} />);
 
    let actual = wrapper.find('govuk-header__logotype-text');
 
