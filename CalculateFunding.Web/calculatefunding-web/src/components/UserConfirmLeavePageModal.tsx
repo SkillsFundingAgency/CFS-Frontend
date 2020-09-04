@@ -3,7 +3,9 @@ import {render, unmountComponentAtNode} from 'react-dom';
 import "../styles/UserConfirmLeavePageModal.scss";
 
 export function UserConfirmLeavePageModal(message: string = 'There are unsaved changes. Are you sure you want to leave this page?',
-                                          callback: any) {
+                                          callback: any,
+                                          confirmButtonText: string = 'Leave this page',
+                                          cancelButtonText: string = 'Stay on this page') {
     const container = document.createElement("div");
     container.setAttribute("user-leave-page-confirmation-placeholder", "");
     container.setAttribute("data-testid", "user-leave-page-confirmation-placeholder");
@@ -37,10 +39,10 @@ export function UserConfirmLeavePageModal(message: string = 'There are unsaved c
                         {message}
                     </h1>
                     <button id="cancel" className="govuk-button govuk-!-margin-right-1" data-module="govuk-button" onClick={handleCancel}>
-                        Stay on this page
+                        {cancelButtonText}
                     </button>
                     <button id="confirm" className="govuk-button govuk-button--warning" data-module="govuk-button" onClick={handleContinue}>
-                        Leave this page
+                        {confirmButtonText}
                     </button>
                 </div>
             </div>

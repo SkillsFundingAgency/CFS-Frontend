@@ -1,4 +1,4 @@
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {Header} from "../../components/Header";
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
@@ -51,6 +51,7 @@ import {useSelector} from "react-redux";
 import {getUserPermissionsService} from "../../services/userService";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {Specification} from "../../types/viewFundingTypes";
+import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageModal";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -159,6 +160,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         datasets: true,
         selectedSpecification: true,
     });
+    let history = useHistory();
     useEffect(() => {
         if (!fundingLineRenderInternalState) {
             return
@@ -410,26 +412,65 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     function chooseForFunding() {
         setErrors([]);
         getUserPermissionsService(specificationId).then((result) => {
-            const specificationPermissions = result.data as EffectiveSpecificationPermission;
-            if (!specificationPermissions.canChooseFunding) {
-                setErrors(errors => [...errors, "You do not have permissions to choose this specification for funding",
-                    "Specification must be approved before the specification can be chosen for funding.",
-                    "Template calculations must be approved before the specification can be chosen for funding."]);
-            } else {
-                refreshFundingService(specificationId).then((response) => {
-                    if (response.status === 200) {
-                        getSpecificationSummaryService(specificationId).then((specificationSummaryResponse) => {
-                            const specificationSummary = specificationSummaryResponse.data as SpecificationSummary;
-                            setSpecification(specificationSummary);
-                        });
-                    }
-                    else
-                    {
-                        setErrors(errors => [...errors, "A problem occurred while choosing specification"]);
-                    }
-                }).catch(()=>{setErrors(errors => [...errors, "A problem occurred while choosing specification"]);});
+            if (isUserAllowedToChooseSpecification(result.data as EffectiveSpecificationPermission)) {
+                UserConfirmLeavePageModal("Are you sure you want to choose this specification?",
+                    refreshFunding, "Confirm", "Cancel");
             }
         }).catch(()=>{setErrors(errors => [...errors, "A problem occurred while getting user permissions"]);});
+    }
+
+    function refreshFunding(confirm: boolean) {
+        if (confirm) {
+            refreshFundingService(specificationId).then((response) => {
+                if (response.status === 200) {
+                    getSpecificationSummaryService(specificationId).then(() => {
+                        history.push(`/ViewSpecificationResults/${specificationId}`);
+                    });
+                } else {
+                    setErrors(errors => [...errors, "A problem occurred while choosing specification"]);
+                }
+            }).catch(() => {
+                setErrors(errors => [...errors, "A problem occurred while choosing specification"]);
+            });
+        }
+    }
+
+    function isUserAllowedToChooseSpecification(specificationPermissions: EffectiveSpecificationPermission) {
+        return true
+        let errors: string[] = [];
+        if (!specificationPermissions.canChooseFunding) {
+            errors.push("You do not have permissions to choose this specification for funding");
+        }
+        if (specification.approvalStatus.toLowerCase() !== PublishStatus.Approved.toLowerCase()) {
+            errors.push("Specification must be approved before the specification can be chosen for funding.");
+        }
+        getCalculationsService({
+            specificationId: specificationId,
+            status: "",
+            pageNumber: 1,
+            searchTerm: "",
+            calculationType: "Template"
+        }).then((response) => {
+            if (response.status === 200) {
+                const calculationSummary = response.data as CalculationSummary;
+                const calculationsWithUnapprovedStatus = calculationSummary.results.filter(calc => calc.status.toLowerCase() !== PublishStatus.Approved.toLowerCase())
+                if (calculationsWithUnapprovedStatus.length > 0) {
+                    errors.push("Template calculations must be approved before the specification can be chosen for funding.");
+                    setErrors(errors);
+                    return false;
+                }
+            } else {
+                errors.push("A problem occurred while choosing specification");
+                setErrors(errors);
+                return false;
+            }
+        }).catch(() => {
+            errors.push("A problem occurred while choosing specification");
+            setErrors(errors);
+            return false;
+        });
+
+        return errors.length > 0;
     }
 
     return <div>
@@ -489,7 +530,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <button type="button" className="govuk-link"
                                     onClick={chooseForFunding}
                                     hidden={specification.isSelectedForFunding || isLoading.selectedSpecification}>Choose for funding</button>
-                            <Link to={`/viewspecificationresults/${specificationId}`}
+                            <Link to={`/ViewSpecificationResults/${specificationId}`}
                                   hidden={!selectedSpecificationForFunding.isSelectedForFunding || isLoading.selectedSpecification} className="govuk-link">
                                 View funding
                             </Link>
