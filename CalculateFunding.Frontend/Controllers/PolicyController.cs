@@ -176,5 +176,53 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new OkObjectResult(fundingPeriods.OrderBy(x => x.Name));
         }
+
+        [HttpGet]
+        [Route("api/policy/templates/{fundingStreamId}/{fundingPeriodId}/{templateVersion}/metadata/distinct")]
+        public async Task<IActionResult> GetDistinctTemplateMetadataContents(string fundingStreamId, string fundingPeriodId, string templateVersion)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(templateVersion, nameof(templateVersion));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<TemplateMetadataDistinctContents> apiResponse =
+                await _policiesApiClient.GetDistinctTemplateMetadataContents(fundingStreamId, fundingPeriodId, templateVersion);
+
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(TemplateMetadataDistinctContents));
+
+            return errorResult ?? Ok(apiResponse.Content);
+        }
+
+        [HttpGet]
+        [Route("api/policy/templates/{fundingStreamId}/{fundingPeriodId}/{templateVersion}/metadata/distinct/funding-lines")]
+        public async Task<IActionResult> GetDistinctTemplateMetadataFundingLinesContents(string fundingStreamId, string fundingPeriodId, string templateVersion)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(templateVersion, nameof(templateVersion));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<TemplateMetadataDistinctFundingLinesContents> apiResponse =
+                await _policiesApiClient.GetDistinctTemplateMetadataFundingLinesContents(fundingStreamId, fundingPeriodId, templateVersion);
+
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(TemplateMetadataDistinctFundingLinesContents));
+
+            return errorResult ?? Ok(apiResponse.Content);
+        }
+
+        [HttpGet]
+        [Route("api/policy/templates/{fundingStreamId}/{fundingPeriodId}/{templateVersion}/metadata/distinct/calculations")]
+        public async Task<IActionResult> GetDistinctTemplateMetadataCalculationsContents(string fundingStreamId, string fundingPeriodId, string templateVersion)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(templateVersion, nameof(templateVersion));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<TemplateMetadataDistinctCalculationsContents> apiResponse =
+                await _policiesApiClient.GetDistinctTemplateMetadataCalculationsContents(fundingStreamId, fundingPeriodId, templateVersion);
+
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(TemplateMetadataDistinctCalculationsContents));
+
+            return errorResult ?? Ok(apiResponse.Content);
+        }
     }
 }
