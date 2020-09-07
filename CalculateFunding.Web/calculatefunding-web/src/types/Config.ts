@@ -4,4 +4,5 @@ export interface Config {
     baseUrl: string;
     debugOn: boolean,
     tracingOn: boolean,
+    appInsightsKey: string
 };

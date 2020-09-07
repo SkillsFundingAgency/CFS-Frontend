@@ -3,5 +3,6 @@
     "loginType": "aad",
     "baseUrl": "",
     "debugOn": true,
-    "tracingOn": true
+    "tracingOn": true,
+    "appInsightsKey": ""
 }

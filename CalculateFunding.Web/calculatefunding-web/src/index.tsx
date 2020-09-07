@@ -7,6 +7,9 @@ import { IStoreState, rootReducer } from "./reducers/rootReducer";
 import { composeWithDevTools } from "redux-devtools-extension";
 import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
+import {initialiseAppInsights} from "./services/appInsightsService";
+
+initialiseAppInsights();
 
 let middleware = [thunk as ThunkMiddleware<IStoreState>];
 
@@ -18,8 +21,6 @@ const store: Store<IStoreState> = createStore(
     rootReducer,
     composeWithDevTools(applyMiddleware(...middleware))
 );
-
-
 
 ReactDOM.render(
     <Provider store={store}>
