@@ -11,7 +11,6 @@ import {getSpecificationSummaryService} from "../../services/specificationServic
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 import {Footer} from "../../components/Footer";
-import {AxiosException} from "../../types/AxiosException";
 import {ErrorSummary} from "../../components/ErrorSummary";
 
 interface CreateDatasetPageRoute {
@@ -163,7 +162,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                         clearFormData();
                         setAddAnother(true);
                     } else {
-                        history.push(`/ViewSpecification/${specificationId}`)
+                        history.push(`/ViewSpecification/${specificationId}?showDatasets=true`)
                     }
                 }
             }).catch((err) => {

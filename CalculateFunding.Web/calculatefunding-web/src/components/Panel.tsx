@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useTabs } from "./Tabs";
+import { useTabs } from "../hooks/useTabs";
 
 export interface IPanelProps {
     label: string;

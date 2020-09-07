@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useTabs } from "./Tabs";
+import "../styles/Tab.scss";
+import { useTabs } from "../hooks/useTabs";
 
 export interface ITabProps {
     label: string;
@@ -8,9 +9,14 @@ export interface ITabProps {
 
 export const Tab: React.FC<ITabProps> = props => {
     const { activeTab, setActiveTab } = useTabs();
+
+    const handleTabClick = () => {
+        setActiveTab(props.label);
+    }
+
     return (
         <li hidden={props.hidden} className={activeTab === props.label ? "govuk-tabs__list-item govuk-tabs__list-item--selected" : "govuk-tabs__list-item"}>
-            <label className="govuk-tabs__tab" onClick={() => setActiveTab(props.label)}>
+            <label className="govuk-tabs__tab" onClick={handleTabClick}>
                 {props.children}
             </label>
         </li>
