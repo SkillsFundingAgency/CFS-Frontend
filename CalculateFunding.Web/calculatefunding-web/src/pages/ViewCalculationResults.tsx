@@ -18,7 +18,7 @@ import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 import {SearchMode} from "../types/SearchMode";
-import {getLatestJobForSpecificationService} from "../services/jobService";
+import {getJobStatusUpdatesForSpecification} from "../services/jobService";
 import {JobSummary} from "../types/jobSummary";
 import {HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../types/jobMessage";
@@ -108,11 +108,13 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     }, [calculationSummary.calculation.specificationId]);
 
     function getLatestJobForSpecification() {
-        getLatestJobForSpecificationService(calculationSummary.calculation.specificationId, "CreateInstructAllocationJob").then((jobSummaryResponse) => {
-            if (jobSummaryResponse.status === 200 || jobSummaryResponse.status === 201) {
-                setJobSummary(jobSummaryResponse.data as JobSummary);
-            }
-        });
+        getJobStatusUpdatesForSpecification(calculationSummary.calculation.specificationId, "CreateInstructAllocationJob")
+            .then((jobSummaryResponse) => 
+            {
+                if (jobSummaryResponse.data && jobSummaryResponse.data.length > 0) {
+                    setJobSummary(jobSummaryResponse.data[0]);
+                }
+            });
     }
 
     useEffect(() => {

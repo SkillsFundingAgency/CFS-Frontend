@@ -134,22 +134,25 @@ namespace CalculateFunding.Frontend.Pages.Results
 
             Task<ApiResponse<SpecificationSummary>> specLookupTask = _specsClient.GetSpecificationSummaryById(Calculation.SpecificationId);
             Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> datasetSchemaTask = _datasetsClient.GetRelationshipsBySpecificationId(Calculation.SpecificationId);
-            Task<ApiResponse<JobSummary>> latestJobTask = _jobsClient.GetLatestJobForSpecification(Calculation.SpecificationId, new[] { JobTypes.CalculationInstruct, JobTypes.CalculationAggregration });
+            Task<ApiResponse<IEnumerable<JobSummary>>> latestJobsTask = _jobsClient.GetLatestJobsForSpecification(Calculation.SpecificationId, new[] { JobTypes.CalculationInstruct, JobTypes.CalculationAggregration });
 
-            await TaskHelper.WhenAllAndThrow(specLookupTask, datasetSchemaTask, latestJobTask);
+            await TaskHelper.WhenAllAndThrow(specLookupTask, datasetSchemaTask, latestJobsTask);
 
-            ApiResponse<JobSummary> latestJobResponse = latestJobTask.Result;
+            ApiResponse<IEnumerable<JobSummary>> latestJobsResponse = latestJobsTask.Result;
 
             // There may not be a latest job for the current spec so don't fail if there isn't one
-            if (latestJobResponse != null)
+            if (latestJobsResponse != null)
             {
-                if (latestJobResponse.Content == null)
+                JobSummary latestJob = latestJobsResponse.Content?.Where(j => j != null).OrderByDescending(j => j.Created).FirstOrDefault();
+
+                if (latestJob == null)
                 {
                     LatestJobJson = "null";
                 }
                 else
                 {
-                    LatestJobJson = JsonConvert.SerializeObject(latestJobResponse.Content);
+                    
+                    LatestJobJson = JsonConvert.SerializeObject(latestJob);
                 }
             }
 

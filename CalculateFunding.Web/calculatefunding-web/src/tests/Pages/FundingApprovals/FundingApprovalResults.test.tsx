@@ -1,11 +1,10 @@
 import React from 'react';
-import {mount} from "enzyme";
 import {match, MemoryRouter} from "react-router";
 import {FundingApprovalResults, FundingApprovalResultsRoute} from "../../../pages/FundingApprovals/FundingApprovalResults";
 import {createLocation, createMemoryHistory} from "history";
-import {DatasetHistoryRouteProps} from "../../../pages/Datasets/DatasetHistory";
-import {Provider} from "react-redux";
-import {ManageData} from "../../../pages/Datasets/ManageData";
+import {render, screen, waitFor} from "@testing-library/react";
+import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import {JobSummary} from "../../../types/jobSummary";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -22,40 +21,58 @@ const matchMock : match<FundingApprovalResultsRoute> = {
     path:"",
     isExact: true,
 };
+export const testSpec: SpecificationSummary = {
+    name: "Wizard Training",
+    approvalStatus: "",
+    description: "",
+    fundingPeriod: {
+        id: "FP123",
+        name: "2019-20"
+    },
+    fundingStreams: [{
+        name: "FS123",
+        id: "Wizard Training Scheme"
+    }],
+    id: "ABC123",
+    isSelectedForFunding: false,
+    providerVersionId: ""
+};
+
+function mockGetSpecification(spec: SpecificationSummary) {
+    const specService = jest.requireActual('../../../services/specificationService');
+    return {
+        ...specService,
+        getSpecificationSummaryService: jest.fn(() => Promise.resolve({
+            data: spec
+        }))
+    }
+}
+function mockGetJobs(jobResults: JobSummary[]) {
+    const jobService = jest.requireActual('../../../services/jobService');
+    return {
+        ...jobService,
+        getJobStatusUpdatesForSpecification: jest.fn(() => Promise.resolve({
+            data: jobResults
+        }))
+    }
+}
+
+const renderPage = () => {
+    const {FundingApprovalResults} = require('../../../pages/FundingApprovals/FundingApprovalResults');
+    return render(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
+};
 
 describe("<FundingApprovalResults />", () => {
-    it('will have the correct breadcrumbs', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(4);
+    beforeEach(() => {
+        mockGetSpecification(testSpec);
+        mockGetJobs([]);
     });
-
-    it('will have the correct Specifications title', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find("span.govuk-caption-xl").text()).toBe("Specification");
+    it('renders Specification loading', async () => {
+        const {getByTestId} = renderPage();
+        await waitFor(() => expect(getByTestId("loadingSpecification")).not.toBeNull());
     });
-
-    it('will have the correct Funding Period title for Funding Approval results', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find("span.govuk-caption-m").at(0).text()).toBe("Funding period");
-    });
-
-    it('will have the correct Funding Stream title for Funding Approval results', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find("span.govuk-caption-m").at(1).text()).toBe("Funding stream");
-    });
-
-    it('will have the correct Provider name title on the table', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find("table").at(0).find("tr").at(0).find("th").at(0).text()).toBe("Provider name");
-    });
-
-    it('will have the correct UKPRN name title on the table', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find("table").at(0).find("tr").at(0).find("th").at(1).text()).toBe("UKPRN");
-    });
-
-    it('will have the correct Status name title on the table', () => {
-        const wrapper = mount(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
-        expect(wrapper.find("table").at(0).find("tr").at(0).find("th").at(2).text()).toBe("Status");
+    it('renders job loading', async () => {
+        const {getByTestId} = renderPage();
+        await waitFor(() => expect(getByTestId("loadingJobs")).not.toBeNull());
     });
 });

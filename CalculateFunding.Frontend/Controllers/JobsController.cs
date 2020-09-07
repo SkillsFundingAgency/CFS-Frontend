@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.Jobs;
@@ -24,41 +27,28 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/jobs/{specificationId}/latest/{jobTypes}")]
-        public async Task<IActionResult> GetLatestJobForSpecification([FromRoute] string specificationId, [FromRoute] string jobTypes)
+        [Route("api/jobs/{specificationId}/{jobTypes}")]
+        public async Task<IActionResult> GetSpecificationJobs([FromRoute] string specificationId, [FromRoute] string jobTypes)
         {
             string[] jobTypesArray = jobTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            ApiResponse<JobSummary> latestJobTask = await _jobsApiClient.GetLatestJobForSpecification(specificationId, jobTypesArray);
+            ApiResponse<IEnumerable<JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypesArray);
 
-            IActionResult errorResult = latestJobTask.IsSuccessOrReturnFailureResult("JobSummary");
-            if (errorResult != null)
-            {
-                return BadRequest(errorResult);
-            }
-
-            JobSummaryViewModel jobSummaryViewModel = _mapper.Map<JobSummaryViewModel>(latestJobTask.Content);
-
-            return Ok(jobSummaryViewModel);
-        }
-
-        [HttpGet]
-        [Route("api/jobs/{specificationId}/last-updated/{jobTypes}")]
-        public async Task<IActionResult> GetJobLastUpdatedForSpecification([FromRoute] string specificationId, [FromRoute] string jobTypes)
-        {
-	        string[] jobTypesArray = jobTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
-
-            ApiResponse<JobSummary> latestJobTask = await _jobsApiClient.GetLatestJobForSpecification(specificationId, jobTypesArray);
-
-            IActionResult errorResult = latestJobTask.IsSuccessOrReturnFailureResult("JobSummary");
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary", treatNoContentAsSuccess: true);
+            
             if (errorResult != null)
             {
                 return errorResult;
             }
 
-            JobSummaryViewModel jobSummaryViewModel = _mapper.Map<JobSummaryViewModel>(latestJobTask.Content);
+            if (response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return Ok(jobTypesArray.Select(x => (string)null));
+            }
 
-            return Ok(jobSummaryViewModel.LastUpdatedFormatted);
+            IEnumerable<JobSummaryViewModel> jobs = _mapper.Map<IEnumerable<JobSummaryViewModel>>(response.Content);
+
+            return Ok(jobs);
         }
     }
 }

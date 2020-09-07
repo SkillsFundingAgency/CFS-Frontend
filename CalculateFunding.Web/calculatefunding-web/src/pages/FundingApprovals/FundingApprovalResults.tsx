@@ -3,7 +3,6 @@ import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {getPublishedProviderResultsService} from "../../services/publishedProviderService";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {PublishProviderSearchResultViewModel} from "../../types/PublishedProvider/PublishProviderSearchResultViewModel";
@@ -15,19 +14,23 @@ import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {SearchRequestViewModel} from "../../types/searchRequestViewModel";
 import {SearchMode} from "../../types/SearchMode";
-import {getLastUpdateJobForSpecificationService, getLatestJobForSpecificationService} from "../../services/jobService";
+import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {Link} from "react-router-dom";
 import {approveFundingService, refreshFundingService, releaseFundingService} from "../../services/publishService";
 import {getUserPermissionsService} from "../../services/userService";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
-import {JobMessage} from "../../types/jobMessage";
 import {BackButton} from "../../components/BackButton";
-import {NotificationSignal} from "../../signals/NotificationSignal";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {NoData} from "../../components/NoData";
 import {FacetValue} from "../../types/Facet";
 import {CollapsibleSearchBox} from "../../components/CollapsibleSearchBox";
 import {Footer} from "../../components/Footer";
+import {AxiosError} from "axios";
+import {DateFormatter} from "../../components/DateFormatter";
+import {HubConnectionBuilder} from "@microsoft/signalr";
+import {JobMessage} from "../../types/jobMessage";
+import {RunningStatus} from "../../types/RunningStatus";
+import {JobSummary} from "../../types/jobSummary";
 
 export interface FundingApprovalResultsRoute {
     fundingStreamId: string;
@@ -39,7 +42,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     const fundingStreamId = match.params.fundingStreamId;
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
-    const jobTypes = "RefreshFundingJob,ApproveFundingJob,PublishProviderFundingJob,ApproveFunding";
 
     const [publishedProviderResults, setPublishedProviderResults] = useState<PublishProviderSearchResultViewModel>({
         facets: [],
@@ -78,53 +80,20 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         facetCount: 0,
         fundingPeriodId: fundingPeriodId,
         errorToggle: ""
-    }
-    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
-
-        fundingStreams: [{
-            id: "",
-            name: ""
-        }],
-        fundingPeriod: {
-            name: "",
-            id: ""
-        },
-        name: "",
-        approvalStatus: "",
-        description: "",
-        isSelectedForFunding: false,
-        providerVersionId: "",
-        id: ""
-    });
-    const [latestRefresh, setLatestRefresh] = useState<string>("Unknown");
-    const [latestJob, setLatestJob] = useState<JobMessage>({
-        completionStatus: null,
-        invokerUserDisplayName: "",
-        invokerUserId: "",
-        itemCount: 0,
-        jobId: "",
-        jobType: "",
-        outcome: undefined,
-        overallItemsFailed: 0,
-        overallItemsProcessed: 0,
-        overallItemsSucceeded: 0,
-        parentJobId: 0,
-        runningStatus: "",
-        specificationId: "",
-        statusDateTime: "",
-        supersededByJobId: 0
-    });
-
-    const [tableIsLoading, setTableIsLoading] = useState<boolean>(true);
-
+    };
     const [searchCriteria, setSearchCriteria] = useState<SearchRequestViewModel>(initialSearch);
-    const [filterStatus, setFilterStatus] = useState<FacetValue[]>([])
-    const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([])
-    const [filterProviderSubType, setFilterProviderSubType] = useState<FacetValue[]>([])
-    const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([])
-
-    const [pageState, setPageState] = useState<string>("IDLE");
-    const [jobState, setJobState] = useState({jobStatus: "", jobMessage: "", jobSuggestion: ""});
+    const [isInitialisingJobMonitor, setIsInitialisingJobMonitor] = useState<boolean>(true);
+    const [isLoadingSpec, setIsLoadingSpec] = useState<boolean>(true);
+    const [isLoadingResults, setIsLoadingResults] = useState<boolean>(false);
+    const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
+    const [isConfirmingRelease, setConfirmRelease] = useState<boolean>(false);
+    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
+    const [latestJob, setLatestJob] = useState<JobSummary | undefined>({});
+    const [filterStatus, setFilterStatus] = useState<FacetValue[]>([]);
+    const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([]);
+    const [filterProviderSubType, setFilterProviderSubType] = useState<FacetValue[]>([]);
+    const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([]);
+    const [jobProgressMessage, setJobProgressMessage] = useState<string>("Checking for any jobs running");
     const [userPermissions, setUserPermissions] = useState<EffectiveSpecificationPermission>({
         canEditTemplates: false,
         canDeleteTemplates: false,
@@ -149,52 +118,138 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         canAdministerFundingStream: false
     });
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
+    const jobTypes = "RefreshFundingJob,ApproveAllProviderFundingJob,ApproveBatchProviderFundingJob,PublishBatchProviderFundingJob,PublishAllProviderFundingJob";
 
     useEffect(() => {
-        getPublishedProviderResults(searchCriteria);
-    }, [searchCriteria]);
-
-    useEffectOnce(() => {
         getUserPermissions();
 
-        getSpecificationSummaryService(specificationId).then((result) => {
-            setSpecificationSummary(result.data as SpecificationSummary);
-        });
+        getSpecificationSummaryService(specificationId)
+            .then((result) => setSpecificationSummary(result.data))
+            .finally(() => setIsLoadingSpec(false));
 
-        getLastUpdateJobForSpecificationService(specificationId).then((result) => {
-            if (result.status === 200) {
-                setLatestRefresh(result.data);
-            }
-        });
+        checkForExistingRunningJob();
 
-        getLatestJobForSpecificationService(specificationId, jobTypes).then((result) => {
-            if (result.status === 200) {
-                setLatestJob(result.data as JobMessage);
+    }, [specificationId]);
+
+    useEffect(() => {
+        if (isInitialisingJobMonitor) {
+            return;
+        }
+        if (latestJob === undefined || latestJob.runningStatus === RunningStatus.Completed) {
+            getPublishedProviderResults(searchCriteria);
+            populatePublishedProviderResultsService(searchCriteria);
+        }
+        if (latestJob && latestJob.runningStatus) {
+            switch (latestJob.jobType) {
+                case "RefreshFundingJob":
+                    setJobProgressMessage("Refreshing funding");
+                    break;
+                case "ApproveFunding":
+                    setJobProgressMessage("Approving funding");
+                    break;
+                case "PublishProviderFundingJob":
+                    setJobProgressMessage("Releasing funding");
+                    break;
+                case "ApproveAllProviderFundingJob":
+                    setJobProgressMessage("Approving all provider funding");
+                    break;
+                case "ApproveBatchProviderFundingJob":
+                    setJobProgressMessage("Approving batch provider funding");
+                    break;
+                case "PublishBatchProviderFundingJob":
+                    setJobProgressMessage("Publishing batch provider funding");
+                    break;
+                case "PublishAllProviderFundingJob":
+                    setJobProgressMessage("Publishing all provider funding");
+                    break;
+                default:
+                    setJobProgressMessage(latestJob.jobType ? latestJob.jobType : "");
+                    break;
             }
-        });
-    });
+        }
+    }, [searchCriteria, latestJob]);
+
+    async function checkForExistingRunningJob() {
+        getJobStatusUpdatesForSpecification(specificationId, jobTypes)
+            .then((result) => {
+                setIsInitialisingJobMonitor(false);
+                if (result.data && result.data.length > 0) {
+                    const runningJob = result.data.find((item) => item !== null && item.runningStatus !== RunningStatus.Completed);
+                    if (runningJob) {
+                        setLatestJob({
+                            jobId: runningJob.jobId,
+                            jobType: runningJob.jobType,
+                            completionStatus: runningJob.completionStatus,
+                            runningStatus: runningJob.runningStatus,
+                            lastUpdated: runningJob.lastUpdated
+                        });
+                    } else {
+                        setLatestJob(undefined);
+                    }
+                } else {
+                    setLatestJob(undefined);
+                }
+            })
+            .catch((error: AxiosError) => {
+                setLatestJob(undefined);
+            })
+            .finally(() => {
+                monitorSpecJobNotifications(specificationId);
+            });
+    }
+
+    async function monitorSpecJobNotifications(specId: string) {
+        const hubConnect = new HubConnectionBuilder()
+            .withUrl(`/api/notifications`)
+            .build();
+        try {
+            await hubConnect.start();
+            hubConnect.on('NotificationEvent', (job: JobMessage) => {
+                if (job && job.runningStatus && job.runningStatus !== RunningStatus.Completed) {
+                    setLatestJob({
+                        jobId: job.jobId,
+                        jobType: job.jobType,
+                        completionStatus: job.completionStatus,
+                        runningStatus: job.runningStatus as unknown as RunningStatus,
+                        lastUpdated: job.statusDateTime as unknown as Date
+                    });
+                } else {
+                    setLatestJob(undefined);
+                }
+            });
+            await hubConnect.invoke("StartWatchingForSpecificationNotifications", specId);
+        } catch (err) {
+            await hubConnect.stop();
+            // re-trigger job monitoring
+            await checkForExistingRunningJob();
+        }
+    }
 
     function getPublishedProviderResults(searchRequestViewModel: SearchRequestViewModel) {
-        setTableIsLoading(true);
-        getPublishedProviderResultsService(searchRequestViewModel).then((result) => {
-            const response = result.data as PublishProviderSearchResultViewModel;
-            setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
-            if (response.facets != null) {
-                if (response.facets.length > 0) {
-                    setFilterProviderType(response.facets[0].facetValues);
+        setIsLoadingResults(true);
+        getPublishedProviderResultsService(searchRequestViewModel)
+            .then((result) => {
+                setPublishedProviderResults(result.data);
+                if (result.data.facets != null) {
+                    result.data.facets.forEach((facet) => {
+                        switch (facet.name) {
+                            case "providerType":
+                                setFilterProviderType(facet.facetValues);
+                                break;
+                            case "providerSubType":
+                                setFilterProviderSubType(facet.facetValues);
+                                break;
+                            case "localAuthority":
+                                setFilterLocalAuthority(facet.facetValues);
+                                break;
+                            case "fundingStatus":
+                                setFilterStatus(facet.facetValues);
+                                break;
+                        }
+                    });
                 }
-                if (response.facets.length > 1) {
-                    setFilterProviderSubType(response.facets[1].facetValues);
-                }
-                if (response.facets.length > 2) {
-                    setFilterLocalAuthority(response.facets[2].facetValues)
-                }
-                if (response.facets.length > 3) {
-                    setFilterStatus(response.facets[3].facetValues)
-                }
-            }
-            setTableIsLoading(false);
-        });
+            })
+            .finally(() => setIsLoadingResults(false));
     }
 
     function pageChange(pageNumber: string) {
@@ -204,20 +259,16 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     }
 
     function populatePublishedProviderResultsService(criteria: SearchRequestViewModel) {
-        setTableIsLoading(true);
-        getPublishedProviderResultsService(criteria).then((result) => {
-            setPublishedProviderResults(result.data as PublishProviderSearchResultViewModel)
-            setTableIsLoading(false);
-        }).catch(()=>{
-            setTableIsLoading(false)
-        })
+        setIsLoadingResults(true);
+        getPublishedProviderResultsService(criteria)
+            .then((result) => setPublishedProviderResults(result.data))
+            .finally(() => setIsLoadingResults(false));
     }
 
     function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
         let filterUpdate = searchCriteria.localAuthority;
 
         if (e.target.checked) {
-
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
@@ -227,8 +278,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             return {...prevState, localAuthority: filterUpdate}
         });
 
-        let request = searchCriteria;
-        request.localAuthority = filterUpdate;
+        searchCriteria.localAuthority = filterUpdate;
 
         populatePublishedProviderResultsService(searchCriteria);
     }
@@ -237,7 +287,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         let filterUpdate = searchCriteria.status;
 
         if (e.target.checked) {
-
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
@@ -247,8 +296,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             return {...prevState, status: filterUpdate}
         });
 
-        let request = searchCriteria;
-        request.status = filterUpdate;
+        searchCriteria.status = filterUpdate;
 
         populatePublishedProviderResultsService(searchCriteria);
     }
@@ -257,7 +305,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         let filterUpdate = searchCriteria.providerType;
 
         if (e.target.checked) {
-
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
@@ -267,8 +314,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             return {...prevState, providerType: filterUpdate}
         });
 
-        let request = searchCriteria;
-        request.providerType = filterUpdate;
+        searchCriteria.providerType = filterUpdate;
 
         populatePublishedProviderResultsService(searchCriteria);
     }
@@ -277,7 +323,6 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         let filterUpdate = searchCriteria.providerSubType;
 
         if (e.target.checked) {
-
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
@@ -287,8 +332,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             return {...prevState, providerSubType: filterUpdate}
         });
 
-        let request = searchCriteria;
-        request.providerSubType = filterUpdate;
+        searchCriteria.providerSubType = filterUpdate;
 
         populatePublishedProviderResultsService(searchCriteria);
     }
@@ -304,253 +348,268 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         }
     }
 
-    function refreshFunding() {
-        setPageState("REFRESH_FUNDING");
+    function handleRefreshFunding() {
         refreshFundingService(specificationId)
-    };
-
-    function approveFunding() {
-        setPageState("APPROVE_FUNDING");
-    };
-
-    function releaseFunding() {
-        setPageState("PUBLISH_FUNDING");
-    };
-
-    function confirmApproveFunding() {
-        setPageState("APPROVE_FUNDING_JOB");
-        approveFundingService(specificationId);
-    };
-
-    function confirmReleaseFunding() {
-        setPageState("RELEASE_FUNDING_JOB");
-        releaseFundingService(specificationId);
-    };
-
-    function refreshProviderResults(status: string, message: string, suggestion: string) {
-        setSearchCriteria(initialSearch);
-        populatePublishedProviderResultsService(initialSearch);
-        setPageState("IDLE");
-        setJobState({jobStatus: status, jobMessage: message, jobSuggestion: suggestion})
-    };
-
-    function dismissLoader() {
-        setPageState("IDLE");
-    };
-
-    function getUserPermissions() {
-        getUserPermissionsService(specificationId).then((result) => {
-            const specificationPermissions = result.data as EffectiveSpecificationPermission;
-            setUserPermissions(specificationPermissions);
-            if (!specificationPermissions.canApproveFunding) {
-                if (!missingPermissions.find(x => x === "approve")) {
-                    setMissingPermissions(prevState => [...prevState, "approve"]);
-                }
-            }
-            if (!specificationPermissions.canReleaseFunding) {
-                if (!missingPermissions.find(x => x === "release")) {
-                    setMissingPermissions(prevState => [...prevState, "release"]);
-                }
-            }
-            if (!specificationPermissions.canRefreshFunding) {
-                if (!missingPermissions.find(x => x === "refresh")) {
-                    setMissingPermissions(prevState => [...prevState, "refresh"]);
-                }
-            }
-        });
     }
 
+    function handleApprove() {
+        setConfirmApproval(true);
+    }
+
+    function handleBack() {
+        setConfirmApproval(false);
+        setConfirmRelease(false);
+    }
+
+    function handleRelease() {
+        setConfirmRelease(true);
+    }
+
+    function handleConfirmApprove() {
+        approveFundingService(specificationId);
+    }
+
+    function handleConfirmRelease() {
+        releaseFundingService(specificationId);
+    }
+
+    function getUserPermissions() {
+        getUserPermissionsService(specificationId)
+            .then((result) => {
+                setUserPermissions(result.data);
+                if (!result.data.canApproveFunding) {
+                    if (!missingPermissions.find(x => x === "approve")) {
+                        setMissingPermissions(prevState => [...prevState, "approve"]);
+                    }
+                }
+                if (!result.data.canReleaseFunding) {
+                    if (!missingPermissions.find(x => x === "release")) {
+                        setMissingPermissions(prevState => [...prevState, "release"]);
+                    }
+                }
+                if (!result.data.canRefreshFunding) {
+                    if (!missingPermissions.find(x => x === "refresh")) {
+                        setMissingPermissions(prevState => [...prevState, "refresh"]);
+                    }
+                }
+            });
+    }
+
+    const isJobRunning = latestJob && (!latestJob.runningStatus || latestJob.runningStatus && latestJob.runningStatus !== RunningStatus.Completed);
+    const haveResults = !isLoadingResults && publishedProviderResults.providers && publishedProviderResults.providers.length > 0;
 
     return <div>
         <Header location={Section.Approvals}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Funding approvals"} url={"/Approvals"}/>
                 <Breadcrumb name={"Select specification"} url={"/ViewFunding"}/>
                 <Breadcrumb name={"Funding approval results"}/>
             </Breadcrumbs>
             <PermissionStatus requiredPermissions={missingPermissions}/>
-            <LoadingStatus title={`${latestJob.jobType} of funding in progress`}
-                           subTitle={"Please wait, this could take several minutes"}
-                           hidden={latestJob.runningStatus === 'Completed' || latestJob.runningStatus === ''}/>
-            <div className="govuk-grid-row govuk-!-margin-bottom-5"
-                 hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-padding-top-5">
                 <div className="govuk-grid-column-two-thirds">
-                    <span className="govuk-caption-xl">Specification</span>
-                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{specificationSummary.name}</h1>
-                    <span className="govuk-caption-m">Funding period</span>
-                    <h1 className="govuk-heading-m">{specificationSummary.fundingPeriod.name}</h1>
-                    <span className="govuk-caption-m">Funding stream</span>
-                    <h1 className="govuk-heading-m">{specificationSummary.fundingStreams[0].name}</h1>
+                    {isLoadingSpec &&
+                    <LoadingStatus title={`Loading specification`} testid='loadingSpecification'/>
+                    }
+                    {!isLoadingSpec && specificationSummary &&
+                    <>
+                        <span className="govuk-caption-xl">Specification</span>
+                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-2" data-testid="specName">{specificationSummary.name}</h1>
+                        <span className="govuk-caption-m">Funding period</span>
+                        <h1 className="govuk-heading-m" data-testid="fundingPeriodName">{specificationSummary.fundingPeriod.name}</h1>
+                        <span className="govuk-caption-m">Funding stream</span>
+                        <h1 className="govuk-heading-m" data-testid="fundingStreamName">{specificationSummary.fundingStreams[0].name}</h1>
+                    </>
+                    }
                 </div>
             </div>
-            <div className="govuk-grid-row "
-                 hidden={pageState !== "IDLE" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '') ||
-                 (publishedProviderResults.providers == null || publishedProviderResults.providers.length === 0)}>
+
+            {isJobRunning &&
+            <LoadingStatus title={`Job running: ${jobProgressMessage} `} subTitle={"Please wait, this could take several minutes"} testid='loadingJobs'/>
+            }
+
+            {!isJobRunning && !isConfirmingApproval && !isConfirmingRelease &&
+            <div className="govuk-grid-row ">
                 <div className="govuk-grid-column-one-third">
-                    <CollapsiblePanel title={"Search"} expanded={true}>
-                        <fieldset className="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
-                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading">
-                                <h4 className="govuk-heading-s">Search</h4>
-                            </legend>
-                            <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span">
+                    {(!publishedProviderResults.providers || publishedProviderResults.providers.length === 0) &&
+                    <LoadingStatus title={`Loading filters`} testid='loadingFilters'/>
+                    }
+                    {publishedProviderResults.providers && publishedProviderResults.providers.length > 0 &&
+                    <>
+                        <CollapsiblePanel title={"Search"} expanded={true}>
+                            <fieldset className="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
+                                <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading">
+                                    <h4 className="govuk-heading-s">Search</h4>
+                                </legend>
+                                <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span">
                                 Select one option.
                             </span>
-                            <CollapsibleSearchBox searchTerm={""} callback={filterByText} />
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by provider type"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label">Search</label>
-                                {/*<input className="govuk-input" type="text"*/}
-                                {/*       onChange={(e) => searchStatus(e)}/>*/}
-                            </div>
-                            <div className="govuk-checkboxes">
-                                {filterProviderType.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               id={`providerType-${s.name}`}
-                                               name={`providerType-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByProviderType(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`providerType-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by provider sub type"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-form-group">
-                                <label className="govuk-label">Search</label>
-                                {/*<input className="govuk-input" type="text"*/}
-                                {/*       onChange={(e) => searchStatus(e)}/>*/}
-                            </div>
-                            <div className="govuk-checkboxes">
-                                {filterProviderSubType.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               id={`providerType-${s.name}`}
-                                               name={`providerType-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByProviderSubType(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`providerType-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by status"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-checkboxes">
-                                {filterStatus.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               id={`fundingPeriods-${s.name}`}
-                                               name={`fundingPeriods-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByStatus(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`fundingPeriods-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
-                    <CollapsiblePanel title={"Filter by local authority"} expanded={true}>
-                        <fieldset className="govuk-fieldset">
-                            <div className="govuk-checkboxes">
-                                {filterLocalAuthority.map((s, index) =>
-                                    <div key={index} className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input"
-                                               id={`localAuthority-${s.name}`}
-                                               name={`localAuthority-${s.name}`}
-                                               type="checkbox" value={s.name}
-                                               onChange={(e) => filterByLocalAuthority(e)}/>
-                                        <label className="govuk-label govuk-checkboxes__label"
-                                               htmlFor={`localAuthority-${s.name}`}>
-                                            {s.name}
-                                        </label>
-                                    </div>)
-                                }
-                            </div>
-                        </fieldset>
-                    </CollapsiblePanel>
+                                <CollapsibleSearchBox searchTerm={""} callback={filterByText}/>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by provider type"} expanded={filterProviderType.length > 0}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-form-group">
+                                    <label className="govuk-label">Search</label>
+                                </div>
+                                <div className="govuk-checkboxes">
+                                    {filterProviderType.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   id={`providerType-${s.name}`}
+                                                   name={`providerType-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={filterByProviderType}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`providerType-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by provider sub type"} expanded={filterProviderSubType.length > 0}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-form-group">
+                                    <label className="govuk-label">Search</label>
+                                </div>
+                                <div className="govuk-checkboxes">
+                                    {filterProviderSubType.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   id={`providerType-${s.name}`}
+                                                   name={`providerType-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={filterByProviderSubType}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`providerType-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by status"} expanded={filterStatus.length > 0}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-checkboxes">
+                                    {filterStatus.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   id={`fundingPeriods-${s.name}`}
+                                                   name={`fundingPeriods-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={filterByStatus}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`fundingPeriods-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                        <CollapsiblePanel title={"Filter by local authority"} expanded={filterLocalAuthority.length > 0}>
+                            <fieldset className="govuk-fieldset">
+                                <div className="govuk-checkboxes">
+                                    {filterLocalAuthority.map((s, index) =>
+                                        <div key={index} className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   id={`localAuthority-${s.name}`}
+                                                   name={`localAuthority-${s.name}`}
+                                                   type="checkbox" value={s.name}
+                                                   onChange={filterByLocalAuthority}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor={`localAuthority-${s.name}`}>
+                                                {s.name}
+                                            </label>
+                                        </div>)
+                                    }
+                                </div>
+                            </fieldset>
+                        </CollapsiblePanel>
+                    </>
+                    }
                 </div>
                 <div className="govuk-grid-column-two-thirds">
-                    <LoadingStatus title={"Loading published provider data"} hidden={!tableIsLoading}/>
-                    <NoData hidden={publishedProviderResults.providers.length > 0 || tableIsLoading} />
-                    <table className="govuk-table" hidden={tableIsLoading}>
-                        <thead>
-                        <tr>
-                            <th className="govuk-table__header govuk-body">Provider name</th>
-                            <th className="govuk-table__header govuk-body">UKPRN</th>
-                            <th className="govuk-table__header govuk-body">Status</th>
-                            <th className="govuk-table__header govuk-body">
-                                Funding total<br/>
-                                <FormattedNumber value={publishedProviderResults.totalFundingAmount}
-                                                 type={NumberType.FormattedMoney}/><br/>
-                                <p className="govuk-body-s">of filtered providers</p>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {publishedProviderResults.providers.map(ppr =>
-                            <tr key={ppr.id}>
-                                <td className="govuk-table__cell govuk-body">
-                                    <Link
-                                        to={`/FundingApprovals/ProviderFundingOverview/${ppr.specificationId}/${ppr.ukprn}/${specificationSummary.providerVersionId}`}>{ppr.providerName}</Link>
-                                </td>
-                                <td className="govuk-table__cell govuk-body">{ppr.ukprn}</td>
-                                <td className="govuk-table__cell govuk-body">{ppr.fundingStatus}</td>
-                                <td className="govuk-table__cell govuk-body">
-                                    <FormattedNumber value={ppr.fundingValue}
-                                                     type={NumberType.FormattedMoney} decimalPoint={2}/>
-                                </td>
+                    {isLoadingResults &&
+                    <LoadingStatus title={"Loading funding data"}/>
+                    }
+                    {!isLoadingResults &&
+                    <>
+                        <NoData hidden={publishedProviderResults.providers.length > 0}/>
+                        {publishedProviderResults.providers.length > 0 &&
+                        <table className="govuk-table">
+                            <thead>
+                            <tr>
+                                <th className="govuk-table__header govuk-body">Provider name</th>
+                                <th className="govuk-table__header govuk-body">UKPRN</th>
+                                <th className="govuk-table__header govuk-body">Status</th>
+                                <th className="govuk-table__header govuk-body">
+                                    Funding total<br/>
+                                    <FormattedNumber value={publishedProviderResults.totalFundingAmount}
+                                                     type={NumberType.FormattedMoney}/><br/>
+                                    <p className="govuk-body-s">of filtered providers</p>
+                                </th>
                             </tr>
-                        )}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                            {specificationSummary && publishedProviderResults.providers.map(ppr =>
+                                <tr key={ppr.id}>
+                                    <td className="govuk-table__cell govuk-body">
+                                        <Link
+                                            to={`/FundingApprovals/ProviderFundingOverview/${ppr.specificationId}/${ppr.ukprn}/${specificationSummary.providerVersionId}`}>{ppr.providerName}</Link>
+                                    </td>
+                                    <td className="govuk-table__cell govuk-body">{ppr.ukprn}</td>
+                                    <td className="govuk-table__cell govuk-body">{ppr.fundingStatus}</td>
+                                    <td className="govuk-table__cell govuk-body">
+                                        <FormattedNumber value={ppr.fundingValue} type={NumberType.FormattedMoney} decimalPoint={2}/>
+                                    </td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                        }
+                    </>
+                    }
                     <BackToTop id="top"/>
                     {publishedProviderResults.totalResults > 0 &&
-                    <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
-                         aria-label="Pagination">
-                        <div
-                            className="pagination__summary">Showing {publishedProviderResults.startItemNumber} - {publishedProviderResults.endItemNumber} of {publishedProviderResults.totalResults} results
+                    <>
+                        <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
+                             aria-label="Pagination">
+                            <div
+                                className="pagination__summary">Showing {publishedProviderResults.startItemNumber} - {publishedProviderResults.endItemNumber} of {publishedProviderResults.totalResults} results
+                            </div>
+                            <Pagination callback={pageChange}
+                                        currentPage={publishedProviderResults.pagerState.currentPage}
+                                        lastPage={publishedProviderResults.pagerState.lastPage}/>
+                        </nav>
+                        <div className="right-align">
+                            <button className="govuk-button govuk-!-margin-right-1"
+                                    disabled={!userPermissions.canRefreshFunding}
+                                    onClick={handleRefreshFunding}>Refresh funding
+                            </button>
+                            <button className="govuk-button govuk-!-margin-right-1"
+                                    disabled={!publishedProviderResults.canApprove || !userPermissions.canApproveFunding}
+                                    onClick={handleApprove}>Approve funding
+                            </button>
+                            <button className="govuk-button govuk-button--warning"
+                                    disabled={!publishedProviderResults.canPublish || !userPermissions.canReleaseFunding}
+                                    onClick={handleRelease}>Release funding
+                            </button>
+                            {latestJob && latestJob.lastUpdated &&
+                            <p className="govuk-body">Last refresh on: <DateFormatter date={latestJob.lastUpdated} utc={false}/></p>}
                         </div>
-                        <Pagination callback={pageChange} currentPage={publishedProviderResults.pagerState.currentPage}
-                                    lastPage={publishedProviderResults.pagerState.lastPage}/>
-                    </nav>}
-                    <div className="right-align">
-                        <button className="govuk-button govuk-!-margin-right-1"
-                                disabled={!publishedProviderResults.canApprove || !userPermissions.canApproveFunding}
-                                onClick={() => approveFunding()}>Approve
-                        </button>
-                        <button className="govuk-button govuk-!-margin-right-1"
-                                disabled={!publishedProviderResults.canPublish || !userPermissions.canReleaseFunding}
-                                onClick={() => releaseFunding()}>Release
-                        </button>
-                        <button className="govuk-button"
-                                disabled={!userPermissions.canRefreshFunding}
-                                onClick={() => refreshFunding()}>Refresh
-                            funding
-                        </button>
-                        <p className="govuk-body">Last refresh on: {latestRefresh}</p>
-                    </div>
+                    </>
+                    }
                 </div>
             </div>
-            <div className="govuk-grid-row"
-                 hidden={(publishedProviderResults.providers != null && publishedProviderResults.providers.length > 0) || tableIsLoading}>
+            }
+
+            {!isJobRunning && !isConfirmingApproval && !isConfirmingRelease && !isLoadingResults && !haveResults &&
+            <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <div className="govuk-warning-text">
                         <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
@@ -562,23 +621,15 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     </div>
                 </div>
             </div>
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
-                 hidden={pageState !== "REFRESH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
-                <BackButton name="Back" callback={dismissLoader}/>
-                <NotificationSignal jobType="RefreshFundingJob"
-                                    jobId={pageState === "REFRESH_FUNDING" ? specificationId : ""}
-                                    message="Waiting to refresh funding"
-                                    callback={refreshProviderResults}/>
-            </div>
+            }
 
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
-                 hidden={pageState !== "APPROVE_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            {!isLoadingResults && isConfirmingApproval && !isConfirmingRelease && specificationSummary &&
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <BackButton name="Back" callback={dismissLoader}/>
+                        <BackButton name="Back" callback={handleBack}/>
                     </div>
                 </div>
-
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
                         <table className="govuk-table">
@@ -649,18 +700,27 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                 </div>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <button className="govuk-button" data-module="govuk-button"
-                                onClick={() => confirmApproveFunding()}>Confirm Approval
+                        <button data-prevent-double-click="true"
+                                className="govuk-button govuk-!-margin-right-1"
+                                data-module="govuk-button"
+                                onClick={handleConfirmApprove}>
+                            Confirm approval
+                        </button>
+                        <button className="govuk-button govuk-button--secondary"
+                                data-module="govuk-button"
+                                onClick={handleBack}>
+                            Cancel
                         </button>
                     </div>
                 </div>
             </div>
+            }
 
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
-                 hidden={pageState !== "PUBLISH_FUNDING" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
+            {!isLoadingResults && isConfirmingRelease && specificationSummary &&
+            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <BackButton name="Back" callback={dismissLoader}/>
+                        <BackButton name="Back" callback={handleBack}/>
                     </div>
                 </div>
                 <div className="govuk-grid-row">
@@ -705,9 +765,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                             </tr>
                             <tr className="govuk-table__row">
                                 <td className="govuk-table__header">Funding Stream</td>
-                                <td className="govuk-table__cell">{specificationSummary.fundingStreams.map(stream =>
-                                    stream.name
-                                )}</td>
+                                <td className="govuk-table__cell">{specificationSummary.fundingStreams.map(stream => stream.name)}</td>
                                 <td className="govuk-table__cell"></td>
                             </tr>
                             </tbody>
@@ -731,33 +789,25 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                         </table>
                     </div>
                 </div>
+                {!isLoadingResults && haveResults &&
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <button className="govuk-button" data-module="govuk-button"
-                                onClick={() => confirmReleaseFunding()}>Confirm Release
+                        <button data-prevent-double-click="true"
+                                className="govuk-button govuk-!-margin-right-1"
+                                data-module="govuk-button"
+                                onClick={handleConfirmRelease}>
+                            Confirm release
                         </button>
-
+                        <button className="govuk-button govuk-button--secondary"
+                                data-module="govuk-button"
+                                onClick={handleBack}>
+                            Cancel
+                        </button>
                     </div>
                 </div>
+                }
             </div>
-
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
-                 hidden={pageState !== "APPROVE_FUNDING_JOB" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
-                <BackButton name="Back" callback={dismissLoader}/>
-                <NotificationSignal jobType="ApproveFunding"
-                                    jobId={pageState === "APPROVE_FUNDING_JOB" ? specificationId : ""}
-                                    message="Waiting to approve funding"
-                                    callback={refreshProviderResults}/>
-            </div>
-
-            <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1"
-                 hidden={pageState !== "RELEASE_FUNDING_JOB" || (latestJob.runningStatus !== 'Completed' && latestJob.runningStatus !== '')}>
-                <BackButton name="Back" callback={dismissLoader}/>
-                <NotificationSignal jobType="PublishProviderFundingJob"
-                                    jobId={pageState === "RELEASE_FUNDING_JOB" ? specificationId : ""}
-                                    message="Waiting to release funding"
-                                    callback={refreshProviderResults}/>
-            </div>
+            }
         </div>
         <Footer/>
     </div>

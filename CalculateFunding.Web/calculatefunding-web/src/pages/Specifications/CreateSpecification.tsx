@@ -1,10 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
-import {
-    createSpecificationService,
-    getFundingPeriodsByFundingStreamIdService
-} from "../../services/specificationService";
+import {createSpecificationService, getFundingPeriodsByFundingStreamIdService} from "../../services/specificationService";
 import {
     getDefaultTemplateVersionService,
     getFundingStreamsService,
@@ -28,7 +25,8 @@ import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import {ErrorMessage} from "../../types/ErrorMessage";
 import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
-import {FundingStructureType} from "../../types/FundingStructureItem";
+import {CompletionStatus} from "../../types/CompletionStatus";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export function CreateSpecification() {
     const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
@@ -172,13 +170,13 @@ export function CreateSpecification() {
 
                 hubConnect.on('NotificationEvent', (message: JobMessage) => {
                     if (message.jobType === "AssignTemplateCalculationsJob" &&
-                        message.runningStatus === "Completed" &&
+                        message.runningStatus === RunningStatus.Completed &&
                         message.specificationId === newSpecificationId) {
                         setIsLoading(false);
                         hubConnect.invoke("StopWatchingForAllNotifications").then(() => {
                             hubConnect.stop();
                         });
-                        if (message.completionStatus !== "Succeeded") {
+                        if (message.completionStatus !== CompletionStatus.Succeeded) {
                             addErrorMessage(message.outcome);
                         } else {
                             history.push(`/ViewSpecification/${newSpecificationId}`);

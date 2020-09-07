@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {CompletionStatus, JobSummary, RunningStatus} from "../types/jobSummary";
+import {JobSummary} from "../types/jobSummary";
 import {DateFormatter} from "./DateFormatter";
+import {RunningStatus} from "../types/RunningStatus";
+import {CompletionStatus} from "../types/CompletionStatus";
 
 export function JobSummaryDetails(props: {jobSummary: JobSummary, hidden?:boolean}) {
     const [jobSummary, setJobSummary] = useState(props.jobSummary);
@@ -8,15 +10,15 @@ export function JobSummaryDetails(props: {jobSummary: JobSummary, hidden?:boolea
     const [jobSummaryColour, setJobSummaryColour] = useState("");
     useEffect(() => {
         setJobSummary(props.jobSummary);
-        if (props.jobSummary.runningStatus.toString().toLowerCase() === RunningStatus[RunningStatus.completed]) {
+        if (props.jobSummary.runningStatus === RunningStatus.Completed) {
             setJobSummaryTitle("Calculation completed successfully");
             setJobSummaryColour("govuk-error-summary govuk-error-summary-green");
         }
-        if (props.jobSummary.completionStatus == null || props.jobSummary.runningStatus.toString().toLowerCase() === RunningStatus[RunningStatus.inProgress]) {
+        if (!props.jobSummary.completionStatus || props.jobSummary.runningStatus === RunningStatus.InProgress) {
             setJobSummaryTitle("Calculation in progress");
             setJobSummaryColour("govuk-error-summary govuk-error-summary-orange");
         }
-        if (props.jobSummary.completionStatus != null && props.jobSummary.completionStatus.toString().toLowerCase() === CompletionStatus[CompletionStatus.failed]) {
+        if (props.jobSummary.completionStatus && props.jobSummary.completionStatus === CompletionStatus.Failed) {
             setJobSummaryTitle("Calculation failed");
             setJobSummaryColour("govuk-error-summary");
         }
@@ -34,12 +36,12 @@ export function JobSummaryDetails(props: {jobSummary: JobSummary, hidden?:boolea
                 <li>
                     <p className="govuk-body">
                         Calculation initiated by&nbsp;{jobSummary.invokerUserDisplayName}&nbsp;on&nbsp;<DateFormatter
-                        date={jobSummary.created} utc={true}/>
+                        date={jobSummary.created as Date} utc={true}/>
                     </p>
                 </li>
-                <li hidden={jobSummary.completionStatus == null || jobSummary.runningStatus === RunningStatus.inProgress}>
+                <li hidden={jobSummary.completionStatus == null || jobSummary.runningStatus === RunningStatus.InProgress}>
                     <p className="govuk-body-s"><strong>Results updated:</strong> <DateFormatter
-                        date={jobSummary.lastUpdated} utc={true}/></p>
+                        date={jobSummary.lastUpdated as Date} utc={true}/></p>
                 </li>
             </ul>
         </div>

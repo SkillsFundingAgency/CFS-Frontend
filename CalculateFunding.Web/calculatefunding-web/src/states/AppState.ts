@@ -1,5 +1,4 @@
 import {IFundingLineStructureState} from "./IFundingLineStructureState";
-import {IViewFundingState} from "./IViewFundingState";
 import {ViewSpecificationResultsState} from "./ViewSpecificationResultsState";
 import {ViewSpecificationState} from "./ViewSpecificationState";
 import {ViewCalculationState} from "./ViewCalculationState";
@@ -13,7 +12,6 @@ import {IUserState} from "./IUserState";
 export interface AppState {
     selectSpecification: SelectSpecificationState,
     user: IUserState,
-    viewFunding: IViewFundingState,
     fundingLineStructure: IFundingLineStructureState
     viewSpecificationResults: ViewSpecificationResultsState,
     viewSpecification: ViewSpecificationState,

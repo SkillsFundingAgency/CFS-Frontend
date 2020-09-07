@@ -22,7 +22,6 @@ export async function saveReleaseTimetableForSpecificationService(saveReleaseTim
     });
 }
 
-
 export async function refreshFundingService(specificationId: string) {
     return axios(`${baseUrl}/refreshfunding/${specificationId}`, {
         method: 'GET',
@@ -30,7 +29,7 @@ export async function refreshFundingService(specificationId: string) {
             'Content-Type': 'application/json'
         }
     });
-};
+}
 
 export async function approveFundingService(specificationId: string) {
 
@@ -41,7 +40,7 @@ export async function approveFundingService(specificationId: string) {
         }
     });
 
-};
+}
 
 export async function releaseFundingService(specificationId: string){
         return axios(`${baseUrl}/publishfunding/${specificationId}`, {
@@ -50,7 +49,7 @@ export async function releaseFundingService(specificationId: string){
                 'Content-Type': 'application/json'
             }
         });
-};
+}
 
 export async function getProfileHistoryService(fundingStreamId:string, fundingPeriodId:string, providerId:string) {
     return axios(`/api/publish/get-profile-history/${fundingStreamId}/${fundingPeriodId}/${providerId}`, {

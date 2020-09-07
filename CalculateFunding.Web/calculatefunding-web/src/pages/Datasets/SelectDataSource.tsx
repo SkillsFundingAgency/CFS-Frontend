@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {HubConnectionBuilder, HubConnection} from "@microsoft/signalr";
+import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../../types/jobMessage";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
@@ -18,7 +18,9 @@ import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificati
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {MappingStatus} from "../../components/MappingStatus";
-import {getLatestJobForSpecificationService} from "../../services/jobService";
+import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
+import {JobSummary} from "../../types/jobSummary";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
@@ -69,7 +71,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
     const [isInitiating, setIsInitiating] = useState<boolean>(false);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
-    const [jobMessage, setJobMessage] = useState<JobMessage>();
+    const [jobMessage, setJobMessage] = useState<JobSummary | JobMessage>();
     let history = useHistory();
 
     useEffect(() => {
@@ -94,14 +96,15 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     useEffect(() => {
         const retrieveLatestJobSpecification = async (specificationId: string) => {
             try {
-                const latestJobResponse = await getLatestJobForSpecificationService(specificationId, "MapDatasetJob");
-                const latestJob = latestJobResponse.data as JobMessage;
-                setJobMessage(latestJob);
+                const latestJobResponse = await getJobStatusUpdatesForSpecification(specificationId, "MapDatasetJob");
+                if (latestJobResponse.data && latestJobResponse.data.length > 0) {
+                    setJobMessage(latestJobResponse.data[0]);
+                }
             }
             catch (err) {
                 // API returns a 400 if no job exists so ignore
             }
-        }
+        };
 
         let hubConnect: HubConnection;
 
@@ -121,7 +124,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         message.specificationId === datasourceVersions.specificationId) {
                         setIsInitiating(false);
                         setJobMessage(message);
-                        if (message.runningStatus !== "Completed") {
+                        if (message.runningStatus !== RunningStatus.Completed) {
                             setIsAssigning(true);
                         } else {
                             setIsAssigning(false);

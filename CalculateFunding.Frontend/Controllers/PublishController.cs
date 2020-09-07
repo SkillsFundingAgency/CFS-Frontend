@@ -253,6 +253,17 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<JobCreationResponse> result =
                 await _publishingApiClient.RefreshFundingForSpecification(specificationId);
 
+            var errorResult = result.IsSuccessOrReturnFailureResult("Refresh Funding");
+            if (errorResult != null)
+            {
+                if (result.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    return BadRequest(result.ModelState);
+                }
+
+                return errorResult;
+            }
+
             if (result.Content.JobId != null)
             {
                 return Ok(result.Content.JobId);

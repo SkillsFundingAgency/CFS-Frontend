@@ -1,18 +1,10 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
+import {JobSummary} from "../types/jobSummary";
 
 let baseURL = "/api/jobs";
 
-export async function getLatestJobForSpecificationService(specificationId: string, jobTypes: string) {
-    return axios(`${baseURL}/${specificationId}/latest/${jobTypes}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
-}
-export async function getLastUpdateJobForSpecificationService(specificationId: string) {
-    const jobTypes = "RefreshFundingJob";
-    return axios(`${baseURL}/${specificationId}/last-updated/${jobTypes}`, {
+export async function getJobStatusUpdatesForSpecification(specificationId: string, jobTypes: string): Promise<AxiosResponse<JobSummary[]>> {
+    return axios(`${baseURL}/${specificationId}/${jobTypes}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

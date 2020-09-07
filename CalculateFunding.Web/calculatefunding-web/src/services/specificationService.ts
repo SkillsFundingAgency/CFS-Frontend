@@ -1,16 +1,15 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
-import {
-    CreateSpecificationViewModel
-} from "../types/Specifications/CreateSpecificationViewModel";
+import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecificationViewModel";
 import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
+import {SpecificationSummary} from "../types/SpecificationSummary";
 
 let baseURL = "/api/specs";
 
-export async function getSpecificationSummaryService(specificationId: string) {
+export async function getSpecificationSummaryService(specificationId: string): Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/specification-summary-by-id/${specificationId}`, {
         method: 'GET',
         headers: {

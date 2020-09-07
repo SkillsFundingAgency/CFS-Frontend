@@ -1,6 +1,5 @@
 import {IUserState} from "../states/IUserState";
 import {IFundingLineStructureState} from "../states/IFundingLineStructureState";
-import {IViewFundingState} from "../states/IViewFundingState";
 import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {ViewCalculationState} from "../states/ViewCalculationState";
@@ -8,7 +7,6 @@ import {combineReducers, Reducer} from "redux";
 import {reduceUserState} from "./userReducer";
 import {reduceFundingLineStructureState} from "./fundingLineStructureReducer";
 import {reduceViewSpecificationState} from "./viewSpecificationReducer";
-import {reduceViewFundingState} from "./viewFundingReducer";
 import {reduceViewSpecificationResultsState} from "./viewSpecificationResultsReducer";
 import {reduceSelectSpecificationState} from "./selectSpecificationReducer";
 import {SelectSpecificationState} from "../states/SelectSpecificationState";
@@ -20,7 +18,6 @@ import {DatasetState} from "../states/DatasetState";
 import {FeatureFlagsState} from "../states/FeatureFlagsState";
 import {reduceFeatureFlagsState} from "./featureFlagsReducer";
 import {FundingLineStructureAction} from "../actions/FundingLineStructureAction";
-import {ViewFundingAction} from "../actions/viewFundingAction";
 import {ViewSpecificationResultsActions} from "../actions/ViewSpecificationResultsActions";
 import {SelectSpecificationActions} from "../actions/SelectSpecificationActions";
 import {ViewCalculationResultsActions} from "../actions/ViewCalculationResultsActions";
@@ -39,7 +36,6 @@ import {
 export interface IStoreState {
     userState: IUserState,
     fundingLineStructureState: IFundingLineStructureState,
-    viewFundingState: IViewFundingState,
     viewSpecificationResults: ViewSpecificationResultsState,
     viewSpecification: ViewSpecificationState,
     viewCalculationResults: ViewCalculationState
@@ -55,7 +51,6 @@ export type Actions =
     IUpdateUserConfirmedSkillsAction |
     IFundingStreamPermissionsAction |
     FundingLineStructureAction |
-    ViewFundingAction |
     ViewSpecificationResultsActions |
     ViewSpecificationsActions |
     SelectSpecificationActions |
@@ -69,7 +64,6 @@ export const rootReducer: Reducer<IStoreState, Actions> =
     combineReducers({
         userState: reduceUserState,
         fundingLineStructureState: reduceFundingLineStructureState,
-        viewFundingState: reduceViewFundingState,
         viewSpecificationResults: reduceViewSpecificationResultsState,
         viewSpecification: reduceViewSpecificationState,
         selectSpecification: reduceSelectSpecificationState,
