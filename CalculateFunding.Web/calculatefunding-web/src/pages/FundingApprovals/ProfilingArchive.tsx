@@ -119,7 +119,7 @@ export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRo
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Funding Approvals"} url={"/approvals"} legacy={true}/>
+                <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"} />
                 <Breadcrumb name={"Select specification"} url={"/Approvals/FundingApprovalSelection"}/>
                 <Breadcrumb name={"Funding approval results"} goBack={true}/>
                 <Breadcrumb name={"Provider funding overview"} />

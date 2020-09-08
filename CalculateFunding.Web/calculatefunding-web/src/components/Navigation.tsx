@@ -46,7 +46,7 @@ export class Navigation extends React.Component<INavigationLevel, {}> {
                        data-topnav="Community">View results</a>
                 </li>
                 <li className={this.props.currentNavigationLevel === NavigationLevel.FundingApproval ? (normalStyle + activeStyle) : (normalStyle)}>
-                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/approvals"
+                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/app/viewfunding"
                        data-topnav="Community">Funding approvals</a>
                 </li>
                 <li className={this.props.currentNavigationLevel === NavigationLevel.Templates ? (normalStyle + activeStyle) : (normalStyle)}>

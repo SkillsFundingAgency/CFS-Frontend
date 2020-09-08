@@ -45,7 +45,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Funding Approvals"} url={"/approvals"} legacy={true}/>
+                <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"} />
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
                 <Breadcrumb name={"Funding approval results"} goBack={true} />
                 <Breadcrumb name={"Provider funding overview"}/>
