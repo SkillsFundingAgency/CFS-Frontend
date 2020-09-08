@@ -72,7 +72,8 @@ namespace CalculateFunding.Frontend.Controllers
                 ErrorToggle = viewModel.ErrorToggle,
                 FacetCount = viewModel.FacetCount,
                 IncludeFacets = viewModel.IncludeFacets,
-                PageSize = viewModel.PageSize
+                PageSize = viewModel.PageSize,
+                SearchFields = viewModel.SearchFields
             };
 
             PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(request);

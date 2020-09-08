@@ -79,7 +79,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         includeFacets: true,
         facetCount: 0,
         fundingPeriodId: fundingPeriodId,
-        errorToggle: ""
+        errorToggle: "",
+        searchFields: []
     };
     const [searchCriteria, setSearchCriteria] = useState<SearchRequestViewModel>(initialSearch);
     const [isInitialisingJobMonitor, setIsInitialisingJobMonitor] = useState<boolean>(true);
@@ -337,13 +338,15 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         populatePublishedProviderResultsService(searchCriteria);
     }
 
-    function filterByText(term: string) {
-        if ((term.length === 0 && searchCriteria.searchTerm.length !== 0) || term.length > 2) {
-            let request = searchCriteria;
-            request.searchTerm = term;
-            request.pageNumber = 1;
+    function filterByText(searchData: any) {
+        if ((searchData.searchTerm.length === 0 && searchCriteria.searchTerm.length !== 0) || searchData.searchTerm.length > 2) {
+            let searchFields: string[] = [];
+            if (searchData.searchField != null && searchData.searchField !== "")
+            {
+                searchFields.push(searchData.searchField);
+            }
             setSearchCriteria(prevState => {
-                return {...prevState, searchTerm: term, pageNumber: 1}
+                return {...prevState, searchTerm: searchData.searchTerm, searchFields: searchFields, pageNumber: 1}
             })
         }
     }

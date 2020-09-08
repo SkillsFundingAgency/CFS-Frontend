@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.ViewModels.Common
@@ -30,5 +31,8 @@ namespace CalculateFunding.Frontend.ViewModels.Common
 		public int FacetCount { get; set; } = 10;
 
 		public SearchMode SearchMode { get; set; }
+
+        public IEnumerable<string> SearchFields { get; set; }
+
 	}
 }

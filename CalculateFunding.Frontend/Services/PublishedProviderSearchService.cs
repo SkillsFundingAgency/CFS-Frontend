@@ -36,7 +36,8 @@ namespace CalculateFunding.Frontend.Services
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = Common.Models.Search.SearchMode.All
+                SearchMode = Common.Models.Search.SearchMode.All,
+                SearchFields = request.SearchFields
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)

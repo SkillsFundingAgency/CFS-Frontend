@@ -13,7 +13,8 @@ export interface SearchRequestViewModel {
     providerSubType: string[],
     pageSize: number
     facetCount: number,
-    searchMode: SearchMode
+    searchMode: SearchMode,
+    searchFields: string[],
 }
 
 export interface CalculationProviderSearchRequestViewModel {

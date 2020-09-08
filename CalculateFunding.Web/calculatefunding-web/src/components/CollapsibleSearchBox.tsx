@@ -6,21 +6,31 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
     const [expandedProvider, setExpandedProvider] = useState(true);
     const [expandedUKPRN, setExpandedUKPRN] = useState(false);
     const [expandedUPIN, setExpandedUPIN] = useState(false);
+    const [expandedURN, setExpandedURN] = useState(false);
 
     function expandSearchProvider() {
         setExpandedUKPRN(false);
         setExpandedUPIN(false);
         setExpandedProvider(true);
+        setExpandedURN(false);
     }
     function expandSearchUKPRN() {
         setExpandedUKPRN(true);
         setExpandedUPIN(false);
         setExpandedProvider(false);
+        setExpandedURN(false);
     }
     function expandSearchUPIN() {
         setExpandedUKPRN(false);
         setExpandedUPIN(true);
         setExpandedProvider(false);
+        setExpandedURN(false);
+    }
+    function expandSearchURN() {
+        setExpandedUKPRN(false);
+        setExpandedUPIN(false);
+        setExpandedProvider(false);
+        setExpandedURN(true);
     }
 
     return (
@@ -36,14 +46,14 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                 </input>
                 <label onClick={expandSearchProvider} className="govuk-label govuk-radios__label"
                        htmlFor="search-options-providers">
-                    Provider
+                    Provider name
                 </label>
             </div>
             <div className={`govuk-radios__conditional ${!expandedProvider? "govuk-radios__conditional--hidden" : ""}`}
                  id="conditional-search-options-provider">
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="text" onChange={(e) => callback(e.target.value)} />
+                           type="text" onChange={(e) => callback({searchField: "providerName", searchTerm: e.target.value})} />
                 </div>
             </div>
             <div className="govuk-radios__item">
@@ -62,7 +72,7 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                  id="conditional-search-options-UKPRN">
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="text" onChange={(e) => callback(e.target.value)} />
+                           type="number" onChange={(e) => callback({searchField: "ukprn", searchTerm: e.target.value})} />
                 </div>
 
             </div>
@@ -82,7 +92,26 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                  id="conditional-search-options-UPIN">
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="text" onChange={(e) => callback(e.target.value)} />
+                           type="number" onChange={(e) => callback({searchField: "upin", searchTerm: e.target.value})} />
+                </div>
+            </div>
+            <div className="govuk-radios__item">
+                <input onClick={expandSearchURN} className="govuk-radios__input" id="search-options-URN"
+                       name="search-options" type="radio" checked={expandedUPIN}
+                       aria-controls="conditional-search-options-URN"
+                       aria-expanded="false">
+
+                </input>
+                <label onClick={expandSearchURN} className="govuk-label govuk-radios__label"
+                       htmlFor="search-options-URN">
+                    URN
+                </label>
+            </div>
+            <div className={`govuk-radios__conditional ${!expandedURN? "govuk-radios__conditional--hidden" : ""}`}
+                 id="conditional-search-options-URN">
+                <div className="govuk-form-group">
+                    <input className="govuk-input sidebar-search-input"
+                           type="number" onChange={(e) => callback({searchField: "urn", searchTerm: e.target.value})} />
                 </div>
             </div>
         </div>
