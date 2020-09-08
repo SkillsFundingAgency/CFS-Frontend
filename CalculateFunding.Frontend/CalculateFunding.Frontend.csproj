@@ -182,6 +182,11 @@
     <Folder Include="wwwroot\js\Tests\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="web.config">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
     <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
   </ItemGroup>
   <ItemGroup>
