@@ -9,6 +9,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string] $DebugOn,
     [Parameter(Mandatory=$true)]
+    [string] $AppInsightsKey,
+    [Parameter(Mandatory=$true)]
     [string] $TracingOn
 )
 
@@ -24,6 +26,7 @@ function Update-ConfigFile {
         [string] $HandlerEnabled,
         [string] $BaseUrl,
         [string] $DebugOn,
+        [string] $AppInsightsKey,
         [string] $TracingOn)
 
     $configObject = [ordered] @{
@@ -31,6 +34,7 @@ function Update-ConfigFile {
         "loginType" = "aad"
         "baseUrl" = $BaseUrl
         "debugOn" = [boolean]::Parse($DebugOn)
+        "appInsightsKey" = $AppInsightsKey
         "tracingOn" = [boolean]::Parse($TracingOn)}
 
     $configObject | ConvertTo-Json | Set-Content -Path $ConfigJsonPath
@@ -44,7 +48,7 @@ Write-Verbose "Expanding deployment package to $TempFolder"
 Expand-Archive -Path $PathToZip -DestinationPath $TempFolder
 
 Write-Verbose "Updating react app configuration file"
-Update-ConfigFile -ConfigJsonPath "$TempFolder\wwwroot\app\config.json" -BaseUrl $BaseUrl -DebugOn $DebugOn -TracingOn $TracingOn -HandlerEnabled $HandlerEnabled
+Update-ConfigFile -ConfigJsonPath "$TempFolder\wwwroot\app\config.json" -BaseUrl $BaseUrl -DebugOn $DebugOn -TracingOn $TracingOn -HandlerEnabled $HandlerEnabled -AppInsightsKey $AppInsightsKey
 
 Write-Verbose "Removing existing deployment package"
 Remove-Item -Path $PathToZip -Force
