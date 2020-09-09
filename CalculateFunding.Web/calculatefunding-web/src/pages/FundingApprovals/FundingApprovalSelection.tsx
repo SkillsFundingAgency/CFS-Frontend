@@ -109,7 +109,6 @@ export function FundingApprovalSelection() {
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Funding approvals"} url={"/Approvals"}/>
                 <Breadcrumb name={"Select specification"}/>
             </Breadcrumbs>
 
