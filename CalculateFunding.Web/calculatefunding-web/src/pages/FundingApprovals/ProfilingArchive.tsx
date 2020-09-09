@@ -14,11 +14,14 @@ import {AccordianPanel} from "../../components/AccordianPanel";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Footer} from "../../components/Footer";
+import {Link} from "react-router-dom";
 
 export interface ProfilingArchiveRouteProps {
     specificationId: string;
     providerId: string;
     providerVersionId: string;
+    fundingStreamId: string;
+    fundingPeriodId: string;
 }
 
 export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRouteProps>) {
@@ -42,7 +45,7 @@ export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRo
             }
         ],
         isSelectedForFunding: false,
-    })
+    });
     const [providerSummary, setProvider] = useState<ProviderSummary>({
         authority: "",
         countryCode: "",
@@ -113,15 +116,17 @@ export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRo
                 })
             }
         })
-    })
+    });
+
+    const approvalResultsPath = `/Approvals/FundingApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`;
     return <div>
         <Header location={Section.Results}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"} />
-                <Breadcrumb name={"Select specification"} url={"/Approvals/FundingApprovalSelection"}/>
-                <Breadcrumb name={"Funding approval results"} goBack={true}/>
+                <Breadcrumb name={"Approvals"}/>
+                <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
+                <Breadcrumb name={"Funding approval results"} url={approvalResultsPath}/>
                 <Breadcrumb name={"Provider funding overview"} />
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
@@ -183,9 +188,9 @@ export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRo
                     )}
                 </div>
 
-
-                <a href={`/app/FundingApprovals/ProviderFundingOverview/${match.params.specificationId}/${match.params.providerId}/${match.params.providerVersionId}`}
-                   className="govuk-back-link">Back</a>
+                <Link to={approvalResultsPath} className="govuk-button" data-module="govuk-button">
+                    Back
+                </Link>
             </div>
         </div>
         <Footer/>

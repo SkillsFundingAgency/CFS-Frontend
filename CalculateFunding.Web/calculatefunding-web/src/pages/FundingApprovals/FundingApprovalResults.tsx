@@ -406,7 +406,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Select specification"} url={"/ViewFunding"}/>
+                <Breadcrumb name={"Approvals"}/>
+                <Breadcrumb name={"Select specification"} url={"/Approvals/Select"}/>
                 <Breadcrumb name={"Funding approval results"}/>
             </Breadcrumbs>
             <PermissionStatus requiredPermissions={missingPermissions}/>
@@ -563,7 +564,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                                 <tr key={ppr.id}>
                                     <td className="govuk-table__cell govuk-body">
                                         <Link
-                                            to={`/FundingApprovals/ProviderFundingOverview/${ppr.specificationId}/${ppr.ukprn}/${specificationSummary.providerVersionId}`}>{ppr.providerName}</Link>
+                                            to={`/Approvals/ProviderFundingOverview/${ppr.specificationId}/${ppr.ukprn}/${specificationSummary.providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}>{ppr.providerName}</Link>
                                     </td>
                                     <td className="govuk-table__cell govuk-body">{ppr.ukprn}</td>
                                     <td className="govuk-table__cell govuk-body">{ppr.fundingStatus}</td>
@@ -620,7 +621,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                             <span className="govuk-warning-text__assistive">Warning</span>
                             No providers are available for the selected specification
                         </strong>
-                        <Link to={"/ViewFunding"} className="govuk-back-link govuk-!-margin-top-7">Back</Link>
+                        <Link to={"/Approvals/Select"} className="govuk-back-link govuk-!-margin-top-7">Back</Link>
                     </div>
                 </div>
             </div>

@@ -68,7 +68,7 @@ export function Header(props: {location:Section}) {
                                 </Link>
                             </li>
                             <li className={"govuk-header__navigation-item" + (props.location === Section.Approvals ? " govuk-header__navigation-item--active" : "")}>
-                                <Link className="govuk-header__link" to="/ViewFunding">
+                                <Link className="govuk-header__link" to="/Approvals/Select">
                                     Funding approvals
                                 </Link>
                             </li>

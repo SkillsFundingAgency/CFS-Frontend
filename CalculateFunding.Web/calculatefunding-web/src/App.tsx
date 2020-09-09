@@ -86,7 +86,7 @@ const App: React.FunctionComponent = () => {
                            getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>
                 <Switch>
                     <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
-                    <Route path="/ViewFunding" component={FundingApprovalSelection}/>
+                    <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
                     <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
                     <Route path="/Approvals/FundingApprovalResults/:fundingStreamId/:fundingPeriodId/:specificationId"
                            component={FundingApprovalResults}/>
@@ -99,9 +99,9 @@ const App: React.FunctionComponent = () => {
                     <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
                     <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
                     <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
-                    <Route path="/FundingApprovals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId"
+                    <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
                            component={ProviderFundingOverview}/>
-                    <Route path="/FundingApprovals/ProfilingArchive/:specificationId/:providerId/:providerVersionId" component={ProfilingArchive}/>
+                    <Route path="/Approvals/ProfilingArchive/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId" component={ProfilingArchive}/>
                     <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
                     <Route path="/Datasets/ManageData" component={ManageData}/>
                     <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>

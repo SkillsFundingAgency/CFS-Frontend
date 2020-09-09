@@ -6,13 +6,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {getProfiling, getProviderByIdAndVersion, getPublishedProviderTransactions} from "../actions/ProviderActions";
 import {getSpecification} from "../actions/ViewSpecificationsActions";
 import {AppState} from "../states/AppState";
-import {ProviderState} from "../states/ProviderState";
-import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {Tabs} from "../components/Tabs";
 import {useEffectOnce} from "../hooks/useEffectOnce";
 import {FormattedNumber, NumberType} from "../components/FormattedNumber";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
+import {Link} from "react-router-dom";
+import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
+import {SpecificationSummary} from "../types/SpecificationSummary";
+import {Profiling} from "../types/Profiling";
 
 interface ProviderFundingOverviewProps {
     providerFundingId: string
@@ -22,6 +24,8 @@ export interface ProviderFundingOverviewRoute {
     providerId: string;
     providerVersionId: string;
     specificationId: string;
+    fundingStreamId: string;
+    fundingPeriodId: string;
 }
 
 export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFundingOverviewRoute>, props: ProviderFundingOverviewProps) {
@@ -33,33 +37,35 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
         dispatch(getPublishedProviderTransactions(match.params.providerId, match.params.specificationId));
     });
 
-    let provider: ProviderState = useSelector((state: AppState) => state.provider);
-    let specification: ViewSpecificationState = useSelector((state: AppState) => state.viewSpecification);
+    let provider: ProviderSummary = useSelector((state: AppState) => state.provider.providerSummary);
+    let transaction: ProviderTransactionSummary = useSelector((state: AppState) => state.provider.providerTransactionSummary);
+    let profiling: Profiling = useSelector((state: AppState) => state.provider.profiling);
+    let specification: SpecificationSummary = useSelector((state: AppState) => state.viewSpecification.specification);
 
     useEffect(() => {
-        dispatch(getProfiling(specification.specification.fundingStreams[0].id, specification.specification.fundingPeriod.id, match.params.providerId));
-    }, [specification.specification.fundingPeriod.id, specification.specification.fundingStreams[0].id]);
+        dispatch(getProfiling(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.providerId));
+    }, [match.params.fundingPeriodId, match.params.fundingStreamId]);
 
     return <div>
         <Header location={Section.Approvals}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Funding Approvals"} url={"/ViewFunding"} />
-                <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
-                <Breadcrumb name={"Funding approval results"} goBack={true} />
+                <Breadcrumb name={"Approvals"}/>
+                <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
+                <Breadcrumb name={"Funding approval results"} url={`/Approvals/FundingApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${specification.id}`} />
                 <Breadcrumb name={"Provider funding overview"}/>
             </Breadcrumbs>
             <div className="govuk-grid-row govuk-!-margin-bottom-5">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-xl">Provider name</span>
-                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{provider.providerSummary.name}</h1>
+                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{provider.name}</h1>
                     <span className="govuk-caption-m">Specification</span>
-                    <h1 className="govuk-heading-m">{specification.specification.name}</h1>
+                    <h1 className="govuk-heading-m">{specification.name}</h1>
                     <span className="govuk-caption-m">Funding period</span>
-                    <h1 className="govuk-heading-m">{specification.specification.fundingPeriod.name}</h1>
+                    <h1 className="govuk-heading-m">{specification.fundingPeriod.name}</h1>
                     <span className="govuk-caption-m">Funding stream</span>
-                    <h1 className="govuk-heading-m">{specification.specification.fundingStreams[0].name}</h1>
+                    <h1 className="govuk-heading-m">{specification.fundingStreams[0].name}</h1>
                 </div>
             </div>
             <div className="govuk-grid-row">
@@ -69,11 +75,11 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-one-half">
                                 <p className="govuk-body">Latest status: <strong
-                                    className="govuk-warning-text">{provider.providerTransactionSummary.latestStatus}</strong></p>
+                                    className="govuk-warning-text">{transaction.latestStatus}</strong></p>
                             </div>
                             <div className="govuk-grid-column-one-half">
                                 <p className="govuk-body">Funding total: <strong
-                                    className="govuk-warning-text">{provider.providerTransactionSummary.fundingTotal}</strong></p>
+                                    className="govuk-warning-text">{transaction.fundingTotal}</strong></p>
                             </div>
                         </div>
                         <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5"/>
@@ -108,12 +114,12 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                     </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                    <tr className="govuk-table__row" hidden={provider.providerTransactionSummary.results.length > 0}>
+                                    <tr className="govuk-table__row" hidden={transaction.results.length > 0}>
                                         <td colSpan={4}>
                                             There are no results that match your search
                                         </td>
                                     </tr>
-                                    {provider.providerTransactionSummary.results.map(fsh =>
+                                    {transaction.results.map(fsh =>
                                         <tr className="govuk-table__row">
                                             <th scope="row" className="govuk-table__header">{fsh.status}</th>
                                             <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.author}</td>
@@ -128,13 +134,13 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                             <section className="govuk-tabs__panel" id="profiling">
                                 <h2 className="govuk-heading-l">Profiling</h2>
 
-                                <span className="govuk-caption-m">Total allocation for {specification.specification.fundingPeriod.name}</span>
+                                <span className="govuk-caption-m">Total allocation for {specification.fundingPeriod.name}</span>
                                 <h3 className="govuk-heading-m govuk-!-margin-bottom-2">
-                                    <FormattedNumber value={provider.profiling.totalAllocation} type={NumberType.FormattedMoney}/>
+                                    <FormattedNumber value={profiling.totalAllocation} type={NumberType.FormattedMoney}/>
                                 </h3>
                                 <span className="govuk-caption-m">Previous allocation value</span>
                                 <h3 className="govuk-heading-m">
-                                    <FormattedNumber value={provider.profiling.previousAllocation} type={NumberType.FormattedMoney}/>
+                                    <FormattedNumber value={profiling.previousAllocation} type={NumberType.FormattedMoney}/>
                                 </h3>
                                 <table className="govuk-table">
                                     <caption className="govuk-table__caption">Profiling installments</caption>
@@ -148,7 +154,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                     </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                    {provider.profiling.profilingInstallments.map(p =>
+                                    {profiling.profilingInstallments.map(p =>
                                         <tr className="govuk-table__row">
                                             <th scope="row" className="govuk-table__header">{p.installmentYear} {p.installmentMonth}
                                                 &nbsp;{p.isPaid ? <strong className="govuk-tag">Paid</strong> : ""}
@@ -163,15 +169,19 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                         </th>
                                         <td className="govuk-table__cell"></td>
                                         <td className="govuk-table__cell govuk-table__cell--numeric">
-                                            <FormattedNumber value={provider.profiling.totalAllocation} type={NumberType.FormattedMoney}/>
+                                            <FormattedNumber value={profiling.totalAllocation} type={NumberType.FormattedMoney}/>
                                         </td>
                                     </tr>
                                     </tbody>
                                 </table>
-<h3 className="govuk-heading-m">Previous profiles</h3>
-                                    <p className="govuk-body">History of previous <a className="govuk-link"
-                                     href={`/app/FundingApprovals/ProfilingArchive/${match.params.specificationId}/${match.params.providerId}/${match.params.providerVersionId}`}>profiles</a>
+                                <h3 className="govuk-heading-m">Previous profiles</h3>
+                                {specification && specification.fundingStreams && specification.fundingStreams.length > 0 &&
+                                <p className="govuk-body">History of previous <Link
+                                    to={`/Approvals/ProfilingArchive/${match.params.specificationId}/${match.params.providerId}/${match.params.providerVersionId}/${match.params.fundingStreamId}/${match.params.fundingPeriodId}`}
+                                    className="govuk-button"
+                                    data-module="govuk-button">profiles</Link>
                                     </p>
+                                }
                             </section>
                         </Tabs.Panel>
                     </Tabs>

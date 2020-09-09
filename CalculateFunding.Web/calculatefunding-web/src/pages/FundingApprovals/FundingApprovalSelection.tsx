@@ -109,6 +109,7 @@ export function FundingApprovalSelection() {
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Approvals"}/>
                 <Breadcrumb name={"Select specification"}/>
             </Breadcrumbs>
 
@@ -155,7 +156,7 @@ export function FundingApprovalSelection() {
                     </label>
                     <h3 className="govuk-heading-m">{selectedSpecification.name}</h3>
 
-                    <Link to={`/approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification.id}`}
+                    <Link to={`/Approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification.id}`}
                           className="govuk-button" data-module="govuk-button">
                         View funding
                     </Link>
