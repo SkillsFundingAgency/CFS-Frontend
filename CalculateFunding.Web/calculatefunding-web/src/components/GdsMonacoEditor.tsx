@@ -300,6 +300,7 @@ export function GdsMonacoEditor(props: {
                 let contextKeywords = keywords;
 
                 monaco.languages.registerCompletionItemProvider('vb', {
+                    triggerCharacters: [".", " ", "("],
                     provideCompletionItems: function (model: monaco.editor.ITextModel, position: IPosition,) {
 
                         let results = {
