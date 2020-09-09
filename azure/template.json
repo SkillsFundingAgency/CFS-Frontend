@@ -351,7 +351,9 @@
                 "RedisSettings:CacheConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]",
                 "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]",
                 "HandlerEnabled": "true",
-                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]"
+                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]",
+                "fdzClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]",
+                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             }
         },
         {
@@ -420,7 +422,9 @@
                 "RedisSettings:CacheConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]",
                 "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]",
                 "HandlerEnabled": "true",
-                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]"
+                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]",
+                "fdzClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]",
+                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]"
             }
         },
         {
