@@ -21,6 +21,8 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
 
         public string Description { get; set; }
 
+        public bool IsSelectedForFunding { get; set; }
+
         public string LastUpdatedDateDisplay
         {
             get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown"; }

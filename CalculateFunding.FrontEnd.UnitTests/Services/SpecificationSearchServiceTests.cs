@@ -105,6 +105,7 @@ namespace CalculateFunding.Frontend.Services
             first.Name.Should().Be("Specification 1");
             first.Status.Should().Be("Draft");
             first.FundingPeriodName.Should().Be("Test Period");
+            first.IsSelectedForFunding.Should().BeTrue();
         }
 
         [TestMethod]
@@ -155,6 +156,7 @@ namespace CalculateFunding.Frontend.Services
                     FundingStreamIds = new[] { "fs1", "fs2" },
                     FundingStreamNames = new[] { "Funding Stream 1", "Funding Stream 2" },
                     LastUpdatedDate = new DateTime(2018, 12, 5, 12, 5, 6),
+                    IsSelectedForFunding = true
                 });
 
             results
@@ -370,6 +372,7 @@ namespace CalculateFunding.Frontend.Services
                     FundingStreamIds = new[] { "fs1", "fs2" },
                     FundingStreamNames = new[] { "Funding Stream 1", "Funding Stream 2" },
                     LastUpdatedDate = new DateTime(2018, 12, 5, 12, 5, 6),
+                    IsSelectedForFunding = true
                 });
             }
 
