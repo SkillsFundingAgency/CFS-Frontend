@@ -567,7 +567,10 @@ namespace CalculateFunding.Frontend.Controllers
                 .Returns(response);
             calcsClient
                 .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
-                .Returns(new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, new PublishStatusResult()));
+                .Returns(new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.OK, new PublishStatusResult()
+                {
+                    PublishStatus = PublishStatus.Approved
+                }));
 
             var identity = Substitute.For<IIdentity>();
             identity.Name.Returns("BSir");
@@ -673,9 +676,9 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         private static CalculationController CreateCalculationController(
-            ICalculationsApiClient calcsClient, 
-            IMapper mapper, 
-            IAuthorizationHelper authorizationHelper, 
+            ICalculationsApiClient calcsClient,
+            IMapper mapper,
+            IAuthorizationHelper authorizationHelper,
             IResultsApiClient resultsApiClient,
             ClaimsPrincipal user = null)
         {

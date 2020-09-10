@@ -27,8 +27,8 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IResultsApiClient _resultsApiClient;
 
         public CalculationController(
-            ICalculationsApiClient calcClient, 
-            IMapper mapper, 
+            ICalculationsApiClient calcClient,
+            IMapper mapper,
             IAuthorizationHelper authorizationHelper,
             IResultsApiClient resultsApiClient)
         {
@@ -183,7 +183,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            if (publishStatusEditModel.PublishStatus == PublishStatus.Approved)
+            if (calculationResult.Content.PublishStatus == PublishStatus.Approved)
             {
                 return Ok(new PublishStatusResult()
                 {
@@ -359,10 +359,10 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{pageNumber}/provider/{providerId}")]
         public async Task<IActionResult> GetAdditionalCalculationsByProviderId(
             string specificationId,
-            CalculationType calculationType, 
-            int pageNumber, 
-            [FromQuery] string searchTerm, 
-            [FromQuery] string status, 
+            CalculationType calculationType,
+            int pageNumber,
+            [FromQuery] string searchTerm,
+            [FromQuery] string status,
             [FromRoute] string providerId)
         {
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
@@ -378,13 +378,13 @@ namespace CalculateFunding.Frontend.Controllers
                 await _calcClient.SearchCalculationsForSpecification(specificationId,
                     calculationType, publishStatus, searchTerm, pageNumber);
 
-	        ApiResponse<ProviderResultResponse> providerResultResponse =
-		        await _resultsApiClient.GetProviderResults(providerId, specificationId);
-	        IActionResult providerResultResponseErrorResult = providerResultResponse.IsSuccessOrReturnFailureResult("GetProviderResults");
-	        if (providerResultResponseErrorResult != null)
-	        {
-		        return providerResultResponseErrorResult;
-	        }
+            ApiResponse<ProviderResultResponse> providerResultResponse =
+                await _resultsApiClient.GetProviderResults(providerId, specificationId);
+            IActionResult providerResultResponseErrorResult = providerResultResponse.IsSuccessOrReturnFailureResult("GetProviderResults");
+            if (providerResultResponseErrorResult != null)
+            {
+                return providerResultResponseErrorResult;
+            }
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
@@ -400,7 +400,7 @@ namespace CalculateFunding.Frontend.Controllers
                             Value = providerResultResponse.Content.CalculationResults.FirstOrDefault(calcResult => calcResult.Calculation.Id == c.Id)?.Value,
                             LastUpdatedDate = c.LastUpdatedDate
                         });
-                
+
                 var calcs = new SearchResults<AdditionalCalculationSearchResultViewModel>
                 {
                     TotalCount = calcSearchResults.TotalCount,
@@ -451,7 +451,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return BadRequest();
             }
-            
+
             return new StatusCodeResult(500);
 
         }
