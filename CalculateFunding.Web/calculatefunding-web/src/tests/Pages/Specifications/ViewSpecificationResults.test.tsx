@@ -10,9 +10,6 @@ import {FundingStructureType} from "../../../types/FundingStructureItem";
 import {ViewSpecificationResults} from "../../../pages/Specifications/ViewSpecificationResults";
 
 describe("Provider Funding Overview ", () => {
-    const Adapter = require('enzyme-adapter-react-16');
-    const enzyme = require('enzyme');
-    enzyme.configure({adapter: new Adapter()});
     const specificationId = "056fcfcd-fb12-45ed-8a1b-079a0e2fc8c5";
     const match: match<ViewSpecificationRoute> = {
         params: {
@@ -43,6 +40,4 @@ describe("Provider Funding Overview ", () => {
 
         expect(wrapper.find("#downloadable-reports")).toBeTruthy();
     })
-
-
 });

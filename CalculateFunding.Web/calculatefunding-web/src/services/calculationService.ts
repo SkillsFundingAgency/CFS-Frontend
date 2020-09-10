@@ -86,7 +86,6 @@ export async function compileCalculationPreviewService(specificationId: string, 
 }
 
 export async function getCodeContextService(specificationId: string) {
-    console.log("Going to call " + specificationId);
     let response = await axios(`/api/specs/${specificationId}/codeContext`, {
         method: 'GET',
         headers: {
@@ -115,6 +114,7 @@ export async function approveCalculationService(publishStatusModel: PublishStatu
         data: publishStatusModel
     })
 }
+
 export async function getMultipleVersionsByCalculationIdService(calculationId: string, versions: number[]) {
     return axios(`/api/calcs/getmultipleversions`, {
         method: 'GET',
@@ -127,6 +127,15 @@ export async function getMultipleVersionsByCalculationIdService(calculationId: s
 
 export async function getIsUserAllowedToApproveCalculationService(calculationId: string) {
     return axios(`/api/calcs/${calculationId}/approvepermission`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+export async function getCalculationCircularDependencies(specificationId: string) {
+    return axios(`/api/graph/calculation/circulardependencies/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

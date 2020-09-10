@@ -7,9 +7,6 @@ import {EditSpecification, EditSpecificationRouteProps} from "../../../pages/Spe
 import {createBrowserHistory, createLocation} from "history";
 import {match, MemoryRouter} from "react-router";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
 const store: Store<IStoreState> = createStore(
     rootReducer
 );
