@@ -8,8 +8,9 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications, getSpecificationsByFundingPeriodAndStreamIdService, getSpecificationsByFundingPeriodAndStreamIdWithResultsService} from "../../services/specificationService";
+import {getFundingPeriodsByFundingStreamIdService, getSpecificationsByFundingPeriodAndStreamIdWithResultsService} from "../../services/specificationService";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import { getFundingStreamsService } from "../../services/policyService";
 
 export function SelectSpecification() {
     const [selectedFundingStreamId, setSelectedFundingStreamId] = useState('');
@@ -30,7 +31,7 @@ export function SelectSpecification() {
     document.title = "Select specification - Calculate funding";
 
     useEffectOnce(() => {
-        getFundingStreamsForSelectedSpecifications().then((response) => {
+        getFundingStreamsService(false).then((response) => {
             setFundingStreams(response.data as FundingStream[])
         })
     })
