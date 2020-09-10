@@ -16,8 +16,7 @@ export interface IFundingStructureItem {
 }
 
 export enum FundingStructureType{
-    fundingLine,
-    calculation,
-    'Funding Line' = fundingLine,
-    'Calculation' = calculation
+    FundingLine = "Funding Line",
+    Calculation = "Calculation",
+    "Funding Line" = FundingLine,
 }

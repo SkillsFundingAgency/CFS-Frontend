@@ -2,6 +2,14 @@ import React, {useEffect, useState} from "react";
 
 export function AutoComplete(props: { suggestions: string[], hidden?: boolean, disabled?:boolean, callback: any }) {
 
+    window.onclick = (event: any) => {
+        if(event.target.className !== "autocomplete-option" && event.target.id !== "input-auto-complete"){
+            setAutoCompleteState(prevState => {
+                return {...prevState, showSuggestions: false}
+            });
+        }
+    }
+
     const [autoCompleteState, setAutoCompleteState] = useState({
         suggestions: props.suggestions,
         filteredSuggestions: [] as string[],
@@ -60,8 +68,7 @@ export function AutoComplete(props: { suggestions: string[], hidden?: boolean, d
         <div className="govuk-form-group" hidden={props.hidden}>
             <input className="govuk-input" id="input-auto-complete"
                    type="text" disabled={autoCompleteState.disabled} autoComplete={"off"}
-                   onChange={onChange} onClick={onClickInput} value={autoCompleteState.userInput}
-            />
+                   onChange={onChange} onClick={onClickInput} value={autoCompleteState.userInput}/>
             <ul hidden={!autoCompleteState.showSuggestions} className="govuk-list autocomplete">
                 {autoCompleteState.filteredSuggestions.map((fs, index) => <li className="autocomplete-option"
                                                                               key={index} value={fs}

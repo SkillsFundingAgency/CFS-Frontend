@@ -3,6 +3,7 @@ import {ViewSpecificationActionTypes} from "../../actions/ViewSpecificationsActi
 import {ViewSpecificationState} from "../../states/ViewSpecificationState";
 import {FundingStructureType} from "../../types/FundingStructureItem";
 import {FundingLineStructureActionTypes} from "../../actions/FundingLineStructureAction";
+import React from "react";
 
 const initialState: ViewSpecificationState = {
     additionalCalculations: {
@@ -493,77 +494,78 @@ describe('ViewSpecificationReducer ', () => {
     });
 
     it('should handle GET_FUNDINGLINESTRUCTURE', () => {
-        const expectedState = {
-            "additionalCalculations": {
-                "currentPage": 0,
-                "endItemNumber": 0,
-                "facets": [],
-                "lastPage": 0,
-                "pagerState": {
+        const expectedState =
+            {
+                "additionalCalculations": {
                     "currentPage": 0,
-                    "displayNumberOfPages": 0,
+                    "endItemNumber": 0,
+                    "facets": [],
                     "lastPage": 0,
-                    "nextPage": 0,
-                    "pages": [],
-                    "previousPage": 0,
+                    "pagerState": {
+                        "currentPage": 0,
+                        "displayNumberOfPages": 0,
+                        "lastPage": 0,
+                        "nextPage": 0,
+                        "pages": [],
+                        "previousPage": 0,
+                    },
+                    "results": [],
+                    "startItemNumber": 0,
+                    "totalCount": 0,
+                    "totalErrorResults": 0,
+                    "totalResults": 0,
                 },
-                "results": [],
-                "startItemNumber": 0,
-                "totalCount": 0,
-                "totalErrorResults": 0,
-                "totalResults": 0,
-            },
-            "datasets": {
-                "content": [],
-                "statusCode": 0,
-            },
-            "fundingLineStatusResult": "",
-            "fundingLineStructureResult": [
-                {
-                    "calculationId": "test calculationId",
-                    "calculationPublishStatus": "",
-                    "expanded": false,
-                    "fundingStructureItems": [],
-                    "level": 1,
-                    "name": "test funding line",
-                    "parentName": "",
-                    "type": 1,
+                "datasets": {
+                    "content": [],
+                    "statusCode": 0,
                 },
-            ],
-            "profileVariationPointerResult": [],
-            "releaseTimetable": {
-                "navisionDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-                "releaseDate": {
-                    "day": "",
-                    "month": "",
-                    "time": "",
-                    "year": "",
-                },
-            },
-            "specification": {
-                "approvalStatus": "",
-                "description": "",
-                "fundingPeriod": {
-                    "id": "",
-                    "name": "",
-                },
-                "fundingStreams": [
+                "fundingLineStatusResult": "",
+                "fundingLineStructureResult": [
                     {
+                        "calculationId": "test calculationId",
+                        "calculationPublishStatus": "",
+                        "expanded": false,
+                        "fundingStructureItems": [],
+                        "level": 1,
+                        "name": "test funding line",
+                        "parentName": "",
+                        "type": "Calculation",
+                    },
+                ],
+                "profileVariationPointerResult": [],
+                "releaseTimetable": {
+                    "navisionDate": {
+                        "day": "",
+                        "month": "",
+                        "time": "",
+                        "year": "",
+                    },
+                    "releaseDate": {
+                        "day": "",
+                        "month": "",
+                        "time": "",
+                        "year": "",
+                    },
+                },
+                "specification": {
+                    "approvalStatus": "",
+                    "description": "",
+                    "fundingPeriod": {
                         "id": "",
                         "name": "",
                     },
-                ],
-                "id": "",
-                "isSelectedForFunding": false,
-                "name": "",
-                "providerVersionId": "",
-            },
-        };
+                    "fundingStreams": [
+                        {
+                            "id": "",
+                            "name": "",
+                        },
+                    ],
+                    "id": "",
+                    "isSelectedForFunding": false,
+                    "name": "",
+                    "providerVersionId": "",
+                },
+            };
 
         expect(
             reduceViewSpecificationState(initialState, {
@@ -573,9 +575,9 @@ describe('ViewSpecificationReducer ', () => {
                     name : "test funding line",
                     calculationId : "test calculationId",
                     calculationPublishStatus : "",
-                    type : FundingStructureType.calculation,
-                    parentName: "",
+                    type : FundingStructureType.Calculation,
                     fundingStructureItems: [],
+                    parentName: "",
                     expanded: false
                 }]
             })
