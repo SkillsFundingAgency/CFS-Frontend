@@ -111,7 +111,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         getJobStatusUpdatesForSpecification(calculationSummary.calculation.specificationId, "CreateInstructAllocationJob")
             .then((jobSummaryResponse) => 
             {
-                if (jobSummaryResponse.data && jobSummaryResponse.data.length > 0) {
+                if (jobSummaryResponse.data && jobSummaryResponse.data.length > 0 && jobSummaryResponse.data[0]) {
                     setJobSummary(jobSummaryResponse.data[0]);
                 }
             });
