@@ -353,7 +353,9 @@
                 "HandlerEnabled": "true",
                 "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]",
                 "fdzClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]",
-                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]",
+                "graphClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-graph-',parameters('productVersion'),'.azurewebsites.net/api/')]",
+                "graphClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapigraph'),'2018-02-14').secretUriWithVersion, ')')]"
             }
         },
         {
@@ -424,7 +426,9 @@
                 "HandlerEnabled": "true",
                 "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]",
                 "fdzClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]",
-                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]",
+                "graphClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-graph-',parameters('productVersion'),'.azurewebsites.net/api/')]",
+                "graphClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapigraph'),'2018-02-14').secretUriWithVersion, ')')]"
             }
         },
         {
