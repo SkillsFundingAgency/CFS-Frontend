@@ -216,7 +216,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                             fundingLines.map((f, index) => {
                                                 let linkValue = '';
                                                 if (f.calculationId != null && f.calculationId !== '') {
-                                                    linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
+                                                    linkValue = `/ViewCalculationResults/${f.calculationId}`;
                                                 }
                                                 return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
                                                     <CollapsibleSteps
@@ -234,7 +234,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         lastUpdatedDate={f.lastUpdatedDate}>
                                                         <FundingLineStep key={f.name.replace(" ", "") + index}
                                                                          expanded={fundingLinesExpandedStatus}
-                                                                         fundingStructureItem={f}/>
+                                                                         fundingStructureItem={f} results={true}/>
                                                     </CollapsibleSteps>
                                                 </li>
                                             })}

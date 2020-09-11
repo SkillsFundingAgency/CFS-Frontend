@@ -37,6 +37,7 @@ export function SelectSpecification() {
     })
 
     function updateFundingPeriods(event: React.ChangeEvent<HTMLSelectElement>) {
+        setFundingPeriods([]);
         const filter = event.target.value;
         setSelectedFundingStreamId(filter);
         setLoadingState({
