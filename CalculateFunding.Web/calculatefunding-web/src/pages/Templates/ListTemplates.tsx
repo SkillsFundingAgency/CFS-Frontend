@@ -12,6 +12,7 @@ import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
+import {useHistory} from 'react-router';
 
 export const ListTemplates = () => {
     const [haveResults, setHaveResults] = useState<boolean>(false);
@@ -22,6 +23,8 @@ export const ListTemplates = () => {
     const [searchCriteria, setSearchCriteria] = useState(initialSearch);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const {canCreateTemplate, missingPermissions} = useTemplatePermissions([TemplatePermissions.Create]);
+
+    const history = useHistory();
 
     function populateTemplates(criteria: TemplateSearchRequest) {
         const getAllTemplates = async () => {
@@ -39,6 +42,15 @@ export const ListTemplates = () => {
         window.scrollTo(0, 0);
         populateTemplates(searchCriteria);
     });
+
+    const handleTemplateLinkClick = (e: React.MouseEvent, templateId: string) => {
+        e.preventDefault();
+        if (e.shiftKey) {
+            history.push(`/Templates/${templateId}/Edit?disableUndo=true`);
+       } else {
+           history.push(`/Templates/${templateId}/Edit`);
+       }
+    }
 
     return (
         <div>
@@ -85,7 +97,7 @@ export const ListTemplates = () => {
                             {templateListResults.results.map(template =>
                                 <tr className="govuk-table__row" key={template.id} data-testid={`template-result-${template.id}`}>
                                     <th scope="row" className="govuk-table__header">
-                                        <Link to={`/Templates/${template.id}/Edit`}>{template.name}</Link>
+                                        <Link to={""} onClick={(e) => handleTemplateLinkClick(e, `${template.id}`)}>{template.name}</Link>
                                         <div className="govuk-!-margin-top-3">
                                             <details className="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
                                                 <summary className="govuk-details__summary">

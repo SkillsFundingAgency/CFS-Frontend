@@ -61,8 +61,9 @@ import {useTemplateUndo} from "../../hooks/useTemplateUndo";
 import {useEventListener} from "../../hooks/useEventListener";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import {ErrorMessage} from '../../types/ErrorMessage';
-import {useHistory} from "react-router";
+import {useHistory, useLocation} from "react-router";
 import {AutoComplete} from '../../components/AutoComplete';
+import * as QueryString from "query-string";
 
 enum Mode {
     View = 'view',
@@ -74,6 +75,7 @@ export function EditTemplate() {
     const descriptionRef = useRef<HTMLSpanElement>(null);
     const itemRefs = useRef({});
     let {templateId, version} = useParams();
+    const [enableUndo, setEnableUndo] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDirty, setIsDirty] = useState<boolean>(false);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
@@ -104,7 +106,7 @@ export function EditTemplate() {
         clearUndoState,
         undoCount,
         redoCount
-    } = useTemplateUndo(setDS);
+    } = useTemplateUndo(setDS, enableUndo);
     const history = useHistory();
 
     const keyPressHandler = (e: React.KeyboardEvent) => {
@@ -119,6 +121,15 @@ export function EditTemplate() {
     useEventListener('keydown', keyPressHandler);
 
     useConfirmLeavePage(isDirty && !isSaving);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = QueryString.parse(location.search);
+        if (params.disableUndo) {
+            setEnableUndo(false);
+        }
+    }, [location]);
 
     useEffect(() => {
         const initialisePage = () => {

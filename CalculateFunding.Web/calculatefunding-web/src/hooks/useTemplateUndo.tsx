@@ -3,7 +3,7 @@ import {FundingLineDictionaryEntry} from '../types/TemplateBuilderDefinitions';
 import {v4 as uuidv4} from "uuid";
 import {open, clear, update, deleteItem, findByKey} from "../services/indexedDbWrapper";
 
-export const useTemplateUndo = (updateFunction: Function) => {
+export const useTemplateUndo = (updateFunction: Function, enabled: boolean) => {
     const [localStorageKey] = React.useState<string>(`${uuidv4()}`);
 
     const templateBuilderStateKey = () => `templateBuilderState-${localStorageKey}`;
@@ -19,84 +19,96 @@ export const useTemplateUndo = (updateFunction: Function) => {
     }
 
     React.useEffect(() => {
-        initialiseDatabase();
+        if (enabled) {
+            initialiseDatabase();
+        }
 
         return () => {
-            clearItems();
+            enabled && clearItems();
         }
     }, []);
 
     const initialiseState = async (ds: FundingLineDictionaryEntry[]) => {
-        await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(ds)});
+        if (enabled) {
+            await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(ds)});
+        }
         updateFunction(ds);
     }
 
     const updatePresentState = async (ds: FundingLineDictionaryEntry[]) => {
-        const currentState = await getPresentState();
-        const pastState = await getTimeItems(templateBuilderPastStateKey());
-        pastState.push(currentState);
+        if (enabled) {
+            const currentState = await getPresentState();
+            const pastState = await getTimeItems(templateBuilderPastStateKey());
+            pastState.push(currentState);
 
-        await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(ds)});
-        await update({key: templateBuilderPastStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(pastState)});
-        await clearRedoState();
+            await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(ds)});
+            await update({key: templateBuilderPastStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(pastState)});
+            await clearRedoState();
+        }
 
         updateFunction(ds);
     }
 
     const undo = async () => {
-        const present = await getPresentState();
+        if (enabled) {
+            const present = await getPresentState();
 
-        const futureState = await getTimeItems(templateBuilderFutureStateKey());
-        futureState.unshift(present);
+            const futureState = await getTimeItems(templateBuilderFutureStateKey());
+            futureState.unshift(present);
 
-        const past = await getTimeItems(templateBuilderPastStateKey());
-        if (past.length === 0) {
-            return;
-        }
+            const past = await getTimeItems(templateBuilderPastStateKey());
+            if (past.length === 0) {
+                return;
+            }
 
-        const pastItem = past.pop();
-        if (pastItem) {
-            await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(pastItem)});
-            await update({key: templateBuilderPastStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(past)});
-            await update({key: templateBuilderFutureStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(futureState)});
+            const pastItem = past.pop();
+            if (pastItem) {
+                await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(pastItem)});
+                await update({key: templateBuilderPastStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(past)});
+                await update({key: templateBuilderFutureStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(futureState)});
 
-            updateFunction(pastItem);
+                updateFunction(pastItem);
+            }
         }
     }
 
     const redo = async () => {
-        const currentState = await getPresentState();
-        const pastState = await getTimeItems(templateBuilderPastStateKey());
-        pastState.push(currentState);
-        const futureState = await getTimeItems(templateBuilderFutureStateKey());
-        const future = futureState.shift();
-        if (future) {
-            await update({key: templateBuilderFutureStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(futureState)});
-            await update({key: templateBuilderPastStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(pastState)});
-            await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(future)});
+        if (enabled) {
+            const currentState = await getPresentState();
+            const pastState = await getTimeItems(templateBuilderPastStateKey());
+            pastState.push(currentState);
+            const futureState = await getTimeItems(templateBuilderFutureStateKey());
+            const future = futureState.shift();
+            if (future) {
+                await update({key: templateBuilderFutureStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(futureState)});
+                await update({key: templateBuilderPastStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(pastState)});
+                await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(future)});
 
-            updateFunction(future);
+                updateFunction(future);
+            }
         }
     }
 
     const clearPresentState = async () => {
-        await deleteItem(templateBuilderStateKey());
+        enabled && await deleteItem(templateBuilderStateKey());
     }
 
     const clearUndoState = async () => {
-        await deleteItem(templateBuilderPastStateKey());
+        enabled && await deleteItem(templateBuilderPastStateKey());
     }
 
     const clearRedoState = async () => {
-        await deleteItem(templateBuilderFutureStateKey());
+        enabled && await deleteItem(templateBuilderFutureStateKey());
     }
 
     const undoCount = async () => {
+        if (!enabled) return 0;
         const items = await getTimeItems(templateBuilderPastStateKey());
         return items.length;
     }
 
     const redoCount = async () => {
+        if (!enabled) return 0;
         const items = await getTimeItems(templateBuilderFutureStateKey());
         return items.length;
     }
