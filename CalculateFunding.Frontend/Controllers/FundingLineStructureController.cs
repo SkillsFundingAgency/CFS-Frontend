@@ -63,7 +63,7 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<FundingStructure> fundingStructureApiResponse = await _policiesApiClient.GetFundingStructureResults(fundingStreamId,
                 fundingPeriodId,
                 specificationId,
-                etag);
+                etag:etag);
             
             if (fundingStructureApiResponse.StatusCode == HttpStatusCode.NotModified)
             {
