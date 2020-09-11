@@ -161,11 +161,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
-        if (providerSource === ProviderSource.CFS)
+        if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
         {
             setSelectedProviderVersionId(coreProviderId as string);
         }
-        else if (providerSource === ProviderSource.FDZ)
+        else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
         {
             setSelectedProviderSnapshotId(parseInt(coreProviderId));
         }
@@ -199,11 +199,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 assignedTemplateIds: assignedTemplateIdsValue,
             };
 
-            if (providerSource === ProviderSource.CFS)
+            if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
             {
                 updateSpecificationViewModel.providerVersionId = selectedProviderVersionId;
             }
-            else if (providerSource === ProviderSource.FDZ)
+            else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
             {
                 updateSpecificationViewModel.providerSnapshotId = selectedProviderSnapshotId
             }
