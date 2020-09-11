@@ -12,6 +12,7 @@ import {CalculationVersionHistorySummary} from "../../types/Calculations/Calcula
 import {GdsMonacoDiffEditor} from "../../components/GdsMonacoDiffEditor";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Link} from "react-router-dom";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface CompareCalculationVersionsRouteProps {
     calculationId: string;
@@ -156,21 +157,21 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
             </div>
             <div className="govuk-grid-row" >
                 <div className="govuk-grid-column-full">
-                    <p className="govuk-body">Funding Period: <span>Financial year 2020 to 2021</span></p>
-                    <h1 className="govuk-heading-xl">Primary unit of funding</h1>
+                    <p className="govuk-body">Funding Period: <span>{specification.fundingPeriod.name}</span></p>
+                    <h1 className="govuk-heading-xl">{calculation.name}</h1>
                 </div>
             </div>
             <div className="govuk-grid-row" >
                 <div className="govuk-grid-column-one-half">
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
-                            6 December 2020 10:33am <span className="right-align">Draft</span>
+                            <DateFormatter date={calculationVersions[0].lastUpdated} utc={true} /> <span className="right-align">{calculationVersions[0].publishStatus}</span>
                         </label></div>
                 </div>
                 <div className="govuk-grid-column-one-half">
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
-                            6 December 2020 10:33am <span className="right-align">Draft</span>
+                            <DateFormatter date={calculationVersions[1].lastUpdated} utc={true} /> <span className="right-align">{calculationVersions[1].publishStatus}</span>
                         </label></div>
                 </div>
                 <div className="govuk-grid-column-full">
@@ -179,7 +180,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                     </div>
                 </div>
             </div>
-            <div className="govuk-grid-row" >
+            <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <div className="govuk-form-group">
                         <fieldset className="govuk-fieldset">
@@ -194,14 +195,11 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                             </div>
                         </fieldset>
                     </div>
-
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">
                             <Link to={`/Calculations/CalculationVersionHistory/${calculationId}`} className="govuk-back-link">Back</Link>
                         </div>
                     </div>
-
-
                 </div>
             </div>
         </div>
