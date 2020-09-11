@@ -1,12 +1,15 @@
-import axios from "axios"
-import {TemplateSearchRequest} from "../types/searchRequestViewModel";
+import axios, {AxiosResponse} from "axios"
+import {TemplateSearchRequest} from "../types/publishedProviderSearchRequest";
 import {SearchMode} from "../types/SearchMode";
 import {useState} from "react";
 import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
+import {TemplateResponse} from "../types/TemplateBuilderDefinitions";
+import {ProviderSummary} from "../types/ProviderSummary";
 
 let baseURL = "/api/provider";
 
-export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string) {
+export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string) : 
+    Promise<AxiosResponse<ProviderSummary>> {
     return axios(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`, {
         method: 'GET',
         headers: {

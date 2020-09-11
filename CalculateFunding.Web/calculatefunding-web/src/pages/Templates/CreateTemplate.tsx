@@ -14,6 +14,7 @@ import {createNewDraftTemplate, getAllFundingStreamsWithAvailablePeriods} from "
 import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
 import {useHistory} from "react-router";
 import {FundingStreamAndPeriodSelection} from "../../components/TemplateBuilder/FundingStreamAndPeriodSelection";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export const CreateTemplate = () => {
     const [permittedFundingStreamsWithPeriods, setPermittedFundingStreamsWithPeriods] = useState<FundingStreamWithPeriodsResponse[]>([]);
@@ -147,23 +148,9 @@ export const CreateTemplate = () => {
                     <Breadcrumb name={"Create a new template"}/>
                 </Breadcrumbs>
                 <PermissionStatus requiredPermissions={missingPermissions}/>
-                {canCreateTemplate && errors.length > 0 &&
-                <div className="govuk-error-summary"
-                     aria-labelledby="error-summary-title" role="alert" tabIndex={-1} data-module="govuk-error-summary">
-                    <h2 className="govuk-error-summary__title" id="error-summary-title">
-                        There is a problem
-                    </h2>
-                    <div className="govuk-error-summary__body">
-                        <ul className="govuk-list govuk-error-summary__list">
-                            {errors.map((error) =>
-                                <li key={error.id}>
-                                    {error.fieldName && <a href={"#" + error.fieldName}>{error.message}</a>}
-                                    {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                </div>}
+                {canCreateTemplate &&
+                <MultipleErrorSummary errors={errors} />
+                }
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Create a new template</h1>
                     <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Build a new funding policy template</h3>

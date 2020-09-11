@@ -12,6 +12,8 @@ import {GetTemplateVersionsResponse, TemplateResponse, TemplateStatus, TemplateV
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {Footer} from "../../components/Footer";
 import {AxiosError} from "axios";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {ErrorMessage} from "../../types/ErrorMessage";
 
 export const ListVersions = () => {
     let {templateId} = useParams();
@@ -23,7 +25,7 @@ export const ListVersions = () => {
     const [page, setPage] = useState<number>(1);
     const [includeDrafts, setIncludeDrafts] = useState<boolean>(true);
     const [includePublished, setIncludePublished] = useState<boolean>(true);
-    const [errors, setErrors] = useState<string[]>([]);
+    const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const itemsPerPage = 10;
 
     function loadTemplate() {
@@ -36,10 +38,7 @@ export const ListVersions = () => {
             setTemplate(result);
             setIsLoadingTemplate(false);
         }).catch((error: AxiosError) => {
-            const response = error.response;
-            if (!response) {
-                setErrors(errors => [...errors, `Error whilst fetching template: ${response.statusText}`]);
-            }
+            addErrorMessage(`Error whilst fetching template: ${error.code}: ${error.message}`);
         }).finally(() => setIsLoadingTemplate(false));
     }
 
@@ -54,7 +53,7 @@ export const ListVersions = () => {
                 const statuses: TemplateStatus[] = [
                     ...includeDrafts ? [TemplateStatus.Draft] : [],
                     ...includePublished ? [TemplateStatus.Published] : [],
-                ]
+                ];
                 const result = await getVersionsOfTemplate(templateId, page, itemsPerPage, statuses);
                 return result.data as GetTemplateVersionsResponse;
             };
@@ -67,10 +66,7 @@ export const ListVersions = () => {
                     setResults(result.pageResults);
                     setTotalResults(result.totalCount);
                 }).catch((error: AxiosError) => {
-                    const response = error.response;
-                    if (!response) {
-                        setErrors(errors => [...errors, `Error whilst fetching versions: ${response.statusText}`]);
-                    }
+                    addErrorMessage(`Error whilst fetching versions: ${error.code}: ${error.message}`);
                 }).finally(() => setIsLoadingVersions(false));
             }
         }
@@ -89,6 +85,17 @@ export const ListVersions = () => {
 
     const onChangePage = async (newPage: number) => {
         setPage(newPage);
+    };
+
+
+    function addErrorMessage(errorMessage: string, fieldName?: string) {
+        const errorCount: number = errors.length;
+        const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
+        setErrors(errors => [...errors, error]);
+    }
+
+    function clearErrorMessages() {
+        setErrors([]);
     }
     
     return (
@@ -102,22 +109,7 @@ export const ListVersions = () => {
                     <Breadcrumb name={"Template Versions"}/>
                 </Breadcrumbs>
                 <div className="govuk-main-wrapper">
-                    {errors.length > 0 &&
-                    <div className="govuk-error-summary"
-                         aria-labelledby="error-summary-title" role="alert" tabIndex={-1} data-module="govuk-error-summary">
-                        <h2 className="govuk-error-summary__title" id="error-summary-title">
-                            There is a problem
-                        </h2>
-                        <div className="govuk-error-summary__body">
-                            <ul className="govuk-list govuk-error-summary__list">
-                                {errors.map((error, index) =>
-                                    <li key={index}>
-                                        <span className="govuk-error-message">{error}</span>
-                                    </li>
-                                )}
-                            </ul>
-                        </div>
-                    </div>}
+                    <MultipleErrorSummary errors={errors} />
 
                     <div className="govuk-grid-row" hidden={!isLoadingTemplate && !isLoadingVersions}>
                         <LoadingStatus title={"Loading"} description={"Please wait whilst the template versions are loading"}/>

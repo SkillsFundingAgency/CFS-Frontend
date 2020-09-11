@@ -28,7 +28,8 @@ export interface ProviderFundingOverviewRoute {
     fundingPeriodId: string;
 }
 
-export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFundingOverviewRoute>, props: ProviderFundingOverviewProps) {
+export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFundingOverviewRoute>, 
+                                        props: ProviderFundingOverviewProps) {
     const dispatch = useDispatch();
     let history = useHistory();
     useEffectOnce(() => {

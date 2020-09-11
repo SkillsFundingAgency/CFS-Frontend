@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Publishing;
+using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -14,78 +16,103 @@ namespace CalculateFunding.Frontend.Controllers
     public class PublishedProviderSearchController : Controller
     {
         private IPublishedProviderSearchService _publishedProviderSearchService;
+        private readonly IPublishingApiClient _publishingApiClient;
 
-        public PublishedProviderSearchController(IPublishedProviderSearchService publishedProviderSearchService)
+        public PublishedProviderSearchController(IPublishedProviderSearchService publishedProviderSearchService,
+            IPublishingApiClient publishingApiClient)
         {
             Guard.ArgumentNotNull(publishedProviderSearchService, nameof(publishedProviderSearchService));
 
             _publishedProviderSearchService = publishedProviderSearchService;
+            _publishingApiClient = publishingApiClient;
         }
 
         [HttpPost]
-        [Route("api/publishedprovider/searchpublishedproviders")]
-        public async Task<IActionResult> GetProviderVersionsByFundingStream([FromBody]SearchPublishedProvidersViewModel viewModel)
+        [Route("api/publishedprovider/search/ids")]
+        public async Task<IActionResult> GetProviderIds([FromBody] SearchPublishedProvidersRequest request)
         {
-            Guard.ArgumentNotNull(viewModel, nameof(viewModel));
-
-            IDictionary<string, string[]> filters = new Dictionary<string, string[]>();
-
-            if (viewModel.LocalAuthority != null && viewModel.LocalAuthority.Length > 0)
+            PublishedProviderIdSearchModel searchModel = new PublishedProviderIdSearchModel
             {
-                filters.Add("localAuthority", viewModel.LocalAuthority);
-            }
-
-            if (!string.IsNullOrEmpty(viewModel.FundingPeriodId) &&
-                !string.IsNullOrWhiteSpace(viewModel.FundingPeriodId))
-            {
-                filters.Add("fundingPeriodId", new[] {viewModel.FundingPeriodId});
-            }
-
-            if (!string.IsNullOrEmpty(viewModel.FundingStreamId) &&
-                !string.IsNullOrWhiteSpace(viewModel.FundingStreamId))
-            {
-                filters.Add("fundingStreamId", new[] {viewModel.FundingStreamId});
-            }
-
-            if (viewModel.ProviderType != null && viewModel.ProviderType.Length > 0)
-            {
-                filters.Add("providerType", viewModel.ProviderType);
-            }
-
-            if (viewModel.Status != null && viewModel.Status.Length > 0)
-            {
-                filters.Add("fundingStatus", viewModel.Status);
-            }
-
-            if (viewModel.ProviderSubType != null && viewModel.ProviderSubType.Length > 0)
-            {
-                filters.Add("providerSubType", viewModel.ProviderSubType);
-            }
-
-
-            SearchRequestViewModel request = new SearchRequestViewModel
-            {
-                SearchTerm = viewModel.SearchTerm,
-                PageNumber = viewModel.PageNumber,
-                Filters = filters,
-                SearchMode = viewModel.SearchMode,
-                ErrorToggle = viewModel.ErrorToggle,
-                FacetCount = viewModel.FacetCount,
-                IncludeFacets = viewModel.IncludeFacets,
-                PageSize = viewModel.PageSize,
-                SearchFields = viewModel.SearchFields
+                Filters = ExtractFilters(request),
+                SearchTerm = request.SearchTerm,
+                SearchFields = request.SearchFields
             };
 
-            PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(request);
+            ApiResponse<IEnumerable<string>> response = await _publishingApiClient.SearchPublishedProviderIds(searchModel);
+
+            var errorResult = response.IsSuccessOrReturnFailureResult("search");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(response.Content);
+        }
+
+        [HttpPost]
+        [Route("api/publishedprovider/search")]
+        public async Task<IActionResult> GetProviders([FromBody] SearchPublishedProvidersRequest request)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+
+            SearchRequestViewModel searchModel = new SearchRequestViewModel
+            {
+                SearchTerm = request.SearchTerm,
+                PageNumber = request.PageNumber,
+                Filters = ExtractFilters(request),
+                SearchMode = request.SearchMode,
+                ErrorToggle = request.ErrorToggle,
+                FacetCount = request.FacetCount,
+                IncludeFacets = request.IncludeFacets,
+                PageSize = request.PageSize,
+                SearchFields = request.SearchFields
+            };
+
+            PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(searchModel);
 
             if (result != null)
             {
                 return Ok(result);
             }
-            else
+
+            return new InternalServerErrorResult("Cannot find it");
+        }
+
+        private Dictionary<string, string[]> ExtractFilters(IFilterPublishedProviders source)
+        {
+            Dictionary<string, string[]> destination = new Dictionary<string, string[]>();
+
+            if (source.LocalAuthority != null && source.LocalAuthority.Length > 0)
             {
-                return new InternalServerErrorResult($"Cannot find it");
+                destination.Add("localAuthority", source.LocalAuthority);
             }
+
+            if (!string.IsNullOrWhiteSpace(source.FundingPeriodId))
+            {
+                destination.Add("fundingPeriodId", new[] {source.FundingPeriodId});
+            }
+
+            if (!string.IsNullOrWhiteSpace(source.FundingStreamId))
+            {
+                destination.Add("fundingStreamId", new[] {source.FundingStreamId});
+            }
+
+            if (source.ProviderType != null && source.ProviderType.Length > 0)
+            {
+                destination.Add("providerType", source.ProviderType);
+            }
+
+            if (source.Status != null && source.Status.Length > 0)
+            {
+                destination.Add("fundingStatus", source.Status);
+            }
+
+            if (source.ProviderSubType != null && source.ProviderSubType.Length > 0)
+            {
+                destination.Add("providerSubType", source.ProviderSubType);
+            }
+            
+            return destination;
         }
     }
 }

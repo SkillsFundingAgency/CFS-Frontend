@@ -1,6 +1,6 @@
 import {SearchMode} from "./SearchMode";
 
-export interface SearchRequestViewModel {
+export interface PublishedProviderSearchRequest {
     pageNumber: number,
     searchTerm: string,
     errorToggle: string,

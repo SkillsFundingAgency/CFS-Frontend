@@ -2,7 +2,8 @@ import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {
-    getFundingPeriodsByFundingStreamIdService, getFundingStreamsForSelectedSpecifications,
+    getFundingPeriodsByFundingStreamIdService, 
+    getFundingStreamsForSelectedSpecifications,
     getSpecificationsSelectedForFundingByPeriod
 } from "../../services/specificationService";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
@@ -93,14 +94,14 @@ export function FundingApprovalSelection() {
 
     function changeFundingStream(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingStream = e.target.value;
-        setSelectedFundingStream(fundingStream)
+        setSelectedFundingStream(fundingStream);
         populateFundingPeriod(fundingStream)
     }
 
 
     function changeFundingPeriod(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingPeriod = e.target.value;
-        setSelectedFundingPeriod(fundingPeriod)
+        setSelectedFundingPeriod(fundingPeriod);
         populateSpecification(fundingPeriod)
     }
 

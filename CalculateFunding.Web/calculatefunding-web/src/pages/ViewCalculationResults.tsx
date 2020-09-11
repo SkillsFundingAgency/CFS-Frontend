@@ -11,7 +11,7 @@ import {ViewCalculationState} from "../states/ViewCalculationState";
 import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import {getCalculationById, getCalculationResults} from "../actions/ViewCalculationResultsActions";
 import {FundingStream} from "../types/viewFundingTypes";
-import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
+import {CalculationProviderSearchRequestViewModel} from "../types/publishedProviderSearchRequest";
 import {getSpecificationSummary} from "../actions/ViewSpecificationResultsActions";
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";

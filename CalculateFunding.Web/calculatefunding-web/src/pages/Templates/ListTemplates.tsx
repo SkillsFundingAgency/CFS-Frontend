@@ -5,7 +5,7 @@ import {Section} from "../../types/Sections";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {TemplateSearchRequest} from "../../types/searchRequestViewModel";
+import {TemplateSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {DateFormatter} from "../../components/DateFormatter";
 import {TemplatePermissions, TemplateSearchResponse, TemplateStatus} from "../../types/TemplateBuilderDefinitions";
 import {useEffectOnce} from "../../hooks/useEffectOnce";

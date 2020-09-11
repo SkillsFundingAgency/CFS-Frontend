@@ -3,7 +3,7 @@ import {ActionCreator, Dispatch} from "redux";
 import {Calculation} from "../types/CalculationSummary";
 import {ViewCalculationState} from "../states/ViewCalculationState";
 import {getCalculationByIdService, getCalculationProvidersService} from "../services/calculationService";
-import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
+import {CalculationProviderSearchRequestViewModel} from "../types/publishedProviderSearchRequest";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
 
 export enum ViewCalculationResultsActionTypes {

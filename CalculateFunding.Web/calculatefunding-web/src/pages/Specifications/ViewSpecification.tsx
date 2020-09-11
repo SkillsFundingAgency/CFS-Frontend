@@ -542,7 +542,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <button type="button" className="govuk-link"
                                 onClick={chooseForFunding}
                                 hidden={specification.isSelectedForFunding || isLoading.selectedSpecification}>Choose for funding</button>
-                            <Link to={`/ViewSpecificationResults/${specificationId}`}
+                            <Link to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}
                                 hidden={!selectedSpecificationForFunding.isSelectedForFunding || isLoading.selectedSpecification} className="govuk-link">
                                 View funding
                             </Link>

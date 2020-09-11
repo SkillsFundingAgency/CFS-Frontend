@@ -29,12 +29,12 @@ export const FundingStreamAndPeriodSelection: React.FC<IFundingStreamAndPeriodSe
             if (onFundingStreamChange) {
                 onFundingStreamChange(e.target.value);
             }
-        }
+        };
 
         const handleFundingPeriodChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
             selectedFundingPeriodId = e.target.value;
             onFundingPeriodChange(e.target.value);
-        }
+        };
 
 
         return (

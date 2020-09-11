@@ -1,6 +1,6 @@
 import axios from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
-import {CalculationProviderSearchRequestViewModel} from "../types/searchRequestViewModel";
+import {CalculationProviderSearchRequestViewModel} from "../types/publishedProviderSearchRequest";
 import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
 

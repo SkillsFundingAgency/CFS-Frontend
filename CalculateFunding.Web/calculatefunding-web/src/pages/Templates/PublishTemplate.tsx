@@ -26,6 +26,7 @@ import {
 } from "../../services/templateBuilderDatasourceService";
 import {SidebarContent} from "../../components/TemplateBuilder/SidebarContent";
 import Sidebar from "react-sidebar";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export const PublishTemplate = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -175,23 +176,7 @@ export const PublishTemplate = () => {
                     <Breadcrumb name={"Publish a template"}/>
                 </Breadcrumbs>
 
-                {errors.length > 0 &&
-                <div className="govuk-error-summary"
-                     aria-labelledby="error-summary-title" role="alert" tabIndex={-1} data-module="govuk-error-summary">
-                    <h2 className="govuk-error-summary__title" id="error-summary-title">
-                        There is a problem
-                    </h2>
-                    <div className="govuk-error-summary__body">
-                        <ul className="govuk-list govuk-error-summary__list">
-                            {errors.map((error, index) =>
-                                <li key={error.id}>
-                                    {error.fieldName && <a href={"#" + error.fieldName}>{error.message}</a>}
-                                    {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                </div>}
+                <MultipleErrorSummary errors={errors} />
 
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Publish Template</h1>
