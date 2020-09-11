@@ -234,7 +234,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         lastUpdatedDate={f.lastUpdatedDate}>
                                                         <FundingLineStep key={f.name.replace(" ", "") + index}
                                                                          expanded={fundingLinesExpandedStatus}
-                                                                         fundingStructureItem={f} results={true}/>
+                                                                         fundingStructureItem={f}
+                                                                         showResults={true}/>
                                                     </CollapsibleSteps>
                                                 </li>
                                             })}

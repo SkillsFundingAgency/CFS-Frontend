@@ -3,7 +3,7 @@ import {
     FundingStructureType, IFundingStructureItem
 } from "../../types/FundingStructureItem";
 import {CollapsibleSteps} from "../CollapsibleSteps";
-export function FundingLineStep(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean, results:boolean}) {
+export function FundingLineStep(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean, showResults: boolean}) {
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
     let fundingType: string = "";
@@ -19,8 +19,8 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                     }
                     let linkValue = "";
                     if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId !== '') {
-                        linkValue = props.results ?
-                        encodeURI(`/ViewCalculationResults/${innerFundingLineItem.calculationId}/${parentFundingLineName}`) :
+                        linkValue = props.showResults ?
+                            encodeURI(`/ViewCalculationResults/${innerFundingLineItem.calculationId}/${parentFundingLineName}`) :
                             encodeURI(`/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`) ;
                     }
                     return (
@@ -41,7 +41,7 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                             lastUpdatedDate={innerFundingLineItem.lastUpdatedDate}>
                             {
                                 innerFundingLineItem.fundingStructureItems ?
-                                    (<FundingLineStep fundingStructureItem={innerFundingLineItem} expanded={expanded} results={props.results} />)
+                                    (<FundingLineStep fundingStructureItem={innerFundingLineItem} expanded={expanded} showResults={props.showResults} />)
                                     : null
                             }
                         </CollapsibleSteps>

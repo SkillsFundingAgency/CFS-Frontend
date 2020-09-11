@@ -155,12 +155,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         lastEditedDate: new Date(),
         dataDefinitionRelationshipIds: [],
     });
-    const [isLoading, setIsLoading] = useState({
-        fundingLineStructure: true,
-        additionalCalculations: true,
-        datasets: true,
-        selectedSpecification: true,
-    });
+    const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
+    const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
+    const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
+    const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
 
     let history = useHistory();
@@ -188,12 +186,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     useEffect(() => {
         if (additionalCalculations.currentPage !== 0) {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    additionalCalculations: false
-                }
-            })
+            setIsLoadingAdditionalCalculations(false);
         }
     }, [additionalCalculations.results]);
 
@@ -204,20 +197,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
                 setFundingLinesOriginalData(fundingLines);
             }
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    fundingLineStructure: false
-                }
-            })
+            setIsLoadingFundingLineStructure(false);
         }
         if (datasets.content.length === 0) {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    datasets: false
-                }
-            })
+            setIsLoadingDatasets(false);
         }
     }, [fundingLines]);
 
@@ -281,27 +264,21 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         if (specification != null && specification.fundingPeriod.id !== "" && specification.fundingStreams[0].id !== "") {
             getSpecificationsSelectedForFundingByPeriodAndStreamService(specification.fundingPeriod.id, specification.fundingStreams[0].id)
                 .then((selectedSpecificationResponse) => {
+                    setIsLoadingSelectedForFunding(false);
                     if (selectedSpecificationResponse.status === 200) {
                         const selectedSpecification = selectedSpecificationResponse.data as Specification[];
                         if (selectedSpecification.length > 0) {
                             setSelectedSpecificationForFunding(selectedSpecification[0]);
                         }
                     }
-                }).finally(() => {
-                    setIsLoading(prevState => {
-                        return {
-                            ...prevState,
-                            selectedSpecification: false
-                        }
-                    })
-                });
+                }).finally(() => setIsLoadingSelectedForFunding(false));
         }
     }, [specification]);
 
     const resetErrors = () => {
         setFundingLineStructureError(false);
         setErrors([]);
-    }
+    };
 
     const fetchData = async () => {
         try {
@@ -319,14 +296,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             setFundingLineStructureError(true);
             setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
         } finally {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    fundingLineStructure: false
-                }
-            })
+            setIsLoadingFundingLineStructure(false);
         }
-    }
+    };
 
     function confirmChanges() {
         setCanTimetableBeUpdated(false);
@@ -384,8 +356,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         if (response.status === 200) {
             setFundingLinePublishStatus(PublishStatus.Approved);
         } else {
-            setErrors(errors => [...errors,
-            `Error whilst approving funding line structure: ${response.statusText} ${response.data}`]);
+            setErrors(errors => [...errors, `Error whilst approving funding line structure: ${response.statusText} ${response.data}`]);
             setFundingLinePublishStatus(specification.approvalStatus as PublishStatus);
         }
     };
@@ -414,12 +385,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 const result = response.data as CalculationSummary;
                 setAdditionalCalculations(result)
             }
-        }).finally(() => setIsLoading(prevState => {
-            return {
-                ...prevState,
-                additionalCalculations: false
-            }
-        }));
+        }).finally(() => setIsLoadingAdditionalCalculations(false));
     }
 
     function chooseForFunding() {
@@ -429,7 +395,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 UserConfirmLeavePageModal("Are you sure you want to choose this specification?",
                     refreshFunding, "Confirm", "Cancel");
             }
-        }).catch(() => {setErrors(errors => [...errors, "A problem occurred while getting user permissions"]);});
+        }).catch(() => setErrors(errors => [...errors, "A problem occurred while getting user permissions"]));
     }
 
     function refreshFunding(confirm: boolean) {
@@ -511,9 +477,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                     <span className="govuk-caption-l">Specification Name</span>
-                    <h2 className={`govuk-heading-l ${(!specification.isSelectedForFunding || isLoading.selectedSpecification) ? "" : "govuk-!-margin-bottom-2"}`}>{specification.name}</h2>
+                    <h2 className={`govuk-heading-l ${(!specification.isSelectedForFunding || isLoadingSelectedForFunding) ? "" : "govuk-!-margin-bottom-2"}`}>{specification.name}</h2>
                     {
-                        (!(selectedSpecificationForFunding.id === specification.id) || isLoading.selectedSpecification) ?
+                        (!(selectedSpecificationForFunding.id === specification.id) || isLoadingSelectedForFunding) ?
                             "" : <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
                     }
 
@@ -538,15 +504,18 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
+                        {!isLoadingSelectedForFunding &&
                         <li>
-                            <button type="button" className="govuk-link"
-                                onClick={chooseForFunding}
-                                hidden={specification.isSelectedForFunding || isLoading.selectedSpecification}>Choose for funding</button>
-                            <Link to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}
-                                hidden={!selectedSpecificationForFunding.isSelectedForFunding || isLoading.selectedSpecification} className="govuk-link">
-                                View funding
-                            </Link>
+                            {specification.isSelectedForFunding ?
+                                <Link className="govuk-link" 
+                                      to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}>
+                                    View funding
+                                </Link>
+                                :
+                                <button type="button" className="govuk-link" onClick={chooseForFunding}>Choose for funding</button>
+                            }
                         </li>
+                        }
                     </ul>
                 </div>
             </div>
@@ -563,14 +532,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="fundingline-structure">
                             <section className="govuk-tabs__panel" id="fundingline-structure">
                                 <LoadingStatus title={"Loading funding line structure"}
-                                    hidden={!isLoading.fundingLineStructure}
+                                    hidden={!isLoadingFundingLineStructure}
                                     description={"Please wait whilst funding line structure is loading"} />
                                 <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
                                     </div>
                                 </div>
-                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure || fundingLineStructureError}>
+                                <div className="govuk-grid-row" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Funding line structure</h2>
                                     </div>
@@ -588,7 +557,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         </div>
                                     </div>
                                 </div>
-                                <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure || fundingLineStructureError}>
+                                <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
                                     <button type="button" className="govuk-accordion__open-all"
                                         aria-expanded="false"
                                         onClick={openCloseAllFundingLines}
@@ -614,15 +583,15 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                     uniqueKey={index.toString()}
                                                     title={FundingStructureType[f.type]}
                                                     description={f.name}
-                                                    status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
-                                                        f.calculationPublishStatus : ""}
+                                                    status={(f.calculationPublishStatus && f.calculationPublishStatus !== '') ? f.calculationPublishStatus : ""}
                                                     step={f.level.toString()}
                                                     expanded={fundingLinesExpandedStatus || f.expanded}
                                                     link={linkValue}
                                                     hasChildren={f.fundingStructureItems != null}>
                                                     <FundingLineStep key={f.name.replace(" ", "") + index}
-                                                        expanded={fundingLinesExpandedStatus}
-                                                        fundingStructureItem={f} />
+                                                                     showResults={false}
+                                                                     expanded={fundingLinesExpandedStatus}
+                                                                     fundingStructureItem={f} />
                                                 </CollapsibleSteps>
                                             </li>
                                         })}
@@ -633,9 +602,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="additional-calculations">
                             <section className="govuk-tabs__panel" id="additional-calculations">
                                 <LoadingStatus title={"Loading additional calculations"}
-                                    hidden={!isLoading.additionalCalculations}
+                                    hidden={!isLoadingAdditionalCalculations}
                                     description={"Please wait whilst additional calculations are loading"} />
-                                <div className="govuk-grid-row" hidden={isLoading.additionalCalculations}>
+                                <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Additional calculations</h2>
                                     </div>
@@ -712,9 +681,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="datasets">
                             <section className="govuk-tabs__panel" id="datasets">
                                 <LoadingStatus title={"Loading datasets"}
-                                    hidden={!isLoading.datasets}
+                                    hidden={!isLoadingDatasets}
                                     description={"Please wait whilst datasets are loading"} />
-                                <div className="govuk-grid-row" hidden={isLoading.datasets}>
+                                <div className="govuk-grid-row" hidden={isLoadingDatasets}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>
