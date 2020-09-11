@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using AutoMapper;
 using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
@@ -8,12 +9,11 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.Helpers;
-using CalculateFunding.Frontend.ViewModels.Datasets;
-using System.Threading.Tasks;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Frontend.ViewModels.Datasets;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,7 +26,7 @@ namespace CalculateFunding.Frontend.Controllers
         private IAuthorizationHelper _authorizationHelper;
         private IMapper _mapper;
         private IDatasetsApiClient _datasetsApiClient;
-        
+
         public DatasetRelationshipsSearchController(IDatasetRelationshipsSearchService searchService, ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper, IMapper mapper, IDatasetsApiClient datasetsApiClient)
         {
             Guard.ArgumentNotNull(searchService, nameof(searchService));
@@ -78,10 +78,10 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return new StatusCodeResult(500);
             }
-            
+
             return new OkObjectResult(viewModel);
         }
-        
+
         private async Task<SpecificationDatasetRelationshipsViewModel> PopulateViewModel(SpecificationSummary specification)
         {
             SpecificationSummaryViewModel vm = _mapper.Map<SpecificationSummaryViewModel>(specification);
@@ -93,7 +93,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return null;
             }
-            
+
             viewModel.Items = apiResponse.Content.Select(m => new SpecificationDatasetRelationshipItemViewModel
             {
                 DatasetId = m.DatasetId,
@@ -108,7 +108,7 @@ namespace CalculateFunding.Frontend.Controllers
                 IsProviderData = m.IsProviderData,
                 IsLatestVersion = m.IsLatestVersion,
                 LastUpdatedDate = m.LastUpdatedDate,
-                LastUpdatedAuthorName = m.LastUpdatedAuthor.Name
+                LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name) ? "Unknown" : m.LastUpdatedAuthor.Name,
             });
 
             return viewModel;
