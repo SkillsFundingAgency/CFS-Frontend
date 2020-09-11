@@ -307,7 +307,7 @@ export function MapDataSourceFiles() {
                                         }
                                         {
                                             dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ?
-                                                <p className="govuk-body"> Last mapped <DateFormatter date={dr.mapDatasetLastUpdated} utc={true} /></p>
+                                                <p className="govuk-body"> Last mapped <DateFormatter date={dr.mapDatasetLastUpdated} utc={false} /></p>
                                                 : null
                                         }
                                     </th>

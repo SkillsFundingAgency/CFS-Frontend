@@ -131,7 +131,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                                         <strong>Description:</strong> {sdr.definitionDescription}
                                                     </p>
                                                     <p className="govuk-body">
-                                                        <strong>Last mapped:</strong> <DateFormatter date={sdr.lastUpdatedDate} utc={true}/>
+                                                        <strong>Last mapped:</strong> <DateFormatter date={sdr.lastUpdatedDate} utc={false}/>
                                                     </p>
                                                     <p className="govuk-body">
                                                         <strong>Last mapped by:</strong> {sdr.lastUpdatedAuthorName}
