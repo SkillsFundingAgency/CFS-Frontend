@@ -11,6 +11,6 @@ export interface NewDatasetVersionResponseViewModel {
 
 export interface NewDatasetVersionResponseErrorModel {
     DefinitionId: string;
-    Filename: string[];
+    Name: string[];
     FundingStreamId: string[];
 }

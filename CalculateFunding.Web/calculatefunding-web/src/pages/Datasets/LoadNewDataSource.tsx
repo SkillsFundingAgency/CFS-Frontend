@@ -361,8 +361,8 @@ export function LoadNewDataSource() {
 
     let uploadErrorMessage = "";
     if (errorResponse) {
-        if (errorResponse.Filename && errorResponse.Filename.length > 0) {
-            uploadErrorMessage += errorResponse.Filename[0];
+        if (errorResponse.Name && errorResponse.Name.length > 0) {
+            uploadErrorMessage += errorResponse.Name[0];
         }
         if (errorResponse.DefinitionId && errorResponse.DefinitionId.length > 0) {
             uploadErrorMessage += errorResponse.DefinitionId;
