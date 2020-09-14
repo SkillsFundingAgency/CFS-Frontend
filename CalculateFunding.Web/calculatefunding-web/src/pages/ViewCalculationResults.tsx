@@ -65,7 +65,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         searchTerm: "",
         calculationId: match.params.calculationId,
     };
-    const [calculationProviderSearchRequest, setcalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
+    const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
     const calculationId = match.params.calculationId;
     const jobSummaryInitial = {
         jobId: "",
@@ -96,7 +96,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
     useEffect(() => {
         dispatch(getCalculationById(calculationId));
-
     }, [calculationId]);
 
     useEffect(() => {
@@ -122,7 +121,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     }, [specificationResults.specification.fundingStreams]);
 
     useEffect(() => {
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {
                 ...prevState,
                 calculationValueType: calculationSummary.calculation.valueType,
@@ -178,7 +177,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {...prevState, providerType: filterUpdate}
         });
         dispatch(getCalculationResults(calculationProviderSearchRequest));
@@ -193,7 +192,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {...prevState, providerSubType: filterUpdate}
         });
         dispatch(getCalculationResults(calculationProviderSearchRequest));
@@ -208,7 +207,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             filterUpdate = "";
         }
 
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {...prevState, errorToggle: filterUpdate}
         });
 
@@ -227,7 +226,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {...prevState, localAuthority: filterUpdate}
         });
         dispatch(getCalculationResults(calculationProviderSearchRequest));
@@ -236,7 +235,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     function filterBySearchTerm(e: React.ChangeEvent<HTMLInputElement>) {
         let filterUpdate = e.target.value;
 
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {...prevState, searchTerm: filterUpdate}
         });
 
@@ -244,7 +243,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     }
 
     function clearFilters() {
-        setcalculationProviderSearchRequest(initialSearch);
+        setCalculationProviderSearchRequest(initialSearch);
         // @ts-ignore
         document.getElementById("searchProviders").reset();
         dispatch(getCalculationResults(initialSearch));
@@ -253,7 +252,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     function setPagination(e: number) {
         let request = calculationProviderSearchRequest;
         request.pageNumber = e;
-        setcalculationProviderSearchRequest(prevState => {
+        setCalculationProviderSearchRequest(prevState => {
             return {...prevState, pageNumber: e}
         });
 
@@ -385,7 +384,9 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                                        key={cpr.id} autoExpand={autoExpand}>
                                     <div id={"accordion-default-content-" + cpr.id}
                                          className="govuk-accordion__section-content">
-                                        <Link to={`/ViewResults/ViewProviderResults/${cpr.providerId}`} className="govuk-link">View provider calculations</Link>
+                                        <Link to={`/ViewResults/ViewProviderResults/${cpr.providerId}?specificationId=${cpr.specificationId}`} className="govuk-link">
+                                            View provider calculations
+                                        </Link>
                                         <dl className="govuk-summary-list govuk-!-margin-top-5">
                                             <div className="govuk-summary-list__row">
                                                 <dt className="govuk-summary-list__key">

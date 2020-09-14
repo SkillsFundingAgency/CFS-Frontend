@@ -1,10 +1,7 @@
 import axios, {AxiosResponse} from "axios"
-import {TemplateSearchRequest} from "../types/publishedProviderSearchRequest";
-import {SearchMode} from "../types/SearchMode";
-import {useState} from "react";
 import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
-import {TemplateResponse} from "../types/TemplateBuilderDefinitions";
 import {ProviderSummary} from "../types/ProviderSummary";
+import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
 
 let baseURL = "/api/provider";
 
@@ -53,7 +50,7 @@ export async function GetProvidersByFundingStreamService(fundingStreamId: string
     });
 }
 
-export async function getProviderResultsService(providerId: string) {
+export async function getProviderResultsService(providerId: string): Promise<AxiosResponse<SpecificationInformation[]>> {
     return axios(`${baseURL}/getproviderresults/${providerId}`, {
         method: 'GET',
         headers: {

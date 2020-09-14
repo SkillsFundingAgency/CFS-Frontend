@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {ProviderDetailsViewModel} from "../../types/Provider/ProviderDetailsViewModel";
 import {getProviderByIdAndVersionService, getProviderResultsService} from "../../services/providerService";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useLocation} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
@@ -28,6 +28,7 @@ import {NoData} from "../../components/NoData";
 import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
 import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
 import {Footer} from "../../components/Footer";
+import * as QueryString from "query-string";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -79,7 +80,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         id: "",
         lastEditDate: new Date(),
         name: ""
-    }])
+    }]);
     const [additionalCalculations, setAdditionalCalculations] = useState<AdditionalCalculationSearchResultViewModel>({
         currentPage: 0,
         endItemNumber: 0,
@@ -98,7 +99,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         totalCount: 0,
         totalErrorResults: 0,
         totalResults: 0
-    })
+    });
     const [additionalCalculationsSearchTerm, setAdditionalCalculationsSearchTerm] = useState("");
     const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
         approvalStatus: "",
@@ -132,37 +133,42 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<PublishStatus>(PublishStatus.Draft);
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState();
+    const location = useLocation();
 
     useEffectOnce(() => {
         const providerId = match.params.providerId;
+        const querystringParams = QueryString.parse(location.search);
 
-        getProviderResultsService(providerId).then((response) => {
-            if (response.status === 200) {
-                const specificationInformation = response.data as SpecificationInformation[];
-                populateSpecification(specificationInformation[0].id);
-                setProviderResults(specificationInformation);
+        getProviderResultsService(providerId)
+            .then((response) => {
+                const specificationInformation = response.data;
+                if (specificationInformation && specificationInformation.length > 0) {
+                    const selectedSpecification = specificationInformation
+                        .find((s) => 
+                            s.id === querystringParams.specificationId) ?? specificationInformation[0];
+                    populateSpecification(selectedSpecification.id);
+                    setProviderResults(specificationInformation);
+                    setIsLoading(prevState => {
+                        return {
+                            ...prevState,
+                            providerResults: false
+                        }
+                    });
+                }
+            })
+            .catch((e) => {
                 setIsLoading(prevState => {
                     return {
                         ...prevState,
-                        providerResults: false
+                        providerDetails: false,
+                        providerResults: false,
+                        providerData: false,
+                        additionalCalculations: false,
+                        fundingLineStructure: false
                     }
                 })
-            }
-        }).catch((e) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    providerDetails: false,
-                    providerResults: false,
-                    providerData: false,
-                    additionalCalculations: false,
-                    fundingLineStructure: false
-                }
-            })
-        });
-
-
-    })
+            });
+    });
 
     useEffect(() => {
         if (!fundingLineRenderInternalState) {
@@ -219,7 +225,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         if (specificationSummary.providerVersionId !== "") {
             populateProviderResults(specificationSummary.providerVersionId);
         }
-    }, [specificationSummary.providerVersionId])
+    }, [specificationSummary.providerVersionId]);
 
     function populateProviderResults(providerVersion: string) {
         getProviderByIdAndVersionService(match.params.providerId, providerVersion).then((response) => {
@@ -253,7 +259,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             .then((response) => {
                 if (response.status === 200) {
                     const result = response.data as AdditionalCalculationSearchResultViewModel;
-                    setAdditionalCalculations(result)
+                    setAdditionalCalculations(result);
                     setIsLoading(prevState => {
                         return {
                             ...prevState,
@@ -386,7 +392,9 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                     <div className="govuk-form-group">
                         <h3 className="govuk-heading-m govuk-!-margin-bottom-1">Specification</h3>
                         <span className="govuk-caption-m">Select a specification for the provider</span>
-                        <select className="govuk-select" id="sort" name="sort" onChange={(e) => setSelectedSpecification(e)}>
+                        <select className="govuk-select" id="sort" name="sort" 
+                                onChange={setSelectedSpecification} 
+                                value={specificationSummary.id}>
                             {providerResults.map(p =>
                                 <option key={p.id} value={p.id}>{p.name}
                                 </option>
@@ -454,7 +462,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                         uniqueKey={index.toString()}
                                                         title={FundingStructureType[f.type]}
                                                         calculationType={f.calculationType != null ? f.calculationType : ""}
-                                                        value={f.value != null? f.value : ""}
+                                                        value={f.value != null ? f.value : ""}
                                                         description={f.name}
                                                         status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
                                                             f.calculationPublishStatus : ""}
@@ -463,8 +471,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                         link={linkValue}
                                                         hasChildren={f.fundingStructureItems != null}>
                                                         <FundingLineStepProviderResults key={f.name.replace(" ", "") + index}
-                                                                         expanded={fundingLinesExpandedStatus}
-                                                                         fundingStructureItem={f}/>
+                                                                                        expanded={fundingLinesExpandedStatus}
+                                                                                        fundingStructureItem={f}/>
                                                     </CollapsibleSteps>
                                                     </li>
                                                 })}
