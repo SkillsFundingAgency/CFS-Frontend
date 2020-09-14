@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
-using CalculateFunding.Common.Extensions;
 
 namespace CalculateFunding.Frontend.Controllers
 {

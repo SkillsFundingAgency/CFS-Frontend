@@ -1,10 +1,8 @@
 ﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
-using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -16,6 +14,31 @@ namespace CalculateFunding.Frontend.Controllers
         public FundingLineDetailsController(IPublishingApiClient publishingApiClient)
         {
             _publishingApiClient = publishingApiClient;
+        }
+
+        [HttpGet]
+        [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}/{fundingLineCode}")]
+        public async Task<IActionResult> GetFundingLinePublishedProviderDetails(
+            string specificationId,
+            string providerId,
+            string fundingStreamId,
+            string fundingLineCode)
+        {
+            ApiResponse<FundingLineProfile> fundingLineApiResponse = await _publishingApiClient
+                .GetFundingLinePublishedProviderDetails(
+                    specificationId,
+                    providerId,
+                    fundingStreamId,
+                    fundingLineCode);
+
+            IActionResult errorResult =
+                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(fundingLineApiResponse.Content);
         }
 
         [HttpGet]
@@ -35,7 +58,7 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingLineCode);
 
             IActionResult errorResult =
-                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetPreviousProfilesForSpecificationForProviderForFundingLine));
+                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
             if (errorResult != null)
             {
                 return errorResult;
@@ -61,7 +84,7 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingLineCode);
 
             IActionResult errorResult =
-                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetPreviousProfilesForSpecificationForProviderForFundingLine));
+                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
             if (errorResult != null)
             {
                 return errorResult;

@@ -39,6 +39,31 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task ReturnsInternalServerErrorWhenGetFundingLinePublishedProviderDetailsApiReturnsInternalServerError()
+        {
+            GivenGetFundingLinePublishedProviderDetailsForFundingLine(
+                HttpStatusCode.InternalServerError);
+
+            IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
+
+            actualResult.Should().BeOfType<InternalServerErrorResult>();
+        }
+
+        [TestMethod]
+        public async Task ReturnsPublishedProviderDetailsWhenPreviousProfileExists()
+        {
+            GivenGetFundingLinePublishedProviderDetailsForFundingLine(
+                HttpStatusCode.OK, new FundingLineProfile());
+
+            IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
+
+            actualResult.Should().BeOfType<OkObjectResult>();
+            OkObjectResult okObjectResult = actualResult as OkObjectResult;
+            okObjectResult.Should().NotBeNull();
+            okObjectResult.Value.Should().NotBeNull();
+        }
+
+        [TestMethod]
         public async Task ReturnsInternalServerErrorWhenPreviousProfileExistsApiReturnsInternalServerError()
         {
             GivenPreviousProfileExistsForSpecificationForProviderForFundingLine(
@@ -107,6 +132,19 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             fundingLineChange.FundingLineName.Should().Be(fundingLineName);
         }
 
+        public void GivenGetFundingLinePublishedProviderDetailsForFundingLine(
+            HttpStatusCode httpStatusCode,
+            FundingLineProfile result = null)
+        {
+            _publishingApiClient
+                .Setup(_ => _.GetFundingLinePublishedProviderDetails(
+                    _specificationId,
+                    _providerId,
+                    _fundingStreamId,
+                    _fundingLineCode))
+                .ReturnsAsync(new ApiResponse<FundingLineProfile>(httpStatusCode, result));
+        }
+
         public void GivenPreviousProfileExistsForSpecificationForProviderForFundingLine(
             HttpStatusCode httpStatusCode,
             bool? result = null)
@@ -124,6 +162,16 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             return await _fundingLineDetailsController
                 .PreviousProfileExistsForSpecificationForProviderForFundingLine(
+                    _specificationId,
+                    _providerId,
+                    _fundingStreamId,
+                    _fundingLineCode);
+        }
+
+        public async Task<IActionResult> WhenGetFundingLinePublishedProviderDetails()
+        {
+            return await _fundingLineDetailsController
+                .GetFundingLinePublishedProviderDetails(
                     _specificationId,
                     _providerId,
                     _fundingStreamId,

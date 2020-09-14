@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -289,21 +290,15 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingPeriodId,
                     providerId);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            IActionResult errorResult =
+                apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+
+            if (errorResult != null)
             {
-                if (apiResponse.Content != null && apiResponse.Content.Any())
-                {
-                    return Ok(MapToProfilingViewModel(apiResponse.Content));
-                }
+                return errorResult;
             }
 
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(apiResponse.Content);
-            }
-
-            return new InternalServerErrorResult(
-                "There was an error retrieving latest profile totals.");
+            return Ok(MapToProfilingViewModel(apiResponse.Content));
         }
 
         [HttpGet]
@@ -342,21 +337,15 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingPeriodId,
                     providerId);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            IActionResult errorResult =
+                apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+
+            if (errorResult != null)
             {
-                if (apiResponse.Content != null && apiResponse.Content.Any())
-                {
-                    return Ok(MapToArchiveViewModel(apiResponse.Content));
-                }
+                return errorResult;
             }
 
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(apiResponse.Content);
-            }
-
-            return new InternalServerErrorResult(
-                "There was an error retrieving profile archive details.");
+            return Ok(MapToArchiveViewModel(apiResponse.Content));
         }
 
         [HttpPost("api/specifications/{specificationId}/publishedproviders/publishingstatus-for-release")]
@@ -409,7 +398,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             decimal previousAllocation = CalculatePreviousAllocation(orderedProfilingVersionByLatest);
 
-            List<ProfilingInstallment> profilingInstallments = orderedProfilingVersionByLatest.First().Value
+            IEnumerable<ProfilingInstallment> profilingInstallments = orderedProfilingVersionByLatest.Any() ? orderedProfilingVersionByLatest.First().Value
                 .ProfileTotals
                 .Select(profilingTotal =>
                     new ProfilingInstallment(
@@ -417,7 +406,7 @@ namespace CalculateFunding.Frontend.Controllers
                         profilingTotal.TypeValue,
                         profilingTotal.Occurrence,
                         profilingTotal.Value))
-                .ToList();
+                : Array.Empty<ProfilingInstallment>();
 
             return new ProfilingViewModel(profilingInstallments, previousAllocation);
         }

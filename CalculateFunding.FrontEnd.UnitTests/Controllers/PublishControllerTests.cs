@@ -157,7 +157,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task GetAllReleasedProfileTotals_Returns_InternalServerError_Result_Given_PublishingApi_Returns_An_Empty_Ok_Result()
+        public async Task GetAllReleasedProfileTotals_Returns_NotFoundObjectResult_Result_Given_PublishingApi_Returns_An_Empty_Ok_Result()
         {
             string  aValidId = "VALID_ID";
             _publishingApiClient.GetAllReleasedProfileTotals(aValidId, aValidId, aValidId)
@@ -168,26 +168,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 aValidId,
                 aValidId);
 
-            result.Should().BeAssignableTo<InternalServerErrorResult>();
+            result.Should().BeAssignableTo<NotFoundObjectResult>();
         }
 
         [TestMethod]
-        public async Task GetAllReleasedProfileTotals_Returns_InternalServerError_Result_Given_PublishingApi_Returns_Result_With_Empty_ProfilingVersion()
-        {
-            string aValidId = "VALID_ID";
-            _publishingApiClient.GetAllReleasedProfileTotals(aValidId, aValidId, aValidId)
-                .Returns(new ApiResponse<IDictionary<int, ProfilingVersion>>(HttpStatusCode.OK, new Dictionary<int, ProfilingVersion>()));
-
-            IActionResult result = await _publishController.GetAllReleasedProfileTotals(
-                aValidId,
-                aValidId,
-                aValidId);
-
-            result.Should().BeAssignableTo<InternalServerErrorResult>();
-        }
-
-        [TestMethod]
-        public async Task GetAllReleasedProfileTotals_Returns_BadRequest_Result_Given_PublishingApi_Returns_BadRequest()
+        public async Task GetAllReleasedProfileTotals_Returns_InternalServerErrorResult_Result_Given_PublishingApi_Returns_BadRequest()
         {
             string aValidId = "VALID_ID";
             _publishingApiClient.GetAllReleasedProfileTotals(aValidId, aValidId, aValidId)
@@ -198,7 +183,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 aValidId,
                 aValidId);
 
-            result.Should().BeAssignableTo<BadRequestObjectResult>();
+            result.Should().BeAssignableTo<InternalServerErrorResult>();
         }
 
         [TestMethod]
