@@ -358,7 +358,49 @@ namespace CalculateFunding.Frontend.Controllers
             return new InternalServerErrorResult(
                 "There was an error retrieving profile archive details.");
         }
-        
+
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/publishingstatus-for-release")]
+        public async Task<IActionResult> GetProviderBatchForReleaseCount([FromBody] PublishProvidersRequest publishedProviderIds, [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(publishedProviderIds, nameof(publishedProviderIds));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<PublishedProviderFundingCount> apiResponse = await _publishingApiClient.GetProviderBatchForReleaseCount(publishedProviderIds, specificationId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(apiResponse.Content);
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(apiResponse.Content);
+            }
+
+            return new InternalServerErrorResult("There was an error retrieving provider funding counts for release.");
+        }
+
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/publishingstatus-for-approval")]
+        public async Task<IActionResult> GetProviderBatchForApprovalCount([FromBody] PublishProvidersRequest publishedProviderIds, [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(publishedProviderIds, nameof(publishedProviderIds));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<PublishedProviderFundingCount> apiResponse = await _publishingApiClient.GetProviderBatchForReleaseCount(publishedProviderIds, specificationId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(apiResponse.Content);
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(apiResponse.Content);
+            }
+
+            return new InternalServerErrorResult("There was an error retrieving provider funding counts for approval.");
+        }
+
         private static ProfilingViewModel MapToProfilingViewModel(
             IDictionary<int, ProfilingVersion> profilingVersions)
         {
