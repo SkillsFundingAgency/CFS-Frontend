@@ -53,6 +53,7 @@ import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificati
 import {Specification} from "../../types/viewFundingTypes";
 import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageModal";
 import * as QueryString from "query-string";
+import {NoData} from "../../components/NoData";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -159,6 +160,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
     const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
+    const [isLoadingVariationManagement, setIsLoadingVariationManagement] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
 
     let history = useHistory();
@@ -166,8 +168,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     useEffect(() => {
         const params = QueryString.parse(location.search);
+
         if (params.showDatasets) {
             setInitialTab("datasets");
+        } else if (params.showVariationManagement) {
+            setInitialTab("variation-management");
         } else {
             setInitialTab("fundingline-structure")
         }
@@ -231,32 +236,35 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
                     let request: ReleaseTimetableViewModel = {
                         releaseDate:
-                        {
-                            day: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getDate().toString() : "1",
-                            month: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getMonth().toString() : "1",
-                            year: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getFullYear().toString() : "2000",
-                            time: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getTime().toString() : "00:00",
+                            {
+                                day: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getDate().toString() : "1",
+                                month: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getMonth().toString() : "1",
+                                year: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getFullYear().toString() : "2000",
+                                time: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getTime().toString() : "00:00",
 
-                        },
+                            },
                         navisionDate:
-                        {
-                            day: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getDate().toString() : "1",
-                            month: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getMonth().toString() : "1",
-                            year: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getFullYear().toString() : "2000",
-                            time: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getTime().toString() : "00:00",
+                            {
+                                day: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getDate().toString() : "1",
+                                month: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getMonth().toString() : "1",
+                                year: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getFullYear().toString() : "2000",
+                                time: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getTime().toString() : "00:00",
 
-                        }
+                            }
                     };
 
                     setReleaseTimetable(request);
                 }
             });
 
+
         getProfileVariationPointersService(specificationId).then((result) => {
             const response = result;
             if (response.status === 200) {
                 setProfileVariationPointers(response.data as ProfileVariationPointer[]);
             }
+        }).finally(() => {
+            setIsLoadingVariationManagement(false);
         })
     }, [specificationId]);
 
@@ -452,27 +460,27 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     return <div>
-        <Header location={Section.Specifications} />
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"} />
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-                <Breadcrumb name={specification.name} />
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specification.name}/>
             </Breadcrumbs>
             {errors.length > 0 &&
-                <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}
-                    data-module="govuk-error-summary">
-                    <h2 className="govuk-error-summary__title" id="error-summary-title">
-                        There is a problem
+            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}
+                 data-module="govuk-error-summary">
+                <h2 className="govuk-error-summary__title" id="error-summary-title">
+                    There is a problem
                 </h2>
-                    <div className="govuk-error-summary__body">
-                        <ul className="govuk-list govuk-error-summary__list">
-                            {errors.map((error, i) =>
-                                <li key={i}>{error}</li>
-                            )}
-                        </ul>
-                    </div>
+                <div className="govuk-error-summary__body">
+                    <ul className="govuk-list govuk-error-summary__list">
+                        {errors.map((error, i) =>
+                            <li key={i}>{error}</li>
+                        )}
+                    </ul>
                 </div>
+            </div>
             }
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
@@ -507,7 +515,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         {!isLoadingSelectedForFunding &&
                         <li>
                             {specification.isSelectedForFunding ?
-                                <Link className="govuk-link" 
+                                <Link className="govuk-link"
                                       to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}>
                                     View funding
                                 </Link>
@@ -521,19 +529,20 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
             {initialTab.length > 0 && <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
-                    <Details title={`What is ${specification.name}`} body={specification.description} />
+                    <Details title={`What is ${specification.name}`} body={specification.description}/>
                     <Tabs initialTab={initialTab}>
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                             <Tabs.Tab hidden={!releaseTimetableIsEnabled} label="release-timetable">Release timetable</Tabs.Tab>
+                            <Tabs.Tab label="variation-management">Variation Management</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
                             <section className="govuk-tabs__panel" id="fundingline-structure">
                                 <LoadingStatus title={"Loading funding line structure"}
-                                    hidden={!isLoadingFundingLineStructure}
-                                    description={"Please wait whilst funding line structure is loading"} />
+                                               hidden={!isLoadingFundingLineStructure}
+                                               description={"Please wait whilst funding line structure is loading"}/>
                                 <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
@@ -545,29 +554,29 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <ApproveStatusButton id={specification.id}
-                                            status={fundingLinePublishStatus}
-                                            callback={handleApproveFundingLineStructure} />
+                                                             status={fundingLinePublishStatus}
+                                                             callback={handleApproveFundingLineStructure}/>
                                     </div>
                                     <div className="govuk-grid-column-two-thirds">
                                         <div className="govuk-form-group search-container">
                                             <label className="govuk-label">
                                                 Search by calculation
                                             </label>
-                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
+                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
                                     <button type="button" className="govuk-accordion__open-all"
-                                        aria-expanded="false"
-                                        onClick={openCloseAllFundingLines}
-                                        hidden={fundingLinesExpandedStatus}>Open all<span
-                                            className="govuk-visually-hidden"> sections</span></button>
+                                            aria-expanded="false"
+                                            onClick={openCloseAllFundingLines}
+                                            hidden={fundingLinesExpandedStatus}>Open all<span
+                                        className="govuk-visually-hidden"> sections</span></button>
                                     <button type="button" className="govuk-accordion__open-all"
-                                        aria-expanded="true"
-                                        onClick={openCloseAllFundingLines}
-                                        hidden={!fundingLinesExpandedStatus}>Close all<span
-                                            className="govuk-visually-hidden"> sections</span></button>
+                                            aria-expanded="true"
+                                            onClick={openCloseAllFundingLines}
+                                            hidden={!fundingLinesExpandedStatus}>Close all<span
+                                        className="govuk-visually-hidden"> sections</span></button>
                                 </div>
                                 <ul className="collapsible-steps">
                                     {
@@ -591,26 +600,26 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                                     <FundingLineStep key={f.name.replace(" ", "") + index}
                                                                      showResults={false}
                                                                      expanded={fundingLinesExpandedStatus}
-                                                                     fundingStructureItem={f} />
+                                                                     fundingStructureItem={f}/>
                                                 </CollapsibleSteps>
                                             </li>
                                         })}
                                 </ul>
-                                <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0} />
+                                <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0}/>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <section className="govuk-tabs__panel" id="additional-calculations">
                                 <LoadingStatus title={"Loading additional calculations"}
-                                    hidden={!isLoadingAdditionalCalculations}
-                                    description={"Please wait whilst additional calculations are loading"} />
+                                               hidden={!isLoadingAdditionalCalculations}
+                                               description={"Please wait whilst additional calculations are loading"}/>
                                 <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Additional calculations</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third ">
                                         <p className="govuk-body right-align"
-                                            hidden={additionalCalculations.totalResults === 0}>
+                                           hidden={additionalCalculations.totalResults === 0}>
                                             Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults}
                                             calculations
@@ -621,7 +630,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     <div className="govuk-grid-column-two-thirds">
                                         <div className="govuk-form-group search-container">
                                             <input className="govuk-input input-search" id="event-name"
-                                                name="event-name" type="text" />
+                                                   name="event-name" type="text"/>
                                         </div>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
@@ -630,30 +639,30 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 </div>
                                 <table className="govuk-table">
                                     <thead className="govuk-table__head">
-                                        <tr className="govuk-table__row">
-                                            <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                                            <th scope="col" className="govuk-table__header">Status</th>
-                                            <th scope="col" className="govuk-table__header">Value type</th>
-                                            <th scope="col" className="govuk-table__header">Last edited date</th>
-                                        </tr>
+                                    <tr className="govuk-table__row">
+                                        <th scope="col" className="govuk-table__header">Additional calculation name</th>
+                                        <th scope="col" className="govuk-table__header">Status</th>
+                                        <th scope="col" className="govuk-table__header">Value type</th>
+                                        <th scope="col" className="govuk-table__header">Last edited date</th>
+                                    </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                        {additionalCalculations.results.map((ac, index) =>
-                                            <tr className="govuk-table__row" key={index}>
-                                                <td className="govuk-table__cell text-overflow">
-                                                    <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
-                                                </td>
-                                                <td className="govuk-table__cell">{ac.status}</td>
-                                                <td className="govuk-table__cell">{ac.valueType}</td>
-                                                <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
-                                                    utc={false} /></td>
-                                            </tr>
-                                        )}
+                                    {additionalCalculations.results.map((ac, index) =>
+                                        <tr className="govuk-table__row" key={index}>
+                                            <td className="govuk-table__cell text-overflow">
+                                                <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
+                                            </td>
+                                            <td className="govuk-table__cell">{ac.status}</td>
+                                            <td className="govuk-table__cell">{ac.valueType}</td>
+                                            <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
+                                                                                             utc={false}/></td>
+                                        </tr>
+                                    )}
                                     </tbody>
                                 </table>
 
                                 <div className="govuk-warning-text"
-                                    hidden={additionalCalculations.totalCount > 0}>
+                                     hidden={additionalCalculations.totalCount > 0}>
                                     <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
                                     <strong className="govuk-warning-text__text">
                                         <span className="govuk-warning-text__assistive">Warning</span>
@@ -664,64 +673,64 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     </strong>
                                 </div>
                                 {additionalCalculations.totalResults > 0 &&
-                                    <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                                        <div className="pagination__summary">
-                                            <p className="govuk-body right-align">
-                                                Showing
+                                <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
+                                    <div className="pagination__summary">
+                                        <p className="govuk-body right-align">
+                                            Showing
                                             {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults} calculations
                                         </p>
-                                        </div>
-                                        <Pagination currentPage={additionalCalculations.currentPage}
-                                            lastPage={additionalCalculations.lastPage}
-                                            callback={movePage} />
-                                    </nav>}
+                                    </div>
+                                    <Pagination currentPage={additionalCalculations.currentPage}
+                                                lastPage={additionalCalculations.lastPage}
+                                                callback={movePage}/>
+                                </nav>}
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
                             <section className="govuk-tabs__panel" id="datasets">
                                 <LoadingStatus title={"Loading datasets"}
-                                    hidden={!isLoadingDatasets}
-                                    description={"Please wait whilst datasets are loading"} />
+                                               hidden={!isLoadingDatasets}
+                                               description={"Please wait whilst datasets are loading"}/>
                                 <div className="govuk-grid-row" hidden={isLoadingDatasets}>
                                     <div className="govuk-grid-column-two-thirds">
                                         <h2 className="govuk-heading-l">Datasets</h2>
                                     </div>
                                     <div className="govuk-grid-column-one-third">
                                         <Link to={`/Datasets/DataRelationships/${specificationId}`}
-                                            id={"dataset-specification-relationship-button"}
-                                            className="govuk-link govuk-button" data-module="govuk-button">
+                                              id={"dataset-specification-relationship-button"}
+                                              className="govuk-link govuk-button" data-module="govuk-button">
                                             Map data source file to data set</Link>
                                     </div>
                                 </div>
                                 <table className="govuk-table">
                                     <caption className="govuk-table__caption">Dataset and schemas</caption>
                                     <thead className="govuk-table__head">
-                                        <tr className="govuk-table__row">
-                                            <th scope="col" className="govuk-table__header govuk-!-width-one-half">Dataset</th>
-                                            <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data schema</th>
-                                        </tr>
+                                    <tr className="govuk-table__row">
+                                        <th scope="col" className="govuk-table__header govuk-!-width-one-half">Dataset</th>
+                                        <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data schema</th>
+                                    </tr>
                                     </thead>
                                     <tbody className="govuk-table__body">
-                                        {datasets.content.map(ds =>
-                                            <tr className="govuk-table__row" key={ds.id}>
-                                                <td scope="row" className="govuk-table__cell">{ds.name}
-                                                    <div className="govuk-!-margin-top-2">
-                                                        <details className="govuk-details govuk-!-margin-bottom-0"
-                                                            data-module="govuk-details">
-                                                            <summary className="govuk-details__summary">
+                                    {datasets.content.map(ds =>
+                                        <tr className="govuk-table__row" key={ds.id}>
+                                            <td scope="row" className="govuk-table__cell">{ds.name}
+                                                <div className="govuk-!-margin-top-2">
+                                                    <details className="govuk-details govuk-!-margin-bottom-0"
+                                                             data-module="govuk-details">
+                                                        <summary className="govuk-details__summary">
                                                                 <span
                                                                     className="govuk-details__summary-text">Dataset Description</span>
-                                                            </summary>
-                                                            <div className="govuk-details__text">
-                                                                {ds.relationshipDescription}
-                                                            </div>
-                                                        </details>
-                                                    </div>
-                                                </td>
-                                                <td className="govuk-table__cell">{ds.definition.name}</td>
-                                            </tr>
-                                        )}
+                                                        </summary>
+                                                        <div className="govuk-details__text">
+                                                            {ds.relationshipDescription}
+                                                        </div>
+                                                    </details>
+                                                </div>
+                                            </td>
+                                            <td className="govuk-table__cell">{ds.definition.name}</td>
+                                        </tr>
+                                    )}
                                     </tbody>
                                 </table>
                             </section>
@@ -735,22 +744,22 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 </div>
                                 <div className="govuk-form-group">
                                     <fieldset className="govuk-fieldset" role="group"
-                                        aria-describedby="passport-issued-hint">
+                                              aria-describedby="passport-issued-hint">
                                         <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                                             <h3 className="govuk-heading-m">Release date of funding to Navison?</h3>
                                         </legend>
                                         <span id="passport-issued-hint" className="govuk-hint">
-                                            Set the date and time that the statement will be published externally for this funding stream. <br />
+                                            Set the date and time that the statement will be published externally for this funding stream. <br/>
                                             For example, 12 11 2019</span>
                                         <DateInput year={parseInt(releaseTimetable.navisionDate.year)}
-                                            month={parseInt(releaseTimetable.navisionDate.month)}
-                                            day={parseInt(releaseTimetable.navisionDate.day)}
-                                            callback={updateNavisionDate} />
+                                                   month={parseInt(releaseTimetable.navisionDate.month)}
+                                                   day={parseInt(releaseTimetable.navisionDate.day)}
+                                                   callback={updateNavisionDate}/>
                                     </fieldset>
                                 </div>
                                 <div className="govuk-form-group govuk-!-margin-bottom-9">
                                     <TimeInput time={releaseTimetable.navisionDate.time}
-                                        callback={updateNavisionTime} />
+                                               callback={updateNavisionTime}/>
                                 </div>
                                 <div className="govuk-form-group">
                                     <fieldset className="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
@@ -758,57 +767,61 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                             <h3 className="govuk-heading-m">Release date of statement to providers?</h3>
                                         </legend>
                                         <span id="passport-issued-hint" className="govuk-hint">
-                                            Set the date and time that the statement will be published externally for this funding stream. <br />
+                                            Set the date and time that the statement will be published externally for this funding stream. <br/>
                                             For example, 12 11 2019</span>
                                         <DateInput year={parseInt(releaseTimetable.releaseDate.year)}
-                                            month={parseInt(releaseTimetable.releaseDate.month)}
-                                            day={parseInt(releaseTimetable.releaseDate.day)}
-                                            callback={updateReleaseDate} />
+                                                   month={parseInt(releaseTimetable.releaseDate.month)}
+                                                   day={parseInt(releaseTimetable.releaseDate.day)}
+                                                   callback={updateReleaseDate}/>
                                     </fieldset>
                                 </div>
                                 <div className="govuk-form-group govuk-!-margin-bottom-9">
-                                    <TimeInput time={releaseTimetable.releaseDate.time} callback={updateReleaseTime} />
+                                    <TimeInput time={releaseTimetable.releaseDate.time} callback={updateReleaseTime}/>
                                 </div>
                                 <div className="govuk-form-group">
                                     <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated}>Confirm changes
                                     </button>
                                 </div>
-                                {
-                                    (profileVariationPointers != null && profileVariationPointers.length > 0) ?
-                                        <div className="govuk-grid-row">
-                                            <div className="govuk-grid-column-full">
-                                                <h2 className="govuk-heading-l">Point of variation</h2>
-                                                <p className="govuk-body">Set the installment from which a variation
-                                                    should take effect.</p>
-                                            </div>
-                                            <div className="govuk-grid-column-two-thirds">
-                                                {
-                                                    profileVariationPointers.map((f, index) => {
-                                                        return (
-                                                            <dl key={index} className="govuk-summary-list">
-                                                                <div className="govuk-summary-list__row">
-                                                                    <dt className="govuk-summary-list__key">
-                                                                        {f.fundingLineId}
-                                                                    </dt>
-                                                                    <dd className="govuk-summary-list__value">
-                                                                        {f.typeValue} {f.year} <br />
-                                                                        Installment {f.occurrence}
-                                                                    </dd>
-                                                                    <dd className="govuk-summary-list__actions">
-                                                                        <Link to={`/specifications/EditVariationPoints/${specificationId}`}
-                                                                            className="govuk-link">
-                                                                            Change<span className="govuk-visually-hidden"> {f.periodType}</span>
-                                                                        </Link>
-                                                                    </dd>
-                                                                </div>
-                                                            </dl>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
-                                        </div>
-                                        : null
-                                }
+
+                            </section>
+                        </Tabs.Panel>
+                        <Tabs.Panel label={"variation-management"}>
+                            <section className="govuk-tabs__panel" id="variation-management">
+                                <LoadingStatus title={"Loading variation management"}
+                                               hidden={!isLoadingVariationManagement}
+                                               description={"Please wait whilst variation management is loading"}/>
+                                <div className="govuk-grid-row">
+                                    <div className="govuk-grid-column-full">
+                                        <NoData hidden={profileVariationPointers.length > 0 || isLoadingVariationManagement}/>
+                                    </div>
+                                    <div className="govuk-grid-column-full" hidden={profileVariationPointers.length === 0}>
+                                        <h2 className="govuk-heading-l">Variation Management</h2>
+                                        <p className="govuk-body">Set the installment from which a variation should take effect.</p>
+                                    </div>
+                                    <div className="govuk-grid-column-two-thirds">
+                                        {
+                                            profileVariationPointers.map((f, index) =>
+                                                <dl key={index} className="govuk-summary-list">
+                                                    <div className="govuk-summary-list__row">
+                                                        <dt className="govuk-summary-list__key">
+                                                            {f.fundingLineId}
+                                                        </dt>
+                                                        <dd className="govuk-summary-list__value">
+                                                            {f.typeValue} {f.year} <br/>
+                                                            Installment {f.occurrence}
+                                                        </dd>
+                                                        <dd className="govuk-summary-list__actions">
+                                                            <Link to={`/Specifications/EditVariationPoints/${specificationId}`}
+                                                                  className="govuk-link">
+                                                                Change<span className="govuk-visually-hidden"> {f.periodType}</span>
+                                                            </Link>
+                                                        </dd>
+                                                    </div>
+                                                </dl>
+                                            )
+                                        }
+                                    </div>
+                                </div>
                             </section>
                         </Tabs.Panel>
                     </Tabs>
@@ -816,7 +829,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>}
         </div>
         &nbsp;
-        <Footer />
+        <Footer/>
     </div>
 }
 

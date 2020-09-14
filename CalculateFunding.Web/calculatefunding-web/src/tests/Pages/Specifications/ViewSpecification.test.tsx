@@ -160,7 +160,7 @@ describe("Provider Funding Overview ", () => {
     it("renders the page with the expected number of tabs", async () => {
         const wrapper = mount(<Provider store={store}><MemoryRouter><ViewSpecification history={fakeHistory} location={fakeLocation} match={match} /></MemoryRouter></Provider>);
 
-        expect(wrapper.find('.govuk-tabs__list').children().length).toBe(4);
+        expect(wrapper.find('.govuk-tabs__list').children().length).toBe(5);
     });
 
     it("shows approve status in funding line structure tab", () => {
