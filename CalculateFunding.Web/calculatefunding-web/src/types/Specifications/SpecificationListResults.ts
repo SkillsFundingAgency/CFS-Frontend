@@ -11,6 +11,7 @@ export interface SpecificationListResultsItem {
     description: string;
     id: string;
     name: string;
+    isSelectedForFunding: boolean;
 }
 
 export interface SpecificationListResults {

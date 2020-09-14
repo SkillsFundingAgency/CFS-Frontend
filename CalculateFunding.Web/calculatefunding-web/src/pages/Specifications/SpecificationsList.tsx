@@ -310,6 +310,7 @@ export function SpecificationsList() {
                             {specificationListResults.items.map(s => <tr key={s.id} className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header">
                                     <Link to={`/ViewSpecification/${s.id}`}>{s.name}</Link>
+                                    {s.isSelectedForFunding && <strong className="govuk-tag govuk-!-margin-top-2">Chosen for funding</strong>}
                                 </th>
                                 <td className="govuk-table__cell">
                                     <DateFormatter date={s.lastUpdatedDate} utc={false}/>
