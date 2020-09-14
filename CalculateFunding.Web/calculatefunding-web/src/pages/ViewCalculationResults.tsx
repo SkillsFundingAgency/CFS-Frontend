@@ -67,13 +67,13 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     };
     const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
     const calculationId = match.params.calculationId;
-    const jobSummaryInitial = {
+    const jobSummaryInitial: JobSummary = {
         jobId: "",
         jobType: "",
         specificationId: "",
         entityId: "",
-        runningStatus: 0,
-        completionStatus: 0,
+        runningStatus: undefined,
+        completionStatus: undefined,
         invokerUserId: "",
         invokerUserDisplayName: "",
         parentJobId: "",
@@ -152,8 +152,8 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
     async function createHubConnection(specificationId: string) {
         const hubConnect = new HubConnectionBuilder()
-            .withUrl(`/api/notifications`)
-            .build();
+                .withUrl(`/api/notifications`)
+                .build();
         try {
             await hubConnect.start();
 

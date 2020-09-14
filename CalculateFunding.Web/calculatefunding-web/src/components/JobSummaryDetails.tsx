@@ -8,18 +8,29 @@ export function JobSummaryDetails(props: {jobSummary: JobSummary, hidden?:boolea
     const [jobSummary, setJobSummary] = useState(props.jobSummary);
     const [jobSummaryTitle, setJobSummaryTitle] = useState("");
     const [jobSummaryColour, setJobSummaryColour] = useState("");
+
     useEffect(() => {
+        if (!props.jobSummary.runningStatus) return;
         setJobSummary(props.jobSummary);
-        if (props.jobSummary.runningStatus === RunningStatus.Completed) {
+        if (props.jobSummary.runningStatus === RunningStatus.Completed &&
+                props.jobSummary.completionStatus === CompletionStatus.Succeeded) {
             setJobSummaryTitle("Calculation completed successfully");
             setJobSummaryColour("govuk-error-summary govuk-error-summary-green");
         }
-        if (!props.jobSummary.completionStatus || props.jobSummary.runningStatus === RunningStatus.InProgress) {
+        if (props.jobSummary.runningStatus === RunningStatus.InProgress) {
             setJobSummaryTitle("Calculation in progress");
             setJobSummaryColour("govuk-error-summary govuk-error-summary-orange");
         }
         if (props.jobSummary.completionStatus && props.jobSummary.completionStatus === CompletionStatus.Failed) {
             setJobSummaryTitle("Calculation failed");
+            setJobSummaryColour("govuk-error-summary");
+        }
+        if (props.jobSummary.completionStatus && props.jobSummary.completionStatus === CompletionStatus.TimedOut) {
+            setJobSummaryTitle("Calculation timed out");
+            setJobSummaryColour("govuk-error-summary");
+        }
+        if (props.jobSummary.completionStatus && props.jobSummary.completionStatus === CompletionStatus.Cancelled) {
+            setJobSummaryTitle("Calculation cancelled");
             setJobSummaryColour("govuk-error-summary");
         }
     }, [props.jobSummary]);
