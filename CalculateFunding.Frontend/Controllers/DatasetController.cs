@@ -273,7 +273,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (!string.IsNullOrWhiteSpace(viewModel.Name))
             {
-                ApiResponse<IEnumerable<DefinitionSpecificationRelationship>> existingRelationshipResponse =
+                ApiResponse<DefinitionSpecificationRelationship> existingRelationshipResponse =
                     await _datasetApiClient.GetRelationshipBySpecificationIdAndName(specificationId, viewModel.Name);
 
                 if (existingRelationshipResponse.StatusCode != HttpStatusCode.NotFound)

@@ -51,8 +51,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
                     Builder<DefinitionSpecificationRelationship>.CreateNew().Build()));
             _mockDatasetApiClient.Setup(x =>
                 x.GetRelationshipBySpecificationIdAndName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() =>
-                    new ApiResponse<IEnumerable<DefinitionSpecificationRelationship>>(HttpStatusCode.OK,
-                        Builder<DefinitionSpecificationRelationship>.CreateListOfSize(10).Build().AsEnumerable())
+                    new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK,
+                        Builder<DefinitionSpecificationRelationship>.CreateNew().Build())
                 );
             _mockDatasetApiClient.Setup(x =>
                 x.GetDatasetDefinitions()).ReturnsAsync(() =>
@@ -84,8 +84,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
                     Builder<DefinitionSpecificationRelationship>.CreateNew().Build()));
             _mockDatasetApiClient.Setup(x =>
                 x.GetRelationshipBySpecificationIdAndName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(() =>
-                    new ApiResponse<IEnumerable<DefinitionSpecificationRelationship>>(HttpStatusCode.OK,
-                        Builder<DefinitionSpecificationRelationship>.CreateListOfSize(10).Build().AsEnumerable())
+                    new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK,
+                        Builder<DefinitionSpecificationRelationship>.CreateNew().Build())
                 );
             _mockDatasetApiClient.Setup(x =>
                 x.GetDatasetDefinitions()).ReturnsAsync(() =>
