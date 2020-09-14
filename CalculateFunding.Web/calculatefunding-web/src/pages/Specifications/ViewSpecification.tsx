@@ -50,10 +50,10 @@ import {IStoreState} from "../../reducers/rootReducer";
 import {useSelector} from "react-redux";
 import {getUserPermissionsService} from "../../services/userService";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
-import {Specification} from "../../types/viewFundingTypes";
 import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageModal";
 import * as QueryString from "query-string";
 import {NoData} from "../../components/NoData";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -135,27 +135,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         totalResults: 0
     });
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
-    const [selectedSpecificationForFunding, setSelectedSpecificationForFunding] = useState<Specification>({
-        fundingPeriod: {
-            id: "",
-            name: ""
-        },
-        fundingStreams: [{
-            name: "",
-            id: ""
-        }],
-        providerVersionId: "",
-        description: "",
-        isSelectedForFunding: false,
-        approvalStatus: "",
-        publishedResultsRefreshedAt: null,
-        lastCalculationUpdatedAt: null,
-        templateIds: {"": [""]},
-        id: "",
-        name: "",
-        lastEditedDate: new Date(),
-        dataDefinitionRelationshipIds: [],
-    });
+    const [hasRelatedSpecSelectedForFunding, setHasRelatedSpecSelectedForFunding] = useState<boolean>(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
     const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
@@ -257,7 +237,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 }
             });
 
-
         getProfileVariationPointersService(specificationId).then((result) => {
             const response = result;
             if (response.status === 200) {
@@ -265,46 +244,39 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             }
         }).finally(() => {
             setIsLoadingVariationManagement(false);
-        })
+        });
     }, [specificationId]);
-
-    useEffect(() => {
-        if (specification != null && specification.fundingPeriod.id !== "" && specification.fundingStreams[0].id !== "") {
-            getSpecificationsSelectedForFundingByPeriodAndStreamService(specification.fundingPeriod.id, specification.fundingStreams[0].id)
-                .then((selectedSpecificationResponse) => {
-                    setIsLoadingSelectedForFunding(false);
-                    if (selectedSpecificationResponse.status === 200) {
-                        const selectedSpecification = selectedSpecificationResponse.data as Specification[];
-                        if (selectedSpecification.length > 0) {
-                            setSelectedSpecificationForFunding(selectedSpecification[0]);
-                        }
-                    }
-                }).finally(() => setIsLoadingSelectedForFunding(false));
-        }
-    }, [specification]);
-
-    const resetErrors = () => {
-        setFundingLineStructureError(false);
-        setErrors([]);
-    };
 
     const fetchData = async () => {
         try {
-            const specificationSummaryResponse = await getSpecificationSummaryService(specificationId);
-            const specificationSummary = specificationSummaryResponse.data as SpecificationSummary;
-            setSpecification(specificationSummary);
+            const spec: SpecificationSummary = (await getSpecificationSummaryService(specificationId)).data;
+            setSpecification(spec);
+
+            if (!spec.isSelectedForFunding) {
+                await spec.fundingStreams.some(async (stream) => {
+                    const selectedSpecs = (await getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id)).data;
+                    const hasAnySelectedForFunding = selectedSpecs !== null && selectedSpecs.length > 0;
+                    if (hasAnySelectedForFunding) {
+                        setHasRelatedSpecSelectedForFunding(true);
+                    }
+                    return hasAnySelectedForFunding;
+                });
+            } else {
+                setHasRelatedSpecSelectedForFunding(true);
+            }
 
             setCanTimetableBeUpdated(true);
-            const fundingLineStructureResponse = await getFundingLineStructureService(specificationSummary.id,
-                specificationSummary.fundingPeriod.id, specificationSummary.fundingStreams[0].id);
+
+            const fundingLineStructureResponse = await getFundingLineStructureService(spec.id, spec.fundingPeriod.id, spec.fundingStreams[0].id);
             const fundingStructureItem = fundingLineStructureResponse.data as IFundingStructureItem[];
             setFundingLines(fundingStructureItem);
-            setFundingLinePublishStatus(specificationSummary.approvalStatus as PublishStatus);
+            setFundingLinePublishStatus(spec.approvalStatus as PublishStatus);
         } catch (err) {
             setFundingLineStructureError(true);
             setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
         } finally {
             setIsLoadingFundingLineStructure(false);
+            setIsLoadingSelectedForFunding(false);
         }
     };
 
@@ -396,14 +368,17 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }).finally(() => setIsLoadingAdditionalCalculations(false));
     }
 
-    function chooseForFunding() {
+    async function chooseForFunding() {
         setErrors([]);
-        getUserPermissionsService(specificationId).then((result) => {
-            if (isUserAllowedToChooseSpecification(result.data as EffectiveSpecificationPermission)) {
+        try {
+            const isAllowed: boolean = await isUserAllowedToChooseSpecification(specificationId);
+            if (isAllowed) {
                 UserConfirmLeavePageModal("Are you sure you want to choose this specification?",
                     refreshFunding, "Confirm", "Cancel");
             }
-        }).catch(() => setErrors(errors => [...errors, "A problem occurred while getting user permissions"]));
+        } catch (e) {
+            setErrors(errors => [...errors, "A problem occurred while getting user permissions"]);
+        }
     }
 
     function refreshFunding(confirm: boolean) {
@@ -422,42 +397,38 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }
     }
 
-    function isUserAllowedToChooseSpecification(specificationPermissions: EffectiveSpecificationPermission) {
+    async function isUserAllowedToChooseSpecification(specificationId: string) {
+        const permissions = (await getUserPermissionsService(specificationId)).data;
         let errors: string[] = [];
-        if (!specificationPermissions.canChooseFunding) {
+        if (!permissions.canChooseFunding) {
             errors.push("You do not have permissions to choose this specification for funding");
         }
         if (specification.approvalStatus.toLowerCase() !== PublishStatus.Approved.toLowerCase()) {
             errors.push("Specification must be approved before the specification can be chosen for funding.");
         }
-        getCalculationsService({
-            specificationId: specificationId,
-            status: "",
-            pageNumber: 1,
-            searchTerm: "",
-            calculationType: "Template"
-        }).then((response) => {
-            if (response.status === 200) {
-                const calculationSummary = response.data as CalculationSummary;
-                const calculationsWithUnapprovedStatus = calculationSummary.results.filter(calc => calc.status.toLowerCase() !== PublishStatus.Approved.toLowerCase())
-                if (calculationsWithUnapprovedStatus.length > 0) {
-                    errors.push("Template calculations must be approved before the specification can be chosen for funding.");
-                    setErrors(errors);
-                    return false;
-                }
-            } else {
-                errors.push("A problem occurred while choosing specification");
+        try {
+            const calc = (await getCalculationsService({
+                specificationId: specificationId,
+                status: "",
+                pageNumber: 1,
+                searchTerm: "",
+                calculationType: "Template"
+            })).data;
+            if (calc.results.some(calc => calc.status.toLowerCase() !== PublishStatus.Approved.toLowerCase())) {
+                errors.push("Template calculations must be approved before the specification can be chosen for funding.");
                 setErrors(errors);
-                return false;
             }
-        }).catch(() => {
+        } catch(err) {
             errors.push("A problem occurred while choosing specification");
             setErrors(errors);
-            return false;
-        });
-
-        return errors.length > 0;
+        }
+        return errors.length === 0;
     }
+
+    const resetErrors = () => {
+        setFundingLineStructureError(false);
+        setErrors([]);
+    };
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -483,22 +454,25 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
             }
             <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
+                <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-4">
                     <span className="govuk-caption-l">Specification Name</span>
-                    <h2 className={`govuk-heading-l ${(!specification.isSelectedForFunding || isLoadingSelectedForFunding) ? "" : "govuk-!-margin-bottom-2"}`}>{specification.name}</h2>
-                    {
-                        (!(selectedSpecificationForFunding.id === specification.id) || isLoadingSelectedForFunding) ?
-                            "" : <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                    <h2 className="govuk-heading-l govuk-!-margin-bottom-2">{specification.name}</h2>
+                    {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
+                    <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
                     }
-
-                    <span className="govuk-caption-m">Funding period</span>
-                    <h3 className="govuk-heading-m">{specification.fundingPeriod.name}</h3>
                 </div>
             </div>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
-                    <span className="govuk-caption-m">Funding streams</span>
-                    <h3 className="govuk-heading-m">{specification.fundingStreams[0].name}</h3>
+                    <div>
+                        <span className="govuk-caption-m">Funding streams</span>
+                        <h3 className="govuk-heading-m">{specification.fundingStreams[0].name}</h3>
+                    </div>
+                    <div>
+                        <span className="govuk-caption-m">Funding period</span>
+                        <h3 className="govuk-heading-m">{specification.fundingPeriod.name}</h3>
+                    </div>
+                    <Details title={`What is ${specification.name}`} body={specification.description}/>
                 </div>
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
@@ -512,10 +486,13 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
+                        {isLoadingSelectedForFunding &&
+                        <LoadingFieldStatus title={"checking funding status..."} />
+                        }
                         {!isLoadingSelectedForFunding &&
                         <li>
-                            {specification.isSelectedForFunding ?
-                                <Link className="govuk-link"
+                            {specification.isSelectedForFunding || hasRelatedSpecSelectedForFunding ?
+                                <Link className="govuk-link govuk-link--no-visited-state"
                                       to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}>
                                     View funding
                                 </Link>
@@ -527,9 +504,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     </ul>
                 </div>
             </div>
-            {initialTab.length > 0 && <div className="govuk-main-wrapper">
+            {initialTab.length > 0 && <div className="govuk-main-wrapper  govuk-!-padding-top-2">
                 <div className="govuk-grid-row">
-                    <Details title={`What is ${specification.name}`} body={specification.description}/>
                     <Tabs initialTab={initialTab}>
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>

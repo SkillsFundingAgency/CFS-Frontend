@@ -1,3 +1,5 @@
+import {PublishStatus} from "./PublishStatusModel";
+
 export interface CalculationSummary {
     totalCount: number;
     results: Calculation[];

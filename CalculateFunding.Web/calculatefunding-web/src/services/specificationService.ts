@@ -6,6 +6,7 @@ import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecif
 import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 import {SpecificationSummary} from "../types/SpecificationSummary";
+import {Specification} from "../types/viewFundingTypes";
 
 let baseURL = "/api/specs";
 
@@ -46,7 +47,7 @@ export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId:
     });
 }
 
-export async function getSpecificationsByFundingPeriodAndStreamIdService(fundingStreamId: string, fundingPeriodId: string) {
+export async function getSpecificationsByFundingPeriodAndStreamIdService(fundingStreamId: string, fundingPeriodId: string): Promise<AxiosResponse<Specification[]>> {
     return axios(`${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
         method: 'GET',
         headers: {
@@ -155,7 +156,7 @@ export async function getSpecificationsSelectedForFundingByPeriod(fundingPeriodI
     });
 }
 
-export async function getSpecificationsSelectedForFundingByPeriodAndStreamService(fundingPeriodId: string, fundingStreamId:string) {
+export async function getSpecificationsSelectedForFundingByPeriodAndStreamService(fundingPeriodId: string, fundingStreamId:string): Promise<AxiosResponse<Specification[]>> {
     return axios(`${baseURL}/selected-specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}`, {
         method: 'GET',
         headers: {

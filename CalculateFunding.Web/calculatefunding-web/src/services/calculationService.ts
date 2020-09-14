@@ -1,10 +1,12 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {CalculationProviderSearchRequestViewModel} from "../types/publishedProviderSearchRequest";
 import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
+import {CalculationSummary} from "../types/CalculationSummary";
+import {Specification} from "../types/viewFundingTypes";
 
-export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
+export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel): Promise<AxiosResponse<CalculationSummary>> {
     return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
             method: 'GET',
             headers: {
