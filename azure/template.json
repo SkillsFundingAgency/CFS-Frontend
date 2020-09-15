@@ -292,7 +292,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]",
-                "[concat(variables('webSiteName'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
+                "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "WEBSITE_TIME_ZONE": "GMT Standard Time",
@@ -366,7 +366,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]",
-                "[concat(variables('webSiteName'),'/staging/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
+                "[resourceId('Microsoft.Web/sites/slots/siteextensions', variables('webSiteName'), 'staging', 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "WEBSITE_TIME_ZONE": "GMT Standard Time",
@@ -440,7 +440,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]",
-                "[concat(variables('webSiteName'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
+                "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
@@ -465,7 +465,7 @@
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]",
-                "[concat(variables('webSiteName'),'/staging/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
+                "[resourceId('Microsoft.Web/sites/slots/siteextensions', variables('webSiteName'), 'staging', 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
