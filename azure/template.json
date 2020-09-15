@@ -291,7 +291,8 @@
             "name": "[concat(variables('webSiteName'), '/appsettings')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]"
+                "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]",
+                "[concat(variables('webSiteName'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "WEBSITE_TIME_ZONE": "GMT Standard Time",
@@ -364,7 +365,8 @@
             "name": "[concat(variables('webSiteName'), '/staging/appsettings')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]"
+                "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]",
+                "[concat(variables('webSiteName'),'/staging/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "WEBSITE_TIME_ZONE": "GMT Standard Time",
@@ -437,7 +439,8 @@
             "name": "[concat(variables('webSiteName'), '/authsettings')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]"
+                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]",
+                "[concat(variables('webSiteName'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
@@ -461,7 +464,8 @@
             "name": "[concat(variables('webSiteName'), '/staging/authsettings')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]"
+                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]",
+                "[concat(variables('webSiteName'),'/staging/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
                 "enabled": "[parameters('enablePlatformAuth')]",
