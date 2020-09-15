@@ -381,19 +381,18 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }
     }
 
-    function refreshFunding(confirm: boolean) {
+    async function refreshFunding(confirm: boolean) {
         if (confirm) {
-            refreshFundingService(specificationId).then((response) => {
+            try {
+                const response = await refreshFundingService(specificationId);
                 if (response.status === 200) {
-                    getSpecificationSummaryService(specificationId).then(() => {
-                        history.push(`/ViewSpecificationResults/${specificationId}`);
-                    });
+                    history.push(`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
                 } else {
-                    setErrors(errors => [...errors, "A problem occurred while choosing specification"]);
+                    setErrors(errors => [...errors, "A problem occurred while refreshing funding"]);
                 }
-            }).catch(() => {
-                setErrors(errors => [...errors, "A problem occurred while choosing specification"]);
-            });
+            } catch (err) {
+                setErrors(errors => [...errors, "A problem occurred while refreshing funding: " + err]);
+            }
         }
     }
 
@@ -418,7 +417,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 errors.push("Template calculations must be approved before the specification can be chosen for funding.");
                 setErrors(errors);
             }
-        } catch(err) {
+        } catch (err) {
             errors.push("A problem occurred while choosing specification");
             setErrors(errors);
         }
@@ -487,7 +486,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
                         {isLoadingSelectedForFunding &&
-                        <LoadingFieldStatus title={"checking funding status..."} />
+                        <LoadingFieldStatus title={"checking funding status..."}/>
                         }
                         {!isLoadingSelectedForFunding &&
                         <li>

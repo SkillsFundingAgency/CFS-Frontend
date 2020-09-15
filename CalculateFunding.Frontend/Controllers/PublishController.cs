@@ -270,7 +270,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Ok(result.Content.JobId);
             }
 
-            return BadRequest(-1);
+            return BadRequest();
         }
 
         [HttpGet]
