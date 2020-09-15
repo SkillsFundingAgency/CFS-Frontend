@@ -6,7 +6,7 @@ import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecif
 import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 import {SpecificationSummary} from "../types/SpecificationSummary";
-import {Specification} from "../types/viewFundingTypes";
+import {FundingStream, Specification} from "../types/viewFundingTypes";
 
 let baseURL = "/api/specs";
 
@@ -139,7 +139,7 @@ export async  function setProfileVariationPointersService(specificationId:string
     });
 }
 
-export async function getFundingStreamsForSelectedSpecifications() {
+export async function getFundingStreamsForSelectedSpecifications(): Promise<AxiosResponse<FundingStream[]>> {
     return axios('/api/specs/get-fundingstreams-for-selected-specifications', {
         method: 'GET',
         headers: {
@@ -147,7 +147,7 @@ export async function getFundingStreamsForSelectedSpecifications() {
         }
     });
 }
-export async function getSpecificationsSelectedForFundingByPeriod(fundingPeriodId:string) {
+export async function getSpecificationsSelectedForFundingByPeriod(fundingPeriodId:string): Promise<AxiosResponse<SpecificationSummary[]>> {
     return axios(`/api/specs/specifications-selected-for-funding-by-period/${fundingPeriodId}`, {
         method: 'GET',
         headers: {

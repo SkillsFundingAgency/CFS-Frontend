@@ -3,12 +3,11 @@ import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {createSpecificationService, getFundingPeriodsByFundingStreamIdService} from "../../services/specificationService";
 import {
-    getDefaultTemplateVersionService,
+    getFundingConfiguration,
     getFundingStreamsService,
-    getProviderSourceService,
-    getTemplatesService
+    getPublishedTemplatesByStreamAndPeriod
 } from "../../services/policyService";
-import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
+import {FundingConfiguration, FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
 import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
 import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpecificationViewModel";
@@ -73,7 +72,9 @@ export function CreateSpecification() {
                 const periodResult = await getFundingPeriodsByFundingStreamIdService(selectedFundingStream);
                 setFundingPeriodData(periodResult.data);
             } catch (err) {
-                if (err.response.status !== 404) {
+                if (err.response.status === 404) {
+                    addErrorMessage("No funding periods exist for your selection.");
+                } else {
                     addErrorMessage("There was a problem loading the funding periods. Please try again.");
                 }
             } finally {
@@ -87,73 +88,57 @@ export function CreateSpecification() {
     }, [selectedFundingStream]);
 
     useEffect(() => {
-        const updateTemplateVersions = async () => {
+        const updateTemplateVersions = async (fundingStreamId: string, fundingPeriodId: string) => {
             try {
                 setTemplateVersionData([]);
-                const templatesResult = await getTemplatesService(selectedFundingStream, selectedFundingPeriod);
-                const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
+                const publishedFundingTemplates = (await getPublishedTemplatesByStreamAndPeriod(fundingStreamId, fundingPeriodId)).data;
                 setTemplateVersionData(publishedFundingTemplates);
             } catch (err) {
-                if (err.response.status !== 404) {
+                if (err.response.status == 404) {
+                    addErrorMessage("No published template exists for your selections.")
+                } else {
                     addErrorMessage("There was a problem loading the template versions. Please try again.");
                 }
-            };
+            }
         };
 
-        const updateCoreProviderData = async () => {
-            let providerSource: any;
+        const updateCoreProviderData = async (providerSource: ProviderSource) => {
+            setProviderSource(providerSource);
             try {
-                const providerSourceData = await getProviderSourceService(selectedFundingStream, selectedFundingPeriod);
-                providerSource = providerSourceData.data as ProviderSource;
-                setProviderSource(providerSource);
-            } catch (err) {
-                if (err.response != null && err.response.status !== 404) {
-                    addErrorMessage("There was a problem determining the provider source. Please try again.");
-                }
-            }
-            try {
-                if (providerSource.valueOf() === ProviderSource[ProviderSource.CFS]) {
+                if (providerSource === ProviderSource.CFS) {
                     const coreProviderResult = await getProviderByFundingStreamIdService(selectedFundingStream);
                     setCoreProviderData(coreProviderResult.data as CoreProviderSummary[]);
-                } else if (providerSource.valueOf() === ProviderSource[ProviderSource.FDZ]) {
+                } else if (providerSource === ProviderSource.FDZ) {
                     const coreProviderSnapshotsResult = await getProviderSnapshotsForFundingStreamService(selectedFundingStream);
                     const providerSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
                     setProviderSnapshots(providerSnapshots);
                 }
             } catch (err) {
-                if (err.response != null && err.response.status !== 404) {
-                    addErrorMessage("There was a problem loading the core providers. Please try again.");
+                if (err.response != null) {
+                    if (err.response.status === 404) {
+                        addErrorMessage("No provider data exists for your selections.");
+                    } else {
+                        addErrorMessage("There was a problem loading the core providers. Please try again.");
+                    }
                 }
             }
         };
 
         if (selectedFundingPeriod !== "" && selectedFundingStream !== "") {
-            updateTemplateVersions();
-            updateCoreProviderData();
+            getFundingConfiguration(selectedFundingStream, selectedFundingPeriod)
+                .then(response => {
+                    const fundingConfig = response.data;
+                    updateTemplateVersions(selectedFundingStream, selectedFundingPeriod);
+                    updateCoreProviderData(fundingConfig.providerSource);
+                    setSelectedTemplateVersion(parseFloat(fundingConfig.defaultTemplateVersion).toFixed(1).toString());
+                })
+                .catch((err) => {
+                    if (err.response != null && err.response.status !== 404) {
+                        addErrorMessage("There was a problem fetching the data. Please try again.");
+                    }
+                });
         }
-
-
     }, [selectedFundingPeriod]);
-
-    useEffect(() => {
-        const updateDefaultTemplateVersionIfAvailable = async () => {
-            try {
-                const defaultTemplatesResult = await getDefaultTemplateVersionService(selectedFundingStream, selectedFundingPeriod);
-                const defaultTemplateVersionId = (defaultTemplatesResult.data != null &&
-                    defaultTemplatesResult.data !== "" ? parseFloat(defaultTemplatesResult.data).toFixed(1) : "") as string;
-                if (defaultTemplateVersionId.trim().length > 0) {
-                    setSelectedTemplateVersion(defaultTemplateVersionId);
-                }
-            }
-            catch {
-                // Ignore as couldn't retrieve default template version but not essential
-            }
-        };
-
-        if (templateVersionData.length > 0) {
-            updateDefaultTemplateVersionIfAvailable();
-        }
-    }, [templateVersionData]);
 
     useEffect(() => {
         if (newSpecificationId.length === 0) return;
@@ -190,7 +175,7 @@ export function CreateSpecification() {
                 await hubConnect.stop();
                 history.push(`/ViewSpecification/${newSpecificationId}`);
             }
-        }
+        };
 
         createHubConnection();
     }, [newSpecificationId]);

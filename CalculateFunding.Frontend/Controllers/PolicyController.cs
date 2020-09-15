@@ -39,11 +39,11 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
             ApiResponse<FundingTemplateContents> apiResponse =
-	            await _policiesApiClient.GetFundingTemplate(fundingStreamId, fundingPeriodId, templateVersion);
+                await _policiesApiClient.GetFundingTemplate(fundingStreamId, fundingPeriodId, templateVersion);
 
-		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(FundingTemplateContents));
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(FundingTemplateContents));
 
-		    return errorResult ?? Ok(apiResponse.Content);
+            return errorResult ?? Ok(apiResponse.Content);
         }
 
         [HttpGet]
@@ -54,43 +54,30 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
             ApiResponse<IEnumerable<PublishedFundingTemplate>> apiResponse =
-	            await _policiesApiClient.GetFundingTemplates(fundingStreamId, fundingPeriodId);
+                await _policiesApiClient.GetFundingTemplates(fundingStreamId, fundingPeriodId);
 
-		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
 
-		    return errorResult ?? Ok(apiResponse.Content);
-        }
-
-        [HttpGet]
-        [Route("api/policy/configuration/{fundingStreamId}/{fundingPeriodId}/providersource")]
-        public async Task<IActionResult> GetProviderSource(string fundingStreamId, string fundingPeriodId)
-        {
-            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
-            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
-
-            ApiResponse<FundingConfiguration> apiResponse =
-	            await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
-
-		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
-
-		    return errorResult ?? Ok(apiResponse.Content.ProviderSource);
+            return errorResult ?? Ok(apiResponse.Content);
         }
 
         [HttpGet]
         [Route("api/policy/configuration/{fundingStreamId}/{fundingPeriodId}")]
-        public async Task<IActionResult> GetDefaultTemplateVersion(string fundingStreamId, string fundingPeriodId)
+        public async Task<IActionResult> GetFundingConfiguration(string fundingStreamId, string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            
+            ApiResponse<FundingConfiguration> apiResponse = await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(FundingConfiguration));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
 
-            ApiResponse<FundingConfiguration> apiResponse =
-	            await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
-
-		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
-
-		    return errorResult ?? Ok(apiResponse.Content.DefaultTemplateVersion);
+            return new OkObjectResult(apiResponse.Content);
         }
-        
+
         [HttpGet]
         [Route("api/policy/fundingperiods")]
         public async Task<IActionResult> GetFundingPeriods()
@@ -138,9 +125,9 @@ namespace CalculateFunding.Frontend.Controllers
         {
             ApiResponse<FundingStream> apiResponse = await _policiesApiClient.GetFundingStreamById(fundingStreamId);
 
-		    IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
 
-		    return errorResult ?? Ok(apiResponse.Content);
+            return errorResult ?? Ok(apiResponse.Content);
         }
 
         [HttpGet]
@@ -168,11 +155,11 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             HashSet<string> fundingPeriodIds =
-	            fundingConfigsLookupTask.Result.Content.Select(_ => _.FundingPeriodId)
-		            .ToHashSet();
+                fundingConfigsLookupTask.Result.Content.Select(_ => _.FundingPeriodId)
+                    .ToHashSet();
 
             IEnumerable<Reference> fundingPeriods =
-	            fundingPeriodsLookupTask.Result.Content.Where(_ => fundingPeriodIds.Contains(_.Id));
+                fundingPeriodsLookupTask.Result.Content.Where(_ => fundingPeriodIds.Contains(_.Id));
 
             return new OkObjectResult(fundingPeriods.OrderBy(x => x.Name));
         }

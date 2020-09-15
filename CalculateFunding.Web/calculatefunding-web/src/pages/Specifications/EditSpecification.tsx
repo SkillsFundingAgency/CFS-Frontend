@@ -14,7 +14,7 @@ import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpe
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
-import {getProviderSourceService, getTemplatesService} from "../../services/policyService";
+import {getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} from "../../services/policyService";
 import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
 
 export interface EditSpecificationRouteProps {
@@ -104,12 +104,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             try {
                 const fundingStreamId = specificationSummary.fundingStreams[0].id;
 
-                let providerSource: any;
-                const providerSourceData = await getProviderSourceService(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id);
-                providerSource = providerSourceData.data as ProviderSource;
-                setProviderSource(providerSource);
+                const fundingConfiguration = (await getFundingConfiguration(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id)).data;
+                setProviderSource(fundingConfiguration.providerSource);
 
-                if (providerSource.valueOf() === ProviderSource[ProviderSource.CFS]) {
+                if (providerSource === ProviderSource.CFS) {
                     const coreProviderResult = await getProviderByFundingStreamIdService(fundingStreamId);
                     const coreProviderSummaries = coreProviderResult.data as CoreProviderSummary[];
                     const providerData = coreProviderSummaries.map(coreProviderItem => ({
@@ -119,7 +117,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     setCoreProviderData(providerData);
                     const selectedProviderVersion = providerData.find(p => p.value === specificationSummary.providerVersionId);
                     selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
-                } else if (providerSource.valueOf() === ProviderSource[ProviderSource.FDZ]) {
+                } else if (providerSource === ProviderSource.FDZ) {
                     const coreProviderSnapshotsResult = await getProviderSnapshotsForFundingStreamService(specificationSummary.fundingStreams[0].id);
                     const coreProviderSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
                     const providerData = coreProviderSnapshots.map(coreProviderItem => ({
@@ -130,7 +128,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value.toString());
                 }
 
-                const templatesResult = await getTemplatesService(fundingStreamId, specificationSummary.fundingPeriod.id);
+                const templatesResult = await getPublishedTemplatesByStreamAndPeriod(fundingStreamId, specificationSummary.fundingPeriod.id);
                 const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
                 const templateVersionData = publishedFundingTemplates.map(publishedFundingTemplate => ({
                     name: publishedFundingTemplate.templateVersion,
@@ -146,7 +144,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             finally {
                 setIsLoading(false);
             }
-        }
+        };
 
         if (specificationSummary.id !== "") {
             setSelectedName(specificationSummary.name);

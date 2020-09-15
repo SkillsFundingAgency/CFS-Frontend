@@ -1,3 +1,5 @@
+import {ProviderSource} from "./CoreProviderSummary";
+
 export interface Specification {
     fundingPeriod: FundingPeriod;
     fundingStreams: FundingStream[];
@@ -31,4 +33,18 @@ export interface FundingTypes{
 export interface FundingStream {
     id: string,
     name: string
+}
+
+export enum ApprovalMode {
+    Undefined,
+    All,
+    Batches,
+}
+
+export interface FundingConfiguration {
+    fundingStreamId: string;
+    fundingPeriodId: string;
+    approvalMode: ApprovalMode;
+    providerSource: ProviderSource;
+    defaultTemplateVersion: string;
 }

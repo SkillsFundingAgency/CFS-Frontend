@@ -28,6 +28,8 @@ import {ConfirmFundingApproval} from "../../components/Funding/ConfirmFundingApp
 import {ConfirmFundingRelease} from "../../components/Funding/ConfirmFundingRelease";
 import {PublishedProviderSearchFilters} from "../../components/Funding/PublishedProviderSearchFilters";
 import {searchForPublishedProviderIds, searchForPublishedProviderResults} from "../../services/publishedProviderService";
+import {getFundingConfiguration} from "../../services/policyService";
+import {ApprovalMode} from "../../types/viewFundingTypes";
 
 export interface FundingApprovalResultsRoute {
     fundingStreamId: string;
@@ -115,6 +117,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         canApproveFunding: false,
         canAdministerFundingStream: false
     });
+    const [approvalMode, setApprovalMode] = useState<ApprovalMode>(ApprovalMode.Undefined);
     const [providerIdsForSelection, setProviderIdsForSelection] = useState<string[]>([]);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
@@ -131,7 +134,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         checkForExistingRunningJob();
 
     }, [specificationId]);
-
+    
     useEffect(() => {
         if (isInitialisingJobMonitor) {
             return;
@@ -227,9 +230,40 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         }
     }
 
-    function loadPublishedProviderResults(searchRequest: PublishedProviderSearchRequest) {
+    async function loadPublishedProviderResults(searchRequest: PublishedProviderSearchRequest) {
         clearErrorMessages();
         setIsLoadingResults(true);
+        try {
+            const results = (await searchForPublishedProviderResults(searchRequest)).data;
+            setIsLoadingResults(false);
+            setPublishedProviderResults(results);
+            if (results.facets != null) {
+                results.facets.forEach((facet) => {
+                    switch (facet.name) {
+                        case "providerType":
+                            setProviderTypeFacets(facet.facetValues);
+                            break;
+                        case "providerSubType":
+                            setProviderSubTypeFacets(facet.facetValues);
+                            break;
+                        case "localAuthority":
+                            setLocalAuthorityFacets(facet.facetValues);
+                            break;
+                        case "fundingStatus":
+                            setStatusFacets(facet.facetValues);
+                            break;
+                    }
+                });
+            }
+            const fundingConfiguration = (await getFundingConfiguration(fundingStreamId, fundingPeriodId)).data;
+            if (fundingConfiguration) {
+                setApprovalMode(fundingConfiguration.approvalMode);
+            }
+        } catch (e) {
+            setIsLoadingResults(false);
+            addErrorMessage(`Error while loading results: ${e}`);
+        }
+        
         searchForPublishedProviderResults(searchRequest)
             .then((result) => {
                 setIsLoadingResults(false);
