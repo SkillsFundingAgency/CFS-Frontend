@@ -105,7 +105,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (viewModel.ProviderSubType != null && viewModel.ProviderSubType.Any())
             {
-                request.Filters.Add("subProviderType", viewModel.ProviderSubType);
+                request.Filters.Add("providerSubType", viewModel.ProviderSubType);
             }
 
             if (viewModel.ResultsStatus != null && viewModel.ResultsStatus.Any())
