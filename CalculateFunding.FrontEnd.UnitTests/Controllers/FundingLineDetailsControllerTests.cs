@@ -145,7 +145,50 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .ReturnsAsync(new ApiResponse<FundingLineProfile>(httpStatusCode, result));
         }
 
-        public void GivenPreviousProfileExistsForSpecificationForProviderForFundingLine(
+        [TestMethod]
+        public async Task ReturnsInternalServerErrorWhenCurrentProfileConfigApiReturnsInternalServerError()
+        {
+            GivenGetPreviousProfilesForSpecificationForProviderForFundingLine(
+                HttpStatusCode.InternalServerError, null);
+
+            IActionResult actualResult = await WhenGetCurrentProfileConfig();
+
+            actualResult.Should().BeOfType<InternalServerErrorResult>();
+        }
+
+        [TestMethod]
+        public async Task ReturnsChangesWhenGetCurrentProfileConfig()
+        {
+            string fundingLineName = "FundingLineName";
+
+            IEnumerable<FundingLineProfile> actualFundingLineChanges = new List<FundingLineProfile> {
+                new FundingLineProfile
+                {
+                    FundingLineName = fundingLineName
+                }
+            };
+
+            GivenGetCurrentProfileConfig(
+                HttpStatusCode.OK, actualFundingLineChanges);
+
+            IActionResult actualResult = await WhenGetCurrentProfileConfig();
+
+            actualResult.Should().BeOfType<OkObjectResult>();
+
+            OkObjectResult okObjectResult = actualResult as OkObjectResult;
+            okObjectResult.Should().NotBeNull();
+            okObjectResult.Value.Should().NotBeNull();
+            okObjectResult.Value.Should().BeOfType<List<FundingLineProfile>>();
+
+            IEnumerable<FundingLineProfile> fundingLineProfiles = okObjectResult.Value as IEnumerable<FundingLineProfile>;
+            fundingLineProfiles.Count().Should().Be(1);
+
+            FundingLineProfile fundingLineProfile = fundingLineProfiles.FirstOrDefault();
+            fundingLineProfile.Should().NotBeNull();
+            fundingLineProfile.FundingLineName.Should().Be(fundingLineName);
+        }
+
+        private void GivenPreviousProfileExistsForSpecificationForProviderForFundingLine(
             HttpStatusCode httpStatusCode,
             bool? result = null)
         {
@@ -158,7 +201,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .ReturnsAsync(new ApiResponse<bool>(httpStatusCode, result ?? false));
         }
 
-        public async Task<IActionResult> WhenPreviousProfileExistsForSpecificationForProviderForFundingLine()
+        private async Task<IActionResult> WhenPreviousProfileExistsForSpecificationForProviderForFundingLine()
         {
             return await _fundingLineDetailsController
                 .PreviousProfileExistsForSpecificationForProviderForFundingLine(
@@ -168,7 +211,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _fundingLineCode);
         }
 
-        public async Task<IActionResult> WhenGetFundingLinePublishedProviderDetails()
+        private async Task<IActionResult> WhenGetFundingLinePublishedProviderDetails()
         {
             return await _fundingLineDetailsController
                 .GetFundingLinePublishedProviderDetails(
@@ -177,8 +220,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _fundingStreamId,
                     _fundingLineCode);
         }
-
-        public void GivenGetPreviousProfilesForSpecificationForProviderForFundingLine(
+        private void GivenGetPreviousProfilesForSpecificationForProviderForFundingLine(
                 HttpStatusCode httpStatusCode,
                 IEnumerable<FundingLineChange> fundingLineChanges = null)
         {
@@ -191,7 +233,19 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .ReturnsAsync(new ApiResponse<IEnumerable<FundingLineChange>>(httpStatusCode, fundingLineChanges));
         }
 
-        public async Task<IActionResult> WhenGetPreviousProfilesForSpecificationForProviderForFundingLine()
+        private void GivenGetCurrentProfileConfig(
+            HttpStatusCode httpStatusCode,
+            IEnumerable<FundingLineProfile> fundingLineProfiles = null)
+        {
+            _publishingApiClient
+                .Setup(_ => _.GetCurrentProfileConfig(
+                    _specificationId,
+                    _providerId,
+                    _fundingStreamId))
+                .ReturnsAsync(new ApiResponse<IEnumerable<FundingLineProfile>>(httpStatusCode, fundingLineProfiles));
+        }
+
+        private async Task<IActionResult> WhenGetPreviousProfilesForSpecificationForProviderForFundingLine()
         {
             return await _fundingLineDetailsController
                 .GetPreviousProfilesForSpecificationForProviderForFundingLine(
@@ -199,6 +253,15 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _providerId,
                     _fundingStreamId,
                     _fundingLineCode);
+        }
+
+        private async Task<IActionResult> WhenGetCurrentProfileConfig()
+        {
+            return await _fundingLineDetailsController
+                .GetCurrentProfileConfig(
+                    _specificationId,
+                    _providerId,
+                    _fundingStreamId);
         }
     }
 }

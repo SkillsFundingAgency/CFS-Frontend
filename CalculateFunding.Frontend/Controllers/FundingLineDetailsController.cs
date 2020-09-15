@@ -49,7 +49,6 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingStreamId,
             string fundingLineCode)
         {
-
             ApiResponse<bool> fundingLineApiResponse = await _publishingApiClient
                 .PreviousProfileExistsForSpecificationForProviderForFundingLine(
                     specificationId,
@@ -75,7 +74,6 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingStreamId,
             string fundingLineCode)
         {
-
             ApiResponse<IEnumerable<FundingLineChange>> fundingLineApiResponse = await _publishingApiClient
                 .GetPreviousProfilesForSpecificationForProviderForFundingLine(
                     specificationId,
@@ -85,6 +83,29 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(fundingLineApiResponse.Content);
+        }
+
+        [HttpGet]
+        [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}")]
+        public async Task<IActionResult> GetCurrentProfileConfig(
+        [FromRoute] string specificationId,
+            [FromRoute] string providerId,
+            [FromRoute] string fundingStreamId)
+        {
+            ApiResponse<IEnumerable<FundingLineProfile>> fundingLineApiResponse = await _publishingApiClient
+                .GetCurrentProfileConfig(
+                    specificationId,
+                    providerId,
+                    fundingStreamId);
+
+            IActionResult errorResult =
+                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetCurrentProfileConfig));
             if (errorResult != null)
             {
                 return errorResult;

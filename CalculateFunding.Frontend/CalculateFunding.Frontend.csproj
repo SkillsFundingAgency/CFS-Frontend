@@ -80,13 +80,13 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="3.0.0" />
 
 
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.6.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.6.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.7.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.7.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="4.10.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.13.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="2.6.0" />
-    <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="1.5.0" />
+    <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="1.6.0" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="2.3.0" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="2.1.0" />
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.1.0" />

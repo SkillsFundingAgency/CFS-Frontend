@@ -437,9 +437,7 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> DownloadReport(string specificationReportId)
         {
-
             ApiResponse<SpecificationsDownloadModel> response = await _specificationsApiClient.DownloadSpecificationReport(specificationReportId);
-
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
