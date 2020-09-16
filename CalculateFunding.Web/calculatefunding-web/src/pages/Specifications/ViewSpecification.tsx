@@ -135,7 +135,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         totalResults: 0
     });
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
-    const [hasRelatedSpecSelectedForFunding, setHasRelatedSpecSelectedForFunding] = useState<boolean>(false);
+    const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
     const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
@@ -252,17 +252,17 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             const spec: SpecificationSummary = (await getSpecificationSummaryService(specificationId)).data;
             setSpecification(spec);
 
-            if (!spec.isSelectedForFunding) {
+            if (spec.isSelectedForFunding) {
+                setSelectedForFundingSpecId(spec.id);
+            } else {
                 await spec.fundingStreams.some(async (stream) => {
                     const selectedSpecs = (await getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id)).data;
                     const hasAnySelectedForFunding = selectedSpecs !== null && selectedSpecs.length > 0;
                     if (hasAnySelectedForFunding) {
-                        setHasRelatedSpecSelectedForFunding(true);
+                        setSelectedForFundingSpecId(selectedSpecs[0].id);
                     }
                     return hasAnySelectedForFunding;
                 });
-            } else {
-                setHasRelatedSpecSelectedForFunding(true);
             }
 
             setCanTimetableBeUpdated(true);
@@ -490,9 +490,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         }
                         {!isLoadingSelectedForFunding &&
                         <li>
-                            {specification.isSelectedForFunding || hasRelatedSpecSelectedForFunding ?
+                            {specification.isSelectedForFunding || selectedForFundingSpecId ?
                                 <Link className="govuk-link govuk-link--no-visited-state"
-                                      to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}>
+                                      to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
                                     View funding
                                 </Link>
                                 :
