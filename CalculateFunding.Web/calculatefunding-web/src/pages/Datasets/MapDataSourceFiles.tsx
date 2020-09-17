@@ -187,7 +187,7 @@ export function MapDataSourceFiles() {
         filterResults("fundingPeriodName", e.target.value, e.target.checked);
     }
 
-    return <div>
+    return <div id="map-datasource-files">
         <Header location={Section.Datasets} />
         <div className="govuk-width-container">
             <div className="govuk-grid-row  govuk-!-margin-bottom-9">
@@ -273,7 +273,7 @@ export function MapDataSourceFiles() {
                 </div>
 
                 <div className="govuk-grid-column-two-thirds">
-                    <LoadingStatus title={"Loading data source file results"} hidden={!isLoading} />
+                    <LoadingStatus title={"Loading specifications"} hidden={!isLoading} />
                     <NoData hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading} />
                     <table className="govuk-table" hidden={isLoading || datasetRelationships.items.length === 0}>
                         <thead className="govuk-table__head">
