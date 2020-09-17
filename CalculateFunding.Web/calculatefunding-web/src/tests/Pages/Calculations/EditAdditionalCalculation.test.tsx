@@ -6,6 +6,9 @@ import {MemoryRouter} from 'react-router-dom';
 import {render, waitFor, fireEvent} from '@testing-library/react';
 import {CircularReferenceError} from "../../../types/Calculations/CircularReferenceError";
 import '@testing-library/jest-dom/extend-expect';
+import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import {CalculationTypes} from "../../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {PublishStatus} from "../../../types/PublishStatusModel";
 
 const history = createMemoryHistory();
 
@@ -24,21 +27,34 @@ jest.mock("../../../components/GdsMonacoEditor", () => <></>);
 
 describe("<EditAdditionalCalculation>", () => {
     beforeEach(() => {
-        function mockFunctions(mockCircularReferenceErrors: CircularReferenceError[]) {
+        function mockCalculationFunctions(mockCircularReferenceErrors: CircularReferenceError[], mockCalculation: any) {
             const originalService = jest.requireActual('../../../services/calculationService');
             return {
                 ...originalService,
                 getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
                     data: mockCircularReferenceErrors
+                })),
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalculation
                 }))
             }
         }
-        jest.mock('../../../services/calculationService', () => mockFunctions(mockCircularReferenceErrors));
+        function mockSpecificationFunctions(mockSpecificationSummary: SpecificationSummary) {
+            const originalService = jest.requireActual('../../../services/specificationService');
+            return {
+                ...originalService,
+                getSpecificationSummaryService: jest.fn((specificationId) => Promise.resolve({
+                    data: mockSpecificationSummary
+                }))
+            }
+        }
+        jest.mock('../../../services/calculationService', () => mockCalculationFunctions(mockCircularReferenceErrors, mockCalculation));
+        jest.mock('../../../services/specificationService', () => mockSpecificationFunctions(mockSpecificationSummary));
     });
 
     it("renders CircularReferenceErrors when there are circular reference errors", async () => {
         const {EditAdditionalCalculation} = require("../../../pages/Calculations/EditAdditionalCalculation");
-        const {getByText, getByTestId} = render(
+        const {getByText} = render(
             <MemoryRouter>
                 <EditAdditionalCalculation
                     excludeMonacoEditor={true}
@@ -46,8 +62,6 @@ describe("<EditAdditionalCalculation>", () => {
                     location={location}
                     match={matchMock} />
             </MemoryRouter>);
-
-        fireEvent.click(getByTestId("build"));
 
         await waitFor(() => {
             expect(getByText("Calculations are not able to run due to the following problem")).toBeInTheDocument();
@@ -57,21 +71,34 @@ describe("<EditAdditionalCalculation>", () => {
 
 describe("<EditAdditionalCalculation>", () => {
     beforeEach(() => {
-        function mockFunctions(mockCircularReferenceErrors: CircularReferenceError[]) {
+        function mockCalculationFunctions(mockCircularReferenceErrors: CircularReferenceError[], mockCalculation: any) {
             const originalService = jest.requireActual('../../../services/calculationService');
             return {
                 ...originalService,
                 getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
                     data: mockCircularReferenceErrors
+                })),
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalculation
                 }))
             }
         }
-        jest.mock('../../../services/calculationService', () => mockFunctions([]));
+        function mockSpecificationFunctions(mockSpecificationSummary: SpecificationSummary) {
+            const originalService = jest.requireActual('../../../services/specificationService');
+            return {
+                ...originalService,
+                getSpecificationSummaryService: jest.fn((specificationId) => Promise.resolve({
+                    data: mockSpecificationSummary
+                }))
+            }
+        }
+        jest.mock('../../../services/calculationService', () => mockCalculationFunctions([], mockCalculation));
+        jest.mock('../../../services/specificationService', () => mockSpecificationFunctions(mockSpecificationSummary));
     });
 
     it("does not render CircularReferenceErrors when there are no circular reference errors", async () => {
         const {EditAdditionalCalculation} = require("../../../pages/Calculations/EditAdditionalCalculation");
-        const {queryByTestId, getByTestId} = render(
+        const {queryByTestId} = render(
             <MemoryRouter>
                 <EditAdditionalCalculation
                     excludeMonacoEditor={true}
@@ -80,13 +107,35 @@ describe("<EditAdditionalCalculation>", () => {
                     match={matchMock} />
             </MemoryRouter>);
 
-        fireEvent.click(getByTestId("build"));
-
         await waitFor(() => {
             expect(queryByTestId("Calculations are not able to run due to the following problem")).toBeNull();
         });
     });
 });
+
+const mockCalculation = {
+    fundingStreamId: "1",
+    sourceCode: "",
+    specificationId: "36e5c7db-45a1-400a-b436-700f8d512650",
+    valueType: CalculationTypes.Number,
+    name: "",
+    publishStatus: PublishStatus.Draft,
+    lastUpdated: new Date(2020, 1, 1)
+}
+
+const mockSpecificationSummary: SpecificationSummary = {
+    name: "spec",
+    id: "36e5c7db-45a1-400a-b436-700f8d512650",
+    approvalStatus: "Approved",
+    isSelectedForFunding: false,
+    description: "description",
+    providerVersionId: "1",
+    fundingStreams: [],
+    fundingPeriod: {
+        id: "321",
+        name: "period"
+    }
+}
 
 const mockCircularReferenceErrors: CircularReferenceError[] = [{
     "node": {

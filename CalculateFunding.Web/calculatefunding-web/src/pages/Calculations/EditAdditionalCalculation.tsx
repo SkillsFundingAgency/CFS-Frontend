@@ -119,6 +119,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
             try {
                 setIsLoading(true);
                 setCalculationError("");
+                setCircularReferenceErrors([]);
                 const result = await getCalculationByIdService(calculationId);
                 const calc = result.data as EditAdditionalCalculationViewModel;
                 setOriginalAdditionalCalculation(calc);
@@ -132,6 +133,14 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                 const spec = specSummaryResult.data as EditSpecificationViewModel;
                 setSpecificationSummary(spec);
                 setSpecificationId(spec.id);
+
+                const circularDependenciesResponse = await getCalculationCircularDependencies(spec.id);
+                const circularDependencies = circularDependenciesResponse.data as CircularReferenceError[];
+                if (circularDependencies.length > 0) {
+                    setCircularReferenceErrors(circularDependencies);
+                    setIsBuildingCalculationCode(false);
+                    window.scrollTo(0, 0);
+                }
             } catch {
                 setCalculationError("There is a problem loading this calculation. Please try again.");
             } finally {
@@ -245,23 +254,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
     async function buildCalculation() {
         setIsBuildingCalculationCode(true);
         setAdditionalCalculationBuildSuccess(initialBuildSuccess);
-        setCircularReferenceErrors([]);
         setCalculationError("");
-
-        try {
-            const circularDependenciesResponse = await getCalculationCircularDependencies(specificationSummary.id);
-            const circularDependencies = circularDependenciesResponse.data as CircularReferenceError[];
-            if (circularDependencies.length > 0) {
-                setCircularReferenceErrors(circularDependencies);
-                setIsBuildingCalculationCode(false);
-                window.scrollTo(0, 0);
-                return;
-            }
-        }
-        catch {
-            setCalculationError("There is a problem building this calculation. Please try again.");
-            setIsBuildingCalculationCode(false);
-        }
 
         compileCalculationPreviewService(specificationId, calculationId, additionalCalculationSourceCode).then((result) => {
             if (result.status === 200) {
