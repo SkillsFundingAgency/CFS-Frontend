@@ -126,22 +126,9 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(d => d.ValueType, opt => opt.Ignore())
                 ;
 
-            CreateMap<EditCalculationViewModel, CalculationEditModel>()
-                .ForMember(d => d.CalculationId, opt => opt.Ignore())
-                .ForMember(d => d.SpecificationId, opt => opt.Ignore())
-                .ForMember(d => d.ValueType, opt => opt.Ignore())
-                .ForMember(d => d.SourceCode, opt => opt.Ignore());
-
             CreateMap<CalculationVersion, CalculationVersionsCompareModel>()
                 .ForMember(m => m.Versions, opt => opt.MapFrom(f => new[] { f.Version }))
                 ;
-
-            CreateMap<CalculationVersion, CalculationVersionViewModel>()
-	            .ForMember(m => m.Date, opt => opt.MapFrom(s => s.LastUpdated != null ? s.LastUpdated.Value.DateTime : DateTime.MinValue))
-	            .ForMember(m => m.DecimalPlaces, opt => opt.Ignore())
-	            .ForMember(m => m.Status, opt => opt.Ignore())
-	            .AfterMap((src, dest) => dest.Status = src.PublishStatus.ToString());
-                
 
             CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>();
         }
@@ -183,12 +170,6 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.OriginalFundingStreamId, opt => opt.Ignore())
                 .ForMember(m => m.OriginalSpecificationName, opt => opt.Ignore())
                 .ForMember(m => m.IsSelectedForFunding, opt => opt.Ignore());
-
-            CreateMap<CreateCalculationViewModel, CalculationCreateModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
-                .ForMember(m => m.SourceCode, opt => opt.Ignore())
-                .ForMember(m => m.ValueType, opt => opt.Ignore())
-                .ForMember(m => m.Id, opt => opt.Ignore());
 
             CreateMap<CreateAdditionalCalculationViewModel, CalculationCreateModel>()
                 .ForMember(m => m.Name, opt => opt.Ignore())
@@ -313,10 +294,6 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
                     .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
-            CreateMap<TestScenario, TestScenarioViewModel>();
-
-            //CreateMap<CurrentScenarioVersion, CurrentScenarioVersionViewModel>();
 
             CreateMap<ScenarioEditViewModel, TestScenarioUpdateModel>()
               .ForMember(m => m.SpecificationId, opt => opt.Ignore())

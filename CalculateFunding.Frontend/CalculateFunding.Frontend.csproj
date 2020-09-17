@@ -177,9 +177,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\Middleware" />
-    <Folder Include="Pages\Users" />
-    <Folder Include="wwwroot\assets\libs\js\monaco\" />
-    <Folder Include="wwwroot\js\Tests\" />
+    <Folder Include="Scripts" />
+    <Folder Include="wwwroot" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.config">
@@ -187,83 +186,70 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
-    <None Include="wwwroot\assets\js\bootstrap-multiselect.js" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="Scripts\approvals.chooseforfunding.ts" />
-    <TypeScriptCompile Include="Scripts\approvals.ts" />
-    <TypeScriptCompile Include="Scripts\bindingHandler.monacoDiff.ts" />
-    <TypeScriptCompile Include="Scripts\bindingHandler.monacoEditor.ts" />
-    <TypeScriptCompile Include="Scripts\bindingHandler.multiselect.ts" />
-    <TypeScriptCompile Include="Scripts\bootstrap-multiselect.d.ts" />
-    <TypeScriptCompile Include="Scripts\calculationspec.create-edit.ts" />
-    <TypeScriptCompile Include="Scripts\component.approveStatusButton.ts" />
-    <TypeScriptCompile Include="Scripts\confirm.funding-specification.ts" />
-    <TypeScriptCompile Include="Scripts\releasetimetable.ts" />
-    <TypeScriptCompile Include="Scripts\editadditionalcalculation.ts" />
-    <TypeScriptCompile Include="Scripts\createspecification.ts" />
-    <TypeScriptCompile Include="Scripts\createadditionalcalculation.ts" />
-    <TypeScriptCompile Include="Scripts\edittemplatecalculation.ts" />
-    <TypeScriptCompile Include="Scripts\search.additionalCalculations.ts" />
-    <TypeScriptCompile Include="Scripts\specification.common.ts" />
-    <TypeScriptCompile Include="Scripts\dataset-relationships.ts" />
-    <TypeScriptCompile Include="Scripts\dataset.common.ts" />
-    <TypeScriptCompile Include="Scripts\edit.specification.ts" />
-    <TypeScriptCompile Include="Scripts\expander.ts" />
-    <TypeScriptCompile Include="Scripts\navbar.ts" />
-    <TypeScriptCompile Include="Scripts\notifications.ts" />
-    <TypeScriptCompile Include="Scripts\search.datasetDefinitions.ts" />
-    <TypeScriptCompile Include="Scripts\search.specifications.ts" />
-    <TypeScriptCompile Include="Scripts\search.calcuation-results.ts" />
-    <TypeScriptCompile Include="Scripts\search.calculationProviderResults.ts" />
-    <TypeScriptCompile Include="Scripts\search.testScenarioResults.ts" />
-    <TypeScriptCompile Include="Scripts\search.datasets.ts" />
-    <TypeScriptCompile Include="Scripts\diffeditoroptions.d.ts" />
-    <TypeScriptCompile Include="Scripts\search.calcuations.ts" />
-    <TypeScriptCompile Include="Scripts\compare.ts" />
-    <TypeScriptCompile Include="Scripts\common.d.ts" />
-    <TypeScriptCompile Include="Scripts\search.providers.ts" />
-    <TypeScriptCompile Include="Scripts\provider.completion.gherkin.ts" />
-    <TypeScriptCompile Include="Scripts\provider.completion.vb.ts" />
-    <TypeScriptCompile Include="Scripts\search.ts" />
-    <TypeScriptCompile Include="Scripts\submit.disabler.ts" />
-    <TypeScriptCompile Include="Scripts\table.expander.sequential.ts" />
-    <TypeScriptCompile Include="Scripts\table.expander.ts" />
-    <TypeScriptCompile Include="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
-    <TypeScriptCompile Include="Scripts\search.providerTestResults.ts" />
-    <TypeScriptCompile Include="Scripts\Tests\provideCompletionVb.unitTests.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Update="Pages\Errors\401.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Pages\Errors\403.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Pages\Errors\404.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Pages\Errors\500.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
     <Content Update="Pages\Shared\_Layout.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Pages\Specs\EditTemplateCalculation.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Pages\_SearchTablePagerPartial.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Pages\_CheckLastJobStatusTemplatesPartial.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Pages\_SearchTableRowCountPartial.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Pages\_SpecificationHeaderPartial.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Approvals\Choose.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Approvals\Confirm.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Approvals\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Approvals\ViewFunding.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\AdditionalCalculations.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\Compare.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\CreateAdditionalCalculation.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\DiffCalculation.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\EditAdditionalCalculation.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\EditTemplateCalculation.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Calcs\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\AssignDataSetSchema.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\CreateDataset.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\DatasetHistory.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\DatasetRelationships.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\ListDatasetSchemas.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\ManageDatasets.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\Schemas.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\SelectSourceDataset.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\SpecificationRelationships.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Datasets\UpdateDataset.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Results\CalculationProviderResults.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Results\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Results\TestScenarioResults.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Scenarios\CreateTestScenario.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Scenarios\EditTestScenario.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Scenarios\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Scenarios\ViewProviderTestResults.cshtml" />
+    <_ContentIncludedByDefault Remove="Pages\Specs\EditSpecification.cshtml" />
+    <_ContentIncludedByDefault Remove="wwwroot\assetsjs\bootstrap-multiselect-e2feb10e12.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\assetsjs\main-0a2b261fb0.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\fonts\bootstrap\glyphicons-halflings-regular.eot" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\fonts\bootstrap\glyphicons-halflings-regular.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\fonts\bootstrap\glyphicons-halflings-regular.ttf" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\fonts\bootstrap\glyphicons-halflings-regular.woff" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\fonts\bootstrap\glyphicons-halflings-regular.woff2" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\govuk_bootstrap.css" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\apple-touch-icon-120x120.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\apple-touch-icon-152x152.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\apple-touch-icon-60x60.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\apple-touch-icon-76x76.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\close.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\favicon.ico" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\gov.uk_logotype_crown-1x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\gov.uk_logotype_crown.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\gov.uk_logotype_crown.svg" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\gov.uk_logotype_crown_invert.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\govuk-crest-2x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\govuk-crest-ie.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\govuk-crest.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\open-government-licence.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\open-government-licence_2x.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\libs\govuk_bootstrap\images\opengraph-image.png" />
   </ItemGroup>
 
   <PropertyGroup>
