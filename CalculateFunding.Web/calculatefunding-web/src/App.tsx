@@ -39,7 +39,7 @@ import {DatasetHistory} from "./pages/Datasets/DatasetHistory";
 import {UpdateDataSourceFile} from "./pages/Datasets/UpdateDataSourceFile";
 import {LoadNewDataSource} from "./pages/Datasets/LoadNewDataSource";
 import {ManageDataSourceFiles} from "./pages/Datasets/ManageDataSourceFiles";
-import {FundingApprovalResults} from "./pages/FundingApprovals/FundingApprovalResults";
+import {SpecificationFundingApproval} from "./pages/FundingApprovals/SpecificationFundingApproval";
 import {MapDataSourceFiles} from "./pages/Datasets/MapDataSourceFiles";
 import {ViewProvidersFundingStreamSelection} from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
@@ -88,8 +88,8 @@ const App: React.FunctionComponent = () => {
                     <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
                     <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
                     <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
-                    <Route path="/Approvals/FundingApprovalResults/:fundingStreamId/:fundingPeriodId/:specificationId"
-                           component={FundingApprovalResults}/>
+                    <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
+                           component={SpecificationFundingApproval}/>
                     <Route path="/Results/" component={ViewResults}/>
                     <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
                     <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>

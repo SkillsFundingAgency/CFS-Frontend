@@ -1,8 +1,8 @@
 import {Facet} from "../Facet";
 import {PagerState} from "../PagerState";
 
-export interface ProviderVersionSummary {
-    providerVersionId: string;
+export interface PublishedProvider {
+    publishedProviderVersionId: string;
     providerType: string;
     providerSubType: string;
     localAuthority: string;
@@ -16,9 +16,8 @@ export interface ProviderVersionSummary {
     fundingStreamId: string;
     fundingPeriodId: string;
 }
-
-export interface PublishProviderSearchResult {
-    providers: ProviderVersionSummary[];
+export interface PublishedProviderSearchResult {
+    providers: PublishedProvider[];
     filteredFundingAmount: number;
     canPublish: boolean;
     canApprove: boolean;

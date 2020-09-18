@@ -1,6 +1,6 @@
 import {SearchMode} from "../SearchMode";
 import {Facet} from "../Facet";
-import {PagerState} from "../PublishedProvider/PagerState";
+import {PagerState} from "../PagerState";
 
 export interface PagedProviderVersionSearchResults {
     facets: Facet[];

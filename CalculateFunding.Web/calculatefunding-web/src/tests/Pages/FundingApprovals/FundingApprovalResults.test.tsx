@@ -1,8 +1,8 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
-import {FundingApprovalResults, FundingApprovalResultsRoute} from "../../../pages/FundingApprovals/FundingApprovalResults";
+import {SpecificationFundingApproval, SpecificationFundingApprovalRoute} from "../../../pages/FundingApprovals/SpecificationFundingApproval";
 import {createLocation, createMemoryHistory} from "history";
-import {render, screen, waitFor} from "@testing-library/react";
+import {render, screen} from "@testing-library/react";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {JobSummary} from "../../../types/jobSummary";
 
@@ -12,7 +12,7 @@ enzyme.configure({adapter: new Adapter()});
 
 const history = createMemoryHistory();
 const location = createLocation("","","");
-const matchMock : match<FundingApprovalResultsRoute> = {
+const matchMock : match<SpecificationFundingApprovalRoute> = {
     params: {
         specificationId: "ABC123",
         fundingStreamId: "FS123",
@@ -34,7 +34,7 @@ export const testSpec: SpecificationSummary = {
         id: "Wizard Training Scheme"
     }],
     id: "ABC123",
-    isSelectedForFunding: false,
+    isSelectedForFunding: true,
     providerVersionId: ""
 };
 
@@ -58,21 +58,25 @@ function mockGetJobs(jobResults: JobSummary[]) {
 }
 
 const renderPage = () => {
-    const {FundingApprovalResults} = require('../../../pages/FundingApprovals/FundingApprovalResults');
-    return render(<MemoryRouter><FundingApprovalResults location={location} history={history} match={matchMock} /></MemoryRouter>);
+    const {SpecificationFundingApproval} = require('../../../pages/FundingApprovals/SpecificationFundingApproval');
+    return render(<MemoryRouter><SpecificationFundingApproval location={location} history={history} match={matchMock} /></MemoryRouter>);
 };
 
-describe("<FundingApprovalResults />", () => {
+describe("<SpecificationFundingApproval />", () => {
     beforeEach(() => {
         mockGetSpecification(testSpec);
         mockGetJobs([]);
+        renderPage();
     });
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+    
     it('renders Specification loading', async () => {
-        const {getByTestId} = renderPage();
-        await waitFor(() => expect(getByTestId("loadingSpecification")).not.toBeNull());
+        expect(screen.getByTestId("loadingSpecification")).toBeTruthy();
     });
+    
     it('renders job loading', async () => {
-        const {getByTestId} = renderPage();
-        await waitFor(() => expect(getByTestId("loadingJobs")).not.toBeNull());
+        expect(screen.getByTestId("loadingJobs")).toBeTruthy();
     });
 });

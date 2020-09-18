@@ -386,7 +386,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             try {
                 const response = await refreshFundingService(specificationId);
                 if (response.status === 200) {
-                    history.push(`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
+                    history.push(`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
                 } else {
                     setErrors(errors => [...errors, "A problem occurred while refreshing funding"]);
                 }
@@ -492,7 +492,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             {specification.isSelectedForFunding || selectedForFundingSpecId ?
                                 <Link className="govuk-link govuk-link--no-visited-state"
-                                      to={`/Approvals/FundingApprovalResults/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
+                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
                                     View funding
                                 </Link>
                                 :

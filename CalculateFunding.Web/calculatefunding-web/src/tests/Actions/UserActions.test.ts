@@ -3,7 +3,7 @@ import thunk from "redux-thunk";
 import axios from "axios"
 import MockAdapter from "axios-mock-adapter";
 import { IStoreState } from "../../reducers/rootReducer";
-import {getUserFundingStreamPermissions, UserActionTypes} from '../../actions/userAction';
+import {getUserFundingStreamPermissions, UserActionEvent} from '../../actions/userAction';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -42,7 +42,7 @@ describe("user-permissions-actions", () => {
         fetchMock.onGet("/api/users/permissions/fundingstreams").reply(200, payload);
 
         const expectedActions = [
-            { type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS, payload: payload},
+            { type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS, payload: payload},
         ];
 
         const store = mockStore(storeWithData);

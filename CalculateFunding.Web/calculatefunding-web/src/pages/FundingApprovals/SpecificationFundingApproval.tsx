@@ -3,7 +3,7 @@ import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {PublishProviderSearchResult} from "../../types/PublishedProvider/PublishProviderSearchResult";
+import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -27,22 +27,22 @@ import {PublishedProviderResults} from "../../components/Funding/PublishedProvid
 import {ConfirmFundingApproval} from "../../components/Funding/ConfirmFundingApproval";
 import {ConfirmFundingRelease} from "../../components/Funding/ConfirmFundingRelease";
 import {PublishedProviderSearchFilters} from "../../components/Funding/PublishedProviderSearchFilters";
-import {searchForPublishedProviderIds, searchForPublishedProviderResults} from "../../services/publishedProviderService";
+import {getAllProviderVersionIdsForSearch, searchForPublishedProviderResults} from "../../services/publishedProviderService";
 import {getFundingConfiguration} from "../../services/policyService";
-import {ApprovalMode} from "../../types/viewFundingTypes";
+import {ApprovalMode} from "../../types/ApprovalMode";
 
-export interface FundingApprovalResultsRoute {
+export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
     fundingPeriodId: string;
     specificationId: string;
 }
 
-export function FundingApprovalResults({match}: RouteComponentProps<FundingApprovalResultsRoute>) {
+export function SpecificationFundingApproval({match}: RouteComponentProps<SpecificationFundingApprovalRoute>) {
     const fundingStreamId = match.params.fundingStreamId;
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
 
-    const [publishedProviderResults, setPublishedProviderResults] = useState<PublishProviderSearchResult>({
+    const [publishedProviderResults, setPublishedProviderResults] = useState<PublishedProviderSearchResult>({
         facets: [],
         canApprove: false,
         canPublish: false,
@@ -84,7 +84,8 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
     const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialSearch);
     const [isInitialisingJobMonitor, setIsInitialisingJobMonitor] = useState<boolean>(true);
     const [isLoadingSpec, setIsLoadingSpec] = useState<boolean>(true);
-    const [isLoadingResults, setIsLoadingResults] = useState<boolean>(false);
+    const [isLoadingResults, setIsLoadingResults] = useState<boolean>(true);
+    const [isLoadingProviderVersionIds, setIsLoadingProviderVersionIds] = useState<boolean>(false);
     const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
     const [isConfirmingRelease, setConfirmRelease] = useState<boolean>(false);
     const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
@@ -118,7 +119,7 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
         canAdministerFundingStream: false
     });
     const [approvalMode, setApprovalMode] = useState<ApprovalMode>(ApprovalMode.Undefined);
-    const [providerIdsForSelection, setProviderIdsForSelection] = useState<string[]>([]);
+    const [allProviderVersionIds, setAllProviderVersionIds] = useState<string[]>([]);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const jobTypes = "RefreshFundingJob,ApproveAllProviderFundingJob,ApproveBatchProviderFundingJob,PublishBatchProviderFundingJob,PublishAllProviderFundingJob";
@@ -232,7 +233,9 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
 
     async function loadPublishedProviderResults(searchRequest: PublishedProviderSearchRequest) {
         clearErrorMessages();
-        setIsLoadingResults(true);
+        if (!isLoadingResults) {
+            setIsLoadingResults(true);
+        }
         try {
             const results = (await searchForPublishedProviderResults(searchRequest)).data;
             setIsLoadingResults(false);
@@ -255,53 +258,34 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                     }
                 });
             }
-            const fundingConfiguration = (await getFundingConfiguration(fundingStreamId, fundingPeriodId)).data;
-            if (fundingConfiguration) {
-                setApprovalMode(fundingConfiguration.approvalMode);
+            if (approvalMode === ApprovalMode.Undefined) {
+                const fundingConfiguration = (await getFundingConfiguration(fundingStreamId, fundingPeriodId)).data;
+                if (fundingConfiguration) {
+                    setApprovalMode(fundingConfiguration.approvalMode);
+                    if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
+                        setAllProviderVersionIds(await loadPublishedProviderVersionIds());
+                    }
+                }
             }
         } catch (e) {
             setIsLoadingResults(false);
             addErrorMessage(`Error while loading results: ${e}`);
         }
-        
-        searchForPublishedProviderResults(searchRequest)
-            .then((result) => {
-                setIsLoadingResults(false);
-                setPublishedProviderResults(result.data);
-                if (result.data.facets != null) {
-                    result.data.facets.forEach((facet) => {
-                        switch (facet.name) {
-                            case "providerType":
-                                setProviderTypeFacets(facet.facetValues);
-                                break;
-                            case "providerSubType":
-                                setProviderSubTypeFacets(facet.facetValues);
-                                break;
-                            case "localAuthority":
-                                setLocalAuthorityFacets(facet.facetValues);
-                                break;
-                            case "fundingStatus":
-                                setStatusFacets(facet.facetValues);
-                                break;
-                        }
-                    });
-                }
-            })
-            .catch((err: AxiosError) => {
-                setIsLoadingResults(false);
-                addErrorMessage(`Error while loading results: ${err.message}`);
-            });
     }
     
-    async function loadPublishedProviderIds(searchRequest: PublishedProviderSearchRequest) {
-        setIsLoadingResults(true);
-        searchForPublishedProviderIds(searchRequest)
-            .then((response) => {
-                if (response.data) {
-                    setProviderIdsForSelection(response.data)
-                }})
-            .catch((err: AxiosError) => addErrorMessage(err.message))
-            .finally(() => setIsLoadingResults(false));
+    async function loadPublishedProviderVersionIds(): Promise<string[]> {
+        setIsLoadingProviderVersionIds(true);
+        
+        // N.B. could be a LOT of results!
+        try {
+            const allProviderVersionIds = await getAllProviderVersionIdsForSearch(searchCriteria);
+            setIsLoadingProviderVersionIds(false);
+            return allProviderVersionIds.data;
+        } catch (e) {
+            addErrorMessage("Error while loading provider version ids: " + e);
+            setIsLoadingProviderVersionIds(false);
+            return [];
+        }
     }
 
     function pageChange(pageNumber: string) {
@@ -320,12 +304,10 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             filterUpdate.splice(position, 1);
         }
         setSearchCriteria(prevState => {
-            return {...prevState, localAuthority: filterUpdate}
+            return {...prevState, localAuthority: filterUpdate, pageNumber: 1}
         });
 
         searchCriteria.localAuthority = filterUpdate;
-
-        loadPublishedProviderResults(searchCriteria);
     }
 
     function filterByStatus(e: React.ChangeEvent<HTMLInputElement>) {
@@ -338,12 +320,10 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             filterUpdate.splice(position, 1);
         }
         setSearchCriteria(prevState => {
-            return {...prevState, status: filterUpdate}
+            return {...prevState, status: filterUpdate, pageNumber: 1}
         });
 
         searchCriteria.status = filterUpdate;
-
-        loadPublishedProviderResults(searchCriteria);
     }
 
     function filterByProviderType(e: React.ChangeEvent<HTMLInputElement>) {
@@ -356,12 +336,11 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             filterUpdate.splice(position, 1);
         }
         setSearchCriteria(prevState => {
-            return {...prevState, providerType: filterUpdate}
+            return {...prevState, providerType: filterUpdate, pageNumber: 1}
         });
 
         searchCriteria.providerType = filterUpdate;
 
-        loadPublishedProviderResults(searchCriteria);
     }
 
     function filterByProviderSubType(e: React.ChangeEvent<HTMLInputElement>) {
@@ -374,12 +353,10 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
             filterUpdate.splice(position, 1);
         }
         setSearchCriteria(prevState => {
-            return {...prevState, providerSubType: filterUpdate}
+            return {...prevState, providerSubType: filterUpdate, pageNumber: 1}
         });
 
         searchCriteria.providerSubType = filterUpdate;
-
-        loadPublishedProviderResults(searchCriteria);
     }
 
     function filterByText(searchData: any) {
@@ -508,15 +485,15 @@ export function FundingApprovalResults({match}: RouteComponentProps<FundingAppro
                                                     handleFilterByText={filterByText}
                     />
                     <PublishedProviderResults isLoading={isLoadingResults}
+                                              isLoadingProviderIds={isLoadingProviderVersionIds}
                                               fundingStreamId={fundingStreamId}
                                               fundingPeriodId={fundingPeriodId}
-                                              enableToggles={false}
-                                              handleToggleProvider={undefined}
-                                              handleToggleAllProviders={undefined}
+                                              enableToggles={approvalMode === ApprovalMode.Batches}
                                               specification={specificationSummary}
                                               providerSearchResults={publishedProviderResults}
                                               userPermissions={userPermissions}
                                               pageChange={pageChange}
+                                              fetchPublishedProviderIds={loadPublishedProviderVersionIds}
                                               handleRefreshFunding={handleRefreshFunding}
                                               handleApprove={handleApprove}
                                               handleRelease={handleRelease}/>

@@ -118,7 +118,7 @@ export function ProfilingArchive({match}: RouteComponentProps<ProfilingArchiveRo
         })
     });
 
-    const approvalResultsPath = `/Approvals/FundingApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`;
+    const approvalResultsPath = `/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`;
     return <div>
         <Header location={Section.Results}/>
         <div className="govuk-width-container">

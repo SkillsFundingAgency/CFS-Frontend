@@ -13,10 +13,10 @@ export interface GetDataSchemaAction {
     payload: DatasetDefinitions[]
 }
 
-export type DatasetAction = GetDataSchemaAction;
+export type DatasetActions = GetDataSchemaAction;
 
 export const getDatasetSchema:
-    ActionCreator<ThunkAction<Promise<any>, DatasetState, null, DatasetAction>> =
+    ActionCreator<ThunkAction<Promise<any>, DatasetState, null, DatasetActions>> =
     () => {
         return async (dispatch: Dispatch) => {
             const response = await getDatasetDefinitionsService();

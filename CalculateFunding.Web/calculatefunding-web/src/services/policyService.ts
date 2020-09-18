@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from "axios"
-import {FundingConfiguration} from "../types/viewFundingTypes";
 import {PublishedFundingTemplate} from "../types/TemplateBuilderDefinitions";
+import {FundingConfiguration} from "../types/fundingConfiguration";
 
 let baseURL = "/api/policy";
 

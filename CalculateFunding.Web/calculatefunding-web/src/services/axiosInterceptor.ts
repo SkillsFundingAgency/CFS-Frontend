@@ -1,6 +1,6 @@
 import axios from "axios";
 import {Config} from '../types/Config';
-import {UserActionTypes} from "../actions/userAction";
+import {UserActionEvent} from "../actions/userAction";
 import {createStore} from 'redux';
 import {rootReducer} from "../reducers/rootReducer";
 
@@ -29,7 +29,7 @@ export function initialiseAxios() {
                 // api says user hasn't confirmed skills
                 if (error.response.status === 451) {
                     if (store.getState().userState.hasConfirmedSkills) {
-                        store.dispatch({ type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS, payload: false });
+                        store.dispatch({ type: UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS, payload: false });
                     }
                 }
                 

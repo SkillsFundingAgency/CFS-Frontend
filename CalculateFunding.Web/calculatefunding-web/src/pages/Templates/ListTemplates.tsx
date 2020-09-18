@@ -5,7 +5,6 @@ import {Section} from "../../types/Sections";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {TemplateSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {DateFormatter} from "../../components/DateFormatter";
 import {TemplatePermissions, TemplateSearchResponse, TemplateStatus} from "../../types/TemplateBuilderDefinitions";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
@@ -13,6 +12,7 @@ import {searchForTemplates} from "../../services/templateBuilderDatasourceServic
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
 import {useHistory} from 'react-router';
+import {TemplateSearchRequest} from "../../types/templateSearchRequest";
 
 export const ListTemplates = () => {
     const [haveResults, setHaveResults] = useState<boolean>(false);

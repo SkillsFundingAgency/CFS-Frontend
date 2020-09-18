@@ -22,16 +22,14 @@ import {ViewSpecificationResultsActions} from "../actions/ViewSpecificationResul
 import {SelectSpecificationActions} from "../actions/SelectSpecificationActions";
 import {ViewCalculationResultsActions} from "../actions/ViewCalculationResultsActions";
 import {ProviderActions} from "../actions/ProviderActions";
-import {GetAllSpecifications} from "../actions/SpecificationActions";
-import {GetDataSchemaAction} from "../actions/DatasetActions";
+import {SpecificationActions} from "../actions/SpecificationActions";
+import {DatasetActions} from "../actions/DatasetActions";
 import {GetFeatureFlagsAction} from "../actions/FeatureFlagsActions";
 import {ViewSpecificationsActions} from "../actions/ViewSpecificationsActions";
-import {
-    ICreateAccountAction,
-    IFundingStreamPermissionsAction,
-    IHasUserConfirmedSkillsAction,
-    IUpdateUserConfirmedSkillsAction
-} from "../actions/userAction";
+import {IUserActions} from "../actions/userAction";
+import {IFundingSelectionState} from "../states/IFundingSelectionState";
+import {reduceFundingSelectionState} from "./fundingSelectionReducer";
+import {IFundingSelectionActions} from "../actions/FundingSelectionActions";
 
 export interface IStoreState {
     userState: IUserState,
@@ -42,22 +40,21 @@ export interface IStoreState {
     selectSpecification: SelectSpecificationState,
     provider: ProviderState,
     datasets: DatasetState,
+    fundingSelection: IFundingSelectionState,
     featureFlags: FeatureFlagsState
 }
 
-export type Actions = 
-    ICreateAccountAction |
-    IHasUserConfirmedSkillsAction |
-    IUpdateUserConfirmedSkillsAction |
-    IFundingStreamPermissionsAction |
+export type Actions =
+    IFundingSelectionActions |
+    IUserActions |
     FundingLineStructureAction |
     ViewSpecificationResultsActions |
     ViewSpecificationsActions |
     SelectSpecificationActions |
     ViewCalculationResultsActions |
     ProviderActions |
-    GetAllSpecifications |
-    GetDataSchemaAction |
+    SpecificationActions |
+    DatasetActions |
     GetFeatureFlagsAction;
 
 export const rootReducer: Reducer<IStoreState, Actions> =
@@ -70,6 +67,7 @@ export const rootReducer: Reducer<IStoreState, Actions> =
         viewCalculationResults: reduceCalculationResultsState,
         provider: reduceProvider,
         datasets: reduceDatasetState,
+        fundingSelection: reduceFundingSelectionState,
         featureFlags: reduceFeatureFlagsState
     });
 

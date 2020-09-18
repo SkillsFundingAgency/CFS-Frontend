@@ -1,13 +1,13 @@
 ﻿import {BackButton} from "../BackButton";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import React from "react";
-import {PublishProviderSearchResult} from "../../types/PublishedProvider/PublishProviderSearchResult";
+import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {FundingSpecificationDetails} from "./FundingSpecificationDetails";
 
 export interface IConfirmFundingReleaseProps {
-    publishedProviderResults: PublishProviderSearchResult,
+    publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
     userPermissions: EffectiveSpecificationPermission,
     handleBack: any,

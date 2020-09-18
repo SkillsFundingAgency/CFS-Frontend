@@ -54,7 +54,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Approvals"}/>
                 <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
-                <Breadcrumb name={"Funding approval results"} url={`/Approvals/FundingApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${specification.id}`} />
+                <Breadcrumb name={"Funding approval results"} url={`/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${specification.id}`} />
                 <Breadcrumb name={"Provider funding overview"}/>
             </Breadcrumbs>
             <div className="govuk-grid-row govuk-!-margin-bottom-5">

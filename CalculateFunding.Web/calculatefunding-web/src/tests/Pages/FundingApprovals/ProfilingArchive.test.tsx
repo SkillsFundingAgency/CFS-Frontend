@@ -1,12 +1,8 @@
 import React from 'react';
-import {createStore, Store} from "redux";
-import {Provider} from 'react-redux';
 import {mount} from "enzyme";
-import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {ProfilingArchive, ProfilingArchiveRouteProps} from "../../../pages/FundingApprovals/ProfilingArchive";
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
-import {FundingApprovalResultsRoute} from "../../../pages/FundingApprovals/FundingApprovalResults";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');

@@ -1,25 +1,29 @@
-﻿import React from "react";
+﻿import React, {useState} from "react";
 import {LoadingStatus} from "../LoadingStatus";
 import {NoData} from "../NoData";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {Link} from "react-router-dom";
 import {BackToTop} from "../BackToTop";
 import Pagination from "../Pagination";
-import {PublishProviderSearchResult} from "../../types/PublishedProvider/PublishProviderSearchResult";
+import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
+import {useDispatch, useSelector} from "react-redux";
+import {removeProvidersFromFundingSelection, addProvidersToFundingSelection} from "../../actions/FundingSelectionActions";
+import {IStoreState} from "../../reducers/rootReducer";
+import {IFundingSelectionState} from "../../states/IFundingSelectionState";
 
 export interface IPublishedProviderResultsProps {
     isLoading: boolean,
+    isLoadingProviderIds: boolean,
     enableToggles: boolean,
     fundingStreamId: string,
     fundingPeriodId: string,
-    providerSearchResults: PublishProviderSearchResult,
+    providerSearchResults: PublishedProviderSearchResult,
     specification: SpecificationSummary,
     userPermissions: EffectiveSpecificationPermission,
     pageChange: any,
-    handleToggleProvider: any,
-    handleToggleAllProviders: any,
+    fetchPublishedProviderIds: () => Promise<string[]>,
     handleRefreshFunding: any,
     handleApprove: any,
     handleRelease: any
@@ -27,15 +31,37 @@ export interface IPublishedProviderResultsProps {
 
 export function PublishedProviderResults(props: IPublishedProviderResultsProps) {
 
+    const fundingSelectionState: IFundingSelectionState = useSelector<IStoreState, IFundingSelectionState>(state => state.fundingSelection);
     const havePageResults = props.providerSearchResults.providers.length > 0;
     const totalResults = props.providerSearchResults.totalResults;
+    const [selectAll, setSelectAll] = useState<boolean>(false);
+    const dispatch = useDispatch();
+
+    const handleToggleAllProviders = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked;
+        setSelectAll(checked);
+        const allProviderIdsInCurrentSearch = await props.fetchPublishedProviderIds();
+        dispatch(checked ?
+            addProvidersToFundingSelection(allProviderIdsInCurrentSearch) :
+            removeProvidersFromFundingSelection(allProviderIdsInCurrentSearch));
+    };
+
+    const handleItemSelectionToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked;
+        const providerId = e.target.value;
+        dispatch(checked ?
+            addProvidersToFundingSelection([providerId]) :
+            removeProvidersFromFundingSelection([providerId]));
+    };
+
+    const isLoading = props.isLoading || props.isLoadingProviderIds;
     
     return (
         <div className="govuk-grid-column-two-thirds">
-            {props.isLoading &&
-            <LoadingStatus title={"Loading provider funding data"}/>
+            {isLoading &&
+            <LoadingStatus title={isLoading ? "Loading provider funding data" : "Applying selection..."}/>
             }
-            {!props.isLoading &&
+            {!isLoading &&
             <>
                 <NoData hidden={havePageResults}/>
                 {havePageResults &&
@@ -47,7 +73,8 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                             <div className="govuk-checkboxes govuk-checkboxes--small">
                                 <div className="govuk-checkboxes__item">
                                     <input className="govuk-checkboxes__input" id="toggle-all" type="checkbox" value="toggle-all"
-                                           onClick={props.handleToggleAllProviders}/>
+                                           checked={selectAll}
+                                           onChange={handleToggleAllProviders}/>
                                     <label className="govuk-label govuk-checkboxes__label" htmlFor="toggle-all">
                                         Select all
                                     </label>
@@ -67,17 +94,19 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                     </thead>
                     <tbody>
                     {props.providerSearchResults.providers.map(provider =>
-                        <tr key={provider.providerVersionId}>
+                        <tr key={provider.publishedProviderVersionId}>
                             <td className="govuk-table__cell govuk-body">
                                 {props.enableToggles &&
                                 <div className="govuk-checkboxes govuk-checkboxes--small">
                                     <div className="govuk-checkboxes__item">
                                         <input className="govuk-checkboxes__input provider-checked"
-                                               id={`provider-approval-${provider.providerVersionId}`}
+                                               id={`provider-approval-${provider.publishedProviderVersionId}`}
                                                type="checkbox"
-                                               value={props.specification.providerVersionId}
-                                               onClick={props.handleToggleProvider(props.specification.providerVersionId)}/>
-                                        <label className="govuk-label govuk-checkboxes__label" htmlFor={`provider-approval-${provider.providerVersionId}`}>
+                                               value={provider.publishedProviderVersionId}
+                                               checked={fundingSelectionState.providerVersionIds.includes(provider.publishedProviderVersionId)}
+                                               onChange={handleItemSelectionToggle}
+                                        />
+                                        <label className="govuk-label govuk-checkboxes__label" htmlFor={`provider-approval-${provider.publishedProviderVersionId}`}>
                                             <Link to={`/Approvals/ProviderFundingOverview/${provider.specificationId}/${provider.ukprn}/${props.specification.providerVersionId}/${props.fundingStreamId}/${props.fundingPeriodId}`}>
                                                 {provider.providerName}
                                             </Link>
@@ -103,7 +132,7 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                 }
             </>
             }
-            <BackToTop id="top" />
+            <BackToTop id="top"/>
             {totalResults > 0 &&
             <>
                 <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"

@@ -1,8 +1,10 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Results
-{
+﻿using Newtonsoft.Json;
 
+namespace CalculateFunding.Frontend.ViewModels.Results
+{
     public class PublishedProviderSearchResultItemViewModel
     {
+        [JsonProperty("publishedProviderVersionId")]
         public string Id { get; set; }
 
         public string ProviderType { get; set; }

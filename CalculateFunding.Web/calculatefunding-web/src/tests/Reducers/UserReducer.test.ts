@@ -1,4 +1,4 @@
-﻿import {UserActionTypes} from "../../actions/userAction";
+﻿import {UserActionEvent} from "../../actions/userAction";
 import {reduceUserState} from "../../reducers/userReducer";
 
 const payload = [{
@@ -50,7 +50,7 @@ const fundingStreamPermissionsDsgState = {
 
 describe("user-reducer", () => {
     it("Should return the initial state", () => {
-        expect(reduceUserState(undefined, {type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS, payload: []}))
+        expect(reduceUserState(undefined, {type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS, payload: []}))
             .toEqual({
                 "fundingStreamPermissions": [],
                 "hasConfirmedSkills": undefined,
@@ -68,7 +68,7 @@ describe("user-reducer", () => {
                 userName: "test-user"
             },
             {
-                type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
+                type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS,
                 payload: payload
             }))
             .toEqual({

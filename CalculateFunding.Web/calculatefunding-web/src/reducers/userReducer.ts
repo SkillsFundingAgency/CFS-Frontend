@@ -1,6 +1,6 @@
 import {IUserState} from "../states/IUserState";
 import {Reducer} from "redux";
-import {hasConfirmedSkillsStateKey, UserActions, UserActionTypes} from '../actions/userAction';
+import {hasConfirmedSkillsStateKey, IUserActions, UserActionEvent} from '../actions/userAction';
 
 const initialState: IUserState = {
     isLoggedIn: false,
@@ -9,17 +9,17 @@ const initialState: IUserState = {
     fundingStreamPermissions: []
 };
 
-export const reduceUserState: Reducer<IUserState, UserActions> =
-    (state: IUserState = initialState, action: UserActions): IUserState => {
+export const reduceUserState: Reducer<IUserState, IUserActions> =
+    (state: IUserState = initialState, action: IUserActions): IUserState => {
         switch (action.type) {
-            case UserActionTypes.CREATE_ACCOUNT:
+            case UserActionEvent.CREATE_ACCOUNT:
                 return {...state, isLoggedIn: true, userName: action.userName};
-            case UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS:
+            case UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS:
                 return {...state, fundingStreamPermissions: action.payload};
-            case UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS:
+            case UserActionEvent.GET_HAS_USER_CONFIRMED_SKILLS:
                 updateSkillsInLocalStorage(action.payload);
                 return {...state, hasConfirmedSkills: action.payload};
-            case UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS:
+            case UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS:
                 updateSkillsInLocalStorage(action.payload);
                 return {...state, hasConfirmedSkills: action.payload};
             default:
@@ -34,3 +34,4 @@ const updateSkillsInLocalStorage = (hasConfirmedSkills: boolean) => {
         localStorage.removeItem(hasConfirmedSkillsStateKey);
     }
 };
+

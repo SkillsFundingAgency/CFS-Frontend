@@ -148,7 +148,7 @@ export function FundingApprovalSelection() {
                     {!isLoadingSpecification && selectedSpecification && selectedSpecification.name.length > 0 &&
                     <>
                         <h3 className="govuk-heading-m">{selectedSpecification.name}</h3>
-                        <Link to={`/Approvals/FundingApprovalResults/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification.id}`}
+                        <Link to={`/Approvals/SpecificationFundingApproval/${selectedFundingStream}/${selectedFundingPeriod}/${selectedSpecification.id}`}
                               data-testid={"view-funding-link"}
                               className="govuk-button" 
                               data-module="govuk-button">

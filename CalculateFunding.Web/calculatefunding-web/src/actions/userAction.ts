@@ -6,61 +6,40 @@ import {IUserState} from "../states/IUserState";
 
 export const hasConfirmedSkillsStateKey = "hasConfirmedSkillsState";
 
-export enum UserActionTypes {
+export enum UserActionEvent {
     CREATE_ACCOUNT = 'userActionCreateAccount',
     GET_FUNDING_STREAM_PERMISSIONS = 'getFundingStreamPermissions',
     GET_HAS_USER_CONFIRMED_SKILLS = 'getHasUserConfirmedSkills',
     UPDATE_USER_CONFIRMED_SKILLS = 'updateUserConfirmedSkills'
 }
 
-export type UserActions =
+export type IUserActions =
     ICreateAccountAction |
     IFundingStreamPermissionsAction |
     IHasUserConfirmedSkillsAction |
     IUpdateUserConfirmedSkillsAction;
 
 export interface ICreateAccountAction {
-    type: UserActionTypes.CREATE_ACCOUNT;
+    type: UserActionEvent.CREATE_ACCOUNT;
     userName: string
 }
 
 export interface IFundingStreamPermissionsAction {
-    type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS;
+    type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS;
     payload: FundingStreamPermissions[]
 }
 
 export interface IHasUserConfirmedSkillsAction {
-    type: UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS;
+    type: UserActionEvent.GET_HAS_USER_CONFIRMED_SKILLS;
     payload: boolean
 }
 
 export interface IUpdateUserConfirmedSkillsAction {
-    type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS;
+    type: UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS;
     payload: boolean
 }
 
-export function createCreateAccountAction(userName: string): ICreateAccountAction {
-    return {
-        type: UserActionTypes.CREATE_ACCOUNT,
-        userName: userName
-    };
-}
-
-export function fundingStreamPermissionsAction(fundingStreamPermissions: FundingStreamPermissions[]): IFundingStreamPermissionsAction {
-    return {
-        type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
-        payload: fundingStreamPermissions
-    };
-}
-
-export function updateUserConfirmedSkillsAction(success: boolean): IUpdateUserConfirmedSkillsAction {
-    return {
-        type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
-        payload: success
-    };
-}
-
-export const getUserFundingStreamPermissions: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = () => {
+export const getUserFundingStreamPermissions: ActionCreator<ThunkAction<Promise<any>, IUserState, null, IUserActions>> = () => {
     return async (dispatch, getState) => {
         const state = getState();
         if (state.fundingStreamPermissions && state.fundingStreamPermissions.length > 0) {
@@ -71,13 +50,13 @@ export const getUserFundingStreamPermissions: ActionCreator<ThunkAction<Promise<
             headers: {'Content-Type': 'application/json'},
         });
         dispatch({
-            type: UserActionTypes.GET_FUNDING_STREAM_PERMISSIONS,
+            type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS,
             payload: response.data as FundingStreamPermissions[]
         });
     }
 };
 
-export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = () => {
+export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, IUserActions>> = () => {
     return async (dispatch, getState) => {
         if (getState().hasConfirmedSkills === true) {
             return;
@@ -96,23 +75,23 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
         }
 
         dispatch({
-            type: UserActionTypes.GET_HAS_USER_CONFIRMED_SKILLS,
+            type: UserActionEvent.GET_HAS_USER_CONFIRMED_SKILLS,
             payload: hasConfirmed === true
         });
     }
 };
 
-export const updateUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, UserActions>> = (hasConfirmed: boolean) => {
+export const updateUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, IUserState, null, IUserActions>> = (hasConfirmed: boolean) => {
     return async dispatch => {
         if (hasConfirmed) {
             const response = await axios.put(`/api/account/hasConfirmedSkills`);
             dispatch({
-                type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
+                type: UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS,
                 payload: response.status === 200
             });
         } else {
             dispatch({
-                type: UserActionTypes.UPDATE_USER_CONFIRMED_SKILLS,
+                type: UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS,
                 payload: false
             });
         }

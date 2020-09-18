@@ -2,15 +2,13 @@
 import {CollapsiblePanel} from "../CollapsiblePanel";
 import {CollapsibleSearchBox} from "../CollapsibleSearchBox";
 import React from "react";
-import {PublishProviderSearchResult} from "../../types/PublishedProvider/PublishProviderSearchResult";
+import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {FacetValue} from "../../types/Facet";
-import {NoData} from "../NoData";
-
 
 export interface IPublishedProviderSearchFiltersProps {
     isLoadingResults: boolean,
-    publishedProviderResults: PublishProviderSearchResult,
+    publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
     localAuthorities: FacetValue[],
     providerTypes: FacetValue[],

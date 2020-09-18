@@ -7,7 +7,7 @@ import {
     getFundingStreamsService,
     getPublishedTemplatesByStreamAndPeriod
 } from "../../services/policyService";
-import {FundingConfiguration, FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
+import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
 import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
 import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpecificationViewModel";

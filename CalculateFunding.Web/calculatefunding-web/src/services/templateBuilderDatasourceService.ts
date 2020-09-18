@@ -23,10 +23,10 @@ import {
     FundingLineDictionaryItem,
     NodeDictionaryItem
 } from "../types/TemplateBuilderDefinitions";
-import {TemplateSearchRequest} from "../types/publishedProviderSearchRequest";
 import axios from "axios";
 import {AxiosResponse} from "axios";
 import cloneDeep from 'lodash/cloneDeep';
+import {TemplateSearchRequest} from "../types/templateSearchRequest";
 
 const fundingLineIdField = "id";
 const fundingLineChildrenField = "children";
