@@ -24,13 +24,13 @@ export interface IPublishedProviderSearchFiltersProps {
 export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFiltersProps) {
 
     const hasInitialLoad = props.publishedProviderResults.facets.length > 0;
-    const hasFilters = props.statuses.length > 0;
+    
     return (
         <div className="govuk-grid-column-one-third">
             {!hasInitialLoad &&
                 <LoadingStatus title={`Loading filters`} testid='loadingFilters'/>
             }
-            {hasInitialLoad && hasFilters &&
+            {hasInitialLoad && 
             <>
                 <CollapsiblePanel title={"Search"} expanded={true}>
                     <fieldset className="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
