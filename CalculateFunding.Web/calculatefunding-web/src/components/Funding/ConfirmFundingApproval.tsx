@@ -62,7 +62,7 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
                             <th className="govuk-table__header">
                                 <FormattedNumber
                                     value={props.publishedProviderResults.totalFundingAmount}
-                                    type={NumberType.FormattedMoney} decimalPoint={2}/>
+                                    type={NumberType.FormattedMoney} decimalPlaces={2}/>
                             </th>
                         </tr>
                         </thead>

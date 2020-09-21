@@ -165,29 +165,33 @@ export const PublishTemplate = () => {
     const clearSelectedNode = () => {
         setSelectedNodes(new Set());
     };
-    
+
     return (
         <div>
-            <Header location={Section.Templates}/>
+            <Header location={Section.Templates} />
             <div className="govuk-width-container">
                 <Breadcrumbs>
-                    <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
-                    <Breadcrumb name={"Publish a template"}/>
+                    <Breadcrumb name={"Calculate Funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+                    <Breadcrumb name={"Publish a template"} />
                 </Breadcrumbs>
 
-                <MultipleErrorSummary errors={errors} />
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-two-thirds">
+                        <MultipleErrorSummary errors={errors} />
+                    </div>
+                </div>
 
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Publish Template</h1>
                     {canApproveTemplate &&
-                    <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Check the information below before publishing</h3>}
+                        <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Check the information below before publishing</h3>}
                     <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} />
                 </div>
 
                 {canApproveTemplate && <div>
                     <div className="govuk-grid-row" hidden={!isLoading}>
-                        <LoadingStatus title={"Loading..."} description={"Please wait whilst the template is loading"}/>
+                        <LoadingStatus title={"Loading..."} description={"Please wait whilst the template is loading"} />
                     </div>
                     <div className="govuk-grid-row" hidden={isLoading}>
                         <div className="govuk-grid-column-full">
@@ -217,16 +221,16 @@ export const PublishTemplate = () => {
                                         Add publish note
                                     </label>
                                     <textarea className="govuk-textarea" id="publishNote" rows={4}
-                                              maxLength={1000}
-                                              onClick={clearErrorMessages}
-                                              onChange={handlePublishNoteChange}/>
+                                        maxLength={1000}
+                                        onClick={clearErrorMessages}
+                                        onChange={handlePublishNoteChange} />
                                     {errors.map(error => error.fieldName === "publishNote" &&
                                         <span key={error.id} id={"publishNote-error-" + error.id} className="govuk-error-message">
                                             <span className="govuk-visually-hidden">Error:</span> {error.message}</span>
                                     )}
                                 </div>
                                 <div id="content"
-                                     className={"gov-org-chart-container " + (errors.some(error => error.fieldName === "content") ? 'govuk-form-group--error' : '')}>
+                                    className={"gov-org-chart-container " + (errors.some(error => error.fieldName === "content") ? 'govuk-form-group--error' : '')}>
                                     <OrganisationChart
                                         ref={orgchart}
                                         NodeTemplate={TemplateBuilderNode}
@@ -255,18 +259,18 @@ export const PublishTemplate = () => {
                                     : null}
 
                                 {template && template.status !== "Published" &&
-                                <button className="govuk-button" data-testid="publish"
+                                    <button className="govuk-button" data-testid="publish"
                                         disabled={isPublishing || isLoading || !canApproveTemplate || !template}
                                         onClick={handlePublishClick}>Publish
                                 </button>}
                                 &nbsp;
-                                {template && template.status !== "Published" && 
-                                <Link id="cancel" to="/Templates/List" className="govuk-button govuk-button--secondary" data-module="govuk-button">
-                                    Back
+                                {template && template.status !== "Published" &&
+                                    <Link id="cancel" to="/Templates/List" className="govuk-button govuk-button--secondary" data-module="govuk-button">
+                                        Back
                                 </Link>}
                                 {template && template.status === "Published" &&
-                                <Link id="continue" to="/Templates/List" className="govuk-button govuk-button--primary" data-module="govuk-button">
-                                    Continue
+                                    <Link id="continue" to="/Templates/List" className="govuk-button govuk-button--primary" data-module="govuk-button">
+                                        Continue
                                 </Link>}
                                 <Sidebar sidebar={
                                     <SidebarContent
@@ -275,30 +279,30 @@ export const PublishTemplate = () => {
                                         isEditMode={false}
                                         openSideBar={openSideBar}
                                     />}
-                                         open={isSidebarOpen}
-                                         onSetOpen={openSideBar}
-                                         pullRight={true}
-                                         styles={{
-                                             sidebar: {
-                                                 background: "white",
-                                                 position: "fixed",
-                                                 padding: "20px 20px",
-                                                 width: "500px"
-                                             }, root: {position: "undefined"}, content: {
-                                                 position: "undefined",
-                                                 top: "undefined",
-                                                 left: "undefined",
-                                                 right: "undefined",
-                                                 bottom: "undefined"
-                                             }
-                                         }}
+                                    open={isSidebarOpen}
+                                    onSetOpen={openSideBar}
+                                    pullRight={true}
+                                    styles={{
+                                        sidebar: {
+                                            background: "white",
+                                            position: "fixed",
+                                            padding: "20px 20px",
+                                            width: "500px"
+                                        }, root: {position: "undefined"}, content: {
+                                            position: "undefined",
+                                            top: "undefined",
+                                            left: "undefined",
+                                            right: "undefined",
+                                            bottom: "undefined"
+                                        }
+                                    }}
                                 ><span></span></Sidebar>
                             </form>
                         </div>
                     </div>
                 </div>}
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };

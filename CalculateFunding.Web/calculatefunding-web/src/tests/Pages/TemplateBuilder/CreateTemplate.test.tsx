@@ -32,7 +32,12 @@ export const noPermissionsState: FundingStreamPermissions[] = [{
     canCreateTemplates: false,
     canEditTemplates: false,
     canDeleteTemplates: false,
-    canApproveTemplates: false
+    canApproveTemplates: false,
+    canApplyCustomProfilePattern: false,
+    canAssignProfilePattern: false,
+    canDeleteProfilePattern: false,
+    canEditProfilePattern: false,
+    canCreateProfilePattern: false
 }];
 
 export const permissionsState: FundingStreamPermissions[] = [{
@@ -56,7 +61,12 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canCreateTemplates: true,
     canEditTemplates: true,
     canDeleteTemplates: true,
-    canApproveTemplates: true
+    canApproveTemplates: true,
+    canApplyCustomProfilePattern: false,
+    canAssignProfilePattern: false,
+    canDeleteProfilePattern: false,
+    canEditProfilePattern: false,
+    canCreateProfilePattern: false
 }];
 
 describe("Create Template page when I have no create permissions ", () => {

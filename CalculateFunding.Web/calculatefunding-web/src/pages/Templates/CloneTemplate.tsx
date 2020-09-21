@@ -40,57 +40,57 @@ export const CloneTemplate = () => {
     }
 
     useEffectOnce(() => {
-            setIsLoading(true);
+        setIsLoading(true);
 
-            const fetchTemplateToClone = async (templateId: string, version: number) => {
-                try {
-                    setIsLoading(true);
-                    const templateResult = await getTemplateVersion(templateId, version);
-                    if (templateResult.status !== 200) {
-                        addErrorMessage("Could not fetch template from which to clone. " + templateResult.statusText);
-                    }
-                    const templateResponse = templateResult.data as TemplateResponse;
-                    setTemplateToClone(templateResponse);
-                    setFundingStream({id: templateResponse.fundingStreamId, name: templateResponse.fundingStreamName});
-                    await loadAvailable(templateResponse.fundingStreamId);
-                } catch (err) {
-                    addErrorMessage(err.message);
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-
-            const loadAvailable = async (fundingStreamId: string) => {
-                if (!fundingStreamId) {
-                    return;
-                }
-                const fundingStreamWithPeriodsResponse = await fetchAvailableFundingConfigurations();
-                setIsLoading(false);
-
-                // extract funding stream matching the template we're cloning from
-                const streamWithPeriods = fundingStreamWithPeriodsResponse
-                    .find(x => x.fundingStream.id === fundingStreamId);
-                if (!streamWithPeriods) {
-                    addErrorMessage("No available funding streams with periods", "fundingStreamId");
-                    return;
-                }
-                // user has sufficient permissions?
-                if (!fundingStreamPermissions.some(f => f.permission === TemplatePermissions.Create &&
-                    f.fundingStreamId === fundingStreamId)) {
-                    addErrorMessage("Insufficient permissions to clone a template with this funding stream", "fundingStreamId");
-                    return;
-                }
-                populateFundingPeriods(streamWithPeriods.fundingPeriods);
-            };
-
+        const fetchTemplateToClone = async (templateId: string, version: number) => {
             try {
-                fetchTemplateToClone(templateId, version);
-            } catch
-                (err) {
-                addErrorMessage(`Template options could not be loaded: ${err.message}.`);
+                setIsLoading(true);
+                const templateResult = await getTemplateVersion(templateId, version);
+                if (templateResult.status !== 200) {
+                    addErrorMessage("Could not fetch template from which to clone. " + templateResult.statusText);
+                }
+                const templateResponse = templateResult.data as TemplateResponse;
+                setTemplateToClone(templateResponse);
+                setFundingStream({id: templateResponse.fundingStreamId, name: templateResponse.fundingStreamName});
+                await loadAvailable(templateResponse.fundingStreamId);
+            } catch (err) {
+                addErrorMessage(err.message);
+            } finally {
                 setIsLoading(false);
             }
+        };
+
+        const loadAvailable = async (fundingStreamId: string) => {
+            if (!fundingStreamId) {
+                return;
+            }
+            const fundingStreamWithPeriodsResponse = await fetchAvailableFundingConfigurations();
+            setIsLoading(false);
+
+            // extract funding stream matching the template we're cloning from
+            const streamWithPeriods = fundingStreamWithPeriodsResponse
+                .find(x => x.fundingStream.id === fundingStreamId);
+            if (!streamWithPeriods) {
+                addErrorMessage("No available funding streams with periods", "fundingStreamId");
+                return;
+            }
+            // user has sufficient permissions?
+            if (!fundingStreamPermissions.some(f => f.permission === TemplatePermissions.Create &&
+                f.fundingStreamId === fundingStreamId)) {
+                addErrorMessage("Insufficient permissions to clone a template with this funding stream", "fundingStreamId");
+                return;
+            }
+            populateFundingPeriods(streamWithPeriods.fundingPeriods);
+        };
+
+        try {
+            fetchTemplateToClone(templateId, version);
+        } catch
+        (err) {
+            addErrorMessage(`Template options could not be loaded: ${err.message}.`);
+            setIsLoading(false);
         }
+    }
     );
 
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -155,75 +155,79 @@ export const CloneTemplate = () => {
 
     return (
         <div>
-            <Header location={Section.Templates}/>
+            <Header location={Section.Templates} />
             <div className="govuk-width-container">
                 <Breadcrumbs>
-                    <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
-                    <Breadcrumb name={isLoading ? "Loading..." : templateToClone ? templateToClone.name : "Template"} 
-                                url={`/Templates/${templateId}/Edit`}/>
+                    <Breadcrumb name={"Calculate Funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+                    <Breadcrumb name={isLoading ? "Loading..." : templateToClone ? templateToClone.name : "Template"}
+                        url={`/Templates/${templateId}/Edit`} />
                     <Breadcrumb name={isLoading ? "Loading..." : templateToClone ? `Version ${templateToClone.majorVersion}.${templateToClone.minorVersion}` : ""}
-                                url={templateToClone && `/Templates/${templateToClone.templateId}/Versions/${templateToClone.version}`}/>
-                    <Breadcrumb name={"Clone template"}/>
+                        url={templateToClone && `/Templates/${templateToClone.templateId}/Versions/${templateToClone.version}`} />
+                    <Breadcrumb name={"Clone template"} />
                 </Breadcrumbs>
-                <PermissionStatus requiredPermissions={missingPermissions}/>
-                {canCreateTemplate && 
-                <MultipleErrorSummary errors={errors} />
+                <PermissionStatus requiredPermissions={missingPermissions} />
+                {canCreateTemplate &&
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-two-thirds">
+                            <MultipleErrorSummary errors={errors} />
+                        </div>
+                    </div>
                 }
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Clone a template</h1>
                     {templateToClone &&
-                    <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">
-                        Clone a template of {templateToClone.name} version {templateToClone.majorVersion}.{templateToClone.minorVersion}
-                    </h3>}
+                        <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">
+                            Clone a template of {templateToClone.name} version {templateToClone.majorVersion}.{templateToClone.minorVersion}
+                        </h3>}
                     {canCreateTemplate &&
-                    <form id="cloneTemplate">
-                        <div className="govuk-grid-row" hidden={!isLoading}>
-                            <LoadingStatus title={"Loading options..."} description={"Please wait whilst the options are loading"}/>
-                        </div>
-                        {fundingStream && !isLoading &&
-                        <FundingStreamAndPeriodSelection
-                            hideFundingStreamSelection={true}
-                            selectedFundingStreamId={fundingStream.id}
-                            selectedFundingPeriodId={selectedFundingPeriodId}
-                            fundingStreams={[fundingStream]}
-                            fundingPeriods={fundingPeriods}
-                            errors={errors}
-                            onFundingPeriodChange={handleFundingPeriodChange}
-                        />}
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full">
-                                <label className="govuk-label" htmlFor="description">
-                                    Template description
+                        <form id="cloneTemplate">
+                            <div className="govuk-grid-row" hidden={!isLoading}>
+                                <LoadingStatus title={"Loading options..."} description={"Please wait whilst the options are loading"} />
+                            </div>
+                            {fundingStream && !isLoading &&
+                                <FundingStreamAndPeriodSelection
+                                    hideFundingStreamSelection={true}
+                                    selectedFundingStreamId={fundingStream.id}
+                                    selectedFundingPeriodId={selectedFundingPeriodId}
+                                    fundingStreams={[fundingStream]}
+                                    fundingPeriods={fundingPeriods}
+                                    errors={errors}
+                                    onFundingPeriodChange={handleFundingPeriodChange}
+                                />}
+                            <div className="govuk-grid-row">
+                                <div className="govuk-grid-column-full">
+                                    <label className="govuk-label" htmlFor="description">
+                                        Template description
                                 </label>
-                                <textarea className="govuk-textarea" id="description" rows={8}
-                                          aria-describedby="description-hint"
-                                          maxLength={1000}
-                                          onChange={handleDescriptionChange}/>
+                                    <textarea className="govuk-textarea" id="description" rows={8}
+                                        aria-describedby="description-hint"
+                                        maxLength={1000}
+                                        onChange={handleDescriptionChange} />
+                                </div>
                             </div>
-                        </div>
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full">
-                                {selectedFundingPeriodId &&
-                                <button className="govuk-button" data-testid='save'
-                                        onClick={handleSaveClick}
-                                        disabled={!enableSaveButton}>
-                                    Clone Template
+                            <div className="govuk-grid-row">
+                                <div className="govuk-grid-column-full">
+                                    {selectedFundingPeriodId &&
+                                        <button className="govuk-button" data-testid='save'
+                                            onClick={handleSaveClick}
+                                            disabled={!enableSaveButton}>
+                                            Clone Template
                                 </button>}
-                                {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                                    {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                                </div>
                             </div>
-                        </div>
 
-                        <Link to={`/Templates/${templateId}/Edit?version=${version}`}
-                              id="back-button"
-                              className="govuk-link govuk-back-link govuk-link--no-visited-state">
-                            Back
+                            <Link to={`/Templates/${templateId}/Edit?version=${version}`}
+                                id="back-button"
+                                className="govuk-link govuk-back-link govuk-link--no-visited-state">
+                                Back
                         </Link>
-                    </form>
+                        </form>
                     }
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };

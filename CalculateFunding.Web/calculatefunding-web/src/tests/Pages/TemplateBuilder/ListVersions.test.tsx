@@ -33,7 +33,12 @@ export const noPermissionsState: FundingStreamPermissions[] = [{
     canCreateTemplates: false,
     canEditTemplates: false,
     canDeleteTemplates: false,
-    canApproveTemplates: false
+    canApproveTemplates: false,
+    canApplyCustomProfilePattern: false,
+    canAssignProfilePattern: false,
+    canDeleteProfilePattern: false,
+    canEditProfilePattern: false,
+    canCreateProfilePattern: false
 }];
 
 describe("Template Versions page when there are two versions and I have no permissions ", () => {

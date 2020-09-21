@@ -52,6 +52,7 @@ import {UserConfirmLeavePageModal} from "./components/UserConfirmLeavePageModal"
 import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
 import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculationVersions";
+import {ViewFundingLineProfile} from "./pages/FundingApprovals/ViewFundingLineProfile";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -99,6 +100,8 @@ const App: React.FunctionComponent = () => {
                     <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
                     <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
                     <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
+                    <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
+                        component={ViewFundingLineProfile} />
                     <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
                            component={ProviderFundingOverview}/>
                     <Route path="/Approvals/ProfilingArchive/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId" component={ProfilingArchive}/>

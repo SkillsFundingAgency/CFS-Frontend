@@ -140,63 +140,65 @@ export const CreateTemplate = () => {
 
     return (
         <div>
-            <Header location={Section.Templates}/>
+            <Header location={Section.Templates} />
             <div className="govuk-width-container">
                 <Breadcrumbs>
-                    <Breadcrumb name={"Calculate Funding"} url={"/"}/>
-                    <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
-                    <Breadcrumb name={"Create a new template"}/>
+                    <Breadcrumb name={"Calculate Funding"} url={"/"} />
+                    <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+                    <Breadcrumb name={"Create a new template"} />
                 </Breadcrumbs>
-                <PermissionStatus requiredPermissions={missingPermissions}/>
-                {canCreateTemplate &&
-                <MultipleErrorSummary errors={errors} />
-                }
+                <PermissionStatus requiredPermissions={missingPermissions} />
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-two-thirds">
+                        <MultipleErrorSummary errors={errors} />
+                    </div>
+                </div>
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Create a new template</h1>
                     <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Build a new funding policy template</h3>
                 </div>
                 {canCreateTemplate &&
-                <form id="createTemplate">
-                    <div className="govuk-grid-row" hidden={!isLoading}>
-                        <LoadingStatus title={"Loading options..."} description={"Please wait whilst the options are loading"}/>
-                    </div>
-                    {!isLoading &&
-                    <FundingStreamAndPeriodSelection
-                        hideFundingStreamSelection={false}
-                        fundingStreams={fundingStreams}
-                        fundingPeriods={fundingPeriods}
-                        errors={errors}
-                        onFundingStreamChange={handleFundingStreamChange}
-                        onFundingPeriodChange={handleFundingPeriodChange}
-                    />}
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-full govuk-form-group">
-                            <label className="govuk-label" htmlFor="description">
-                                Description
-                            </label>
-                            <textarea className="govuk-textarea" id="description" rows={8}
-                                      aria-describedby="description-hint"
-                                      maxLength={1000}
-                                      onChange={handleDescriptionChange}/>
+                    <form id="createTemplate">
+                        <div className="govuk-grid-row" hidden={!isLoading}>
+                            <LoadingStatus title={"Loading options..."} description={"Please wait whilst the options are loading"} />
                         </div>
-                    </div>
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-full">
-                            {selectedFundingPeriodId && selectedFundingStreamId &&
-                            <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
+                        {!isLoading &&
+                            <FundingStreamAndPeriodSelection
+                                hideFundingStreamSelection={false}
+                                fundingStreams={fundingStreams}
+                                fundingPeriods={fundingPeriods}
+                                errors={errors}
+                                onFundingStreamChange={handleFundingStreamChange}
+                                onFundingPeriodChange={handleFundingPeriodChange}
+                            />}
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full govuk-form-group">
+                                <label className="govuk-label" htmlFor="description">
+                                    Description
+                            </label>
+                                <textarea className="govuk-textarea" id="description" rows={8}
+                                    aria-describedby="description-hint"
+                                    maxLength={1000}
+                                    onChange={handleDescriptionChange} />
+                            </div>
+                        </div>
+                        <div className="govuk-grid-row">
+                            <div className="govuk-grid-column-full">
+                                {selectedFundingPeriodId && selectedFundingStreamId &&
+                                    <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
                                 Template</button>}
                             &nbsp;
                             <Link id="cancel-create-template" to="/Templates/List" className="govuk-button govuk-button--secondary"
-                                  data-module="govuk-button">
-                                Back
+                                    data-module="govuk-button">
+                                    Back
                             </Link>
-                            {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                                {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
                 }
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };
