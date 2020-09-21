@@ -93,7 +93,7 @@ const App: React.FunctionComponent = () => {
                     <Route path="/Results/" component={ViewResults}/>
                     <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
                     <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>
-                    <Route path="/ViewResults/ViewProviderResults/:providerId" component={ViewProviderResults}/>
+                    <Route path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId" component={ViewProviderResults}/>
                     <Route path="/SelectSpecification" component={SelectSpecification}/>
                     <Route path="/SpecificationsList" component={SpecificationsList}/>
                     <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>

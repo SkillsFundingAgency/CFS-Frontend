@@ -32,6 +32,7 @@ import * as QueryString from "query-string";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
+    fundingStreamId: string;
 }
 
 export function ViewProviderResults({match}: RouteComponentProps<ViewProviderResultsRouteProps>) {
@@ -79,7 +80,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         fundingPeriodEnd: new Date(),
         id: "",
         lastEditDate: new Date(),
-        name: ""
+        name: "",
+        fundingStreamIds: []
     }]);
     const [additionalCalculations, setAdditionalCalculations] = useState<AdditionalCalculationSearchResultViewModel>({
         currentPage: 0,
@@ -125,14 +127,15 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         providerResults: true,
         providerDetails: true
     });
+    const [selectedSpecificationIdByFundingStream, setSelectedSpecificationIdByFundingStream] = useState<string>("");
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
-    const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState();
+    const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<PublishStatus>(PublishStatus.Draft);
-    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState();
+    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const location = useLocation();
 
     useEffectOnce(() => {
@@ -146,7 +149,21 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                     const selectedSpecification = specificationInformation
                         .find((s) => 
                             s.id === querystringParams.specificationId) ?? specificationInformation[0];
-                    populateSpecification(selectedSpecification.id);
+
+                    let selectedSpecificationId = selectedSpecification.id;
+
+                    specificationInformation.map((specInfo)=> {
+                        return specInfo.fundingStreamIds?.map((fundingStreamId) => {
+                            if (fundingStreamId === match.params.fundingStreamId) {
+                                setSelectedSpecificationIdByFundingStream(specInfo.id);
+                                selectedSpecificationId = specInfo.id;
+                                return;
+                            }
+                        });
+                    });
+
+                    populateSpecification(selectedSpecificationId);
+
                     setProviderResults(specificationInformation);
                     setIsLoading(prevState => {
                         return {
@@ -394,7 +411,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                         <span className="govuk-caption-m">Select a specification for the provider</span>
                         <select className="govuk-select" id="sort" name="sort" 
                                 onChange={setSelectedSpecification} 
-                                value={specificationSummary.id}>
+                                value={selectedSpecificationIdByFundingStream !== "" ?  selectedSpecificationIdByFundingStream : specificationSummary.id}>
                             {providerResults.map(p =>
                                 <option key={p.id} value={p.id}>{p.name}
                                 </option>

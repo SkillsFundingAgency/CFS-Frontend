@@ -3,5 +3,6 @@ export interface SpecificationInformation {
     name: string;
     lastEditDate: Date;
     fundingPeriod: string;
+    fundingStreamIds: string[];
     fundingPeriodEnd: Date;
 }

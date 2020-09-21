@@ -307,7 +307,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                         providerVersionSearchResults.items.map(providerVersionSearchResult =>
                             <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
                                 <h3 className="govuk-heading-m">
-                                    <Link to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}`}>{providerVersionSearchResult.name}</Link>
+                                    <Link to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}/${match.params.fundingStreamId}`}>{providerVersionSearchResult.name}</Link>
                                 </h3>
                                 <p className="govuk-body-s govuk-!-margin-bottom-3">
                                 <span>UKPRN: <strong>
