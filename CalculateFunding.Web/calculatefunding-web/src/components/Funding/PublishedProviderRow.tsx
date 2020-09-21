@@ -44,8 +44,10 @@ export function PublishedProviderRow(props: IPublishedProviderRowProps) {
             </td>
             <td className="govuk-table__cell govuk-body">{provider.ukprn}</td>
             <td className="govuk-table__cell govuk-body">{provider.fundingStatus}</td>
-            <td className="govuk-table__cell govuk-body">
-                <FormattedNumber value={provider.fundingValue} type={NumberType.FormattedMoney} decimalPoint={2}/>
+            <td className="govuk-table__cell govuk-body govuk-table__cell--numeric">
+                <span className="right-align">
+                    <FormattedNumber value={provider.fundingValue} type={NumberType.FormattedMoney} decimalPlaces={2}/>
+                </span>
             </td>
         </tr>
     );
