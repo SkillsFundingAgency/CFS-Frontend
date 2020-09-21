@@ -1,4 +1,5 @@
 export interface FeatureFlagsState {
     templateBuilderVisible: boolean,
-    releaseTimetableVisible: boolean
+    releaseTimetableVisible: boolean,
+    profilingPatternVisible: boolean
 }

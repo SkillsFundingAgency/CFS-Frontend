@@ -12,7 +12,8 @@ import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
 import {ProfilingInstallments} from "../../types/Profiling";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import { getFutureInstallmentsService
+import {
+    GetProfilePatternsService
 } from "../../services/profilingService";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 export interface EditVariationPointsRouteProps {
@@ -109,7 +110,7 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
                     {
                         setProfileVariationPointers(profileVariationPointersResult.data as ProfileVariationPointer[])
                         const getInstallments = async () => {
-                            return getFutureInstallmentsService(
+                            return GetProfilePatternsService(
                                 spec.fundingStreams[0].id,
                                 spec.fundingPeriod.id);
                         };

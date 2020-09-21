@@ -5,7 +5,8 @@ import { Reducer } from "redux";
 
 const initialState: FeatureFlagsState = {
     templateBuilderVisible: false,
-    releaseTimetableVisible: false
+    releaseTimetableVisible: false,
+    profilingPatternVisible: false
 };
 
 function isFeatureEnabled(featureFlags: FeatureFlag[], targetFeature: FeatureFlagKey): boolean {
@@ -19,7 +20,8 @@ export const reduceFeatureFlagsState: Reducer<FeatureFlagsState, GetFeatureFlags
             return {
                 ...state,
                 templateBuilderVisible: isFeatureEnabled(action.payload, FeatureFlagKey.TemplateBuilderVisible),
-                releaseTimetableVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ReleaseTimetableVisible)
+                releaseTimetableVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ReleaseTimetableVisible),
+                profilingPatternVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ProfilingPatternVisible)
             };
         default:
             return state;

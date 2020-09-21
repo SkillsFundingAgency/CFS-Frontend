@@ -6,6 +6,10 @@ import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../reducers/rootReducer";
 import {mount} from "enzyme";
+import * as redux from "react-redux";
+import {FeatureFlagsState} from "../../states/FeatureFlagsState";
+
+const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 describe("Provider Funding Overview ", () => {
     const Adapter = require('enzyme-adapter-react-16');
@@ -20,7 +24,9 @@ describe("Provider Funding Overview ", () => {
         params: {
             providerId: "ABC123",
             specificationId: "ABC-123",
-            providerVersionId: "XYZ-456"
+            providerVersionId: "XYZ-456",
+            fundingStreamId: "A VALID FUNDING STREAM ID",
+            fundingPeriodId: "A VALID FUNDING PERIOD ID"
         },
         isExact: true,
         path: "",
@@ -45,5 +51,25 @@ describe("Provider Funding Overview ", () => {
 
         expect(actual.length).toBe(2);
         expect(actual.at(1).text()).toBe("Profiling");
+    });
+
+    it("displays profiling tab containing profiling patterns given profilingPatternVisible is true in featureFlagsState", async () => {
+        const featureFlagsState: FeatureFlagsState = { profilingPatternVisible: true, releaseTimetableVisible: false, templateBuilderVisible: false};
+        useSelectorSpy.mockReturnValue(featureFlagsState);
+
+        const wrapper = mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);
+        let actual = wrapper.find("Panel");
+        expect(actual.at(1).props().hidden).toBe(true);
+        expect(actual.at(2).props().hidden).toBe(false);
+    });
+
+    it("hides profiling tab containing profiling patterns given profilingPatternVisible is false in featureFlagsState", async () => {
+        const featureFlagsState: FeatureFlagsState = { profilingPatternVisible: false, releaseTimetableVisible: false, templateBuilderVisible: false};
+        useSelectorSpy.mockReturnValue(featureFlagsState);
+
+        const wrapper = mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);
+        let actual = wrapper.find("Panel");
+        expect(actual.at(1).props().hidden).toBe(false);
+        expect(actual.at(2).props().hidden).toBe(true);
     });
 });

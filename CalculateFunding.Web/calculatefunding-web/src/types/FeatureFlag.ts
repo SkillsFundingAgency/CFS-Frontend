@@ -1,6 +1,7 @@
 export enum FeatureFlagKey {
     TemplateBuilderVisible = "TemplateBuilderVisible",
-    ReleaseTimetableVisible = "ReleaseTimetableVisible"
+    ReleaseTimetableVisible = "ReleaseTimetableVisible",
+    ProfilingPatternVisible = "ProfilingPatternVisible"
 }
 
 export interface FeatureFlag {
