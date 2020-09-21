@@ -3,18 +3,26 @@ import {BackButton} from "../BackButton";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {FundingSpecificationDetails} from "./FundingSpecificationDetails";
+import {approveFundingService} from "../../services/publishService";
 
 export interface IConfirmFundingApprovalProps {
     publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
-    userPermissions: EffectiveSpecificationPermission,
+    canApproveFunding: boolean | undefined,
     handleBack: any,
-    handleConfirmApprove: any
 }
 
 export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
+
+    if (!props.canApproveFunding || !props.publishedProviderResults.canApprove) {
+        return (<></>);
+    }
+
+    function handleConfirmApprove() {
+        approveFundingService(props.specificationSummary.id);
+    }
+        
     return (
         <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
             <div className="govuk-grid-row">
@@ -41,8 +49,10 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
                     </table>
                 </div>
             </div>
+            
             <FundingSpecificationDetails specification={props.specificationSummary} />
-s            <div className="govuk-grid-row">
+            
+            <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <table className="govuk-table">
                         <thead className="govuk-table__head">
@@ -64,7 +74,7 @@ s            <div className="govuk-grid-row">
                     <button data-prevent-double-click="true"
                             className="govuk-button govuk-!-margin-right-1"
                             data-module="govuk-button"
-                            onClick={props.handleConfirmApprove}>
+                            onClick={handleConfirmApprove}>
                         Confirm approval
                     </button>
                     <button className="govuk-button govuk-button--secondary"

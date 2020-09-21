@@ -3,20 +3,23 @@ import {FormattedNumber, NumberType} from "../FormattedNumber";
 import React from "react";
 import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {FundingSpecificationDetails} from "./FundingSpecificationDetails";
+import {releaseFundingService} from "../../services/publishService";
 
 export interface IConfirmFundingReleaseProps {
     publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
-    userPermissions: EffectiveSpecificationPermission,
+    canReleaseFunding: boolean | undefined,
     handleBack: any,
-    handleConfirmRelease: any
 }
 
 export function ConfirmFundingRelease(props: IConfirmFundingReleaseProps) {
 
-    if (!props.userPermissions.canReleaseFunding || !props.publishedProviderResults.canPublish) {
+    function handleConfirmRelease() {
+        releaseFundingService(props.specificationSummary.id);
+    }
+    
+    if (!props.canReleaseFunding || !props.publishedProviderResults.canPublish) {
         return (<></>);
     }
     return (
@@ -68,7 +71,7 @@ export function ConfirmFundingRelease(props: IConfirmFundingReleaseProps) {
                     <button data-prevent-double-click="true"
                             className="govuk-button govuk-!-margin-right-1"
                             data-module="govuk-button"
-                            onClick={props.handleConfirmRelease}>
+                            onClick={handleConfirmRelease}>
                         Confirm release
                     </button>
                     <button className="govuk-button govuk-button--secondary"

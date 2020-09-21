@@ -5,6 +5,9 @@ import {createLocation, createMemoryHistory} from "history";
 import {render, screen} from "@testing-library/react";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {JobSummary} from "../../../types/jobSummary";
+import {Provider} from "react-redux";
+import {createStore, Store} from "redux";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -18,7 +21,8 @@ const matchMock : match<SpecificationFundingApprovalRoute> = {
         fundingStreamId: "FS123",
         fundingPeriodId: "FP123"
     },
-    path:"",
+    url: "",
+    path: "",
     isExact: true,
 };
 export const testSpec: SpecificationSummary = {
@@ -56,10 +60,12 @@ function mockGetJobs(jobResults: JobSummary[]) {
         }))
     }
 }
+const store: Store<IStoreState> = createStore(rootReducer);
 
 const renderPage = () => {
     const {SpecificationFundingApproval} = require('../../../pages/FundingApprovals/SpecificationFundingApproval');
-    return render(<MemoryRouter><SpecificationFundingApproval location={location} history={history} match={matchMock} /></MemoryRouter>);
+    store.dispatch = jest.fn();
+    return render(<MemoryRouter><Provider store={store}><SpecificationFundingApproval location={location} history={history} match={matchMock} /></Provider></MemoryRouter>);
 };
 
 describe("<SpecificationFundingApproval />", () => {

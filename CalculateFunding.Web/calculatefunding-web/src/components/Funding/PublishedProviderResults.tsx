@@ -1,32 +1,30 @@
 ﻿import React, {useState} from "react";
-import {LoadingStatus} from "../LoadingStatus";
 import {NoData} from "../NoData";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
-import {Link} from "react-router-dom";
 import {BackToTop} from "../BackToTop";
 import Pagination from "../Pagination";
 import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {useDispatch, useSelector} from "react-redux";
 import {removeProvidersFromFundingSelection, addProvidersToFundingSelection} from "../../actions/FundingSelectionActions";
 import {IStoreState} from "../../reducers/rootReducer";
 import {IFundingSelectionState} from "../../states/IFundingSelectionState";
+import {PublishedProviderRow} from "./PublishedProviderRow";
+import {refreshFundingService} from "../../services/publishService";
 
 export interface IPublishedProviderResultsProps {
-    isLoading: boolean,
-    isLoadingProviderIds: boolean,
-    enableToggles: boolean,
-    fundingStreamId: string,
-    fundingPeriodId: string,
+    specificationId: string,
+    enableBatchSelection: boolean,
     providerSearchResults: PublishedProviderSearchResult,
-    specification: SpecificationSummary,
-    userPermissions: EffectiveSpecificationPermission,
+    specProviderVersionId: string,
+    canRefreshFunding: boolean | undefined,
+    canApproveFunding: boolean | undefined,
+    canReleaseFunding: boolean | undefined,
+    selectedResults: number,
+    totalResults: number,
     pageChange: any,
     fetchPublishedProviderIds: () => Promise<string[]>,
-    handleRefreshFunding: any,
-    handleApprove: any,
-    handleRelease: any
+    setConfirmRelease: (set: boolean) => void,
+    setConfirmApproval: (set: boolean) => void,
 }
 
 export function PublishedProviderResults(props: IPublishedProviderResultsProps) {
@@ -54,89 +52,64 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
             removeProvidersFromFundingSelection([providerId]));
     };
 
-    const isLoading = props.isLoading || props.isLoadingProviderIds;
-    
+    function handleRefreshFunding() {
+        refreshFundingService(props.specificationId);
+    }
+
     return (
         <div className="govuk-grid-column-two-thirds">
-            {isLoading &&
-            <LoadingStatus title={isLoading ? "Loading provider funding data" : "Applying selection..."}/>
-            }
-            {!isLoading &&
-            <>
-                <NoData hidden={havePageResults}/>
-                {havePageResults &&
-                <table className="govuk-table">
-                    <thead>
-                    <tr>
-                        <th className="govuk-table__header govuk-body">Provider name
-                            {props.enableToggles &&
-                            <div className="govuk-checkboxes govuk-checkboxes--small">
-                                <div className="govuk-checkboxes__item">
-                                    <input className="govuk-checkboxes__input" id="toggle-all" type="checkbox" value="toggle-all"
-                                           checked={selectAll}
-                                           onChange={handleToggleAllProviders}/>
-                                    <label className="govuk-label govuk-checkboxes__label" htmlFor="toggle-all">
-                                        Select all
-                                    </label>
-                                </div>
+            <NoData hidden={havePageResults}/>
+            {havePageResults &&
+            <table className="govuk-table">
+                <thead>
+                <tr>
+                    <th className="govuk-table__header govuk-body">Provider name
+                        {props.enableBatchSelection &&
+                            <>
+                                <br/>
+                                <span className="govuk-!-margin-right-2">
+                                    <span id="checkbox-checked">{props.selectedResults}</span> / <span id="checkbox-count">{props.totalResults}</span>
+                                </span>
+                        <div className="govuk-checkboxes govuk-checkboxes--small">
+                            <div className="govuk-checkboxes__item">
+                                <input className="govuk-checkboxes__input" id="toggle-all" type="checkbox" value="toggle-all"
+                                       checked={selectAll}
+                                       onChange={handleToggleAllProviders}/>
+                                <label className="govuk-label govuk-checkboxes__label" htmlFor="toggle-all">
+                                    Select all
+                                </label>
                             </div>
-                            }
-                        </th>
-                        <th className="govuk-table__header govuk-body">UKPRN</th>
-                        <th className="govuk-table__header govuk-body">Status</th>
-                        <th className="govuk-table__header govuk-body">
-                            Funding total<br/>
-                            <FormattedNumber value={props.providerSearchResults.totalFundingAmount}
-                                             type={NumberType.FormattedMoney}/><br/>
-                            <p className="govuk-body-s">of filtered providers</p>
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {props.providerSearchResults.providers.map(provider =>
-                        <tr key={provider.publishedProviderVersionId}>
-                            <td className="govuk-table__cell govuk-body">
-                                {props.enableToggles &&
-                                <div className="govuk-checkboxes govuk-checkboxes--small">
-                                    <div className="govuk-checkboxes__item">
-                                        <input className="govuk-checkboxes__input provider-checked"
-                                               id={`provider-approval-${provider.publishedProviderVersionId}`}
-                                               type="checkbox"
-                                               value={provider.publishedProviderVersionId}
-                                               checked={fundingSelectionState.providerVersionIds.includes(provider.publishedProviderVersionId)}
-                                               onChange={handleItemSelectionToggle}
-                                        />
-                                        <label className="govuk-label govuk-checkboxes__label" htmlFor={`provider-approval-${provider.publishedProviderVersionId}`}>
-                                            <Link to={`/Approvals/ProviderFundingOverview/${provider.specificationId}/${provider.ukprn}/${props.specification.providerVersionId}/${props.fundingStreamId}/${props.fundingPeriodId}`}>
-                                                {provider.providerName}
-                                            </Link>
-                                        </label>
-                                    </div>
-                                </div>
-                                }
-                                {!props.enableToggles &&
-                                <Link to={`/Approvals/ProviderFundingOverview/${provider.specificationId}/${provider.ukprn}/${props.specification.providerVersionId}/${props.fundingStreamId}/${props.fundingPeriodId}`}>
-                                    {provider.providerName}
-                                </Link>
-                                }
-                            </td>
-                            <td className="govuk-table__cell govuk-body">{provider.ukprn}</td>
-                            <td className="govuk-table__cell govuk-body">{provider.fundingStatus}</td>
-                            <td className="govuk-table__cell govuk-body">
-                                <FormattedNumber value={provider.fundingValue} type={NumberType.FormattedMoney} decimalPoint={2}/>
-                            </td>
-                        </tr>
-                    )}
-                    </tbody>
-                </table>
-                }
-            </>
+                        </div>
+                        </>
+                        }
+                    </th>
+                    <th className="govuk-table__header govuk-body">UKPRN</th>
+                    <th className="govuk-table__header govuk-body">Status</th>
+                    <th className="govuk-table__header govuk-body">
+                        Funding total<br/>
+                        <FormattedNumber value={props.providerSearchResults.totalFundingAmount}
+                                         type={NumberType.FormattedMoney}/><br/>
+                        <p className="govuk-body-s">of filtered providers</p>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {props.providerSearchResults.providers.map(provider =>
+                    <PublishedProviderRow
+                        publishedProvider={provider}
+                        specProviderVersionId={props.specProviderVersionId}
+                        enableSelection={props.enableBatchSelection}
+                        isSelected={fundingSelectionState.providerVersionIds.includes(provider.publishedProviderVersionId)}
+                        handleItemSelectionToggle={handleItemSelectionToggle}
+                    />
+                )}
+                </tbody>
+            </table>
             }
             <BackToTop id="top"/>
             {totalResults > 0 &&
             <>
-                <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
-                     aria-label="Pagination">
+                <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation" aria-label="Pagination">
                     <div
                         className="pagination__summary">Showing {props.providerSearchResults.startItemNumber} - {props.providerSearchResults.endItemNumber} of {totalResults} results
                     </div>
@@ -146,16 +119,16 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                 </nav>
                 <div className="right-align">
                     <button className="govuk-button govuk-!-margin-right-1"
-                            disabled={!props.userPermissions.canRefreshFunding}
-                            onClick={props.handleRefreshFunding}>Refresh funding
+                            disabled={!props.canRefreshFunding}
+                            onClick={handleRefreshFunding}>Refresh funding
                     </button>
                     <button className="govuk-button govuk-!-margin-right-1"
-                            disabled={!props.providerSearchResults.canApprove || !props.userPermissions.canApproveFunding}
-                            onClick={props.handleApprove}>Approve funding
+                            disabled={!props.providerSearchResults.canApprove || !props.canApproveFunding}
+                            onClick={() => props.setConfirmRelease(true)}>Approve funding
                     </button>
                     <button className="govuk-button govuk-button--warning"
-                            disabled={!props.providerSearchResults.canPublish || !props.userPermissions.canReleaseFunding}
-                            onClick={props.handleRelease}>Release funding
+                            disabled={!props.providerSearchResults.canPublish || !props.canReleaseFunding}
+                            onClick={() => props.setConfirmApproval(true)}>Release funding
                     </button>
                 </div>
             </>

@@ -26,12 +26,12 @@ store.dispatch = jest.fn();
 
 describe("<EditVariationPoints />", () => {
     it('will have the correct breadcrumbs', () => {
-        const wrapper = mount(<MemoryRouter><Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} /></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(4);
     });
 
     it('will have the correct <H1 /> title', () => {
-        const wrapper = mount(<MemoryRouter><Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} />></Provider></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditVariationPoints match={editVariationPointsRouteProps} history={history} location={location} /></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Variation occurence");
     });
 });
