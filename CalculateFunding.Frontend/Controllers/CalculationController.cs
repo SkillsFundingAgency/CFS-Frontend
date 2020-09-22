@@ -81,6 +81,11 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, update);
 
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
+
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
@@ -192,6 +197,11 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
+                
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -250,6 +260,11 @@ namespace CalculateFunding.Frontend.Controllers
             createCalculation.ValueType = vm.CalculationType;
 
             ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);
+            
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -302,6 +317,11 @@ namespace CalculateFunding.Frontend.Controllers
             editCalculation.ValueType = vm.CalculationType;
 
             ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, editCalculation);
+                
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

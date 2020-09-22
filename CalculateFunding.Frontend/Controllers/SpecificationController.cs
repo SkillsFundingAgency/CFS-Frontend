@@ -14,7 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -283,13 +285,19 @@ namespace CalculateFunding.Frontend.Controllers
                 ProviderSnapshotId = viewModel.ProviderSnapshotId
             };
 
-            var fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
+            IEnumerable<FundingStreamPermission> fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
+            
             if (fundingStreamPermissions.All(x => x.CanCreateSpecification == false))
             {
                 return new ForbidResult();
             }
 
             ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.CreateSpecification(specification);
+
+            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
             if (result.StatusCode.IsSuccess())
             {
@@ -407,6 +415,11 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> UpdateSpecification([FromBody]EditSpecificationModel viewModel, [FromRoute]string specificationId)
         {
             ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.UpdateSpecification(specificationId, viewModel);
+                
+            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
             if (result.StatusCode == HttpStatusCode.OK)
             {

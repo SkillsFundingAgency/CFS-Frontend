@@ -25,16 +25,27 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class PublishControllerTests
     {
         private const string ValidSpecificationId = "A VALID SPECIFICATION ID";
-        private readonly ISpecificationsApiClient _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
-        private readonly IAuthorizationHelper _authorizationHelper = Substitute.For<IAuthorizationHelper>();
-        private readonly IPublishingApiClient _publishingApiClient = Substitute.For<IPublishingApiClient>();
-        private readonly ValidatedApiResponse<JobCreationResponse> _validatedApiResponse =
-            new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.OK, new JobCreationResponse { JobId = "ID" });
+
+        private ISpecificationsApiClient _specificationsApiClient;
+        private IAuthorizationHelper _authorizationHelper;
+        private IPublishingApiClient _publishingApiClient;
+        private ValidatedApiResponse<JobCreationResponse> _validatedApiResponse;
+
         private PublishController _publishController;
 
         [TestInitialize]
         public void Setup()
         {
+            _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
+            _authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            _publishingApiClient = Substitute.For<IPublishingApiClient>();
+            _validatedApiResponse =
+                new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.OK,
+                    new JobCreationResponse
+                    {
+                        JobId = "ID"
+                    });
+
             _publishController =
                 new PublishController(_specificationsApiClient, _publishingApiClient, _authorizationHelper);
         }
@@ -53,12 +64,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
             _specificationsApiClient.SetPublishDates(Arg.Any<string>(), Arg.Any<SpecificationPublishDateModel>())
                 .Returns(HttpStatusCode.OK);
-            _publishController =
-                new PublishController(_specificationsApiClient, _publishingApiClient, _authorizationHelper);
 
-            var fundingDate = DateTime.Now.AddDays(-1);
-            var statementDate = DateTime.Now.AddMonths(-1);
-            var releaseTimetableViewModel = new ReleaseTimetableViewModel
+            DateTime fundingDate = DateTime.Now.AddDays(-1);
+            DateTime statementDate = DateTime.Now.AddMonths(-1);
+            ReleaseTimetableViewModel releaseTimetableViewModel = new ReleaseTimetableViewModel
             {
                 SpecificationId = "XYZ",
                 FundingDate = fundingDate,
@@ -67,7 +76,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IActionResult result = await _publishController.SaveTimetable(releaseTimetableViewModel);
 
             result.Should().BeAssignableTo<OkObjectResult>();
-            var specificationPublishDateModelResult = result.As<OkObjectResult>().Value.As<SpecificationPublishDateModel>();
+            SpecificationPublishDateModel specificationPublishDateModelResult = result.As<OkObjectResult>().Value.As<SpecificationPublishDateModel>();
             specificationPublishDateModelResult.EarliestPaymentAvailableDate.Should().Be(fundingDate);
             specificationPublishDateModelResult.ExternalPublicationDate.Should().Be(statementDate);
         }
@@ -84,13 +93,28 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task RefreshFunding_Returns_OK_Result_Given_User_Has_Required_Permission()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanRefreshFunding);
+            
             _publishingApiClient.RefreshFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
-            _publishController =
-                new PublishController(_specificationsApiClient, _publishingApiClient, _authorizationHelper);
 
             IActionResult result = await _publishController.RefreshFunding(ValidSpecificationId);
 
             result.Should().BeAssignableTo<OkObjectResult>();
+        }
+        
+        [TestMethod]
+        public async Task RefreshFunding_Returns_BadRequestForBadRequestApiResponses()
+        {
+            SetupAuthorizedUser(SpecificationActionTypes.CanRefreshFunding);
+
+            _validatedApiResponse = new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.BadRequest);
+            
+            _publishingApiClient.RefreshFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
+
+            IActionResult result = await _publishController.RefreshFunding(ValidSpecificationId);
+
+            result
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
         }
 
         [TestMethod]
@@ -105,13 +129,28 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task ApproveFunding_Returns_OK_Result_Given_User_Has_Required_Permission()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanApproveFunding);
+            
             _publishingApiClient.ApproveFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
-            _publishController =
-                new PublishController(_specificationsApiClient, _publishingApiClient, _authorizationHelper);
 
             IActionResult result = await _publishController.ApproveFunding(ValidSpecificationId);
 
             result.Should().BeAssignableTo<OkObjectResult>();
+        }
+        
+        [TestMethod]
+        public async Task ApproveFunding_Returns_BadRequestForBadRequestApiResponses()
+        {
+            SetupAuthorizedUser(SpecificationActionTypes.CanApproveFunding);
+
+            _validatedApiResponse = new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.BadRequest);
+            
+            _publishingApiClient.ApproveFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
+
+            IActionResult result = await _publishController.ApproveFunding(ValidSpecificationId);
+
+            result
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
         }
 
         [TestMethod]
@@ -127,19 +166,33 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanReleaseFunding);
             _publishingApiClient.PublishFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
-            _publishController =
-                new PublishController(_specificationsApiClient, _publishingApiClient, _authorizationHelper);
 
             IActionResult result = await _publishController.PublishFunding(ValidSpecificationId);
 
             result.Should().BeAssignableTo<OkObjectResult>();
+        }
+        
+        [TestMethod]
+        public async Task PublishFunding_Returns_BadRequestForBadRequestApiResponses()
+        {
+            SetupAuthorizedUser(SpecificationActionTypes.CanReleaseFunding);
+
+            _validatedApiResponse = new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.BadRequest);
+            
+            _publishingApiClient.PublishFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
+
+            IActionResult result = await _publishController.PublishFunding(ValidSpecificationId);
+
+            result
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
         }
 
         [TestMethod]
         [DataRow(null, "VALID_ID", "VALID_ID")]
         [DataRow("VALID_ID", null, "VALID_ID")]
         [DataRow("VALID_ID", "VALID_ID", null)]
-        public async Task GetAllReleasedProfileTotals_Throws_Exception_Given_Invalid_Parameters(
+        public void GetAllReleasedProfileTotals_Throws_Exception_Given_Invalid_Parameters(
             string fundingStreamId,
             string fundingPeriodId,
             string providerId)
@@ -155,7 +208,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetAllReleasedProfileTotals_Returns_NotFoundObjectResult_Result_Given_PublishingApi_Returns_An_Empty_Ok_Result()
         {
-            string  aValidId = "VALID_ID";
+            string aValidId = "VALID_ID";
             _publishingApiClient.GetAllReleasedProfileTotals(aValidId, aValidId, aValidId)
                 .Returns(new ApiResponse<IDictionary<int, ProfilingVersion>>(HttpStatusCode.OK));
 
@@ -243,14 +296,20 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IDictionary<int, ProfilingVersion> profileVersions =
                 new Dictionary<int, ProfilingVersion>
                 {
-                    {latestProfilingVersion.Version, latestProfilingVersion},
-                    {previousProfilingVersion.Version, previousProfilingVersion}
+                    {
+                        latestProfilingVersion.Version, latestProfilingVersion
+                    },
+                    {
+                        previousProfilingVersion.Version, previousProfilingVersion
+                    }
                 };
 
             ApiResponse<IDictionary<int, ProfilingVersion>> publishingApiResponse =
                 new ApiResponse<IDictionary<int, ProfilingVersion>>(HttpStatusCode.OK, profileVersions);
             _publishingApiClient.GetAllReleasedProfileTotals(
-                    Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                    Arg.Any<string>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>())
                 .Returns(publishingApiResponse);
 
             IActionResult result = await _publishController.GetAllReleasedProfileTotals(
@@ -259,11 +318,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 "A VALID PROVIDER ID");
 
             ProfilingViewModel profilingViewModelResult = result.As<OkObjectResult>().Value.As<ProfilingViewModel>();
-			result.Should().BeAssignableTo<OkObjectResult>();
+            result.Should().BeAssignableTo<OkObjectResult>();
             profilingViewModelResult.TotalAllocation.Should().Be(latestProfilingVersion.ProfileTotals.Sum(
-                                                            profileTotal => profileTotal.Value));
+                profileTotal => profileTotal.Value));
             profilingViewModelResult.PreviousAllocation.Should().Be(previousProfilingVersion.ProfileTotals.Sum(
-                                                            profileTotal => profileTotal.Value));
+                profileTotal => profileTotal.Value));
             profilingViewModelResult.ProfilingInstallments.ToList()[0].InstallmentMonth.Should()
                 .Be(aProfileTotalOneYearInThePast.TypeValue);
             profilingViewModelResult.ProfilingInstallments.ToList()[0].InstallmentYear.Should()

@@ -66,11 +66,11 @@ namespace CalculateFunding.Frontend.Controllers
                     FundingStreamId = vm.FundingStreamId
                 });
 
-            if (response.ModelState != null && response.ModelState.Keys.Any())
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
             {
                 _logger.Warning("Invalid model provided");
 
-                return new BadRequestObjectResult(response.ModelState);
+                return badRequest;
             }
             else
             {
@@ -108,11 +108,11 @@ namespace CalculateFunding.Frontend.Controllers
                     Filename = vm.Filename
                 });
 
-            if (response.ModelState != null && response.ModelState.Keys.Any())
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
             {
                 _logger.Warning("Invalid model provided");
 
-                return new BadRequestObjectResult(response.ModelState);
+                return badRequest;
             }
             else
             {
@@ -161,10 +161,9 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 _logger.Warning("Failed to validate dataset with status code: {statusCode}", apiResponse.StatusCode);
 
-                if (apiResponse.StatusCode == HttpStatusCode.BadRequest &&
-                    !apiResponse.ModelState.Values.IsNullOrEmpty())
+                if (apiResponse.IsBadRequest(out BadRequestObjectResult badRequest))
                 {
-                    return new BadRequestObjectResult(apiResponse.ModelState);
+                    return badRequest;
                 }
 
                 return new InternalServerErrorResult(

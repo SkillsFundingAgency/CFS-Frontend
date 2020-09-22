@@ -120,6 +120,10 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<JobCreationResponse> result =
                 await _publishingApiClient.ApproveFundingForSpecification(specificationId);
 
+            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
             
             if (result.StatusCode == HttpStatusCode.OK)
             {
@@ -156,6 +160,11 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<JobCreationResponse> result =
                 await _publishingApiClient.PublishFundingForSpecification(specificationId);
+            
+            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
             if (result.Content.JobId != null)
             {
@@ -254,15 +263,16 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<JobCreationResponse> result =
                 await _publishingApiClient.RefreshFundingForSpecification(specificationId);
+            
+            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
+            {
+                return badRequest;
+            }
 
-            var errorResult = result.IsSuccessOrReturnFailureResult("Refresh Funding");
+            IActionResult errorResult = result.IsSuccessOrReturnFailureResult("Refresh Funding");
+                
             if (errorResult != null)
             {
-                if (result.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    return BadRequest(result.ModelState);
-                }
-
                 return errorResult;
             }
 

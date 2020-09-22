@@ -318,9 +318,46 @@ namespace CalculateFunding.Frontend.Controllers
             // Assert
             a.Should().Throw<InvalidOperationException>();
         }
-
+        
         [TestMethod]
         public void EditCalculationStatus_GivenFailedStatusCodeFromApprovingCalc_ThrowsInvalidOperationException()
+        {
+            //Arrange
+            string specificationId = "abc123";
+            string calculationId = "5";
+
+            PublishStatusEditModel model = new PublishStatusEditModel();
+
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+
+            ValidatedApiResponse<PublishStatusResult> response = new ValidatedApiResponse<PublishStatusResult>(HttpStatusCode.Forbidden);
+
+            calcsClient
+                .UpdatePublishStatus(Arg.Is(calculationId), Arg.Is(model))
+                .Returns(response);
+
+            ValidatedApiResponse<Calculation> calculation = new ValidatedApiResponse<Calculation>(HttpStatusCode.OK, new Calculation() { FundingStreamId = "fs1", SpecificationId = specificationId });
+            calcsClient
+                .GetCalculationById(Arg.Is(calculationId))
+                .Returns(calculation);
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveAnyCalculations);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+
+            // Act
+            Func<Task> test = async () => await controller.ApproveCalculation(specificationId, calculationId, model);
+
+            // Assert
+            test
+                .Should()
+                .Throw<InvalidOperationException>();
+        }
+
+        [TestMethod]
+        public async Task EditCalculationStatus_GivenBadRequestStatusCodeFromApprovingCalc_ReturnsBadRequestObjectResponse()
         {
             //Arrange
             string specificationId = "abc123";
@@ -346,14 +383,12 @@ namespace CalculateFunding.Frontend.Controllers
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveAnyCalculations);
             CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            
+            IActionResult actionResult = await controller.ApproveCalculation(specificationId, calculationId, model);
 
-            // Act
-            Func<Task> test = async () => await controller.ApproveCalculation(specificationId, calculationId, model);
-
-            // Assert
-            test
+            actionResult
                 .Should()
-                .Throw<InvalidOperationException>();
+                .BeOfType<BadRequestObjectResult>();
         }
 
         [TestMethod]

@@ -9,30 +9,37 @@ using CalculateFunding.Common.ApiClient.Models;
 using System.Net;
 using System;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
+using static NSubstitute.Substitute;
 
 namespace CalculateFunding.Frontend.Controllers
 {
     [TestClass]
     public class DownloadDataSourceControllerTests
     {
+        private IDatasetsApiClient _dataClient;
+        private ILogger _logger;
+        
+        private DownloadDatasourceController _controller;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _dataClient = For<IDatasetsApiClient>();
+            _logger = For<ILogger>();
+            
+            _controller = new DownloadDatasourceController(_dataClient, _logger);
+        }
+        
         [TestMethod]
         public void DownloadUrl_WithNullDatasetID_Then_ThrowsArgumentNullException()
         {
-            //Arrange
-            string datasourceId = null;
-            IDatasetsApiClient dataClient = CreateApiClient();
-            ILogger logger = CreateLogger();
-
-            DownloadDatasourceController controller = new DownloadDatasourceController(dataClient, logger);
-
             //Act
-            Func<Task> result = async () => await controller.Download(datasourceId);
+            Func<Task> result = async () => await _controller.Download(null);
 
             // Assert
             result
                .Should()
                .ThrowExactly<ArgumentNullException>();
-
         }
 
         [TestMethod]
@@ -40,19 +47,15 @@ namespace CalculateFunding.Frontend.Controllers
         {
             //Arrange
             string datasourceId = "123123";
-            IDatasetsApiClient dataClient = CreateApiClient();
-            ILogger logger = CreateLogger();
 
             ApiResponse<DatasetDownloadModel> response = new ApiResponse<DatasetDownloadModel>(HttpStatusCode.NoContent);
 
-            dataClient
+            _dataClient
                 .DownloadDatasetFile(datasourceId)
                 .Returns(response);
 
-            DownloadDatasourceController controller = new DownloadDatasourceController(dataClient, logger);
-
             //Act
-            IActionResult result = await controller.Download(datasourceId);
+            IActionResult result = await _controller.Download(datasourceId);
 
             //Assert
             result
@@ -66,8 +69,6 @@ namespace CalculateFunding.Frontend.Controllers
         {
             //Arrange
             string datasourceId = "23423423";
-            IDatasetsApiClient dataClient = CreateApiClient();
-            ILogger logger = CreateLogger();
 
             DatasetDownloadModel urlResults = new DatasetDownloadModel()
             {
@@ -76,13 +77,11 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<DatasetDownloadModel> response = new ApiResponse<DatasetDownloadModel>(HttpStatusCode.OK, urlResults);
 
-            DownloadDatasourceController controller = new DownloadDatasourceController(dataClient, logger);
-
-            dataClient
+            _dataClient
            .DownloadDatasetFile(datasourceId)
            .Returns(response);
             //Act
-            IActionResult actionResult = await controller.Download(datasourceId);
+            IActionResult actionResult = await _controller.Download(datasourceId);
 
             // Asserts
             actionResult
@@ -92,17 +91,6 @@ namespace CalculateFunding.Frontend.Controllers
                 .Url
                 .Should()
                 .Be(urlResults.Url);
-        }
-
-
-        private static IDatasetsApiClient CreateApiClient()
-        {
-            return Substitute.For<IDatasetsApiClient>();
-        }
-
-        private static ILogger CreateLogger()
-        {
-            return Substitute.For<ILogger>();
         }
     }
 }

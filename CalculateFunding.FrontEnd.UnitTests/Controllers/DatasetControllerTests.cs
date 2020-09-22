@@ -2,17 +2,16 @@
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
 
-using CalculateFunding.Common.ApiClient.DataSets;
-using CalculateFunding.Common.ApiClient.DataSets.Models;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using FluentAssertions;
@@ -22,29 +21,55 @@ using Moq;
 using NSubstitute;
 using Serilog;
 
-namespace CalculateFunding.Frontend.Controllers
+namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
     [TestClass]
     public class DatasetControllerTests
     {
-	    private static Mock<ISpecificationsApiClient> _mockSpecificationsApiClient;
-	    private static Mock<IAuthorizationHelper> _mockAuthorisationHelper;
+        private Mock<ISpecificationsApiClient> _specifications;
+        private Mock<IAuthorizationHelper> _authorisationHelper;
 
-	    [TestMethod]
+        private DatasetController _controller;
+        private IDatasetsApiClient _apiClient;
+        private ILogger _logger;
+
+        [TestInitialize]
+        public void SetUp()
+        {
+            _specifications = new Mock<ISpecificationsApiClient>();
+            _authorisationHelper = new Mock<IAuthorizationHelper>();
+            _logger = Substitute.For<ILogger>();
+            _apiClient = Substitute.For<IDatasetsApiClient>();
+
+            _controller = CreateController(_apiClient, _logger);
+        }
+
+        [TestMethod]
         public void SaveDataset_GivenViewModelIsNull_ThrowsArgumentNullException()
         {
-            // Arrange
-            CreateDatasetViewModel viewModel = null;
-
-            DatasetController controller = CreateController();
-
             // Act
-            Func<Task> test = async () => await controller.SaveDataset(viewModel);
+            Func<Task> test = async () => await _controller.SaveDataset(null);
 
             // Assert
             test
-               .Should()
-               .ThrowExactly<NullReferenceException>();
+                .Should()
+                .ThrowExactly<NullReferenceException>();
+        }
+        
+        [TestMethod]
+        public async Task UpdateDatasetVersion_GivenBadRequestFromApi_ReturnsBadRequest()
+        {
+            ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.BadRequest);
+
+            _apiClient
+                .DatasetVersionUpdate(Arg.Any<DatasetVersionUpdateModel>())
+                .Returns(response);
+
+            IActionResult result = await _controller.UpdateDatasetVersion(null, null, new DatasetUpdateViewModel());
+
+            result
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
         }
 
         [TestMethod]
@@ -53,7 +78,15 @@ namespace CalculateFunding.Frontend.Controllers
             // Arrange
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.BadRequest)
             {
-	            ModelState = new Dictionary<string, IEnumerable<string>> {{"Name", new[] {"Invalid name"}}}
+                ModelState = new Dictionary<string, IEnumerable<string>>
+                {
+                    {
+                        "Name", new[]
+                        {
+                            "Invalid name"
+                        }
+                    }
+                }
             };
 
             CreateDatasetViewModel viewModel = new CreateDatasetViewModel
@@ -65,20 +98,15 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingStreamId = "DSG"
             };
 
-            IDatasetsApiClient apiClient = CreateApiClient();
-            apiClient
+            _apiClient
                 .CreateNewDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
-            ILogger logger = CreateLogger();
-
-            DatasetController controller = CreateController(apiClient, logger);
-
             // Act
-            IActionResult result = await controller.SaveDataset(viewModel);
+            IActionResult result = await _controller.SaveDataset(viewModel);
 
             // Assert
-            logger
+            _logger
                 .Received(1)
                 .Warning(Arg.Is("Invalid model provided"));
 
@@ -102,22 +130,17 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingStreamId = "DSG"
             };
 
-            IDatasetsApiClient apiClient = CreateApiClient();
-            apiClient
+            _apiClient
                 .CreateNewDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
-            ILogger logger = CreateLogger();
-
-            DatasetController controller = CreateController(apiClient, logger);
-
             // Act
-            IActionResult result = await controller.SaveDataset(viewModel);
+            IActionResult result = await _controller.SaveDataset(viewModel);
 
             // Assert
-            logger
+            _logger
                 .Received(1)
-                .Error(Arg.Is($"Error when posting data set with status code: 500"));
+                .Error(Arg.Is("Error when posting data set with status code: 500"));
 
             result
                 .Should()
@@ -151,17 +174,12 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingStreamId = "DSG"
             };
 
-            IDatasetsApiClient apiClient = CreateApiClient();
-            apiClient
+            _apiClient
                 .CreateNewDataset(Arg.Any<CreateNewDatasetModel>())
                 .Returns(response);
 
-            ILogger logger = CreateLogger();
-
-            DatasetController controller = CreateController(apiClient, logger);
-
             // Act
-            IActionResult result = await controller.SaveDataset(viewModel);
+            IActionResult result = await _controller.SaveDataset(viewModel);
 
             // Assert
             result
@@ -179,83 +197,76 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [TestMethod]
-        public void ValidateDatasett_GivenViewModelIsNull_ThowsArgumentNullException()
+        public void ValidateDataset_GivenViewModelIsNull_ThrowsArgumentNullException()
         {
-            // Arrange
-            ValidateDatasetModel viewModel = null;
-
-            DatasetController controller = CreateController();
-
             // Act
-            Func<Task> test = async () => await controller.ValidateDataset(viewModel);
+            Func<Task> test = async () => await _controller.ValidateDataset(null);
 
             // Assert
             test
-               .Should()
-               .ThrowExactly<ArgumentNullException>();
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
         }
 
         [TestMethod]
-        public async Task ValidateDataset_GivenViewModelButResponseIsBadRequest_ReturnsStatusCode400()
+        public async Task ValidateDataset_GivenViewModelButResponseIsBadRequest_ReturnsBadRequestObjectResult()
         {
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
-            ValidatedApiResponse<DatasetValidationStatusModel> response = new ValidatedApiResponse<DatasetValidationStatusModel>(HttpStatusCode.BadRequest);
-            response.ModelState = new Dictionary<string, IEnumerable<string>>();
+            ValidatedApiResponse<DatasetValidationStatusModel> response = new ValidatedApiResponse<DatasetValidationStatusModel>(HttpStatusCode.BadRequest)
+            {
+                ModelState = new Dictionary<string, IEnumerable<string>>()
+            };
 
-            IDatasetsApiClient apiClient = CreateApiClient();
-            apiClient
+            _apiClient
                 .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
                 .Returns(response);
 
-            ILogger logger = CreateLogger();
-
-            DatasetController controller = CreateController(apiClient, logger);
-
             // Act
-            IActionResult result = await controller.ValidateDataset(viewModel);
+            IActionResult result = await _controller.ValidateDataset(viewModel);
 
             // Assert
             result
-               .Should()
-               .BeOfType<InternalServerErrorResult>();
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
 
-            logger
+            _logger
                 .Received(1)
                 .Warning(Arg.Is("Failed to validate dataset with status code: {statusCode}"), Arg.Is(HttpStatusCode.BadRequest));
         }
 
         [TestMethod]
-        public async Task ValidateDataset_GivenViewModelButResponseIsBadRequestAndHasModelState_ReturnsStatusCode400()
+        public async Task ValidateDataset_GivenViewModelButResponseIsBadRequestAndHasModelState_ReturnsBadRequestObjectResult()
         {
             // Arrange
             ValidateDatasetModel viewModel = new ValidateDatasetModel();
 
             IDictionary<string, IEnumerable<string>> modelState = new Dictionary<string, IEnumerable<string>>();
-            modelState.Add("error", new List<string> { "an error occured" });
+            modelState.Add("error",
+                new List<string>
+                {
+                    "an error occured"
+                });
 
-            ValidatedApiResponse<DatasetValidationStatusModel> response = new ValidatedApiResponse<DatasetValidationStatusModel>(HttpStatusCode.BadRequest);
-            response.ModelState = modelState;
+            ValidatedApiResponse<DatasetValidationStatusModel> response = new ValidatedApiResponse<DatasetValidationStatusModel>(HttpStatusCode.BadRequest)
+            {
+                ModelState = modelState
+            };
 
-            IDatasetsApiClient apiClient = CreateApiClient();
-            apiClient
-	            .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
-	            .Returns(response);
-
-            ILogger logger = CreateLogger();
-
-            DatasetController controller = CreateController(apiClient, logger);
+            _apiClient
+                .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
+                .Returns(response);
 
             // Act
-            IActionResult result = await controller.ValidateDataset(viewModel);
+            IActionResult result = await _controller.ValidateDataset(viewModel);
 
             // Assert
             result
-               .Should()
-               .BeOfType<BadRequestObjectResult>();
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
 
-            logger
+            _logger
                 .Received(1)
                 .Warning(Arg.Is("Failed to validate dataset with status code: {statusCode}"), Arg.Is(HttpStatusCode.BadRequest));
         }
@@ -273,58 +284,43 @@ namespace CalculateFunding.Frontend.Controllers
                 CurrentOperation = DatasetValidationStatus.Processing,
                 DatasetId = "datasetId",
                 ErrorMessage = "errorMessage",
-                OperationId = "operationId",
+                OperationId = "operationId"
             };
 
             ValidatedApiResponse<DatasetValidationStatusModel> response = new ValidatedApiResponse<DatasetValidationStatusModel>(HttpStatusCode.OK, statusModel);
 
-            DatasetValidationStatusViewModel resultViewModel = new DatasetValidationStatusViewModel()
+            DatasetValidationStatusViewModel resultViewModel = new DatasetValidationStatusViewModel
             {
                 ValidationFailures = new Dictionary<string, IEnumerable<string>>(),
                 CurrentOperation = DatasetValidationStatusOperationViewModel.Processing,
                 DatasetId = "datasetId",
                 ErrorMessage = "errorMessage",
-                OperationId = "operationId",
+                OperationId = "operationId"
             };
 
-            IDatasetsApiClient apiClient = CreateApiClient();
-            apiClient
-	            .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
-	            .Returns(response);
-
-            ILogger logger = CreateLogger();
-
-            DatasetController controller = CreateController(apiClient, logger);
+            _apiClient
+                .ValidateDataset(Arg.Any<GetDatasetBlobModel>())
+                .Returns(response);
 
             // Act
-            IActionResult result = await controller.ValidateDataset(viewModel);
+            IActionResult result = await _controller.ValidateDataset(viewModel);
 
             // Assert
             result
-               .Should()
-                   .BeOfType<OkObjectResult>()
-                   .Which
-                   .Value
-                   .Should()
-                   .BeEquivalentTo(resultViewModel);
+                .Should()
+                .BeOfType<OkObjectResult>()
+                .Which
+                .Value
+                .Should()
+                .BeEquivalentTo(resultViewModel);
         }
 
-        private static DatasetController CreateController(IDatasetsApiClient apiClient = null, ILogger logger = null, IMapper mapper = null)
-        {
-			_mockSpecificationsApiClient = new Mock<ISpecificationsApiClient>();
-			_mockAuthorisationHelper = new Mock<IAuthorizationHelper>();
-
-            return new DatasetController(apiClient ?? CreateApiClient(), logger ?? CreateLogger(), mapper ?? MappingHelper.CreateFrontEndMapper(), _mockSpecificationsApiClient.Object, _mockAuthorisationHelper.Object);
-        }
-
-        private static IDatasetsApiClient CreateApiClient()
-        {
-            return Substitute.For<IDatasetsApiClient>();
-        }
-
-        private static ILogger CreateLogger()
-        {
-            return Substitute.For<ILogger>();
-        }
+        private DatasetController CreateController(IDatasetsApiClient apiClient,
+            ILogger logger)
+            => new DatasetController(apiClient,
+                logger,
+               MappingHelper.CreateFrontEndMapper(),
+                _specifications.Object,
+                _authorisationHelper.Object);
     }
 }
