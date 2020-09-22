@@ -144,7 +144,7 @@ export function ManageDataSourceFiles() {
         searchDataSourceFiles(initialSearch);
     }
 
-    return (<div>
+    return <div>
             <Header location={Section.Datasets}/>
             <div className="govuk-width-container">
                 <div className="govuk-grid-row">
@@ -155,7 +155,7 @@ export function ManageDataSourceFiles() {
                             <Breadcrumb name={"Manage data source files"}/>
                         </Breadcrumbs>
                         <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Manage data source files</h1>
-                        <span className="govuk-caption-xl">Manage data source files or map them to datasets for a specification</span>
+                        <span className="govuk-caption-xl">Upload new or updated data source files</span>
                     </div>
                 </div>
 
@@ -295,5 +295,4 @@ export function ManageDataSourceFiles() {
             </div>
             <Footer/>
         </div>
-    )
 }

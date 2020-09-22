@@ -23,7 +23,7 @@ describe("<ManageDataSourceFiles />", () => {
 
     it('will have the correct <span /> subtitle for Manage data source files', () => {
         const wrapper = mount(<MemoryRouter><ManageDataSourceFiles/></MemoryRouter>);
-        expect(wrapper.find("span.govuk-caption-xl").text()).toBe("Manage data source files or map them to datasets for a specification");
+        expect(wrapper.find("span.govuk-caption-xl").text()).toBe("Upload new or updated data source files");
     });
 
     it('will have the correct <a /> title for Upload a new data source', () => {

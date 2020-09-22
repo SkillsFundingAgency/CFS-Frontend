@@ -25,19 +25,19 @@ export function ManageData() {
                         <h3 id={"manage-data-source-files-title"} className="govuk-heading-m">
                            <Link to={"/Datasets/ManageDataSourceFiles"}>Manage data source files</Link>
                         </h3>
-                        <p className="govuk-body">Load a new data source file or download an existing one.</p>
+                        <p className="govuk-body">Upload new or updated data source files</p>
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"map-data-source-files-title"} className="govuk-heading-m">
                             <Link to={"/Datasets/MapDataSourceFiles"}>Map data source files to datasets for a specification</Link>
                         </h3>
-                        <p className="govuk-body">Select the data source file a dataset uses.</p>
+                        <p className="govuk-body">Select the data source file a dataset uses</p>
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"download-data-schemas-title"} className="govuk-heading-m">
                             <Link to="/Datasets/DownloadDataSchema">Download data schemas</Link>
                         </h3>
-                        <p className="govuk-body">Download the data schema for data source.</p>
+                        <p className="govuk-body">Download the data schema for data source</p>
                     </div>
                 </div>
             </div>
