@@ -81,7 +81,7 @@
 
 
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.7.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.8.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.9.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="4.10.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.13.0" />
