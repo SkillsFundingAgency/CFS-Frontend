@@ -280,6 +280,48 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Be(false);
         }
 
+        [TestMethod]
+        public async Task GetPublishedProviderErrors_ReturnsNotFound_WhenUnderlyingAPIReturnsNotFound()
+        {
+            _publishingApiClient
+                .GetPublishedProviderErrors(ValidSpecificationId)
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.NotFound));
+
+            IActionResult result = await _publishController.GetPublishedProviderErrors(ValidSpecificationId);
+
+            result.Should().BeOfType<NotFoundObjectResult>();
+        }
+
+        [TestMethod]
+        public async Task GetPublishedProviderErrors_ReturnsErrorSummaries_WhenUnderlyingAPIReturnsErrorSummaries()
+        {
+            string errorSummary = "Error";
+
+            IEnumerable<string> errorSummaries = new List<string>
+            {
+                errorSummary
+            };
+
+            _publishingApiClient
+                .GetPublishedProviderErrors(ValidSpecificationId)
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, errorSummaries));
+
+            IActionResult result = await _publishController.GetPublishedProviderErrors(ValidSpecificationId);
+
+            result.Should().BeOfType<OkObjectResult>();
+            OkObjectResult okObjectResult = result as OkObjectResult;
+            okObjectResult.Should().NotBeNull();
+            okObjectResult.Value.Should().NotBeNull();
+            okObjectResult.Value.Should().BeOfType<List<string>>();
+
+            IEnumerable<string> actualErrorSummaries = okObjectResult.Value as IEnumerable<string>;
+
+            actualErrorSummaries.Count().Should().Be(1);
+
+            string actualErrorSummary = actualErrorSummaries.FirstOrDefault();
+            actualErrorSummary.Should().Be(errorSummary);
+        }
+
         private void SetupAuthorizedUser(SpecificationActionTypes specificationActionType)
         {
             _authorizationHelper.DoesUserHavePermission(

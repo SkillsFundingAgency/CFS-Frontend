@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Graph.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
@@ -388,6 +389,25 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new InternalServerErrorResult("There was an error retrieving provider funding counts for approval.");
+        }
+
+        [HttpGet]
+        [Route("api/publishedprovidererrors/{specificationId}")]
+        public async Task<IActionResult> GetPublishedProviderErrors(string specificationId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            ApiResponse<IEnumerable<string>> apiResponse = await _publishingApiClient.GetPublishedProviderErrors(specificationId);
+
+            IActionResult errorResult =
+                apiResponse.IsSuccessOrReturnFailureResult(nameof(Specification));
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return new OkObjectResult(apiResponse.Content);
         }
 
         private static ProfilingViewModel MapToProfilingViewModel(
