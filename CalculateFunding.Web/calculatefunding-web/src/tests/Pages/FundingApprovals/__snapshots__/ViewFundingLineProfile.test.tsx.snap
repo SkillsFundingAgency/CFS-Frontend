@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<ViewFundingLineProfile /> when user has permission shows the correct funding line profile values 1`] = `
+exports[`<ViewFundingLineProfile /> when user has canEditProfilePattern permission shows the correct funding line profile values 1`] = `
 Array [
   <tr
     class="govuk-table__row"

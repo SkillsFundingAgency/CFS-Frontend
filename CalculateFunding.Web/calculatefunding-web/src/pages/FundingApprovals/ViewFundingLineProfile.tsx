@@ -82,21 +82,16 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
                             <Breadcrumb name="Calculate funding" url={"/"} />
                             <Breadcrumb name="Approvals" />
                             <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
-                            <Breadcrumb name="Funding approval results" url={`/Approvals/FundingApprovalResults/${fundingStreamId}/${fundingPeriodId}/${specificationId}`} />
+                            <Breadcrumb name={"Funding approval results"} url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`} />
                             <Breadcrumb name={fundingLineProfile.providerName} url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`} />
                             <Breadcrumb name={fundingLineProfile.fundingLineName || "Missing funding line name"} />
                         </Breadcrumbs>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
-                                <PermissionStatus requiredPermissions={missingPermissions} />
-                            </div>
-                        </div>
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full">
                                 <MultipleErrorSummary errors={errors} />
                             </div>
                         </div>
-                        <div hidden={missingPermissions.length > 0}>
+                        <div>
                             <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-margin-top-5">
                                 <div className="govuk-grid-column-two-thirds">
                                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2" data-testid="funding-line-name">{fundingLineProfile.fundingLineName || "Missing funding line name"}</h1>

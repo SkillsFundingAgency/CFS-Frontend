@@ -13,7 +13,7 @@ describe("<ViewFundingLineProfile />", () => {
         jest.mock("../../../services/publishedProviderFundingLineService", () => mockPublishedProviderFundingLineService());
     });
 
-    describe("when user has permission", () => {
+    describe("when user has canEditProfilePattern permission", () => {
         beforeAll(() => {
             useSelectorSpy.mockReturnValue([{
                 fundingStreamId: "fundingStreamId",
@@ -49,7 +49,7 @@ describe("<ViewFundingLineProfile />", () => {
         });
     });
 
-    describe("when user does not have permission", () => {
+    describe("when user does not have canEditProfilePattern permission", () => {
         beforeAll(() => {
             useSelectorSpy.mockReturnValue([{
                 fundingStreamId: "fundingStreamId",
@@ -61,10 +61,10 @@ describe("<ViewFundingLineProfile />", () => {
             useSelectorSpy.mockClear();
         });
 
-        it("shows a permissions message", async () => {
-            const {getByTestId} = renderPage();
+        it("does not show a permissions message", async () => {
+            const {container} = renderPage();
             await waitFor(() => {
-                expect(getByTestId('permission-alert-message')).toBeInTheDocument();
+                expect(container.querySelector("#permission-alert-message")).not.toBeInTheDocument();
             });
         });
     })
