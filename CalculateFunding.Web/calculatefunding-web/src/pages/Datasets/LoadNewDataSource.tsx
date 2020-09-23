@@ -175,8 +175,6 @@ export function LoadNewDataSource() {
             fundingStreamId: selectedFundingStream
         };
 
-        setIsLoading(true);
-
         if (request.name !== "" && request.filename !== "" && request.description !== "" && request.dataDefinitionId !== "" && request.fundingStreamId !== "") {
             setValidateForm(prevState => {
                 return {
@@ -187,6 +185,7 @@ export function LoadNewDataSource() {
                     dataDefinitionIdValid: true
                 }
             });
+            setIsLoading(true);
             createDatasetService(request)
                 .then((result) => {
                     const response = result.data as NewDatasetVersionResponseViewModel;
