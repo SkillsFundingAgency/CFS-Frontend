@@ -112,13 +112,15 @@ export function CreateSpecification() {
                     const coreProviderSnapshotsResult = await getProviderSnapshotsForFundingStreamService(selectedFundingStream);
                     const providerSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
                     setProviderSnapshots(providerSnapshots);
+                } else {
+                    throw new Error("Unable to resolve provider source to either 'CFS' or 'FDZ'.");
                 }
-            } catch (err) {
-                if (err.response != null) {
-                    if (err.response.status === 404) {
+            } catch (error) {
+                if (error.response != null) {
+                    if (error.response.status === 404) {
                         addErrorMessage("No provider data exists for your selections.");
                     } else {
-                        addErrorMessage("There was a problem loading the core providers. Please try again.");
+                        addErrorMessage(`There was a problem loading the core providersfor the following reason: ${error.message}. Please try again.`);
                     }
                 }
             }
@@ -214,11 +216,11 @@ export function CreateSpecification() {
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId : string = e.target.value as string;
-        if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
+        if (providerSource === ProviderSource.CFS)
         {
             setSelectedProviderVersionId(coreProviderId);
         }
-        else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
+        else if (providerSource === ProviderSource.FDZ)
         {
             setSelectedProviderSnapshotId(parseInt(coreProviderId));
         }

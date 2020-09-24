@@ -105,7 +105,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 const fundingStreamId = specificationSummary.fundingStreams[0].id;
 
                 const fundingConfiguration = (await getFundingConfiguration(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id)).data;
-                setProviderSource(fundingConfiguration.providerSource);
+                const providerSource = fundingConfiguration.providerSource;
+                setProviderSource(providerSource);
 
                 if (providerSource === ProviderSource.CFS) {
                     const coreProviderResult = await getProviderByFundingStreamIdService(fundingStreamId);
@@ -126,6 +127,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     }));
                     const selectedProviderSnapshot = providerData.find(p => p.value === specificationSummary.providerSnapshotId);
                     selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value.toString());
+                } else {
+                    throw new Error("Unable to resolve provider source to either 'CFS' or 'FDZ'.");
                 }
 
                 const templatesResult = await getPublishedTemplatesByStreamAndPeriod(fundingStreamId, specificationSummary.fundingPeriod.id);
@@ -138,8 +141,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 const selectedVersion = templateVersionData.find(t => t.value === specificationSummary.templateIds[fundingStreamId]);
                 selectedVersion && setSelectedTemplateVersion(selectedVersion.value);
             }
-            catch (err) {
-                setErrorSummary({title: "There is a problem", error: "Specification failed to load, please try again."});
+            catch (error) {
+                setErrorSummary({title: "There is a problem", error: `Specification failed to load for the following reason: ${error.message}. Please try again.`});
             }
             finally {
                 setIsLoading(false);
@@ -159,11 +162,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
-        if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
+        if (providerSource === ProviderSource.CFS)
         {
             setSelectedProviderVersionId(coreProviderId as string);
         }
-        else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
+        else if (providerSource === ProviderSource.FDZ)
         {
             setSelectedProviderSnapshotId(parseInt(coreProviderId));
         }
