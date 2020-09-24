@@ -29,6 +29,9 @@ import {FundingLineStepProviderResults} from "../../components/fundingLineStruct
 import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
 import {Footer} from "../../components/Footer";
 import * as QueryString from "query-string";
+import {getFundingStreamByIdService} from "../../services/policyService";
+import {FundingStream} from "../../types/viewFundingTypes";
+import {WarningText} from "../../components/WarningText";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -128,6 +131,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         providerDetails: true
     });
     const [selectedSpecificationIdByFundingStream, setSelectedSpecificationIdByFundingStream] = useState<string>("");
+    const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
@@ -152,16 +156,28 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
 
                     let selectedSpecificationId = selectedSpecification.id;
 
-                    specificationInformation.map((specInfo)=> {
-                        return specInfo.fundingStreamIds?.map((fundingStreamId) => {
-                            if (fundingStreamId === match.params.fundingStreamId) {
-                                setSelectedSpecificationIdByFundingStream(specInfo.id);
-                                selectedSpecificationId = specInfo.id;
-                                return;
-                            }
+                    if (specificationInformation.some((specInformation)=>
+                        specInformation.fundingStreamIds != null)) {
+                        let selectSpecificationByFundingStream = false;
+                        specificationInformation.map((specInfo) => {
+                            return specInfo.fundingStreamIds?.map((fundingStreamId) => {
+                                if (fundingStreamId === match.params.fundingStreamId) {
+                                    setSelectedSpecificationIdByFundingStream(specInfo.id);
+                                    selectedSpecificationId = specInfo.id;
+                                    selectSpecificationByFundingStream = true;
+                                    return;
+                                }
+                            });
                         });
-                    });
 
+                        if (!selectSpecificationByFundingStream) {
+                            getFundingStreamByIdService(match.params.fundingStreamId)
+                                .then((fundingStreamResponse) => {
+                                    const fundingStream = fundingStreamResponse.data as FundingStream;
+                                    setDefaultFundingStreamName(fundingStream.name);
+                                })
+                        }
+                    }
                     populateSpecification(selectedSpecificationId);
 
                     setProviderResults(specificationInformation);
@@ -399,16 +415,16 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             <div className="govuk-grid-row" hidden={isLoading.providerDetails}>
                 <div className="govuk-grid-column-full">
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">{providerDetails.name}</h1>
-                    <span className="govuk-caption-m govuk-!-margin-bottom-8">UKPRN: <strong>{providerDetails.ukprn}</strong></span>
+                    <span className="govuk-caption-m govuk-!-margin-bottom-4">UKPRN: <strong>{providerDetails.ukprn}</strong></span>
                 </div>
-
             </div>
+            <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === ""} />
             <NoData hidden={isLoading.providerResults || specificationSummary.id !== ""}/>
             <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === ""}>
                 <div className="govuk-grid-column-two-thirds">
                     <div className="govuk-form-group">
                         <h3 className="govuk-heading-m govuk-!-margin-bottom-1">Specification</h3>
-                        <span className="govuk-caption-m">Select a specification for the provider</span>
+                        <span className="govuk-caption-m govuk-!-margin-bottom-2">Available specifications for all funding streams will be displayed here.</span>
                         <select className="govuk-select" id="sort" name="sort" 
                                 onChange={setSelectedSpecification} 
                                 value={selectedSpecificationIdByFundingStream !== "" ?  selectedSpecificationIdByFundingStream : specificationSummary.id}>
