@@ -60,7 +60,7 @@ export const ListTemplates = () => {
                     <Breadcrumb name={"Calculate funding"} url={"/"}/>
                     <Breadcrumb name={"Templates"}/>
                 </Breadcrumbs>
-                <PermissionStatus requiredPermissions={missingPermissions}/>
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading}/>
                 <div className="govuk-main-wrapper">
                     <h1 className="govuk-heading-xl">Templates</h1>
                     <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">View and edit existing templates</h3>

@@ -166,7 +166,7 @@ export const CloneTemplate = () => {
                         url={templateToClone && `/Templates/${templateToClone.templateId}/Versions/${templateToClone.version}`} />
                     <Breadcrumb name={"Clone template"} />
                 </Breadcrumbs>
-                <PermissionStatus requiredPermissions={missingPermissions} />
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
                 {canCreateTemplate &&
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">

@@ -1,10 +1,11 @@
 ﻿﻿import React from 'react';
-import {mount} from "enzyme";
+import '@testing-library/jest-dom/extend-expect';
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
+import {render, waitFor, screen} from "@testing-library/react";
+
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
-import { waitFor } from "@testing-library/react"
 
 export const noPermissionsState: FundingStreamPermissions[] = [{
     fundingStreamId: "DSG",
@@ -78,7 +79,7 @@ export const setupGetTemplate = function () {
                 version: 2,
                 status: "Draft",
                 schemaVersion: "1.1",
-                templateJson: "",
+                templateJson: undefined,
                 authorId: "",
                 authorName: "",
                 lastModificationDate: new Date(),
@@ -89,27 +90,54 @@ export const setupGetTemplate = function () {
         getAllCalculations: jest.fn()
     }));
 };
-describe("Publish Template page when I don't have approve permissions ", () => {
-    beforeEach(() => {
-        useSelectorSpy.mockClear();
-        useSelectorSpy.mockReturnValue(noPermissionsState);
-        setupGetTemplate();
+
+const renderPage = () => {
+    const {PublishTemplate} = require("../../../pages/Templates/PublishTemplate");
+    return render(
+        <MemoryRouter>
+            <PublishTemplate />
+        </MemoryRouter>);
+};
+
+describe("Publish Template page", () => {
+    describe("when I don't have approve permissions ", () => {
+        beforeEach(() => {
+            useSelectorSpy.mockClear();
+            useSelectorSpy.mockReturnValue(noPermissionsState);
+            setupGetTemplate();
+        });
+        it("does not render a permission status warning at first", async () => {
+            renderPage();
+            await waitFor(() => expect(screen.queryByTestId('permission-alert-message')).toBeFalsy());
+        });
+        it("fetches template data", async () => {
+            const {getTemplateById} = require('../../../services/templateBuilderDatasourceService');
+            renderPage();
+            await waitFor(() => expect(getTemplateById).toBeCalled());
+        });
+        it("renders a permission status warning after loading data", async () => {
+            const {getTemplateById} = require('../../../services/templateBuilderDatasourceService');
+            renderPage();
+            await waitFor(() => expect(getTemplateById).toBeCalled());
+            await waitFor(() => expect(screen.getByTestId('permission-alert-message')).toBeInTheDocument());
+        });
     });
-    it("renders a permission status warning", async () => {
-        const { PublishTemplate } = require("../../../pages/Templates/PublishTemplate");
-        const wrapper = mount(<MemoryRouter><PublishTemplate /></MemoryRouter>);
-        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(1));
-    });
-});
-describe("Publish Template page when I have approve permissions ", () => {
-    beforeEach(() => {
-        useSelectorSpy.mockClear();
-        useSelectorSpy.mockReturnValue(permissionsState);
-        setupGetTemplate();
-    });
-    it("does not render a permission status warning", async () => {
-        const { PublishTemplate } = require("../../../pages/Templates/PublishTemplate");
-        const wrapper = mount(<MemoryRouter><PublishTemplate /></MemoryRouter>);
-        await waitFor(() => expect(wrapper.find("[data-testid='permission-alert-message']")).toHaveLength(0));
+    describe("when I have approve permissions ", () => {
+        beforeEach(() => {
+            useSelectorSpy.mockClear();
+            useSelectorSpy.mockReturnValue(permissionsState);
+            setupGetTemplate();
+        });
+        it("fetches template data", async () => {
+            const {getTemplateById} = require('../../../services/templateBuilderDatasourceService');
+            renderPage();
+            await waitFor(() => expect(getTemplateById).toBeCalled());
+        });
+        it("does not render a permission status warning after loading data", async () => {
+            const {getTemplateById} = require('../../../services/templateBuilderDatasourceService');
+            renderPage();
+            await waitFor(() => expect(getTemplateById).toBeCalled());
+            await waitFor(() => expect(screen.queryByTestId('permission-alert-message')).not.toBeInTheDocument());
+        });
     });
 });

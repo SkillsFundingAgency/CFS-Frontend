@@ -5,6 +5,7 @@ import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationP
 export enum SpecificationPermissions {
     Create = "Create",
     Edit = "Edit",
+    MapDatasets = "Map Datasets",
     Release = "Release",
     Refresh = "Refresh",
     Approve = "Approve"
@@ -39,6 +40,10 @@ export const useSpecificationPermissions = (specificationId: string, requiredPer
     const canReleaseFunding = useMemo(() => {
         return permissions && permissions.canReleaseFunding;
     }, [permissions]);
+    
+    const canMapDatasets = useMemo(() => {
+        return permissions && permissions.canMapDatasets;
+    }, [permissions]);
 
 
     const missingPermissions = useMemo(() => {
@@ -58,8 +63,11 @@ export const useSpecificationPermissions = (specificationId: string, requiredPer
         if (!canApproveFunding && requiredPermissions.includes(SpecificationPermissions.Approve)) {
             missing.push(SpecificationPermissions.Approve);
         }
+        if (!canMapDatasets && requiredPermissions.includes(SpecificationPermissions.MapDatasets)) {
+            missing.push(SpecificationPermissions.MapDatasets);
+        }
         return missing;
-    }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, requiredPermissions]);
+    }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canMapDatasets, requiredPermissions]);
 
 
     return {
@@ -68,6 +76,7 @@ export const useSpecificationPermissions = (specificationId: string, requiredPer
         canApproveFunding,
         canRefreshFunding,
         canReleaseFunding,
+        canMapDatasets,
         missingPermissions
     }
 };

@@ -147,7 +147,7 @@ export const CreateTemplate = () => {
                     <Breadcrumb name={"Templates"} url={"/Templates/List"} />
                     <Breadcrumb name={"Create a new template"} />
                 </Breadcrumbs>
-                <PermissionStatus requiredPermissions={missingPermissions} />
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-two-thirds">
                         <MultipleErrorSummary errors={errors} />

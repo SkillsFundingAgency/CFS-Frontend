@@ -13,14 +13,13 @@ import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
 import {assignDataSourceService, getDatasourcesByRelationshipIdService} from "../../services/datasetService";
 import {getSpecificationSummaryService} from "../../services/specificationService";
-import {getUserPermissionsService} from "../../services/userService";
-import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {MappingStatus} from "../../components/MappingStatus";
 import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {JobSummary} from "../../types/jobSummary";
 import {RunningStatus} from "../../types/RunningStatus";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
@@ -70,27 +69,25 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [selectedDataset, setSelectedDataset] = useState<string>("");
     const [isAssigning, setIsAssigning] = useState<boolean>(false);
     const [isInitiating, setIsInitiating] = useState<boolean>(false);
-    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [jobMessage, setJobMessage] = useState<JobSummary | JobMessage>();
     let history = useHistory();
+    const {canMapDatasets, missingPermissions} =
+        useSpecificationPermissions(specificationSummary.id, [SpecificationPermissions.MapDatasets]);
 
     useEffect(() => {
         getDatasourcesByRelationshipIdService(match.params.datasetRelationshipId)
             .then((relationshipResult) => {
                 const relationship = relationshipResult.data as DatasourceRelationshipResponseViewModel;
                 setDatasourceVersions(relationship);
-                return getUserPermissionsService(relationship.specificationId);
+                return getSpecificationSummaryService(relationship.specificationId);
             })
-            .then((permissionsResult) => {
-                const specificationPermissions = permissionsResult.data as EffectiveSpecificationPermission;
-                if (!specificationPermissions.canMapDatasets) {
-                    setMissingPermissions(["map datasets"]);
-                }
-                return getSpecificationSummaryService(specificationPermissions.specificationId);
+            .then((specResult) => {
+                setSpecificationSummary(specResult.data as SpecificationSummary);
             })
-            .then((specResult) => setSpecificationSummary(specResult.data as SpecificationSummary))
-            .catch((err) => {setMissingVersion(true);})
-            .finally(() => {setIsLoading(false);});
+            .catch((err) => {
+                setMissingVersion(true);})
+            .finally(() => {
+                setIsLoading(false);});
     }, [match.params.datasetRelationshipId]);
 
     useEffect(() => {
@@ -137,7 +134,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
             } catch (err) {
                 await hubConnect.stop();
             }
-        }
+        };
 
         if (!datasourceVersions.specificationId || datasourceVersions.specificationId.length === 0) return;
         retrieveLatestJobSpecification(datasourceVersions.specificationId);
@@ -174,7 +171,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
             .catch(() => setSaveErrorOccurred(true));
     }
 
-    const canMapDatasets = !isLoading && missingPermissions !== undefined && missingPermissions.length === 0;
+    const allowToMapDatasets = !isLoading && canMapDatasets;
 
     return (<div>
         <Header location={Section.Datasets} />
@@ -200,9 +197,9 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                     <LoadingStatus title={"Assigning version to dataset"} />
                 </div>
             </div>
-            {!canMapDatasets && missingPermissions &&
+            {!allowToMapDatasets && missingPermissions &&
                 <div className="govuk-grid-row">
-                    <PermissionStatus requiredPermissions={missingPermissions} />
+                    <PermissionStatus requiredPermissions={missingPermissions} hidden={isInitiating || isLoading} />
                 </div>}
             {!isLoading && !isInitiating &&
                 <div className="govuk-grid-row">
@@ -215,7 +212,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                             <div className="govuk-form-group">
                                 <MappingStatus jobMessage={jobMessage} />
                             </div>}
-                        {canMapDatasets &&
+                        {allowToMapDatasets &&
                             <div className="govuk-form-group">
                                 <div hidden={!missingVersion}>
                                     <ErrorSummary title={"Please select a version"} error={"No selection has been made"}
@@ -247,7 +244,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                     <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-options`} type="radio"
                                                         aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false"
                                                         value={d.id}
-                                                        disabled={!canMapDatasets}
+                                                        disabled={!allowToMapDatasets}
                                                         onChange={(e) => populateVersions(e)} />
                                                     <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
                                                         {d.name}

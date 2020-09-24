@@ -4,7 +4,6 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {ErrorMessage} from "../../types/ErrorMessage";
 import {getFundingLinePublishedProviderDetails} from "../../services/publishedProviderFundingLineService";

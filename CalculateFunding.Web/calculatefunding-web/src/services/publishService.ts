@@ -1,5 +1,6 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
+import {PublishedProviderSearchResult} from "../types/PublishedProvider/PublishedProviderSearchResult";
 
 const baseUrl = "/api/publish";
 
@@ -22,7 +23,7 @@ export async function saveReleaseTimetableForSpecificationService(saveReleaseTim
     });
 }
 
-export async function refreshFundingService(specificationId: string) {
+export async function refreshFundingService(specificationId: string): Promise<AxiosResponse<string>> {
     return axios(`${baseUrl}/refreshfunding/${specificationId}`, {
         method: 'GET',
         headers: {
@@ -31,18 +32,16 @@ export async function refreshFundingService(specificationId: string) {
     });
 }
 
-export async function approveFundingService(specificationId: string) {
-
+export async function approveFundingService(specificationId: string): Promise<AxiosResponse<string>> {
     return axios(`${baseUrl}/approvefunding/${specificationId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
         }
     });
-
 }
 
-export async function releaseFundingService(specificationId: string){
+export async function releaseFundingService(specificationId: string): Promise<AxiosResponse<string>> {
         return axios(`${baseUrl}/publishfunding/${specificationId}`, {
             method: 'GET',
             headers: {

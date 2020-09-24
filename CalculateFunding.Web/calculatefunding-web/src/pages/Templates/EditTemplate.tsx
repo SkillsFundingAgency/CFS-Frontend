@@ -530,7 +530,7 @@ export function EditTemplate() {
         <div>
             <Header location={Section.Templates} />
             <div className="govuk-width-container">
-                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} />
+                <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} hidden={isLoading} />
                 <LoadingStatus title={"Loading Template"} hidden={!isLoading} id={"template-builder-loader"}
                     subTitle={"Please wait while the template loads."} />
                 {!version && <Breadcrumbs>

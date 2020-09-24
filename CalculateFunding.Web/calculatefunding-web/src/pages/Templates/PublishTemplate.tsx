@@ -59,7 +59,7 @@ export const PublishTemplate = () => {
                 if (templateResponse.templateJson) {
                     const template = JSON.parse(templateResponse.templateJson) as Template;
                     if (template) {
-                        const fundingLines = templateFundingLinesToDatasource(template.fundingTemplate.fundingLines)
+                        const fundingLines = templateFundingLinesToDatasource(template.fundingTemplate.fundingLines);
                         setDS(fundingLines);
                     } else {
                         addErrorMessage("The template content could not be loaded.", "content");
@@ -186,7 +186,7 @@ export const PublishTemplate = () => {
                     <h1 className="govuk-heading-xl">Publish Template</h1>
                     {canApproveTemplate &&
                         <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Check the information below before publishing</h3>}
-                    <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} />
+                    <PermissionStatus requiredPermissions={missingPermissions ? missingPermissions : []} hidden={isLoading} />
                 </div>
 
                 {canApproveTemplate && <div>

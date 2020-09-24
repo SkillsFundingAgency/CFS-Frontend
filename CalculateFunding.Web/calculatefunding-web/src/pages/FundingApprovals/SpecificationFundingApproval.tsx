@@ -25,6 +25,7 @@ import {IStoreState} from "../../reducers/rootReducer";
 import {SpecificationSummarySection} from "../../components/Funding/SpecificationSummarySection";
 import {SpecificationJobMonitor} from "../../components/Funding/SpecificationJobMonitor";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import Pagination from "../../components/Pagination";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -88,7 +89,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const [allProviderVersionIds, setAllProviderVersionIds] = useState<string[]>([]);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const fundingSelectionState: IFundingSelectionState = useSelector<IStoreState, IFundingSelectionState>(state => state.fundingSelection);
-    const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} = 
+    const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
 
     useEffect(() => {
@@ -106,7 +107,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             const results = (await searchForPublishedProviderResults(searchRequest)).data;
             setIsLoadingResults(false);
             setPublishedProviderResults(results);
-            
+
             if (approvalMode === ApprovalMode.Undefined) {
                 const fundingConfiguration = (await getFundingConfiguration(fundingStreamId, fundingPeriodId)).data;
                 if (fundingConfiguration) {
@@ -158,7 +159,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     function clearErrorMessages() {
         setErrors([]);
     }
-    
+
     return <div>
         <Header location={Section.Approvals}/>
         <div className="govuk-width-container">
@@ -169,14 +170,14 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 <Breadcrumb name={"Funding approval results"}/>
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions}/>
-            
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingResults}/>
+
             <MultipleErrorSummary errors={errors}/>
 
             <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-padding-top-5">
                 <div className="govuk-grid-column-two-thirds">
-                    <SpecificationSummarySection 
-                        specificationId={specificationId} 
+                    <SpecificationSummarySection
+                        specificationId={specificationId}
                         specification={specificationSummary}
                         setSpecification={setSpecificationSummary}
                         addError={addErrorMessage}
@@ -185,8 +186,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             </div>
 
             <div className="govuk-grid-row">
-                
-                <SpecificationJobMonitor 
+
+                <SpecificationJobMonitor
                     specificationId={specificationId}
                     isJobRunning={isJobRunning}
                     setIsJobRunning={setIsJobRunning}
@@ -208,20 +209,23 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     </div>
                     }
                     {!isLoadingResults && !isLoadingProviderVersionIds &&
-                    <PublishedProviderResults specificationId={specificationId} 
-                                              enableBatchSelection={approvalMode === ApprovalMode.Batches}
-                                              specProviderVersionId={specificationSummary?.providerVersionId}
-                                              providerSearchResults={publishedProviderResults}
-                                              canRefreshFunding={canRefreshFunding}
-                                              canApproveFunding={canApproveFunding}
-                                              canReleaseFunding={canReleaseFunding}
-                                              selectedResults={fundingSelectionState.providerVersionIds.length}
-                                              totalResults={allProviderVersionIds?.length}
-                                              pageChange={pageChange}
-                                              fetchPublishedProviderIds={loadPublishedProviderVersionIds}
-                                              setConfirmRelease={setConfirmRelease}
-                                              setConfirmApproval={setConfirmApproval}
-                    />
+                    <>
+                        <PublishedProviderResults specificationId={specificationId}
+                                                  enableBatchSelection={approvalMode === ApprovalMode.Batches}
+                                                  specProviderVersionId={specificationSummary?.providerVersionId}
+                                                  providerSearchResults={publishedProviderResults}
+                                                  canRefreshFunding={canRefreshFunding}
+                                                  canApproveFunding={canApproveFunding}
+                                                  canReleaseFunding={canReleaseFunding}
+                                                  selectedResults={fundingSelectionState.providerVersionIds.length}
+                                                  totalResults={allProviderVersionIds?.length}
+                                                  pageChange={pageChange}
+                                                  fetchPublishedProviderIds={loadPublishedProviderVersionIds}
+                                                  setConfirmRelease={setConfirmRelease}
+                                                  setConfirmApproval={setConfirmApproval}
+                                                  addError={addErrorMessage}
+                        />
+                    </>
                     }
                 </>
                 }
@@ -231,16 +235,18 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     {isConfirmingApproval && !isConfirmingRelease ?
                         <ConfirmFundingApproval
                             canApproveFunding={canApproveFunding}
-                            specificationSummary={specificationSummary as SpecificationSummary}
+                            specificationSummary={specificationSummary}
                             publishedProviderResults={publishedProviderResults}
                             handleBack={handleBack}
+                            addError={addErrorMessage}
                         />
                         :
                         <ConfirmFundingRelease
                             canReleaseFunding={canReleaseFunding}
-                            specificationSummary={specificationSummary as SpecificationSummary}
+                            specificationSummary={specificationSummary}
                             publishedProviderResults={publishedProviderResults}
                             handleBack={handleBack}
+                            addError={addErrorMessage}
                         />
                     }
                 </>
