@@ -235,11 +235,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
 
     useEffect(() => {
         if (fundingLines.length !== 0) {
-            if (fundingLinesOriginalData.length === 0) {
-
                 setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
                 setFundingLinesOriginalData(fundingLines);
-            }
         }
     }, [fundingLines]);
 
