@@ -307,7 +307,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                                         </dd>
                                                         <dd className="govuk-summary-list__actions">
                                                             <Link
-                                                                to={`/Approvals/ProviderFundingOverview/${match.params.specificationId}/${match.params.providerId}/${match.params.providerVersionId}/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${p.lastUpdatedUser.id}`}>
+                                                                to={`/Approvals/ProviderFundingOverview/${match.params.specificationId}/${match.params.providerId}/${match.params.providerVersionId}/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${p.fundingLineCode}`}>
                                                                 Change
                                                             </Link>
                                                         </dd>
