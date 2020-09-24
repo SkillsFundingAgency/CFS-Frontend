@@ -1,7 +1,7 @@
 import * as React from "react";
 import {useState} from "react";
 
-export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }) {
+export function CollapsibleSearchBox(props: { searchTerm: string, callback: (searchField: string, searchTerm: string) => void }) {
     const callback = props.callback;
     const [expandedProvider, setExpandedProvider] = useState(true);
     const [expandedUKPRN, setExpandedUKPRN] = useState(false);
@@ -38,7 +38,7 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
             className="govuk-radios govuk-radios--small govuk-radios--conditional sidebar-overflow-visible"
             data-module="govuk-radios">
             <div className="govuk-radios__item">
-                <input onClick={expandSearchProvider}
+                <input onChange={expandSearchProvider}
                        className="govuk-radios__input" id="search-options-providers"
                        name="search-options" type="radio" checked={expandedProvider}
                        aria-controls="conditional-search-options-provider" aria-expanded="false">
@@ -49,15 +49,18 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                     Provider name
                 </label>
             </div>
-            <div className={`govuk-radios__conditional ${!expandedProvider? "govuk-radios__conditional--hidden" : ""}`}
-                 id="conditional-search-options-provider">
+            {expandedProvider &&
+            <div className={`govuk-radios__conditional`}>
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="text" onChange={(e) => callback({searchField: "providerName", searchTerm: e.target.value})} />
+                           id={"providerName"}
+                           data-testid={"providerName"}
+                           type="text" onChange={(e) => callback("providerName", e.target.value)}/>
                 </div>
             </div>
+            }
             <div className="govuk-radios__item">
-                <input onClick={expandSearchUKPRN} className="govuk-radios__input" id="search-options-UKPRN"
+                <input onChange={expandSearchUKPRN} className="govuk-radios__input" id="search-options-UKPRN"
                        name="search-options" type="radio" checked={expandedUKPRN}
                        aria-controls="conditional-search-options-UKPRN"
                        aria-expanded="true">
@@ -68,16 +71,18 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                     UKPRN
                 </label>
             </div>
-            <div className={`govuk-radios__conditional ${!expandedUKPRN? "govuk-radios__conditional--hidden" : ""}`}
-                 id="conditional-search-options-UKPRN">
+            {expandedUKPRN &&
+            <div className={`govuk-radios__conditional`}>
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="number" onChange={(e) => callback({searchField: "ukprn", searchTerm: e.target.value})} />
+                           id={"ukprn"}
+                           data-testid={"ukprn"}
+                           type="number" onChange={(e) => callback("ukprn", e.target.value)}/>
                 </div>
-
             </div>
+            }
             <div className="govuk-radios__item">
-                <input onClick={expandSearchUPIN} className="govuk-radios__input" id="search-options-UPIN"
+                <input onChange={expandSearchUPIN} className="govuk-radios__input" id="search-options-UPIN"
                        name="search-options" type="radio" checked={expandedUPIN}
                        aria-controls="conditional-search-options-UPIN"
                        aria-expanded="false">
@@ -88,16 +93,19 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                     UPIN
                 </label>
             </div>
-            <div className={`govuk-radios__conditional ${!expandedUPIN? "govuk-radios__conditional--hidden" : ""}`}
-                 id="conditional-search-options-UPIN">
+            {expandedUPIN &&
+            <div className={`govuk-radios__conditional`}>
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="number" onChange={(e) => callback({searchField: "upin", searchTerm: e.target.value})} />
+                           id={"upin"}
+                           data-testid={"upin"}
+                           type="number" onChange={(e) => callback("upin", e.target.value)}/>
                 </div>
             </div>
+            }
             <div className="govuk-radios__item">
-                <input onClick={expandSearchURN} className="govuk-radios__input" id="search-options-URN"
-                       name="search-options" type="radio" checked={expandedUPIN}
+                <input onChange={expandSearchURN} className="govuk-radios__input" id="search-options-URN"
+                       name="search-options" type="radio" checked={expandedURN}
                        aria-controls="conditional-search-options-URN"
                        aria-expanded="false">
 
@@ -107,13 +115,16 @@ export function CollapsibleSearchBox(props: { searchTerm: string, callback:any }
                     URN
                 </label>
             </div>
-            <div className={`govuk-radios__conditional ${!expandedURN? "govuk-radios__conditional--hidden" : ""}`}
-                 id="conditional-search-options-URN">
+            {expandedURN &&
+            <div className={`govuk-radios__conditional`}>
                 <div className="govuk-form-group">
                     <input className="govuk-input sidebar-search-input"
-                           type="number" onChange={(e) => callback({searchField: "urn", searchTerm: e.target.value})} />
+                           id={"urn"}
+                           data-testid={"urn"}
+                           type="number" onChange={(e) => callback("urn", e.target.value)}/>
                 </div>
             </div>
+            }
         </div>
     );
-};
+}

@@ -97,7 +97,7 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
             setTransform("");
             sendSelectedNodeInfo(focusNodeId);
             setTimeout(() => {
-                (itemRefs.current as any)[focusNodeId].current.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
+                (itemRefs.current as any)[focusNodeId].current?.scrollIntoView({behavior: "smooth", block: "center", inline: "center"});
             }, 500);
         }, [focusNodeId]); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -86,13 +86,13 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         props.setSearchCriteria({...props.searchCriteria, providerSubType: filterUpdate, pageNumber: 1});
     }
 
-    function changeSearchTextFilter(searchData: any) {
-        if ((searchData.searchTerm.length === 0 && props.searchCriteria.searchTerm.length !== 0) || searchData.searchTerm.length > 2) {
+    function changeSearchTextFilter(searchField: string, searchTerm: string) {
+        if ((searchTerm.length === 0 && props.searchCriteria.searchTerm.length !== 0) || searchTerm.length > 2) {
             let searchFields: string[] = [];
-            if (searchData.searchField != null && searchData.searchField !== "") {
-                searchFields.push(searchData.searchField);
+            if (searchField != null && searchField !== "") {
+                searchFields.push(searchField);
             }
-            props.setSearchCriteria({...props.searchCriteria, searchTerm: searchData.searchTerm, searchFields: searchFields, pageNumber: 1});
+            props.setSearchCriteria({...props.searchCriteria, searchTerm: searchTerm, searchFields: searchFields, pageNumber: 1});
         }
     }
 
