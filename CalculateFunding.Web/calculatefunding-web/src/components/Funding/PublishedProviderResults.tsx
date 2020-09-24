@@ -94,8 +94,9 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                 </tr>
                 </thead>
                 <tbody>
-                {props.providerSearchResults.providers.map(provider =>
+                {props.providerSearchResults.providers.map((provider, i) =>
                     <PublishedProviderRow
+                        key={`provider-${i}`}
                         publishedProvider={provider}
                         specProviderVersionId={props.specProviderVersionId}
                         enableSelection={props.enableBatchSelection}

@@ -10,7 +10,7 @@ import {LoadingStatus} from "../LoadingStatus";
 export interface ISpecificationJobMonitorProps {
     specificationId: string,
     isJobRunning: boolean,
-    setIsJobRunning:  (is: boolean) => void,
+    setIsJobRunning: (is: boolean) => void,
     isInitialising: boolean,
     setIsInitialising: (is: boolean) => void,
     addError: (errorMessage: string, fieldName?: string) => void,
@@ -63,6 +63,9 @@ export function SpecificationJobMonitor(props: ISpecificationJobMonitorProps) {
         const hubConnect = new HubConnectionBuilder()
             .withUrl(`/api/notifications`)
             .build();
+        hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
+        hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
+
         try {
             await hubConnect.start();
             hubConnect.on('NotificationEvent', (job: JobMessage) => {
@@ -88,7 +91,7 @@ export function SpecificationJobMonitor(props: ISpecificationJobMonitorProps) {
             await checkForExistingRunningJob();
         }
     }
-    
+
     function getJobProgressMessage(job: JobSummary) {
         switch (job.jobType) {
             case "RefreshFundingJob":
@@ -113,10 +116,10 @@ export function SpecificationJobMonitor(props: ISpecificationJobMonitorProps) {
     if (props.isInitialising || props.isJobRunning) {
         return (
             <LoadingStatus title={`Job running: ${latestJob ? getJobProgressMessage(latestJob) : "Checking for jobs..."} `}
-                           subTitle={props.isInitialising ? 
-                               "Searching for any running jobs" : 
-                               "Monitoring job progress. Please wait, this could take several minutes"}
-                           testid='loadingJobs'/>
+                subTitle={props.isInitialising ?
+                    "Searching for any running jobs" :
+                    "Monitoring job progress. Please wait, this could take several minutes"}
+                testid='loadingJobs' />
         );
     } else {
         return null;
