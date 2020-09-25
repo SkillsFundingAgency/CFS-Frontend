@@ -11,7 +11,8 @@ export interface IConfirmFundingApprovalProps {
     publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
     canApproveFunding: boolean | undefined,
-    handleBack: any,
+    handleBack: () => void,
+    checkForJobs: () => void,
     addError: (errorMessage: string, fieldName?: string) => void,
 }
 
@@ -26,16 +27,17 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
         setIsLoadingApproval(true);
         try {
             await approveFundingService(props.specificationSummary.id);
-        } catch (e) {
-            props.addError("An error occured whilst calling the server to confirm approval: " + e);
-        } finally {
             setIsLoadingApproval(false);
+            props.checkForJobs();
+        } catch (e) {
+            setIsLoadingApproval(false);
+            props.addError("An error occured whilst calling the server to confirm approval: " + e);
         }
     }
 
     if (isLoadingApproval) {
         return (
-            <div className="govuk-grid-column-two-thirds">
+            <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
                 <LoadingStatus title={"Approving..."} description={"Please wait"}/>
             </div>
         );

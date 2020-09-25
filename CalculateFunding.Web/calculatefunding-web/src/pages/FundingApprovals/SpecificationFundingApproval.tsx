@@ -144,6 +144,13 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         });
     }
 
+    function checkForJobs() {
+        setConfirmApproval(false);
+        setConfirmRelease(false);
+        clearErrorMessages();
+        setIsInitialisingJobMonitor(true);
+    }
+
     function handleBack() {
         setConfirmApproval(false);
         setConfirmRelease(false);
@@ -191,8 +198,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     specificationId={specificationId}
                     isJobRunning={isJobRunning}
                     setIsJobRunning={setIsJobRunning}
-                    isInitialising={isInitialisingJobMonitor}
-                    setIsInitialising={setIsInitialisingJobMonitor}
+                    isCheckingForJobs={isInitialisingJobMonitor}
+                    setIsCheckingForJobs={setIsInitialisingJobMonitor}
                     addError={addErrorMessage}
                 />
 
@@ -229,7 +236,6 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     }
                 </>
                 }
-
                 {!isLoadingResults && specificationSummary &&
                 <>
                     {isConfirmingApproval && !isConfirmingRelease ?
@@ -238,6 +244,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             specificationSummary={specificationSummary}
                             publishedProviderResults={publishedProviderResults}
                             handleBack={handleBack}
+                            checkForJobs={checkForJobs}
                             addError={addErrorMessage}
                         />
                         :
@@ -246,6 +253,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             specificationSummary={specificationSummary}
                             publishedProviderResults={publishedProviderResults}
                             handleBack={handleBack}
+                            checkForJobs={checkForJobs}
                             addError={addErrorMessage}
                         />
                     }

@@ -55,7 +55,15 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
             removeProvidersFromFundingSelection([providerId]));
     };
 
-    async function handleRefreshFunding() {
+    async function handleApprove() {
+        props.setConfirmApproval(true);
+    }
+    
+    async function handleRelease() {
+        props.setConfirmRelease(true);
+    }
+    
+    async function handleRefresh() {
         setIsLoadingRefresh(true);
         try {
             await refreshFundingService(props.specificationId);
@@ -139,15 +147,15 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                     <div className="right-align">
                         <button className="govuk-button govuk-!-margin-right-1"
                                 disabled={!props.canRefreshFunding}
-                                onClick={handleRefreshFunding}>Refresh funding
+                                onClick={handleRefresh}>Refresh funding
                         </button>
                         <button className="govuk-button govuk-!-margin-right-1"
                                 disabled={!props.providerSearchResults.canApprove || !props.canApproveFunding}
-                                onClick={() => props.setConfirmRelease(true)}>Approve funding
+                                onClick={handleApprove}>Approve funding
                         </button>
                         <button className="govuk-button govuk-button--warning"
                                 disabled={!props.providerSearchResults.canPublish || !props.canReleaseFunding}
-                                onClick={() => props.setConfirmApproval(true)}>Release funding
+                                onClick={handleRelease}>Release funding
                         </button>
                     </div>
                 </>

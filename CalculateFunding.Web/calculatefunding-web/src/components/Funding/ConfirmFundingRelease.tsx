@@ -11,7 +11,8 @@ export interface IConfirmFundingReleaseProps {
     publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
     canReleaseFunding: boolean | undefined,
-    handleBack: any,
+    handleBack: () => void,
+    checkForJobs: () => void,
     addError: (errorMessage: string, fieldName?: string) => void,
 }
 
@@ -22,10 +23,11 @@ export function ConfirmFundingRelease(props: IConfirmFundingReleaseProps) {
         setIsLoadingRelease(true);
         try {
             await releaseFundingService(props.specificationSummary.id);
-        } catch (e) {
-            props.addError("An error occured whilst calling the server to confirm release: " + e);
-        } finally {
             setIsLoadingRelease(false);
+            props.checkForJobs();
+        } catch (e) {
+            setIsLoadingRelease(false);
+            props.addError("An error occured whilst calling the server to confirm release: " + e);
         }
     }
 
@@ -36,7 +38,7 @@ export function ConfirmFundingRelease(props: IConfirmFundingReleaseProps) {
 
     if (isLoadingRelease) {
         return (
-            <div className="govuk-grid-column-two-thirds">
+            <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
                 <LoadingStatus title={"Releasing..."} description={"Please wait"}/>
             </div>
         );

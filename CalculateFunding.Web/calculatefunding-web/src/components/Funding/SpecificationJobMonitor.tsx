@@ -11,8 +11,8 @@ export interface ISpecificationJobMonitorProps {
     specificationId: string,
     isJobRunning: boolean,
     setIsJobRunning: (is: boolean) => void,
-    isInitialising: boolean,
-    setIsInitialising: (is: boolean) => void,
+    isCheckingForJobs: boolean,
+    setIsCheckingForJobs: (is: boolean) => void,
     addError: (errorMessage: string, fieldName?: string) => void,
 }
 
@@ -21,14 +21,15 @@ export function SpecificationJobMonitor(props: ISpecificationJobMonitorProps) {
     const [latestJob, setLatestJob] = useState<JobSummary>();
 
     useEffect(() => {
-        props.setIsInitialising(true);
-        checkForExistingRunningJob();
-    }, []);
+        if (props.isCheckingForJobs) {
+            checkForExistingRunningJob();
+        }
+    }, [props.isCheckingForJobs]);
 
     async function checkForExistingRunningJob() {
         getJobStatusUpdatesForSpecification(props.specificationId, jobTypes)
             .then((result) => {
-                props.setIsInitialising(false);
+                props.setIsCheckingForJobs(false);
                 if (result.data && result.data.length > 0) {
                     const runningJob = result.data.find((item) => item !== null && item.runningStatus !== RunningStatus.Completed);
                     if (runningJob) {
@@ -113,10 +114,10 @@ export function SpecificationJobMonitor(props: ISpecificationJobMonitorProps) {
         }
     }
 
-    if (props.isInitialising || props.isJobRunning) {
+    if (props.isCheckingForJobs || props.isJobRunning) {
         return (
             <LoadingStatus title={`Job running: ${latestJob ? getJobProgressMessage(latestJob) : "Checking for jobs..."} `}
-                subTitle={props.isInitialising ?
+                subTitle={props.isCheckingForJobs ?
                     "Searching for any running jobs" :
                     "Monitoring job progress. Please wait, this could take several minutes"}
                 testid='loadingJobs' />
