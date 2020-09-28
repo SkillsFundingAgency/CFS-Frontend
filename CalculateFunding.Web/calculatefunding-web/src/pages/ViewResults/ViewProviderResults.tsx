@@ -415,9 +415,9 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                     <span className="govuk-caption-m govuk-!-margin-bottom-4">UKPRN: <strong>{providerDetails.ukprn}</strong></span>
                 </div>
             </div>
-            <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === ""} />
-            <NoData hidden={isLoading.providerResults || specificationSummary.id !== ""}/>
-            <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === ""}>
+            <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === "" || isLoading.providerDetails} />
+            <NoData hidden={isLoading.providerResults || specificationSummary.id !== "" || isLoading.providerDetails}/>
+            <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === "" || isLoading.providerDetails}>
                 <div className="govuk-grid-column-two-thirds">
                     <div className="govuk-form-group">
                         <h3 className="govuk-heading-m govuk-!-margin-bottom-1">Specification</h3>
@@ -437,7 +437,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                     </p>
                 </div>
             </div>
-            <div className="govuk-grid-row" hidden={specificationSummary.id === ""}>
+            <div className="govuk-grid-row" hidden={specificationSummary.id === "" || isLoading.providerDetails}>
                 <div className="govuk-grid-column-full">
                     <Tabs initialTab={"funding-line-structure"}>
                         <ul className="govuk-tabs__list">
