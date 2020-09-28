@@ -79,6 +79,12 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
             .then((relationshipResult) => {
                 const relationship = relationshipResult.data as DatasourceRelationshipResponseViewModel;
                 setDatasourceVersions(relationship);
+                relationship.datasets.forEach(x => {
+                    if(x.selectedVersion !== null)
+                    {
+                        setSelectedDataset(x.id);
+                    }
+                });
                 return getSpecificationSummaryService(relationship.specificationId);
             })
             .then((specResult) => {
@@ -245,6 +251,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                         aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false"
                                                         value={d.id}
                                                         disabled={!allowToMapDatasets}
+                                                        defaultChecked={d.selectedVersion !== null}
                                                         onChange={(e) => populateVersions(e)} />
                                                     <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
                                                         {d.name}
@@ -265,6 +272,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                                     <div className="govuk-radios__item" key={index}>
                                                                         <input className="govuk-radios__input" id={`datasource-${v.id}`}
                                                                             name={`datasource-${v.id}`} type="radio" value={`${d.id}_${v.version}`}
+                                                                            defaultChecked={d.selectedVersion === v.version}
                                                                             onChange={(e) => saveSelection(e)} />
                                                                         <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.id}`}>
                                                                             {d.name} (version {v.version})
