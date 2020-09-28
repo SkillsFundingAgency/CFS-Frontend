@@ -267,8 +267,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
             setCanTimetableBeUpdated(true);
 
-            const fundingLineStructureResponse = await getFundingLineStructureService(spec.id, spec.fundingPeriod.id, spec.fundingStreams[0].id);
-            const fundingStructureItem = fundingLineStructureResponse.data as IFundingStructureItem[];
+            const fundingStructureItem = (await getFundingLineStructureService(spec.id, spec.fundingPeriod.id, spec.fundingStreams[0].id)).data;
             setFundingLines(fundingStructureItem);
             setFundingLinePublishStatus(spec.approvalStatus as PublishStatus);
         } catch (err) {

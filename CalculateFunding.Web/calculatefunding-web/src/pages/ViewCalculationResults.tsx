@@ -276,7 +276,10 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         <h1 className="govuk-heading-xl">{calculationSummary.calculation.name}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
                         <JobSummaryDetails jobSummary={jobSummary} hidden={jobSummary.jobId === ""}/>
-                        <Link to={`/Specifications/Edit${calculationSummary.calculation.calculationType}Calculation/${calculationSummary.calculation.id}/${calculationSummary.calculation.name}`} className="govuk-button" role="button">View calculation</Link>
+                        <Link to={`/Specifications/Edit${calculationSummary.calculation.calculationType}Calculation/${calculationSummary.calculation.id}`}
+                              className="govuk-button" role="button">
+                            View calculation
+                        </Link>
                     </div>
                 </div>
                 <div className="govuk-grid-row">

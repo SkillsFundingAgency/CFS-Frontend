@@ -33,8 +33,10 @@ import {
     updateFundingLineExpandStatus
 } from "../../components/fundingLineStructure/FundingLineStructure";
 import {
-    GetFundingStructuresWithCalculationResultService
+    getFundingStructuresWithCalculationResultService
 } from "../../services/fundingStructuresService";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {ErrorMessage} from "../../types/ErrorMessage";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
@@ -46,13 +48,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const [templateCalculationsSearchTerm] = useState('');
     const [additionalStatusFilter, setAdditionalStatusFilter] = useState("All");
     const [downloadableReports, setDownloadableReports] = useState<ReportMetadataViewModel[]>([]);
-    const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
+    const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(false);
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
-    const [errors, setErrors] = useState<string[]>([]);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
+    const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const fundingLineStepReactRef = useRef(null);
 
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
@@ -65,21 +67,20 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         dispatch(getTemplateCalculations(specificationId, "All", 1, templateCalculationsSearchTerm));
         dispatch(getAdditionalCalculations(specificationId, "All", 1, additionalCalculationsSearchTerm));
 
-        const getLiveDownloadableReports = async () => {
-            return getDownloadableReportsService(specificationId);
-        };
-
-        getLiveDownloadableReports().then((result) => {
-            if (result.status === 200) {
-                let response = result.data as ReportMetadataViewModel[];
-                setDownloadableReports(response);
-            }
-        });
+        getDownloadableReportsService(specificationId)
+            .then((result) => {
+                    let response = result.data as ReportMetadataViewModel[];
+                    setDownloadableReports(response);
+            });
     }, [specificationId]);
 
     useEffect(() => {
-        fetchData();
-    }, [specificationResults]);
+        if (specificationResults.specification &&
+            specificationResults.specification.fundingPeriod &&
+            specificationResults.specification.fundingStreams[0]) {
+            fetchData();
+        }
+    }, [specificationResults.specification]);
 
     function updateAdditionalCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
@@ -117,21 +118,34 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     }, [fundingLines]);
 
     const fetchData = async () => {
-        if (specificationResults.specification != undefined && specificationResults.specification.fundingPeriod != undefined
-        && specificationResults.specification.fundingStreams[0] != undefined) {
+        if (specificationResults.specification &&
+            specificationResults.specification.fundingPeriod &&
+            specificationResults.specification.fundingStreams[0]) {
             try {
                 setIsLoadingFundingLineStructure(true);
-                const fundingLineStructureResponse = await GetFundingStructuresWithCalculationResultService(specificationResults.specification.id,
-                    specificationResults.specification.fundingPeriod.id, specificationResults.specification.fundingStreams[0].id);
+                const fundingLineStructureResponse = await getFundingStructuresWithCalculationResultService(
+                    specificationResults.specification.id,
+                    specificationResults.specification.fundingPeriod.id,
+                    specificationResults.specification.fundingStreams[0].id);
                 const fundingStructureItem = fundingLineStructureResponse.data as IFundingStructureItem[];
                 setFundingLines(fundingStructureItem);
             } catch (err) {
                 setFundingLineStructureError(true);
-                setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
+                addErrorMessage(`A problem occurred while loading funding line structure: ${err}`);
             } finally {
                 setIsLoadingFundingLineStructure(false);
             }
         }
+    };
+
+    function addErrorMessage(errorMessage: string, fieldName?: string) {
+        const errorCount: number = errors.length;
+        const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
+        setErrors(errors => [...errors, error]);
+    }
+
+    function clearErrorMessages() {
+        setErrors([]);
     }
 
     return <div>
@@ -139,28 +153,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         <div className="govuk-width-container">
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View results"} url={"/results"} />
+                <Breadcrumb name={"View results"} url={"/results"}/>
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
-                <Breadcrumb name={specificationResults.specification.name} />
+                <Breadcrumb name={specificationResults.specification.name}/>
             </Breadcrumbs>
-            {errors.length > 0 &&
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column">
-                    <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
-                        <h2 className="govuk-error-summary__title" id="error-summary-title">
-                            There is a problem
-                        </h2>
-                        <div className="govuk-error-summary__body">
-                            <ul className="govuk-list govuk-error-summary__list">
-                                {errors.map((error, i) =>
-                                    <li key={i}>{error}</li>
-                                )}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            }
+            
+            <MultipleErrorSummary errors={errors} />
+            
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
@@ -346,9 +345,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                                 utc={false} date={dlr.lastModified}/></span>
                                                             </p>
                                                         </div>
-                                                    <div className="govuk-clearfix"></div>
+                                                        <div className="govuk-clearfix"></div>
                                                     </div>
-
                                                 )}
                                             </div>
                                             <div hidden={downloadableReports.filter(dr => dr.category === "History").length === 0}>
@@ -358,7 +356,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         <div className="attachment__thumbnail">
                                                             <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
                                                                aria-hidden="true">
-                                                            <svg
+                                                                <svg
                                                                     className="attachment__thumbnail-image thumbnail-image-small "
                                                                     version="1.1" viewBox="0 0 99 140" width="99"
                                                                     height="140"

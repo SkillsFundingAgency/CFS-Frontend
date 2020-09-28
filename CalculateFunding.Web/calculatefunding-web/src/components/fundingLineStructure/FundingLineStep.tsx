@@ -7,6 +7,7 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
     let fundingType: string = "";
+    
     const parentFundingLineName :string = fundingStructureItems && fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
     return <div>
         {
@@ -20,8 +21,8 @@ export function FundingLineStep(props: { fundingStructureItem: IFundingStructure
                     let linkValue = "";
                     if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId !== '') {
                         linkValue = props.showResults ?
-                            encodeURI(`/ViewCalculationResults/${innerFundingLineItem.calculationId}/${parentFundingLineName}`) :
-                            encodeURI(`/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${parentFundingLineName}`) ;
+                            `/ViewCalculationResults/${innerFundingLineItem.calculationId}` :
+                            `/Specifications/EditTemplateCalculation/${innerFundingLineItem.calculationId}/${encodeURI(parentFundingLineName)}`;
                     }
                     return (
                         <CollapsibleSteps

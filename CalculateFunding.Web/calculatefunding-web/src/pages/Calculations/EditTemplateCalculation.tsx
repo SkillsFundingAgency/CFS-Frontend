@@ -39,10 +39,10 @@ export interface EditTemplateCalculationProps {
 
 export interface EditTemplateCalculationRouteProps {
     calculationId: string;
-    fundingLineItem: string;
 }
 
-export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteComponentProps<EditTemplateCalculationRouteProps> & EditTemplateCalculationProps) {
+export function EditTemplateCalculation({match, excludeMonacoEditor}:
+                                            RouteComponentProps<EditTemplateCalculationRouteProps> & EditTemplateCalculationProps) {
     const [renderMonacoEditor] = useState<boolean>(!excludeMonacoEditor);
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
@@ -97,6 +97,8 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
     const [calculationError, setCalculationError] = useState<string>();
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingUpdate, setIsLoadingUpdate] = useState(false);
+    const [isLoadingCircularDependencies, setIsLoadingCircularDependencies] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string>("");
     const [circularReferenceErrors, setCircularReferenceErrors] = useState<CircularReferenceError[]>([]);
     const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
@@ -128,13 +130,19 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                 setSpecificationSummary(spec);
                 setSpecificationId(spec.id);
 
-                const circularDependenciesResponse = await getCalculationCircularDependencies(spec.id);
-                const circularDependencies = circularDependenciesResponse.data as CircularReferenceError[];
-                if (circularDependencies.length > 0) {
-                    setCircularReferenceErrors(circularDependencies);
-                    setIsBuildingCalculationCode(false);
-                    window.scrollTo(0, 0);
-                }
+                setIsLoadingCircularDependencies(true);
+                getCalculationCircularDependencies(spec.id)
+                    .then(response => {
+                            setIsLoadingCircularDependencies(false);
+                            const circularDependencies = response.data as CircularReferenceError[];
+                            if (circularDependencies.length > 0) {
+                                setCircularReferenceErrors(circularDependencies);
+                                setIsBuildingCalculationCode(false);
+                                window.scrollTo(0, 0);
+                            }
+                        }
+                    ).catch(err => !calculationError || calculationError.length === 0 ?
+                            setCalculationError(`Error whilst checking for circular dependencies: ${err}`) : null);
             } catch {
                 setCalculationError("There is a problem loading this calculation. Please try again.");
             } finally {
@@ -159,7 +167,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
 
         setFormValid({formSubmitted: true, formValid: true});
 
-        setIsLoading(true);
+        setIsLoadingUpdate(true);
         setIsSaving(true);
 
         let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
@@ -177,13 +185,13 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                 }
             })
             .finally(() => {
-                setIsLoading(false);
+                setIsLoadingUpdate(false);
                 setIsSaving(false);
             });
     }
 
     function approveTemplateCalculation() {
-        setIsLoading(true);
+        setIsLoadingUpdate(true);
         setCalculationError("");
 
         getIsUserAllowedToApproveCalculationService(calculationId)
@@ -206,10 +214,10 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                     }
                 }
             }).catch(() => {
-                setCalculationError("There is a problem, calculation can not be approved, please try again");
-            }).finally(() => {
-                setIsLoading(false);
-            });
+            setCalculationError("There is a problem, calculation can not be approved, please try again");
+        }).finally(() => {
+            setIsLoadingUpdate(false);
+        });
     }
 
     async function buildCalculation() {
@@ -256,20 +264,20 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
     }
 
     return <div>
-        <Header location={Section.Specifications} />
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"} />
-                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
-                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`} />
-                <Breadcrumb name={"Edit template calculation"} />
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
+                <Breadcrumb name={"Edit template calculation"}/>
             </Breadcrumbs>
-            <LoadingStatus title={"Updating template calculation"} hidden={!isLoading}
-                subTitle={"Please wait whilst the calculation is updated"} />
+            <LoadingStatus title={isLoadingUpdate ? "Updating template calculation" : "Loading"} hidden={!isLoading && !isLoadingUpdate}
+                           subTitle={isLoadingUpdate ? "Please wait whilst the calculation is updated" : "Please wait..."}/>
 
             <div hidden={(calculationError == null || calculationError === "" || isLoading)}
-                className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                data-module="govuk-error-summary">
+                 className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                 data-module="govuk-error-summary">
                 <h2 className="govuk-error-summary__title">
                     There is a problem
                 </h2>
@@ -282,7 +290,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                 </div>
             </div>
 
-            <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3} />
+            <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3}/>
 
             <fieldset className="govuk-fieldset" hidden={isLoading}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -291,7 +299,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                     </h1>
                 </legend>
                 <div id="calculation-status"
-                    className={"govuk-form-group" + (calculationError != null && calculationError !== "" ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (calculationError != null && calculationError !== "" ? " govuk-form-group--error" : "")}>
                     <span className="govuk-error-message">
                         <span className="govuk-visually-hidden">Error:</span> {calculationError}
                     </span>
@@ -309,16 +317,9 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
 
                 <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="sort">
-                        Funding line
-                    </label>
-                    <h2 className="govuk-heading-m">{match.params.fundingLineItem}</h2>
-                </div>
-
-                <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="sort">
                         Last saved
                     </label>
-                    <h2 className="govuk-heading-m"><DateFormatter date={templateCalculationLastUpdated} utc={false} /></h2>
+                    <h2 className="govuk-heading-m"><DateFormatter date={templateCalculationLastUpdated} utc={false}/></h2>
                     <Link to={`/Calculations/CalculationVersionHistory/${calculationId}`} className="govuk-link">View calculation history</Link>
                 </div>
 
@@ -328,41 +329,41 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                         Calculation script
                     </label>
                     {renderMonacoEditor && <GdsMonacoEditor specificationId={specificationId}
-                        calculationType="TemplateCalculations"
-                        value={templateCalculationSourceCode}
-                        language="vbs"
-                        change={updateSourceCode}
-                        minimap={true}
-                        key={'1'}
-                        calculationName={templateCalculationName}
-                        fundingStreamId={templateCalculationFundingStreamId}
+                                                            calculationType="TemplateCalculations"
+                                                            value={templateCalculationSourceCode}
+                                                            language="vbs"
+                                                            change={updateSourceCode}
+                                                            minimap={true}
+                                                            key={'1'}
+                                                            calculationName={templateCalculationName}
+                                                            fundingStreamId={templateCalculationFundingStreamId}
                     />}
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
-                        data-testid="build"
-                        onClick={buildCalculation} disabled={isBuildingCalculationCode}>
+                            data-testid="build"
+                            onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation
                     </button>
-                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode} />
+                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
                 </div>
                 <div className="govuk-form-group">
-                    <CalculationResultsLink calculationId={calculationId} />
+                    <CalculationResultsLink calculationId={calculationId}/>
                 </div>
                 {templateCalculationBuildSuccess.buildSuccess &&
-                    <div className="govuk-panel govuk-panel--confirmation">
-                        <div className="govuk-panel__body">
-                            Build successful
+                <div className="govuk-panel govuk-panel--confirmation">
+                    <div className="govuk-panel__body">
+                        Build successful
                     </div>
-                    </div>}
+                </div>}
                 {isDirty && templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess &&
-                    <div className={"govuk-form-group" +
-                        ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ?
-                            " govuk-form-group--error" : "")}>
-                        <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
-                    </div>}
+                <div className={"govuk-form-group" +
+                ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ?
+                    " govuk-form-group--error" : "")}>
+                    <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
+                </div>}
                 {isDirty &&
-                    <div className="govuk-form-group">
-                        <div className="govuk-body">Your calculation must be saved before you can approve it</div>
-                    </div>}
+                <div className="govuk-form-group">
+                    <div className="govuk-body">Your calculation must be saved before you can approve it</div>
+                </div>}
                 <div
                     hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
@@ -376,24 +377,24 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                         <div className="govuk-error-summary__body">
                             <table className={"govuk-table"}>
                                 <thead className={"govuk-table__head"}>
-                                    <tr className={"govuk-table__row"}>
-                                        <th className="govuk-table__header">Error message</th>
-                                        <th className="govuk-table__header">Start line</th>
-                                        <th className="govuk-table__header">Start char</th>
-                                        <th className="govuk-table__header">End line</th>
-                                        <th className="govuk-table__header">End char</th>
-                                    </tr>
+                                <tr className={"govuk-table__row"}>
+                                    <th className="govuk-table__header">Error message</th>
+                                    <th className="govuk-table__header">Start line</th>
+                                    <th className="govuk-table__header">Start char</th>
+                                    <th className="govuk-table__header">End line</th>
+                                    <th className="govuk-table__header">End char</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    {templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
-                                        <tr key={index} className={"govuk-table__row"}>
-                                            <td className="govuk-table__cell">{cm.message}</td>
-                                            <td className="govuk-table__cell">{cm.location.startLine}</td>
-                                            <td className="govuk-table__cell">{cm.location.startChar}</td>
-                                            <td className="govuk-table__cell">{cm.location.endLine}</td>
-                                            <td className="govuk-table__cell">{cm.location.endChar}</td>
-                                        </tr>
-                                    )}
+                                {templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
+                                    <tr key={index} className={"govuk-table__row"}>
+                                        <td className="govuk-table__cell">{cm.message}</td>
+                                        <td className="govuk-table__cell">{cm.location.startLine}</td>
+                                        <td className="govuk-table__cell">{cm.location.startChar}</td>
+                                        <td className="govuk-table__cell">{cm.location.endLine}</td>
+                                        <td className="govuk-table__cell">{cm.location.endChar}</td>
+                                    </tr>
+                                )}
                                 </tbody>
                             </table>
                             <ul className="govuk-error-summary__list">
@@ -402,14 +403,19 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                         </div>
                     </div>
                 </div>
+                {isLoadingCircularDependencies &&
+                <div className="govuk-!-margin-bottom-4">
+                    <LoadingFieldStatus title={"Checking for circular dependencies..."}/>
+                </div>
+                }
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={submitTemplateCalculation}
-                    disabled={!isDirty || isSaving || !templateCalculationBuildSuccess.buildSuccess}>
+                        onClick={submitTemplateCalculation}
+                        disabled={!isDirty || isSaving || !templateCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={approveTemplateCalculation}
-                    disabled={isDirty || templateCalculationStatus === PublishStatus.Approved}>
+                        onClick={approveTemplateCalculation}
+                        disabled={isDirty || isLoadingCircularDependencies || templateCalculationStatus === PublishStatus.Approved}>
                     Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">
@@ -417,6 +423,6 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}: RouteCompo
                 </Link>
             </fieldset>
         </div>
-        <Footer />
+        <Footer/>
     </div>
 }

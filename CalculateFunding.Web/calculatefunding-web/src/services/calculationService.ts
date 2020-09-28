@@ -3,7 +3,6 @@ import {CalculationSearchRequestViewModel} from "../types/CalculationSearchReque
 import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
 import {CalculationSummary} from "../types/CalculationSummary";
-import {Specification} from "../types/viewFundingTypes";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 
 export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel): Promise<AxiosResponse<CalculationSummary>> {
@@ -144,3 +143,4 @@ export async function getCalculationCircularDependencies(specificationId: string
         }
     })
 }
+
