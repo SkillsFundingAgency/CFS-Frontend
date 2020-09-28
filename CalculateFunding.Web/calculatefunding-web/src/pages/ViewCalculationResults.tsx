@@ -384,7 +384,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                                        key={cpr.id} autoExpand={autoExpand}>
                                     <div id={"accordion-default-content-" + cpr.id}
                                          className="govuk-accordion__section-content">
-                                        <Link to={`/ViewResults/ViewProviderResults/${cpr.providerId}?specificationId=${cpr.specificationId}`} className="govuk-link">
+                                        <Link to={`/ViewResults/ViewProviderResults/${cpr.providerId}/${calculationSummary.calculation.fundingStreamId}/?specificationId=${cpr.specificationId}`} className="govuk-link">
                                             View provider calculations
                                         </Link>
                                         <dl className="govuk-summary-list govuk-!-margin-top-5">
