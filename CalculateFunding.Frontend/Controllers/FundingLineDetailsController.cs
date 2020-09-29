@@ -1,8 +1,10 @@
 ﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
+using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -106,6 +108,30 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetCurrentProfileConfig));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(fundingLineApiResponse.Content);
+        }
+
+        [HttpGet]
+        [Route("api/publishedproviderfundingstructure/{publishedProviderVersionId}")]
+        public async Task<IActionResult> GetPublishedProviderFundingStructure(
+        [FromRoute] string publishedProviderVersionId)
+        {
+            string etag = Request.ReadETagHeaderValue();
+            ApiResponse<PublishedProviderFundingStructure> fundingLineApiResponse = await _publishingApiClient
+                .GetPublishedProviderFundingStructure(publishedProviderVersionId, etag);
+
+            if (fundingLineApiResponse.StatusCode == HttpStatusCode.NotModified)
+            {
+                return new StatusCodeResult(304);
+            }
+
+            IActionResult errorResult =
+                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetPublishedProviderFundingStructure));
             if (errorResult != null)
             {
                 return errorResult;
