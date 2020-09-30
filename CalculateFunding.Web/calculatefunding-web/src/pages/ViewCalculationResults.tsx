@@ -17,14 +17,12 @@ import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 import {SearchMode} from "../types/SearchMode";
-import {getJobStatusUpdatesForSpecification} from "../services/jobService";
-import {JobSummary} from "../types/jobSummary";
-import {HubConnectionBuilder} from "@microsoft/signalr";
-import {JobMessage} from "../types/jobMessage";
-import {JobSummaryDetails} from "../components/JobSummaryDetails";
+import {CalculationJobNotification} from "../components/Calculations/CalculationJobNotification";
 import {FacetValue} from "../types/Facet";
 import {Link} from "react-router-dom";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
+import {useLatestSpecificationJobWithMonitoring} from "../hooks/useLatestSpecificationJobWithMonitoring";
+import {JobType} from "../types/jobType";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -67,26 +65,19 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     };
     const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
     const calculationId = match.params.calculationId;
-    const jobSummaryInitial: JobSummary = {
-        jobId: "",
-        jobType: "",
-        specificationId: "",
-        entityId: "",
-        runningStatus: undefined,
-        completionStatus: undefined,
-        invokerUserId: "",
-        invokerUserDisplayName: "",
-        parentJobId: "",
-        lastUpdated: new Date(),
-        created: new Date(),
-    };
-    const [jobSummary, setJobSummary] = useState<JobSummary>(jobSummaryInitial);
     let calculationSummary: ViewCalculationState = useSelector((state: AppState) => state.viewCalculationResults);
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
     let fundingStream: FundingStream = {
         name: "",
         id: ""
     };
+    const specificationId = calculationSummary.calculation.specificationId.length > 0 ?
+        calculationSummary.calculation.specificationId : specificationResults.specification.id.length > 0 ?
+            specificationResults.specification.id :
+            calculationSummary.specification.id.length > 0 ?
+                calculationSummary.specification.id : "";
+    const {latestJob, anyJobsRunning, jobError, hasJobError, isCheckingForJob} = 
+        useLatestSpecificationJobWithMonitoring(specificationId, [JobType.CreateInstructAllocationJob]);
 
     useEffect(() => {
         if (!singleFire && calculationSummary.providers.totalResults > 0) {
@@ -101,20 +92,8 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     useEffect(() => {
         if (calculationSummary.calculation.specificationId !== "") {
             dispatch(getSpecificationSummary(calculationSummary.calculation.specificationId));
-            getLatestJobForSpecification();
-            createHubConnection(calculationSummary.calculation.specificationId);
         }
     }, [calculationSummary.calculation.specificationId]);
-
-    function getLatestJobForSpecification() {
-        getJobStatusUpdatesForSpecification(calculationSummary.calculation.specificationId, "CreateInstructAllocationJob")
-            .then((jobSummaryResponse) => 
-            {
-                if (jobSummaryResponse.data && jobSummaryResponse.data.length > 0 && jobSummaryResponse.data[0]) {
-                    setJobSummary(jobSummaryResponse.data[0]);
-                }
-            });
-    }
 
     useEffect(() => {
         fundingStream = specificationResults.specification.fundingStreams[0];
@@ -149,24 +128,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             setLocalAuthority(calculationSummary.providers.facets[8].facetValues)
         }
     }, [singleFire]);
-
-    async function createHubConnection(specificationId: string) {
-        const hubConnect = new HubConnectionBuilder()
-                .withUrl(`/api/notifications`)
-                .build();
-        try {
-            await hubConnect.start();
-
-            hubConnect.on('NotificationEvent', (message: JobMessage) => {
-                getLatestJobForSpecification();
-            });
-
-            await hubConnect.invoke("StartWatchingForSpecificationNotifications", specificationId);
-
-        } catch (err) {
-            await hubConnect.stop();
-        }
-    }
 
     function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
         let filterUpdate = calculationProviderSearchRequest.providerType;
@@ -272,10 +233,17 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <h2 className="govuk-caption-xl">{specificationResults.specification.fundingPeriod.name}</h2>
+                        <h2 className="govuk-caption-xl govuk-!-margin-top-0">{specificationResults.specification.fundingPeriod.name}</h2>
                         <h1 className="govuk-heading-xl">{calculationSummary.calculation.name}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
-                        <JobSummaryDetails jobSummary={jobSummary} hidden={jobSummary.jobId === ""}/>
+                        {specificationId.length > 0 &&
+                        <CalculationJobNotification 
+                            latestJob={latestJob} 
+                            anyJobsRunning={anyJobsRunning} 
+                            isCheckingForJob={isCheckingForJob}
+                            hasJobError={hasJobError}
+                            jobError={jobError}/>
+                        }
                         <Link to={`/Specifications/Edit${calculationSummary.calculation.calculationType}Calculation/${calculationSummary.calculation.id}`}
                               className="govuk-button" role="button">
                             View calculation
@@ -295,12 +263,12 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                 <fieldset className="govuk-fieldset">
                                     <div className="govuk-checkboxes">
                                         {filterProviderTypes.map(pt =>
-                                            <div className="govuk-checkboxes__item">
+                                            <div key={pt.name} className="govuk-checkboxes__item">
                                                 <input className="govuk-checkboxes__input"
                                                        id={`providerTypes-${pt.name}`}
                                                        name={`providerTypes-${pt.name}`}
                                                        type="checkbox" value={pt.name}
-                                                       onChange={(e) => filterByProviderTypes(e)}/>
+                                                       onChange={filterByProviderTypes}/>
                                                 <label className="govuk-label govuk-checkboxes__label"
                                                        htmlFor={`providerTypes-${pt.name}`}>
                                                     {pt.name}
@@ -314,12 +282,12 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                 <fieldset className="govuk-fieldset">
                                     <div className="govuk-checkboxes">
                                         {filterProviderSubTypes.map(pt =>
-                                            <div className="govuk-checkboxes__item">
+                                            <div key={pt.name} className="govuk-checkboxes__item">
                                                 <input className="govuk-checkboxes__input"
                                                        id={`providerSubTypes-${pt.name}`}
                                                        name={`providerSubTypes-${pt.name}`}
                                                        type="checkbox" value={pt.name}
-                                                       onChange={(e) => filterByProviderSubTypes(e)}/>
+                                                       onChange={filterByProviderSubTypes}/>
                                                 <label className="govuk-label govuk-checkboxes__label"
                                                        htmlFor={`providerSubTypes-${pt.name}`}>
                                                     {pt.name}
@@ -338,7 +306,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                                        name="resultsStatus"
                                                        type="radio" value={pt.name}
                                                        defaultChecked={pt.name === "Without exceptions"}
-                                                       onChange={(e) => filterByResultStatus(e)}/>
+                                                       onChange={filterByResultStatus}/>
                                                 <label className="govuk-label govuk-radios__label"
                                                        htmlFor="resultsStatus">
                                                     {pt.name}
@@ -352,11 +320,11 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                 <fieldset className="govuk-fieldset">
                                     <div className="govuk-checkboxes">
                                         {filterLocalAuthority.map(pt =>
-                                            <div className="govuk-checkboxes__item">
+                                            <div key={pt.name} className="govuk-checkboxes__item">
                                                 <input className="govuk-checkboxes__input"
                                                        id={`localAuthorities-${pt.name}`} name="localAuthorities"
                                                        type="checkbox" value={pt.name}
-                                                       onChange={(e) => filterByLocalAuthority(e)}/>
+                                                       onChange={filterByLocalAuthority}/>
                                                 <label className="govuk-label govuk-checkboxes__label"
                                                        htmlFor={`localAuthorities-${pt.name}`}>
                                                     {pt.name}
@@ -428,24 +396,21 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                 </AccordianPanel>
                             }
                             )}
-
-
                         </div>
                         {calculationSummary.providers.totalResults === 0 && singleFire ?
                             <h2 className="govuk-heading-m">There are no results available</h2> : ""}
+                        {calculationSummary.providers.totalResults > 0 &&
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-two-thirds">
-                                {calculationSummary.providers.totalResults > 0 ?
-                                    <Pagination currentPage={calculationSummary.providers.pagerState.currentPage}
-                                                lastPage={calculationSummary.providers.pagerState.lastPage}
-                                                callback={setPagination}/> : ""}
+                                <Pagination currentPage={calculationSummary.providers.pagerState.currentPage}
+                                            lastPage={calculationSummary.providers.pagerState.lastPage}
+                                            callback={setPagination}/>
                             </div>
                             <div className="govuk-grid-column-one-third">
                                 <p className="govuk-body-s">Showing {calculationSummary.providers.startItemNumber} - {calculationSummary.providers.endItemNumber} of {calculationSummary.providers.totalResults}</p>
-
                             </div>
                         </div>
-
+                        }
                     </div>
                 </div>
             </div>

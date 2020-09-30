@@ -53,6 +53,10 @@ import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
 import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculationVersions";
 import {ViewFundingLineProfile} from "./pages/FundingApprovals/ViewFundingLineProfile";
+import {
+    QueryCache,
+    ReactQueryCacheProvider,
+} from "react-query";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -82,60 +86,63 @@ const App: React.FunctionComponent = () => {
         );
     }
     if (hasConfirmedSkills === true) {
+        const queryCache = new QueryCache();
         return (
             <BrowserRouter basename="/app"
                            getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>
-                <Switch>
-                    <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
-                    <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
-                    <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
-                    <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
-                           component={SpecificationFundingApproval}/>
-                    <Route path="/Results/" component={ViewResults}/>
-                    <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
-                    <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>
-                    <Route path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId" component={ViewProviderResults}/>
-                    <Route path="/SelectSpecification" component={SelectSpecification}/>
-                    <Route path="/SpecificationsList" component={SpecificationsList}/>
-                    <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
-                    <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
-                    <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
-                    <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
-                        component={ViewFundingLineProfile} />
-                    <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
-                           component={ProviderFundingOverview}/>
-                    <Route path="/Approvals/ProfilingArchive/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId" component={ProfilingArchive}/>
-                    <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
-                    <Route path="/Datasets/ManageData" component={ManageData}/>
-                    <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>
-                    <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory}/>
-                    <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId" component={UpdateDataSourceFile}/>
-                    <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource}/>
-                    <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles}/>
-                    <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships}/>
-                    <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles}/>
-                    <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource}/>
-                    <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId"
-                           component={SelectDataSourceExpanded}/>
-                    <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
-                    <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
-                    {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
-                    <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation}/>
-                    <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation}/>
-                    <Route path="/Specifications/EditTemplateCalculation/:calculationId/:fundingLineItem" component={EditTemplateCalculation}/>
-                    <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints}/>
-                    <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
-                    <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
-                    <Route path="*">
-                        <NoMatch/>
-                    </Route>
-                </Switch>
+                <ReactQueryCacheProvider queryCache={queryCache}>
+                    <Switch>
+                        <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
+                        <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
+                        <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
+                        <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
+                               component={SpecificationFundingApproval}/>
+                        <Route path="/Results/" component={ViewResults}/>
+                        <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
+                        <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>
+                        <Route path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId" component={ViewProviderResults}/>
+                        <Route path="/SelectSpecification" component={SelectSpecification}/>
+                        <Route path="/SpecificationsList" component={SpecificationsList}/>
+                        <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
+                        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
+                        <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
+                               component={ViewFundingLineProfile}/>
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
+                               component={ProviderFundingOverview}/>
+                        <Route path="/Approvals/ProfilingArchive/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId" component={ProfilingArchive}/>
+                        <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
+                        <Route path="/Datasets/ManageData" component={ManageData}/>
+                        <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>
+                        <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory}/>
+                        <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId" component={UpdateDataSourceFile}/>
+                        <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource}/>
+                        <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles}/>
+                        <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships}/>
+                        <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles}/>
+                        <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource}/>
+                        <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId"
+                               component={SelectDataSourceExpanded}/>
+                        <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
+                        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>}
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>}
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate}/>}
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
+                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
+                        <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation}/>
+                        <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation}/>
+                        <Route path="/Specifications/EditTemplateCalculation/:calculationId" component={EditTemplateCalculation}/>
+                        <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints}/>
+                        <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
+                        <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
+                        <Route path="*">
+                            <NoMatch/>
+                        </Route>
+                    </Switch>
+                </ReactQueryCacheProvider>
             </BrowserRouter>
         );
     } else {

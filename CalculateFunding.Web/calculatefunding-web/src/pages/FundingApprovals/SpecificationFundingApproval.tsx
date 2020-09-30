@@ -23,9 +23,9 @@ import {IFundingSelectionState} from "../../states/IFundingSelectionState";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {SpecificationSummarySection} from "../../components/Funding/SpecificationSummarySection";
-import {SpecificationJobMonitor} from "../../components/Funding/SpecificationJobMonitor";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
-import Pagination from "../../components/Pagination";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/useLatestSpecificationJobWithMonitoring";
+import {JobType} from "../../types/jobType";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -38,6 +38,14 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
 
+    const {hasJob, anyJobsRunning, isCheckingForJob, jobProgressMessage} =
+        useLatestSpecificationJobWithMonitoring(
+            specificationId,
+            [JobType.RefreshFundingJob,
+                JobType.ApproveAllProviderFundingJob,
+                JobType.ApproveBatchProviderFundingJob,
+                JobType.PublishBatchProviderFundingJob,
+                JobType.PublishAllProviderFundingJob]);
     const [publishedProviderResults, setPublishedProviderResults] = useState<PublishedProviderSearchResult>({
         facets: [],
         canApprove: false,
@@ -78,8 +86,6 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         searchFields: []
     };
     const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialSearch);
-    const [isInitialisingJobMonitor, setIsInitialisingJobMonitor] = useState<boolean>(true);
-    const [isJobRunning, setIsJobRunning] = useState<boolean>(true);
     const [isLoadingResults, setIsLoadingResults] = useState<boolean>(true);
     const [isLoadingProviderVersionIds, setIsLoadingProviderVersionIds] = useState<boolean>(false);
     const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
@@ -93,10 +99,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
 
     useEffect(() => {
-        if (!isInitialisingJobMonitor && !isJobRunning) {
+        if (!isCheckingForJob && !anyJobsRunning) {
             loadPublishedProviderResults(searchCriteria);
         }
-    }, [searchCriteria, isJobRunning, isInitialisingJobMonitor]);
+    }, [searchCriteria, anyJobsRunning, isCheckingForJob]);
 
     async function loadPublishedProviderResults(searchRequest: PublishedProviderSearchRequest) {
         clearErrorMessages();
@@ -144,14 +150,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         });
     }
 
-    function checkForJobs() {
-        setConfirmApproval(false);
-        setConfirmRelease(false);
-        clearErrorMessages();
-        setIsInitialisingJobMonitor(true);
-    }
-
-    function handleBack() {
+    function handleBackToResults() {
         setConfirmApproval(false);
         setConfirmRelease(false);
         clearErrorMessages();
@@ -193,17 +192,14 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             </div>
 
             <div className="govuk-grid-row">
-
-                <SpecificationJobMonitor
-                    specificationId={specificationId}
-                    isJobRunning={isJobRunning}
-                    setIsJobRunning={setIsJobRunning}
-                    isCheckingForJobs={isInitialisingJobMonitor}
-                    setIsCheckingForJobs={setIsInitialisingJobMonitor}
-                    addError={addErrorMessage}
-                />
-
-                {!isJobRunning && !isConfirmingApproval && !isConfirmingRelease && specificationSummary &&
+                {(isCheckingForJob || anyJobsRunning) &&
+                <LoadingStatus title={`Job running: ${hasJob ? jobProgressMessage : "Checking for jobs..."} `}
+                               subTitle={isCheckingForJob ?
+                                   "Searching for any running jobs" :
+                                   "Monitoring job progress. Please wait, this could take several minutes"}
+                               testid='loadingJobs'/>
+                }
+                {!isCheckingForJob && !anyJobsRunning && !isConfirmingApproval && !isConfirmingRelease && specificationSummary &&
                 <>
                     <PublishedProviderSearchFilters publishedProviderResults={publishedProviderResults}
                                                     specificationSummary={specificationSummary as SpecificationSummary}
@@ -243,8 +239,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             canApproveFunding={canApproveFunding}
                             specificationSummary={specificationSummary}
                             publishedProviderResults={publishedProviderResults}
-                            handleBack={handleBack}
-                            checkForJobs={checkForJobs}
+                            handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
                         />
                         :
@@ -252,8 +247,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             canReleaseFunding={canReleaseFunding}
                             specificationSummary={specificationSummary}
                             publishedProviderResults={publishedProviderResults}
-                            handleBack={handleBack}
-                            checkForJobs={checkForJobs}
+                            handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
                         />
                     }

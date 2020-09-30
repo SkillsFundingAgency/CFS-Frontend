@@ -11,8 +11,7 @@ export interface IConfirmFundingApprovalProps {
     publishedProviderResults: PublishedProviderSearchResult,
     specificationSummary: SpecificationSummary,
     canApproveFunding: boolean | undefined,
-    handleBack: () => void,
-    checkForJobs: () => void,
+    handleBackToResults: () => void,
     addError: (errorMessage: string, fieldName?: string) => void,
 }
 
@@ -28,7 +27,7 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
         try {
             await approveFundingService(props.specificationSummary.id);
             setIsLoadingApproval(false);
-            props.checkForJobs();
+            props.handleBackToResults();
         } catch (e) {
             setIsLoadingApproval(false);
             props.addError("An error occured whilst calling the server to confirm approval: " + e);
@@ -46,7 +45,7 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
             <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <BackButton name="Back" callback={props.handleBack}/>
+                        <BackButton name="Back" callback={props.handleBackToResults}/>
                     </div>
                 </div>
                 <div className="govuk-grid-row">
@@ -98,7 +97,7 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
                         </button>
                         <button className="govuk-button govuk-button--secondary"
                                 data-module="govuk-button"
-                                onClick={props.handleBack}>
+                                onClick={props.handleBackToResults}>
                             Cancel
                         </button>
                     </div>
