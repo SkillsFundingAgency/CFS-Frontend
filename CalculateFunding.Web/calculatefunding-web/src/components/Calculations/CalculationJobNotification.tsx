@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React from "react";
 import {DateFormatter} from "../DateFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {CompletionStatus} from "../../types/CompletionStatus";
@@ -12,6 +12,7 @@ export interface ICalculationJobNotificationProps {
     isCheckingForJob: boolean,
     hasJobError: boolean,
     jobError: string,
+    jobProgressMessage: string,
 }
 
 export function CalculationJobNotification(props: ICalculationJobNotificationProps) {
@@ -29,40 +30,40 @@ export function CalculationJobNotification(props: ICalculationJobNotificationPro
         return <ErrorSummary title={"Error while checking for latest job"} error={props.jobError} suggestion={"Please try again later"}/>
     }
 
-    if (!props.latestJob) {
+    if (!props.latestJob || (!props.anyJobsRunning && props.latestJob.completionStatus === CompletionStatus.Succeeded)) {
         return null;
     }
 
     switch (props.latestJob.runningStatus) {
         case RunningStatus.Queued:
         case RunningStatus.QueuedWithService:
-            jobSummaryTitle = "Calculation job in queue";
+            jobSummaryTitle = "Job in queue";
             jobSummaryColour = "govuk-error-summary govuk-error-summary-orange";
             break;
         case RunningStatus.InProgress:
-            jobSummaryTitle = "Calculation job in progress";
+            jobSummaryTitle = "Job in progress";
             jobSummaryColour = "govuk-error-summary govuk-error-summary-orange";
             break;
         default:
             switch (props.latestJob.completionStatus) {
                 case CompletionStatus.Succeeded:
-                    jobSummaryTitle = "Calculation job completed successfully";
+                    jobSummaryTitle = "Job completed successfully";
                     jobSummaryColour = "govuk-error-summary govuk-error-summary-green";
                     break;
                 case CompletionStatus.Cancelled:
-                    jobSummaryTitle = "Calculation job cancelled";
+                    jobSummaryTitle = "Job cancelled";
                     jobSummaryColour = "govuk-error-summary";
                     break;
                 case CompletionStatus.Failed:
-                    jobSummaryTitle = "Calculation job failed";
+                    jobSummaryTitle = "Job failed";
                     jobSummaryColour = "govuk-error-summary";
                     break;
                 case CompletionStatus.TimedOut:
-                    jobSummaryTitle = "Calculation job timed out";
+                    jobSummaryTitle = "Job timed out";
                     jobSummaryColour = "govuk-error-summary";
                     break;
                 default:
-                    jobSummaryTitle = "Calculation job " + props.latestJob.completionStatus;
+                    jobSummaryTitle = "Job " + props.latestJob.completionStatus;
                     jobSummaryColour = "govuk-error-summary";
                     break;
             }
@@ -73,13 +74,13 @@ export function CalculationJobNotification(props: ICalculationJobNotificationPro
                  aria-labelledby="error-summary-title" role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
-            {jobSummaryTitle}
+            {jobSummaryTitle}: {props.jobProgressMessage}
         </h2>
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">
                 <li>
                     <p className="govuk-body">
-                        Calculation initiated by {props.latestJob.invokerUserDisplayName} on <DateFormatter
+                        Job initiated by {props.latestJob.invokerUserDisplayName} on <DateFormatter
                         date={props.latestJob.created as Date} utc={true}/>
                     </p>
                 </li>

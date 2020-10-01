@@ -22,38 +22,54 @@ describe("useFetchLatestSpecificationJob tests", () => {
     
     describe("Handles invalid inputs correctly", () => {
         it("when specification id is null", async () => {
-            const {result, waitForNextUpdate} =
+            const {result, waitForNextUpdate, waitForValueToChange} =
                 renderHook(() =>
-                    useFetchLatestSpecificationJob(specificationId, [JobType.RefreshFundingJob]));
+                    useFetchLatestSpecificationJob("", [JobType.RefreshFundingJob]));
             await act(async () => {
-                await waitForNextUpdate();
+                await waitForValueToChange(() => result.current.isCheckingForJob);
             });
             expect(result.current.lastJob).toBe(undefined);
-            expect(result.current.isCheckingForJob).toBe(true);
+            expect(result.current.isCheckingForJob).toBe(false);
             expect(result.current.haveErrorCheckingForJob).toBe(false);
-            expect(result.current.errorCheckingForJob).toBe(null);
-            expect(result.current.isCheckingForJob).toBe(true);
-            expect(result.current.isFetching).toBe(true);
-            expect(result.current.isFetched).toBe(false);
+            expect(result.current.errorCheckingForJob).toBe("");
+            expect(result.current.isCheckingForJob).toBe(false);
+            expect(result.current.isFetching).toBe(false);
+            expect(result.current.isFetched).toBe(true);
         });
         it("when no job types supplied", async () => {
             const {result, waitForNextUpdate} =
                 renderHook(() =>
-                    useFetchLatestSpecificationJob(specificationId, [JobType.RefreshFundingJob]));
+                    useFetchLatestSpecificationJob(specificationId, []));
             await act(async () => {
                 await waitForNextUpdate();
             });
             
             expect(result.current).toBeTruthy();
             expect(result.current.lastJob).toBe(undefined);
-            expect(result.current.haveErrorCheckingForJob).toBe(false);
-            expect(result.current.errorCheckingForJob).toBe(null);
-            expect(result.current.isCheckingForJob).toBe(true);
-            expect(result.current.isFetching).toBe(true);
+            expect(result.current.haveErrorCheckingForJob).toBe(true);
+            expect(result.current.errorCheckingForJob).toBe("Missing job types");
+            expect(result.current.isCheckingForJob).toBe(false);
+            expect(result.current.isFetching).toBe(false);
             expect(result.current.isFetched).toBe(false);
         });
     });
 
+    describe("When api throws a 500", () => {
+        it("returns correct error", async () => {
+            const {result, waitForNextUpdate, waitForValueToChange} = 
+                renderHook(() => 
+                    useFetchLatestSpecificationJob(specificationId, [JobType.CreateSpecificationJob]));
+
+            await act(async () => {
+                await waitForValueToChange(() => result.current.isCheckingForJob);
+                // await waitForNextUpdate();
+            });
+            
+            expect(result.current.lastJob).toBeUndefined();
+            expect(result.current.haveErrorCheckingForJob).toBeTruthy();
+            expect(result.current.errorCheckingForJob).toBe("Request failed with status code 404");
+        });
+    });
     describe("When passing valid inputs", () => {
         const mock = new MockAdapter(axios);
 

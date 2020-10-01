@@ -76,8 +76,9 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             specificationResults.specification.id :
             calculationSummary.specification.id.length > 0 ?
                 calculationSummary.specification.id : "";
-    const {latestJob, anyJobsRunning, jobError, hasJobError, isCheckingForJob} = 
-        useLatestSpecificationJobWithMonitoring(specificationId, [JobType.CreateInstructAllocationJob]);
+    const {latestJob, anyJobsRunning, jobError, hasJobError, isCheckingForJob, jobProgressMessage} = 
+        useLatestSpecificationJobWithMonitoring(specificationId, 
+            [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
 
     useEffect(() => {
         if (!singleFire && calculationSummary.providers.totalResults > 0) {
@@ -241,6 +242,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                             latestJob={latestJob} 
                             anyJobsRunning={anyJobsRunning} 
                             isCheckingForJob={isCheckingForJob}
+                            jobProgressMessage={jobProgressMessage}
                             hasJobError={hasJobError}
                             jobError={jobError}/>
                         }

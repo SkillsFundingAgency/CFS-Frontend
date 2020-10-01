@@ -40,6 +40,8 @@ export const useMonitorForNewSpecificationJob = (specificationId: string, jobTyp
                         jobType: job.jobType,
                         completionStatus: job.completionStatus,
                         runningStatus: job.runningStatus as unknown as RunningStatus,
+                        invokerUserId: job.invokerUserId,
+                        invokerUserDisplayName: job.invokerUserDisplayName,
                         lastUpdated: job.statusDateTime as unknown as Date
                     });
                 } else {

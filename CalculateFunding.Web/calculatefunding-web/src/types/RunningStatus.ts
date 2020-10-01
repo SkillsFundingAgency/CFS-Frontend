@@ -3,4 +3,5 @@
     QueuedWithService = "QueuedWithService",
     InProgress = "InProgress",
     Completed = "Completed",
+    Completing = "Completing"
 }

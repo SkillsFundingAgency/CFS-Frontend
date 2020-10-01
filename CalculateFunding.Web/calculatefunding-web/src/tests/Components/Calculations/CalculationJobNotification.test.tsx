@@ -75,6 +75,7 @@ const renderComponent = (params: ICalculationJobNotificationProps) => {
         anyJobsRunning={params.anyJobsRunning}
         hasJobError={params.hasJobError}
         isCheckingForJob={params.isCheckingForJob}
+        jobProgressMessage={params.jobProgressMessage}
         jobError={params.jobError}/>);
 };
 
@@ -88,6 +89,7 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "",
                 jobError: ""
             };
             await renderComponent(props);
@@ -96,6 +98,7 @@ describe('<CalculationJobNotification />', () => {
             expect(screen.queryByText("Error while checking for latest job")).toBeFalsy();
             expect(screen.queryByText("Calculation job ")).toBeFalsy();
             expect(screen.queryByText("Calculation initiated by Bob on ")).toBeFalsy();
+            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
         });
     });
 
@@ -106,11 +109,13 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: true,
                 hasJobError: false,
+                jobProgressMessage: "",
                 jobError: ""
             };
             await renderComponent(props);
 
             expect(screen.getByText("Checking for running jobs")).toBeInTheDocument();
+            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
         });
     });
 
@@ -121,12 +126,14 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: true,
+                jobProgressMessage: "",
                 jobError: "Uh oh!"
             };
             await renderComponent(props);
 
             expect(screen.queryByText("Error while checking for latest job")).toBeInTheDocument();
             expect(screen.queryByText("Uh oh!")).toBeInTheDocument();
+            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
         });
     });
 
@@ -137,12 +144,14 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: true,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
             
-            await renderComponent(props);
-
-            expect(screen.getByText("Calculation job in queue")).toBeInTheDocument();
+            renderComponent(props);
+            
+            expect(await screen.getByText("Job in queue: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
     describe('when job is in progress', () => {
@@ -152,12 +161,14 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: true,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(screen.getByText("Calculation job in progress")).toBeInTheDocument();
+            expect(await screen.getByText("Job in progress: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
     describe('when job has timed out', () => {
@@ -167,12 +178,14 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(screen.getByText("Calculation job timed out")).toBeInTheDocument();
+            expect(await screen.getByText("Job timed out: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
     describe('when job has been cancelled', () => {
@@ -182,12 +195,14 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(screen.getByText("Calculation job cancelled")).toBeInTheDocument();
+            expect(screen.getByText("Job cancelled: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
     describe('when job has failed', () => {
@@ -197,12 +212,13 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(screen.getByText("Calculation job failed")).toBeInTheDocument();
+            expect(await screen.getByText("Job failed: Reindexing everything")).toBeInTheDocument();
         });
     });
     describe('when job was successfully completed', () => {
@@ -212,16 +228,16 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
+                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(screen.queryByText("Calculation job")).not.toBeInTheDocument();
-            expect(screen.queryByText("Checking for running jobs")).toBeFalsy();
-            expect(screen.queryByText("Error while checking for latest job")).toBeFalsy();
-            expect(screen.queryByText("Calculation job ")).toBeFalsy();
-            expect(screen.queryByText("Calculation initiated by Bob on ")).toBeFalsy();
+            expect(screen.queryByText(/Reindexing everything/)).not.toBeInTheDocument();
+            expect(screen.queryByText(/Checking for running jobs/)).not.toBeInTheDocument();
+            expect(screen.queryByText(/Error while checking for latest job/)).not.toBeInTheDocument();
+            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
         });
     });
 });
