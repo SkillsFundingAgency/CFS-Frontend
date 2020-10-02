@@ -30,7 +30,7 @@ export function CalculationJobNotification(props: ICalculationJobNotificationPro
         return <ErrorSummary title={"Error while checking for latest job"} error={props.jobError} suggestion={"Please try again later"}/>
     }
 
-    if (!props.latestJob || (!props.anyJobsRunning && props.latestJob.completionStatus === CompletionStatus.Succeeded)) {
+    if (!props.latestJob) {
         return null;
     }
 

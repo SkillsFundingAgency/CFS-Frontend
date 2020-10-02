@@ -219,10 +219,11 @@ describe('<CalculationJobNotification />', () => {
             await renderComponent(props);
 
             expect(await screen.getByText("Job failed: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText((content) => content.startsWith('Job initiated by'))).toBeInTheDocument();
         });
     });
     describe('when job was successfully completed', () => {
-        it('renders error message correctly', async () => {
+        it('renders success message correctly', async () => {
             const props: ICalculationJobNotificationProps = {
                 latestJob: mockSuccessfulJobResult,
                 anyJobsRunning: false,
@@ -234,10 +235,8 @@ describe('<CalculationJobNotification />', () => {
 
             await renderComponent(props);
 
-            expect(screen.queryByText(/Reindexing everything/)).not.toBeInTheDocument();
-            expect(screen.queryByText(/Checking for running jobs/)).not.toBeInTheDocument();
-            expect(screen.queryByText(/Error while checking for latest job/)).not.toBeInTheDocument();
-            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
+            expect(await screen.getByText("Job completed successfully: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText((content) => content.startsWith('Job initiated by'))).toBeInTheDocument();
         });
     });
 });

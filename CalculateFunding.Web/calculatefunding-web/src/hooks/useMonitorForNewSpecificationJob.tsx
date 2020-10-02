@@ -42,6 +42,7 @@ export const useMonitorForNewSpecificationJob = (specificationId: string, jobTyp
                         runningStatus: job.runningStatus as unknown as RunningStatus,
                         invokerUserId: job.invokerUserId,
                         invokerUserDisplayName: job.invokerUserDisplayName,
+                        created: job.jobCreatedDateTime,
                         lastUpdated: job.statusDateTime as unknown as Date
                     });
                 } else {
