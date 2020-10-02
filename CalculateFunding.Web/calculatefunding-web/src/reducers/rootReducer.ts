@@ -20,7 +20,6 @@ import {reduceFeatureFlagsState} from "./featureFlagsReducer";
 import {FundingLineStructureAction} from "../actions/FundingLineStructureAction";
 import {ViewSpecificationResultsActions} from "../actions/ViewSpecificationResultsActions";
 import {SelectSpecificationActions} from "../actions/SelectSpecificationActions";
-import {ViewCalculationResultsActions} from "../actions/ViewCalculationResultsActions";
 import {ProviderActions} from "../actions/ProviderActions";
 import {SpecificationActions} from "../actions/SpecificationActions";
 import {DatasetActions} from "../actions/DatasetActions";
@@ -36,7 +35,6 @@ export interface IStoreState {
     fundingLineStructureState: IFundingLineStructureState,
     viewSpecificationResults: ViewSpecificationResultsState,
     viewSpecification: ViewSpecificationState,
-    viewCalculationResults: ViewCalculationState
     selectSpecification: SelectSpecificationState,
     provider: ProviderState,
     datasets: DatasetState,
@@ -51,7 +49,6 @@ export type Actions =
     ViewSpecificationResultsActions |
     ViewSpecificationsActions |
     SelectSpecificationActions |
-    ViewCalculationResultsActions |
     ProviderActions |
     SpecificationActions |
     DatasetActions |
@@ -64,7 +61,6 @@ export const rootReducer: Reducer<IStoreState, Actions> =
         viewSpecificationResults: reduceViewSpecificationResultsState,
         viewSpecification: reduceViewSpecificationState,
         selectSpecification: reduceSelectSpecificationState,
-        viewCalculationResults: reduceCalculationResultsState,
         provider: reduceProvider,
         datasets: reduceDatasetState,
         fundingSelection: reduceFundingSelectionState,
