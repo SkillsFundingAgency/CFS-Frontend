@@ -223,7 +223,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                 <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationId}`}/>
                 <Breadcrumb name={"Create dataset"}/>
             </Breadcrumbs>
-            <ConfirmationPanel title={"Dataset created"} body={"Your dataset has been created."} hidden={!addAnother}/>
+            <ConfirmationPanel title={"Dataset created"} body={`Dataset ${datasetName} has been created.`} hidden={!addAnother}/>
             <div hidden={(!saveDatasetResult.result && !saveDatasetResult.attempted) || (saveDatasetResult.result && saveDatasetResult.attempted)}>
                 <ErrorSummary title={"An error has occurred"} error={`${errorMessage}`} suggestion={"Please check and try again"}/>
             </div>
@@ -236,14 +236,14 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                         <form id={"save-dataset-form"}>
                             <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                                 <span className="govuk-caption-xl">{specificationSummary.name}</span>
-                                <h1 className="govuk-heading-xl">Create dataset</h1>
+                                <h1 id={"create-dataset-headline"} className="govuk-heading-xl">Create dataset</h1>
                             </legend>
 
                             <div className={"govuk-form-group" + (datasetDataschema.isValid ? "" : " govuk-form-group--error")}>
                                 <label className="govuk-label" htmlFor="sort">
                                     Select data schema
                                 </label>
-                                <select className="govuk-select" id="sort" name="sort"
+                                <select id={"select-data-schema"} className="govuk-select" id="sort" name="sort"
                                         onChange={(e) => changeDataschema(e)}>
                                     <option key={-1} value="">Please select</option>
                                     )
