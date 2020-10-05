@@ -3,10 +3,13 @@ import {
     FundingStructureType, IFundingStructureItem
 } from "../../types/FundingStructureItem";
 import {CollapsibleSteps} from "../CollapsibleSteps";
-export function FundingLineStepProviderResults(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean}) {
+export function FundingLineStepProviderResults(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean, callback: any}) {
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
     let fundingType: string = "";
+    function collapsibleStepsChanged(expanded: boolean, name: string) {
+        props.callback(expanded, name);
+    }
     return <div>
         {
             (fundingStructureItems != null && fundingStructureItems.length > 0)? fundingStructureItems.map((innerFundingLineItem, index) => {
@@ -34,10 +37,13 @@ export function FundingLineStepProviderResults(props: { fundingStructureItem: IF
                             step={displayFundingType?innerFundingLineItem.level.toString(): ""}
                             expanded={expanded || innerFundingLineItem.expanded}
                             link={linkValue}
-                            hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}>
+                            hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}
+                            callback={collapsibleStepsChanged}>
                             {
                                 innerFundingLineItem.fundingStructureItems ?
-                                    (<FundingLineStepProviderResults fundingStructureItem={innerFundingLineItem} expanded={expanded} />)
+                                    (<FundingLineStepProviderResults fundingStructureItem={innerFundingLineItem}
+                                                                     expanded={expanded}
+                                                                     callback={collapsibleStepsChanged} />)
                                     : null
                             }
                         </CollapsibleSteps>

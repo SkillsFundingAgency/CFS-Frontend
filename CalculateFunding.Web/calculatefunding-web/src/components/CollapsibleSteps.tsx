@@ -2,6 +2,8 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {DateFormatter} from "./DateFormatter";
+import {func} from "prop-types";
+import {IFundingStructureItem} from "../types/FundingStructureItem";
 
 interface ICollapsibleStepsProps {
     uniqueKey: string;
@@ -16,6 +18,12 @@ interface ICollapsibleStepsProps {
     hasChildren: boolean;
     customRef: React.MutableRefObject<null>;
     lastUpdatedDate?: Date;
+    callback: any;
+}
+
+export interface ICollapsibleStepsAllStepsStatus {
+    openAllSteps: boolean;
+    closeAllSteps: boolean;
 }
 
 export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleStepsProps>) {
@@ -26,7 +34,13 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
         if(!expandRef.current) {
             setExpanded(props.expanded);
         }
+
     }, [props.expanded]);
+
+    function updateExpandedStatus() {
+        setExpanded(!expanded);
+        props.callback(!expanded, props.description);
+    }
 
     let description = <span>{props.description}</span>;
     if (props.link !== "") {
@@ -77,7 +91,7 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
                     <span className="collapsible-step-header-updated-date">
                         <DateFormatter date={props.lastUpdatedDate} utc={true} />
                     </span>
-                    <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={() => setExpanded(!expanded)}>
+                    <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={updateExpandedStatus}>
                         <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"}/>
                     </span>
                 </h2>
@@ -88,4 +102,29 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
         </li>
         </ul>
     );
+}
+
+export function setCollapsibleStepsAllStepsStatus(fundingLines: IFundingStructureItem[])
+{
+    let collapsibleStepsAllStepsStatus: ICollapsibleStepsAllStepsStatus = {
+        openAllSteps: true,
+        closeAllSteps: true
+    }
+    fundingLines.map(
+        function searchFundingLines(fundingStructureItem: IFundingStructureItem) {
+            if (!fundingStructureItem.expanded && fundingStructureItem.fundingStructureItems != null)
+            {
+                collapsibleStepsAllStepsStatus.openAllSteps = false;
+            }
+            if (fundingStructureItem.expanded  && fundingStructureItem.fundingStructureItems != null)
+            {
+                collapsibleStepsAllStepsStatus.closeAllSteps = false;
+            }
+            if (fundingStructureItem.fundingStructureItems) {
+                fundingStructureItem.fundingStructureItems.map(searchFundingLines);
+            }
+        }
+    );
+
+    return collapsibleStepsAllStepsStatus;
 }

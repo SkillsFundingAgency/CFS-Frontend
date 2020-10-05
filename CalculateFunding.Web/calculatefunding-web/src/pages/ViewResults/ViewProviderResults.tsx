@@ -20,10 +20,15 @@ import {
 } from "../../services/fundingStructuresService";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {AutoComplete} from "../../components/AutoComplete";
-import {CollapsibleSteps} from "../../components/CollapsibleSteps";
+import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../../components/CollapsibleSteps";
 import {BackToTop} from "../../components/BackToTop";
 import {PublishStatus} from "../../types/PublishStatusModel";
-import {expandCalculationsByName, getDistinctOrderedFundingLineCalculations, updateFundingLineExpandStatus} from "../../components/fundingLineStructure/FundingLineStructure";
+import {
+    checkIfShouldOpenAllSteps,
+    expandCalculationsByName,
+    getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName,
+    updateFundingLineExpandStatus
+} from "../../components/fundingLineStructure/FundingLineStructure";
 import {NoData} from "../../components/NoData";
 import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
 import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
@@ -137,6 +142,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
     const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
+    const nullReactRef = useRef(null);
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<PublishStatus>(PublishStatus.Draft);
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
@@ -215,7 +221,11 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     }, [fundingLineRenderInternalState]);
 
     useEffect(() => {
+        if (!rerenderFundingLineSteps) {
+            return
+        }
         setFundingLineRenderInternalState(true);
+        setRerenderFundingLineSteps(false);
     }, [rerenderFundingLineSteps]);
 
     useEffect(() => {
@@ -323,16 +333,32 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     if (fundingLines != null)
         fundingLineStatus = fundingLinePublishStatus;
 
-    function openCloseAllFundingLines() {
-        setFundingLinesExpandedStatus(!fundingLinesExpandedStatus);
-        updateFundingLineExpandStatus(fundingLines, !fundingLinesExpandedStatus);
+    function openCloseAllFundingLines(isOpen: boolean) {
+        setFundingLinesExpandedStatus(isOpen);
+        updateFundingLineExpandStatus(fundingLines, isOpen);
     }
 
     function searchFundingLines(calculationName: string) {
         const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
-        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef);
+        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
         setFundingLines(fundingLinesCopy);
         setRerenderFundingLineSteps(true);
+        if (checkIfShouldOpenAllSteps(fundingLinesCopy)) {
+            openCloseAllFundingLines(true);
+        }
+    }
+
+    function collapsibleStepsChanged(expanded: boolean, name: string) {
+        const fundingLinesCopy: IFundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
+        setFundingLines(fundingLinesCopy);
+
+        const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
+        if (collapsibleStepsAllStepsStatus.openAllSteps){
+            openCloseAllFundingLines(true);
+        }
+        if (collapsibleStepsAllStepsStatus.closeAllSteps){
+            openCloseAllFundingLines(false);
+        }
     }
 
     function searchAdditionalCalculations() {
@@ -470,12 +496,12 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                         <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure}>
                                             <button type="button" className="govuk-accordion__open-all"
                                                     aria-expanded="false"
-                                                    onClick={openCloseAllFundingLines}
+                                                    onClick={(e)=>openCloseAllFundingLines(true)}
                                                     hidden={fundingLinesExpandedStatus}>Open all<span
                                                 className="govuk-visually-hidden"> sections</span></button>
                                             <button type="button" className="govuk-accordion__open-all"
                                                     aria-expanded="true"
-                                                    onClick={openCloseAllFundingLines}
+                                                    onClick={(e)=>openCloseAllFundingLines(false)}
                                                     hidden={!fundingLinesExpandedStatus}>Close all<span
                                                 className="govuk-visually-hidden"> sections</span></button>
                                         </div>
@@ -499,10 +525,12 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                         step={f.level.toString()}
                                                         expanded={fundingLinesExpandedStatus || f.expanded}
                                                         link={linkValue}
-                                                        hasChildren={f.fundingStructureItems != null}>
+                                                        hasChildren={f.fundingStructureItems != null}
+                                                        callback={collapsibleStepsChanged}>
                                                         <FundingLineStepProviderResults key={f.name.replace(" ", "") + index}
                                                                                         expanded={fundingLinesExpandedStatus}
-                                                                                        fundingStructureItem={f}/>
+                                                                                        fundingStructureItem={f}
+                                                                                        callback={collapsibleStepsChanged}/>
                                                     </CollapsibleSteps>
                                                     </li>
                                                 })}
