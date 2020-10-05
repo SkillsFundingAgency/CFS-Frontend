@@ -22,6 +22,7 @@ import {SpecificationSummary} from "../types/SpecificationSummary";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../types/jobType";
+import {SearchBox} from "../components/SearchBox";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -125,13 +126,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
 
-
-    const [searchQuery, setSearchQuery] = useState<string>("");
-
-    useEffect(() => {
-        const timeout = setTimeout(() => filterBySearchTerm(), 900);
-        return () => clearTimeout(timeout);
-    }, [searchQuery]);
 
     useEffect(() => {
         if (!singleFire && providers.totalResults > 0) {
@@ -250,7 +244,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         getCalculationResults(calculationProviderSearchRequest);
     }
 
-    function filterBySearchTerm() {
+    function filterBySearchTerm(searchQuery:string) {
             setIsLoading(true);
             let filterUpdate = searchQuery;
             calculationProviderSearchRequest.searchTerm = filterUpdate;
@@ -336,7 +330,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                             <CollapsiblePanel title="Search" expanded={true}>
                                 <fieldset className="govuk-fieldset">
                                     <label className="govuk-label">Search</label>
-                                    <input className="govuk-input" onChange={(e) => setSearchQuery(e.target.value)}/>
+                                    <SearchBox callback={filterBySearchTerm} timeout={5000} />
                                 </fieldset>
                             </CollapsiblePanel>
                             <CollapsiblePanel title="Filter by provider type" expanded={false}>
