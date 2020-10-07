@@ -23,13 +23,14 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {AutoComplete} from "../../components/AutoComplete";
-import {CollapsibleSteps} from "../../components/CollapsibleSteps";
+import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../../components/CollapsibleSteps";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {FundingLineStep} from "../../components/fundingLineStructure/FundingLineStep";
 import {BackToTop} from "../../components/BackToTop";
 import {useRef} from "react";
 import {
-    expandCalculationsByName, getDistinctOrderedFundingLineCalculations,
+    checkIfShouldOpenAllSteps,
+    expandCalculationsByName, getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName,
     updateFundingLineExpandStatus
 } from "../../components/fundingLineStructure/FundingLineStructure";
 import {
@@ -51,11 +52,14 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(false);
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
+    const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
+    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const fundingLineStepReactRef = useRef(null);
+    const nullReactRef = useRef(null);
 
     let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
@@ -82,6 +86,25 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         }
     }, [specificationResults.specification]);
 
+    useEffect(() => {
+        if (!rerenderFundingLineSteps) {
+            return
+        }
+        setFundingLineRenderInternalState(true);
+        setRerenderFundingLineSteps(false);
+    }, [rerenderFundingLineSteps]);
+
+    useEffect(() => {
+        if (!fundingLineRenderInternalState) {
+            return
+        }
+        if (fundingLineStepReactRef !== null && fundingLineStepReactRef.current !== null) {
+            // @ts-ignore
+            fundingLineStepReactRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+        }
+        setFundingLineRenderInternalState(false);
+    }, [fundingLineRenderInternalState]);
+
     function updateAdditionalCalculations(event: React.ChangeEvent<HTMLSelectElement>) {
         const filter = event.target.value;
         setAdditionalStatusFilter(filter);
@@ -96,15 +119,32 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         setAdditionalCalculationsSearchTerm(e.target.value);
     }
 
-    function searchFundingLines(calculationName: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
-        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef);
-        setFundingLines(fundingLinesCopy);
+    function openCloseAllFundingLines(isOpen: boolean) {
+        setFundingLinesExpandedStatus(isOpen);
+        updateFundingLineExpandStatus(fundingLines, isOpen);
     }
 
-    function openCloseAllFundingLines() {
-        setFundingLinesExpandedStatus(!fundingLinesExpandedStatus);
-        updateFundingLineExpandStatus(fundingLines, !fundingLinesExpandedStatus);
+    function searchFundingLines(calculationName: string) {
+        const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
+        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
+        setFundingLines(fundingLinesCopy);
+        setRerenderFundingLineSteps(true);
+        if (checkIfShouldOpenAllSteps(fundingLinesCopy)) {
+            openCloseAllFundingLines(true);
+        }
+    }
+
+    function collapsibleStepsChanged(expanded: boolean, name: string) {
+        const fundingLinesCopy: IFundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
+        setFundingLines(fundingLinesCopy);
+
+        const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
+        if (collapsibleStepsAllStepsStatus.openAllSteps){
+            openCloseAllFundingLines(true);
+        }
+        if (collapsibleStepsAllStepsStatus.closeAllSteps){
+            openCloseAllFundingLines(false);
+        }
     }
 
     useEffect(() => {
@@ -201,12 +241,12 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
                                         <button type="button" className="govuk-accordion__open-all"
                                                 aria-expanded="false"
-                                                onClick={openCloseAllFundingLines}
+                                                onClick={(e)=>openCloseAllFundingLines(true)}
                                                 hidden={fundingLinesExpandedStatus}>Open all<span
                                             className="govuk-visually-hidden"> sections</span></button>
                                         <button type="button" className="govuk-accordion__open-all"
                                                 aria-expanded="true"
-                                                onClick={openCloseAllFundingLines}
+                                                onClick={(e)=>openCloseAllFundingLines(false)}
                                                 hidden={!fundingLinesExpandedStatus}>Close all<span
                                             className="govuk-visually-hidden"> sections</span></button>
                                     </div>
@@ -230,11 +270,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                         expanded={fundingLinesExpandedStatus || f.expanded}
                                                         link={linkValue}
                                                         hasChildren={f.fundingStructureItems != null}
-                                                        lastUpdatedDate={f.lastUpdatedDate}>
+                                                        lastUpdatedDate={f.lastUpdatedDate}
+                                                        callback={collapsibleStepsChanged}>
                                                         <FundingLineStep key={f.name.replace(" ", "") + index}
                                                                          expanded={fundingLinesExpandedStatus}
                                                                          fundingStructureItem={f}
-                                                                         showResults={true}/>
+                                                                         showResults={true}
+                                                                         callback={collapsibleStepsChanged}/>
                                                     </CollapsibleSteps>
                                                 </li>
                                             })}
