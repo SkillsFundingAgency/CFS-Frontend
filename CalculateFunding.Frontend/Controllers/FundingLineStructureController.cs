@@ -1,7 +1,8 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,14 @@ namespace CalculateFunding.Frontend.Controllers
 {
     public class FundingLineStructureController : Controller
     {
-        private readonly IPoliciesApiClient _policiesApiClient;
+        private readonly IResultsApiClient _resultsApiClient;
 
         public FundingLineStructureController(
-            IPoliciesApiClient policiesApiClient)
+            IResultsApiClient resultsApiClient)
         {
-            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
 
-            _policiesApiClient = policiesApiClient;
+            _resultsApiClient = resultsApiClient;
         }
 
         [HttpGet("api/fundingstructures/specifications/{specificationId}/fundingperiods/{fundingPeriodId}/fundingstreams/{fundingStreamId}/provider/{providerId}")]
@@ -29,7 +30,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             string etag = Request.ReadETagHeaderValue();
 
-            ApiResponse<FundingStructure> fundingStructureApiResponse = await _policiesApiClient.GetFundingStructureResults(fundingStreamId,
+            ApiResponse<FundingStructure> fundingStructureApiResponse = await _resultsApiClient.GetFundingStructureResults(fundingStreamId,
                 fundingPeriodId,
                 specificationId,
                 providerId,
@@ -60,7 +61,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             string etag = Request.ReadETagHeaderValue();
 
-            ApiResponse<FundingStructure> fundingStructureApiResponse = await _policiesApiClient.GetFundingStructureResults(fundingStreamId,
+            ApiResponse<FundingStructure> fundingStructureApiResponse = await _resultsApiClient.GetFundingStructureResults(fundingStreamId,
                 fundingPeriodId,
                 specificationId,
                 etag:etag);
@@ -90,7 +91,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             string etag = Request.ReadETagHeaderValue();
 
-            ApiResponse<FundingStructure> fundingStructureApiResponse = await _policiesApiClient.GetFundingStructure(fundingStreamId,
+            ApiResponse<FundingStructure> fundingStructureApiResponse = await _resultsApiClient.GetFundingStructure(fundingStreamId,
                 fundingPeriodId,
                 specificationId,
                 etag);
