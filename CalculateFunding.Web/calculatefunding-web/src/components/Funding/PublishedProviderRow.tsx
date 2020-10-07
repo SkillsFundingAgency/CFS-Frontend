@@ -1,10 +1,10 @@
 ﻿import React from "react";
-import {PublishedProvider} from "../../types/PublishedProvider/PublishedProviderSearchResult";
+import {PublishedProviderResult} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {Link} from "react-router-dom";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 
 export interface IPublishedProviderRowProps {
-    publishedProvider: PublishedProvider;
+    publishedProvider: PublishedProviderResult;
     enableSelection: boolean;
     isSelected: boolean;
     specProviderVersionId: string;

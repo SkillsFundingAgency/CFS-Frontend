@@ -3,7 +3,7 @@ import {NoData} from "../NoData";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {BackToTop} from "../BackToTop";
 import Pagination from "../Pagination";
-import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
+import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {useDispatch, useSelector} from "react-redux";
 import {removeProvidersFromFundingSelection, addProvidersToFundingSelection} from "../../actions/FundingSelectionActions";
 import {IStoreState} from "../../reducers/rootReducer";
@@ -15,7 +15,7 @@ import {LoadingStatus} from "../LoadingStatus";
 export interface IPublishedProviderResultsProps {
     specificationId: string,
     enableBatchSelection: boolean,
-    providerSearchResults: PublishedProviderSearchResult,
+    providerSearchResults: PublishedProviderSearchResults,
     specProviderVersionId: string,
     canRefreshFunding: boolean | undefined,
     canApproveFunding: boolean | undefined,
@@ -77,13 +77,10 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
 
     if (isLoadingRefresh) {
         return (
-        <div className="govuk-grid-column-two-thirds">
             <LoadingStatus title={"Refreshing..."} description={"Please wait"}/>
-        </div>
         );
     } else {
-        return (
-            <div className="govuk-grid-column-two-thirds">
+        return <>
                 <NoData hidden={havePageResults}/>
                 {havePageResults &&
                 <table className="govuk-table">
@@ -137,8 +134,8 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                 {totalResults > 0 &&
                 <>
                     <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation" aria-label="Pagination">
-                        <div
-                            className="pagination__summary">Showing {props.providerSearchResults.startItemNumber} - {props.providerSearchResults.endItemNumber} of {totalResults} results
+                        <div className="pagination__summary">
+                            Showing {props.providerSearchResults.startItemNumber} - {props.providerSearchResults.endItemNumber} of {totalResults} results
                         </div>
                         <Pagination callback={props.pageChange}
                                     currentPage={props.providerSearchResults.pagerState.currentPage}
@@ -160,7 +157,6 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                     </div>
                 </>
                 }
-            </div>
-        );
+            </>
     }
 }

@@ -3,8 +3,7 @@ import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {SearchMode} from "../../types/SearchMode";
@@ -26,6 +25,7 @@ import {SpecificationSummarySection} from "../../components/Funding/Specificatio
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
+import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -46,7 +46,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob]);
-    const [publishedProviderResults, setPublishedProviderResults] = useState<PublishedProviderSearchResult>({
+    const {specification, isLoadingSpecification, haveErrorCheckingForSpecification, errorCheckingForSpecification} =
+        useSpecificationSummary(specificationId);
+
+    const [publishedProviderResults, setPublishedProviderResults] = useState<PublishedProviderSearchResults>({
         facets: [],
         canApprove: false,
         canPublish: false,
@@ -63,7 +66,6 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         },
         providers: [],
         startItemNumber: 0,
-        totalErrorResults: 0,
         totalFundingAmount: 0,
         totalProvidersToApprove: 0,
         totalProvidersToPublish: 0,
@@ -76,6 +78,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         providerSubType: [],
         localAuthority: [],
         fundingStreamId: fundingStreamId,
+        hasErrors: undefined,
         searchMode: SearchMode.All,
         pageSize: 50,
         pageNumber: 1,
@@ -90,7 +93,6 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const [isLoadingProviderVersionIds, setIsLoadingProviderVersionIds] = useState<boolean>(false);
     const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
     const [isConfirmingRelease, setConfirmRelease] = useState<boolean>(false);
-    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
     const [approvalMode, setApprovalMode] = useState<ApprovalMode>(ApprovalMode.Undefined);
     const [allProviderVersionIds, setAllProviderVersionIds] = useState<string[]>([]);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
@@ -157,6 +159,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }
 
     function addErrorMessage(errorMessage: string, fieldName?: string) {
+        if (errors.some(err => err.message === errorMessage && err.fieldName === fieldName)) {
+            return;
+        }
+            
         const errorCount: number = errors.length;
         const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
         setErrors(errors => [...errors, error]);
@@ -166,56 +172,65 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         setErrors([]);
     }
 
-    return <div>
-        <Header location={Section.Approvals}/>
-        <div className="govuk-width-container">
-            <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"Approvals"}/>
-                <Breadcrumb name={"Select specification"} url={"/Approvals/Select"}/>
-                <Breadcrumb name={"Funding approval results"}/>
-            </Breadcrumbs>
+    if (haveErrorCheckingForSpecification) {
+        addErrorMessage(errorCheckingForSpecification);
+    }
+    const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || anyJobsRunning || isLoadingResults || isLoadingProviderVersionIds;
+    
+    
+    return (
+        <div>
+            <Header location={Section.Approvals}/>
+            <div className="govuk-width-container">
+                <Breadcrumbs>
+                    <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                    <Breadcrumb name={"Approvals"}/>
+                    <Breadcrumb name={"Select specification"} url={"/Approvals/Select"}/>
+                    <Breadcrumb name={"Funding approval results"}/>
+                </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingResults}/>
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingResults}/>
 
-            <MultipleErrorSummary errors={errors}/>
+                <MultipleErrorSummary errors={errors}/>
 
-            <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-padding-top-5">
-                <div className="govuk-grid-column-two-thirds">
-                    <SpecificationSummarySection
-                        specificationId={specificationId}
-                        specification={specificationSummary}
-                        setSpecification={setSpecificationSummary}
-                        addError={addErrorMessage}
-                    />
-                </div>
-            </div>
-
-            <div className="govuk-grid-row">
-                {(isCheckingForJob || anyJobsRunning) &&
-                <LoadingStatus title={`Job running: ${hasJob ? jobProgressMessage : "Checking for jobs..."} `}
-                               subTitle={isCheckingForJob ?
-                                   "Searching for any running jobs" :
-                                   "Monitoring job progress. Please wait, this could take several minutes"}
-                               testid='loadingJobs'/>
-                }
-                {!isCheckingForJob && !anyJobsRunning && !isConfirmingApproval && !isConfirmingRelease && specificationSummary &&
-                <>
-                    <PublishedProviderSearchFilters publishedProviderResults={publishedProviderResults}
-                                                    specificationSummary={specificationSummary as SpecificationSummary}
-                                                    searchCriteria={searchCriteria}
-                                                    setSearchCriteria={setSearchCriteria}
-                    />
-                    {(isLoadingResults || isLoadingProviderVersionIds) &&
+                <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-padding-top-5">
                     <div className="govuk-grid-column-two-thirds">
-                        <LoadingStatus title={isLoadingResults ? "Loading provider funding data" : "Applying selection..."}/>
+                        <SpecificationSummarySection
+                            specification={specification}
+                            isLoadingSpecification={isLoadingSpecification}
+                        />
                     </div>
-                    }
-                    {!isLoadingResults && !isLoadingProviderVersionIds &&
-                    <>
+                </div>
+
+                {!isConfirmingApproval && !isConfirmingRelease &&
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-third">
+                        <PublishedProviderSearchFilters publishedProviderResults={publishedProviderResults}
+                                                        searchCriteria={searchCriteria}
+                                                        setSearchCriteria={setSearchCriteria}
+                                                        numberOfProvidersWithErrors={0}
+                        />
+                    </div>
+                    <div className="govuk-grid-column-two-thirds">
+                        {isLoading &&
+                        <div>
+                            {isLoadingSpecification ?
+                                <LoadingStatus title={"Loading specification..."}/>
+                                : (isCheckingForJob || anyJobsRunning) ?
+                                    <LoadingStatus title={`Job running: ${hasJob ? jobProgressMessage : "Checking for jobs..."} `}
+                                                   subTitle={isCheckingForJob ?
+                                                       "Searching for any running jobs" :
+                                                       "Monitoring job progress. Please wait, this could take several minutes"}
+                                                   testid='loadingJobs'/>
+                                    :
+                                    <LoadingStatus title={isLoadingResults ? "Loading provider funding data..." : "Applying selection..."}/>
+                            }
+                        </div>
+                        }
+                        {!isCheckingForJob && !anyJobsRunning && !isLoadingResults && !isLoadingProviderVersionIds && !isLoadingSpecification && specification &&
                         <PublishedProviderResults specificationId={specificationId}
                                                   enableBatchSelection={approvalMode === ApprovalMode.Batches}
-                                                  specProviderVersionId={specificationSummary?.providerVersionId}
+                                                  specProviderVersionId={specification.providerVersionId}
                                                   providerSearchResults={publishedProviderResults}
                                                   canRefreshFunding={canRefreshFunding}
                                                   canApproveFunding={canApproveFunding}
@@ -228,16 +243,16 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                                   setConfirmApproval={setConfirmApproval}
                                                   addError={addErrorMessage}
                         />
-                    </>
-                    }
-                </>
+                        }
+                    </div>
+                </div>
                 }
-                {!isLoadingResults && specificationSummary &&
-                <>
+                {!isLoadingResults && specification &&
+                <div className="govuk-grid-row">
                     {isConfirmingApproval && !isConfirmingRelease ?
                         <ConfirmFundingApproval
                             canApproveFunding={canApproveFunding}
-                            specificationSummary={specificationSummary}
+                            specificationSummary={specification}
                             publishedProviderResults={publishedProviderResults}
                             handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
@@ -245,16 +260,16 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         :
                         <ConfirmFundingRelease
                             canReleaseFunding={canReleaseFunding}
-                            specificationSummary={specificationSummary}
+                            specificationSummary={specification}
                             publishedProviderResults={publishedProviderResults}
                             handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
                         />
                     }
-                </>
+                </div>
                 }
             </div>
+            <Footer/>
         </div>
-        <Footer/>
-    </div>
+    );
 }

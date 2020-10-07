@@ -1,14 +1,14 @@
 ﻿import React, {useState} from "react";
 import {BackButton} from "../BackButton";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
-import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
+import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {FundingSpecificationDetails} from "./FundingSpecificationDetails";
 import {approveFundingService} from "../../services/publishService";
 import {LoadingStatus} from "../LoadingStatus";
 
 export interface IConfirmFundingApprovalProps {
-    publishedProviderResults: PublishedProviderSearchResult,
+    publishedProviderResults: PublishedProviderSearchResults,
     specificationSummary: SpecificationSummary,
     canApproveFunding: boolean | undefined,
     handleBackToResults: () => void,

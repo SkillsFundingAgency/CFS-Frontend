@@ -7,6 +7,7 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.Models.Search;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
@@ -29,6 +30,8 @@ namespace CalculateFunding.Frontend.Services
 
         public async Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request.PageSize, "PageSize");
+            
             SearchModel requestOptions = new SearchModel
             {
                 PageNumber = request.PageNumber ?? 1,
@@ -56,100 +59,59 @@ namespace CalculateFunding.Frontend.Services
             PublishProviderSearchResultViewModel result = new PublishProviderSearchResultViewModel
             {
                 TotalResults = searchRequestResult.Content?.TotalCount ?? 0,
+                TotalErrorResults = searchRequestResult.Content?.TotalErrorCount ?? 0,
                 CurrentPage = requestOptions.PageNumber,
+                Facets = searchRequestResult.Content?.Facets?.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)),
+                Providers = searchRequestResult.Content?.Results?.Select(provider => _mapper.Map<PublishedProviderSearchResultItemViewModel>(provider)),
+                FilteredFundingAmount = searchRequestResult.Content?.Results?.Sum(x => x.FundingValue) ?? 0
             };
 
-            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-
-            if (searchRequestResult.Content?.Facets != null)
-            {
-                foreach (SearchFacet facet in searchRequestResult.Content.Facets)
-                {
-                    searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
-                }
-            }
-
-            result.Facets = searchFacets.AsEnumerable();
-
-            List<PublishedProviderSearchResultItemViewModel> itemResults = new List<PublishedProviderSearchResultItemViewModel>();
-
-            result.FilteredFundingAmount = 0;
-
-            if (searchRequestResult.Content != null)
-            {
-                foreach (PublishedProviderSearchItem searchResult in searchRequestResult.Content.Results)
-                {
-                    itemResults.Add(_mapper.Map<PublishedProviderSearchResultItemViewModel>(searchResult));
-                    result.FilteredFundingAmount += searchResult.FundingValue;
-                }
-
-                result.Providers = itemResults.AsEnumerable();
-                if (result.TotalResults == 0)
-                {
-                    result.StartItemNumber = 0;
-                    result.EndItemNumber = 0;
-                }
-                else
-                {
-                    result.StartItemNumber = ((requestOptions.PageNumber - 1) * requestOptions.Top) + 1;
-                    result.EndItemNumber = result.StartItemNumber + requestOptions.Top - 1;
-                }
-
-                if (result.EndItemNumber > searchRequestResult.Content.TotalCount)
-                {
-                    result.EndItemNumber = searchRequestResult.Content.TotalCount;
-                }
-            }
-
-            result.CanPublish = result.CanApprove = false;
-
-            result.TotalFundingAmount = 0;
-            result.TotalProvidersToApprove = 0;
-            result.TotalProvidersToPublish = 0;
-
-            int totalItemCount = result.TotalResults;
-            int totalPages = (int)Math.Ceiling((double)totalItemCount / (double)request.PageSize.Value);
+            int totalPages = (int) Math.Ceiling((double) result.TotalResults / (double) request.PageSize.Value);
             result.PagerState = new PagerState(requestOptions.PageNumber, totalPages, 4);
-
-            if (result.Providers.FirstOrDefault() == null)
+            
+            int numberOfResultsInThisPage = result.Providers?.Count() ?? 0;
+            if (numberOfResultsInThisPage > 0)
             {
-                return result;
+                result.StartItemNumber = (result.PagerState.CurrentPage - 1) * request.PageSize.Value + 1;
+                result.EndItemNumber = result.StartItemNumber + numberOfResultsInThisPage - 1;
             }
 
-            ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts =
-                await _publishingApiClient.GetProviderStatusCounts(
-                    result.Providers.First().SpecificationId,
-                    request.Filters.GetValueOrDefault("providerType")?.FirstOrDefault(),
-                    request.Filters.GetValueOrDefault("localAuthority")?.FirstOrDefault(),
-                    request.Filters.GetValueOrDefault("fundingStatus")?.FirstOrDefault()
+            if (result.Providers != null && result.Providers.Any())
+            {
+                ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts =
+                    await _publishingApiClient.GetProviderStatusCounts(
+                        result.Providers.First().SpecificationId,
+                        request.Filters.GetValueOrDefault("providerType")?.FirstOrDefault(),
+                        request.Filters.GetValueOrDefault("localAuthority")?.FirstOrDefault(),
+                        request.Filters.GetValueOrDefault("fundingStatus")?.FirstOrDefault()
                     );
 
-            foreach (var providerFundingStreamStatusResponse in providerStatusCounts.Content)
-            {
-                if (providerFundingStreamStatusResponse.ProviderDraftCount == 0 &&
-                    providerFundingStreamStatusResponse.ProviderApprovedCount > 0 &&
-                    providerFundingStreamStatusResponse.ProviderUpdatedCount == 0)
+                foreach (var providerFundingStreamStatusResponse in providerStatusCounts.Content)
                 {
-                    result.CanPublish = true;
-                    result.TotalProvidersToPublish += providerFundingStreamStatusResponse.ProviderApprovedCount;
-                }
+                    if (providerFundingStreamStatusResponse.ProviderDraftCount == 0 &&
+                        providerFundingStreamStatusResponse.ProviderApprovedCount > 0 &&
+                        providerFundingStreamStatusResponse.ProviderUpdatedCount == 0)
+                    {
+                        result.CanPublish = true;
+                        result.TotalProvidersToPublish += providerFundingStreamStatusResponse.ProviderApprovedCount;
+                    }
 
-                if (providerFundingStreamStatusResponse.ProviderDraftCount > 0 ||
-                    providerFundingStreamStatusResponse.ProviderUpdatedCount > 0)
-                {
-                    result.CanApprove = true;
-                    result.TotalProvidersToApprove += providerFundingStreamStatusResponse.ProviderUpdatedCount;
-                    result.TotalProvidersToApprove += providerFundingStreamStatusResponse.ProviderDraftCount;
-                }
+                    if (providerFundingStreamStatusResponse.ProviderDraftCount > 0 ||
+                        providerFundingStreamStatusResponse.ProviderUpdatedCount > 0)
+                    {
+                        result.CanApprove = true;
+                        result.TotalProvidersToApprove += providerFundingStreamStatusResponse.ProviderUpdatedCount;
+                        result.TotalProvidersToApprove += providerFundingStreamStatusResponse.ProviderDraftCount;
+                    }
 
-                if (providerFundingStreamStatusResponse.TotalFunding.HasValue)
-                {
-                    result.TotalFundingAmount = +providerFundingStreamStatusResponse.TotalFunding.Value;
+                    if (providerFundingStreamStatusResponse.TotalFunding.HasValue)
+                    {
+                        result.TotalFundingAmount = +providerFundingStreamStatusResponse.TotalFunding.Value;
+                    }
                 }
             }
 
             return result;
         }
-
     }
 }

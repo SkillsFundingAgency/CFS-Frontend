@@ -1,11 +1,11 @@
 import {PublishedProviderSearchRequest} from "../types/publishedProviderSearchRequest";
 import axios, {AxiosResponse} from "axios"
-import {PublishedProviderSearchResult} from "../types/PublishedProvider/PublishedProviderSearchResult";
+import {PublishedProviderSearchResults} from "../types/PublishedProvider/PublishedProviderSearchResults";
 
 const baseUrl = "/api/publishedprovider";
 
 export async function searchForPublishedProviderResults(criteria: PublishedProviderSearchRequest): 
-    Promise<AxiosResponse<PublishedProviderSearchResult>> {
+    Promise<AxiosResponse<PublishedProviderSearchResults>> {
     return axios(`${baseUrl}/search`, {
         method: 'POST',
         headers: {

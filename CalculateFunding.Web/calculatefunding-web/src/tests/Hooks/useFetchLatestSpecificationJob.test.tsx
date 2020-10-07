@@ -62,7 +62,6 @@ describe("useFetchLatestSpecificationJob tests", () => {
 
             await act(async () => {
                 await waitForValueToChange(() => result.current.isCheckingForJob);
-                // await waitForNextUpdate();
             });
             
             expect(result.current.lastJob).toBeUndefined();

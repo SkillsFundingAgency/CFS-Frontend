@@ -1,14 +1,14 @@
 ﻿import {BackButton} from "../BackButton";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import React, {useState} from "react";
-import {PublishedProviderSearchResult} from "../../types/PublishedProvider/PublishedProviderSearchResult";
+import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {FundingSpecificationDetails} from "./FundingSpecificationDetails";
 import {releaseFundingService} from "../../services/publishService";
 import {LoadingStatus} from "../LoadingStatus";
 
 export interface IConfirmFundingReleaseProps {
-    publishedProviderResults: PublishedProviderSearchResult,
+    publishedProviderResults: PublishedProviderSearchResults,
     specificationSummary: SpecificationSummary,
     canReleaseFunding: boolean | undefined,
     handleBackToResults: () => void,

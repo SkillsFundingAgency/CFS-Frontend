@@ -16,5 +16,6 @@ namespace CalculateFunding.Frontend.ViewModels.Common
         public string[] ProviderType { get; set; }
         public string[] ProviderSubType { get; set; }
         public string[] LocalAuthority { get; set; }
+        public bool? HasErrors { get; set; }
     }
 }

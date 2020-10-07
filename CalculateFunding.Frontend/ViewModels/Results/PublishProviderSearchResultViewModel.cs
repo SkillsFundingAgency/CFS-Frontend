@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CalculateFunding.Frontend.ViewModels.Common;
+using Newtonsoft.Json;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
@@ -24,5 +25,8 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         public int TotalProvidersToApprove { get; set; }
 
         public int TotalProvidersToPublish { get; set; }
+        
+        [JsonIgnore] // We can't figure this out from the search results so hide it to avoid confusion on UI
+        public new int TotalErrorResults { get; set; }
     }
 }

@@ -110,6 +110,11 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 destination.Add("providerSubType", source.ProviderSubType);
             }
+
+            if (source.HasErrors.HasValue)
+            {
+                destination.Add("hasErrors", new [] {source.HasErrors.Value ? "true" : "false"});
+            }
             
             return destination;
         }

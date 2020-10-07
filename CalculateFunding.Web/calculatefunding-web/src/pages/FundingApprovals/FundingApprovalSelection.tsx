@@ -69,7 +69,7 @@ export function FundingApprovalSelection() {
                 .finally(() => setIsLoadingSpecification(false));
         }
     }
-
+    
     function changeFundingStream(e: React.ChangeEvent<HTMLSelectElement>) {
         const fundingStream = e.target.value;
         setSelectedFundingStream(fundingStream);

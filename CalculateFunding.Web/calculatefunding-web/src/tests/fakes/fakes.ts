@@ -385,6 +385,7 @@ export const fakeInitialState: IStoreState = {
     },
     featureFlags: {
         templateBuilderVisible: false,
+        enableReactQueryDevTool: false,
         releaseTimetableVisible: false,
         profilingPatternVisible: false
     }

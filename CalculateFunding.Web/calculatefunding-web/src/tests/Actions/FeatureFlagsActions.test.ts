@@ -388,7 +388,10 @@ const storeWithData: IStoreState = {
     ]
   },
   featureFlags: {
-    templateBuilderVisible: false
+    templateBuilderVisible: false,
+    enableReactQueryDevTool: false,
+    releaseTimetableVisible: false,
+    profilingPatternVisible: false
   },
   userPermissions: {
     fundingStreamPermissions: 

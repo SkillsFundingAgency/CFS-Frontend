@@ -1,7 +1,7 @@
 import {Facet} from "../Facet";
 import {PagerState} from "../PagerState";
 
-export interface PublishedProvider {
+export interface PublishedProviderResult {
     publishedProviderVersionId: string;
     providerType: string;
     providerSubType: string;
@@ -15,9 +15,12 @@ export interface PublishedProvider {
     specificationId: string;
     fundingStreamId: string;
     fundingPeriodId: string;
+    hasErrors: boolean;
+    errors: string[];
 }
-export interface PublishedProviderSearchResult {
-    providers: PublishedProvider[];
+
+export interface PublishedProviderSearchResults {
+    providers: PublishedProviderResult[];
     filteredFundingAmount: number;
     canPublish: boolean;
     canApprove: boolean;
@@ -25,7 +28,6 @@ export interface PublishedProviderSearchResult {
     totalProvidersToApprove: number;
     totalProvidersToPublish: number;
     totalResults: number;
-    totalErrorResults: number;
     currentPage: number;
     startItemNumber: number;
     endItemNumber: number;

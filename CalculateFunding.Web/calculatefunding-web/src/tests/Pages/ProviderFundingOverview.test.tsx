@@ -54,7 +54,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("displays profiling tab containing profiling patterns given profilingPatternVisible is true in featureFlagsState", async () => {
-        const featureFlagsState: FeatureFlagsState = { profilingPatternVisible: true, releaseTimetableVisible: false, templateBuilderVisible: false};
+        const featureFlagsState: FeatureFlagsState = { profilingPatternVisible: true, releaseTimetableVisible: false, templateBuilderVisible: false, enableReactQueryDevTool: false};
         useSelectorSpy.mockReturnValue(featureFlagsState);
 
         const wrapper = mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);
@@ -64,7 +64,7 @@ describe("Provider Funding Overview ", () => {
     });
 
     it("hides profiling tab containing profiling patterns given profilingPatternVisible is false in featureFlagsState", async () => {
-        const featureFlagsState: FeatureFlagsState = { profilingPatternVisible: false, releaseTimetableVisible: false, templateBuilderVisible: false};
+        const featureFlagsState: FeatureFlagsState = { profilingPatternVisible: false, releaseTimetableVisible: false, templateBuilderVisible: false, enableReactQueryDevTool: false};
         useSelectorSpy.mockReturnValue(featureFlagsState);
 
         const wrapper = mount(<MemoryRouter><Provider store={store}><ProviderFundingOverview history={history} location={location} match={match} /></Provider></MemoryRouter>);

@@ -5,6 +5,7 @@ export interface PublishedProviderSearchRequest {
     searchTerm: string,
     errorToggle: string,
     includeFacets: boolean,
+    hasErrors: boolean | undefined,
     fundingStreamId: string,
     fundingPeriodId: string,
     localAuthority: string[],

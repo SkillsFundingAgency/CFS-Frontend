@@ -57,6 +57,7 @@ import {
     QueryCache,
     ReactQueryCacheProvider,
 } from "react-query";
+import {ReactQueryDevtools} from "react-query-devtools";
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -142,6 +143,9 @@ const App: React.FunctionComponent = () => {
                             <NoMatch/>
                         </Route>
                     </Switch>
+                    {process.env.NODE_ENV === 'development' && featureFlagsState.enableReactQueryDevTool &&
+                    <ReactQueryDevtools initialIsOpen={false}/>
+                    }
                 </ReactQueryCacheProvider>
             </BrowserRouter>
         );

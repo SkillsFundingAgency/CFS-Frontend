@@ -6,6 +6,7 @@ import { Reducer } from "redux";
 const initialState: FeatureFlagsState = {
     templateBuilderVisible: false,
     releaseTimetableVisible: false,
+    enableReactQueryDevTool: false,
     profilingPatternVisible: false
 };
 
@@ -21,9 +22,10 @@ export const reduceFeatureFlagsState: Reducer<FeatureFlagsState, GetFeatureFlags
                 ...state,
                 templateBuilderVisible: isFeatureEnabled(action.payload, FeatureFlagKey.TemplateBuilderVisible),
                 releaseTimetableVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ReleaseTimetableVisible),
+                enableReactQueryDevTool: isFeatureEnabled(action.payload, FeatureFlagKey.EnableReactQueryDevTool),
                 profilingPatternVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ProfilingPatternVisible)
             };
         default:
             return state;
     }
-}
+};
