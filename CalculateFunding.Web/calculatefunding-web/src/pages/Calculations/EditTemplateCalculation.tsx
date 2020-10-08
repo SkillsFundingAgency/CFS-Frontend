@@ -32,6 +32,7 @@ import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
 import {CircularReferenceError} from "../../types/Calculations/CircularReferenceError";
+import {CompliationErrorMessageList} from "../../components/Calculations/CompliationErrorMessageList";
 
 export interface EditTemplateCalculationProps {
     excludeMonacoEditor?: boolean
@@ -370,38 +371,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
                     </label>
-                    <div className="govuk-error-summary">
-                        <h2 className="govuk-error-summary__title">
-                            There was a compilation error
-                        </h2>
-                        <div className="govuk-error-summary__body">
-                            <table className={"govuk-table"}>
-                                <thead className={"govuk-table__head"}>
-                                <tr className={"govuk-table__row"}>
-                                    <th className="govuk-table__header">Error message</th>
-                                    <th className="govuk-table__header">Start line</th>
-                                    <th className="govuk-table__header">Start char</th>
-                                    <th className="govuk-table__header">End line</th>
-                                    <th className="govuk-table__header">End char</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
-                                    <tr key={index} className={"govuk-table__row"}>
-                                        <td className="govuk-table__cell">{cm.message}</td>
-                                        <td className="govuk-table__cell">{cm.location.startLine}</td>
-                                        <td className="govuk-table__cell">{cm.location.startChar}</td>
-                                        <td className="govuk-table__cell">{cm.location.endLine}</td>
-                                        <td className="govuk-table__cell">{cm.location.endChar}</td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
-                            <ul className="govuk-error-summary__list">
-                                <li hidden={errorMessage.length === 0}>{errorMessage}</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <CompliationErrorMessageList compilerMessages={templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages} errorMessage={errorMessage} />
                 </div>
                 {isLoadingCircularDependencies &&
                 <div className="govuk-!-margin-bottom-4">

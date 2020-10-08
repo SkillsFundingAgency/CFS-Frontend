@@ -15,6 +15,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {Footer} from "../../components/Footer";
+import {CompliationErrorMessageList} from "../../components/Calculations/CompliationErrorMessageList";
 
 export interface CreateAdditionalCalculationRouteProps {
     specificationId: string;
@@ -252,37 +253,10 @@ export function CreateAdditionalCalculation({match}: RouteComponentProps<CreateA
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
                     </label>
-                    <div className="govuk-error-summary">
-                        <h2 className="govuk-error-summary__title">
-                            There was a compilation error
-                        </h2>
-                        <div className="govuk-error-summary__body">
-                            <table className={"govuk-table"}>
-                                <thead className={"govuk-table__head"}>
-                                <tr className={"govuk-table__row"}>
-                                    <th className="govuk-table__header">Error message</th>
-                                    <th className="govuk-table__header">Start line</th>
-                                    <th className="govuk-table__header">Start char</th>
-                                    <th className="govuk-table__header">End line</th>
-                                    <th className="govuk-table__header">End char</th>
-                                </tr>
-                                </thead>
-                                {additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages.map((cm, index) =>
-                                    <tr key={index} className={"govuk-table__row"}>
-                                        <td className="govuk-table__cell">{cm.message}</td>
-                                        <td className="govuk-table__cell">{cm.location.startLine}</td>
-                                        <td className="govuk-table__cell">{cm.location.startChar}</td>
-                                        <td className="govuk-table__cell">{cm.location.endLine}</td>
-                                        <td className="govuk-table__cell">{cm.location.endChar}</td>
-                                    </tr>
-                                )}
-                            </table>
-                            <ul className="govuk-error-summary__list">
-                                <li hidden={errorMessage.length === 0}>{errorMessage}</li>
-
-                            </ul>
-                        </div>
-                    </div>
+                    <CompliationErrorMessageList
+                        compilerMessages={additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages}
+                        errorMessage={errorMessage}
+                    />
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitAdditionalCalculation}
