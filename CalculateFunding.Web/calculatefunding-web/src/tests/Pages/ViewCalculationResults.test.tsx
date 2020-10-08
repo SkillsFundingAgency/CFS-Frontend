@@ -1,8 +1,6 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
 import {cleanup, render, waitFor} from "@testing-library/react";
-import {RunningStatus} from "../../types/RunningStatus";
-import {CompletionStatus} from "../../types/CompletionStatus";
 import '@testing-library/jest-dom/extend-expect';
 import * as hooks from "../../hooks/useLatestSpecificationJobWithMonitoring";
 import {JobSummary} from "../../types/jobSummary";

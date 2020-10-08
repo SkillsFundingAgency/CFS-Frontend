@@ -1,81 +1,55 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import {DateTime} from "luxon";
 
-export function DateInput(props: { day: number, month: number, year: number, callback: any, inputName?: string }) {
-    const propDay = props.day;
-    const propMonth = props.month;
-    const propYear = props.year;
-    const inputId = props.inputName == null? generateRandomId() : props.inputName;
-    const inputDayId = inputId + "_day";
-    const inputMonthId = inputId + "_month";
-    const inputYearId = inputId + "_year";
+export function DateInput(props: { date: Date, callback: any, inputName?: string }) {
+    const inputId = props.inputName == null ? generateRandomId() : props.inputName;
+    const inputDayId = inputId;
+    const [date, setDate] = useState<Date>(props.date);
 
-    const [localDay, setDay] = useState(props.day);
-    const [localMonth, setMonth] = useState(props.month);
-    const [localYear, setYear] = useState(props.year);
+    const [dateIsValid, setDateIsValid] = useState<boolean>(true);
 
-    useEffect(() => {
-        setDay(propDay);
-        setMonth(propMonth + 1); // adapt to calendar month from javascript's zero index month
-        setYear(propYear);
-        const displayDate: Date = new Date(propYear,propMonth,propDay);
-        props.callback(displayDate);
-    }, [propDay, propMonth, propYear]);
-
-    function generateRandomId ()
-    {
+    function generateRandomId() {
         return Math.random().toString(36).substr(2);
     }
 
-    if (localDay === null)
-        setDay(1);
-
-    function setDateTime(day: number, month: number, year: number) {
-        setDay(day);
-        setMonth(month);
-        setYear(year);
-        const updatedDate: Date = new Date(`${year}-${month}-${day}`);
+    function setDateTime(day: string) {
+        let newDate = DateTime.fromISO(day)
+        setDate(newDate.toJSDate());
+        const updatedDate: Date = newDate.toJSDate();
         if (updatedDate !== undefined && !isNaN(updatedDate.getDate())) {
             props.callback(updatedDate);
+            setDateIsValid(true);
+        } else {
+            setDateIsValid(false);
+        }
+    }
+
+    function checkDate() {
+        const currentDate = DateTime.fromJSDate(date);
+
+        if (currentDate.equals(DateTime.fromSeconds(0))) {
+            setDateIsValid(false);
         }
     }
 
     return (
-        <div className="govuk-date-input" id="passport-issued">
-            <div className="govuk-date-input__item">
-                <div className="govuk-form-group">
-                    <label className="govuk-label govuk-date-input__label" htmlFor={inputDayId}>Day</label>
-                    <input className="govuk-input govuk-date-input__input govuk-input--width-2"
-                           id={inputDayId} name={inputDayId}
-                           type="number" pattern="[0-9]*" max={31} min={1}
-                           value={localDay.toString()}
-                           onChange={(e) => setDateTime(parseInt(e.target.value), localMonth, localYear)}
-                    />
+        <div className={"govuk-form-group" + (dateIsValid ? "" : " govuk-form-group--error")}>
+            <fieldset className={"govuk-fieldset govuk-!-margin-top-5"} role="group" aria-describedby={`timeInputFieldset-${inputId}`}>
+                <div className="govuk-date-input">
+                    <div className="govuk-date-input__item">
+                        <div className="govuk-form-group">
+                            <label className="govuk-label govuk-date-input__label" htmlFor={inputDayId}>Day</label>
+                            <input className="govuk-input govuk-date-input__input govuk-input--width-6"
+                                   id={inputDayId} name={inputDayId}
+                                   type="date"
+                                   defaultValue={`${props.date}`}
+                                   onChange={(e) => setDateTime(e.target.value)}
+                                   onBlur={checkDate}
+                            />
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className="govuk-date-input__item">
-                <div className="govuk-form-group">
-                    <label className="govuk-label govuk-date-input__label" htmlFor={inputMonthId}>Month</label>
-                    <input className="govuk-input govuk-date-input__input govuk-input--width-2"
-                           id={inputMonthId} name={inputMonthId}
-                           type="number" pattern="[0-9]*"
-                           value={localMonth.toString()}
-                           onChange={(e) => setDateTime(localDay, parseInt(e.target.value), localYear)}
-                    />
-                </div>
-            </div>
-            <div className="govuk-date-input__item">
-                <div className="govuk-form-group">
-                    <label className="govuk-label govuk-date-input__label"
-                           htmlFor={inputYearId}>Year</label>
-                    <input
-                        className="govuk-input govuk-date-input__input govuk-input--width-4"
-                        id={inputYearId} name={inputYearId}
-                        type="number" pattern="[0-9]*"
-                        value={localYear.toString()}
-                        onChange={(e) => setDateTime(localDay, localMonth, parseInt(e.target.value))}
-                    />
-                </div>
-            </div>
+            </fieldset>
         </div>
     )
 }

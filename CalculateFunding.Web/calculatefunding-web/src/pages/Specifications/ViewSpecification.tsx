@@ -4,9 +4,6 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
-import {SaveReleaseTimetableViewModel} from "../../types/SaveReleaseTimetableViewModel";
-import {DateInput} from "../../components/DateInput";
-import {TimeInput} from "../../components/TimeInput";
 import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
@@ -38,11 +35,8 @@ import {
 } from "../../components/fundingLineStructure/FundingLineStructure";
 import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
 import {
-    getReleaseTimetableForSpecificationService,
     refreshFundingService,
-    saveReleaseTimetableForSpecificationService
 } from "../../services/publishService";
-import {ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../../types/ReleaseTimetableSummary";
 import {getDatasetBySpecificationIdService} from "../../services/datasetService";
 import {DatasetSummary} from "../../types/DatasetSummary";
 import {getCalculationsService} from "../../services/calculationService";
@@ -57,6 +51,7 @@ import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageMo
 import * as QueryString from "query-string";
 import {NoData} from "../../components/NoData";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {ReleaseTimetable} from "./ReleaseTimetable";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -66,11 +61,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const [additionalCalculationsSearchTerm,] = useState('');
     const [statusFilter] = useState("");
-    const [navisionDate, setNavisionDate] = useState<Date>(new Date());
-    const [releaseDate, setReleaseDate] = useState<Date>(new Date());
-    const [navisionTime, setNavisionTime] = useState<string>("");
-    const [releaseTime, setReleaseTime] = useState<string>("");
-    const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
+
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
     const initialSpecification: SpecificationSummary = {
@@ -91,7 +82,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     };
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     let specificationId = match.params.specificationId;
-    let saveReleaseTimetable: SaveReleaseTimetableViewModel;
+
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
@@ -102,20 +93,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
     const [profileVariationPointers, setProfileVariationPointers] = useState<ProfileVariationPointer[]>([]);
-    const [releaseTimetable, setReleaseTimetable] = useState<ReleaseTimetableViewModel>({
-        navisionDate: {
-            time: "00:00",
-            year: "2000",
-            month: "1",
-            day: "1"
-        },
-        releaseDate: {
-            time: "00:00",
-            year: "2000",
-            month: "1",
-            day: "1"
-        }
-    });
+
     const [datasets, setDatasets] = useState<DatasetSummary>({
         content: [],
         statusCode: 0
@@ -222,33 +200,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 }
             });
 
-        getReleaseTimetableForSpecificationService(specificationId)
-            .then((response) => {
-                if (response.status === 200) {
-                    const result = response.data as ReleaseTimetableSummary;
 
-                    let request: ReleaseTimetableViewModel = {
-                        releaseDate:
-                            {
-                                day: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getDate().toString() : "1",
-                                month: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getMonth().toString() : "1",
-                                year: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getFullYear().toString() : "2000",
-                                time: result.content.earliestPaymentAvailableDate != null ? new Date(result.content.earliestPaymentAvailableDate).getTime().toString() : "00:00",
-
-                            },
-                        navisionDate:
-                            {
-                                day: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getDate().toString() : "1",
-                                month: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getMonth().toString() : "1",
-                                year: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getFullYear().toString() : "2000",
-                                time: result.content.externalPublicationDate != null ? new Date(result.content.externalPublicationDate).getTime().toString() : "00:00",
-
-                            }
-                    };
-
-                    setReleaseTimetable(request);
-                }
-            });
 
         getProfileVariationPointersService(specificationId).then((result) => {
             const response = result;
@@ -259,6 +211,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             setIsLoadingVariationManagement(false);
         });
     }, [specificationId]);
+
+
 
     const fetchData = async () => {
         try {
@@ -277,7 +231,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     return hasAnySelectedForFunding;
                 });
             }
-            setCanTimetableBeUpdated(true);
+
+            //setCanTimetableBeUpdated(true);
+
             const fundingStructureItem = (await getFundingLineStructureService(spec.id, spec.fundingPeriod.id, spec.fundingStreams[0].id)).data;
             setInitialExpandedStatus(fundingStructureItem, false);
             setFundingLines(fundingStructureItem);
@@ -290,53 +246,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             setIsLoadingSelectedForFunding(false);
         }
     };
-
-    function confirmChanges() {
-        setCanTimetableBeUpdated(false);
-        let navDateAndTime2 = updateDateWithTime(navisionDate, navisionTime);
-        let releaseDate2 = updateDateWithTime(releaseDate, releaseTime);
-        saveReleaseTimetable = {
-            specificationId: specification.id,
-            statementDate: navDateAndTime2,
-            fundingDate: releaseDate2
-        };
-
-        saveReleaseTimetableForSpecificationService(saveReleaseTimetable).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as ReleaseTimetableViewModel;
-                setReleaseTimetable(result);
-            }
-        })
-    }
-
-    function updateDateWithTime(date: Date, time: string) {
-        let timeParts = time.match(/(\d+):(\d+)/);
-        if (timeParts !== null) {
-            let hours = timeParts[1];
-            let minutes = timeParts[2];
-            if (hours !== null && minutes !== null) {
-                date.setHours(hours as unknown as number);
-                date.setMinutes(minutes as unknown as number);
-            }
-        }
-        return date;
-    }
-
-    function updateNavisionDate(e: Date) {
-        setNavisionDate(e);
-    }
-
-    function updateReleaseDate(e: Date) {
-        setReleaseDate(e);
-    }
-
-    function updateNavisionTime(e: string) {
-        setNavisionTime(e);
-    }
-
-    function updateReleaseTime(e: string) {
-        setReleaseTime(e);
-    }
 
     function movePage(pageNumber: number) {
         populateAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm);
@@ -532,12 +441,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
             {initialTab.length > 0 && <div className="govuk-main-wrapper  govuk-!-padding-top-2">
                 <div className="govuk-grid-row">
-                    <Tabs initialTab={initialTab}>
+                    <Tabs initialTab={"release-timetable"}>
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
-                            <Tabs.Tab hidden={!releaseTimetableIsEnabled} label="release-timetable">Release timetable</Tabs.Tab>
+                            <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
                             <Tabs.Tab label="variation-management">Variation Management</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
@@ -739,54 +648,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 </table>
                             </section>
                         </Tabs.Panel>
-                        <Tabs.Panel hidden={!releaseTimetableIsEnabled} label="release-timetable">
+                        <Tabs.Panel label="release-timetable">
                             <section className="govuk-tabs__panel">
-                                <div className="govuk-grid-row">
-                                    <div className="govuk-grid-column-full">
-                                        <h2 className="govuk-heading-l">Release timetable</h2>
-                                    </div>
-                                </div>
-                                <div className="govuk-form-group">
-                                    <fieldset className="govuk-fieldset" role="group"
-                                              aria-describedby="passport-issued-hint">
-                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                                            <h3 className="govuk-heading-m">Release date of funding to Navison?</h3>
-                                        </legend>
-                                        <span id="passport-issued-hint" className="govuk-hint">
-                                            Set the date and time that the statement will be published externally for this funding stream. <br/>
-                                            For example, 12 11 2019</span>
-                                        <DateInput year={parseInt(releaseTimetable.navisionDate.year)}
-                                                   month={parseInt(releaseTimetable.navisionDate.month)}
-                                                   day={parseInt(releaseTimetable.navisionDate.day)}
-                                                   callback={updateNavisionDate}/>
-                                    </fieldset>
-                                </div>
-                                <div className="govuk-form-group govuk-!-margin-bottom-9">
-                                    <TimeInput time={releaseTimetable.navisionDate.time}
-                                               callback={updateNavisionTime}/>
-                                </div>
-                                <div className="govuk-form-group">
-                                    <fieldset className="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
-                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                                            <h3 className="govuk-heading-m">Release date of statement to providers?</h3>
-                                        </legend>
-                                        <span id="passport-issued-hint" className="govuk-hint">
-                                            Set the date and time that the statement will be published externally for this funding stream. <br/>
-                                            For example, 12 11 2019</span>
-                                        <DateInput year={parseInt(releaseTimetable.releaseDate.year)}
-                                                   month={parseInt(releaseTimetable.releaseDate.month)}
-                                                   day={parseInt(releaseTimetable.releaseDate.day)}
-                                                   callback={updateReleaseDate}/>
-                                    </fieldset>
-                                </div>
-                                <div className="govuk-form-group govuk-!-margin-bottom-9">
-                                    <TimeInput time={releaseTimetable.releaseDate.time} callback={updateReleaseTime}/>
-                                </div>
-                                <div className="govuk-form-group">
-                                    <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated}>Confirm changes
-                                    </button>
-                                </div>
-
+                                <ReleaseTimetable specificationId={specificationId}/>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label={"variation-management"}>
@@ -836,4 +700,3 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         <Footer/>
     </div>
 }
-

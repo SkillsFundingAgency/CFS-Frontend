@@ -9,16 +9,6 @@ export interface ReleaseTimetableSummary {
 }
 
 export interface ReleaseTimetableViewModel {
-    navisionDate: {
-        day: string,
-        month: string,
-        year: string,
-        time: string
-    };
-    releaseDate: {
-        day: string,
-        month: string,
-        year: string,
-        time: string
-    }
+    navisionDate: Date;
+    releaseDate: Date;
 }

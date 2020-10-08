@@ -1,10 +1,10 @@
 import axios, {AxiosResponse} from "axios"
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
-import {PublishedProviderSearchResult} from "../types/PublishedProvider/PublishedProviderSearchResult";
+import {ReleaseTimetableSummary} from "../types/ReleaseTimetableSummary";
 
 const baseUrl = "/api/publish";
 
-export async function getReleaseTimetableForSpecificationService(specificationId: string) {
+export async function getReleaseTimetableForSpecificationService(specificationId: string): Promise<AxiosResponse<ReleaseTimetableSummary>> {
     return axios(`${baseUrl}/gettimetable/${specificationId}`, {
         method: 'GET',
         headers: {
