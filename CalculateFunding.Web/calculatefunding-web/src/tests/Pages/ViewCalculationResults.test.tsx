@@ -2,21 +2,22 @@ import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
 import {cleanup, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import * as hooks from "../../hooks/useLatestSpecificationJobWithMonitoring";
-import {JobSummary} from "../../types/jobSummary";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/useLatestSpecificationJobWithMonitoring";
 
-jest.spyOn(hooks, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
+jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
     () => ({
         anyJobsRunning: false,
         hasJob: false,
+        hasActiveJob: false,
+        hasFailedJob: false,
         hasJobError: false,
-        isCheckingForJob: false,
+        isCheckingForJob: true,
         isFetched: false,
         isFetching: false,
         isMonitoring: false,
         jobError: "",
-        jobProgressMessage: "",
-        latestJob: new class implements JobSummary {}
+        jobInProgressMessage: "",
+        latestJob: undefined
     }));
 
 const renderViewCalculationResultsPage = () => {
@@ -26,7 +27,7 @@ const renderViewCalculationResultsPage = () => {
             <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
         </Switch>
     </MemoryRouter>)
-}
+};
 
 beforeAll(() => {
     function mockCalculationService() {
@@ -263,31 +264,8 @@ beforeAll(() => {
         }
     }
 
-    function mockSpecificationService() {
-        const specificationService = jest.requireActual('../../services/specificationService');
-        return {
-            ...specificationService,
-            getSpecificationSummaryService: jest.fn(() => Promise.resolve({
-                data: {
-                    name: "Specification Name",
-                    id: "SPEC123",
-                    approvalStatus: "Draft",
-                    isSelectedForFunding: true,
-                    description: "Test Description",
-                    providerVersionId: "PROVID123",
-                    fundingStreams: ["PSG"],
-                    fundingPeriod: {
-                        id: "fp123",
-                        name: "fp 123"
-                    }
-                }
-            }))
-        }
-    }
-
     jest.mock('../../services/calculationService', () => mockCalculationService())
-    jest.mock('../../services/specificationService', () => mockSpecificationService())
-})
+});
 
 afterEach(cleanup);
 
@@ -297,32 +275,26 @@ describe("<ViewCalculationResults /> service call checks ", () => {
         renderViewCalculationResultsPage();
         await waitFor(() => expect(getCalculationByIdService).toBeCalled())
     });
-
-    it("it calls the specificationService", async () => {
-        const {getSpecificationSummaryService} = require('../../services/specificationService');
-        renderViewCalculationResultsPage();
-        await waitFor(() => expect(getSpecificationSummaryService).toBeCalled())
-    });
 });
 
 describe('<ViewCalculationResults /> page render checks ', () => {
     it('the breadcrumbs are correct', async () => {
         const {queryAllByText} = renderViewCalculationResultsPage();
         await waitFor(() => expect(queryAllByText('Calc123')[0]).toHaveClass("govuk-breadcrumbs__list-item"));
-    })
-
+    });
 
     it('the page header is correct', async () => {
         const {queryAllByText} = renderViewCalculationResultsPage();
         await waitFor(() => expect(queryAllByText('Calc123')[1]).toHaveClass("govuk-heading-xl"));
-    })
+    });
 
     it('the view calculation button exists', async () => {
         const {container} = renderViewCalculationResultsPage();
         await waitFor(() => expect(container.querySelector('#view-calculation-button')).toBeInTheDocument())
-    })
+    });
+    
     it('the calculation results are populated', async () => {
         const {container} = renderViewCalculationResultsPage();
         await waitFor(() => expect(container.querySelectorAll('.govuk-accordion__section')).toHaveLength(2))
-    })
-})
+    });
+});

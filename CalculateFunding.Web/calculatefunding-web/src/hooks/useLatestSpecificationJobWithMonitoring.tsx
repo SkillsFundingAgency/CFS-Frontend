@@ -4,22 +4,25 @@ import {JobSummary} from "../types/jobSummary";
 import {useMonitorForNewSpecificationJob} from "./useMonitorForNewSpecificationJob";
 import {RunningStatus} from "../types/RunningStatus";
 import {getJobProgressMessage} from "../helpers/getJobProgressMessage";
+import {CompletionStatus} from "../types/CompletionStatus";
 
 export type LatestSpecificationJobWithMonitoringResult = {
     latestJob: JobSummary | undefined,
     hasJob: boolean,
-    anyJobsRunning: boolean,
+    hasActiveJob: boolean,
+    hasFailedJob: boolean,
     jobError: string,
     hasJobError: boolean,
     isMonitoring: boolean,
     isFetching: boolean,
     isFetched: boolean,
     isCheckingForJob: boolean,
-    jobProgressMessage: string
+    jobInProgressMessage: string
 }
 
 export const useLatestSpecificationJobWithMonitoring =
-    (specificationId: string, jobTypes: JobType[] = []): LatestSpecificationJobWithMonitoringResult => {
+    (specificationId: string, jobTypes: JobType[] = [])
+        : LatestSpecificationJobWithMonitoringResult => {
         const {lastJob, isCheckingForJob, errorCheckingForJob, haveErrorCheckingForJob, isFetching, isFetched} =
             useFetchLatestSpecificationJob(specificationId, jobTypes);
         const {newJob, isMonitoring, errorWhileMonitoringJobs, haveErrorWhileMonitoringJobs} =
@@ -30,13 +33,14 @@ export const useLatestSpecificationJobWithMonitoring =
         return {
             latestJob,
             hasJob: latestJob !== undefined,
-            anyJobsRunning: latestJob !== undefined && latestJob.runningStatus !== RunningStatus.Completed,
+            hasActiveJob: latestJob !== undefined && latestJob.runningStatus !== RunningStatus.Completed,
+            hasFailedJob: latestJob !== undefined && latestJob.runningStatus === RunningStatus.Completed && lastJob?.completionStatus !== CompletionStatus.Succeeded,
             jobError: haveErrorCheckingForJob ? errorCheckingForJob : haveErrorWhileMonitoringJobs ? errorWhileMonitoringJobs : "",
             hasJobError: haveErrorCheckingForJob || haveErrorWhileMonitoringJobs,
             isMonitoring,
             isFetching,
             isFetched,
             isCheckingForJob,
-            jobProgressMessage: getJobProgressMessage(latestJob)
+            jobInProgressMessage: getJobProgressMessage(latestJob)
         };
     };

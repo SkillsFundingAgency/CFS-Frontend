@@ -204,8 +204,8 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                             <div className="govuk-radios govuk-radios--small">
                                                 {datasourceVersions.items.map(v =>
                                                         <div className="govuk-radios__item">
-                                                            <input className="govuk-radios__input" id={`datasource-${v.id}`} name={`datasource-${v.id}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)}/>
-                                                            <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.id}`}>
+                                                            <input className="govuk-radios__input" id={`datasource-${v.version}`} name={`datasource-${v.version}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)}/>
+                                                            <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.version}`}>
                                                                 {datasourceVersions.name} (Version {v.version})
                                                                 <div className="govuk-!-margin-top-1">
                                                                     <details className="govuk-details summary-margin-removal" data-module="govuk-details">

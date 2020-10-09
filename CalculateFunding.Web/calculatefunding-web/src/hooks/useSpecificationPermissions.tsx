@@ -1,6 +1,6 @@
-﻿import {useEffect, useMemo, useState} from "react";
+﻿import {useMemo} from "react";
 import {getUserPermissionsService} from "../services/userService";
-import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
+import {useQuery} from "react-query";
 
 export enum SpecificationPermissions {
     Create = "Create",
@@ -12,14 +12,17 @@ export enum SpecificationPermissions {
 }
 
 export const useSpecificationPermissions = (specificationId: string, requiredPermissions: SpecificationPermissions[]) => {
-    const [permissions, setPermissions] = useState<EffectiveSpecificationPermission>();
+    const isEnabled = specificationId && specificationId.length > 0;
+    const oneHour = 1000 * 60 * 60;
 
-    useEffect(() => {
-        getUserPermissionsService(specificationId)
-            .then(result => {
-                setPermissions(result.data);
-            });
-    }, [specificationId]);
+    const {data: permissions, isLoading, isFetched} =
+        useQuery(
+            `specification-${specificationId}-permissions`,
+            () => getUserPermissionsService(specificationId)
+                .then((response) => {
+                    return response.data;
+                }),
+            {cacheTime: oneHour, staleTime: oneHour, enabled: isEnabled, refetchOnWindowFocus: false});
 
     const canCreateSpecification = useMemo(() => {
         return permissions && permissions.canCreateSpecification;
@@ -69,14 +72,16 @@ export const useSpecificationPermissions = (specificationId: string, requiredPer
         return missing;
     }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canMapDatasets, requiredPermissions]);
 
-
     return {
+        isCheckingForPermissions: isEnabled ?isLoading : false,
+        isPermissionsFetched: isEnabled ?isFetched: false,
         canCreateSpecification,
         canEditSpecification,
         canApproveFunding,
         canRefreshFunding,
         canReleaseFunding,
         canMapDatasets,
+        hasMissingPermissions: isEnabled ? missingPermissions && missingPermissions.length > 0: false,
         missingPermissions
     }
 };

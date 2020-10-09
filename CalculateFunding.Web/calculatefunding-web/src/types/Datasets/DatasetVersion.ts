@@ -1,7 +1,6 @@
 import {Author} from "../Calculations/Author";
 
-export interface Version {
-    id: string;
+export interface DatasetVersion {
     version: number;
     author: Author;
     date: Date;

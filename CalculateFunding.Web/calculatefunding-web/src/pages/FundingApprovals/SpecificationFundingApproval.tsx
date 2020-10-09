@@ -38,7 +38,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
 
-    const {hasJob, anyJobsRunning, isCheckingForJob, jobProgressMessage} =
+    const {hasJob, hasActiveJob, isCheckingForJob, jobInProgressMessage} =
         useLatestSpecificationJobWithMonitoring(
             specificationId,
             [JobType.RefreshFundingJob,
@@ -101,10 +101,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
 
     useEffect(() => {
-        if (!isCheckingForJob && !anyJobsRunning) {
+        if (!isCheckingForJob && !hasActiveJob) {
             loadPublishedProviderResults(searchCriteria);
         }
-    }, [searchCriteria, anyJobsRunning, isCheckingForJob]);
+    }, [searchCriteria, hasActiveJob, isCheckingForJob]);
 
     async function loadPublishedProviderResults(searchRequest: PublishedProviderSearchRequest) {
         clearErrorMessages();
@@ -175,7 +175,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     if (haveErrorCheckingForSpecification) {
         addErrorMessage(errorCheckingForSpecification);
     }
-    const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || anyJobsRunning || isLoadingResults || isLoadingProviderVersionIds;
+    const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingResults || isLoadingProviderVersionIds;
     
     
     return (
@@ -216,8 +216,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         <div>
                             {isLoadingSpecification ?
                                 <LoadingStatus title={"Loading specification..."}/>
-                                : (isCheckingForJob || anyJobsRunning) ?
-                                    <LoadingStatus title={`Job running: ${hasJob ? jobProgressMessage : "Checking for jobs..."} `}
+                                : (isCheckingForJob || hasActiveJob) ?
+                                    <LoadingStatus title={`Job running: ${hasJob ? jobInProgressMessage : "Checking for jobs..."} `}
                                                    subTitle={isCheckingForJob ?
                                                        "Searching for any running jobs" :
                                                        "Monitoring job progress. Please wait, this could take several minutes"}
@@ -227,7 +227,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             }
                         </div>
                         }
-                        {!isCheckingForJob && !anyJobsRunning && !isLoadingResults && !isLoadingProviderVersionIds && !isLoadingSpecification && specification &&
+                        {!isCheckingForJob && !hasActiveJob && !isLoadingResults && !isLoadingProviderVersionIds && !isLoadingSpecification && specification &&
                         <PublishedProviderResults specificationId={specificationId}
                                                   enableBatchSelection={approvalMode === ApprovalMode.Batches}
                                                   specProviderVersionId={specification.providerVersionId}

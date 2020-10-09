@@ -29,7 +29,7 @@ export const testSpec: SpecificationSummary = {
 describe("useSpecificationSummary when network error", () => {
         it("returns correct error results", async () => {
             const {result, waitForValueToChange} =
-                renderHook(() => useSpecificationSummary(null));
+                renderHook(() => useSpecificationSummary("whatever"));
             await act(async () => await waitForValueToChange(() => result.current.isLoadingSpecification));
             expect(result.current.isLoadingSpecification).toBe(false);
             expect(result.current.errorCheckingForSpecification).toContain("Error while fetching specification details: ");

@@ -108,13 +108,15 @@ describe("<SpecificationFundingApproval /> when loading specification", () => {
             () => ({
                 anyJobsRunning: false,
                 hasJob: false,
+                hasActiveJob: false,
+                hasFailedJob: false,
                 hasJobError: false,
                 isCheckingForJob: true,
                 isFetched: false,
                 isFetching: false,
                 isMonitoring: false,
                 jobError: "",
-                jobProgressMessage: "",
+                jobInProgressMessage: "",
                 latestJob: undefined
             }));
         renderPage();
@@ -136,15 +138,16 @@ describe("<SpecificationFundingApproval /> when specification loads and no activ
             () => ({
                 anyJobsRunning: false,
                 hasJob: false,
+                hasActiveJob: false,
+                hasFailedJob: false,
                 hasJobError: false,
                 isCheckingForJob: false,
                 isFetched: false,
                 isFetching: false,
                 isMonitoring: false,
                 jobError: "",
-                jobProgressMessage: "",
-                latestJob: new class implements JobSummary {
-                }
+                jobInProgressMessage: "",
+                latestJob: undefined
             }));
         jest.spyOn(specHook, 'useSpecificationSummary')
             .mockImplementation(() => ({

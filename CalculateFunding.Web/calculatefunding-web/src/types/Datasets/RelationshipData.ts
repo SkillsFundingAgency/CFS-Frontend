@@ -1,14 +1,14 @@
-import {Version} from "./Version";
+import {DatasetVersion} from "./DatasetVersion";
 
 export interface Dataset {
     description: string;
     selectedVersion: number;
-    versions: Version[];
+    versions: DatasetVersion[];
     id: string;
     name: string;
 }
 
-export interface DatasourceRelationshipResponseViewModel {
+export interface RelationshipData {
     specificationId: string;
     specificationName: string;
     definitionId: string;

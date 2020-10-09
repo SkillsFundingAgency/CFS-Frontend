@@ -2,13 +2,20 @@ import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
 import {SelectDataSourceRouteProps} from "../../../pages/Datasets/SelectDataSource";
-import {render, waitFor} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import {getDatasourcesByRelationshipIdService} from "../../../services/datasetService";
-import * as hooks from "../../../hooks/useSpecificationPermissions";
+import * as useSpecificationPermissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissions} from "../../../hooks/useSpecificationPermissions";
-import {DatasourceRelationshipResponseViewModel} from "../../../types/Datasets/DatasourceRelationshipResponseViewModel";
+import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/useLatestSpecificationJobWithMonitoring";
+import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/useLatestSpecificationJobWithMonitoring";
+import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
+import {SpecificationSummaryResult} from "../../../hooks/useSpecificationSummary";
+import {RelationshipData} from "../../../types/Datasets/RelationshipData";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import {QueryResult} from "react-query/types/core/types";
+import {JobType} from "../../../types/jobType";
+import {RunningStatus} from "../../../types/RunningStatus";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
@@ -22,7 +29,7 @@ const matchMock: match<SelectDataSourceRouteProps> = {
     isExact: true,
     url: ""
 };
-const mockRelationshipData: DatasourceRelationshipResponseViewModel = {
+const mockRelationshipData: RelationshipData = {
     specificationId: "asdfga",
     datasets: [],
     definitionId: "asdfa",
@@ -31,30 +38,74 @@ const mockRelationshipData: DatasourceRelationshipResponseViewModel = {
     relationshipName: "relationship name",
     specificationName: "Spec Name"
 };
-const mockSpecificationSummary: SpecificationSummary = {
+const mockSpecification: SpecificationSummary = {
     id: "asdfga",
-    approvalStatus: "", description: "", fundingPeriod: {id: "", name: ""}, fundingStreams: [], isSelectedForFunding: false, name: "", providerVersionId: "",
+    name: "Wizard Spec",
+    approvalStatus: "", 
+    description: "", 
+    fundingPeriod: {id: "", name: "The Distant Future, 2000"}, 
+    fundingStreams: [], 
+    isSelectedForFunding: false, 
+    providerVersionId: "",
 };
-
-function mockDatasetService() {
-    const originalService = jest.requireActual("../../../services/datasetService");
-    return {
-        ...originalService,
-        getDatasourcesByRelationshipIdService: jest.fn(() => Promise.resolve({
-            data: mockRelationshipData
-        })),
-    }
-}
-
-function mockSpecificationService() {
-    const originalService = jest.requireActual("../../../services/specificationService");
-    return {
-        ...originalService,
-        getSpecificationSummaryService: jest.fn(() => Promise.resolve({
-            data: mockSpecificationSummary
-        })),
-    }
-}
+const specificationResult: SpecificationSummaryResult = {
+    specification: mockSpecification,
+    isLoadingSpecification: false,
+    errorCheckingForSpecification: "",
+    haveErrorCheckingForSpecification: false,
+    isFetchingSpecification: false,
+    isSpecificationFetched: false,
+};
+const noJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: false,
+    isCheckingForJob: false,
+    hasFailedJob: false,
+    hasActiveJob: false,
+    jobError: "",
+    latestJob: undefined,
+    hasJobError: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    jobInProgressMessage: "",
+};
+const activeJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    hasFailedJob: false,
+    hasActiveJob: true,
+    jobError: "",
+    latestJob: { jobType: JobType.MapDatasetJob, invokerUserDisplayName: "test user", runningStatus: RunningStatus.InProgress, created: new Date(), lastUpdated: new Date()},
+    hasJobError: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    jobInProgressMessage: "",
+};
+const withoutPermissions = {
+    isCheckingForPermissions: false,
+    hasMissingPermissions: true,
+    isPermissionsFetched: true,
+    missingPermissions: [SpecificationPermissions.MapDatasets],
+    canMapDatasets: false,
+    canApproveFunding: false,
+    canCreateSpecification: false,
+    canEditSpecification: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false
+};
+const withPermissions = {
+    isCheckingForPermissions: false,
+    hasMissingPermissions: false,
+    isPermissionsFetched: true,
+    missingPermissions: [],
+    canMapDatasets: true,
+    canApproveFunding: false,
+    canCreateSpecification: false,
+    canEditSpecification: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false
+};
 
 const renderPage = () => {
     const {SelectDataSource} = require("../../../pages/Datasets/SelectDataSource");
@@ -66,83 +117,134 @@ const renderPage = () => {
 
 describe("<SelectDataSource/>", () => {
     describe("when user without mapping permissions", () => {
-        beforeAll(() => {
-            jest.mock("../../../services/datasetService", () => mockDatasetService());
-            jest.mock("../../../services/specificationService", () => mockSpecificationService());
-            jest.spyOn(hooks, 'useSpecificationPermissions').mockImplementation(
-                () => ({
-                    missingPermissions: [SpecificationPermissions.MapDatasets],
-                    canMapDatasets: false,
-                    canApproveFunding: false,
-                    canCreateSpecification: false,
-                    canEditSpecification: false,
-                    canRefreshFunding: false,
-                    canReleaseFunding: false
-                }));
-        });
-        it("fetches dataset relationship", async () => {
-            const {getDatasourcesByRelationshipIdService} = require('../../../services/datasetService');
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutPermissions));
+            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
             renderPage();
-            await waitFor(() => expect(getDatasourcesByRelationshipIdService).toBeCalled());
         });
-
-        it("does not render permissions alert initially", async () => {
-            const {queryByTestId} = renderPage();
-            expect(queryByTestId('permission-alert-message')).toBeNull();
+        
+        it("renders permissions alert", () => {
+            expect(screen.getByTestId('permission-alert-message')).toBeInTheDocument();
         });
-
-        it("renders permissions alert after finished loading", async () => {
-            const {getSpecificationSummaryService} = require('../../../services/specificationService');
-            const {getByTestId} = renderPage();
-            await waitFor(() => expect(getSpecificationSummaryService).toBeCalled());
-            await waitFor(() => expect(getByTestId('permission-alert-message')).toBeInTheDocument());
+        
+        it("does not render dataset relationship", () => {
+            expect(screen.queryByText('Select data source file')).not.toBeInTheDocument();
+        });
+        
+        it("save button is disabled", () => {
+            const button = screen.getByRole('button', {name: /saveButton/}) as HTMLButtonElement;
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
+        });
+        
+        it("back button is enabled", () => {
+            const button = screen.getByRole('button', {name: /backButton/}) as HTMLButtonElement;
+            expect(button).toBeInTheDocument();
+            expect(button).toBeEnabled();
+        });
+        
+        it("cancel button is hidden", () => {
+            const button = screen.queryByRole('button', {name: /cancelButton/}) as HTMLButtonElement;
+            expect(button).not.toBeInTheDocument();
         });
     });
 
     describe("when user with permissions", () => {
-        beforeAll(() => {
-            jest.mock("../../../services/datasetService", () => mockDatasetService());
-            jest.mock("../../../services/specificationService", () => mockSpecificationService());
-            jest.spyOn(hooks, 'useSpecificationPermissions').mockImplementation(
-                () => ({
-                    missingPermissions: [],
-                    canMapDatasets: true,
-                    canApproveFunding: false,
-                    canCreateSpecification: false,
-                    canEditSpecification: false,
-                    canRefreshFunding: false,
-                    canReleaseFunding: false
-                }));
-        });
-
-        it("fetches dataset relationship", async () => {
-            const {getDatasourcesByRelationshipIdService} = require('../../../services/datasetService');
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
             renderPage();
-            await waitFor(() => expect(getDatasourcesByRelationshipIdService).toBeCalled());
         });
+        
+        it("does not render permissions alert", () => {
+            expect(screen.queryByTestId('permission-alert-message')).not.toBeInTheDocument();
+        });
+        
+        it("save button is disabled by default", () => {
+            const button = screen.getByRole('button', {name: /saveButton/}) as HTMLButtonElement;
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
+        });
+        
+        it("back button is hidden", () => {
+            const button = screen.getByRole('button', {name: /cancelButton/}) as HTMLButtonElement;
+            expect(button).toBeInTheDocument();
+            expect(button).toBeEnabled();
+        });
+        
+        it("cancel button is enabled", () => {
+            const button = screen.queryByRole('button', {name: /backButton/}) as HTMLButtonElement;
+            expect(button).not.toBeInTheDocument();
+        });
+    });
 
-        it("fetches specification", async () => {
-            const {getSpecificationSummaryService} = require('../../../services/specificationService');
+    describe("when specification summary loaded", () => {
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
             renderPage();
-            await waitFor(() => expect(getSpecificationSummaryService).toBeCalled());
         });
 
-        it("does not render permissions alert after finished loading", async () => {
-            const {getSpecificationSummaryService} = require('../../../services/specificationService');
-            const {queryByTestId} = renderPage();
-            await waitFor(() => expect(getSpecificationSummaryService).toBeCalled());
-            await waitFor(() => expect(queryByTestId('permission-alert-message')).toBeNull());
+        it("renders correct specification name", () => {
+            expect(screen.getAllByText(mockSpecification.name)).toHaveLength(2);
         });
 
-        it('renders correct breadcrumbs', async () => {
-            const {container} = renderPage();
-            await waitFor(() => {
-                const breadcrumbs = container.querySelector(".govuk-breadcrumbs__list");
-                expect(breadcrumbs).not.toBeNull();
-                if (breadcrumbs) {
-                    expect(breadcrumbs.children.length).toBe(5);
-                }
-            });
+        it("renders correct funding period", () => {
+            expect(screen.getByText(mockSpecification.fundingPeriod.name)).toBeInTheDocument();
+        });
+    });
+    
+    describe("when relationship data loaded", () => {
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
+            renderPage();
+        });
+
+        it("renders correct title", async () => {
+            await waitFor(() => expect(screen.getByText('Select data source file')).toBeInTheDocument());
+        });
+    });
+    
+    describe("when background job is running", () => {
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));
+            renderPage();
+        });
+
+        it("renders correct title", async () => {
+            const activeJobTitle = screen.getByTestId('job-notification-title');
+            expect(activeJobTitle).toBeInTheDocument();
+            expect(activeJobTitle).toHaveTextContent("Mapping dataset job in progress");
+        });
+
+        it("save button is hidden", () => {
+            const button = screen.queryByRole('button', {name: /saveButton/}) as HTMLButtonElement;
+            expect(button).not.toBeInTheDocument();
+        });
+
+        it("back button is enabled", () => {
+            const button = screen.getByRole('button', {name: /backButton/}) as HTMLButtonElement;
+            expect(button).toBeInTheDocument();
+            expect(button).toBeEnabled();
+        });
+
+        it("cancel button is hidden", () => {
+            const button = screen.queryByRole('button', {name: /cancelButton/}) as HTMLButtonElement;
+            expect(button).not.toBeInTheDocument();
         });
     });
 });

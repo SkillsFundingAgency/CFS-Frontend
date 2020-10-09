@@ -122,7 +122,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             specification.id.length > 0 ?
                 specification.id : "";
 
-    const {latestJob, anyJobsRunning, jobError, hasJobError, isCheckingForJob, jobProgressMessage} =
+    const {latestJob, hasActiveJob, jobError, hasJobError, isCheckingForJob, jobInProgressMessage} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
 
@@ -312,9 +312,9 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         {specificationId.length > 0 &&
                         <CalculationJobNotification 
                             latestJob={latestJob} 
-                            anyJobsRunning={anyJobsRunning} 
+                            anyJobsRunning={hasActiveJob} 
                             isCheckingForJob={isCheckingForJob}
-                            jobProgressMessage={jobProgressMessage}
+                            jobProgressMessage={jobInProgressMessage}
                             hasJobError={hasJobError}
                             jobError={jobError}/>
                         }

@@ -1,11 +1,11 @@
-import {Version} from "./Version";
-import {PagerState} from "../PublishedProvider/PagerState";
+import {DatasetVersion} from "./DatasetVersion";
+import {PagerState} from "../PagerState";
 
     export interface DatasetRelationshipPagedResponseViewModel {
         totalCount: number;
         startItemNumber: number;
         endItemNumber: number;
-        items: Version[];
+        items: DatasetVersion[];
         facets?: any;
         pagerState: PagerState;
         name:string;

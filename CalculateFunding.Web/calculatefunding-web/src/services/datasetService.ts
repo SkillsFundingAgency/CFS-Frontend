@@ -2,8 +2,9 @@ import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatase
 import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
 import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequestViewModel";
 import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import {DatasourceVersionSearchModel} from "../types/Datasets/DatasourceVersionSearchModel";
+import {RelationshipData} from "../types/Datasets/RelationshipData";
 
 const baseUrl = "/api/datasets";
 
@@ -180,7 +181,7 @@ export async function getDatasetsForFundingStreamService(fundingStreamId: string
     })
 }
 
-export async function getDatasourcesByRelationshipIdService(relationshipId: string) {
+export async function getRelationshipData(relationshipId: string): Promise<AxiosResponse<RelationshipData>> {
     return axios(`${baseUrl}/get-datasources-by-relationship-id/${relationshipId}`, {
         method: 'GET',
         headers: {

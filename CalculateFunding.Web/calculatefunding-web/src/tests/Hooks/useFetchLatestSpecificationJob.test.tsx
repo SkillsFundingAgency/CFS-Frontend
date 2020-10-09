@@ -25,16 +25,13 @@ describe("useFetchLatestSpecificationJob tests", () => {
             const {result, waitForNextUpdate, waitForValueToChange} =
                 renderHook(() =>
                     useFetchLatestSpecificationJob("", [JobType.RefreshFundingJob]));
-            await act(async () => {
-                await waitForValueToChange(() => result.current.isCheckingForJob);
-            });
             expect(result.current.lastJob).toBe(undefined);
             expect(result.current.isCheckingForJob).toBe(false);
             expect(result.current.haveErrorCheckingForJob).toBe(false);
             expect(result.current.errorCheckingForJob).toBe("");
             expect(result.current.isCheckingForJob).toBe(false);
             expect(result.current.isFetching).toBe(false);
-            expect(result.current.isFetched).toBe(true);
+            expect(result.current.isFetched).toBe(false);
         });
         it("when no job types supplied", async () => {
             const {result, waitForNextUpdate} =

@@ -12,13 +12,14 @@ export type FetchLatestSpecificationJobResult = {
     isFetched: boolean,
 }
 
-export const useFetchLatestSpecificationJob = (specificationId: string, jobTypes: JobType[]): FetchLatestSpecificationJobResult => {
+export const useFetchLatestSpecificationJob = (specificationId: string, jobTypes: JobType[])
+    : FetchLatestSpecificationJobResult => {
     const jobTypeList = jobTypes.join(",");
-    let jobError = "";
     
     const {data, error, isFetching, isLoading, isError, isFetched} =
         useQuery(`specification-${specificationId}-jobs-` + jobTypeList,
-            async () => await checkForJob(specificationId, jobTypes));
+            async () => await checkForJob(specificationId, jobTypes),
+            {enabled: specificationId && specificationId.length > 0});
 
     const checkForJob = async (specId: string, jobTypes: JobType[]) => {
         if (specId === undefined || specId === null || specId.length === 0) {

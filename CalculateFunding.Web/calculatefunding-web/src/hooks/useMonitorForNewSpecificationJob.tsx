@@ -12,7 +12,8 @@ export type MonitorForNewSpecificationJobResult = {
     isMonitoring: boolean,
 }
 
-export const useMonitorForNewSpecificationJob = (specificationId: string, jobTypes: JobType[] = []): MonitorForNewSpecificationJobResult => {
+export const useMonitorForNewSpecificationJob = (specificationId: string, jobTypes: JobType[] = [])
+    : MonitorForNewSpecificationJobResult => {
     const [newJob, setNewJob] = useState<JobSummary>();
     const [error, setError] = useState<string>();
     const [isMonitoring, setIsMonitoring] = useState<boolean>(false);

@@ -11,10 +11,18 @@ export type SpecificationSummaryResult = {
     isFetchingSpecification: boolean,
     isSpecificationFetched: boolean,
 }
+const oneHour = 1000 * 60 * 60;
 
 export const useSpecificationSummary = (specificationId: string,
-                                        queryConfig: QueryConfig<SpecificationSummary | Error, any> = 
-                                            {cacheTime: 600000, staleTime: 600000, refetchOnWindowFocus: false}): SpecificationSummaryResult => {
+                                        queryConfig: QueryConfig<SpecificationSummary | Error, any> =
+                                            {
+                                                cacheTime: oneHour,
+                                                staleTime: oneHour,
+                                                refetchOnWindowFocus: false,
+                                                enabled: specificationId && specificationId.length > 0
+                                            })
+    : SpecificationSummaryResult => {
+
     const {data, error, isFetching, isLoading, isError, isFetched} =
         useQuery(
             `specification-${specificationId}-summary`,

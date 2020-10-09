@@ -1,240 +1,181 @@
 import React, {useEffect, useState} from "react";
-import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
-import {JobMessage} from "../../types/jobMessage";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {RouteComponentProps, useHistory} from "react-router";
 import {DateFormatter} from "../../components/DateFormatter";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {DatasourceRelationshipResponseViewModel} from "../../types/Datasets/DatasourceRelationshipResponseViewModel";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
-import {assignDataSourceService, getDatasourcesByRelationshipIdService} from "../../services/datasetService";
-import {getSpecificationSummaryService} from "../../services/specificationService";
+import {assignDataSourceService} from "../../services/datasetService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
-import {MappingStatus} from "../../components/MappingStatus";
-import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
-import {JobSummary} from "../../types/jobSummary";
-import {RunningStatus} from "../../types/RunningStatus";
+import {MappingStatus} from "../../components/DatasetMapping/MappingStatus";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {JobType} from "../../types/jobType";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/useLatestSpecificationJobWithMonitoring";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
+import {useRelationshipData} from "../../hooks/useRelationshipData";
+import {Dataset} from "../../types/Datasets/RelationshipData";
+import {DatasetVersionSelection} from "../../components/DatasetMapping/DatasetVersionSelection";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
 }
 
 export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRouteProps>) {
-    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
-        approvalStatus: "",
-        description: "",
-        fundingPeriod: {
-            id: "",
-            name: ""
-        },
-        fundingStreams: [],
-        id: "",
-        isSelectedForFunding: false,
-        name: "",
-        providerVersionId: ""
-    });
-    const [datasourceVersions, setDatasourceVersions] = useState<DatasourceRelationshipResponseViewModel>({
-        datasets: [{
-            name: "",
-            id: "",
-            selectedVersion: 0,
-            versions: [{
-                author: {
-                    name: "",
-                    id: ""
-                },
-                date: new Date(),
-                id: "",
-                version: 0
-            }],
-            description: ""
-        }],
-        definitionId: "",
-        definitionName: "",
-        relationshipId: "",
-        relationshipName: "",
-        specificationId: "",
-        specificationName: ""
-    });
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [selectedVersion, setSelectedVersion] = useState<string>("");
+    const [newVersionNumber, setNewVersionNumber] = useState<number | undefined>();
+    const [newDataset, setNewDataset] = useState<Dataset>();
     const [missingVersion, setMissingVersion] = useState<boolean>(false);
     const [saveErrorOccurred, setSaveErrorOccurred] = useState<boolean>(false);
-    const [selectedDataset, setSelectedDataset] = useState<string>("");
-    const [isAssigning, setIsAssigning] = useState<boolean>(false);
-    const [isInitiating, setIsInitiating] = useState<boolean>(false);
-    const [jobMessage, setJobMessage] = useState<JobSummary | JobMessage>();
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [isRemapping, setIsRemapping] = useState<boolean>(false);
     let history = useHistory();
-    const {canMapDatasets, missingPermissions} =
-        useSpecificationPermissions(specificationSummary.id, [SpecificationPermissions.MapDatasets]);
 
-    useEffect(() => {
-        getDatasourcesByRelationshipIdService(match.params.datasetRelationshipId)
-            .then((relationshipResult) => {
-                const relationship = relationshipResult.data as DatasourceRelationshipResponseViewModel;
-                setDatasourceVersions(relationship);
-                relationship.datasets.forEach(x => {
-                    if(x.selectedVersion !== null)
-                    {
-                        setSelectedDataset(x.id);
-                    }
-                });
-                return getSpecificationSummaryService(relationship.specificationId);
-            })
-            .then((specResult) => {
-                setSpecificationSummary(specResult.data as SpecificationSummary);
-            })
-            .catch((err) => {
-                setMissingVersion(true);})
-            .finally(() => {
-                setIsLoading(false);});
-    }, [match.params.datasetRelationshipId]);
+    const {data: relationshipData, isLoading: isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
 
-    useEffect(() => {
-        const retrieveLatestJobSpecification = async (specificationId: string) => {
-            try {
-                const latestJobResponse = await getJobStatusUpdatesForSpecification(specificationId, "MapDatasetJob");
-                if (latestJobResponse.data && latestJobResponse.data.length > 0) {
-                    setJobMessage(latestJobResponse.data[0]);
-                }
-            }
-            catch (err) {
-                // API returns a 400 if no job exists so ignore
-            }
-        };
+    const specificationId = relationshipData && relationshipData.specificationId ? relationshipData.specificationId : "";
+    const {specification, isLoadingSpecification} = useSpecificationSummary(specificationId);
 
-        let hubConnect: HubConnection;
+    const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
+        useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
 
-        const createHubConnection = async () => {
-            hubConnect = new HubConnectionBuilder()
-                .withUrl(`/api/notifications`)
-                .withAutomaticReconnect()
-                .build();
-            hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
-            hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
-
-            try {
-                await hubConnect.start();
-
-                hubConnect.on('NotificationEvent', (message: JobMessage) => {
-                    if (message.jobType === "MapDatasetJob" &&
-                        message.specificationId === datasourceVersions.specificationId) {
-                        setIsInitiating(false);
-                        setJobMessage(message);
-                        if (message.runningStatus !== RunningStatus.Completed) {
-                            setIsAssigning(true);
-                        } else {
-                            setIsAssigning(false);
-                        }
-                    }
-                });
-
-                await hubConnect.invoke("StartWatchingForAllNotifications");
-
-            } catch (err) {
-                await hubConnect.stop();
-            }
-        };
-
-        if (!datasourceVersions.specificationId || datasourceVersions.specificationId.length === 0) return;
-        retrieveLatestJobSpecification(datasourceVersions.specificationId);
-        createHubConnection();
-        return () => {
-            hubConnect.stop();
-        }
-    }, [datasourceVersions]);
-
-    function populateVersions(e: React.ChangeEvent<HTMLInputElement>) {
-        const selectedRadioButton = e.target.value;
-        setSelectedDataset(selectedRadioButton);
+    const {hasJob, latestJob, hasActiveJob, hasFailedJob, isCheckingForJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId, [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation]);
+    
+    function getCurrentDataset() {
+        return newDataset ? newDataset :
+            relationshipData ? relationshipData.datasets.find(x => x.selectedVersion !== null) :
+                undefined;
     }
 
-    function changeSelection() {
+    function getCurrentVersion() {
+        const dataset = getCurrentDataset();
+        if (!dataset) {
+            return undefined;
+        }
+        if (!newVersionNumber) {
+            return dataset.versions.find(v => v.version === dataset.selectedVersion);
+        }
+        return dataset.versions.find(x => x.version === newVersionNumber);
+    }
+
+    function changeDataset(e: React.ChangeEvent<HTMLInputElement>) {
+        const newValue = e.target.value;
+        const currentDataset = getCurrentDataset();
+
+        if (!currentDataset || newValue !== currentDataset.id) {
+            const dataset = relationshipData?.datasets.find(x => x.id === newValue);
+            setNewDataset(dataset);
+
+            // auto select version if only one exists
+            if (dataset && dataset.versions.length === 1) {
+                const version = dataset.versions[0];
+                setNewVersionNumber(version.version);
+            } else {
+                setNewVersionNumber(undefined);
+            }
+        }
+    }
+
+    function changeVersion(e: React.ChangeEvent<HTMLInputElement>) {
+        const newValue = e.target.value;
+        const newValueAsNumber: number = +newValue;
+        const currentVersion = getCurrentVersion();
+
+        if (!currentVersion || newValueAsNumber !== currentVersion.version) {
+            const dataset = getCurrentDataset();
+            if (!dataset) {
+                throw new Error("Error: selecting version without a selected dataset");
+            }
+            const newVersion = dataset.versions.find(x => x.version === newValueAsNumber);
+            if (!newVersion) {
+                throw new Error("Error: selected version doesn't exist in selected dataset");
+            }
+            setNewVersionNumber(newVersion.version);
+            setNewDataset(dataset);
+        }
+    }
+
+    function goBack() {
         history.goBack();
     }
 
-    function saveSelection(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.checked) {
-            setSelectedVersion(e.target.value);
-        }
-    }
-
-    async function saveVersion() {
-        if (selectedVersion === "") {
+    async function changeSpecificationDataMapping() {
+        if (!newVersionNumber || !newDataset || !relationshipData || !specification) {
             return;
         }
         setMissingVersion(false);
         setSaveErrorOccurred(false);
-        setIsAssigning(true);
-        setIsInitiating(true);
-        assignDataSourceService(datasourceVersions.relationshipId, specificationSummary.id, selectedVersion)
-            .catch(() => setSaveErrorOccurred(true));
+        setIsUpdating(true);
+        assignDataSourceService(relationshipData.relationshipId, specification.id, `${newDataset.id}_${newVersionNumber}`)
+            .then(() => setIsRemapping(true))
+            .catch(() => setSaveErrorOccurred(true))
+            .finally(() => setIsUpdating(false));
     }
 
-    const allowToMapDatasets = !isLoading && canMapDatasets;
+    const specificationName = !isLoadingSpecification && specification && specification.name.length > 0 ? specification.name : "Specification";
 
     return (<div>
-        <Header location={Section.Datasets} />
-        <div className="govuk-width-container">
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full" hidden={specificationSummary.name === ""}>
-                    <Breadcrumbs>
-                        <Breadcrumb name={"Calculate funding"} url={"/"} />
-                        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-                        <Breadcrumb name={"Map data source files to datasets for a specification"} url={"/Datasets/MapDataSourceFiles"} />
-                        <Breadcrumb name={specificationSummary.name} url={`/Datasets/DataRelationships/${specificationSummary.id}`} />
-                        <Breadcrumb name={`Change ${specificationSummary.name}`} />
-                    </Breadcrumbs>
-                </div>
-            </div>
-            <div className="govuk-grid-row" hidden={!isLoading}>
-                <div className="govuk-grid-column-full">
-                    <LoadingStatus title={"Loading datasources"} />
-                </div>
-            </div>
-            <div className="govuk-grid-row" hidden={!isInitiating}>
-                <div className="govuk-grid-column-full">
-                    <LoadingStatus title={"Assigning version to dataset"} />
-                </div>
-            </div>
-            {!allowToMapDatasets && missingPermissions &&
-                <div className="govuk-grid-row">
-                    <PermissionStatus requiredPermissions={missingPermissions} hidden={isInitiating || isLoading} />
-                </div>}
-            {!isLoading && !isInitiating &&
+            <Header location={Section.Datasets}/>
+            <div className="govuk-width-container">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <h1 className="govuk-heading-xl">
-                            {specificationSummary.name}
-                            <span className="govuk-caption-xl">{specificationSummary.fundingPeriod.name}</span>
-                        </h1>
-                        {jobMessage &&
-                            <div className="govuk-form-group">
-                                <MappingStatus jobMessage={jobMessage} />
-                            </div>}
-                        {allowToMapDatasets &&
-                            <div className="govuk-form-group">
-                                <div hidden={!missingVersion}>
-                                    <ErrorSummary title={"Please select a version"} error={"No selection has been made"}
-                                        suggestion={"No version is selected. Please select a version to apply."} />
-                                </div>
-                                <div hidden={!saveErrorOccurred}>
-                                    <ErrorSummary title={"Error"} error={"An error was encountered whilst trying to save changes"}
-                                        suggestion={"Please check and try again."} />
-                                </div>
-                                <div
-                                    hidden={datasourceVersions !== null && datasourceVersions.datasets !== null && datasourceVersions.datasets.length > 0}>
-                                    <ErrorSummary title={"Error"} error={"No datasets available for you"}
-                                        suggestion={"Please check your permissions or data."} />
-                                </div>
-                            </div>}
-                        <div className="govuk-form-group" hidden={isLoading}>
+                        <Breadcrumbs>
+                            <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                            <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"}/>
+                            <Breadcrumb name={"Map data source files to datasets for a specification"} url={"/Datasets/MapDataSourceFiles"}/>
+                            {specification &&
+                            <Breadcrumb name={specificationName} url={`/Datasets/DataRelationships/${specification.id}`}/>}
+                            <Breadcrumb name={`Change ${specificationName}`}/>
+                        </Breadcrumbs>
+                    </div>
+                </div>
+                {(isLoadingRelationshipData || isLoadingSpecification || isUpdating) &&
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-full">
+                        <LoadingStatus title={isLoadingSpecification ? "Loading specification..." :
+                            isLoadingRelationshipData ? "Loading data sources..." :
+                                isUpdating ? "Assigning version to dataset..." : ""}/>
+                    </div>
+                </div>}
+                {!isLoadingRelationshipData && isPermissionsFetched && hasMissingPermissions &&
+                <div className="govuk-grid-row">
+                    <PermissionStatus requiredPermissions={missingPermissions} hidden={false}/>
+                </div>}
+                {!isLoadingRelationshipData && !isUpdating &&
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-full">
+                        {specification &&
+                        <h1 className="govuk-heading-xl govuk-!-margin-top-2 govuk-!-margin-bottom-5">
+                            {specification.name}
+                            <span className="govuk-caption-xl govuk-!-margin-top-3">{specification.fundingPeriod.name}</span>
+                        </h1>}
+                        {(isCheckingForJob || hasJob) &&
+                        <div className="govuk-form-group">
+                            <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
+                            {hasJob &&
+                            <MappingStatus job={latestJob} hasActiveJob={hasActiveJob}/>
+                            }
+                        </div>}
+                        {!isCheckingForPermissions && !hasMissingPermissions &&
+                        <div className="govuk-form-group">
+                            <div hidden={!missingVersion}>
+                                <ErrorSummary title={"Please select a version"} error={"No selection has been made"}
+                                              suggestion={"No version is selected. Please select a version to apply."}/>
+                            </div>
+                            <div hidden={!saveErrorOccurred}>
+                                <ErrorSummary title={"Error"} error={"An error was encountered whilst trying to save changes"}
+                                              suggestion={"Please check and try again."}/>
+                            </div>
+                            <div hidden={relationshipData && relationshipData.datasets && relationshipData.datasets.length > 0}>
+                                <ErrorSummary title={"Error"} error={"No datasets available for you"}
+                                              suggestion={"Please check your permissions or data."}/>
+                            </div>
+                        </div>}
+                        {!isCheckingForPermissions && !hasMissingPermissions && !hasActiveJob &&
+                        <div className="govuk-form-group">
                             <fieldset className="govuk-fieldset">
                                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
                                     <h4 className="govuk-heading-s">Select data source file</h4>
@@ -242,82 +183,73 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                 <span id="select-one-option" className="govuk-hint">
                                     Select one option.
                                 </span>
-                                {datasourceVersions && datasourceVersions.datasets &&
-                                    <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                                        {datasourceVersions.datasets.map(d =>
-                                            <React.Fragment key={d.id}>
-                                                <div className="govuk-radios__item">
-                                                    <input className="govuk-radios__input" id={`dataset-${d.id}`} name={`dataset-options`} type="radio"
-                                                        aria-controls="conditional-master-dataset-option-conditional" aria-expanded="false"
-                                                        value={d.id}
-                                                        disabled={!allowToMapDatasets}
-                                                        defaultChecked={d.selectedVersion !== null}
-                                                        onChange={(e) => populateVersions(e)} />
-                                                    <label className="govuk-label govuk-radios__label" htmlFor={`dataset-${d.id}`}>
-                                                        {d.name}
-                                                        <span className="govuk-hint">
-                                                            <strong>Description:</strong> {d.description}
-                                                        </span>
-                                                    </label>
+                                {relationshipData && relationshipData.datasets &&
+                                <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                                    {relationshipData.datasets.map(dataset =>
+                                        <React.Fragment key={dataset.id}>
+                                            <div className="govuk-radios__item">
+                                                <input className="govuk-radios__input"
+                                                       id={`dataset-${dataset.id}`}
+                                                       type="radio"
+                                                       aria-controls="conditional-master-dataset-option-conditional"
+                                                       aria-expanded="false"
+                                                       value={dataset.id}
+                                                       checked={newDataset ? dataset.id === newDataset.id : dataset.selectedVersion !== null}
+                                                       onChange={changeDataset}/>
+                                                <label className="govuk-label govuk-radios__label govuk-!-padding-top-0" htmlFor={`dataset-${dataset.id}`}>
+                                                    {dataset.name}
+                                                    <span className="govuk-hint">
+                                                        <strong>Description:</strong> {dataset.description}
+                                                    </span>
+                                                </label>
+                                            </div>
+                                            {(newDataset ? dataset.id === newDataset.id : dataset.selectedVersion !== null) &&
+                                            <div className="govuk-radios__conditional" id="conditional-how-contacted-conditional">
+                                                <div className="govuk-form-group">
+                                                    <fieldset className="govuk-fieldset">
+                                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                                            <h4 className="govuk-heading-s">Select data source version</h4>
+                                                        </legend>
+                                                        <DatasetVersionSelection
+                                                            newVersionNumber={newVersionNumber}
+                                                            dataset={dataset}
+                                                            changeVersion={changeVersion}/>
+                                                    </fieldset>
                                                 </div>
-                                                <div className="govuk-radios__conditional" id="conditional-how-contacted-conditional"
-                                                    hidden={d.id !== selectedDataset}>
-                                                    <div className="govuk-form-group">
-                                                        <fieldset className="govuk-fieldset">
-                                                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                                                <h4 className="govuk-heading-s">Select data source version</h4>
-                                                            </legend>
-                                                            <div className="govuk-radios govuk-radios--small">
-                                                                {d.versions.slice(0, 5).map((v, index) =>
-                                                                    <div className="govuk-radios__item" key={index}>
-                                                                        <input className="govuk-radios__input" id={`datasource-${v.id}`}
-                                                                            name={`datasource-${v.id}`} type="radio" value={`${d.id}_${v.version}`}
-                                                                            defaultChecked={d.selectedVersion === v.version}
-                                                                            onChange={(e) => saveSelection(e)} />
-                                                                        <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.id}`}>
-                                                                            {d.name} (version {v.version})
-                                                                        <div className="govuk-!-margin-top-1">
-                                                                                <details className="govuk-details  summary-margin-removal"
-                                                                                    data-module="govuk-details">
-                                                                                    <div className="govuk-details__text summary-margin-removal">
-                                                                                        <p className="govuk-body-s">
-                                                                                            <strong>Version notes:</strong>
-                                                                                        </p>
-                                                                                        <p className="govuk-body-s">
-                                                                                            <strong>Last updated:</strong>
-                                                                                            <DateFormatter date={v.date} utc={true} /></p>
-                                                                                        <p className="govuk-body-s">
-                                                                                            <strong>Last updated by:</strong> {v.author.name}
-                                                                                        </p>
-                                                                                    </div>
-                                                                                </details>
-                                                                            </div>
-                                                                        </label>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </fieldset>
-                                                    </div>
-                                                    <p className="govuk-body govuk-!-margin-top-5" hidden={d.versions.length <= 5}>
-                                                        <Link
-                                                            to={`/Datasets/SelectDataSourceExpanded/${specificationSummary.id}/${d.id}/${datasourceVersions.relationshipId}`}
-                                                            className="govuk-link">View {datasourceVersions.datasets.length - 5} more versions</Link>
-                                                    </p>
-                                                </div>
-                                            </React.Fragment>
-                                        )}
-                                    </div>}
+                                                {specification && dataset.versions.length > 5 &&
+                                                <p className="govuk-body govuk-!-margin-top-5">
+                                                    <Link
+                                                        to={`/Datasets/SelectDataSourceExpanded/${specification.id}/${dataset.id}/${relationshipData.relationshipId}`}
+                                                        className="govuk-link">View {relationshipData.datasets.length - 5} more versions</Link>
+                                                </p>}
+                                            </div>
+                                            }
+                                        </React.Fragment>
+                                    )}
+                                </div>}
                             </fieldset>
                         </div>
-                        <div className="govuk-form-group" hidden={isLoading}>
-                            <button className="govuk-button govuk-!-margin-right-1" onClick={saveVersion} disabled={selectedVersion === "" || isAssigning}>Save
+                        }
+                        <div className="govuk-form-group">
+                            {!hasActiveJob &&
+                            <button className="govuk-button govuk-!-margin-right-1"
+                                    name="saveButton"
+                                    aria-label="saveButton"
+                                    onClick={changeSpecificationDataMapping}
+                                    disabled={!newVersionNumber || hasMissingPermissions || isCheckingForJob || hasActiveJob || isUpdating}>
+                                Save
                             </button>
-                            <button className="govuk-button govuk-button--secondary" onClick={changeSelection}>Cancel</button>
+                            }
+                            {(hasMissingPermissions || isUpdating || hasActiveJob) ?
+                                <button className="govuk-button govuk-button--secondary" name="backButton" aria-label="backButton" onClick={goBack}>Back</button>
+                                :
+                                <button className="govuk-button govuk-button--secondary" name="cancelButton" aria-label="cancelButton" onClick={goBack}>Cancel</button>
+                            }
                         </div>
                     </div>
                 </div>}
+            </div>
+            <Footer/>
         </div>
-        <Footer />
-    </div>
     )
 }
