@@ -223,7 +223,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                 <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationId}`}/>
                 <Breadcrumb name={"Create dataset"}/>
             </Breadcrumbs>
-            <ConfirmationPanel title={"Dataset created"} body={`Dataset ${datasetName} has been created.`} hidden={!addAnother}/>
+            <ConfirmationPanel title={"Dataset created"} body={`Dataset ${datasetName.name} has been created.`} hidden={!addAnother}/>
             <div hidden={(!saveDatasetResult.result && !saveDatasetResult.attempted) || (saveDatasetResult.result && saveDatasetResult.attempted)}>
                 <ErrorSummary title={"An error has occurred"} error={`${errorMessage}`} suggestion={"Please check and try again"}/>
             </div>
