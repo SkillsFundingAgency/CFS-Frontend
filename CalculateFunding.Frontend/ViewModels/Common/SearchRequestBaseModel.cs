@@ -11,6 +11,7 @@ namespace CalculateFunding.Frontend.ViewModels.Common
         public IEnumerable<string> SearchFields { get; set; }
         
         public string[] Status { get; set; }
+        public string SpecificationId { get; set; }
         public string FundingPeriodId { get; set; }
         public string FundingStreamId { get; set; }
         public string[] ProviderType { get; set; }

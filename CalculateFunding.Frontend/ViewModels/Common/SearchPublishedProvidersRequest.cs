@@ -13,6 +13,8 @@ namespace CalculateFunding.Frontend.ViewModels.Common
 
         public bool IncludeFacets { get; set; }
 
+        public string SpecificationId { get; set; }
+
         public string FundingPeriodId { get; set; }
 
         public string FundingStreamId { get; set; }

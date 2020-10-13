@@ -4,6 +4,8 @@
     {
         public string[] Status { get; set; }
 
+        public string SpecificationId { get; set; }
+
         public string FundingPeriodId { get; set; }
 
         public string FundingStreamId { get; set; }

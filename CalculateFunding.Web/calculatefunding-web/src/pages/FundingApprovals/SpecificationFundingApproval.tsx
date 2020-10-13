@@ -78,6 +78,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         providerSubType: [],
         localAuthority: [],
         fundingStreamId: fundingStreamId,
+        specificationId: specificationId,
         hasErrors: undefined,
         searchMode: SearchMode.All,
         pageSize: 50,

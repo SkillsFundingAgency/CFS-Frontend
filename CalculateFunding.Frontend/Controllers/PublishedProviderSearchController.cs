@@ -86,6 +86,11 @@ namespace CalculateFunding.Frontend.Controllers
                 destination.Add("localAuthority", source.LocalAuthority);
             }
 
+            if (!string.IsNullOrWhiteSpace(source.SpecificationId))
+            {
+                destination.Add("specificationId", new[] { source.SpecificationId });
+            }
+
             if (!string.IsNullOrWhiteSpace(source.FundingPeriodId))
             {
                 destination.Add("fundingPeriodId", new[] {source.FundingPeriodId});

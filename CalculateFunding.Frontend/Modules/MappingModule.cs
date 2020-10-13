@@ -11,7 +11,7 @@
         {
             MapperConfiguration config = new MapperConfiguration(c => c.AddProfile<FrontEndMappingProfile>());
             services
-                 .AddSingleton<IMapper>(config.CreateMapper());
+                 .AddSingleton(config.CreateMapper());
         }
     }
 }

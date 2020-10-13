@@ -8,6 +8,7 @@ export interface PublishedProviderSearchRequest {
     hasErrors: boolean | undefined,
     fundingStreamId: string,
     fundingPeriodId: string,
+    specificationId: string,
     localAuthority: string[],
     status: string[],
     providerType: string[],
