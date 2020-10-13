@@ -441,7 +441,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             </div>
             {initialTab.length > 0 && <div className="govuk-main-wrapper  govuk-!-padding-top-2">
                 <div className="govuk-grid-row">
-                    <Tabs initialTab={"release-timetable"}>
+                    <Tabs initialTab={"fundingline-structure"}>
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
