@@ -78,7 +78,7 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="3.0.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.8.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.10.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.13.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.14.0" />

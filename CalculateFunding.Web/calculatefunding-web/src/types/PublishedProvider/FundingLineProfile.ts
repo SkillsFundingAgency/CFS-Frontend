@@ -1,5 +1,3 @@
-import {number} from "yargs";
-
 export interface FundingLineProfile {
   fundingLineCode: string,
   fundingLineName: string,
@@ -7,7 +5,7 @@ export interface FundingLineProfile {
   totalAllocation?: number,
   amountAlreadyPaid: number,
   remainingAmount?: number,
-  carryOverAmount?: number,
+  carryOverAmount: number | null,
   providerName: string,
   profilePatternKey: string,
   profilePatternName: string,
@@ -27,7 +25,8 @@ export interface ProfileTotal {
   isPaid: boolean,
   installmentNumber: number,
   profileRemainingPercentage?: number,
-  actualDate?: Date
+  actualDate?: Date,
+  distributionPeriodId: string
 }
 
 export interface Reference {

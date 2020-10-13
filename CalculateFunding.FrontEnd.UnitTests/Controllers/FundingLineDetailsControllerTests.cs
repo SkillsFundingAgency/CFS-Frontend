@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Frontend.Helpers;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
@@ -18,6 +19,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class FundingLineDetailsControllerTests
     {
         private Mock<IPublishingApiClient> _publishingApiClient;
+        private Mock<IAuthorizationHelper> _mockAuthorizationHelper;
         private FundingLineDetailsController _fundingLineDetailsController;
 
         private string _specificationId;
@@ -30,7 +32,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public void Initialize()
         {
             _publishingApiClient = new Mock<IPublishingApiClient>();
-            _fundingLineDetailsController = new FundingLineDetailsController(_publishingApiClient.Object);
+            _mockAuthorizationHelper = new Mock<IAuthorizationHelper>();
+            _fundingLineDetailsController = new FundingLineDetailsController(_publishingApiClient.Object, _mockAuthorizationHelper.Object);
 
             _specificationId = "specificationId";
             _providerId = "providerId";

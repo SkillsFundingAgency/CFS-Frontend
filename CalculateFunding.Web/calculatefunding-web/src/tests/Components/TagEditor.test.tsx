@@ -7,6 +7,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={"Option1,Option2,Option2"}
+            label="test"
             onAddNewValue={jest.fn()}
             onRemoveValue={jest.fn()} />);
 
@@ -22,6 +23,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={"Option1,Option2,Option2"}
+            label="test"
             showErrorMessageOnRender={"There is an error"}
             onAddNewValue={jest.fn()}
             onRemoveValue={jest.fn()} />);
@@ -39,6 +41,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={"Option1,Option2"}
+            label="test"
             onAddNewValue={jest.fn()}
             onRemoveValue={mockRemoveValue} />)
 
@@ -57,6 +60,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={""}
+            label="test"
             onAddNewValue={mockAddNewValue}
             onRemoveValue={jest.fn()} />)
 
@@ -75,6 +79,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={""}
+            label="test"
             onAddNewValue={mockAddNewValue}
             onRemoveValue={jest.fn()} />)
 
@@ -93,6 +98,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={"Option1"}
+            label="test"
             duplicateErrorMessage={"No duplicates allowed"}
             onAddNewValue={mockAddNewValue}
             onRemoveValue={jest.fn()} />)
@@ -114,6 +120,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={false}
             tagValuesCsv={"Option1"}
+            label="test"
             onAddNewValue={mockAddNewValue}
             onRemoveValue={jest.fn()} />)
 
@@ -134,6 +141,7 @@ describe('<TagEditor />', () => {
         const wrapper = mount(<TagEditor
             allowDuplicates={true}
             tagValuesCsv={"Option1"}
+            label="test"
             onAddNewValue={mockAddNewValue}
             onRemoveValue={jest.fn()} />)
 

@@ -31,97 +31,101 @@ namespace CalculateFunding.Frontend.Helpers
 
         public Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId)
         {
-	        return Task.FromResult(new FundingStreamPermission
-	        {
-		        CanAdministerFundingStream = true,
-		        CanApproveFunding = true,
-		        CanApproveSpecification = true,
-		        CanChooseFunding = true,
-		        CanCreateQaTests = true,
-		        CanCreateSpecification = true,
-		        CanEditCalculations = true,
-		        CanEditQaTests = true,
-		        CanEditSpecification = true,
-		        CanMapDatasets = true,
-		        CanReleaseFunding = true,
-		        CanRefreshFunding = true,
-		        CanCreateTemplates = true,
-		        CanEditTemplates = true,
-		        CanDeleteTemplates = true,
-		        CanApproveTemplates = true,
-		        UserId = user.GetUserProfile()?.Id,
-		        FundingStreamId = fundingStreamId
-	        });
+            return Task.FromResult(new FundingStreamPermission
+            {
+                CanAdministerFundingStream = true,
+                CanApproveFunding = true,
+                CanApproveSpecification = true,
+                CanChooseFunding = true,
+                CanCreateQaTests = true,
+                CanCreateSpecification = true,
+                CanEditCalculations = true,
+                CanEditQaTests = true,
+                CanEditSpecification = true,
+                CanMapDatasets = true,
+                CanReleaseFunding = true,
+                CanRefreshFunding = true,
+                CanCreateTemplates = true,
+                CanEditTemplates = true,
+                CanDeleteTemplates = true,
+                CanApproveTemplates = true,
+                UserId = user.GetUserProfile()?.Id,
+                FundingStreamId = fundingStreamId
+            });
         }
 
         public Task<IEnumerable<FundingStreamPermission>> GetUserFundingStreamPermissions(ClaimsPrincipal user)
         {
-	        return Task.FromResult(new []
-	        {
-		        new FundingStreamPermission
-		        {
-			        CanAdministerFundingStream = true,
-			        CanApproveFunding = true,
-			        CanApproveSpecification = true,
-			        CanChooseFunding = true,
-			        CanCreateQaTests = true,
-			        CanCreateSpecification = true,
-			        CanEditCalculations = true,
-			        CanEditQaTests = true,
-			        CanEditSpecification = true,
-			        CanMapDatasets = true,
-			        CanReleaseFunding = true,
-			        CanRefreshFunding = true,
-			        CanCreateTemplates = true,
-			        CanEditTemplates = true,
-			        CanDeleteTemplates = true,
-			        CanApproveTemplates = true,
-			        UserId = user.GetUserProfile()?.Id,
-			        FundingStreamId = "DSG"
-		        },
-		        new FundingStreamPermission
-		        {
-			        CanAdministerFundingStream = true,
-			        CanApproveFunding = true,
-			        CanApproveSpecification = true,
-			        CanChooseFunding = true,
-			        CanCreateQaTests = true,
-			        CanCreateSpecification = true,
-			        CanEditCalculations = true,
-			        CanEditQaTests = true,
-			        CanEditSpecification = true,
-			        CanMapDatasets = true,
-			        CanReleaseFunding = true,
-			        CanRefreshFunding = true,
-			        CanCreateTemplates = false,
-			        CanEditTemplates = false,
-			        CanDeleteTemplates = false,
-			        CanApproveTemplates = false,
-			        UserId = user.GetUserProfile()?.Id,
-			        FundingStreamId = "PSG"
-		        },
-		        new FundingStreamPermission
-		        {
-			        CanAdministerFundingStream = true,
-			        CanApproveFunding = true,
-			        CanApproveSpecification = true,
-			        CanChooseFunding = true,
-			        CanCreateQaTests = true,
-			        CanCreateSpecification = true,
-			        CanEditCalculations = true,
-			        CanEditQaTests = true,
-			        CanEditSpecification = true,
-			        CanMapDatasets = true,
-			        CanReleaseFunding = true,
-			        CanRefreshFunding = true,
-			        CanCreateTemplates = true,
-			        CanEditTemplates = true,
-			        CanDeleteTemplates = true,
-			        CanApproveTemplates = true,
-			        UserId = user.GetUserProfile()?.Id,
-			        FundingStreamId = "DSG-AT"
-		        }
-	        } as IEnumerable<FundingStreamPermission>);
+            return Task.FromResult(new[]
+            {
+                new FundingStreamPermission
+                {
+                    CanAdministerFundingStream = true,
+                    CanApproveFunding = true,
+                    CanApproveSpecification = true,
+                    CanChooseFunding = true,
+                    CanCreateQaTests = true,
+                    CanCreateSpecification = true,
+                    CanEditCalculations = true,
+                    CanEditQaTests = true,
+                    CanEditSpecification = true,
+                    CanMapDatasets = true,
+                    CanReleaseFunding = true,
+                    CanRefreshFunding = true,
+                    CanCreateTemplates = true,
+                    CanEditTemplates = true,
+                    CanDeleteTemplates = true,
+                    CanApproveTemplates = true,
+                    CanEditProfilePattern = true,
+                    CanApplyCustomProfilePattern = true,
+                    UserId = user.GetUserProfile()?.Id,
+                    FundingStreamId = "DSG"
+                },
+                new FundingStreamPermission
+                {
+                    CanAdministerFundingStream = true,
+                    CanApproveFunding = true,
+                    CanApproveSpecification = true,
+                    CanChooseFunding = true,
+                    CanCreateQaTests = true,
+                    CanCreateSpecification = true,
+                    CanEditCalculations = true,
+                    CanEditQaTests = true,
+                    CanEditSpecification = true,
+                    CanMapDatasets = true,
+                    CanReleaseFunding = true,
+                    CanRefreshFunding = true,
+                    CanCreateTemplates = false,
+                    CanEditTemplates = false,
+                    CanDeleteTemplates = false,
+                    CanApproveTemplates = false,
+                    CanEditProfilePattern = true,
+                    CanApplyCustomProfilePattern = true,
+                    UserId = user.GetUserProfile()?.Id,
+                    FundingStreamId = "PSG"
+                },
+                new FundingStreamPermission
+                {
+                    CanAdministerFundingStream = true,
+                    CanApproveFunding = true,
+                    CanApproveSpecification = true,
+                    CanChooseFunding = true,
+                    CanCreateQaTests = true,
+                    CanCreateSpecification = true,
+                    CanEditCalculations = true,
+                    CanEditQaTests = true,
+                    CanEditSpecification = true,
+                    CanMapDatasets = true,
+                    CanReleaseFunding = true,
+                    CanRefreshFunding = true,
+                    CanCreateTemplates = true,
+                    CanEditTemplates = true,
+                    CanDeleteTemplates = true,
+                    CanApproveTemplates = true,
+                    UserId = user.GetUserProfile()?.Id,
+                    FundingStreamId = "DSG-AT"
+                }
+            } as IEnumerable<FundingStreamPermission>);
         }
 
         public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)

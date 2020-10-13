@@ -1,9 +1,12 @@
 ﻿using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -12,10 +15,12 @@ namespace CalculateFunding.Frontend.Controllers
     public class FundingLineDetailsController : Controller
     {
         private readonly IPublishingApiClient _publishingApiClient;
+        private readonly IAuthorizationHelper _authorizationHelper;
 
-        public FundingLineDetailsController(IPublishingApiClient publishingApiClient)
+        public FundingLineDetailsController(IPublishingApiClient publishingApiClient, IAuthorizationHelper authorizationHelper)
         {
             _publishingApiClient = publishingApiClient;
+            _authorizationHelper = authorizationHelper;
         }
 
         [HttpGet]
@@ -138,6 +143,39 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(fundingLineApiResponse.Content);
+        }
+
+        [HttpPost]
+        [Route("api/publishedproviderfundinglinedetails/customprofiles")]
+        public async Task<IActionResult> ApplyCustomProfile([FromBody] ApplyCustomProfileRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return new BadRequestObjectResult(ModelState);
+            }
+
+            IEnumerable<FundingStreamPermission> fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
+
+            if (fundingStreamPermissions.All(
+                x => x.FundingStreamId == request.FundingStreamId && x.CanApplyCustomProfilePattern == false))
+            {
+                return new ForbidResult();
+            }
+
+            // TODO: Change Backend to return a ValidatedApiResponse instead of just a status code
+            HttpStatusCode result = await _publishingApiClient.ApplyCustomProfilePattern(request);
+
+            if (result == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestObjectResult("One or more validation errors occurred.");
+            }
+
+            if (result == HttpStatusCode.NoContent)
+            {
+                return new NoContentResult();
+            }
+
+            return new InternalServerErrorResult($"Unable to apply custom profile - result '{result}'");
         }
     }
 }

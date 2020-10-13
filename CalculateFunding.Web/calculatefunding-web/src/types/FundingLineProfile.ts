@@ -27,5 +27,6 @@ export interface ProfileTotal {
  isPaid: boolean,
  installmentNumber: number,
  profileRemainingPercentage?: number,
- actualDate?: Date
+ actualDate?: Date,
+ distributionPeriodId: string
 }
