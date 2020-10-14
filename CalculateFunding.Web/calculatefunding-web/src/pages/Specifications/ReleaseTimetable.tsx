@@ -6,6 +6,8 @@ import {getReleaseTimetableForSpecificationService, saveReleaseTimetableForSpeci
 import {ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../../types/ReleaseTimetableSummary";
 import {SaveReleaseTimetableViewModel} from "../../types/SaveReleaseTimetableViewModel";
 import {AxiosError} from "axios";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import {ConfirmationPanel} from "../../components/ConfirmationPanel";
 
 export function ReleaseTimetable(props: { specificationId: string }) {
     const [navisionDate, setNavisionDate] = useState<Date>(DateTime.fromMillis(0).toJSDate());
@@ -19,6 +21,8 @@ export function ReleaseTimetable(props: { specificationId: string }) {
     });
     const [isSavingReleaseTimetable, setIsSavingReleaseTimetable] = useState<boolean>(false);
     const [pageErrors, setPageErrors] = useState<string>("");
+    const [saveSuccessful, setSaveSuccessful] = useState<boolean>(false);
+
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
 
     useEffect(() => {
@@ -70,13 +74,20 @@ export function ReleaseTimetable(props: { specificationId: string }) {
     }
 
     function updateDateWithTime(date: Date, time: string) {
-        let newDate = DateTime.fromFormat(`${date.getFullYear()}-${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}-${date.getDate()}T${parseInt(time) < 10 ? "0" + time : time}:00`, "YYYY-MM-ddTHH:mm")
+        let year = `${date.getFullYear()}`
+        let month = `${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}`;
+        let day = `${date.getDate()}`;
+        let hours = `T${parseInt(time) < 10 ? "0" + parseInt(time) : parseInt(time)}:00:00.000`;
+
+        let newDate = DateTime.fromISO(`${year}-${month}-${day}${hours}`)
         return newDate.toJSDate();
     }
 
     function confirmChanges() {
+        setSaveSuccessful(false);
         setCanTimetableBeUpdated(false);
         setIsSavingReleaseTimetable(true);
+
         let navisionDateTime = updateDateWithTime(navisionDate, navisionTime);
         let releaseDateTime = updateDateWithTime(releaseDate, releaseTime);
         saveReleaseTimetable = {
@@ -89,6 +100,7 @@ export function ReleaseTimetable(props: { specificationId: string }) {
             if (response.status === 200) {
                 const result = response.data as ReleaseTimetableViewModel;
                 setReleaseTimetable(result);
+                setSaveSuccessful(true);
             }
         }).catch((error: AxiosError) => {
             setPageErrors(error.message)
@@ -103,6 +115,8 @@ export function ReleaseTimetable(props: { specificationId: string }) {
                 <h2 id="release-timetable-title" className="govuk-heading-l">Release timetable</h2>
             </div>
         </div>
+        <LoadingStatus title={"Saving Release Timetable"} description={"Please wait whilst we save your changes"} hidden={!isSavingReleaseTimetable}/>
+        <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"} hidden={saveSuccessful} />
         <div className={"govuk-form-group"} hidden={isSavingReleaseTimetable}>
             <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary" hidden={pageErrors === ""}>
                 <h2 className="govuk-error-summary__title" id="error-summary-title">
@@ -132,7 +146,7 @@ export function ReleaseTimetable(props: { specificationId: string }) {
         <div className="govuk-form-group govuk-!-margin-bottom-9" hidden={isSavingReleaseTimetable}>
             <TimeInput time={DateTime.fromJSDate(navisionDate).toFormat("HH:mm") === DateTime.fromMillis(0).toFormat("HH:mm") ? "" : DateTime.fromJSDate(navisionDate).toFormat("HH")} callback={updateNavisionTime}/>
         </div>
-        <div className="govuk-form-group">
+        <div className="govuk-form-group" hidden={isSavingReleaseTimetable}>
             <fieldset className="govuk-fieldset" role="group">
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h3 id="statement-providers-title" className="govuk-heading-m">Release date of statement to providers?</h3>
