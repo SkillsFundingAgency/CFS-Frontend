@@ -6,7 +6,8 @@ import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecif
 import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 import {SpecificationSummary} from "../types/SpecificationSummary";
-import {FundingStream, Specification} from "../types/viewFundingTypes";
+import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
+import {FundingStreamWithSpecificationSelectedForFunding, SpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
 
 let baseURL = "/api/specs";
 
@@ -29,7 +30,7 @@ export async function getAdditionalCalculationsForSpecificationService(calculati
     });
 }
 
-export async function getFundingStreamsService() {
+export async function getFundingStreamIdsWithSpecsService(): Promise<AxiosResponse<string[]>> {
     return axios(`${baseURL}/fundingstream-id-for-specifications`, {
         method: 'GET',
         headers: {
@@ -38,7 +39,7 @@ export async function getFundingStreamsService() {
     });
 }
 
-export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId: string) {
+export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId: string): Promise<AxiosResponse<FundingPeriod[]>> {
     return axios(`/api/policy/fundingperiods/${fundingStreamId}`, {
         method: 'GET',
         headers: {
@@ -139,16 +140,8 @@ export async  function setProfileVariationPointersService(specificationId:string
     });
 }
 
-export async function getFundingStreamsForSelectedSpecifications(): Promise<AxiosResponse<FundingStream[]>> {
-    return axios('/api/specs/get-fundingstreams-for-selected-specifications', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-}
-export async function getSpecificationsSelectedForFundingByPeriod(fundingPeriodId:string): Promise<AxiosResponse<SpecificationSummary[]>> {
-    return axios(`/api/specs/specifications-selected-for-funding-by-period/${fundingPeriodId}`, {
+export async function getSpecificationsSelectedForFundingService(): Promise<AxiosResponse<FundingStreamWithSpecificationSelectedForFunding[]>> {
+    return axios(`/api/specs/funding-selections`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

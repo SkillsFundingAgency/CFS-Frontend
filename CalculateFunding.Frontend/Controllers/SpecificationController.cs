@@ -35,14 +35,52 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/specs/specifications-selected-for-funding")]
-        public async Task<IActionResult> GetSpecificationsSelectedForFunding()
+        [Route("api/specs/funding-selections")]
+        public async Task<IActionResult> GetSelectionsForSpecificationsSelectedForFunding()
         {
             ApiResponse<IEnumerable<SpecificationSummary>> apiResponse = await _specificationsApiClient.GetSpecificationsSelectedForFunding();
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
-                return Ok(apiResponse.Content.OrderBy(c => c.Name));
+                List<SpecificationSummary> specifications = apiResponse.Content.ToList();
+                List<FundingStreamWithSpecificationSelectedForFundingModel> fundingStreams = specifications
+                    .SelectMany(x =>
+                        x.FundingStreams.Select(fs =>
+                            new FundingStreamWithSpecificationSelectedForFundingModel
+                            {
+                                Id = fs.Id,
+                                Name = fs.Name
+                            }))
+                    .DistinctBy(x => x.Id)
+                    .ToList();
+                foreach (FundingStreamWithSpecificationSelectedForFundingModel fundingStream in fundingStreams)
+                {
+                    List<SpecificationSummary> streamSpecs = specifications
+                        .Where(x => x.FundingStreams.Any(s => s.Id == fundingStream.Id)).ToList();
+                    IEnumerable<Reference> fundingPeriods = streamSpecs
+                        .Select(y => y.FundingPeriod)
+                        .DistinctBy(x => x.Id);
+                    foreach (Reference fundingPeriod in fundingPeriods)
+                    {
+                        IEnumerable<SpecificationSummary> periodSpecs = streamSpecs
+                            .Where(x => x.FundingPeriod.Id == fundingPeriod.Id);
+
+                        fundingStream.Periods.Add(new FundingPeriodWithSpecificationSelectedForFundingModel
+                        {
+                            Id = fundingPeriod.Id,
+                            Name = fundingPeriod.Name,
+                            Specifications = periodSpecs
+                                .Select(s => new SpecificationSelectedForFundingModel
+                                {
+                                    Id = s.Id,
+                                    Name = s.Name
+                                })
+                                .DistinctBy(x => x.Id)
+                        });
+                    }
+                }
+
+                return Ok(fundingStreams);
             }
 
             if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
@@ -262,7 +300,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/specs/create")]
-        public async Task<IActionResult> CreateSpecification([FromBody]CreateSpecificationViewModel viewModel)
+        public async Task<IActionResult> CreateSpecification([FromBody] CreateSpecificationViewModel viewModel)
         {
             //TODO: Could do with some validation here
 
@@ -271,7 +309,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new BadRequestObjectResult(ModelState);
             }
 
-            var fundingStreamIds = new List<string> { viewModel.FundingStreamId };
+            var fundingStreamIds = new List<string> {viewModel.FundingStreamId};
 
             CreateSpecificationModel specification = new CreateSpecificationModel
             {
@@ -285,7 +323,7 @@ namespace CalculateFunding.Frontend.Controllers
             };
 
             IEnumerable<FundingStreamPermission> fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
-            
+
             if (fundingStreamPermissions.All(x => x.CanCreateSpecification == false))
             {
                 return new ForbidResult();
@@ -316,7 +354,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/specs/{specificationId}/status")]
         [HttpPut]
-        public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody]PublishStatusEditModel publishStatusEditModel)
+        public async Task<IActionResult> EditSpecificationStatus(string specificationId, [FromBody] PublishStatusEditModel publishStatusEditModel)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
@@ -340,7 +378,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/specs/get-all-specifications")]
         [HttpGet]
-        public async Task<IActionResult> GetAllSpecifications([FromQuery]SpecificationSearchRequestViewModel viewModel)
+        public async Task<IActionResult> GetAllSpecifications([FromQuery] SpecificationSearchRequestViewModel viewModel)
         {
             var searchFilterRequest = new SearchFilterRequest
             {
@@ -358,7 +396,6 @@ namespace CalculateFunding.Frontend.Controllers
             if (viewModel.Status?.Length > 0)
             {
                 searchFilterRequest.Filters.Add("status", viewModel.Status.ToArray());
-
             }
 
             if (viewModel.FundingPeriods?.Length > 0)
@@ -392,7 +429,7 @@ namespace CalculateFunding.Frontend.Controllers
                 {
                     endNumber = result.TotalItems;
                 }
-                
+
                 PagedSpecficationSearchResults searchPagedResult = new PagedSpecficationSearchResults
                 {
                     Items = result.Items,
@@ -405,16 +442,16 @@ namespace CalculateFunding.Frontend.Controllers
 
                 return Ok(searchPagedResult);
             }
-            
+
             return new BadRequestResult();
         }
 
         [Route("api/specs/update/{specificationId}")]
         [HttpPost]
-        public async Task<IActionResult> UpdateSpecification([FromBody]EditSpecificationModel viewModel, [FromRoute]string specificationId)
+        public async Task<IActionResult> UpdateSpecification([FromBody] EditSpecificationModel viewModel, [FromRoute] string specificationId)
         {
             ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.UpdateSpecification(specificationId, viewModel);
-                
+
             if (result.IsBadRequest(out BadRequestObjectResult badRequest))
             {
                 return badRequest;
@@ -453,13 +490,13 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-	            WebClient client = new WebClient();
+                WebClient client = new WebClient();
 
-	            byte[] data = client.DownloadData(response.Content.Url);
+                byte[] data = client.DownloadData(response.Content.Url);
 
-	            FileContentResult fileContentResult = new FileContentResult(data, "text/csv") {FileDownloadName = response.Content.FileName};
+                FileContentResult fileContentResult = new FileContentResult(data, "text/csv") {FileDownloadName = response.Content.FileName};
 
-	            return fileContentResult;
+                return fileContentResult;
             }
 
             return new BadRequestResult();
@@ -469,8 +506,8 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/specs/{specificationId}/profile-variation-pointers")]
         public async Task<IActionResult> GetProfileVariationPointers(string specificationId)
         {
-            ApiResponse<IEnumerable<ProfileVariationPointer>> apiResponse = 
-	            await _specificationsApiClient.GetProfileVariationPointers(specificationId);
+            ApiResponse<IEnumerable<ProfileVariationPointer>> apiResponse =
+                await _specificationsApiClient.GetProfileVariationPointers(specificationId);
 
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
@@ -493,26 +530,26 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/specs/{specificationId}/profile-variation-pointers")]
         [HttpPut]
         public async Task<IActionResult> SetProfileVariationPointers(
-	        [FromRoute]string specificationId,
-	        [FromBody]IEnumerable<ProfileVariationPointer> profileVariationPointer)
+            [FromRoute] string specificationId,
+            [FromBody] IEnumerable<ProfileVariationPointer> profileVariationPointer)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(profileVariationPointer, nameof(profileVariationPointer));
 
             if (!await _authorizationHelper.DoesUserHavePermission(
-	            User, 
-	            specificationId, 
-	            SpecificationActionTypes.CanEditSpecification))
+                User,
+                specificationId,
+                SpecificationActionTypes.CanEditSpecification))
             {
                 return new ForbidResult();
             }
 
-            HttpStatusCode response = 
-	            await _specificationsApiClient.SetProfileVariationPointers(specificationId, profileVariationPointer);
+            HttpStatusCode response =
+                await _specificationsApiClient.SetProfileVariationPointers(specificationId, profileVariationPointer);
 
-			if (response == HttpStatusCode.OK)
+            if (response == HttpStatusCode.OK)
             {
-	            return new OkObjectResult(response);
+                return new OkObjectResult(response);
             }
 
             throw new InvalidOperationException($"An error occurred while updating profile variation pointers. Status code={response}");

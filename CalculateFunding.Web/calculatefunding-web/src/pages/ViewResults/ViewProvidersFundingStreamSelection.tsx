@@ -1,9 +1,7 @@
 import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {
-    getFundingStreamsService
-} from "../../services/specificationService";
+import {getFundingStreamIdsWithSpecsService} from "../../services/specificationService";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {useHistory} from "react-router";
@@ -19,7 +17,7 @@ export function ViewProvidersFundingStreamSelection() {
 
     useEffectOnce(() => {
         setIsLoading(true);
-        getFundingStreamsService().then((result) => {
+        getFundingStreamIdsWithSpecsService().then((result) => {
             setIsLoading(false);
             setFundingStreams(result.data);
         })

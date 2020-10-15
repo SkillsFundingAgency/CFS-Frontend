@@ -4,7 +4,7 @@ import {SelectSpecificationState} from "../states/SelectSpecificationState";
 import {FundingPeriod, Specification} from "../types/viewFundingTypes";
 import {
     getFundingPeriodsByFundingStreamIdService,
-    getFundingStreamsService,
+    getFundingStreamIdsWithSpecsService,
     getSpecificationsByFundingPeriodAndStreamIdService
 } from "../services/specificationService";
 
@@ -37,7 +37,7 @@ export type SelectSpecificationActions =
 export const getFundingStreams: ActionCreator<ThunkAction<Promise<any>, SelectSpecificationState, null, SelectSpecificationActions>> =
     () => {
         return async (dispatch: Dispatch) => {
-            const response = await getFundingStreamsService();
+            const response = await getFundingStreamIdsWithSpecsService();
             dispatch({
                 type: SelectSpecificationActionTypes.GET_FUNDINGSTREAMS,
                 payload: response.data as string[]
