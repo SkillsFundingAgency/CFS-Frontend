@@ -4,7 +4,6 @@ import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
-import Pagination from "../../components/Pagination";
 import {Details} from "../../components/Details";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
@@ -16,7 +15,6 @@ import {
 } from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
-import {DateFormatter} from "../../components/DateFormatter";
 import {
     CollapsibleSteps,
     setCollapsibleStepsAllStepsStatus
@@ -41,7 +39,6 @@ import {getDatasetBySpecificationIdService} from "../../services/datasetService"
 import {DatasetSummary} from "../../types/DatasetSummary";
 import {getCalculationsService} from "../../services/calculationService";
 import {getFundingLineStructureService} from "../../services/fundingStructuresService";
-import {CalculationSummary} from "../../types/CalculationSummary";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
@@ -52,6 +49,7 @@ import * as QueryString from "query-string";
 import {NoData} from "../../components/NoData";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {ReleaseTimetable} from "./ReleaseTimetable";
+import {AdditionalCalculations} from "../../components/Calculations/AdditionalCalculations";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -59,9 +57,6 @@ export interface ViewSpecificationRoute {
 
 export function ViewSpecification({match}: RouteComponentProps<ViewSpecificationRoute>) {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
-    const [additionalCalculationsSearchTerm,] = useState('');
-    const [statusFilter] = useState("");
-
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
     const initialSpecification: SpecificationSummary = {
@@ -98,29 +93,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         content: [],
         statusCode: 0
     });
-    const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSummary>({
-        results: [],
-        currentPage: 0,
-        endItemNumber: 0,
-        facets: [],
-        lastPage: 0,
-        pagerState: {
-            lastPage: 0,
-            currentPage: 0,
-            pages: [],
-            displayNumberOfPages: 0,
-            nextPage: 0,
-            previousPage: 0
-        },
-        startItemNumber: 0,
-        totalCount: 0,
-        totalErrorResults: 0,
-        totalResults: 0
-    });
+
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
-    const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
     const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [isLoadingVariationManagement, setIsLoadingVariationManagement] = useState(true);
@@ -161,12 +137,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }, [rerenderFundingLineSteps]);
 
     useEffect(() => {
-        if (additionalCalculations.currentPage !== 0) {
-            setIsLoadingAdditionalCalculations(false);
-        }
-    }, [additionalCalculations.results]);
-
-    useEffect(() => {
         setFundingLineRenderInternalState(true);
         if (fundingLines.length !== 0) {
             if (fundingLinesOriginalData.length === 0) {
@@ -187,10 +157,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
         resetErrors();
-
         fetchData();
-
-        populateAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm);
 
         getDatasetBySpecificationIdService(specificationId)
             .then((result) => {
@@ -199,8 +166,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     setDatasets(response.data as DatasetSummary);
                 }
             });
-
-
 
         getProfileVariationPointersService(specificationId).then((result) => {
             const response = result;
@@ -211,8 +176,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             setIsLoadingVariationManagement(false);
         });
     }, [specificationId]);
-
-
 
     const fetchData = async () => {
         try {
@@ -246,10 +209,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             setIsLoadingSelectedForFunding(false);
         }
     };
-
-    function movePage(pageNumber: number) {
-        populateAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm);
-    }
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
         const response = await approveFundingLineStructureService(specificationId);
@@ -287,21 +246,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         if (collapsibleStepsAllStepsStatus.closeAllSteps){
             openCloseAllFundingLines(false);
         }
-    }
-
-    function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
-        getCalculationsService({
-            specificationId: specificationId,
-            status: status,
-            pageNumber: pageNumber,
-            searchTerm: additionalCalculationsSearchTerm,
-            calculationType: "Additional"
-        }).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as CalculationSummary;
-                setAdditionalCalculations(result)
-            }
-        }).finally(() => setIsLoadingAdditionalCalculations(false));
     }
 
     async function chooseForFunding() {
@@ -522,83 +466,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
-                            <section className="govuk-tabs__panel" id="additional-calculations">
-                                <LoadingStatus title={"Loading additional calculations"}
-                                               hidden={!isLoadingAdditionalCalculations}
-                                               description={"Please wait whilst additional calculations are loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <h2 className="govuk-heading-l">Additional calculations</h2>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third ">
-                                        <p className="govuk-body right-align"
-                                           hidden={additionalCalculations.totalResults === 0}>
-                                            Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
-                                            of {additionalCalculations.totalResults}
-                                            calculations
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="govuk-grid-row">
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <div className="govuk-form-group search-container">
-                                            <input className="govuk-input input-search" id="event-name"
-                                                   name="event-name" type="text"/>
-                                        </div>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third">
-                                        <button className="govuk-button" type="submit">Search</button>
-                                    </div>
-                                </div>
-                                <table className="govuk-table">
-                                    <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                                        <th scope="col" className="govuk-table__header">Status</th>
-                                        <th scope="col" className="govuk-table__header">Value type</th>
-                                        <th scope="col" className="govuk-table__header">Last edited date</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="govuk-table__body">
-                                    {additionalCalculations.results.map((ac, index) =>
-                                        <tr className="govuk-table__row" key={index}>
-                                            <td className="govuk-table__cell text-overflow">
-                                                <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
-                                            </td>
-                                            <td className="govuk-table__cell">{ac.status}</td>
-                                            <td className="govuk-table__cell">{ac.valueType}</td>
-                                            <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
-                                                                                             utc={false}/></td>
-                                        </tr>
-                                    )}
-                                    </tbody>
-                                </table>
-
-                                <div className="govuk-warning-text"
-                                     hidden={additionalCalculations.totalCount > 0}>
-                                    <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                    <strong className="govuk-warning-text__text">
-                                        <span className="govuk-warning-text__assistive">Warning</span>
-                                        No additional calculations available. &nbsp;
-                                        <Link to={`/specifications/createadditionalcalculation/${specificationId}`}>
-                                            Create a calculation
-                                        </Link>
-                                    </strong>
-                                </div>
-                                {additionalCalculations.totalResults > 0 &&
-                                <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                                    <div className="pagination__summary">
-                                        <p className="govuk-body right-align">
-                                            Showing
-                                            {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
-                                            of {additionalCalculations.totalResults} calculations
-                                        </p>
-                                    </div>
-                                    <Pagination currentPage={additionalCalculations.currentPage}
-                                                lastPage={additionalCalculations.lastPage}
-                                                callback={movePage}/>
-                                </nav>}
-                            </section>
+                            <AdditionalCalculations specificationId={specificationId} />
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
                             <section className="govuk-tabs__panel" id="datasets">
