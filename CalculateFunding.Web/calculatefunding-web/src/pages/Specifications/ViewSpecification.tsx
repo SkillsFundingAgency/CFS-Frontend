@@ -46,10 +46,10 @@ import {useSelector} from "react-redux";
 import {getUserPermissionsService} from "../../services/userService";
 import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageModal";
 import * as QueryString from "query-string";
-import {NoData} from "../../components/NoData";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {ReleaseTimetable} from "./ReleaseTimetable";
 import {AdditionalCalculations} from "../../components/Calculations/AdditionalCalculations";
+import {VariationManagement} from "../../components/Specifications/VariationManagement";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -87,7 +87,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
-    const [profileVariationPointers, setProfileVariationPointers] = useState<ProfileVariationPointer[]>([]);
+
 
     const [datasets, setDatasets] = useState<DatasetSummary>({
         content: [],
@@ -99,7 +99,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
-    const [isLoadingVariationManagement, setIsLoadingVariationManagement] = useState(true);
+
     const [initialTab, setInitialTab] = useState<string>("");
 
     let history = useHistory();
@@ -166,15 +166,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     setDatasets(response.data as DatasetSummary);
                 }
             });
-
-        getProfileVariationPointersService(specificationId).then((result) => {
-            const response = result;
-            if (response.status === 200) {
-                setProfileVariationPointers(response.data as ProfileVariationPointer[]);
-            }
-        }).finally(() => {
-            setIsLoadingVariationManagement(false);
-        });
     }, [specificationId]);
 
     const fetchData = async () => {
@@ -240,10 +231,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         setFundingLines(fundingLinesCopy);
 
         const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
-        if (collapsibleStepsAllStepsStatus.openAllSteps){
+        if (collapsibleStepsAllStepsStatus.openAllSteps) {
             openCloseAllFundingLines(true);
         }
-        if (collapsibleStepsAllStepsStatus.closeAllSteps){
+        if (collapsibleStepsAllStepsStatus.closeAllSteps) {
             openCloseAllFundingLines(false);
         }
     }
@@ -424,12 +415,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="false"
-                                            onClick={(e)=>openCloseAllFundingLines(true)}
+                                            onClick={(e) => openCloseAllFundingLines(true)}
                                             hidden={fundingLinesExpandedStatus}>Open all<span
                                         className="govuk-visually-hidden"> sections</span></button>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="true"
-                                            onClick={(e)=>openCloseAllFundingLines(false)}
+                                            onClick={(e) => openCloseAllFundingLines(false)}
                                             hidden={!fundingLinesExpandedStatus}>Close all<span
                                         className="govuk-visually-hidden"> sections</span></button>
                                 </div>
@@ -466,7 +457,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
-                            <AdditionalCalculations specificationId={specificationId} />
+                            <AdditionalCalculations specificationId={specificationId}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
                             <section className="govuk-tabs__panel" id="datasets">
@@ -522,43 +513,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label={"variation-management"}>
-                            <section className="govuk-tabs__panel" id="variation-management">
-                                <LoadingStatus title={"Loading variation management"}
-                                               hidden={!isLoadingVariationManagement}
-                                               description={"Please wait whilst variation management is loading"}/>
-                                <div className="govuk-grid-row">
-                                    <div className="govuk-grid-column-full">
-                                        <NoData hidden={profileVariationPointers.length > 0 || isLoadingVariationManagement}/>
-                                    </div>
-                                    <div className="govuk-grid-column-full" hidden={profileVariationPointers.length === 0}>
-                                        <h2 className="govuk-heading-l">Variation Management</h2>
-                                        <p className="govuk-body">Set the installment from which a variation should take effect.</p>
-                                    </div>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        {
-                                            profileVariationPointers.map((f, index) =>
-                                                <dl key={index} className="govuk-summary-list">
-                                                    <div className="govuk-summary-list__row">
-                                                        <dt className="govuk-summary-list__key">
-                                                            {f.fundingLineId}
-                                                        </dt>
-                                                        <dd className="govuk-summary-list__value">
-                                                            {f.typeValue} {f.year} <br/>
-                                                            Installment {f.occurrence}
-                                                        </dd>
-                                                        <dd className="govuk-summary-list__actions">
-                                                            <Link to={`/Specifications/EditVariationPoints/${specificationId}`}
-                                                                  className="govuk-link">
-                                                                Change<span className="govuk-visually-hidden"> {f.periodType}</span>
-                                                            </Link>
-                                                        </dd>
-                                                    </div>
-                                                </dl>
-                                            )
-                                        }
-                                    </div>
-                                </div>
-                            </section>
+                            <VariationManagement specificationId={specificationId}/>
                         </Tabs.Panel>
                     </Tabs>
                 </div>
