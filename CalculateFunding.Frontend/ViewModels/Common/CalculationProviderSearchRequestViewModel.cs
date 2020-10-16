@@ -1,4 +1,5 @@
-﻿using CalculateFunding.Common.Models.Search;
+﻿using System.Collections.Generic;
+using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.ViewModels.Common
 {
@@ -29,5 +30,7 @@ namespace CalculateFunding.Frontend.ViewModels.Common
 		public string CalculationValueType { get; set; }
 
 		public string CalculationId { get; set; }
+
+        public IEnumerable<string> SearchFields { get; set; }
 	}
 }

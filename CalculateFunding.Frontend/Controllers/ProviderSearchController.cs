@@ -78,14 +78,15 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(viewModel, nameof(viewModel));
 
-            var request = new SearchRequestViewModel
+            SearchRequestViewModel request = new SearchRequestViewModel
             {
 	            Filters = new Dictionary<string, string[]>(),
 	            FacetCount = viewModel.FacetCount,
 	            IncludeFacets = viewModel.IncludeFacets,
 	            PageNumber = viewModel.PageNumber,
 	            PageSize = viewModel.PageSize,
-	            SearchMode = viewModel.SearchMode
+	            SearchMode = viewModel.SearchMode,
+                SearchFields = viewModel.SearchFields
             };
 
             if (!string.IsNullOrEmpty(viewModel.SearchTerm))

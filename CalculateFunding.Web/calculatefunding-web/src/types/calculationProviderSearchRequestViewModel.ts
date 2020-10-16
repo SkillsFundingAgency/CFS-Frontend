@@ -14,4 +14,5 @@ export interface CalculationProviderSearchRequestViewModel {
     searchMode: SearchMode;
     calculationValueType: string;
     calculationId: string;
+    searchFields: string[];
 }

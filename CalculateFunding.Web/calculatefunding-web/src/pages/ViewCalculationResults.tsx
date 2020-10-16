@@ -22,7 +22,7 @@ import {SpecificationSummary} from "../types/SpecificationSummary";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../types/jobType";
-import {SearchBox} from "../components/SearchBox";
+import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
 
 export interface ViewCalculationResultsProps {
     calculation: CalculationSummary;
@@ -62,6 +62,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         searchMode: SearchMode.All,
         searchTerm: "",
         calculationId: match.params.calculationId,
+        searchFields: []
     };
     const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
     const calculationId = match.params.calculationId;
@@ -244,16 +245,16 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         getCalculationResults(calculationProviderSearchRequest);
     }
 
-    function filterBySearchTerm(searchQuery:string) {
-            setIsLoading(true);
-            let filterUpdate = searchQuery;
-            calculationProviderSearchRequest.searchTerm = filterUpdate;
+    function filterBySearchTerm(searchField: string, searchTerm: string) {
+        setIsLoading(true);
+        let filterUpdate = searchTerm;
+        calculationProviderSearchRequest.searchTerm = filterUpdate;
 
-            setCalculationProviderSearchRequest(prevState => {
-                return {...prevState, searchTerm: filterUpdate}
-            });
+        setCalculationProviderSearchRequest(prevState => {
+            return {...prevState, searchTerm: filterUpdate, searchField: searchField}
+        });
 
-            getCalculationResults(calculationProviderSearchRequest);
+        getCalculationResults(calculationProviderSearchRequest);
     }
 
     function clearFilters() {
@@ -327,10 +328,12 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third">
                         <form id="searchProviders">
-                            <CollapsiblePanel title="Search" expanded={true}>
+                            <CollapsiblePanel title={"Search"} expanded={true}>
                                 <fieldset className="govuk-fieldset">
-                                    <label className="govuk-label">Search</label>
-                                    <SearchBox callback={filterBySearchTerm} timeout={5000} />
+                                    <span className="govuk-hint sidebar-search-span">
+                                        Select one option.
+                                    </span>
+                                    <CollapsibleSearchBox searchTerm={""} callback={filterBySearchTerm}/>
                                 </fieldset>
                             </CollapsiblePanel>
                             <CollapsiblePanel title="Filter by provider type" expanded={false}>

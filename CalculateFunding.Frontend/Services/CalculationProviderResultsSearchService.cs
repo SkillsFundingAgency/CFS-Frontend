@@ -52,7 +52,8 @@ namespace CalculateFunding.Frontend.Services
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors"),
-                Filters = request.Filters
+                Filters = request.Filters,
+                SearchFields = request.SearchFields
             });
 
             if (searchRequestResult?.Content == null)

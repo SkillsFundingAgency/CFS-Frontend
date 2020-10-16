@@ -1,8 +1,10 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
-import {cleanup, render, waitFor} from "@testing-library/react";
+import {cleanup, fireEvent, render, waitFor, waitForDomChange} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/useLatestSpecificationJobWithMonitoring";
+import {getCalculationProvidersService} from "../../services/calculationService";
+import userEvent from "@testing-library/user-event";
 
 jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
     () => ({
@@ -287,12 +289,17 @@ beforeAll(() => {
 });
 
 afterEach(cleanup);
+afterEach(() => jest.clearAllMocks())
 
 describe("<ViewCalculationResults /> service call checks ", () => {
     it("it calls the calculationService", async () => {
         const {getCalculationByIdService} = require('../../services/calculationService');
+        const {getCalculationProvidersService} = require('../../services/calculationService');
+        const {getSpecificationSummaryService} = require('../../services/specificationService');
         renderViewCalculationResultsPage();
-        await waitFor(() => expect(getCalculationByIdService).toBeCalled())
+        await waitFor(() => expect(getCalculationByIdService).toBeCalledTimes(1))
+        await waitFor(() => expect(getCalculationProvidersService).toBeCalledTimes(1))
+        await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1))
     });
 });
 
@@ -315,5 +322,41 @@ describe('<ViewCalculationResults /> page render checks ', () => {
     it('the calculation results are populated', async () => {
         const {container} = renderViewCalculationResultsPage();
         await waitFor(() => expect(container.querySelectorAll('.govuk-accordion__section')).toHaveLength(2))
+    })
+
+    it("search filters exist", async () => {
+        const {container} = renderViewCalculationResultsPage();
+        await waitFor(() => expect(container.querySelector('#search-options-providers')).toBeInTheDocument())
+        await waitFor(() => expect(container.querySelector('#search-options-UKPRN')).toBeInTheDocument())
+        await waitFor(() => expect(container.querySelector('#search-options-UPIN')).toBeInTheDocument())
+        await waitFor(() => expect(container.querySelector('#search-options-URN')).toBeInTheDocument())
     });
 });
+
+describe('<ViewCalculationResults /> search filters checks', () => {
+    it("search value changes when searching for providerName", async () => {
+        const {getCalculationProvidersService} = require('../../services/calculationService');
+        const {container} = renderViewCalculationResultsPage();
+        const searchQuery = "9";
+
+        await userEvent.type(container.querySelector('#providerName') as HTMLInputElement, searchQuery);
+
+        await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith( {"calculationId": "12345", "calculationValueType": "", "errorToggle": "", "facetCount": 0, "includeFacets": true, "localAuthority": [], "pageNumber": 1, "pageSize": 50, "providerSubType": [], "providerType": []
+            , "resultsStatus": [], "searchFields": [], "searchMode": 1, "searchTerm": searchQuery}
+        ))
+    });
+
+    it("search value changes when searching for urn", async () => {
+        const {getCalculationProvidersService} = require('../../services/calculationService');
+        const {container} = renderViewCalculationResultsPage();
+        const searchQuery = "9";
+
+        fireEvent.click(container.querySelector('#search-options-URN') as HTMLInputElement)
+        await userEvent.type(container.querySelector('#urn') as HTMLInputElement, searchQuery);
+
+        await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith( {"calculationId": "12345", "calculationValueType": "", "errorToggle": "", "facetCount": 0, "includeFacets": true, "localAuthority": [], "pageNumber": 1, "pageSize": 50, "providerSubType": [], "providerType": []
+            , "resultsStatus": [], "searchFields": [], "searchMode": 1, "searchTerm": searchQuery}));
+    });
+})
+
+

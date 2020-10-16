@@ -2,7 +2,6 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {DateFormatter} from "./DateFormatter";
-import {func} from "prop-types";
 import {IFundingStructureItem} from "../types/FundingStructureItem";
 
 interface ICollapsibleStepsProps {
