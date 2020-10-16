@@ -10,7 +10,7 @@ import {TemplatePermissions, TemplateSearchResponse, TemplateStatus} from "../..
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchForTemplates} from "../../services/templateBuilderDatasourceService";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
+import {useTemplatePermissions} from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import {useHistory} from 'react-router';
 import {TemplateSearchRequest} from "../../types/templateSearchRequest";
 

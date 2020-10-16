@@ -1,6 +1,8 @@
 ﻿import {useMemo} from "react";
 import {getUserPermissionsService} from "../services/userService";
-import {useQuery} from "react-query";
+import {QueryConfig, useQuery} from "react-query";
+import { AxiosError } from "axios";
+import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 
 export enum SpecificationPermissions {
     Create = "Create",
@@ -10,19 +12,23 @@ export enum SpecificationPermissions {
     Refresh = "Refresh",
     Approve = "Approve"
 }
+const oneHour = 1000 * 60 * 60;
 
-export const useSpecificationPermissions = (specificationId: string, requiredPermissions: SpecificationPermissions[]) => {
-    const isEnabled = specificationId && specificationId.length > 0;
-    const oneHour = 1000 * 60 * 60;
+export const useSpecificationPermissions = (
+    specificationId: string, 
+    requiredPermissions: SpecificationPermissions[],
+    queryOptions: QueryConfig<EffectiveSpecificationPermission, AxiosError> = {
+        cacheTime: oneHour, 
+        staleTime: oneHour, 
+        enabled: specificationId && specificationId.length > 0, 
+        refetchOnWindowFocus: false
+    }) => {
 
     const {data: permissions, isLoading, isFetched} =
-        useQuery(
+        useQuery<EffectiveSpecificationPermission, AxiosError>(
             `specification-${specificationId}-permissions`,
-            () => getUserPermissionsService(specificationId)
-                .then((response) => {
-                    return response.data;
-                }),
-            {cacheTime: oneHour, staleTime: oneHour, enabled: isEnabled, refetchOnWindowFocus: false});
+            async () => (await getUserPermissionsService(specificationId)).data,
+            queryOptions);
 
     const canCreateSpecification = useMemo(() => {
         return permissions && permissions.canCreateSpecification;
@@ -73,15 +79,15 @@ export const useSpecificationPermissions = (specificationId: string, requiredPer
     }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canMapDatasets, requiredPermissions]);
 
     return {
-        isCheckingForPermissions: isEnabled ?isLoading : false,
-        isPermissionsFetched: isEnabled ?isFetched: false,
+        isCheckingForPermissions: queryOptions.enabled ? isLoading : false,
+        isPermissionsFetched: queryOptions.enabled ? isFetched: false,
         canCreateSpecification,
         canEditSpecification,
         canApproveFunding,
         canRefreshFunding,
         canReleaseFunding,
         canMapDatasets,
-        hasMissingPermissions: isEnabled ? missingPermissions && missingPermissions.length > 0: false,
+        hasMissingPermissions: queryOptions.enabled ? missingPermissions && missingPermissions.length > 0: false,
         missingPermissions
     }
 };

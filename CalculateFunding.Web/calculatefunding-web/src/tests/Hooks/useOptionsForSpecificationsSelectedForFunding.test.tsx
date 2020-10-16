@@ -3,7 +3,7 @@ import {act} from "react-test-renderer";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../types/SpecificationSelectedForFunding";
-import {useOptionsForSpecificationsSelectedForFunding} from "../../hooks/useOptionsForSpecificationsSelectedForFunding";
+import {useOptionsForSpecificationsSelectedForFunding} from "../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
 
 const mockData: FundingStreamWithSpecificationSelectedForFunding[] = [
     {

@@ -7,10 +7,10 @@ import '@testing-library/jest-dom/extend-expect';
 import * as useSpecificationPermissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissions} from "../../../hooks/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
-import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/useLatestSpecificationJobWithMonitoring";
-import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/useLatestSpecificationJobWithMonitoring";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
-import {SpecificationSummaryResult} from "../../../hooks/useSpecificationSummary";
+import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {RelationshipData} from "../../../types/Datasets/RelationshipData";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {QueryResult} from "react-query/types/core/types";
@@ -48,7 +48,7 @@ const mockSpecification: SpecificationSummary = {
     isSelectedForFunding: false, 
     providerVersionId: "",
 };
-const specificationResult: SpecificationSummaryResult = {
+const specificationResult: SpecificationSummaryQueryResult = {
     specification: mockSpecification,
     isLoadingSpecification: false,
     errorCheckingForSpecification: "",

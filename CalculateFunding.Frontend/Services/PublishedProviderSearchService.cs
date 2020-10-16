@@ -110,7 +110,7 @@ namespace CalculateFunding.Frontend.Services
                     }
                 }
             }
-
+            
             return result;
         }
     }

@@ -11,6 +11,7 @@ import {FundingStreamWithSpecificationSelectedForFunding, SpecificationSelectedF
 
 let baseURL = "/api/specs";
 
+
 export async function getSpecificationSummaryService(specificationId: string): Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/specification-summary-by-id/${specificationId}`, {
         method: 'GET',

@@ -1,5 +1,5 @@
 import * as React from "react";
-import {useTemplateUndo} from "../../hooks/useTemplateUndo";
+import {useTemplateUndo} from "../../hooks/TemplateBuilder/useTemplateUndo";
 import {singleNodeDs, withChildFundingLineDs} from "../Services/templateBuilderTestData";
 import {renderHook} from '@testing-library/react-hooks';
 

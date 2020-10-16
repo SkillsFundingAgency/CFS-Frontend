@@ -5,7 +5,7 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {Footer} from "../../components/Footer";
-import {useOptionsForSpecificationsSelectedForFunding} from "../../hooks/useOptionsForSpecificationsSelectedForFunding";
+import {useOptionsForSpecificationsSelectedForFunding} from "../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
 import {FundingPeriodWithSpecificationSelectedForFunding, FundingStreamWithSpecificationSelectedForFunding} from "../../types/SpecificationSelectedForFunding";
 import {ErrorSummary} from "../../components/ErrorSummary";
 
@@ -62,33 +62,33 @@ export function FundingApprovalSelection() {
                     }
                 </div>}
                 {!isLoadingOptions && selectedFundingStream &&
-                    <div className="govuk-form-group">
+                <div className="govuk-form-group">
                     <label className="govuk-label" htmlFor="sort">
-                    Funding period
+                        Funding period
                     </label>
                     <select className="govuk-select"
-                    id="funding-periods"
-                    data-testid={"funding-period-dropdown"}
-                    onChange={changeFundingPeriod}>
-                    <option>Please select</option>
-                    {selectedFundingStream.periods.map((fp, index) =>
-                        <option key={index} value={fp.id}>{fp.name}</option>)}
+                            id="funding-periods"
+                            data-testid={"funding-period-dropdown"}
+                            onChange={changeFundingPeriod}>
+                        <option>Please select</option>
+                        {selectedFundingStream.periods.map((fp, index) =>
+                            <option key={index} value={fp.id}>{fp.name}</option>)}
                     </select>
-                    </div>
+                </div>
                 }
                 {selectedFundingStream && selectedFundingPeriod && selectedFundingPeriod.specifications.length > 0 &&
-                    <div className="govuk-form-group">
+                <div className="govuk-form-group">
                     <label className="govuk-label">
-                    Specification
+                        Specification
                     </label>
                     <h3 className="govuk-heading-m">{selectedFundingPeriod.specifications[0].name}</h3>
                     <Link to={`/Approvals/SpecificationFundingApproval/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`}
-                    data-testid={"view-funding-link"}
-                    className="govuk-button"
-                    data-module="govuk-button">
-                    View funding
+                          data-testid={"view-funding-link"}
+                          className="govuk-button"
+                          data-module="govuk-button">
+                        View funding
                     </Link>
-                    </div>
+                </div>
                 }
             </div>
         </div>

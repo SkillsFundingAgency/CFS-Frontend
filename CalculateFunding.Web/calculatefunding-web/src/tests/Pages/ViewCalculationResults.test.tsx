@@ -2,7 +2,7 @@ import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
 import {cleanup, fireEvent, render, waitFor, waitForDomChange} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/useLatestSpecificationJobWithMonitoring";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {getCalculationProvidersService} from "../../services/calculationService";
 import userEvent from "@testing-library/user-event";
 

@@ -3,7 +3,7 @@ import {FundingApprovalSelection} from "../../../pages/FundingApprovals/FundingA
 import {render, screen, act} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../../types/SpecificationSelectedForFunding";
-import * as hook from '../../../hooks/useOptionsForSpecificationsSelectedForFunding';
+import * as hook from '../../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding';
 import {MemoryRouter} from 'react-router';
 import '@testing-library/jest-dom/extend-expect';
 
@@ -32,7 +32,7 @@ const renderPage = () => {
 describe("Renders <FundingApprovalSelection /> correctly", () => {
     beforeEach(() => {
         jest.spyOn(hook, 'useOptionsForSpecificationsSelectedForFunding')
-            .mockImplementation(() => ({fundingStreams: mockData, isLoadingOptions: false, haveErrorCheckingForOptions: false, errorCheckingForOptions: ""}));
+            .mockImplementation(() => ({fundingStreams: mockData, isLoadingOptions: false, isErrorCheckingForOptions: false, errorCheckingForOptions: ""}));
         renderPage();
     });
     afterEach(() => {

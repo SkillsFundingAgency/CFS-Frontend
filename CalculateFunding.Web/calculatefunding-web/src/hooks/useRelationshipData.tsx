@@ -2,23 +2,28 @@
 import {QueryConfig, useQuery} from "react-query";
 import {getRelationshipData} from "../services/datasetService";
 import {RelationshipData} from "../types/Datasets/RelationshipData";
-import {QueryResult} from "react-query/types/core/types";
 
+export type RelationshipDataQueryResult = {
+    relationshipData: RelationshipData | undefined,
+    isLoadingRelationshipData: boolean,
+    isErrorLoadingRelationshipData: boolean,
+    errorLoadingRelationshipData: string
+}
 export const useRelationshipData = (relationshipId: string,
-                                    queryConfig: QueryConfig<any | Error, any> =
+                                    queryConfig: QueryConfig<RelationshipData, AxiosError> =
                                         {
                                             enabled: relationshipId && relationshipId.length > 0
                                         })
-    : QueryResult<RelationshipData, Error> => {
-    return useQuery(
+    : RelationshipDataQueryResult => {
+    const {data, isLoading, isError, error} = useQuery<RelationshipData, AxiosError>(
         `datasources-by-relationship-${relationshipId}`,
-        () => getRelationshipData(relationshipId)
-            .then((response) => {
-                return response.data;
-            })
-            .catch((err: AxiosError) => {
-                return new Error(err.code ? err.code + " " : "" + `Error while fetching specification details: ${err.message}`);
-            }),
+        async () => (await getRelationshipData(relationshipId)).data,
         queryConfig);
+    return {
+        relationshipData: data,
+        isLoadingRelationshipData: isLoading,
+        isErrorLoadingRelationshipData: isError,
+        errorLoadingRelationshipData: !isError ? "" : error ? `Error while fetching relationship data: ${error.message}` : "Unknown error while fetching relationship data"
+    }
 };
 

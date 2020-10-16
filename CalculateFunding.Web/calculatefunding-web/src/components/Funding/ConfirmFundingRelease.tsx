@@ -8,7 +8,7 @@ import {releaseFundingService} from "../../services/publishService";
 import {LoadingStatus} from "../LoadingStatus";
 
 export interface IConfirmFundingReleaseProps {
-    publishedProviderResults: PublishedProviderSearchResults,
+    publishedProviderResults: PublishedProviderSearchResults | undefined,
     specificationSummary: SpecificationSummary,
     canReleaseFunding: boolean | undefined,
     handleBackToResults: () => void,
@@ -31,7 +31,7 @@ export function ConfirmFundingRelease(props: IConfirmFundingReleaseProps) {
     }
 
 
-    if (!props.canReleaseFunding || !props.publishedProviderResults.canPublish) {
+    if (!props.publishedProviderResults || !props.canReleaseFunding || !props.publishedProviderResults.canPublish) {
         return (<></>);
     }
 

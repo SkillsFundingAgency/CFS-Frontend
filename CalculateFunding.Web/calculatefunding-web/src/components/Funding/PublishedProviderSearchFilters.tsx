@@ -6,7 +6,7 @@ import {FacetValue} from "../../types/Facet";
 import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
 
 export interface IPublishedProviderSearchFiltersProps {
-    publishedProviderResults: PublishedProviderSearchResults,
+    publishedProviderResults: PublishedProviderSearchResults | undefined,
     searchCriteria: PublishedProviderSearchRequest,
     setSearchCriteria: (searchCriteria: PublishedProviderSearchRequest) => void,
     numberOfProvidersWithErrors: number
@@ -17,11 +17,11 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
     const [providerTypeFacets, setProviderTypeFacets] = useState<FacetValue[]>([]);
     const [providerSubTypeFacets, setProviderSubTypeFacets] = useState<FacetValue[]>([]);
     const [localAuthorityFacets, setLocalAuthorityFacets] = useState<FacetValue[]>([]);
-    const [filterWithErrors, setFilterWithErrors] = useState<boolean>(false);
-    const [filterWithoutErrors, setFilterWithoutErrors] = useState<boolean>(false);
+    const [filterWithErrors, setFilterWithErrors] = useState<boolean>(props.searchCriteria.hasErrors ? props.searchCriteria.hasErrors : false);
+    const [filterWithoutErrors, setFilterWithoutErrors] = useState<boolean>(props.searchCriteria.hasErrors ? !props.searchCriteria.hasErrors : false);
 
     useEffect(() => {
-        if (props.publishedProviderResults.facets != null) {
+        if (props.publishedProviderResults && props.publishedProviderResults.facets != null) {
             props.publishedProviderResults.facets.forEach((facet) => {
                 switch (facet.name) {
                     case "providerType":
@@ -101,12 +101,8 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         const withErrors = e.target.value === "with-errors" ? e.target.checked : filterWithErrors;
         const withoutErrors = e.target.value === "without-errors" ? e.target.checked : filterWithoutErrors;
         props.setSearchCriteria({...props.searchCriteria, hasErrors: withErrors === withoutErrors ? undefined : withErrors, pageNumber: 1});
-    }
-
-    const hasInitialLoad = props.publishedProviderResults && props.publishedProviderResults.facets && props.publishedProviderResults.facets.length > 0;
-
-    if (!hasInitialLoad) {
-        return null;
+        setFilterWithoutErrors(withoutErrors);
+        setFilterWithErrors(withErrors);
     }
     
     return <>

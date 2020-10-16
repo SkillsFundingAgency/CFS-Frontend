@@ -4,7 +4,7 @@ import {Header} from "../../components/Header";
 import {Footer} from "../../components/Footer";
 import {Section} from "../../types/Sections";
 import {ErrorMessage} from "../../types/ErrorMessage";
-import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
+import {useTemplatePermissions} from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";

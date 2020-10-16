@@ -1,4 +1,4 @@
-import { useTemplatePermissions } from "../../hooks/useTemplatePermissions";
+import { useTemplatePermissions } from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import * as redux from "react-redux";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 import { renderHook } from '@testing-library/react-hooks';

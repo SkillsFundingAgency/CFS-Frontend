@@ -7,7 +7,7 @@ import '@testing-library/jest-dom';
 import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import {UserConfirmLeavePageModal} from "../../../components/UserConfirmLeavePageModal";
-import * as hooks from "../../../hooks/useTemplateUndo";
+import * as hooks from "../../../hooks/TemplateBuilder/useTemplateUndo";
 
 jest.useFakeTimers();
 

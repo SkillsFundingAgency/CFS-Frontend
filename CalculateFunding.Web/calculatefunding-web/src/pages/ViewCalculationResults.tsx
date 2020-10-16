@@ -4,7 +4,7 @@ import {Footer} from "../components/Footer";
 import {Header} from "../components/Header";
 import {RouteComponentProps} from "react-router";
 import {CollapsiblePanel} from "../components/CollapsiblePanel";
-import {Calculation, CalculationSummary} from "../types/CalculationSummary";
+import {Calculation} from "../types/CalculationSummary";
 import {FundingStream} from "../types/viewFundingTypes";
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";
@@ -20,13 +20,9 @@ import {CalculationProviderResultList} from "../types/CalculationProviderResult"
 import {getSpecificationSummaryService} from "../services/specificationService";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {LoadingStatus} from "../components/LoadingStatus";
-import {useLatestSpecificationJobWithMonitoring} from "../hooks/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../types/jobType";
 import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
-
-export interface ViewCalculationResultsProps {
-    calculation: CalculationSummary;
-}
+import {useLatestSpecificationJobWithMonitoring} from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 
 export interface ViewCalculationResultsRoute {
     calculationId: string

@@ -11,7 +11,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {createNewDraftTemplate, getAllFundingStreamsWithAvailablePeriods} from "../../services/templateBuilderDatasourceService";
-import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
+import {useTemplatePermissions} from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import {useHistory} from "react-router";
 import {FundingStreamAndPeriodSelection} from "../../components/TemplateBuilder/FundingStreamAndPeriodSelection";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";

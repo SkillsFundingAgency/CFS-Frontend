@@ -4,7 +4,7 @@ import * as redux from "react-redux";
 import {MemoryRouter, Route, Switch} from "react-router";
 import {waitFor, render, cleanup} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import * as hooks from "../../../hooks/useTemplateUndo";
+import * as hooks from "../../../hooks/TemplateBuilder/useTemplateUndo";
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 

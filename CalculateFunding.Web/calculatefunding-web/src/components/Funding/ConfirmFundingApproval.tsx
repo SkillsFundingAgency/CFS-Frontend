@@ -8,7 +8,7 @@ import {approveFundingService} from "../../services/publishService";
 import {LoadingStatus} from "../LoadingStatus";
 
 export interface IConfirmFundingApprovalProps {
-    publishedProviderResults: PublishedProviderSearchResults,
+    publishedProviderResults: PublishedProviderSearchResults | undefined,
     specificationSummary: SpecificationSummary,
     canApproveFunding: boolean | undefined,
     handleBackToResults: () => void,
@@ -18,7 +18,7 @@ export interface IConfirmFundingApprovalProps {
 export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
     const [isLoadingApproval, setIsLoadingApproval] = useState<boolean>(false);
 
-    if (!props.canApproveFunding || !props.publishedProviderResults.canApprove) {
+    if (!props.publishedProviderResults || !props.canApproveFunding || !props.publishedProviderResults.canApprove) {
         return (<></>);
     }
 

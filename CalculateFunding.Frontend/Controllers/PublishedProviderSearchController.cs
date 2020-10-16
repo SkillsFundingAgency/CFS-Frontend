@@ -5,6 +5,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -63,7 +64,7 @@ namespace CalculateFunding.Frontend.Controllers
                 ErrorToggle = request.ErrorToggle,
                 FacetCount = request.FacetCount,
                 IncludeFacets = request.IncludeFacets,
-                PageSize = request.PageSize,
+                PageSize = request.PageSize ?? 50,
                 SearchFields = request.SearchFields
             };
 

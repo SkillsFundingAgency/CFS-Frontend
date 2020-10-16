@@ -1,10 +1,10 @@
-﻿import {JobType} from "../types/jobType";
+﻿﻿import {JobType} from "../../types/jobType";
 import {useFetchLatestSpecificationJob} from "./useFetchLatestSpecificationJob";
-import {JobSummary} from "../types/jobSummary";
+import {JobSummary} from "../../types/jobSummary";
 import {useMonitorForNewSpecificationJob} from "./useMonitorForNewSpecificationJob";
-import {RunningStatus} from "../types/RunningStatus";
-import {getJobProgressMessage} from "../helpers/getJobProgressMessage";
-import {CompletionStatus} from "../types/CompletionStatus";
+import {RunningStatus} from "../../types/RunningStatus";
+import {getJobProgressMessage} from "../../helpers/getJobProgressMessage";
+import {CompletionStatus} from "../../types/CompletionStatus";
 
 export type LatestSpecificationJobWithMonitoringResult = {
     latestJob: JobSummary | undefined,

@@ -1,4 +1,3 @@
-import jest from 'jest';
 import {mount} from "enzyme";
 import {MapDataSourceFiles} from "../../../pages/Datasets/MapDataSourceFiles";
 import React from "react";

@@ -1,9 +1,9 @@
 ﻿import {AxiosError} from "axios";
 import {QueryConfig, useQuery} from "react-query";
-import {getSpecificationSummaryService} from "../services/specificationService";
 import {SpecificationSummary} from "../types/SpecificationSummary";
+import {getSpecificationSummaryService} from "../services/specificationService";
 
-export type SpecificationSummaryResult = {
+export type SpecificationSummaryQueryResult = {
     specification: SpecificationSummary | undefined,
     isLoadingSpecification: boolean,
     errorCheckingForSpecification: string,
@@ -14,34 +14,28 @@ export type SpecificationSummaryResult = {
 const oneHour = 1000 * 60 * 60;
 
 export const useSpecificationSummary = (specificationId: string,
-                                        queryConfig: QueryConfig<SpecificationSummary | Error, any> =
+                                        queryConfig: QueryConfig<SpecificationSummary, AxiosError> =
                                             {
                                                 cacheTime: oneHour,
                                                 staleTime: oneHour,
                                                 refetchOnWindowFocus: false,
                                                 enabled: specificationId && specificationId.length > 0
                                             })
-    : SpecificationSummaryResult => {
+    : SpecificationSummaryQueryResult => {
 
     const {data, error, isFetching, isLoading, isError, isFetched} =
-        useQuery(
+        useQuery<SpecificationSummary, AxiosError>(
             `specification-${specificationId}-summary`,
-            () => getSpecificationSummaryService(specificationId)
-                .then((response) => {
-                    return response.data;
-                })
-                .catch((err: AxiosError) => {
-                    return new Error(err.code ? err.code + " " : "" + `Error while fetching specification details: ${err.message}`);
-                }),
+            async () => (await getSpecificationSummaryService(specificationId)).data,
             queryConfig);
 
-    if (data instanceof Error) {
-        return {specification: undefined, isLoadingSpecification: false, errorCheckingForSpecification: data.message, haveErrorCheckingForSpecification: true, isFetchingSpecification: false, isSpecificationFetched: false};
-    }
-    if (isError) {
-        return {specification: undefined, isLoadingSpecification: isLoading, errorCheckingForSpecification: error as string, haveErrorCheckingForSpecification: isError, isFetchingSpecification: isFetching, isSpecificationFetched: isFetched};
-    }
-
-    return {specification: data, isLoadingSpecification: isLoading, errorCheckingForSpecification: "", haveErrorCheckingForSpecification: false, isFetchingSpecification: isFetching, isSpecificationFetched: isFetched};
+    return {
+        specification: data, 
+        isLoadingSpecification: isError ? false : isLoading,
+        haveErrorCheckingForSpecification: isError,
+        errorCheckingForSpecification: !isError ? "" : error ? `Error while fetching specification details: ${error.message}` : "Unknown error while fetching specification details", 
+        isFetchingSpecification: isFetching, 
+        isSpecificationFetched: isFetched
+    };
 };
 

@@ -21,7 +21,7 @@ describe("<CreateSpecification />", () => {
 
     it('will have the correct <H1 /> title', () => {
 
-        const wrapper = mount(<MemoryRouter><Provider store={store}><CreateSpecification />></Provider></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><CreateSpecification /></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Create specification");
     });
 });

@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {RouteComponentProps, useHistory} from "react-router";
-import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
@@ -13,7 +12,7 @@ import {Footer} from "../../components/Footer";
 import {MappingStatus} from "../../components/DatasetMapping/MappingStatus";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {JobType} from "../../types/jobType";
-import {useLatestSpecificationJobWithMonitoring} from "../../hooks/useLatestSpecificationJobWithMonitoring";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
@@ -30,10 +29,9 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [missingVersion, setMissingVersion] = useState<boolean>(false);
     const [saveErrorOccurred, setSaveErrorOccurred] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
-    const [isRemapping, setIsRemapping] = useState<boolean>(false);
     let history = useHistory();
 
-    const {data: relationshipData, isLoading: isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
+    const {relationshipData, isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
 
     const specificationId = relationshipData && relationshipData.specificationId ? relationshipData.specificationId : "";
     const {specification, isLoadingSpecification} = useSpecificationSummary(specificationId);
@@ -110,7 +108,6 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
         setSaveErrorOccurred(false);
         setIsUpdating(true);
         assignDataSourceService(relationshipData.relationshipId, specification.id, `${newDataset.id}_${newVersionNumber}`)
-            .then(() => setIsRemapping(true))
             .catch(() => setSaveErrorOccurred(true))
             .finally(() => setIsUpdating(false));
     }

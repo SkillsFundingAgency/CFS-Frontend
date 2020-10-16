@@ -1,11 +1,10 @@
 import {RouteComponentProps} from "react-router";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
+import {buildInitialPublishedProviderSearchRequest, PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {SearchMode} from "../../types/SearchMode";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
@@ -15,17 +14,20 @@ import {PublishedProviderResults} from "../../components/Funding/PublishedProvid
 import {ConfirmFundingApproval} from "../../components/Funding/ConfirmFundingApproval";
 import {ConfirmFundingRelease} from "../../components/Funding/ConfirmFundingRelease";
 import {PublishedProviderSearchFilters} from "../../components/Funding/PublishedProviderSearchFilters";
-import {getAllProviderVersionIdsForSearch, searchForPublishedProviderResults} from "../../services/publishedProviderService";
-import {getFundingConfiguration} from "../../services/policyService";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {IFundingSelectionState} from "../../states/IFundingSelectionState";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {SpecificationSummarySection} from "../../components/Funding/SpecificationSummarySection";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
-import {useLatestSpecificationJobWithMonitoring} from "../../hooks/useLatestSpecificationJobWithMonitoring";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
+import {usePublishedProviderSearch} from "../../hooks/FundingApproval/usePublishedProviderSearch";
+import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
+import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
+import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
+import {buildInitialPublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -46,106 +48,26 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob]);
-    const {specification, isLoadingSpecification, haveErrorCheckingForSpecification, errorCheckingForSpecification} =
-        useSpecificationSummary(specificationId);
-
-    const [publishedProviderResults, setPublishedProviderResults] = useState<PublishedProviderSearchResults>({
-        facets: [],
-        canApprove: false,
-        canPublish: false,
-        currentPage: 0,
-        endItemNumber: 0,
-        filteredFundingAmount: 0,
-        pagerState: {
-            previousPage: 0,
-            nextPage: 0,
-            displayNumberOfPages: 0,
-            lastPage: 0,
-            pages: [],
-            currentPage: 0
-        },
-        providers: [],
-        startItemNumber: 0,
-        totalFundingAmount: 0,
-        totalProvidersToApprove: 0,
-        totalProvidersToPublish: 0,
-        totalResults: 0
-    });
-    const initialSearch: PublishedProviderSearchRequest = {
-        searchTerm: "",
-        status: [],
-        providerType: [],
-        providerSubType: [],
-        localAuthority: [],
-        fundingStreamId: fundingStreamId,
-        specificationId: specificationId,
-        hasErrors: undefined,
-        searchMode: SearchMode.All,
-        pageSize: 50,
-        pageNumber: 1,
-        includeFacets: true,
-        facetCount: 0,
-        fundingPeriodId: fundingPeriodId,
-        errorToggle: "",
-        searchFields: []
-    };
-    const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialSearch);
-    const [isLoadingResults, setIsLoadingResults] = useState<boolean>(true);
-    const [isLoadingProviderVersionIds, setIsLoadingProviderVersionIds] = useState<boolean>(false);
+    const {specification, isLoadingSpecification, errorCheckingForSpecification} = useSpecificationSummary(specificationId);
+    const initialProviderPagedSearch = buildInitialPublishedProviderSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
+    const initialProviderIdsSearch = buildInitialPublishedProviderIdsSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
+    const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialProviderPagedSearch);
+    const {publishedProviderSearchResults, isLoadingSearchResults, errorLoadingSearchResults} =
+        usePublishedProviderSearch(searchCriteria, !isCheckingForJob && !hasActiveJob);
+    const {fundingConfiguration, isLoadingFundingConfiguration, errorLoadingFundingConfiguration} =
+        useFundingConfiguration(fundingStreamId, fundingPeriodId);
+    const {publishedProviderIds, isLoadingPublishedProviderIds, errorLoadingPublishedProviderIds} =
+        usePublishedProviderIds(initialProviderIdsSearch, 
+            !isCheckingForJob && !hasActiveJob && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches);
+    const {publishedProvidersWithErrors, errorLoadingPublishedProviderErrors} =
+        usePublishedProviderErrorSearch(initialProviderPagedSearch, !isCheckingForJob && !hasActiveJob);
     const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
     const [isConfirmingRelease, setConfirmRelease] = useState<boolean>(false);
-    const [approvalMode, setApprovalMode] = useState<ApprovalMode>(ApprovalMode.Undefined);
-    const [allProviderVersionIds, setAllProviderVersionIds] = useState<string[]>([]);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const fundingSelectionState: IFundingSelectionState = useSelector<IStoreState, IFundingSelectionState>(state => state.fundingSelection);
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
 
-    useEffect(() => {
-        if (!isCheckingForJob && !hasActiveJob) {
-            loadPublishedProviderResults(searchCriteria);
-        }
-    }, [searchCriteria, hasActiveJob, isCheckingForJob]);
-
-    async function loadPublishedProviderResults(searchRequest: PublishedProviderSearchRequest) {
-        clearErrorMessages();
-        if (!isLoadingResults) {
-            setIsLoadingResults(true);
-        }
-        try {
-            const results = (await searchForPublishedProviderResults(searchRequest)).data;
-            setIsLoadingResults(false);
-            setPublishedProviderResults(results);
-
-            if (approvalMode === ApprovalMode.Undefined) {
-                const fundingConfiguration = (await getFundingConfiguration(fundingStreamId, fundingPeriodId)).data;
-                if (fundingConfiguration) {
-                    setApprovalMode(fundingConfiguration.approvalMode);
-                    if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
-                        setAllProviderVersionIds(await loadPublishedProviderVersionIds());
-                    }
-                }
-            }
-        } catch (e) {
-            setIsLoadingResults(false);
-            addErrorMessage(`Error while loading results: ${e}`);
-        }
-    }
-
-    async function loadPublishedProviderVersionIds(): Promise<string[]> {
-        setIsLoadingProviderVersionIds(true);
-
-        // N.B. could be a LOT of results!
-        try {
-            const allProviderVersionIds = await getAllProviderVersionIdsForSearch(searchCriteria);
-            setIsLoadingProviderVersionIds(false);
-            return allProviderVersionIds.data;
-        } catch (e) {
-            addErrorMessage("Error while loading provider version ids: " + e);
-            setIsLoadingProviderVersionIds(false);
-            return [];
-        }
-    }
 
     function pageChange(pageNumber: string) {
         setSearchCriteria(prevState => {
@@ -160,10 +82,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }
 
     function addErrorMessage(errorMessage: string, fieldName?: string) {
-        if (errors.some(err => err.message === errorMessage && err.fieldName === fieldName)) {
+        if (!errorMessage || errorMessage.length === 0 || 
+            errors.some(err => err.message === errorMessage && err.fieldName === fieldName)) {
             return;
         }
-            
+
         const errorCount: number = errors.length;
         const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
         setErrors(errors => [...errors, error]);
@@ -173,12 +96,21 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         setErrors([]);
     }
 
-    if (haveErrorCheckingForSpecification) {
-        addErrorMessage(errorCheckingForSpecification);
+    addErrorMessage(errorCheckingForSpecification);
+    addErrorMessage(errorLoadingSearchResults);
+    addErrorMessage(errorLoadingFundingConfiguration);
+    addErrorMessage(errorLoadingPublishedProviderIds);
+    addErrorMessage(errorLoadingPublishedProviderErrors);
+    if (publishedProvidersWithErrors) {
+        publishedProvidersWithErrors.providers.forEach(provider => {
+            const ref = `provider-approval-${provider.publishedProviderVersionId}`;
+            provider.errors.forEach(err => addErrorMessage(err, ref));
+        })
     }
-    const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingResults || isLoadingProviderVersionIds;
     
-    
+    const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds;
+
+
     return (
         <div>
             <Header location={Section.Approvals}/>
@@ -190,7 +122,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     <Breadcrumb name={"Funding approval results"}/>
                 </Breadcrumbs>
 
-                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingResults}/>
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={!publishedProviderSearchResults}/>
 
                 <MultipleErrorSummary errors={errors}/>
 
@@ -206,7 +138,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 {!isConfirmingApproval && !isConfirmingRelease &&
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third">
-                        <PublishedProviderSearchFilters publishedProviderResults={publishedProviderResults}
+                        <PublishedProviderSearchFilters publishedProviderResults={publishedProviderSearchResults}
                                                         searchCriteria={searchCriteria}
                                                         setSearchCriteria={setSearchCriteria}
                                                         numberOfProvidersWithErrors={0}
@@ -224,22 +156,23 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                                        "Monitoring job progress. Please wait, this could take several minutes"}
                                                    testid='loadingJobs'/>
                                     :
-                                    <LoadingStatus title={isLoadingResults ? "Loading provider funding data..." : "Applying selection..."}/>
+                                    <LoadingStatus title={isLoadingSearchResults ? "Loading provider funding data..." : "Applying selection..."}/>
                             }
                         </div>
                         }
-                        {!isCheckingForJob && !hasActiveJob && !isLoadingResults && !isLoadingProviderVersionIds && !isLoadingSpecification && specification &&
+                        {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults && !isLoadingFundingConfiguration && 
+                        !isLoadingPublishedProviderIds && !isLoadingSpecification && specification &&
                         <PublishedProviderResults specificationId={specificationId}
-                                                  enableBatchSelection={approvalMode === ApprovalMode.Batches}
+                                                  enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
                                                   specProviderVersionId={specification.providerVersionId}
-                                                  providerSearchResults={publishedProviderResults}
+                                                  providerSearchResults={publishedProviderSearchResults}
                                                   canRefreshFunding={canRefreshFunding}
                                                   canApproveFunding={canApproveFunding}
                                                   canReleaseFunding={canReleaseFunding}
                                                   selectedResults={fundingSelectionState.providerVersionIds.length}
-                                                  totalResults={allProviderVersionIds?.length}
+                                                  totalResults={publishedProviderIds ? publishedProviderIds.length : 0}
                                                   pageChange={pageChange}
-                                                  fetchPublishedProviderIds={loadPublishedProviderVersionIds}
+                                                  allPublishedProviderIds={publishedProviderIds}
                                                   setConfirmRelease={setConfirmRelease}
                                                   setConfirmApproval={setConfirmApproval}
                                                   addError={addErrorMessage}
@@ -248,13 +181,13 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     </div>
                 </div>
                 }
-                {!isLoadingResults && specification &&
+                {!isLoadingSearchResults && (isConfirmingApproval || isConfirmingRelease) && specification &&
                 <div className="govuk-grid-row">
                     {isConfirmingApproval && !isConfirmingRelease ?
                         <ConfirmFundingApproval
                             canApproveFunding={canApproveFunding}
                             specificationSummary={specification}
-                            publishedProviderResults={publishedProviderResults}
+                            publishedProviderResults={publishedProviderSearchResults}
                             handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
                         />
@@ -262,7 +195,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         <ConfirmFundingRelease
                             canReleaseFunding={canReleaseFunding}
                             specificationSummary={specification}
-                            publishedProviderResults={publishedProviderResults}
+                            publishedProviderResults={publishedProviderSearchResults}
                             handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
                         />

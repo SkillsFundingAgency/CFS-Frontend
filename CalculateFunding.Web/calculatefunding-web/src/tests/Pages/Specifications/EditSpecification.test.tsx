@@ -27,13 +27,13 @@ store.dispatch = jest.fn();
 describe("<EditSpecification />", () => {
     it('will have the correct breadcrumbs', () => {
 
-        const wrapper = mount(<MemoryRouter><Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} /></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(3);
     });
 
     it('will have the correct <H1 /> title', () => {
 
-        const wrapper = mount(<MemoryRouter><Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} />></Provider></MemoryRouter>);
+        const wrapper = mount(<MemoryRouter><Provider store={store}><EditSpecification match={editSpecificationRoutePropsMatch} history={history} location={location} /></Provider></MemoryRouter>);
         expect(wrapper.find(".govuk-fieldset__heading").text()).toBe("Edit specification");
     });
 });

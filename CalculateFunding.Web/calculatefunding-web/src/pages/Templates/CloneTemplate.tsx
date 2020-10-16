@@ -2,7 +2,7 @@
 import {TemplatePermissions, TemplateResponse} from "../../types/TemplateBuilderDefinitions";
 import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {ErrorMessage} from "../../types/ErrorMessage";
-import {useTemplatePermissions} from "../../hooks/useTemplatePermissions";
+import {useTemplatePermissions} from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import {
     cloneNewTemplateFromExisting,
     getAllFundingStreamsWithAvailablePeriods,

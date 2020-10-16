@@ -1,10 +1,5 @@
-import {SearchMode} from "./SearchMode";
-
-export interface PublishedProviderSearchRequest {
-    pageNumber: number,
+﻿export interface PublishedProviderIdsSearchRequest {
     searchTerm: string,
-    errorToggle: string,
-    includeFacets: boolean,
     hasErrors: boolean | undefined,
     fundingStreamId: string,
     fundingPeriodId: string,
@@ -13,14 +8,11 @@ export interface PublishedProviderSearchRequest {
     status: string[],
     providerType: string[],
     providerSubType: string[],
-    pageSize: number
-    facetCount: number,
-    searchMode: SearchMode,
     searchFields: string[],
 }
 
-export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: string, fundingPeriodId: string, specificationId: string): 
-    PublishedProviderSearchRequest => {return {
+export const buildInitialPublishedProviderIdsSearchRequest = (fundingStreamId: string, fundingPeriodId: string, specificationId: string):
+    PublishedProviderIdsSearchRequest => {return {
     searchTerm: "",
     status: [],
     providerType: [],
@@ -29,13 +21,6 @@ export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: stri
     fundingStreamId: fundingStreamId,
     specificationId: specificationId,
     hasErrors: undefined,
-    searchMode: SearchMode.All,
-    pageSize: 50,
-    pageNumber: 1,
-    includeFacets: true,
-    facetCount: 0,
     fundingPeriodId: fundingPeriodId,
-    errorToggle: "",
     searchFields: []
 }};
-

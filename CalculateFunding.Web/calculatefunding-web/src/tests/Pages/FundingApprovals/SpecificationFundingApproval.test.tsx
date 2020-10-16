@@ -10,8 +10,9 @@ import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {QueryCache, ReactQueryCacheProvider} from "react-query";
-import * as jobHook from "../../../hooks/useLatestSpecificationJobWithMonitoring";
+import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specHook from "../../../hooks/useSpecificationSummary";
+import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
@@ -44,6 +45,19 @@ export const testSpec: SpecificationSummary = {
     id: "ABC123",
     isSelectedForFunding: true,
     providerVersionId: ""
+};
+const noJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: false,
+    isCheckingForJob: false,
+    hasFailedJob: false,
+    hasActiveJob: false,
+    jobError: "",
+    latestJob: undefined,
+    hasJobError: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    jobInProgressMessage: "",
 };
 
 function mockGetSpecification(spec: SpecificationSummary) {
@@ -104,21 +118,7 @@ describe("<SpecificationFundingApproval /> when loading specification", () => {
                 isFetchingSpecification: false,
                 isSpecificationFetched: true
             }));
-        jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
-            () => ({
-                anyJobsRunning: false,
-                hasJob: false,
-                hasActiveJob: false,
-                hasFailedJob: false,
-                hasJobError: false,
-                isCheckingForJob: true,
-                isFetched: false,
-                isFetching: false,
-                isMonitoring: false,
-                jobError: "",
-                jobInProgressMessage: "",
-                latestJob: undefined
-            }));
+        jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
         renderPage();
     });
     afterEach(() => {
@@ -134,21 +134,7 @@ describe("<SpecificationFundingApproval /> when specification loads and no activ
     beforeEach(() => {
         mockGetSpecification(testSpec);
         mockGetJobs([]);
-        jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
-            () => ({
-                anyJobsRunning: false,
-                hasJob: false,
-                hasActiveJob: false,
-                hasFailedJob: false,
-                hasJobError: false,
-                isCheckingForJob: false,
-                isFetched: false,
-                isFetching: false,
-                isMonitoring: false,
-                jobError: "",
-                jobInProgressMessage: "",
-                latestJob: undefined
-            }));
+        jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
         jest.spyOn(specHook, 'useSpecificationSummary')
             .mockImplementation(() => ({
                 specification: testSpec,

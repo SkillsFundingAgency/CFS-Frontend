@@ -5,8 +5,7 @@ import {IStoreState} from "../../../reducers/rootReducer";
 import {mount} from "enzyme";
 import configureStore from 'redux-mock-store';
 import {fakeHistory, fakeInitialState, fakeLocation} from "../../fakes/fakes";
-import {ViewSpecification, ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
-import {FundingStructureType} from "../../../types/FundingStructureItem";
+import {ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
 import {ViewSpecificationResults} from "../../../pages/Specifications/ViewSpecificationResults";
 
 describe("Provider Funding Overview ", () => {

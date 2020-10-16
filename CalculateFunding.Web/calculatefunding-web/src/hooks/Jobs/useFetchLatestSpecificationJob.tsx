@@ -1,7 +1,7 @@
-﻿import {JobType} from "../types/jobType";
+﻿﻿import {JobType} from "../../types/jobType";
 import {useQuery} from "react-query";
-import {getJobStatusUpdatesForSpecification} from "../services/jobService";
-import {JobSummary} from "../types/jobSummary";
+import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
+import {JobSummary} from "../../types/jobSummary";
 
 export type FetchLatestSpecificationJobResult = {
     lastJob: JobSummary | undefined,

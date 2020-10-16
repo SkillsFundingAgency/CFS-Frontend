@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
-import { TemplatePermissions } from "../types/TemplateBuilderDefinitions";
-import {IStoreState} from "../reducers/rootReducer";
+import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
+import { TemplatePermissions } from "../../types/TemplateBuilderDefinitions";
+import {IStoreState} from "../../reducers/rootReducer";
 
 export const useTemplatePermissions = (requiredPermissions: string[], requiredFundingStreams: string[] = []) => {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);

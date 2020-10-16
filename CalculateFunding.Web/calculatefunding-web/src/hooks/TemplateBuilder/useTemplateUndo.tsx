@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {FundingLineDictionaryEntry} from '../types/TemplateBuilderDefinitions';
+import {FundingLineDictionaryEntry} from '../../types/TemplateBuilderDefinitions';
 import {v4 as uuidv4} from "uuid";
-import {open, clear, update, deleteItem, findByKey} from "../services/indexedDbWrapper";
+import {open, clear, update, deleteItem, findByKey} from "../../services/indexedDbWrapper";
 
 export const useTemplateUndo = (updateFunction: Function, enabled: boolean) => {
     const [localStorageKey] = React.useState<string>(`${uuidv4()}`);

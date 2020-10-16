@@ -4,6 +4,7 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
+import {waitFor} from "@testing-library/dom";
 
 export const testSpec: SpecificationSummary = {
     name: "Wizard Training",
@@ -22,20 +23,6 @@ export const testSpec: SpecificationSummary = {
     providerVersionId: ""
 };
 
-describe("useSpecificationSummary when network error", () => {
-        it("returns correct error results", async () => {
-            const {result, waitForValueToChange} =
-                renderHook(() => useSpecificationSummary("whatever"));
-            await act(async () => await waitForValueToChange(() => result.current.isLoadingSpecification));
-            expect(result.current.isLoadingSpecification).toBe(false);
-            expect(result.current.errorCheckingForSpecification).toContain("Error while fetching specification details: ");
-            expect(result.current.haveErrorCheckingForSpecification).toBe(true);
-            expect(result.current.specification).toBe(undefined);
-            expect(result.current.isFetchingSpecification).toBe(false);
-            expect(result.current.isSpecificationFetched).toBe(false);
-        });
-});
-
 
 describe("useSpecificationSummary loads specification", () => {
     const specificationId = "abc123";
@@ -48,11 +35,12 @@ describe("useSpecificationSummary loads specification", () => {
         mock.reset();
         jest.clearAllMocks()
     });
-    
+
     it("returns specification correctly", async () => {
         const {result, waitForValueToChange} =
             renderHook(() => useSpecificationSummary(specificationId));
-        await act(async () => { await waitForValueToChange(() => result.current.isLoadingSpecification);
+        await act(async () => {
+            await waitForValueToChange(() => result.current.isLoadingSpecification);
         });
         expect(result.current.specification).toEqual(testSpec);
         expect(result.current.isLoadingSpecification).toBe(false);

@@ -1,9 +1,9 @@
-﻿import {JobType} from "../types/jobType";
+﻿﻿import {JobType} from "../../types/jobType";
 import {useState} from "react";
-import {JobSummary} from "../types/jobSummary";
+import {JobSummary} from "../../types/jobSummary";
 import {HubConnectionBuilder} from "@microsoft/signalr";
-import {JobMessage} from "../types/jobMessage";
-import {RunningStatus} from "../types/RunningStatus";
+import {JobMessage} from "../../types/jobMessage";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export type MonitorForNewSpecificationJobResult = {
     newJob: JobSummary | undefined,

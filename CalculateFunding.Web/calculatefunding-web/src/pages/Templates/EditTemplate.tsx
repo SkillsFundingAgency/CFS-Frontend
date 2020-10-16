@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import Sidebar from "react-sidebar";
-import {useTemplatePermissions} from '../../hooks/useTemplatePermissions';
+import {useTemplatePermissions} from '../../hooks/TemplateBuilder/useTemplatePermissions';
 import {SidebarContent} from "../../components/TemplateBuilder/SidebarContent";
 import {Section} from '../../types/Sections';
 import {Header} from '../../components/Header';
@@ -57,7 +57,7 @@ import {Breadcrumbs, Breadcrumb} from '../../components/Breadcrumbs';
 import {LoadingStatus} from '../../components/LoadingStatus';
 import {EditDescriptionModal} from '../../components/TemplateBuilder/EditDescriptionModal';
 import deepClone from 'lodash/cloneDeep';
-import {useTemplateUndo} from "../../hooks/useTemplateUndo";
+import {useTemplateUndo} from "../../hooks/TemplateBuilder/useTemplateUndo";
 import {useEventListener} from "../../hooks/useEventListener";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import {ErrorMessage} from '../../types/ErrorMessage';

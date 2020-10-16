@@ -1,9 +1,8 @@
 import {ReleaseTimetable} from "../../../pages/Specifications/ReleaseTimetable";
 import React from "react";
 import '@testing-library/jest-dom/extend-expect';
-import {cleanup, render, waitFor, screen, act} from "@testing-library/react";
+import {cleanup, render, waitFor, screen} from "@testing-library/react";
 import {ReleaseTimetableSummary} from "../../../types/ReleaseTimetableSummary";
-import {MemoryRouter} from "react-router";
 
 const publishServicePath = '../../../services/publishService';
 const renderReleaseTimetable = () => {
