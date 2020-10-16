@@ -35,8 +35,6 @@ import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariati
 import {
     refreshFundingService,
 } from "../../services/publishService";
-import {getDatasetBySpecificationIdService} from "../../services/datasetService";
-import {DatasetSummary} from "../../types/DatasetSummary";
 import {getCalculationsService} from "../../services/calculationService";
 import {getFundingLineStructureService} from "../../services/fundingStructuresService";
 import {PublishStatus} from "../../types/PublishStatusModel";
@@ -49,6 +47,7 @@ import * as QueryString from "query-string";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {ReleaseTimetable} from "./ReleaseTimetable";
 import {AdditionalCalculations} from "../../components/Calculations/AdditionalCalculations";
+import {Datasets} from "../../components/Specifications/Datasets";
 import {VariationManagement} from "../../components/Specifications/VariationManagement";
 
 export interface ViewSpecificationRoute {
@@ -89,15 +88,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const nullReactRef = useRef(null);
 
 
-    const [datasets, setDatasets] = useState<DatasetSummary>({
-        content: [],
-        statusCode: 0
-    });
+
 
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
-    const [isLoadingDatasets, setIsLoadingDatasets] = useState(true);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
 
     const [initialTab, setInitialTab] = useState<string>("");
@@ -145,9 +140,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             }
             setIsLoadingFundingLineStructure(false);
         }
-        if (datasets.content.length === 0) {
-            setIsLoadingDatasets(false);
-        }
+
     }, [fundingLines]);
 
     useEffect(() => {
@@ -158,14 +151,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         document.title = "Specification Results - Calculate funding";
         resetErrors();
         fetchData();
-
-        getDatasetBySpecificationIdService(specificationId)
-            .then((result) => {
-                const response = result;
-                if (response.status === 200) {
-                    setDatasets(response.data as DatasetSummary);
-                }
-            });
     }, [specificationId]);
 
     const fetchData = async () => {
@@ -415,12 +400,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="false"
-                                            onClick={(e) => openCloseAllFundingLines(true)}
+                                            onClick={()=>openCloseAllFundingLines(true)}
                                             hidden={fundingLinesExpandedStatus}>Open all<span
                                         className="govuk-visually-hidden"> sections</span></button>
                                     <button type="button" className="govuk-accordion__open-all"
                                             aria-expanded="true"
-                                            onClick={(e) => openCloseAllFundingLines(false)}
+                                            onClick={()=>openCloseAllFundingLines(false)}
                                             hidden={!fundingLinesExpandedStatus}>Close all<span
                                         className="govuk-visually-hidden"> sections</span></button>
                                 </div>
@@ -460,52 +445,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <AdditionalCalculations specificationId={specificationId}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
-                            <section className="govuk-tabs__panel" id="datasets">
-                                <LoadingStatus title={"Loading datasets"}
-                                               hidden={!isLoadingDatasets}
-                                               description={"Please wait whilst datasets are loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoadingDatasets}>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <h2 className="govuk-heading-l">Datasets</h2>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third">
-                                        <Link to={`/Datasets/DataRelationships/${specificationId}`}
-                                              id={"dataset-specification-relationship-button"}
-                                              className="govuk-link govuk-button" data-module="govuk-button">
-                                            Map data source file to data set</Link>
-                                    </div>
-                                </div>
-                                <table className="govuk-table">
-                                    <caption className="govuk-table__caption">Dataset and schemas</caption>
-                                    <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th scope="col" className="govuk-table__header govuk-!-width-one-half">Dataset</th>
-                                        <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data schema</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="govuk-table__body">
-                                    {datasets.content.map(ds =>
-                                        <tr className="govuk-table__row" key={ds.id}>
-                                            <td scope="row" className="govuk-table__cell">{ds.name}
-                                                <div className="govuk-!-margin-top-2">
-                                                    <details className="govuk-details govuk-!-margin-bottom-0"
-                                                             data-module="govuk-details">
-                                                        <summary className="govuk-details__summary">
-                                                                <span
-                                                                    className="govuk-details__summary-text">Dataset Description</span>
-                                                        </summary>
-                                                        <div className="govuk-details__text">
-                                                            {ds.relationshipDescription}
-                                                        </div>
-                                                    </details>
-                                                </div>
-                                            </td>
-                                            <td className="govuk-table__cell">{ds.definition.name}</td>
-                                        </tr>
-                                    )}
-                                    </tbody>
-                                </table>
-                            </section>
+                           <Datasets specificationId={specificationId} />
                         </Tabs.Panel>
                         <Tabs.Panel label="release-timetable">
                             <section className="govuk-tabs__panel">

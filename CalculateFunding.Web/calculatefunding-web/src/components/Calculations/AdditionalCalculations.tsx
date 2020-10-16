@@ -78,7 +78,7 @@ export function AdditionalCalculations(props: { specificationId: string }) {
                 </p>
             </div>
         </div>
-        <div className="govuk-grid-row">
+        <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
             <div className="govuk-grid-column-two-thirds">
                 <div className="govuk-form-group search-container">
                     <input className="govuk-input input-search" id="event-name" name="event-name" type="text" onChange={(e) => setAdditionalCalculationSearchTerm(e.target.value)}/>
@@ -88,7 +88,7 @@ export function AdditionalCalculations(props: { specificationId: string }) {
                 <button className="govuk-button" type="submit" onClick={() => populateAdditionalCalculations(props.specificationId, statusFilter, 1, additionalCalculationsSearchTerm)}>Search</button>
             </div>
         </div>
-        <table className="govuk-table">
+        <table className="govuk-table" hidden={isLoadingAdditionalCalculations}>
             <thead className="govuk-table__head">
             <tr className="govuk-table__row">
                 <th scope="col" className="govuk-table__header">Additional calculation name</th>
@@ -113,7 +113,7 @@ export function AdditionalCalculations(props: { specificationId: string }) {
         </table>
 
         <div className="govuk-warning-text"
-             hidden={additionalCalculations.totalCount > 0}>
+             hidden={additionalCalculations.totalCount > 0 || isLoadingAdditionalCalculations}>
             <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
             <strong className="govuk-warning-text__text">
                 <span className="govuk-warning-text__assistive">Warning</span>
