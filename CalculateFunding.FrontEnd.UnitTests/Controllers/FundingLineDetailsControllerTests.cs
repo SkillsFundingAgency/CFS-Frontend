@@ -11,7 +11,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Profiles;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
@@ -19,6 +25,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class FundingLineDetailsControllerTests
     {
         private Mock<IPublishingApiClient> _publishingApiClient;
+        private Mock<ISpecificationsApiClient> _specificationsApiClient;
+        private Mock<IProvidersApiClient> _providersApiClient;
         private Mock<IAuthorizationHelper> _mockAuthorizationHelper;
         private FundingLineDetailsController _fundingLineDetailsController;
 
@@ -32,8 +40,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public void Initialize()
         {
             _publishingApiClient = new Mock<IPublishingApiClient>();
+            _providersApiClient = new Mock<IProvidersApiClient>();
+            _specificationsApiClient = new Mock<ISpecificationsApiClient>();
             _mockAuthorizationHelper = new Mock<IAuthorizationHelper>();
-            _fundingLineDetailsController = new FundingLineDetailsController(_publishingApiClient.Object, _mockAuthorizationHelper.Object);
+            _fundingLineDetailsController = new FundingLineDetailsController(_publishingApiClient.Object, _providersApiClient.Object,
+                _specificationsApiClient.Object, _mockAuthorizationHelper.Object);
 
             _specificationId = "specificationId";
             _providerId = "providerId";
@@ -115,19 +126,26 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 }
             };
 
+            GivenProviderExists();
+            GivenSpecificationExists();
             GivenGetPreviousProfilesForSpecificationForProviderForFundingLine(
                 HttpStatusCode.OK, actualFundingLineChanges);
 
             IActionResult actualResult = await WhenGetPreviousProfilesForSpecificationForProviderForFundingLine();
 
             actualResult.Should().BeOfType<OkObjectResult>();
-            
+
             OkObjectResult okObjectResult = actualResult as OkObjectResult;
             okObjectResult.Should().NotBeNull();
             okObjectResult.Value.Should().NotBeNull();
-            okObjectResult.Value.Should().BeOfType<List<FundingLineChange>>();
-            
-            IEnumerable<FundingLineChange> fundingLineChanges = okObjectResult.Value as IEnumerable<FundingLineChange>;
+            okObjectResult.Value.Should().BeOfType<FundingLineChangesViewModel>();
+
+            FundingLineChangesViewModel viewModel = okObjectResult.Value as FundingLineChangesViewModel;
+            viewModel.ProviderName.Should().Be("Provider name");
+            viewModel.SpecificationName.Should().Be("Spec name");
+            viewModel.FundingPeriodName.Should().Be("Funding period name");
+
+            IEnumerable<FundingLineChange> fundingLineChanges = viewModel.FundingLineChanges;
             fundingLineChanges.Count().Should().Be(1);
 
             FundingLineChange fundingLineChange = fundingLineChanges.FirstOrDefault();
@@ -202,6 +220,34 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _fundingStreamId,
                     _fundingLineCode))
                 .ReturnsAsync(new ApiResponse<bool>(httpStatusCode, result ?? false));
+        }
+
+        private void GivenSpecificationExists()
+        {
+            _specificationsApiClient
+                .Setup(_ => _.GetSpecificationSummaryById(
+                    _specificationId))
+                .ReturnsAsync(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary
+                {
+                    Id = _specificationId,
+                    Name = "Spec name",
+                    FundingPeriod = new FundingPeriod
+                    {
+                        Name = "Funding period name"
+                    }
+                }));
+        }
+
+        private void GivenProviderExists()
+        {
+            _providersApiClient
+                .Setup(_ => _.GetCurrentProviderForFundingStream(
+                    _fundingStreamId, _providerId))
+                .ReturnsAsync(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, new ProviderVersionSearchResult
+                {
+                    Id = _providerId,
+                    Name = "Provider name"
+                }));
         }
 
         private async Task<IActionResult> WhenPreviousProfileExistsForSpecificationForProviderForFundingLine()

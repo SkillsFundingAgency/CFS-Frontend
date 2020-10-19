@@ -9,17 +9,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Providers.Models.Search;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.ViewModels.Profiles;
 
 namespace CalculateFunding.Frontend.Controllers
 {
     public class FundingLineDetailsController : Controller
     {
         private readonly IPublishingApiClient _publishingApiClient;
+        private readonly IProvidersApiClient _providersApiClient;
+        private readonly ISpecificationsApiClient _specificationsApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public FundingLineDetailsController(IPublishingApiClient publishingApiClient, IAuthorizationHelper authorizationHelper)
+        public FundingLineDetailsController(IPublishingApiClient publishingApiClient, IProvidersApiClient providersApiClient,
+            ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
         {
             _publishingApiClient = publishingApiClient;
+            _providersApiClient = providersApiClient;
+            _specificationsApiClient = specificationsApiClient;
             _authorizationHelper = authorizationHelper;
         }
 
@@ -81,6 +92,11 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingStreamId,
             string fundingLineCode)
         {
+            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(providerId, nameof(providerId));
+            Guard.ArgumentNotNull(fundingLineCode, nameof(fundingLineCode));
+
             ApiResponse<IEnumerable<FundingLineChange>> fundingLineApiResponse = await _publishingApiClient
                 .GetPreviousProfilesForSpecificationForProviderForFundingLine(
                     specificationId,
@@ -88,14 +104,39 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingStreamId,
                     fundingLineCode);
 
-            IActionResult errorResult =
+            IActionResult fundingLineErrorResult =
                 fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-            if (errorResult != null)
+            if (fundingLineErrorResult != null)
             {
-                return errorResult;
+                return fundingLineErrorResult;
             }
 
-            return Ok(fundingLineApiResponse.Content);
+            ApiResponse<ProviderVersionSearchResult> providerResponse =
+                await _providersApiClient.GetCurrentProviderForFundingStream(fundingStreamId, providerId);
+            IActionResult providerErrorResult =
+                providerResponse.IsSuccessOrReturnFailureResult(nameof(ProviderVersionSearchResult));
+            if (providerErrorResult != null)
+            {
+                return providerErrorResult;
+            }
+
+            ApiResponse<SpecificationSummary> specificationResponse = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+            IActionResult specificationErrorResult =
+                specificationResponse.IsSuccessOrReturnFailureResult(nameof(SpecificationSummary));
+            if (specificationErrorResult != null)
+            {
+                return specificationErrorResult;
+            }
+
+            SpecificationSummary specification = specificationResponse.Content;
+
+            return Ok(new FundingLineChangesViewModel
+            {
+                    ProviderName = providerResponse.Content.Name,
+                    SpecificationName = specification.Name,
+                    FundingPeriodName = specification.FundingPeriod.Name,
+                    FundingLineChanges = fundingLineApiResponse.Content
+            });
         }
 
         [HttpGet]

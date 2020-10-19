@@ -27,7 +27,7 @@ describe("<ViewFundingLineProfile />", () => {
         beforeEach(() => {
             mockHistoryPush.mockClear();
             mockApplyCustomProfile.mockClear();
-        })
+        });
 
         it("does not show a permissions message", async () => {
             const {container} = renderPage();

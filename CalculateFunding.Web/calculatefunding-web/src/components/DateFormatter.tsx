@@ -1,27 +1,31 @@
 import React from 'react';
 
-export function DateFormatter(props: {date?: Date, utc?: boolean}) {
-    if (!props.date) return <span></span>;
+export function formatDate(date?: Date, utc?: boolean) {
+    if (!date) return "";
 
-    const date: Date = new Date(props.date);
-    const day: number = date.getDate();
-    const month: string = date.toLocaleString('default', {month: 'long'});
-    const year: number = date.getFullYear();
+    const actualDate: Date = new Date(date);
+    const day: number = actualDate.getDate();
+    const month: string = actualDate.toLocaleString('default', {month: 'long'});
+    const year: number = actualDate.getFullYear();
 
-    if (props.utc === null || props.utc === undefined) {
-        return <span>{day} {month} {year}</span>
+    if (utc === null || utc === undefined) {
+        return `${day} ${month} ${year}`;
     }
 
-    const hours: number = date.getHours();
-    const minutes: number = date.getMinutes();
+    const hours: number = actualDate.getHours();
+    const minutes: number = actualDate.getMinutes();
 
-    if (props.utc) {
-        const utcTime: string = date.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false});
-        return (
-            <span>{day} {month} {year} {utcTime}</span>)
+    if (utc) {
+        const utcTime: string = actualDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false});
+        return `${day} ${month} ${year} ${utcTime}`;
     } else {
-        return (
-            <span>{day} {month} {year} {hours}:{minutes < 10 ? "0" + minutes : minutes} {hours < 12 ? "am" : "pm"}</span>
-        )
+        return `${day} ${month} ${year} ${hours}:${minutes < 10 ? "0" + minutes : minutes} ${hours < 12 ? "am" : "pm"}`;
+
     }
+}
+
+export function DateFormatter(props: {date?: Date, utc?: boolean}) {
+    return (
+        <span>{formatDate(props.date, props.utc)}</span>
+    );
 }

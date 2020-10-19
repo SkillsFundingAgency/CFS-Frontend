@@ -58,6 +58,9 @@ import {
     ReactQueryCacheProvider,
 } from "react-query";
 import {ReactQueryDevtools} from "react-query-devtools";
+import {ProfileHistory} from './pages/FundingApprovals/ProfileHistory';
+
+const queryCache = new QueryCache();
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -87,7 +90,6 @@ const App: React.FunctionComponent = () => {
         );
     }
     if (hasConfirmedSkills === true) {
-        const queryCache = new QueryCache();
         return (
             <BrowserRouter basename="/app"
                            getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>
@@ -112,6 +114,7 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
                                component={ProviderFundingOverview}/>
                         <Route path="/Approvals/ProfilingArchive/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId" component={ProfilingArchive}/>
+                        <Route path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode" component={ProfileHistory}/>
                         <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
                         <Route path="/Datasets/ManageData" component={ManageData}/>
                         <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>

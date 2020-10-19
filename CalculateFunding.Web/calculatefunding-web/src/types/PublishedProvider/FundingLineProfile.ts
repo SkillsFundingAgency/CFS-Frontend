@@ -33,3 +33,21 @@ export interface Reference {
   id: string,
   name: string
 }
+
+export interface FundingLineChange {
+  fundingLineTotal?: number,
+  previousFundingLineTotal?: number,
+  fundingStreamName: string,
+  fundingLineName: string,
+  carryOverAmount?: number,
+  lastUpdatedUser: Reference,
+  lastUpdatedDate?: Date,
+  profileTotals: ProfileTotal[],
+}
+
+export interface FundingLineChangeViewModel {
+  providerName: string,
+  specificationName: string,
+  fundingPeriodName: string,
+  fundingLineChanges: FundingLineChange[]
+}

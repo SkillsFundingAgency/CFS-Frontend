@@ -17,7 +17,7 @@ import {IStoreState} from "../reducers/rootReducer";
 import {Link} from "react-router-dom";
 import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {Profiling} from "../types/Profiling";
-import {GetCurrentProfileConfigService} from "../services/fundingLineDetailsService";
+import {getCurrentProfileConfigService} from "../services/fundingLineDetailsService";
 import {FundingLineProfile} from "../types/FundingLineProfile";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {ErrorMessage} from "../types/ErrorMessage";
@@ -90,7 +90,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
 
     useEffectOnce(() => {
         try {
-            GetCurrentProfileConfigService(
+            getCurrentProfileConfigService(
                 match.params.specificationId,
                 match.params.providerId,
                 match.params.fundingStreamId

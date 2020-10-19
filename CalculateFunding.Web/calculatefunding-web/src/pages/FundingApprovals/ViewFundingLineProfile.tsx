@@ -20,6 +20,7 @@ import {EditableProfileTotal} from "./EditableProfileTotal";
 import {cloneDeep} from "lodash";
 import {ApplyCustomProfileRequest, ProfilePeriodType} from "../../types/PublishedProvider/ApplyCustomProfileRequest";
 import {ProfileTotal} from "../../types/FundingLineProfile";
+import {ProfileHistoryPanel} from "./ProfileHistoryPanel";
 
 export interface ViewFundingLineProfileProps {
     providerId: string;
@@ -366,8 +367,12 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
                                 </div>
                             </div>
                         </div>
+                        <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible" />
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-two-thirds">
+                                <ProfileHistoryPanel
+                                    specificationId={specificationId} providerId={providerId} providerVersionId={providerVersionId}
+                                    fundingStreamId={fundingStreamId} fundingPeriodId={fundingPeriodId} fundingLineCode={fundingLineId} />
                                 <Link to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
                                     className="govuk-back-link">
                                     Back
