@@ -29,6 +29,8 @@
         [Required(ErrorMessageResourceName = nameof(ValidationMessages.SpecificationFundingPeriodRequired), ErrorMessageResourceType = typeof(ValidationMessages))]
         public string FundingPeriodId { get; set; }
 
+        public int? ProviderSnapshotId { get; set; }
+
         public string GetSpecificationId()
         {
             return Id;
