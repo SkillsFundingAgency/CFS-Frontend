@@ -9,7 +9,6 @@ import {FundingStructureType, IFundingStructureItem} from "../../types/FundingSt
 import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {
     approveFundingLineStructureService,
-    getProfileVariationPointersService,
     getSpecificationsSelectedForFundingByPeriodAndStreamService,
     getSpecificationSummaryService
 } from "../../services/specificationService";
@@ -31,7 +30,6 @@ import {
     getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName, setInitialExpandedStatus,
     updateFundingLineExpandStatus
 } from "../../components/fundingLineStructure/FundingLineStructure";
-import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
 import {
     refreshFundingService,
 } from "../../services/publishService";
@@ -367,7 +365,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                             <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
-                            <Tabs.Tab label="variation-management">Variation Management</Tabs.Tab>
+                            <Tabs.Tab hidden={!specification.isSelectedForFunding} label="variation-management">Variation Management</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
                             <section className="govuk-tabs__panel" id="fundingline-structure">
@@ -452,7 +450,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 <ReleaseTimetable specificationId={specificationId}/>
                             </section>
                         </Tabs.Panel>
-                        <Tabs.Panel label={"variation-management"}>
+                        <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>
                             <VariationManagement specificationId={specificationId}/>
                         </Tabs.Panel>
                     </Tabs>

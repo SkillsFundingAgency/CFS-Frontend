@@ -15,7 +15,7 @@ interface ICollapsibleStepsProps {
     calculationType?: string;
     expanded: boolean;
     hasChildren: boolean;
-    customRef: React.MutableRefObject<null>;
+    customRef?: React.MutableRefObject<null>;
     lastUpdatedDate?: Date;
     callback: any;
 }

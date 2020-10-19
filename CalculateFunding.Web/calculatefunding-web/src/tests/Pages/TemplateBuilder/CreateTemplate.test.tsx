@@ -1,4 +1,4 @@
-﻿﻿import React from 'react';
+﻿import React from 'react';
 import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import { waitFor, screen, render } from "@testing-library/react";

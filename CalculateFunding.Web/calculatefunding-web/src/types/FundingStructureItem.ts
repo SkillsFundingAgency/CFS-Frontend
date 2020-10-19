@@ -11,7 +11,7 @@ export interface IFundingStructureItem {
     fundingStructureItems: IFundingStructureItem[];
     parentName: string;
     expanded: boolean;
-    customRef: React.MutableRefObject<null>;
+    customRef?: React.MutableRefObject<null>;
     lastUpdatedDate?: Date
 }
 

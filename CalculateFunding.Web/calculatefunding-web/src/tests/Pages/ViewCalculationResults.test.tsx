@@ -1,6 +1,6 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
-import {cleanup, fireEvent, render, waitFor, waitForDomChange} from "@testing-library/react";
+import {act, cleanup, fireEvent, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {getCalculationProvidersService} from "../../services/calculationService";
@@ -339,7 +339,9 @@ describe('<ViewCalculationResults /> search filters checks', () => {
         const {container} = renderViewCalculationResultsPage();
         const searchQuery = "9";
 
-        await userEvent.type(container.querySelector('#providerName') as HTMLInputElement, searchQuery);
+        act(() => {
+            userEvent.type(container.querySelector('#providerName') as HTMLInputElement, searchQuery);
+        });
 
         await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith( {"calculationId": "12345", "calculationValueType": "", "errorToggle": "", "facetCount": 0, "includeFacets": true, "localAuthority": [], "pageNumber": 1, "pageSize": 50, "providerSubType": [], "providerType": []
             , "resultsStatus": [], "searchFields": [], "searchMode": 1, "searchTerm": searchQuery}
@@ -351,8 +353,13 @@ describe('<ViewCalculationResults /> search filters checks', () => {
         const {container} = renderViewCalculationResultsPage();
         const searchQuery = "9";
 
-        fireEvent.click(container.querySelector('#search-options-URN') as HTMLInputElement)
-        await userEvent.type(container.querySelector('#urn') as HTMLInputElement, searchQuery);
+        act(() => {
+            fireEvent.click(container.querySelector('#search-options-URN') as HTMLInputElement)
+        });
+
+        act(() => {
+            userEvent.type(container.querySelector('#urn') as HTMLInputElement, searchQuery);
+        });
 
         await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith( {"calculationId": "12345", "calculationValueType": "", "errorToggle": "", "facetCount": 0, "includeFacets": true, "localAuthority": [], "pageNumber": 1, "pageSize": 50, "providerSubType": [], "providerType": []
             , "resultsStatus": [], "searchFields": [], "searchMode": 1, "searchTerm": searchQuery}));
