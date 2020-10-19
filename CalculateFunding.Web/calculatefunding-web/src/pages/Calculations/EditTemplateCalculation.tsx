@@ -60,14 +60,13 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
         isSelectedForFunding: false,
         fundingStreams: [],
         dataDefinitionRelationshipIds: [],
-        templateIds: {"": [""]}
+        templateIds: {[""]: ""}
     });
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationFundingStreamId, setTemplateCalculationFundingStreamId] = useState<string>("");
     const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
     const [initialSourceCode, setInitialSourceCode] = useState<string>("");
-    const [originalTemplateCalculationSourceCode, setOriginalTemplateCalculationSourceCode] = useState<string>("");
     const [templateCalculationStatus, setTemplateCalculationStatus] = useState<PublishStatus>();
     const [templateCalculationLastUpdated, setTemplateCalculationLastUpdated] = useState<Date>(new Date());
     const initialBuildSuccess = {
@@ -105,6 +104,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
     const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
     const [isDirty, setIsDirty] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const [canApproveCalculation, setCanApproveCalculation] = useState<boolean>(false);
     let history = useHistory();
 
     useConfirmLeavePage(!isSaving && isDirty);
@@ -117,7 +117,6 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 setIsLoading(true);
                 const result = await getCalculationByIdService(calcId);
                 const calc = result.data as EditAdditionalCalculationViewModel;
-                setOriginalTemplateCalculationSourceCode(calc.sourceCode);
                 setTemplateCalculationSourceCode(calc.sourceCode);
                 setTemplateCalculationName(calc.name);
                 setTemplateCalculationType(calc.valueType);
@@ -152,7 +151,14 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
             }
         };
 
+        const checkCanApproveCalculation = async (calcId: string) => {
+            const result = await getIsUserAllowedToApproveCalculationService(calcId);
+            setCanApproveCalculation(result.data as boolean);
+        };
+
         getTemplateCalculation(calculationId);
+
+        checkCanApproveCalculation(calculationId);
     });
 
     function submitTemplateCalculation() {
@@ -195,30 +201,20 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
         setIsLoadingUpdate(true);
         setCalculationError("");
 
-        getIsUserAllowedToApproveCalculationService(calculationId)
-            .then((userPermissionResult) => {
-                if (userPermissionResult.status === 200) {
-                    const userCanApprove = userPermissionResult.data as boolean;
-                    if (userCanApprove) {
-                        const publishStatusModel: PublishStatusModel = {
-                            publishStatus: PublishStatus.Approved
-                        };
-                        approveCalculationService(publishStatusModel, specificationId, calculationId)
-                            .then((result) => {
-                                if (result.status === 200) {
-                                    const response: PublishStatusModel = result.data as PublishStatusModel;
-                                    setTemplateCalculationStatus(response.publishStatus);
-                                }
-                            });
-                    } else {
-                        setCalculationError("Calculation can not be approved by calculation writer");
-                    }
-                }
-            }).catch(() => {
+        try {
+            const publishStatusModel: PublishStatusModel = {
+                publishStatus: PublishStatus.Approved
+            };
+            approveCalculationService(publishStatusModel, specificationId, calculationId)
+                .then((result) => {
+                    const response: PublishStatusModel = result.data as PublishStatusModel;
+                    setTemplateCalculationStatus(response.publishStatus);
+                });
+        } catch (e) {
             setCalculationError("There is a problem, calculation can not be approved, please try again");
-        }).finally(() => {
-            setIsLoadingUpdate(false);
-        });
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     async function buildCalculation() {
@@ -385,7 +381,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={approveTemplateCalculation}
-                        disabled={isDirty || isLoadingCircularDependencies || templateCalculationStatus === PublishStatus.Approved}>
+                        disabled={isDirty || isLoadingCircularDependencies || templateCalculationStatus === PublishStatus.Approved || !canApproveCalculation}>
                     Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">

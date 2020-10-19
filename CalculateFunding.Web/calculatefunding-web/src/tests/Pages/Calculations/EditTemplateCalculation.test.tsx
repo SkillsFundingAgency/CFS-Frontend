@@ -17,8 +17,7 @@ const matchMock: match<EditTemplateCalculationRouteProps> = {
     path: "",
     url: "",
     params: {
-        calculationId: "123",
-        fundingLineItem: "item"
+        calculationId: "123"
     }
 };
 
@@ -37,6 +36,9 @@ describe("<EditTemplateCalculation>", () => {
                 })),
                 getCalculationByIdService: jest.fn(() => Promise.resolve({
                     data: mockCalculation
+                })),
+                getIsUserAllowedToApproveCalculationService: jest.fn(() => Promise.resolve({
+                    data: true
                 }))
             }
         }
@@ -68,6 +70,23 @@ describe("<EditTemplateCalculation>", () => {
             expect(getByText("Calculations are not able to run due to the following problem")).toBeInTheDocument();
         });
     });
+
+    it('enables approve button given user is allowed to approve calculation', async () => {
+        const {EditTemplateCalculation} = require("../../../pages/Calculations/EditTemplateCalculation");
+        const {getByText} = render(
+            <MemoryRouter>
+                <EditTemplateCalculation
+                    excludeMonacoEditor={true}
+                    history={history}
+                    location={location}
+                    match={matchMock} />
+            </MemoryRouter>);
+
+        await waitFor(() => {
+            expect(getByText("Approve")).toBeInTheDocument();
+            expect(getByText("Approve")).toBeEnabled();
+        });
+    });
 });
 
 describe("<EditTemplateCalculation>", () => {
@@ -81,6 +100,9 @@ describe("<EditTemplateCalculation>", () => {
                 })),
                 getCalculationByIdService: jest.fn(() => Promise.resolve({
                     data: mockCalculation
+                })),
+                getIsUserAllowedToApproveCalculationService: jest.fn(() => Promise.resolve({
+                    data: false
                 }))
             }
         }
@@ -110,6 +132,23 @@ describe("<EditTemplateCalculation>", () => {
 
         await waitFor(() => {
             expect(queryByTestId("Calculations are not able to run due to the following problem")).toBeNull();
+        });
+    });
+
+    it('disables approve button given user is allowed to approve calculation', async () => {
+        const {EditTemplateCalculation} = require("../../../pages/Calculations/EditTemplateCalculation");
+        const {getByText} = render(
+            <MemoryRouter>
+                <EditTemplateCalculation
+                    excludeMonacoEditor={true}
+                    history={history}
+                    location={location}
+                    match={matchMock} />
+            </MemoryRouter>);
+
+        await waitFor(() => {
+            expect(getByText("Approve")).toBeInTheDocument();
+            expect(getByText("Approve")).not.toBeEnabled();
         });
     });
 });
