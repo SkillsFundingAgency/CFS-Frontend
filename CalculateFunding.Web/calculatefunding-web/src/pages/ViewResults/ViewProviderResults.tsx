@@ -135,7 +135,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         providerResults: true,
         providerDetails: true
     });
-    const [selectedSpecificationIdByFundingStream, setSelectedSpecificationIdByFundingStream] = useState<string>("");
+    const [selectedSpecificationId, setSelectedSpecificationId] = useState<string>("");
     const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
     const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
@@ -168,7 +168,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                         specificationInformation.map((specInfo) => {
                             return specInfo.fundingStreamIds?.map((fundingStreamId) => {
                                 if (fundingStreamId === match.params.fundingStreamId) {
-                                    setSelectedSpecificationIdByFundingStream(specInfo.id);
+                                    setSelectedSpecificationId(specInfo.id);
                                     selectedSpecificationId = specInfo.id;
                                     selectSpecificationByFundingStream = true;
                                     return;
@@ -380,6 +380,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             });
             if (response.status === 200) {
                 const result = response.data as SpecificationSummary;
+                setSelectedSpecificationId(result.id);
+
                 setSpecificationSummary(response.data);
 
                 getFundingLineStructureByProviderService(result.id, result.fundingPeriod.id, result.fundingStreams[0].id, match.params.providerId).then((response) => {
@@ -450,7 +452,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                         <span className="govuk-caption-m govuk-!-margin-bottom-2">Available specifications for all funding streams will be displayed here.</span>
                         <select className="govuk-select" id="sort" name="sort" 
                                 onChange={setSelectedSpecification} 
-                                value={selectedSpecificationIdByFundingStream !== "" ?  selectedSpecificationIdByFundingStream : specificationSummary.id}>
+                                value={selectedSpecificationId !== "" ?  selectedSpecificationId : specificationSummary.id}>
                             {providerResults.map(p =>
                                 <option key={p.id} value={p.id}>{p.name}
                                 </option>
