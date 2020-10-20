@@ -87,7 +87,7 @@
     bottom: -11px;
     left: calc(50% - 1px);
     width: 2px;
-    height: 19px;
+    height: 15px;
     background-color: #215a88;
   }
   
@@ -441,6 +441,25 @@
     border-right-color: transparent;
     border-radius: 0.625rem;
     animation: oci-infinite-spinning .75s linear infinite;
+  }
+
+  .orgchart ul li .oc-node .oci-expand-container .oci-expand {
+    display: none;
+  }
+  .orgchart ul li .oc-node:hover .oci-expand-container .oci-expand {
+    display: inline-block;
+  }
+  
+  .oci-expand {
+    position: absolute;
+    right: 30px;
+    font-size: small;
+    margin-bottom: 0px;
+    text-decoration: underline;
+  }
+
+  .orgchart .oc-node .oci-expand:hover {
+    cursor: pointer;
   }
   
   @keyframes oci-infinite-spinning {

@@ -294,7 +294,8 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
                                         openSideBar={openSideBar}
                                         nextId={nextId}
                                         dsKey={ds.key}
-                                        addNodeToRefs={addNodeToRefs} />
+                                        addNodeToRefs={addNodeToRefs}
+                                        hasCloneParent={false} />
                                 </ul>
                             </div>
                         )}

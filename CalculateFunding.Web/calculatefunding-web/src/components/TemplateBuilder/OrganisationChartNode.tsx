@@ -25,12 +25,15 @@ interface OrganisationChartNodeProps {
     nextId: number,
     dsKey: number,
     addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
+    expandAllChildren: boolean,
+    hasCloneParent: boolean,
 };
 
 const defaultProps = {
     draggable: false,
     collapsible: true,
-    multipleSelect: false
+    multipleSelect: false,
+    expandAllChildren: true,
 };
 
 function OrganisationChartNode({
@@ -48,19 +51,33 @@ function OrganisationChartNode({
     nextId,
     dsKey,
     addNodeToRefs,
+    expandAllChildren,
+    hasCloneParent,
 }: OrganisationChartNodeProps) {
     const node = useRef<HTMLDivElement>(null);
 
-    const [isChildrenCollapsed, setIsChildrenCollapsed] = useState<boolean>(datasource.id.includes(":"));
+    const [isChildrenCollapsed, setIsChildrenCollapsed] = useState<boolean>(false);
     const [bottomEdgeExpanded, setBottomEdgeExpanded] = useState<boolean>();
     const [allowedDrop, setAllowedDrop] = useState<boolean>(false);
     const [selected, setSelected] = useState<boolean>(false);
+    const [expandAll, setExpandAll] = useState<boolean>(expandAllChildren);
+
+    const isClone = datasource.id.includes(":");
 
     useEffect(() => {
         addNodeToRefs && addNodeToRefs(datasource.id, node);
+        const shouldCollapseChildren = (!hasCloneParent && isClone) || !expandAllChildren;
+        setIsChildrenCollapsed(shouldCollapseChildren);
     }, []);
 
-    const isClone = datasource.id.includes(":");
+    useEffect(() => {
+        if (expandAllChildren !== expandAll ) {
+            setExpandAll(expandAllChildren);
+        }
+        if (expandAllChildren && isChildrenCollapsed) {
+            setIsChildrenCollapsed(!isChildrenCollapsed);
+        }
+    }, [expandAllChildren]);
 
     const nodeClass = [
         "oc-node",
@@ -133,6 +150,13 @@ function OrganisationChartNode({
         setIsChildrenCollapsed(!isChildrenCollapsed);
         setBottomEdgeExpanded(!bottomEdgeExpanded);
     };
+
+    const handleExpandAll = (e) => {
+        e.stopPropagation();
+        setIsChildrenCollapsed(!isChildrenCollapsed);
+        setBottomEdgeExpanded(!bottomEdgeExpanded);
+        setExpandAll(!expandAll);
+    }
 
     const filterAllowedDropNodes = (id: string, draggedNodeKind: NodeType) => {
         sendDragInfo(id, draggedNodeKind);
@@ -225,10 +249,14 @@ function OrganisationChartNode({
                 {collapsible &&
                     datasource.relationship &&
                     datasource.relationship.charAt(2) === "1" && (
-                        <i
-                            className={`oc-edge verticalEdge bottomEdge oci ${
-                                bottomEdgeExpanded === undefined ? "" : bottomEdgeExpanded ? "oci-chevron-up" : "oci-chevron-down"}`}
-                            onClick={bottomEdgeClickHandler} />
+                        <>
+                            <i
+                                className={`oc-edge verticalEdge bottomEdge oci ${bottomEdgeExpanded === undefined ? "" : bottomEdgeExpanded ? "oci-chevron-up" : "oci-chevron-down"}`}
+                                onClick={bottomEdgeClickHandler} />
+                            <div className="oci-expand-container">
+                                <span className="govuk-body oci-expand" onClick={handleExpandAll}>{`${bottomEdgeExpanded ? "Collapse" : "Expand"} all`}</span>
+                            </div>
+                        </>
                     )}
             </div>
             {datasource.children && datasource.children.length > 0 && (
@@ -251,6 +279,8 @@ function OrganisationChartNode({
                             nextId={nextId}
                             dsKey={dsKey}
                             addNodeToRefs={addNodeToRefs}
+                            expandAllChildren={expandAll}
+                            hasCloneParent={isClone}
                         />
                     ))}
                 </ul>

@@ -1,9 +1,9 @@
 import React from "react";
 import OrganisationChartNode from "../../../components/TemplateBuilder/OrganisationChartNode";
 import NodeTemplate from "../../../components/TemplateBuilder/TemplateBuilderNode";
-import { mount } from "enzyme";
-import { FundingLine, NodeType, FundingLineType, FundingLineOrCalculation, FundingLineOrCalculationSelectedItem, Calculation } from "../../../types/TemplateBuilderDefinitions";
-import { sendDragInfo } from "../../../services/templateBuilderService";
+import {mount} from "enzyme";
+import {FundingLine, NodeType, FundingLineType, FundingLineOrCalculation, FundingLineOrCalculationSelectedItem, Calculation} from "../../../types/TemplateBuilderDefinitions";
+import {sendDragInfo} from "../../../services/templateBuilderService";
 
 let changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
 let cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>;
@@ -22,7 +22,7 @@ beforeEach(() => {
     jest.clearAllMocks();
 });
 
-it("sends drag event info to component", () => {
+describe("Renders non-cloned nodes correctly", () => {
     const data: FundingLine = {
         id: "n0",
         dsKey: 0,
@@ -33,60 +33,78 @@ it("sends drag event info to component", () => {
         fundingLineCode: "Code 0"
     };
 
-    const wrapper = mount(
-        <OrganisationChartNode
-            id="n0"
-            datasource={data}
-            NodeTemplate={NodeTemplate}
-            changeHierarchy={changeHierarchy}
-            cloneNode={cloneNode}
-            onClickNode={onClickNode}
-            addNode={addNode}
-            openSideBar={openSideBar}
-            isEditMode={true}
-            nextId={1}
-            dsKey={0}
-            addNodeToRefs={addNodeToRefs}
-        />);
+    it("sends drag event info to component", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={true}
+                hasCloneParent={false}
+            />);
 
-    const node = wrapper.find("div#n0");
-    node.simulate('dragStart', { dataTransfer: { setData: (format: string, data: string) => { } } });
+        const node = wrapper.find("div#n0");
+        node.simulate('dragStart', {dataTransfer: {setData: (format: string, data: string) => {}}});
 
-    expect(sendDragInfo).toHaveBeenCalledTimes(1);
-    expect(sendDragInfo).toHaveBeenCalledWith("n0", "FundingLine");
+        expect(sendDragInfo).toHaveBeenCalledTimes(1);
+        expect(sendDragInfo).toHaveBeenCalledWith("n0", "FundingLine");
+    });
+
+    it("does not collapse a non-cloned node on initial render", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={true}
+                hasCloneParent={false}
+            />);
+
+        expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(0);
+    });
+
+    it("does collapse a non-cloned node on initial render if expandAllChildren is false", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={false}
+                hasCloneParent={false}
+            />);
+
+        expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(1);
+    });
 });
 
-it("does not collapse a non-cloned node on initial render", () => {
-    const data: FundingLine = {
-        id: "n0",
-        dsKey: 0,
-        templateLineId: 0,
-        kind: NodeType.FundingLine,
-        type: FundingLineType.Information,
-        name: "My Funding Line 0",
-        fundingLineCode: "Code 0"
-    };
-
-    const wrapper = mount(
-        <OrganisationChartNode
-            id="n0"
-            datasource={data}
-            NodeTemplate={NodeTemplate}
-            changeHierarchy={changeHierarchy}
-            cloneNode={cloneNode}
-            onClickNode={onClickNode}
-            addNode={addNode}
-            openSideBar={openSideBar}
-            isEditMode={true}
-            nextId={1}
-            dsKey={0}
-            addNodeToRefs={addNodeToRefs}
-        />);
-
-    expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(0);
-});
-
-it("collapses a cloned node on initial render", () => {
+describe("Renders cloned nodes correctly", () => {
     const data: FundingLine = {
         id: "n0:12345",
         dsKey: 0,
@@ -97,21 +115,91 @@ it("collapses a cloned node on initial render", () => {
         fundingLineCode: "Code 0"
     };
 
-    const wrapper = mount(
-        <OrganisationChartNode
-            id="n0:12345"
-            datasource={data}
-            NodeTemplate={NodeTemplate}
-            changeHierarchy={changeHierarchy}
-            cloneNode={cloneNode}
-            onClickNode={onClickNode}
-            addNode={addNode}
-            openSideBar={openSideBar}
-            isEditMode={true}
-            nextId={1}
-            dsKey={0}
-            addNodeToRefs={addNodeToRefs}
-        />);
+    it("collapses a root cloned node on initial render even if expandAllChildren is true", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0:12345"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={true}
+                hasCloneParent={false}
+            />);
 
-    expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(1);
+        expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(1);
+    });
+
+    it("collapses a root node on initial render if expandAllChildren is false", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0:12345"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={false}
+                hasCloneParent={false}
+            />);
+
+        expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(1);
+    });
+
+    it("expands a clone node if parent is a clone and expandAllChildren is true", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0:12345"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={true}
+                hasCloneParent={true}
+            />);
+
+        expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(0);
+    });
+
+    it("collapses a clone node if parent is a clone and expandAllChildren is false", () => {
+        const wrapper = mount(
+            <OrganisationChartNode
+                id="n0:12345"
+                datasource={data}
+                NodeTemplate={NodeTemplate}
+                changeHierarchy={changeHierarchy}
+                cloneNode={cloneNode}
+                onClickNode={onClickNode}
+                addNode={addNode}
+                openSideBar={openSideBar}
+                isEditMode={true}
+                nextId={1}
+                dsKey={0}
+                addNodeToRefs={addNodeToRefs}
+                expandAllChildren={false}
+                hasCloneParent={true}
+            />);
+
+        expect(wrapper.find('.isChildrenCollapsed')).toHaveLength(1);
+    });
 });
