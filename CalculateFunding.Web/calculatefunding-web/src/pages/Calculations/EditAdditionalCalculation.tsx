@@ -33,6 +33,7 @@ import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
 import {CircularReferenceError} from "../../types/Calculations/CircularReferenceError";
 import {CompliationErrorMessageList} from "../../components/Calculations/CompliationErrorMessageList";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface EditAdditionalCalculationProps {
     excludeMonacoEditor?: boolean
@@ -295,23 +296,24 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
         setAdditionalCalculationSourceCode(sourceCode);
         setIsDirty(initialSourceCode !== sourceCode);
     }
+
     function updateSourceCodeForEditor(updatedSourceCode: string) {
         setAdditionalCalculationSourceCode(updatedSourceCode);
     }
 
     return <div>
-        <Header location={Section.Specifications} />
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"} />
-                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
-                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`} />
-                <Breadcrumb name={"Edit additional calculation"} />
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
+                <Breadcrumb name={"Edit additional calculation"}/>
             </Breadcrumbs>
-            <LoadingStatus title={"Updating additional calculation"} hidden={!isLoading} subTitle={"Please wait whilst the calculation is updated"} />
+            <LoadingStatus title={"Updating additional calculation"} hidden={!isLoading} subTitle={"Please wait whilst the calculation is updated"}/>
             <div hidden={(calculationError == null || calculationError === "" || isLoading)}
-                className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                data-module="govuk-error-summary">
+                 className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                 data-module="govuk-error-summary">
                 <h2 className="govuk-error-summary__title">
                     There is a problem
                 </h2>
@@ -324,58 +326,43 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                 </div>
             </div>
 
-            <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3} />
+            <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3}/>
 
             <fieldset className="govuk-fieldset" hidden={isLoading}>
-                <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                    <h1 className="govuk-fieldset__heading">
-                        Edit additional calculation
-                    </h1>
-                </legend>
+                <div className={"govuk-form-group" + (nameErrorMessage.length > 0 ? " govuk-form-group--error" : "")}>
+                    <span className="govuk-caption-l">
+                        Calculation name
+                    </span>
+                    <h2 id="calculation-name-title" className={"govuk-heading-l"}>{additionalCalculationName}</h2>
+                </div>
                 <div id="calculation-status"
-                    className={"govuk-form-group" + (calculationError != null && calculationError !== "" ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (calculationError != null && calculationError !== "" ? " govuk-form-group--error" : "")}>
                     <span className="govuk-error-message">
                         <span className="govuk-visually-hidden">Error:</span> {calculationError}
                     </span>
-                    <span className="govuk-caption-m">Calculation status</span>
-                    <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2">{additionalCalculationStatus} </strong>
-                </div>
-                <div className={"govuk-form-group" + (nameErrorMessage.length > 0 ? " govuk-form-group--error" : "")}>
-                    <label className="govuk-label" htmlFor="address-line-1">
-                        Calculation name
-                    </label>
-                    <input className="govuk-input" id="calculation-name" name="calculation-name" type="text" pattern="[A-Za-z0-9]+"
-                        value={additionalCalculationName}
-                        onChange={(e) => setAdditionalCalculationName(e.target.value)} />
-                    <div hidden={nameErrorMessage === ""}>
-                        <span id="calculation-name-error" className="govuk-error-message">
-                            <span className="govuk-visually-hidden">Error:</span> Calculation name must be between 4 and 180 characters
-                        </span>
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-one-quarter">
+                            <h3 className="govuk-caption-m govuk-!-font-weight-bold">Calculation status</h3>
+                        </div>
+                        <div className="govuk-grid-column-one-quarter">
+                            <span className="govuk-tag govuk-tag--green govuk-!-margin-top-4">{additionalCalculationStatus} </span>
+                        </div>
+                    </div>
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-one-quarter">
+                            <h3 className="govuk-caption-m govuk-!-font-weight-bold">
+                                Value type
+                            </h3>
+                        </div>
+                        <div className="govuk-grid-column-one-quarter">
+                            <h3 className="govuk-caption-m govuk-">{additionalCalculationType}</h3>
+                        </div>
                     </div>
                 </div>
-
-                <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="sort">
-                        Value type
-                    </label>
-                    <select className="govuk-select" id="sort" name="sort"
-                        onChange={(e) => setAdditionalCalculationType(e.target.value as CalculationTypes)}>
-                        <option value="Percentage"
-                            selected={additionalCalculationType === CalculationTypes.Percentage}>Percentage
-                        </option>
-                        <option value="Number" selected={additionalCalculationType === CalculationTypes.Number}>Number
-                        </option>
-                        <option value="Currency"
-                            selected={additionalCalculationType === CalculationTypes.Currency}>Currency
-                        </option>
-                    </select>
-                </div>
-
-                <div
-                    className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <label className="govuk-label" htmlFor="more-detail">
+                <div className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    <h3 className="govuk-caption-m govuk-!-font-weight-bold">
                         Calculation script
-                    </label>
+                    </h3>
                     {renderMonacoEditor && <GdsMonacoEditor
                         value={additionalCalculationSourceCode}
                         change={updateSourceCode}
@@ -386,55 +373,62 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                         calculationName={additionalCalculationName}
                     />}
                     <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
-                        data-testid="build"
-                        onClick={buildCalculation} disabled={isBuildingCalculationCode}>
+                            data-testid="build"
+                            onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation
                     </button>
-
-                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode} />
+                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
                 </div>
                 <div className="govuk-form-group">
-                    <CalculationResultsLink calculationId={calculationId} />
+                    <CalculationResultsLink calculationId={calculationId}/>
                 </div>
                 {additionalCalculationBuildSuccess.buildSuccess &&
-                    <div className="govuk-panel govuk-panel--confirmation">
-                        <div className="govuk-panel__body">
-                            Build successful
+                <div className="govuk-panel govuk-panel--confirmation">
+                    <div className="govuk-panel__body">
+                        Build successful
                     </div>
-                    </div>}
+                </div>}
                 {isDirty && !additionalCalculationBuildSuccess.buildSuccess &&
-                    <div className={"govuk-form-group" +
-                        ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
-                        <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
-                    </div>}
+                <div className={"govuk-form-group" +
+                ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
+                </div>}
                 {isDirty &&
-                    <div className="govuk-form-group">
-                        <div className="govuk-body">Your calculation must be saved before you can approve it</div>
-                    </div>}
+                <div className="govuk-form-group">
+                    <div className="govuk-body">Your calculation must be saved before you can approve it</div>
+                </div>}
                 <div
                     hidden={(!additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) || (additionalCalculationBuildSuccess.compileRun && additionalCalculationBuildSuccess.buildSuccess)}
                     className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
                     </label>
-                    <CompliationErrorMessageList compilerMessages={additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages} errorMessage={errorMessage} />
+                    <CompliationErrorMessageList compilerMessages={additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages} errorMessage={errorMessage}/>
                 </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={submitAdditionalCalculation}
-                    disabled={!isDirty || isSaving || !additionalCalculationBuildSuccess.buildSuccess}>
+                        onClick={submitAdditionalCalculation}
+                        disabled={!isDirty || isSaving || !additionalCalculationBuildSuccess.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={approveTemplateCalculation}
-                    disabled={isDirty || additionalCalculationStatus === PublishStatus.Approved}>
+                        onClick={approveTemplateCalculation}
+                        disabled={isDirty || additionalCalculationStatus === PublishStatus.Approved}>
                     Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
-                    data-module="govuk-button">
+                      data-module="govuk-button">
                     Cancel
                 </Link>
+                <div className={"govuk-form-group"}>
+                    <span id="last-saved-date" className={"govuk-body"}>
+                    Last saved <DateFormatter date={originalAdditionalCalculation.lastUpdated} utc={false} />
+                    </span>
+                </div>
+                <div className={"govuk-form-group"}>
+                    <Link className={"govuk-link"} to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
+                </div>
             </fieldset>
         </div>
-        <Footer />
+        <Footer/>
     </div>
 }

@@ -3,7 +3,7 @@ import {EditAdditionalCalculationRouteProps} from "../../../pages/Calculations/E
 import {createMemoryHistory, createLocation} from 'history';
 import {match} from 'react-router';
 import {MemoryRouter} from 'react-router-dom';
-import {render, waitFor, fireEvent} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import {CircularReferenceError} from "../../../types/Calculations/CircularReferenceError";
 import '@testing-library/jest-dom/extend-expect';
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
@@ -25,92 +25,77 @@ const location = createLocation(matchMock.url);
 
 jest.mock("../../../components/GdsMonacoEditor", () => <></>);
 
+function renderEditAdditionalCalculation(){
+    const {EditAdditionalCalculation} = require("../../../pages/Calculations/EditAdditionalCalculation");
+    return render(
+        <MemoryRouter>
+            <EditAdditionalCalculation
+                excludeMonacoEditor={true}
+                history={history}
+                location={location}
+                match={matchMock} />
+        </MemoryRouter>);
+}
 describe("<EditAdditionalCalculation>", () => {
     beforeEach(() => {
-        function mockCalculationFunctions(mockCircularReferenceErrors: CircularReferenceError[], mockCalculation: any) {
-            const originalService = jest.requireActual('../../../services/calculationService');
-            return {
-                ...originalService,
-                getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
-                    data: mockCircularReferenceErrors
-                })),
-                getCalculationByIdService: jest.fn(() => Promise.resolve({
-                    data: mockCalculation
-                }))
-            }
+    function mockCalculationFunctions(mockCircularReferenceErrors: CircularReferenceError[], mockCalculation: any) {
+        const originalService = jest.requireActual('../../../services/calculationService');
+        return {
+            ...originalService,
+            getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
+                data: mockCircularReferenceErrors
+            })),
+            getCalculationByIdService: jest.fn(() => Promise.resolve({
+                data: mockCalculation
+            }))
         }
-        function mockSpecificationFunctions(mockSpecificationSummary: SpecificationSummary) {
-            const originalService = jest.requireActual('../../../services/specificationService');
-            return {
-                ...originalService,
-                getSpecificationSummaryService: jest.fn((specificationId) => Promise.resolve({
-                    data: mockSpecificationSummary
-                }))
-            }
+    }
+    function mockSpecificationFunctions(mockSpecificationSummary: SpecificationSummary) {
+        const originalService = jest.requireActual('../../../services/specificationService');
+        return {
+            ...originalService,
+            getSpecificationSummaryService: jest.fn((specificationId) => Promise.resolve({
+                data: mockSpecificationSummary
+            }))
         }
-        jest.mock('../../../services/calculationService', () => mockCalculationFunctions(mockCircularReferenceErrors, mockCalculation));
-        jest.mock('../../../services/specificationService', () => mockSpecificationFunctions(mockSpecificationSummary));
-    });
+    }
+    jest.mock('../../../services/calculationService', () => mockCalculationFunctions(mockCircularReferenceErrors, mockCalculation));
+    jest.mock('../../../services/specificationService', () => mockSpecificationFunctions(mockSpecificationSummary));
+});
 
     it("renders CircularReferenceErrors when there are circular reference errors", async () => {
-        const {EditAdditionalCalculation} = require("../../../pages/Calculations/EditAdditionalCalculation");
-        const {getByText} = render(
-            <MemoryRouter>
-                <EditAdditionalCalculation
-                    excludeMonacoEditor={true}
-                    history={history}
-                    location={location}
-                    match={matchMock} />
-            </MemoryRouter>);
+
+        const {getByText} = renderEditAdditionalCalculation();
 
         await waitFor(() => {
             expect(getByText("Calculations are not able to run due to the following problem")).toBeInTheDocument();
         });
     });
-});
-
-describe("<EditAdditionalCalculation>", () => {
-    beforeEach(() => {
-        function mockCalculationFunctions(mockCircularReferenceErrors: CircularReferenceError[], mockCalculation: any) {
-            const originalService = jest.requireActual('../../../services/calculationService');
-            return {
-                ...originalService,
-                getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
-                    data: mockCircularReferenceErrors
-                })),
-                getCalculationByIdService: jest.fn(() => Promise.resolve({
-                    data: mockCalculation
-                }))
-            }
-        }
-        function mockSpecificationFunctions(mockSpecificationSummary: SpecificationSummary) {
-            const originalService = jest.requireActual('../../../services/specificationService');
-            return {
-                ...originalService,
-                getSpecificationSummaryService: jest.fn((specificationId) => Promise.resolve({
-                    data: mockSpecificationSummary
-                }))
-            }
-        }
-        jest.mock('../../../services/calculationService', () => mockCalculationFunctions([], mockCalculation));
-        jest.mock('../../../services/specificationService', () => mockSpecificationFunctions(mockSpecificationSummary));
-    });
 
     it("does not render CircularReferenceErrors when there are no circular reference errors", async () => {
-        const {EditAdditionalCalculation} = require("../../../pages/Calculations/EditAdditionalCalculation");
-        const {queryByTestId} = render(
-            <MemoryRouter>
-                <EditAdditionalCalculation
-                    excludeMonacoEditor={true}
-                    history={history}
-                    location={location}
-                    match={matchMock} />
-            </MemoryRouter>);
+
+        const {queryByTestId} = renderEditAdditionalCalculation();
 
         await waitFor(() => {
             expect(queryByTestId("Calculations are not able to run due to the following problem")).toBeNull();
         });
     });
+
+    it("has a non-editable name field populated from the calculation service", async () =>{
+        const {container} = renderEditAdditionalCalculation();
+
+        await waitFor(() => {
+            expect(container.querySelector("h2#calculation-name-title")).toHaveTextContent("Test Calculation Name");
+        });
+    })
+
+    it("has a last update date populated from the calculation service", async () =>{
+        const {container} = renderEditAdditionalCalculation();
+
+        await waitFor(() => {
+            expect(container.querySelector("span#last-saved-date")).toHaveTextContent("Last saved 1 February 2020 0:00 am");
+        });
+    })
 });
 
 const mockCalculation = {
@@ -118,7 +103,7 @@ const mockCalculation = {
     sourceCode: "",
     specificationId: "36e5c7db-45a1-400a-b436-700f8d512650",
     valueType: CalculationTypes.Number,
-    name: "",
+    name: "Test Calculation Name",
     publishStatus: PublishStatus.Draft,
     lastUpdated: new Date(2020, 1, 1)
 }
