@@ -123,10 +123,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     const coreProviderSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
                     const providerData = coreProviderSnapshots.map(coreProviderItem => ({
                         name: coreProviderItem.name,
-                        value: coreProviderItem.providerSnapshotId
+                        value: coreProviderItem.providerSnapshotId?.toString()
                     }));
-                    const selectedProviderSnapshot = providerData.find(p => p.value === specificationSummary.providerSnapshotId);
-                    selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value.toString());
+                    setCoreProviderData(providerData);
+                    const selectedProviderSnapshot = providerData.find(p => p.value === specificationSummary.providerSnapshotId?.toString());
+                    selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value);
                 } else {
                     throw new Error("Unable to resolve provider source to either 'CFS' or 'FDZ'.");
                 }
