@@ -105,6 +105,21 @@ namespace CalculateFunding.Frontend.Controllers
             return await ChooseRefresh(specificationId, SpecificationActionTypes.CanRefreshFunding);
         }
 
+        [Route("api/publish/refreshfunding-prereqerrors/{specificationId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetRefreshFundingPreReqErrors(string specificationId)
+        {
+            ApiResponse<IEnumerable<string>> result =
+                await _publishingApiClient.GetRefreshFundingPrereqErrorsForSpecification(specificationId);
+
+            if(result?.Content != null)
+            {
+                return new OkObjectResult(result);
+            }
+
+            return new NotFoundObjectResult(Content("Error. Not Found."));
+        }
+
         [Route("api/publish/approvefunding/{specificationId}")]
         [HttpGet]
         public async Task<IActionResult> ApproveFunding(string specificationId)

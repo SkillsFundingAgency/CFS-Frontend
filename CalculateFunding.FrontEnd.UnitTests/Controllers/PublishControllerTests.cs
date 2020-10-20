@@ -118,6 +118,58 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task GetRefreshFundingPreReqErrors_Returns_NotFoundForBadRequestApiResponses()
+        {
+            ApiResponse<IEnumerable<string>> apiResponse 
+                = new ApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest, null);
+
+            _publishingApiClient
+                .GetRefreshFundingPrereqErrorsForSpecification(Arg.Is(ValidSpecificationId))
+                .Returns(apiResponse);
+
+            IActionResult result = await _publishController.GetRefreshFundingPreReqErrors(ValidSpecificationId);
+
+            result
+                .Should()
+                .BeOfType<NotFoundObjectResult>();
+        }
+
+        [TestMethod]
+        public async Task GetRefreshFundingPreReqErrors_Returns_OkForOkApiResponses()
+        {
+            string errorMessage = "Error";
+            IEnumerable<string> errors = new[] { errorMessage };
+
+            ApiResponse<IEnumerable<string>> apiResponse
+                = new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, errors);
+
+            _publishingApiClient
+                .GetRefreshFundingPrereqErrorsForSpecification(Arg.Is(ValidSpecificationId))
+                .Returns(apiResponse);
+
+            IActionResult result = await _publishController.GetRefreshFundingPreReqErrors(ValidSpecificationId);
+
+            result.Should().BeOfType<OkObjectResult>();
+
+            OkObjectResult okObjectResult = result as OkObjectResult;
+            okObjectResult.Should().NotBeNull();
+            okObjectResult.Value.Should().NotBeNull();
+            okObjectResult.Value.Should().BeOfType<ApiResponse<IEnumerable<string>>>();
+
+            ApiResponse<IEnumerable<string>> actualApiResponse = okObjectResult.Value as ApiResponse<IEnumerable<string>>;
+            actualApiResponse.Should().NotBeNull();
+            actualApiResponse.Content.Should().NotBeNull();
+            actualApiResponse.Content.Should().BeOfType<string[]>();
+
+            IEnumerable<string> actualErrorSummaries = actualApiResponse.Content;
+
+            actualErrorSummaries.Count().Should().Be(1);
+
+            string actualErrorSummary = actualErrorSummaries.FirstOrDefault();
+            actualErrorSummary.Should().Be(errorMessage);
+        }
+
+        [TestMethod]
         public async Task ApproveFunding_Returns_Forbid_Result_Given_User_Does_Not_Have_Approve_Permission()
         {
             IActionResult result = await _publishController.ApproveFunding(ValidSpecificationId);
