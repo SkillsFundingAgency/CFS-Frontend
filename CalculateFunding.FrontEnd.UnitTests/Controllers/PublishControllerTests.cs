@@ -118,55 +118,71 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task GetRefreshFundingPreReqErrors_Returns_NotFoundForBadRequestApiResponses()
+        public async Task ValidateSpecificationForRefresh_ReturnsOk_ForNoContentApiResponses()
         {
-            ApiResponse<IEnumerable<string>> apiResponse 
-                = new ApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest, null);
+            ValidatedApiResponse<IEnumerable<string>> apiResponse
+                = new ValidatedApiResponse<IEnumerable<string>>(HttpStatusCode.NoContent, null);
 
             _publishingApiClient
-                .GetRefreshFundingPrereqErrorsForSpecification(Arg.Is(ValidSpecificationId))
+                .ValidateSpecificationForRefresh(Arg.Is(ValidSpecificationId))
                 .Returns(apiResponse);
 
-            IActionResult result = await _publishController.GetRefreshFundingPreReqErrors(ValidSpecificationId);
+            IActionResult result = await _publishController.ValidateSpecificationForRefresh(ValidSpecificationId);
 
             result
                 .Should()
-                .BeOfType<NotFoundObjectResult>();
+                .BeOfType<OkResult>();
         }
 
         [TestMethod]
-        public async Task GetRefreshFundingPreReqErrors_Returns_OkForOkApiResponses()
+        public async Task ValidateSpecificationForRefresh_ReturnsInternalServerResult_ForNonSuccessApiResponses()
+        {
+            ValidatedApiResponse<IEnumerable<string>> apiResponse
+                = new ValidatedApiResponse<IEnumerable<string>>(HttpStatusCode.InternalServerError, null);
+
+            _publishingApiClient
+                .ValidateSpecificationForRefresh(Arg.Is(ValidSpecificationId))
+                .Returns(apiResponse);
+
+            IActionResult result = await _publishController.ValidateSpecificationForRefresh(ValidSpecificationId);
+
+            result
+                .Should()
+                .BeOfType<InternalServerErrorResult>();
+        }
+
+        [TestMethod]
+        public async Task ValidateSpecificationForRefresh_ReturnsBadRequest_ForBadRequestApiResponses()
         {
             string errorMessage = "Error";
             IEnumerable<string> errors = new[] { errorMessage };
 
-            ApiResponse<IEnumerable<string>> apiResponse
-                = new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, errors);
+            ValidatedApiResponse<IEnumerable<string>> apiResponse
+                = new ValidatedApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest)
+                { 
+                    ModelState = new Dictionary<string, IEnumerable<string>> {
+                        { "", errors }
+                    }
+                };
 
             _publishingApiClient
-                .GetRefreshFundingPrereqErrorsForSpecification(Arg.Is(ValidSpecificationId))
+                .ValidateSpecificationForRefresh(Arg.Is(ValidSpecificationId))
                 .Returns(apiResponse);
 
-            IActionResult result = await _publishController.GetRefreshFundingPreReqErrors(ValidSpecificationId);
+            IActionResult result = await _publishController.ValidateSpecificationForRefresh(ValidSpecificationId);
 
-            result.Should().BeOfType<OkObjectResult>();
+            result.Should().BeOfType<BadRequestObjectResult>();
 
-            OkObjectResult okObjectResult = result as OkObjectResult;
+            BadRequestObjectResult okObjectResult = result as BadRequestObjectResult;
             okObjectResult.Should().NotBeNull();
             okObjectResult.Value.Should().NotBeNull();
-            okObjectResult.Value.Should().BeOfType<ApiResponse<IEnumerable<string>>>();
+            okObjectResult.Value.Should().BeOfType<Dictionary<string, IEnumerable<string>>>();
 
-            ApiResponse<IEnumerable<string>> actualApiResponse = okObjectResult.Value as ApiResponse<IEnumerable<string>>;
-            actualApiResponse.Should().NotBeNull();
-            actualApiResponse.Content.Should().NotBeNull();
-            actualApiResponse.Content.Should().BeOfType<string[]>();
-
-            IEnumerable<string> actualErrorSummaries = actualApiResponse.Content;
-
-            actualErrorSummaries.Count().Should().Be(1);
-
-            string actualErrorSummary = actualErrorSummaries.FirstOrDefault();
-            actualErrorSummary.Should().Be(errorMessage);
+            Dictionary<string, IEnumerable<string>> content = okObjectResult.Value as Dictionary<string, IEnumerable<string>>;
+            content.Should().NotBeNull();
+            content.FirstOrDefault().Should().NotBeNull();
+            content.FirstOrDefault().Value.Count().Should().Be(1);
+            content.FirstOrDefault().Value.FirstOrDefault().Should().Be(errorMessage);
         }
 
         [TestMethod]

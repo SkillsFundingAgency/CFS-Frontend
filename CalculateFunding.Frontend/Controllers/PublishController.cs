@@ -105,19 +105,26 @@ namespace CalculateFunding.Frontend.Controllers
             return await ChooseRefresh(specificationId, SpecificationActionTypes.CanRefreshFunding);
         }
 
-        [Route("api/publish/refreshfunding-prereqerrors/{specificationId}")]
+        [Route("api/publish/validate-specification-for-refresh/{specificationId}")]
         [HttpGet]
-        public async Task<IActionResult> GetRefreshFundingPreReqErrors(string specificationId)
+        public async Task<IActionResult> ValidateSpecificationForRefresh(string specificationId)
         {
-            ApiResponse<IEnumerable<string>> result =
-                await _publishingApiClient.GetRefreshFundingPrereqErrorsForSpecification(specificationId);
+            ValidatedApiResponse<IEnumerable<string>> response =
+                await _publishingApiClient.ValidateSpecificationForRefresh(specificationId);
 
-            if(result?.Content != null)
+            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
             {
-                return new OkObjectResult(result);
+                return badRequest;
             }
 
-            return new NotFoundObjectResult(Content("Error. Not Found."));
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult(nameof(ValidateSpecificationForRefresh), treatNoContentAsSuccess: true);
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok();
         }
 
         [Route("api/publish/approvefunding/{specificationId}")]
