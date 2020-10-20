@@ -109,8 +109,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }
     
     const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds;
-
-
+    
     return (
         <div>
             <Header location={Section.Approvals}/>

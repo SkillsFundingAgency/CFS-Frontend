@@ -2,22 +2,28 @@ import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {SpecificationFundingApproval, SpecificationFundingApprovalRoute} from "../../../pages/FundingApprovals/SpecificationFundingApproval";
 import {createLocation, createMemoryHistory} from "history";
-import {render, screen, waitFor} from "@testing-library/react";
+import {render, screen, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
-import {JobSummary} from "../../../types/jobSummary";
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {QueryCache, ReactQueryCacheProvider} from "react-query";
+import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import * as specHook from "../../../hooks/useSpecificationSummary";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-
+import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
+import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
+import * as providerSearchHook from "../../../hooks/FundingApproval/usePublishedProviderSearch";
+import * as providerIdsSearchHook from "../../../hooks/FundingApproval/usePublishedProviderIds";
+import * as providerErrorsHook from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
+import * as specHook from "../../../hooks/useSpecificationSummary";
+import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
+import {PublishedProviderResult} from "../../../types/PublishedProvider/PublishedProviderSearchResults";
+import {ApprovalMode} from "../../../types/ApprovalMode";
+import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
+import {ProviderSource} from "../../../types/CoreProviderSummary";
+import {createPublishedProviderErrorSearchQueryResult, createPublishedProviderIdsQueryResult, createPublishedProviderSearchQueryResult, createPublishedProviderResult, defaultFacets} from "../../fakes/testFactories";
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
 const matchMock: match<SpecificationFundingApprovalRoute> = {
@@ -30,21 +36,31 @@ const matchMock: match<SpecificationFundingApprovalRoute> = {
     path: "",
     isExact: true,
 };
-export const testSpec: SpecificationSummary = {
+const fundingStream: FundingStream = {
+    name: "FS123",
+    id: "Wizard Training Scheme"
+};
+const fundingPeriod: FundingPeriod = {
+    id: "FP123",
+    name: "2019-20"
+};
+const testSpec: SpecificationSummary = {
     name: "Wizard Training",
     approvalStatus: "",
     description: "",
-    fundingPeriod: {
-        id: "FP123",
-        name: "2019-20"
-    },
-    fundingStreams: [{
-        name: "FS123",
-        id: "Wizard Training Scheme"
-    }],
+    fundingPeriod: fundingPeriod,
+    fundingStreams: [fundingStream],
     id: "ABC123",
     isSelectedForFunding: true,
     providerVersionId: ""
+};
+const specResult: SpecificationSummaryQueryResult = {
+    specification: testSpec,
+    isLoadingSpecification: false,
+    errorCheckingForSpecification: "",
+    haveErrorCheckingForSpecification: false,
+    isFetchingSpecification: false,
+    isSpecificationFetched: true
 };
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
@@ -59,26 +75,64 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isMonitoring: true,
     jobInProgressMessage: "",
 };
-
-function mockGetSpecification(spec: SpecificationSummary) {
-    const specService = jest.requireActual('../../../services/specificationService');
-    return {
-        ...specService,
-        getSpecificationSummaryService: jest.fn(() => Promise.resolve({
-            data: spec
-        }))
-    }
-}
-
-function mockGetJobs(jobResults: JobSummary[]) {
-    const jobService = jest.requireActual('../../../services/jobService');
-    return {
-        ...jobService,
-        getJobStatusUpdatesForSpecification: jest.fn(() => Promise.resolve({
-            data: jobResults
-        }))
-    }
-}
+const fundingConfigResult: FundingConfigurationQueryResult = {
+    fundingConfiguration: {
+        approvalMode: ApprovalMode.All,
+        providerSource: ProviderSource.CFS,
+        defaultTemplateVersion: "1.1",
+        fundingPeriodId: fundingPeriod.id,
+        fundingStreamId: fundingStream.id
+    },
+    isLoadingFundingConfiguration: false,
+    isErrorLoadingFundingConfiguration: false,
+    errorLoadingFundingConfiguration: "",
+};
+const provider1: PublishedProviderResult = {
+    errors: [],
+    fundingPeriodId: "period 1",
+    fundingStatus: "Updated",
+    fundingStreamId: "Stream 1",
+    fundingValue: 3456.43,
+    hasErrors: false,
+    localAuthority: "East London LA",
+    providerName: "East London School",
+    providerSubType: "What sup?",
+    providerType: "whatever",
+    publishedProviderVersionId: "aa123",
+    specificationId: "abc123",
+    ukprn: "23932035",
+    upin: "43634",
+    urn: "851305"
+};
+const providerWithError1: PublishedProviderResult = {
+    errors: ["Error: Something went wrong"],
+    fundingPeriodId: "period 1",
+    fundingStatus: "Updated",
+    fundingStreamId: "Stream 1",
+    fundingValue: 10000,
+    hasErrors: true,
+    localAuthority: "West London",
+    providerName: "West London School",
+    providerSubType: "What sup?",
+    providerType: "whatever",
+    publishedProviderVersionId: "bb123",
+    specificationId: "abc123",
+    ukprn: "9641960",
+    upin: "785220",
+    urn: "82096"
+};
+const fullPermissions = {
+    canRefreshFunding: true,
+    canApproveFunding: true,
+    canReleaseFunding: true,
+    isPermissionsFetched: true,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    missingPermissions: [],
+    canEditSpecification: false,
+    canCreateSpecification: false,
+    canMapDatasets: false
+};
 
 const store: Store<IStoreState> = createStore(rootReducer);
 
@@ -94,56 +148,116 @@ const renderPage = () => {
     </MemoryRouter>);
 };
 
-describe("<SpecificationFundingApproval /> when page initially renders before loading specification", () => {
-    beforeEach(() => {
-        renderPage();
-    });
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));
+const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
+const hasFundingConfiguration = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (fundingConfigResult));
+const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullPermissions));
+const hasProvidersWithErrors = (providers: PublishedProviderResult[]) => jest.spyOn(providerErrorsHook, 'usePublishedProviderErrorSearch').mockImplementation(() => (
+    createPublishedProviderErrorSearchQueryResult(createPublishedProviderResult(providers))));
+const hasProviderIds = (ids: string[]) => jest.spyOn(providerIdsSearchHook, 'usePublishedProviderIds').mockImplementation(() => (
+    createPublishedProviderIdsQueryResult(ids)));
+const hasSearchResults = (providers: PublishedProviderResult[]) => jest.spyOn(providerSearchHook, 'usePublishedProviderSearch')
+    .mockImplementation(() => (
+        createPublishedProviderSearchQueryResult(
+            createPublishedProviderResult(providers, true, true, defaultFacets))));
 
+
+
+describe("<SpecificationFundingApproval /> when page initially renders before loading specification", () => {
     it('renders Specification loading', async () => {
+        renderPage();
         expect(await screen.getByText("Loading specification...")).toBeInTheDocument();
     });
 });
 
 describe("<SpecificationFundingApproval /> when loading specification", () => {
     beforeEach(() => {
-        jest.spyOn(specHook, 'useSpecificationSummary')
-            .mockImplementation(() => ({
-                specification: testSpec,
-                isLoadingSpecification: false,
-                errorCheckingForSpecification: "",
-                haveErrorCheckingForSpecification: false,
-                isFetchingSpecification: false,
-                isSpecificationFetched: true
-            }));
-        jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
+        hasSpecification();
+        hasNoActiveJobsRunning();
         renderPage();
     });
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
 
-    it('renders Specification name', async () => {
-        expect(await screen.findByText(testSpec.name)).toBeInTheDocument();
+    it('renders Specification details', async () => {
+        expect(screen.getByTestId("specName")).toBeInTheDocument();
+        expect(screen.getByTestId("specName")).toHaveTextContent(testSpec.name);
+        expect(screen.getByTestId("fundingPeriodName")).toBeInTheDocument();
+        expect(screen.getByTestId("fundingPeriodName")).toHaveTextContent(testSpec.fundingPeriod.name);
+        expect(screen.getByTestId("fundingStreamName")).toBeInTheDocument();
+        expect(screen.getByTestId("fundingStreamName")).toHaveTextContent(testSpec.fundingStreams[0].name);
     });
 });
 
-describe("<SpecificationFundingApproval /> when specification loads and no active jobs", () => {
+describe("<SpecificationFundingApproval /> when results with facets", () => {
     beforeEach(() => {
-        mockGetSpecification(testSpec);
-        mockGetJobs([]);
-        jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
-        jest.spyOn(specHook, 'useSpecificationSummary')
-            .mockImplementation(() => ({
-                specification: testSpec,
-                isLoadingSpecification: false,
-                errorCheckingForSpecification: "",
-                haveErrorCheckingForSpecification: false,
-                isFetchingSpecification: false,
-                isSpecificationFetched: true
-            }));
+        hasSearchResults([provider1]);
+        renderPage();
+    });
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('renders filters', async () => {
+        expect(screen.getByRole("radio", {name: "Provider name"})).toBeInTheDocument();
+        expect(screen.getByRole("radio", {name: "UKPRN"})).toBeInTheDocument();
+        expect(screen.getByRole("radio", {name: "UPIN"})).toBeInTheDocument();
+        expect(screen.getByRole("radio", {name: "URN"})).toBeInTheDocument();
+        expect(screen.getByRole("checkbox", {name: "With errors"})).toBeInTheDocument();
+        expect(screen.getByRole("checkbox", {name: "Without errors"})).toBeInTheDocument();
+        expect(screen.getByRole("checkbox", {name: "East London"})).toBeInTheDocument();
+    });
+});
+
+describe("<SpecificationFundingApproval /> when results with no errors", () => {
+    beforeEach(() => {
+        hasSpecification();
+        hasNoActiveJobsRunning();
+        hasFundingConfiguration();
+        hasFullPermissions();
+        hasProvidersWithErrors([]);
+        hasProviderIds([provider1.publishedProviderVersionId]);
+        hasSearchResults([provider1]);
+        
+        renderPage();
+    });
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('renders provider results section', async () => {
+        expect(screen.getByTestId("published-provider-results")).toBeInTheDocument();
+    });
+
+    it('renders refresh button', async () => {
+        expect(screen.getByRole("button", {name: /Refresh funding/})).toBeInTheDocument();
+    });
+
+    it('renders approve button', async () => {
+        expect(screen.getByRole("button", {name: /Approve funding/})).toBeInTheDocument();
+    });
+
+    it('renders release button', async () => {
+        expect(screen.getByRole("button", {name: /Release funding/})).toBeInTheDocument();
+    });
+
+    it('renders provider name', async () => {
+        expect(await screen.findByText(provider1.providerName)).toBeInTheDocument();
+    });
+
+    it('renders provider status', async () => {
+        expect(await screen.findByText(provider1.fundingStatus)).toBeInTheDocument();
+    });
+});
+
+
+describe("<SpecificationFundingApproval /> when results with errors", () => {
+    beforeEach(() => {
+        hasSpecification();
+        hasNoActiveJobsRunning();
+        hasFundingConfiguration();
+        hasFullPermissions();
+        hasProvidersWithErrors([providerWithError1]);
+        hasProviderIds([providerWithError1.publishedProviderVersionId]);
+        hasSearchResults([providerWithError1]);
 
         renderPage();
     });
@@ -151,11 +265,12 @@ describe("<SpecificationFundingApproval /> when specification loads and no activ
         jest.clearAllMocks();
     });
 
-    it('renders Specification name', async () => {
-        expect(await screen.findByText(testSpec.name)).toBeInTheDocument();
+    it('renders error summary heading', async () => {
+        expect(await screen.findByText("There is a problem")).toBeInTheDocument();
     });
-    
-    it('renders no jobs alert after loading no jobs', async () => {
-        expect(await screen.queryByText("Job running:")).not.toBeInTheDocument();
+
+    it('renders error messages', async () => {
+        const alerts = await screen.findAllByRole("alert");
+        alerts.some(alert => within(alert).getByText(providerWithError1.errors[0]));
     });
 });

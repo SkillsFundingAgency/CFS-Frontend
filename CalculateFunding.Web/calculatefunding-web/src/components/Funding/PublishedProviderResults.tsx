@@ -74,14 +74,13 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
         }
     }
 
-
     if (isLoadingRefresh) {
         return <LoadingStatus title={"Refreshing..."} description={"Please wait"}/>
     } else {
         return <>
             <NoData hidden={havePageResults}/>
             {havePageResults && props.providerSearchResults &&
-            <table className="govuk-table">
+            <table className="govuk-table" data-testid={"published-provider-results"}>
                 <thead>
                 <tr>
                     <th className="govuk-table__header govuk-body">Provider name
