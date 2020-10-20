@@ -17,6 +17,7 @@ export function CompliationErrorMessageList(props:{compilerMessages:CompilerMess
                     <th className="govuk-table__header">End char</th>
                 </tr>
                 </thead>
+                <tbody>
                 {props.compilerMessages.map((cm, index) =>
                     <tr key={index} className={"govuk-table__row"}>
                         <td className="govuk-table__cell">{cm.message}</td>
@@ -26,6 +27,7 @@ export function CompliationErrorMessageList(props:{compilerMessages:CompilerMess
                         <td className="govuk-table__cell">{cm.location?.endChar}</td>
                     </tr>
                 )}
+                </tbody>
             </table>
             <ul className="govuk-error-summary__list">
                 <li hidden={props.errorMessage.length === 0}>{props.errorMessage}</li>

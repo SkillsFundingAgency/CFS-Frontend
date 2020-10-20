@@ -5,36 +5,18 @@ import {useEffect, useRef, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
 import {Details} from "../../components/Details";
-import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
-import {ApproveStatusButton} from "../../components/ApproveStatusButton";
 import {
-    approveFundingLineStructureService,
     getSpecificationsSelectedForFundingByPeriodAndStreamService,
     getSpecificationSummaryService
 } from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
-import {
-    CollapsibleSteps,
-    setCollapsibleStepsAllStepsStatus
-} from "../../components/CollapsibleSteps";
-import {LoadingStatus} from "../../components/LoadingStatus";
-import {FundingLineStep} from "../../components/fundingLineStructure/FundingLineStep";
-import {AutoComplete} from "../../components/AutoComplete";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {BackToTop} from "../../components/BackToTop";
-import {
-    checkIfShouldOpenAllSteps,
-    expandCalculationsByName,
-    getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName, setInitialExpandedStatus,
-    updateFundingLineExpandStatus
-} from "../../components/fundingLineStructure/FundingLineStructure";
 import {
     refreshFundingService,
 } from "../../services/publishService";
 import {getCalculationsService} from "../../services/calculationService";
-import {getFundingLineStructureService} from "../../services/fundingStructuresService";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
@@ -47,6 +29,7 @@ import {ReleaseTimetable} from "./ReleaseTimetable";
 import {AdditionalCalculations} from "../../components/Calculations/AdditionalCalculations";
 import {Datasets} from "../../components/Specifications/Datasets";
 import {VariationManagement} from "../../components/Specifications/VariationManagement";
+import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -54,7 +37,6 @@ export interface ViewSpecificationRoute {
 
 export function ViewSpecification({match}: RouteComponentProps<ViewSpecificationRoute>) {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
-    const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
     const initialSpecification: SpecificationSummary = {
         name: "",
@@ -75,24 +57,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     let specificationId = match.params.specificationId;
 
-    const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
-    const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
-    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
-    const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
-    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const [errors, setErrors] = useState<string[]>([]);
-    const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
-    const fundingLineStepReactRef = useRef(null);
-    const nullReactRef = useRef(null);
-
-
-
-
-    const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
-    const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
-
     const [initialTab, setInitialTab] = useState<string>("");
 
     let history = useHistory();
@@ -111,37 +78,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }, [location]);
 
     useEffect(() => {
-        if (!fundingLineRenderInternalState) {
-            return
-        }
-        if (fundingLineStepReactRef !== null && fundingLineStepReactRef.current !== null) {
-            // @ts-ignore
-            fundingLineStepReactRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
-        }
-        setFundingLineRenderInternalState(false);
-    }, [fundingLineRenderInternalState]);
-
-    useEffect(() => {
-        if (!rerenderFundingLineSteps) {
-            return
-        }
-        setFundingLineRenderInternalState(true);
-        setRerenderFundingLineSteps(false);
-    }, [rerenderFundingLineSteps]);
-
-    useEffect(() => {
-        setFundingLineRenderInternalState(true);
-        if (fundingLines.length !== 0) {
-            if (fundingLinesOriginalData.length === 0) {
-                setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
-                setFundingLinesOriginalData(fundingLines);
-            }
-            setIsLoadingFundingLineStructure(false);
-        }
-
-    }, [fundingLines]);
-
-    useEffect(() => {
         setReleaseTimetableIsEnabled(featureFlagsState.releaseTimetableVisible);
     }, [featureFlagsState.releaseTimetableVisible]);
 
@@ -154,6 +90,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const fetchData = async () => {
         try {
             const spec: SpecificationSummary = (await getSpecificationSummaryService(specificationId)).data;
+
             setSpecification(spec);
 
             if (spec.isSelectedForFunding) {
@@ -168,59 +105,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     return hasAnySelectedForFunding;
                 });
             }
-
-            //setCanTimetableBeUpdated(true);
-
-            const fundingStructureItem = (await getFundingLineStructureService(spec.id, spec.fundingPeriod.id, spec.fundingStreams[0].id)).data;
-            setInitialExpandedStatus(fundingStructureItem, false);
-            setFundingLines(fundingStructureItem);
-            setFundingLinePublishStatus(spec.approvalStatus as PublishStatus);
-        } catch (err) {
-            setFundingLineStructureError(true);
-            setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
         } finally {
-            setIsLoadingFundingLineStructure(false);
             setIsLoadingSelectedForFunding(false);
         }
     };
-
-    const handleApproveFundingLineStructure = async (specificationId: string) => {
-        const response = await approveFundingLineStructureService(specificationId);
-        if (response.status === 200) {
-            setFundingLinePublishStatus(PublishStatus.Approved);
-        } else {
-            setErrors(errors => [...errors, `Error whilst approving funding line structure: ${response.statusText} ${response.data}`]);
-            setFundingLinePublishStatus(specification.approvalStatus as PublishStatus);
-        }
-    };
-
-    function openCloseAllFundingLines(isOpen: boolean) {
-        setFundingLinesExpandedStatus(isOpen);
-        updateFundingLineExpandStatus(fundingLines, isOpen);
-    }
-
-    function searchFundingLines(calculationName: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
-        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
-        setFundingLines(fundingLinesCopy);
-        setRerenderFundingLineSteps(true);
-        if (checkIfShouldOpenAllSteps(fundingLinesCopy)) {
-            openCloseAllFundingLines(true);
-        }
-    }
-
-    function collapsibleStepsChanged(expanded: boolean, name: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
-        setFundingLines(fundingLinesCopy);
-
-        const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
-        if (collapsibleStepsAllStepsStatus.openAllSteps) {
-            openCloseAllFundingLines(true);
-        }
-        if (collapsibleStepsAllStepsStatus.closeAllSteps) {
-            openCloseAllFundingLines(false);
-        }
-    }
 
     async function chooseForFunding() {
         setErrors([]);
@@ -279,7 +167,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     const resetErrors = () => {
-        setFundingLineStructureError(false);
         setErrors([]);
     };
 
@@ -365,79 +252,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                             <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
-                            <Tabs.Tab hidden={!specification.isSelectedForFunding} label="variation-management">Variation Management</Tabs.Tab>
+                            <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variation-management-tab"} label="variation-management">Variation Management</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
-                            <section className="govuk-tabs__panel" id="fundingline-structure">
-                                <LoadingStatus title={"Loading funding line structure"}
-                                               hidden={!isLoadingFundingLineStructure}
-                                               description={"Please wait whilst funding line structure is loading"}/>
-                                <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
-                                    </div>
-                                </div>
-                                <div className="govuk-grid-row" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <h2 className="govuk-heading-l">Funding line structure</h2>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third">
-                                        <ApproveStatusButton id={specification.id}
-                                                             status={fundingLinePublishStatus}
-                                                             callback={handleApproveFundingLineStructure}/>
-                                    </div>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <div className="govuk-form-group search-container">
-                                            <label className="govuk-label">
-                                                Search by calculation
-                                            </label>
-                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
-                                    <button type="button" className="govuk-accordion__open-all"
-                                            aria-expanded="false"
-                                            onClick={()=>openCloseAllFundingLines(true)}
-                                            hidden={fundingLinesExpandedStatus}>Open all<span
-                                        className="govuk-visually-hidden"> sections</span></button>
-                                    <button type="button" className="govuk-accordion__open-all"
-                                            aria-expanded="true"
-                                            onClick={()=>openCloseAllFundingLines(false)}
-                                            hidden={!fundingLinesExpandedStatus}>Close all<span
-                                        className="govuk-visually-hidden"> sections</span></button>
-                                </div>
-                                <ul className="collapsible-steps">
-                                    {
-                                        fundingLines.map((f, index) => {
-                                            let linkValue = '';
-                                            if (f.calculationId != null && f.calculationId !== '') {
-                                                linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
-                                            }
-                                            return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
-                                                <CollapsibleSteps
-                                                    customRef={f.customRef}
-                                                    key={"collapsible-steps" + index}
-                                                    uniqueKey={index.toString()}
-                                                    title={FundingStructureType[f.type]}
-                                                    description={f.name}
-                                                    status={(f.calculationPublishStatus && f.calculationPublishStatus !== '') ? f.calculationPublishStatus : ""}
-                                                    step={f.level.toString()}
-                                                    expanded={fundingLinesExpandedStatus || f.expanded}
-                                                    link={linkValue}
-                                                    hasChildren={f.fundingStructureItems != null}
-                                                    callback={collapsibleStepsChanged}>
-                                                    <FundingLineStep key={f.name.replace(" ", "") + index}
-                                                                     showResults={false}
-                                                                     expanded={fundingLinesExpandedStatus}
-                                                                     fundingStructureItem={f}
-                                                                     callback={collapsibleStepsChanged}/>
-                                                </CollapsibleSteps>
-                                            </li>
-                                        })}
-                                </ul>
-                                <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0}/>
-                            </section>
+                            <FundingLineResults specificationId={specification.id} fundingStreamId={specification.fundingStreams[0].id} fundingPeriodId={specification.fundingPeriod.id} approvalStatus={specification.approvalStatus as PublishStatus} />
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <AdditionalCalculations specificationId={specificationId}/>

@@ -40,6 +40,6 @@ describe('<CompliationErrorMessageList /> renders ', () => {
 
     it('a table of two rows for the compiler messages', () => {
         const wrapper = mount(<CompliationErrorMessageList compilerMessages={compilerMessages} errorMessage={errorMessage} />);
-        expect(wrapper.find('table>tr').length).toBe(2);
+        expect(wrapper.find('table>tbody>tr').length).toBe(2);
     });
 });

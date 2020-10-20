@@ -165,18 +165,7 @@ describe('<ViewSpecification /> page render checks ', () => {
         await waitFor(() => expect(container.querySelectorAll('.collapsible-steps')).toHaveLength(1))
     });
 
-    it('shows open-close all buttons correctly', async () => {
-        const {container} = renderViewSpecificationPage();
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0]).toBeVisible());
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[1]).not.toBeVisible());
 
-        act(() => {
-            fireEvent.click(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0])
-        });
-
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0]).not.toBeVisible());
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[1]).toBeVisible());
-    });
 
     it('shows search box with an autocomplete input in funding line structure tab', async () => {
         const {container} = renderViewSpecificationPage();

@@ -12,11 +12,11 @@ describe('<DateFormatter />', () => {
     });
 
     it(' has the correct date and time for a utc clock', () => {
-        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 0, 0)} utc={true} />);
+        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 1, 0)} utc={true} />);
 
         let actual = wrapper.find('span');
 
-        expect(actual.text()).toBe("1 January 2000 00:00");
+        expect(actual.text()).toBe("1 January 2000 01:00");
     });
 
     it(' has the correct date and time for a 12 hour clock', () => {
