@@ -18,13 +18,13 @@ describe("<ProfileHistory />", () => {
     it("renders loading status when loading", async () => {
         setUpMockApiResponse({data: fundingLineChangeViewModel, isLoading: true, isError: false});
         const {getByTestId} = renderPage();
-        expect(getByTestId("loading-status")).toBeInTheDocument();
+        expect(getByTestId("loader")).toBeInTheDocument();
     });
 
     it("does not render loading status when not loading", async () => {
         setUpMockApiResponse({data: fundingLineChangeViewModel, isLoading: false, isError: false});
         const {queryByTestId} = renderPage();
-        expect(queryByTestId("loading-status")).not.toBeInTheDocument();
+        expect(queryByTestId("loader")).not.toBeInTheDocument();
     });
 
     it("renders error message if error occurs during loading", async () => {

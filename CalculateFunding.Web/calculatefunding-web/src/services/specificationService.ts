@@ -6,8 +6,8 @@ import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecif
 import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 import {SpecificationSummary} from "../types/SpecificationSummary";
-import {FundingPeriod, FundingStream, Specification} from "../types/viewFundingTypes";
-import {FundingStreamWithSpecificationSelectedForFunding, SpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
+import {FundingPeriod, Specification} from "../types/viewFundingTypes";
+import {FundingStreamWithSpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
 
 let baseURL = "/api/specs";
 

@@ -4,8 +4,10 @@ import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {buildInitialPublishedProviderSearchRequest, PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
-import {SearchMode} from "../../types/SearchMode";
+import {
+    buildInitialPublishedProviderSearchRequest,
+    PublishedProviderSearchRequest
+} from "../../types/publishedProviderSearchRequest";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {ErrorMessage} from "../../types/ErrorMessage";
@@ -28,6 +30,7 @@ import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {buildInitialPublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
+import {formatDate} from "../../components/DateFormatter";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -40,7 +43,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
 
-    const {hasJob, hasActiveJob, isCheckingForJob, jobInProgressMessage} =
+    const {hasJob, hasActiveJob, hasFailedJob, latestJob, isCheckingForJob, jobDisplayInfo} =
         useLatestSpecificationJobWithMonitoring(
             specificationId,
             [JobType.RefreshFundingJob,
@@ -57,7 +60,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const {fundingConfiguration, isLoadingFundingConfiguration, errorLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId);
     const {publishedProviderIds, isLoadingPublishedProviderIds, errorLoadingPublishedProviderIds} =
-        usePublishedProviderIds(initialProviderIdsSearch, 
+        usePublishedProviderIds(initialProviderIdsSearch,
             !isCheckingForJob && !hasActiveJob && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches);
     const {publishedProvidersWithErrors, errorLoadingPublishedProviderErrors} =
         usePublishedProviderErrorSearch(initialProviderPagedSearch, !isCheckingForJob && !hasActiveJob);
@@ -67,6 +70,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const fundingSelectionState: IFundingSelectionState = useSelector<IStoreState, IFundingSelectionState>(state => state.fundingSelection);
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
+    const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
 
 
     function pageChange(pageNumber: string) {
@@ -82,7 +86,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }
 
     function addErrorMessage(errorMessage: string, fieldName?: string) {
-        if (!errorMessage || errorMessage.length === 0 || 
+        if (!errorMessage || errorMessage.length === 0 ||
             errors.some(err => err.message === errorMessage && err.fieldName === fieldName)) {
             return;
         }
@@ -107,9 +111,26 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             provider.errors.forEach(err => addErrorMessage(err, ref));
         })
     }
-    
-    const isLoading = errors.length === 0 && isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds;
-    
+    if (hasFailedJob && latestJob && jobDisplayInfo) {
+        addErrorMessage(`Job ${jobDisplayInfo.statusDescription}: ${jobDisplayInfo.jobDescription}. ` +
+            `Created by ${latestJob.invokerUserDisplayName} at ${formatDate(latestJob.created, false)}. ` +
+            `Last updated at ${formatDate(latestJob.lastUpdated, false)}`)
+    }
+
+    const isLoading = errors.length === 0 && (isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);
+    const loadingTitle =
+        isLoadingSpecification ? "Loading specification..." :
+            isLoadingRefresh ? "Updating..." :
+                isCheckingForJob ? "Checking for jobs..." :
+                    hasActiveJob && jobDisplayInfo ? `Job ${jobDisplayInfo.statusDescription}: ${jobDisplayInfo.jobDescription}` :
+                        isLoadingSearchResults ? "Loading provider funding data..." :
+                            ""
+    const loadingSubtitle =
+        isLoadingRefresh ? "Refreshing data" :
+            isCheckingForJob ? "Searching for any running jobs" :
+                hasActiveJob ? "Monitoring job progress. Please wait, this could take several minutes" : 
+                    "";
+
     return (
         <div>
             <Header location={Section.Approvals}/>
@@ -136,7 +157,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
                 {!isConfirmingApproval && !isConfirmingRelease &&
                 <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-one-third">
+                    <div className="govuk-grid-column-one-third" hidden={hasActiveJob || isCheckingForJob}>
                         <PublishedProviderSearchFilters publishedProviderResults={publishedProviderSearchResults}
                                                         searchCriteria={searchCriteria}
                                                         setSearchCriteria={setSearchCriteria}
@@ -146,20 +167,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     <div className="govuk-grid-column-two-thirds">
                         {isLoading &&
                         <div>
-                            {isLoadingSpecification ?
-                                <LoadingStatus title={"Loading specification..."}/>
-                                : (isCheckingForJob || hasActiveJob) ?
-                                    <LoadingStatus title={`Job running: ${hasJob ? jobInProgressMessage : "Checking for jobs..."} `}
-                                                   subTitle={isCheckingForJob ?
-                                                       "Searching for any running jobs" :
-                                                       "Monitoring job progress. Please wait, this could take several minutes"}
-                                                   testid='loadingJobs'/>
-                                    :
-                                    <LoadingStatus title={isLoadingSearchResults ? "Loading provider funding data..." : "Applying selection..."}/>
-                            }
+                            <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>
                         </div>
                         }
-                        {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults && !isLoadingFundingConfiguration && 
+                        {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults && !isLoadingFundingConfiguration &&
                         !isLoadingPublishedProviderIds && !isLoadingSpecification && specification &&
                         <PublishedProviderResults specificationId={specificationId}
                                                   enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
@@ -169,12 +180,13 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                                   canApproveFunding={canApproveFunding}
                                                   canReleaseFunding={canReleaseFunding}
                                                   selectedResults={fundingSelectionState.providerVersionIds.length}
-                                                  totalResults={publishedProviderIds ? publishedProviderIds.length : 0}
+                                                  totalResults={publishedProviderIds ? publishedProviderIds.length : publishedProviderSearchResults ? publishedProviderSearchResults.totalResults : 0}
                                                   pageChange={pageChange}
                                                   allPublishedProviderIds={publishedProviderIds}
                                                   setConfirmRelease={setConfirmRelease}
                                                   setConfirmApproval={setConfirmApproval}
                                                   addError={addErrorMessage}
+                                                  setIsLoadingRefresh={setIsLoadingRefresh}
                         />
                         }
                     </div>

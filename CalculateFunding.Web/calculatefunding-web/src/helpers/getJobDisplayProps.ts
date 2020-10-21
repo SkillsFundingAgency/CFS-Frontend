@@ -1,15 +1,74 @@
 ﻿import {JobSummary} from "../types/jobSummary";
 import {JobType} from "../types/jobType";
+import {RunningStatus} from "../types/RunningStatus";
+import {CompletionStatus} from "../types/CompletionStatus";
 
-export function getJobProgressMessage(job: JobSummary | undefined) {
 
-    if (!job) {
-        return "";
+export type JobDisplayProps = {
+    statusDescription: string,
+    jobDescription: string,
+    isSuccessful: boolean,
+    isFailed: boolean,
+    isActive: boolean,
+    isComplete: boolean
+}
+
+function getJobType(job: JobSummary): JobType | undefined {
+    return JobType[job.jobType as keyof typeof JobType];
+}
+
+export function getJobDisplayProps(job: JobSummary): JobDisplayProps {
+    let result: JobDisplayProps = {
+        jobDescription: getJobProgressMessage(job),
+        statusDescription: "",
+        isSuccessful: false,
+        isActive: false,
+        isComplete: false,
+        isFailed: false
+    };
+
+    switch (job.runningStatus) {
+        case RunningStatus.Queued:
+        case RunningStatus.QueuedWithService:
+            result.statusDescription = "in queue";
+            result.isActive = true;
+            break;
+        case RunningStatus.InProgress:
+            result.statusDescription = "in progress";
+            result.isActive = true;
+            break;
+        default:
+            result.isComplete = true;
+            switch (job.completionStatus) {
+                case CompletionStatus.Succeeded:
+                    result.statusDescription = "completed successfully";
+                    result.isSuccessful = true;
+                    break;
+                case CompletionStatus.Cancelled:
+                    result.statusDescription = "cancelled";
+                    result.isFailed = true;
+                    break;
+                case CompletionStatus.Failed:
+                    result.statusDescription = "failed";
+                    result.isFailed = true;
+                    break;
+                case CompletionStatus.TimedOut:
+                    result.statusDescription = "timed out";
+                    result.isFailed = true;
+                    break;
+                default:
+                    result.statusDescription = job.completionStatus ? job.completionStatus.toString() : "";
+                    result.isFailed = true;
+                    break;
+            }
+            break;
     }
+    
+    return result;
+}
 
-    const jobType: JobType | undefined = JobType[job.jobType as keyof typeof JobType];
-
-    switch (jobType) {
+function getJobProgressMessage(job: JobSummary) {
+    switch (getJobType(job)) {
         case JobType.MapDatasetJob:
             return "Mapping dataset";
         case JobType.AssignTemplateCalculationsJob:
@@ -85,6 +144,7 @@ export function getJobProgressMessage(job: JobSummary | undefined) {
         case JobType.PublishBatchProviderFundingJob:
             return "Releasing batch provider funding";
         case undefined:
+            return "";
         default:
             return job.jobType ? job.jobType : "";
     }

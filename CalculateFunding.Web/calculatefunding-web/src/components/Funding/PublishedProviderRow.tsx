@@ -1,6 +1,5 @@
 ﻿import React from "react";
 import {PublishedProviderResult} from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import {Link} from "react-router-dom";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {PublishedProviderNameColumn} from "./PublishedProviderNameColumn";
 

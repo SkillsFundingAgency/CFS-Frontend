@@ -1,10 +1,10 @@
-﻿﻿import {JobType} from "../../types/jobType";
+﻿import {JobType} from "../../types/jobType";
 import {useFetchLatestSpecificationJob} from "./useFetchLatestSpecificationJob";
 import {JobSummary} from "../../types/jobSummary";
 import {useMonitorForNewSpecificationJob} from "./useMonitorForNewSpecificationJob";
 import {RunningStatus} from "../../types/RunningStatus";
-import {getJobProgressMessage} from "../../helpers/getJobProgressMessage";
 import {CompletionStatus} from "../../types/CompletionStatus";
+import {getJobDisplayProps, JobDisplayProps} from "../../helpers/getJobDisplayProps";
 
 export type LatestSpecificationJobWithMonitoringResult = {
     latestJob: JobSummary | undefined,
@@ -17,7 +17,7 @@ export type LatestSpecificationJobWithMonitoringResult = {
     isFetching: boolean,
     isFetched: boolean,
     isCheckingForJob: boolean,
-    jobInProgressMessage: string
+    jobDisplayInfo: JobDisplayProps | undefined
 }
 
 export const useLatestSpecificationJobWithMonitoring =
@@ -41,6 +41,6 @@ export const useLatestSpecificationJobWithMonitoring =
             isFetching,
             isFetched,
             isCheckingForJob,
-            jobInProgressMessage: getJobProgressMessage(latestJob)
+            jobDisplayInfo: latestJob ? getJobDisplayProps(latestJob) : undefined
         };
     };

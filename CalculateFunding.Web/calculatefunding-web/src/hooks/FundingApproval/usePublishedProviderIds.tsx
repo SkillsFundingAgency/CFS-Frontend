@@ -1,8 +1,6 @@
 ﻿import {AxiosError} from "axios";
 import {QueryConfig, useQuery} from "react-query";
-import {buildInitialPublishedProviderSearchRequest, PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {getAllProviderVersionIdsForSearch} from "../../services/publishedProviderService";
-import {SearchMode} from "../../types/SearchMode";
 import {PublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
 
 export type PublishedProviderIdsQueryResult = {

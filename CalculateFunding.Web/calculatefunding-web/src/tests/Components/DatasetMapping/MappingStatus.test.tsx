@@ -19,7 +19,7 @@ describe('<MappingStatus />', () => {
 
     renderComponent(job);
 
-    expect(screen.getByText("Mapping dataset job queued"));
+    expect(screen.getByText("Job in queue: Mapping dataset"));
 
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-orange");
@@ -35,7 +35,7 @@ describe('<MappingStatus />', () => {
     
     renderComponent(job);
 
-    expect(screen.getByText("Mapping dataset job in progress"));
+    expect(screen.getByText("Job in progress: Mapping dataset"));
 
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-orange");
@@ -51,7 +51,7 @@ describe('<MappingStatus />', () => {
 
     renderComponent(job);
 
-    expect(screen.getByText("Mapping dataset job completed"));
+    expect(screen.getByText("Job completed successfully: Mapping dataset"));
 
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-green");
@@ -67,7 +67,7 @@ describe('<MappingStatus />', () => {
 
     renderComponent(job);
 
-    expect(screen.getByText("There is a problem with the Mapping dataset job"));
+    expect(screen.getByText("Job failed: Mapping dataset"));
 
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-red");

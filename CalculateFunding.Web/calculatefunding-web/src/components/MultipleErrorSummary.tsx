@@ -4,7 +4,7 @@ import {ErrorMessage} from "../types/ErrorMessage";
 export function MultipleErrorSummary(props: { errors: ErrorMessage[] }) {
     if (props.errors && props.errors.length > 0) {
         return (
-            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
+            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1} data-testid="error-summary">
                 <h2 className="govuk-error-summary__title" id="error-summary-title">
                     There is a problem
                 </h2>

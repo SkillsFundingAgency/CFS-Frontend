@@ -67,7 +67,7 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
             <Header location={Section.Approvals} />
             <div className="govuk-width-container">
                 {isLoading ?
-                    <LoadingStatus title="Loading profiling history" testid="loading-status" /> :
+                    <LoadingStatus title="Loading profiling history"/> :
                     <>
                         {isError || !data ? <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">

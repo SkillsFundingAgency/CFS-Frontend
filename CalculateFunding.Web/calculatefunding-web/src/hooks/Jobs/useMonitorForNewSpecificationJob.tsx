@@ -1,4 +1,4 @@
-﻿﻿import {JobType} from "../../types/jobType";
+﻿import {JobType} from "../../types/jobType";
 import {useState} from "react";
 import {JobSummary} from "../../types/jobSummary";
 import {HubConnectionBuilder} from "@microsoft/signalr";

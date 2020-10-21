@@ -1,6 +1,9 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
-import {SpecificationFundingApproval, SpecificationFundingApprovalRoute} from "../../../pages/FundingApprovals/SpecificationFundingApproval";
+import {
+    SpecificationFundingApproval,
+    SpecificationFundingApprovalRoute
+} from "../../../pages/FundingApprovals/SpecificationFundingApproval";
 import {createLocation, createMemoryHistory} from "history";
 import {render, screen, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
@@ -23,7 +26,17 @@ import {PublishedProviderResult} from "../../../types/PublishedProvider/Publishe
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
-import {createPublishedProviderErrorSearchQueryResult, createPublishedProviderIdsQueryResult, createPublishedProviderSearchQueryResult, createPublishedProviderResult, defaultFacets} from "../../fakes/testFactories";
+import {
+    createPublishedProviderErrorSearchQueryResult,
+    createPublishedProviderIdsQueryResult,
+    createPublishedProviderResult,
+    createPublishedProviderSearchQueryResult,
+    defaultFacets
+} from "../../fakes/testFactories";
+import {JobType} from "../../../types/jobType";
+import {RunningStatus} from "../../../types/RunningStatus";
+import {CompletionStatus} from "../../../types/CompletionStatus";
+
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
 const matchMock: match<SpecificationFundingApprovalRoute> = {
@@ -73,7 +86,60 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobInProgressMessage: "",
+    jobDisplayInfo: undefined
+};
+const activeJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    hasFailedJob: false,
+    hasActiveJob: true,
+    jobError: "",
+    latestJob: {
+        jobType: JobType.RefreshFundingJob,
+        runningStatus: RunningStatus.InProgress,
+        invokerUserDisplayName: "testUser",
+        created: new Date(),
+        lastUpdated: new Date()
+    },
+    hasJobError: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    jobDisplayInfo: {
+        statusDescription: "in progress",
+        jobDescription: "test",
+        isComplete: false,
+        isFailed: false,
+        isActive: true,
+        isSuccessful: false
+    },
+};
+const failedJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    hasFailedJob: true,
+    hasActiveJob: false,
+    jobError: "Failed",
+    latestJob: {
+        jobType: JobType.RefreshFundingJob,
+        runningStatus: RunningStatus.Completed,
+        completionStatus: CompletionStatus.Failed,
+        invokerUserDisplayName: "testUser",
+        created: new Date(),
+        lastUpdated: new Date()
+    },
+    hasJobError: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    jobDisplayInfo: {
+        statusDescription: "in progress",
+        jobDescription: "test",
+        isComplete: false,
+        isFailed: false,
+        isActive: true,
+        isSuccessful: false
+    }
 };
 const fundingConfigResult: FundingConfigurationQueryResult = {
     fundingConfiguration: {
@@ -150,6 +216,8 @@ const renderPage = () => {
 
 const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));
 const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
+const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));
+const hasFailedJob = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (failedJob));
 const hasFundingConfiguration = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (fundingConfigResult));
 const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullPermissions));
 const hasProvidersWithErrors = (providers: PublishedProviderResult[]) => jest.spyOn(providerErrorsHook, 'usePublishedProviderErrorSearch').mockImplementation(() => (
@@ -162,18 +230,93 @@ const hasSearchResults = (providers: PublishedProviderResult[]) => jest.spyOn(pr
             createPublishedProviderResult(providers, true, true, defaultFacets))));
 
 
-
 describe("<SpecificationFundingApproval /> when page initially renders before loading specification", () => {
     it('renders Specification loading', async () => {
+        hasNoActiveJobsRunning();
         renderPage();
         expect(await screen.getByText("Loading specification...")).toBeInTheDocument();
     });
 });
 
-describe("<SpecificationFundingApproval /> when loading specification", () => {
+describe("<SpecificationFundingApproval /> when job is active", () => {
     beforeEach(() => {
+        hasActiveJobRunning();
         hasSpecification();
+        hasFundingConfiguration();
+        hasFullPermissions();
+        hasProvidersWithErrors([]);
+        hasProviderIds([provider1.publishedProviderVersionId]);
+        hasSearchResults([provider1]);
+
+        renderPage();
+    });
+
+    it('renders Specification details', async () => {
+        expect(screen.getByTestId("specName")).toBeInTheDocument();
+    });
+
+    it('renders job progress spinner', async () => {
+        expect(screen.getByTestId("loader")).toBeInTheDocument();
+        expect(screen.getByText(`Job ${activeJob.jobDisplayInfo?.statusDescription}: ${activeJob.jobDisplayInfo?.jobDescription}`)).toBeInTheDocument();
+    });
+
+    it('does not render filters', async () => {
+        expect(screen.queryByRole("radio", {name: "Provider name"})).not.toBeInTheDocument();
+    });
+
+    it('does not render results', async () => {
+        expect(screen.queryByTestId("published-provider-results")).not.toBeInTheDocument();
+    });
+
+    it('does not render refresh button', async () => {
+        expect(screen.queryByRole("button", {name: /Refresh funding/})).not.toBeInTheDocument();
+    });
+});
+
+describe("<SpecificationFundingApproval /> when job has failed", () => {
+    beforeEach(() => {
+        hasFailedJob();
+        hasSpecification();
+        hasFundingConfiguration();
+        hasFullPermissions();
+        hasProvidersWithErrors([]);
+        hasProviderIds([provider1.publishedProviderVersionId]);
+        hasSearchResults([provider1]);
+
+        renderPage();
+    });
+
+    it('renders Specification details', async () => {
+        expect(screen.getByTestId("specName")).toBeInTheDocument();
+    });
+
+    it('does not render loading spinner', async () => {
+        expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
+    });
+
+    it('renders job error', async () => {
+        expect(screen.getByTestId("error-summary")).toBeInTheDocument();
+        expect(screen.getByText(component => component.startsWith(
+            `Job ${failedJob.jobDisplayInfo?.statusDescription}: ${failedJob.jobDisplayInfo?.jobDescription}`))).toBeInTheDocument();
+    });
+
+    it('renders filters', async () => {
+        expect(screen.getByRole("radio", {name: "Provider name"})).toBeInTheDocument();
+    });
+
+    it('renders results', async () => {
+        expect(screen.getByTestId("published-provider-results")).toBeInTheDocument();
+    });
+
+    it('renders refresh button', async () => {
+        expect(screen.getByRole("button", {name: /Refresh funding/})).toBeInTheDocument();
+    });
+});
+
+describe("<SpecificationFundingApproval /> when loading specification, no active jobs", () => {
+    beforeEach(() => {
         hasNoActiveJobsRunning();
+        hasSpecification();
         renderPage();
     });
 
@@ -189,6 +332,7 @@ describe("<SpecificationFundingApproval /> when loading specification", () => {
 
 describe("<SpecificationFundingApproval /> when results with facets", () => {
     beforeEach(() => {
+        hasNoActiveJobsRunning();
         hasSearchResults([provider1]);
         renderPage();
     });
@@ -216,7 +360,7 @@ describe("<SpecificationFundingApproval /> when results with no errors", () => {
         hasProvidersWithErrors([]);
         hasProviderIds([provider1.publishedProviderVersionId]);
         hasSearchResults([provider1]);
-        
+
         renderPage();
     });
     afterEach(() => {

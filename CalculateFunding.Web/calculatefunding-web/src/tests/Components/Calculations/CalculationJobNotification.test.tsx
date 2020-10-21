@@ -75,7 +75,6 @@ const renderComponent = (params: ICalculationJobNotificationProps) => {
         anyJobsRunning={params.anyJobsRunning}
         hasJobError={params.hasJobError}
         isCheckingForJob={params.isCheckingForJob}
-        jobProgressMessage={params.jobProgressMessage}
         jobError={params.jobError}/>);
 };
 
@@ -89,7 +88,6 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "",
                 jobError: ""
             };
             await renderComponent(props);
@@ -109,7 +107,6 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: true,
                 hasJobError: false,
-                jobProgressMessage: "",
                 jobError: ""
             };
             await renderComponent(props);
@@ -126,7 +123,6 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: true,
-                jobProgressMessage: "",
                 jobError: "Uh oh!"
             };
             await renderComponent(props);
@@ -144,13 +140,12 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: true,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
             
             renderComponent(props);
             
-            expect(await screen.getByText("Job in queue: Reindexing everything")).toBeInTheDocument();
+            expect(await screen.getByText("Job in queue: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
@@ -161,13 +156,12 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: true,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(await screen.getByText("Job in progress: Reindexing everything")).toBeInTheDocument();
+            expect(await screen.getByText("Job in progress: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
@@ -178,13 +172,12 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(await screen.getByText("Job timed out: Reindexing everything")).toBeInTheDocument();
+            expect(await screen.getByText("Job timed out: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
@@ -195,13 +188,12 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(screen.getByText("Job cancelled: Reindexing everything")).toBeInTheDocument();
+            expect(screen.getByText("Job cancelled: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by')));
         });
     });
@@ -212,13 +204,12 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(await screen.getByText("Job failed: Reindexing everything")).toBeInTheDocument();
+            expect(await screen.getByText("Job failed: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by'))).toBeInTheDocument();
         });
     });
@@ -229,13 +220,12 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobProgressMessage: "Reindexing everything",
                 jobError: ""
             };
 
             await renderComponent(props);
 
-            expect(await screen.getByText("Job completed successfully: Reindexing everything")).toBeInTheDocument();
+            expect(await screen.getByText("Job completed successfully: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by'))).toBeInTheDocument();
         });
     });

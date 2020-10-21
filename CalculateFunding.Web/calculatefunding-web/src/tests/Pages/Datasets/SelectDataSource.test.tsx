@@ -7,7 +7,8 @@ import '@testing-library/jest-dom/extend-expect';
 import * as useSpecificationPermissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissions} from "../../../hooks/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
-import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as useLatestSpecificationJobWithMonitoringHook
+    from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
@@ -16,6 +17,8 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {QueryResult} from "react-query/types/core/types";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
+import {AxiosError} from 'axios';
+import {RelationshipDataQueryResult} from "../../../hooks/useRelationshipData";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
@@ -41,11 +44,11 @@ const mockRelationshipData: RelationshipData = {
 const mockSpecification: SpecificationSummary = {
     id: "asdfga",
     name: "Wizard Spec",
-    approvalStatus: "", 
-    description: "", 
-    fundingPeriod: {id: "", name: "The Distant Future, 2000"}, 
-    fundingStreams: [], 
-    isSelectedForFunding: false, 
+    approvalStatus: "",
+    description: "",
+    fundingPeriod: {id: "", name: "The Distant Future, 2000"},
+    fundingStreams: [],
+    isSelectedForFunding: false,
     providerVersionId: "",
 };
 const specificationResult: SpecificationSummaryQueryResult = {
@@ -67,7 +70,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobInProgressMessage: "",
+    jobDisplayInfo: undefined,
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
@@ -75,12 +78,25 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasFailedJob: false,
     hasActiveJob: true,
     jobError: "",
-    latestJob: { jobType: JobType.MapDatasetJob, invokerUserDisplayName: "test user", runningStatus: RunningStatus.InProgress, created: new Date(), lastUpdated: new Date()},
+    latestJob: {
+        jobType: JobType.MapDatasetJob,
+        invokerUserDisplayName: "test user",
+        runningStatus: RunningStatus.InProgress,
+        created: new Date(),
+        lastUpdated: new Date()
+    },
     hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobInProgressMessage: "",
+    jobDisplayInfo: {
+        statusDescription: "in progress",
+        jobDescription: "test",
+        isComplete: false,
+        isFailed: false,
+        isActive: true,
+        isSuccessful: false
+    },
 };
 const withoutPermissions = {
     isCheckingForPermissions: false,
@@ -121,30 +137,34 @@ describe("<SelectDataSource/>", () => {
             jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutPermissions));
             jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
             jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
-                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+                () => ({
+                    isLoadingRelationshipData: false, 
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
             renderPage();
         });
-        
+
         it("renders permissions alert", () => {
             expect(screen.getByTestId('permission-alert-message')).toBeInTheDocument();
         });
-        
+
         it("does not render dataset relationship", () => {
             expect(screen.queryByText('Select data source file')).not.toBeInTheDocument();
         });
-        
+
         it("save button is disabled", () => {
             const button = screen.getByRole('button', {name: /saveButton/}) as HTMLButtonElement;
             expect(button).toBeInTheDocument();
             expect(button).toBeDisabled();
         });
-        
+
         it("back button is enabled", () => {
             const button = screen.getByRole('button', {name: /backButton/}) as HTMLButtonElement;
             expect(button).toBeInTheDocument();
             expect(button).toBeEnabled();
         });
-        
+
         it("cancel button is hidden", () => {
             const button = screen.queryByRole('button', {name: /cancelButton/}) as HTMLButtonElement;
             expect(button).not.toBeInTheDocument();
@@ -156,26 +176,30 @@ describe("<SelectDataSource/>", () => {
             jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
             jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
             jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
-                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+                () => ({
+                    isLoadingRelationshipData: false,
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
             renderPage();
         });
-        
+
         it("does not render permissions alert", () => {
             expect(screen.queryByTestId('permission-alert-message')).not.toBeInTheDocument();
         });
-        
+
         it("save button is disabled by default", () => {
             const button = screen.getByRole('button', {name: /saveButton/}) as HTMLButtonElement;
             expect(button).toBeInTheDocument();
             expect(button).toBeDisabled();
         });
-        
+
         it("back button is hidden", () => {
             const button = screen.getByRole('button', {name: /cancelButton/}) as HTMLButtonElement;
             expect(button).toBeInTheDocument();
             expect(button).toBeEnabled();
         });
-        
+
         it("cancel button is enabled", () => {
             const button = screen.queryByRole('button', {name: /backButton/}) as HTMLButtonElement;
             expect(button).not.toBeInTheDocument();
@@ -187,7 +211,11 @@ describe("<SelectDataSource/>", () => {
             jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
             jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
             jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
-                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+                () => ({
+                    isLoadingRelationshipData: false,
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
             renderPage();
         });
 
@@ -199,13 +227,17 @@ describe("<SelectDataSource/>", () => {
             expect(screen.getByText(mockSpecification.fundingPeriod.name)).toBeInTheDocument();
         });
     });
-    
+
     describe("when relationship data loaded", () => {
         beforeEach(() => {
             jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
             jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
             jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
-                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+                () => ({
+                    isLoadingRelationshipData: false,
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
             jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
             renderPage();
         });
@@ -214,13 +246,16 @@ describe("<SelectDataSource/>", () => {
             await waitFor(() => expect(screen.getByText('Select data source file')).toBeInTheDocument());
         });
     });
-    
+
     describe("when background job is running", () => {
         beforeEach(() => {
             jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
-            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
-            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
-                () => ({isLoading: false, data: {}} as QueryResult<RelationshipData, Error>));
+            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({
+                    isLoadingRelationshipData: false,
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
             jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));
             renderPage();
         });
@@ -228,7 +263,7 @@ describe("<SelectDataSource/>", () => {
         it("renders correct title", async () => {
             const activeJobTitle = screen.getByTestId('job-notification-title');
             expect(activeJobTitle).toBeInTheDocument();
-            expect(activeJobTitle).toHaveTextContent("Mapping dataset job in progress");
+            expect(activeJobTitle).toHaveTextContent("Job in progress: Mapping dataset");
         });
 
         it("save button is hidden", () => {
