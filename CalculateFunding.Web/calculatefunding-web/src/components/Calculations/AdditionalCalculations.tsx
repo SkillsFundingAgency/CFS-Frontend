@@ -3,9 +3,10 @@ import {Link} from "react-router-dom";
 import {DateFormatter} from "../DateFormatter";
 import Pagination from "../Pagination";
 import * as React from "react";
-import {getCalculationsService} from "../../services/calculationService";
+import {getCalculationCircularDependencies, getCalculationsService} from "../../services/calculationService";
 import {CalculationSummary} from "../../types/CalculationSummary";
 import {useEffect, useState} from "react";
+import {CircularReferenceError} from "../../types/Calculations/CircularReferenceError";
 
 export function AdditionalCalculations(props: { specificationId: string }) {
     const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSummary>({
@@ -29,10 +30,24 @@ export function AdditionalCalculations(props: { specificationId: string }) {
     });
     const [additionalCalculationsSearchTerm, setAdditionalCalculationSearchTerm] = useState('');
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(true);
+    const [circularReferenceErrors, setCircularReferenceErrors] = useState<CircularReferenceError[]>([]);
     const [statusFilter] = useState("");
 
     useEffect(() => {
         populateAdditionalCalculations(props.specificationId, statusFilter, 1, additionalCalculationsSearchTerm);
+
+        const loadCalculation = async () => {
+            try {
+                const circularDependenciesResponse = await getCalculationCircularDependencies(props.specificationId);
+                const circularDependencies = circularDependenciesResponse.data as CircularReferenceError[];
+                if (circularDependencies.length > 0) {
+                    setCircularReferenceErrors(circularDependencies);
+                }
+            } catch {
+                // ignore
+            }
+        }
+        loadCalculation();
     }, [props.specificationId])
 
     useEffect(() => {
@@ -49,10 +64,9 @@ export function AdditionalCalculations(props: { specificationId: string }) {
             searchTerm: additionalCalculationsSearchTerm,
             calculationType: "Additional"
         }).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as CalculationSummary;
-                setAdditionalCalculations(result)
-            }
+            const result = response.data as CalculationSummary;
+            setAdditionalCalculations(result)
+
         }).finally(() => setIsLoadingAdditionalCalculations(false));
     }
 
@@ -102,8 +116,20 @@ export function AdditionalCalculations(props: { specificationId: string }) {
                 <tr className="govuk-table__row" key={index}>
                     <td className="govuk-table__cell text-overflow">
                         <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
+                        <br />
+                        {
+                            circularReferenceErrors.some((error) =>
+                                error.node.calculationid === ac.id) ?
+                                "circular reference detected in calculation script" : ""
+                        }
                     </td>
-                    <td className="govuk-table__cell">{ac.status}</td>
+                    <td className="govuk-table__cell">
+                        {
+                            circularReferenceErrors.some((error) =>
+                                error.node.calculationid === ac.id) ?
+                                "Error" : ac.status
+                        }
+                    </td>
                     <td className="govuk-table__cell">{ac.valueType}</td>
                     <td className="govuk-table__cell"><DateFormatter date={ac.lastUpdatedDate}
                                                                      utc={false}/></td>
