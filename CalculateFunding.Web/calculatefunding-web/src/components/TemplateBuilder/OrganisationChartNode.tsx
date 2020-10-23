@@ -73,7 +73,7 @@ function OrganisationChartNode({
     }, []);
 
     useEffect(() => {
-        if (expandAllChildren !== expandAll ) {
+        if (expandAllChildren !== expandAll) {
             setExpandAll(expandAllChildren);
         }
         if (expandAllChildren && isChildrenCollapsed) {
@@ -126,8 +126,11 @@ function OrganisationChartNode({
                             setSelected(true);
                         }
                     } else {
-                        expandParent && expandParent();
-                        setSelected(selectedNodeInfo.selectedNodeId === datasource.id);
+                        const isSelected = selectedNodeInfo.selectedNodeId === datasource.id;
+                        setSelected(isSelected);
+                        if (isSelected && expandParent) {
+                            expandParent();
+                        }
                     }
                 } else {
                     setSelected(false);
@@ -155,7 +158,6 @@ function OrganisationChartNode({
     };
 
     const handleExpandAll = (e) => {
-        e.stopPropagation();
         setIsChildrenCollapsed(!isChildrenCollapsed);
         setBottomEdgeExpanded(!bottomEdgeExpanded);
         setExpandAll(!expandAll);
@@ -164,6 +166,7 @@ function OrganisationChartNode({
     const ensureVisible = () => {
         setIsChildrenCollapsed(false);
         setBottomEdgeExpanded(true);
+        expandParent && expandParent();
     }
 
     const filterAllowedDropNodes = (id: string, draggedNodeKind: NodeType) => {

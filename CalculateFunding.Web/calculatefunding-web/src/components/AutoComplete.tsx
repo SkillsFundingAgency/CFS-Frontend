@@ -88,6 +88,7 @@ export function AutoComplete({suggestions, hidden, disabled, includePager, callb
         const userSelected = e.currentTarget.innerText;
         const id = e.currentTarget.dataset.id;
         searchItem(userSelected, id);
+        setCurrentSearchIndex(0);
     }
 
     function searchItem(value: string, id?: string) {
