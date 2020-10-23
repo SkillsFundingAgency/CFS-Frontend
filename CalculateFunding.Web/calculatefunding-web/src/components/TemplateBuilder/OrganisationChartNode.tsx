@@ -27,6 +27,7 @@ interface OrganisationChartNodeProps {
     addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
     expandAllChildren: boolean,
     hasCloneParent: boolean,
+    expandParent?: () => void,
 };
 
 const defaultProps = {
@@ -53,6 +54,7 @@ function OrganisationChartNode({
     addNodeToRefs,
     expandAllChildren,
     hasCloneParent,
+    expandParent,
 }: OrganisationChartNodeProps) {
     const node = useRef<HTMLDivElement>(null);
 
@@ -124,6 +126,7 @@ function OrganisationChartNode({
                             setSelected(true);
                         }
                     } else {
+                        expandParent && expandParent();
                         setSelected(selectedNodeInfo.selectedNodeId === datasource.id);
                     }
                 } else {
@@ -156,6 +159,11 @@ function OrganisationChartNode({
         setIsChildrenCollapsed(!isChildrenCollapsed);
         setBottomEdgeExpanded(!bottomEdgeExpanded);
         setExpandAll(!expandAll);
+    }
+
+    const ensureVisible = () => {
+        setIsChildrenCollapsed(false);
+        setBottomEdgeExpanded(true);
     }
 
     const filterAllowedDropNodes = (id: string, draggedNodeKind: NodeType) => {
@@ -281,6 +289,7 @@ function OrganisationChartNode({
                             addNodeToRefs={addNodeToRefs}
                             expandAllChildren={expandAll}
                             hasCloneParent={isClone}
+                            expandParent={ensureVisible}
                         />
                     ))}
                 </ul>

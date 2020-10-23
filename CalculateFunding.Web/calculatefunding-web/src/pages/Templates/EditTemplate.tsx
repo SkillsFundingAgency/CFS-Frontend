@@ -62,7 +62,7 @@ import {useEventListener} from "../../hooks/useEventListener";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import {ErrorMessage} from '../../types/ErrorMessage';
 import {useHistory, useLocation} from "react-router";
-import {AutoComplete} from '../../components/AutoComplete';
+import {AutoComplete, AutoCompleteMode} from '../../components/AutoComplete';
 import * as QueryString from "query-string";
 
 enum Mode {
@@ -117,7 +117,7 @@ export function EditTemplate() {
             redo();
         }
     };
-    
+
     useEventListener('keydown', keyPressHandler);
 
     useConfirmLeavePage(isDirty && !isSaving);
@@ -161,8 +161,8 @@ export function EditTemplate() {
             setUndos(undos);
             setRedos(redos);
         }
-        const allCalcs = getCalculations().map(c => `CAL: ${c.name} (${c.templateCalculationId})`);
-        const allFundingLines = getFundingLines().map(fl => `FUN: ${fl.name} (${fl.templateLineId})`);
+        const allCalcs = getCalculations(true).map(c => `__C${c.id}__CAL: ${c.name} (${c.templateCalculationId})${c.id.includes(":") ? "*" : ""}`);
+        const allFundingLines = getFundingLines(true).map(fl => `__F${fl.id}__FUN: ${fl.name} (${fl.templateLineId})${fl.id.includes(":") ? "*" : ""}`);
         setAllFundingLinesAndCalculations(allCalcs.concat(allFundingLines));
         calculateUndoCounts();
     }, [ds]);
@@ -181,14 +181,14 @@ export function EditTemplate() {
         setErrors([]);
     }
 
-    function getCalculations(): CalculationDictionaryItem[] {
+    function getCalculations(includeClones: boolean = false): CalculationDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
-        return getAllCalculations(fundingLines);
+        return getAllCalculations(fundingLines, includeClones);
     }
 
-    function getFundingLines(): FundingLineDictionaryItem[] {
+    function getFundingLines(includeClones: boolean = false): FundingLineDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
-        return getAllFundingLines(fundingLines);
+        return getAllFundingLines(fundingLines, includeClones);
     }
 
     const fetchData = async () => {
@@ -257,7 +257,7 @@ export function EditTemplate() {
         try {
             await removeNode(ds, id);
             update((deepClone(ds)));
-        } catch(err) {
+        } catch (err) {
             addErrorMessage(err.message);
         }
     };
@@ -342,14 +342,14 @@ export function EditTemplate() {
                 return;
             }
 
-            setIsSaving(true);
-            setSaveMessage("Saving template...");
-
             const fundingLines: TemplateFundingLine[] = datasourceToTemplateFundingLines(ds);
             if (!fundingLines || fundingLines.length === 0) {
                 showSaveMessage("You can't save an empty template. Add one or more funding lines and try again.");
                 return;
             }
+
+            setIsSaving(true);
+            setSaveMessage("Saving template...");
 
             const templateContentUpdateCommand: TemplateContentUpdateCommand = {
                 templateId: template.templateId,
@@ -364,7 +364,7 @@ export function EditTemplate() {
                 setIsDirty(false);
                 showSaveMessage("Template saved successfully.");
             } else {
-                if (saveResponse.status === 200) {
+                if (saveResponse.status === 200 || saveResponse.status === 201) {
                     setIsDirty(false);
                     history.push(`/Templates/${template.templateId}/Versions/${saveResponse.data}`);
                 } else {
@@ -476,38 +476,31 @@ export function EditTemplate() {
     };
 
     const search = async (result: string) => {
-        if (!result || result.trim().length === 0) return;
-        if (result.startsWith("CAL")) {
-            const allCalculations: CalculationDictionaryItem[] = getCalculations();
-            const matches = result.match(/\((.*?)\)/);
-            if (matches) {
-                const templateCalculationId: number = parseInt(matches[1], 10);
-                const id = allCalculations.filter(c => c.templateCalculationId === templateCalculationId)[0].id;
-                setFocusNodeId(id);
-                const dataNode = await findNodeById(ds, id);
-                const node: FundingLineOrCalculationSelectedItem = {
-                    key: dataNode.dsKey,
-                    value: dataNode as Calculation
-                };
-                readSelectedNode(node);
-                setOpenSidebar(true);
-            }
+        if (!result || result.trim().length === 0) {
+            setFocusNodeId("");
+            return;
         }
-        if (result.startsWith("FUN")) {
-            const allFundingLines: FundingLineDictionaryItem[] = getFundingLines();
-            const matches = result.match(/\((.*?)\)/);
-            if (matches) {
-                const templateLineId: number = parseInt(matches[1], 10);
-                const id = allFundingLines.filter(c => c.templateLineId === templateLineId)[0].id;
-                setFocusNodeId(id);
-                const dataNode = await findNodeById(ds, id);
-                const node: FundingLineOrCalculationSelectedItem = {
-                    key: dataNode.dsKey,
-                    value: dataNode as FundingLine
-                };
-                readSelectedNode(node);
-                setOpenSidebar(true);
-            }
+        if (result.startsWith("C")) {
+            const id = result.substring(1);
+            setFocusNodeId(id);
+            const dataNode = await findNodeById(ds, id);
+            const node: FundingLineOrCalculationSelectedItem = {
+                key: dataNode.dsKey,
+                value: dataNode as Calculation
+            };
+            readSelectedNode(node);
+            setOpenSidebar(true);
+        }
+        if (result.startsWith("F")) {
+            const id = result.substring(1);
+            setFocusNodeId(id);
+            const dataNode = await findNodeById(ds, id);
+            const node: FundingLineOrCalculationSelectedItem = {
+                key: dataNode.dsKey,
+                value: dataNode as FundingLine
+            };
+            readSelectedNode(node);
+            setOpenSidebar(true);
         }
     };
 
@@ -648,11 +641,9 @@ export function EditTemplate() {
                     {mode === Mode.Edit && canEditTemplate &&
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
-                                <label className="govuk-label" htmlFor="textarea">
-                                    Search
-                                </label>
                                 <div className="govuk-grid-column-one-third govuk-!-padding-left-0 search-container">
-                                    <AutoComplete suggestions={allFundingLinesAndCalculations} callback={search} />
+                                    <AutoComplete suggestions={allFundingLinesAndCalculations}
+                                        callback={search} includePager={true} mode={AutoCompleteMode.PrefixedId} />
                                 </div>
                                 <div className="govuk-grid-column-two-thirds govuk-!-padding-left-0 govuk-!-padding-right-0">
                                     <p className="govuk-body govuk-visually-hidden" aria-label="Template actions">Template actions</p>
@@ -687,8 +678,7 @@ export function EditTemplate() {
                         </div>}
                     <div className="govuk-!-margin-bottom-0 gov-org-chart-container">
                         <div id="template"
-                            className={`govuk-form-group govuk-!-margin-bottom-0 ${
-                                errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                            className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
                             {errors.map((error, i) => error.fieldName === "template" &&
                                 <span key={`error${i}`} className="govuk-error-message govuk-!-margin-bottom-1">
                                     <span className="govuk-visually-hidden">Error:</span> {error.message}

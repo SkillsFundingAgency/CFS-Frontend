@@ -1,4 +1,4 @@
-import {singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs, cloneWithChildrenNodeDs} from "./templateBuilderTestData";
+import {singleNodeTemplate, singleNodeDs, withChildFundingLineTemplate, withChildFundingLineDs, withChildFundingLineAndCalculationTemplate, withChildFundingLineAndCalculationDs, multipleFundingLinesDs, multipleFundingLinesTemplate, clonedNodeDs, clonedNodeTemplate, multipleCalculationsDs, clonedFundingLinesDs, cloneWithChildrenNodeDs, clonedCalculationsAndFundingLinesNodeDs} from "./templateBuilderTestData";
 import {addNode, updateNode, findAllClonedNodeIds, removeNode, moveNode, cloneNode, templateFundingLinesToDatasource, datasourceToTemplateFundingLines, getLastUsedId, getAllCalculations, getAllFundingLines, cloneCalculation, isChildOf, getAllTemplateCalculationIds, getAllTemplateLineIds, findParentId, isCloneRoot} from "../../services/templateBuilderDatasourceService";
 import {FundingLineDictionaryEntry, FundingLineType, NodeType, FundingLineUpdateModel, CalculationUpdateModel, CalculationType, AggregrationType, ValueFormatType, Calculation} from "../../types/TemplateBuilderDefinitions";
 import cloneDeep from 'lodash/cloneDeep';
@@ -520,6 +520,12 @@ it("calculates getAllCalculations correctly", () => {
         {"id": "n4", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
         {"id": "n6", "name": "Calculation 6", "templateCalculationId": 6, "aggregationType": "Sum"}
     ]);
+    expect(getAllCalculations(clonedCalculationsAndFundingLinesNodeDs.map(d => d.value), true)).toEqual([
+        {"id": "n0", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
+        {"id": "n0:12345", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
+        {"id": "n0:54321", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
+        {"id": "n0:00000", "name": "Calculation 4", "templateCalculationId": 4, "aggregationType": "Sum"},
+    ]);
 });
 
 it("calculates getAllFundingLines correctly", () => {
@@ -556,6 +562,14 @@ it("calculates getAllFundingLines correctly", () => {
     expect(getAllFundingLines(clonedFundingLinesDs.map(d => d.value))).toEqual([
         {"id": "n0", "name": "Funding Line 0", "templateLineId": 0},
         {"id": "n1", "name": "Funding Line 1", "templateLineId": 1}
+    ]);
+    expect(getAllFundingLines(clonedCalculationsAndFundingLinesNodeDs.map(d => d.value), true)).toEqual([
+        {"id": "n1", "name": "Funding Line 0", "templateLineId": 0},
+        {"id": "n3", "name": "Funding Line 1", "templateLineId": 1},
+        {"id": "n4", "name": "Funding Line 2", "templateLineId": 2},
+        {"id": "n4:12345", "name": "Funding Line 2", "templateLineId": 2},
+        {"id": "n2", "name": "Funding Line 3", "templateLineId": 3},
+        {"id": "n5", "name": "Funding Line 4", "templateLineId": 4}
     ]);
 });
 

@@ -93,7 +93,11 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
         const [cursor, setCursor] = useState("grab");
 
         useEffect(() => {
-            if (!itemRefs || !itemRefs.current || !focusNodeId || focusNodeId.length === 0) return;
+            if (!itemRefs || !itemRefs.current || focusNodeId === undefined) return;
+            if (focusNodeId.length === 0) {
+                clearSelectedNodeInfo();
+                return;
+            }
             setTransform("");
             sendSelectedNodeInfo(focusNodeId);
             setTimeout(() => {
@@ -295,7 +299,8 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
                                         nextId={nextId}
                                         dsKey={ds.key}
                                         addNodeToRefs={addNodeToRefs}
-                                        hasCloneParent={false} />
+                                        hasCloneParent={false}
+                                    />
                                 </ul>
                             </div>
                         )}

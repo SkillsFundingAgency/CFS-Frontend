@@ -478,7 +478,7 @@ export const findParentId = (fundingLines: FundingLine[], childId: string) => {
     return "";
 }
 
-export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDictionaryItem[] => {
+export const getAllCalculations = (fundingLines: FundingLine[], includeClones: boolean = false): CalculationDictionaryItem[] => {
     const result: CalculationDictionaryItem[] = [];
 
     for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
@@ -491,7 +491,7 @@ export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDict
         while (stack.length !== 0) {
             const node = stack.pop();
             if (node && (node.children === undefined || node.children.length === 0)) {
-                node.kind === NodeType.Calculation && visitNode(node as Calculation, hashMap, array);
+                node.kind === NodeType.Calculation && visitNode(node as Calculation, hashMap, array, includeClones);
             } else {
                 if (node && node.children && node.children.length > 0) {
                     for (let i: number = node.children.length - 1; i >= 0; i--) {
@@ -501,7 +501,7 @@ export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDict
             }
 
             if (node && node.kind === NodeType.Calculation) {
-                visitNode(node as Calculation, hashMap, array);
+                visitNode(node as Calculation, hashMap, array, includeClones);
             }
         }
         result.push(...array);
@@ -510,7 +510,7 @@ export const getAllCalculations = (fundingLines: FundingLine[]): CalculationDict
     return result.sort(compareNode);
 }
 
-export const getAllFundingLines = (fundingLines: FundingLine[]): FundingLineDictionaryItem[] => {
+export const getAllFundingLines = (fundingLines: FundingLine[], includeClones: boolean = false): FundingLineDictionaryItem[] => {
     const result: FundingLineDictionaryItem[] = [];
 
     for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
@@ -523,7 +523,7 @@ export const getAllFundingLines = (fundingLines: FundingLine[]): FundingLineDict
         while (stack.length !== 0) {
             const node = stack.pop();
             if (node && (node.children === undefined || node.children.length === 0)) {
-                node.kind === NodeType.FundingLine && visitNode(node as FundingLine, hashMap, array);
+                node.kind === NodeType.FundingLine && visitNode(node as FundingLine, hashMap, array, includeClones);
             } else {
                 if (node && node.children && node.children.length > 0) {
                     for (let i: number = node.children.length - 1; i >= 0; i--) {
@@ -533,7 +533,7 @@ export const getAllFundingLines = (fundingLines: FundingLine[]): FundingLineDict
             }
 
             if (node && node.kind === NodeType.FundingLine) {
-                visitNode(node as FundingLine, hashMap, array);
+                visitNode(node as FundingLine, hashMap, array, includeClones);
             }
         }
         result.push(...array);
@@ -555,8 +555,8 @@ function compareNode(a: NodeDictionaryItem, b: NodeDictionaryItem) {
     return comparison;
 }
 
-function visitNode(node: FundingLineOrCalculation, hashMap: any, array: NodeDictionaryItem[]) {
-    if (!node.id.includes(":") && !hashMap[node.id]) {
+function visitNode(node: FundingLineOrCalculation, hashMap: any, array: NodeDictionaryItem[], visitClone: boolean) {
+    if ((visitClone || !node.id.includes(":")) && !hashMap[node.id]) {
         hashMap[node.id] = true;
         if (node.kind === NodeType.Calculation) {
             const item: Calculation = node as Calculation;
