@@ -140,7 +140,7 @@ export function AutoComplete({suggestions, hidden, disabled, includePager, callb
                 Search
                 {autoCompleteState.filteredSuggestions.length > 0 && autoCompleteState.userInput.length > 0 &&
                     <span className="govuk-caption-s govuk-!-margin-left-1 tb-search">
-                        <button onClick={goBackSearch}>◂</button> {currentSearchIndex + 1} of {autoCompleteState.filteredSuggestions.length} <button onClick={goForwardSearch}>▸</button>
+                        <button onClick={goBackSearch} data-testid="back">◂</button> {currentSearchIndex + 1} of {autoCompleteState.filteredSuggestions.length} <button onClick={goForwardSearch} data-testid="forward">▸</button>
                     </span>}
             </label>}
             <div className="govuk-form-group" hidden={hidden}>
