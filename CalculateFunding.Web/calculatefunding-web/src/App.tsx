@@ -12,7 +12,7 @@ import {Home} from "./pages/Home";
 import {Header} from "./components/Header";
 import {ViewResults} from "./pages/ViewResults";
 import {ViewCalculationResults} from "./pages/ViewCalculationResults";
-import {ProviderFundingOverview} from "./pages/ProviderFundingOverview";
+import {ProviderFundingOverview} from "./pages/FundingApprovals/ProviderFundingOverview";
 import {CreateSpecification} from "./pages/Specifications/CreateSpecification";
 import {CreateDataset} from "./pages/Datasets/CreateDataset";
 import {EditSpecification} from "./pages/Specifications/EditSpecification";
@@ -44,7 +44,6 @@ import {MapDataSourceFiles} from "./pages/Datasets/MapDataSourceFiles";
 import {ViewProvidersFundingStreamSelection} from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
 import {ViewProvidersByFundingStream} from "./pages/ViewResults/ViewProvidersByFundingStream";
 import {DataRelationships} from "./pages/Datasets/DataRelationships";
-import {ProfilingArchive} from "./pages/FundingApprovals/ProfilingArchive";
 import {SelectDataSource} from "./pages/Datasets/SelectDataSource";
 import {SelectDataSourceExpanded} from "./pages/Datasets/SelectDataSourceExpanded";
 import {ViewProviderResults} from "./pages/ViewResults/ViewProviderResults";
@@ -113,7 +112,6 @@ const App: React.FunctionComponent = () => {
                                component={ViewFundingLineProfile}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
                                component={ProviderFundingOverview}/>
-                        <Route path="/Approvals/ProfilingArchive/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId" component={ProfilingArchive}/>
                         <Route path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode" component={ProfileHistory}/>
                         <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
                         <Route path="/Datasets/ManageData" component={ManageData}/>

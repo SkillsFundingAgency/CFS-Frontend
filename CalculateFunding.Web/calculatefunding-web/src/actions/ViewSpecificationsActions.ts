@@ -5,10 +5,9 @@ import {CalculationSearchRequestViewModel} from "../types/CalculationSearchReque
 import {
     approveFundingLineStructureService,
     getProfileVariationPointersService,
-    getSpecificationSummaryService, setProfileVariationPointersService
+    setProfileVariationPointersService
 } from "../services/specificationService";
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
-import {SpecificationSummary} from "../types/SpecificationSummary";
 import {getDatasetBySpecificationIdService} from "../services/datasetService";
 import {DatasetSummary} from "../types/DatasetSummary";
 import {Content, ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
@@ -31,7 +30,6 @@ import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationP
 export enum ViewSpecificationActionTypes {
     GET_RELEASETIMETABLE = 'getReleaseTimetable',
     GET_ADDITIONALCALCULATIONS = 'getAdditionalCalculations',
-    GET_SPECIFICATION = 'getSpecification',
     GET_DATASETS = 'getDatasetBySpecificationId',
     GET_FUNDINGLINESTRUCTURE = 'getFundingLineStructure',
     GET_PROFILEVARIATIONPOINTER = 'getProfileVariationPointers',
@@ -43,11 +41,6 @@ export enum ViewSpecificationActionTypes {
 export interface GetAdditionalCalculations {
     type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS
     payload: CalculationSummary
-}
-
-export interface GetSpecification {
-    type: ViewSpecificationActionTypes.GET_SPECIFICATION
-    payload: SpecificationSummary
 }
 
 export interface GetDatasets {
@@ -87,7 +80,6 @@ export interface ConfirmTimetableChanges {
 
 export type ViewSpecificationsActions =
     GetAdditionalCalculations
-    | GetSpecification
     | GetDatasets
     | GetReleaseTimetable
     | GetFundingLineStructureAction
@@ -110,16 +102,6 @@ export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, 
         dispatch({
             type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS,
             payload: response.data as CalculationSummary
-        });
-    }
-};
-
-export const getSpecification: ActionCreator<ThunkAction<Promise<any>, ViewSpecificationState, null, ViewSpecificationsActions>> = (specificationId: string) => {
-    return async (dispatch: Dispatch) => {
-        const response = await getSpecificationSummaryService(specificationId);
-        dispatch({
-            type: ViewSpecificationActionTypes.GET_SPECIFICATION,
-            payload: response.data as SpecificationSummary
         });
     }
 };

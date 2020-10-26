@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {ProviderDetailsViewModel} from "../../types/Provider/ProviderDetailsViewModel";
-import {getProviderByIdAndVersionService, getProviderResultsService} from "../../services/providerService";
+import {getProviderResultsService} from "../../services/providerService";
 import {RouteComponentProps, useLocation} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Header} from "../../components/Header";
@@ -15,9 +14,7 @@ import {DateFormatter} from "../../components/DateFormatter";
 import {getCalculationsByProviderService} from "../../services/calculationService";
 import {Link} from "react-router-dom";
 import Pagination from "../../components/Pagination";
-import {
-    getFundingLineStructureByProviderService
-} from "../../services/fundingStructuresService";
+import {getFundingLineStructureByProviderService} from "../../services/fundingStructuresService";
 import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
 import {AutoComplete} from "../../components/AutoComplete";
 import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../../components/CollapsibleSteps";
@@ -37,6 +34,9 @@ import * as QueryString from "query-string";
 import {getFundingStreamByIdService} from "../../services/policyService";
 import {FundingStream} from "../../types/viewFundingTypes";
 import {WarningText} from "../../components/WarningText";
+import {useProviderVersion} from "../../hooks/Providers/useProviderVersion";
+import {AxiosError} from "axios";
+import {useErrors} from "../../hooks/useErrors";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -44,45 +44,6 @@ export interface ViewProviderResultsRouteProps {
 }
 
 export function ViewProviderResults({match}: RouteComponentProps<ViewProviderResultsRouteProps>) {
-    const [providerDetails, setProviderDetails] = useState<ProviderDetailsViewModel>({
-        authority: "",
-        countryCode: "",
-        countryName: "",
-        crmAccountId: "",
-        dateClosed: new Date(),
-        dateOpened: new Date(),
-        dfeEstablishmentNumber: "",
-        establishmentNumber: "",
-        id: "",
-        laCode: "",
-        legalName: "",
-        localGovernmentGroupTypeCode: "",
-        localGovernmentGroupTypeName: "",
-        name: "",
-        navVendorNo: "",
-        phaseOfEducation: "",
-        postcode: "",
-        providerId: "",
-        providerProfileIdType: "",
-        providerSubType: "",
-        providerType: "",
-        providerVersionId: "",
-        reasonEstablishmentClosed: "",
-        reasonEstablishmentOpened: "",
-        rscRegionCode: "",
-        rscRegionName: "",
-        status: "",
-        successor: "",
-        town: "",
-        trustCode: "",
-        trustName: "",
-        trustStatus: "",
-        ukprn: "",
-        upin: "",
-        urn: "",
-        paymentOrganisationIdentifier: "",
-        paymentOrganisationName: ""
-    });
     const [providerResults, setProviderResults] = useState<SpecificationInformation[]>([{
         fundingPeriod: "",
         fundingPeriodEnd: new Date(),
@@ -133,7 +94,6 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         additionalCalculations: true,
         providerData: true,
         providerResults: true,
-        providerDetails: true
     });
     const [selectedSpecificationId, setSelectedSpecificationId] = useState<string>("");
     const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
@@ -148,6 +108,13 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const location = useLocation();
 
+    const {errors, addErrorMessage} = useErrors();
+
+    const {providerVersion: providerDetails, isLoadingProviderVersion} = useProviderVersion(
+        match.params.providerId,
+        specificationSummary ? specificationSummary.providerVersionId : "",
+        (err: AxiosError) => addErrorMessage(err.message, "Error while loading provider"));
+    
     useEffectOnce(() => {
         const providerId = match.params.providerId;
         const querystringParams = QueryString.parse(location.search);
@@ -260,33 +227,6 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             });
         }
     }, [fundingLines]);
-
-    useEffect(() => {
-        if (specificationSummary.providerVersionId !== "") {
-            populateProviderResults(specificationSummary.providerVersionId);
-        }
-    }, [specificationSummary.providerVersionId]);
-
-    function populateProviderResults(providerVersion: string) {
-        getProviderByIdAndVersionService(match.params.providerId, providerVersion).then((response) => {
-            if (response.status === 200) {
-                setProviderDetails(response.data as ProviderDetailsViewModel);
-                setIsLoading(prevState => {
-                    return {
-                        ...prevState,
-                        providerDetails: false
-                    }
-                })
-            }
-        }).catch((e) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    providerDetails: false
-                }
-            })
-        });
-    }
 
     function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
         getCalculationsByProviderService({
@@ -422,7 +362,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         <Header location={Section.Results}/>
         <div className="govuk-width-container">
             <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full" hidden={providerDetails.name === ""}>
+                {providerDetails &&
+                <div className="govuk-grid-column-full">
                     <Breadcrumbs>
                         <Breadcrumb name={"Calculate funding"} url={"/"}/>
                         <Breadcrumb name={"View results"} url={"/Results"}/>
@@ -431,21 +372,26 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                         <Breadcrumb name={providerDetails.name}/>
                     </Breadcrumbs>
                 </div>
+                }
             </div>
-            <div className="govuk-grid-row" hidden={!isLoading.providerDetails}>
+            {isLoadingProviderVersion &&
+            <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <LoadingStatus title={"Loading provider details"}/>
                 </div>
             </div>
-            <div className="govuk-grid-row" hidden={isLoading.providerDetails}>
+            }
+            {!isLoadingProviderVersion && providerDetails &&
+            <div className="govuk-grid-row" hidden={isLoadingProviderVersion}>
                 <div className="govuk-grid-column-full">
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">{providerDetails.name}</h1>
                     <span className="govuk-caption-m govuk-!-margin-bottom-4">UKPRN: <strong>{providerDetails.ukprn}</strong></span>
                 </div>
             </div>
-            <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === "" || isLoading.providerDetails} />
-            <NoData hidden={isLoading.providerResults || specificationSummary.id !== "" || isLoading.providerDetails}/>
-            <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === "" || isLoading.providerDetails}>
+            }
+            <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === "" || isLoadingProviderVersion} />
+            <NoData hidden={isLoading.providerResults || specificationSummary.id !== "" || isLoadingProviderVersion}/>
+            <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === "" || isLoadingProviderVersion}>
                 <div className="govuk-grid-column-two-thirds">
                     <div className="govuk-form-group">
                         <h3 className="govuk-heading-m govuk-!-margin-bottom-1">Specification</h3>
@@ -465,7 +411,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                     </p>
                 </div>
             </div>
-            <div className="govuk-grid-row" hidden={specificationSummary.id === "" || isLoading.providerDetails}>
+            <div className="govuk-grid-row" hidden={specificationSummary.id === "" || isLoadingProviderVersion}>
                 <div className="govuk-grid-column-full">
                     <Tabs initialTab={"funding-line-structure"}>
                         <ul className="govuk-tabs__list">
@@ -619,6 +565,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel label={"provider-data"}>
+                            {providerDetails &&
                             <section className="govuk-tabs__panel" id="provider-data">
                                 <h2 className="govuk-heading-l">Provider data</h2>
                                 <div className="govuk-warning-text">
@@ -886,6 +833,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                     </div>
                                 </dl>
                             </section>
+                            }
                         </Tabs.Panel>
                     </Tabs>
                 </div>

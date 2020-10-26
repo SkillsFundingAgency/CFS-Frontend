@@ -51,7 +51,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob]);
-    const {specification, isLoadingSpecification, errorCheckingForSpecification} = useSpecificationSummary(specificationId);
+    const {specification, isLoadingSpecification} =
+        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification") );
     const initialProviderPagedSearch = buildInitialPublishedProviderSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
     const initialProviderIdsSearch = buildInitialPublishedProviderIdsSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
     const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialProviderPagedSearch);
@@ -100,7 +101,6 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         setErrors([]);
     }
 
-    addErrorMessage(errorCheckingForSpecification);
     addErrorMessage(errorLoadingSearchResults);
     addErrorMessage(errorLoadingFundingConfiguration);
     addErrorMessage(errorLoadingPublishedProviderIds);

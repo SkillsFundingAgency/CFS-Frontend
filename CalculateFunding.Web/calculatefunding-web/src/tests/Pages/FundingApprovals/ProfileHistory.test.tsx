@@ -40,7 +40,7 @@ describe("<ProfileHistory />", () => {
         expect(queryByText("There is a problem")).not.toBeInTheDocument();
     });
 
-    it("renders correct number of accordian panels", async () => {
+    it("renders correct number of accordion panels", async () => {
         setUpMockApiResponse({data: fundingLineChangeViewModel, isLoading: false, isError: false});
         const {getAllByRole} = renderPage();
         expect(getAllByRole("region").length).toBe(2);

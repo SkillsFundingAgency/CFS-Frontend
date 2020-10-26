@@ -18,6 +18,8 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
 import {Dataset} from "../../types/Datasets/RelationshipData";
 import {DatasetVersionSelection} from "../../components/DatasetMapping/DatasetVersionSelection";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {ErrorMessage} from "../../types/ErrorMessage";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
@@ -30,11 +32,13 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [saveErrorOccurred, setSaveErrorOccurred] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
     let history = useHistory();
+    const [errors, setErrors] = useState<ErrorMessage[]>([]);
 
     const {relationshipData, isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
 
     const specificationId = relationshipData && relationshipData.specificationId ? relationshipData.specificationId : "";
-    const {specification, isLoadingSpecification} = useSpecificationSummary(specificationId);
+    const {specification, isLoadingSpecification} = 
+        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification") );
 
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
@@ -100,6 +104,17 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
         history.goBack();
     }
 
+    function addErrorMessage(errorMessage: string, description?: string, fieldName?: string) {
+        const errorCount: number = errors.length;
+        const error: ErrorMessage = {
+            id: errorCount + 1,
+            fieldName: fieldName,
+            description: description,
+            message: errorMessage
+        };
+        setErrors(errors => [...errors, error]);
+    }
+
     async function changeSpecificationDataMapping() {
         if (!newVersionNumber || !newDataset || !relationshipData || !specification) {
             return;
@@ -129,6 +144,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         </Breadcrumbs>
                     </div>
                 </div>
+                <MultipleErrorSummary errors={errors} />
                 {(isLoadingRelationshipData || isLoadingSpecification || isUpdating) &&
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">

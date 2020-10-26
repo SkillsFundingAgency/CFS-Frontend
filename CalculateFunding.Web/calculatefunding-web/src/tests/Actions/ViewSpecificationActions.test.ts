@@ -32,13 +32,6 @@ describe('ViewSpecification actions ', () => {
         expect(actions[0]).toEqual({type: ViewSpecificationActionTypes.GET_DATASETS});
     });
 
-    it('calls the get specification action', () => {
-        store.dispatch({type: ViewSpecificationActionTypes.GET_SPECIFICATION});
-        const actions = store.getActions();
-
-        expect(actions[0]).toEqual({type: ViewSpecificationActionTypes.GET_SPECIFICATION});
-    });
-
     it('calls the get additional calculations action', () => {
         store.dispatch({type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS});
         const actions = store.getActions();

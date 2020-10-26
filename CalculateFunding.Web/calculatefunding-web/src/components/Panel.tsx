@@ -8,5 +8,6 @@ export interface IPanelProps {
 
 export const Panel: React.FC<IPanelProps> = props => {
     const { activeTab } = useTabs();
-    return activeTab === props.label ? <div hidden={props.hidden}>{props.children}</div> : null;
+    return activeTab === props.label ? 
+        <div hidden={props.hidden} data-testid={`tab-panel-${props.label}`}>{props.children}</div> : null;
 };

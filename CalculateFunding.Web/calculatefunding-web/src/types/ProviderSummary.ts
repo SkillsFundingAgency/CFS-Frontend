@@ -34,6 +34,8 @@ export interface ProviderSummary {
     localGovernmentGroupTypeCode?: any;
     countryName: string;
     countryCode: string;
+    paymentOrganisationIdentifier: string;
+    paymentOrganisationName: string;
 }
 
 export interface ProviderTransactionSummary {

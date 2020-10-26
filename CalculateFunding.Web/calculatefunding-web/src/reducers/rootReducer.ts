@@ -9,8 +9,6 @@ import {reduceViewSpecificationState} from "./viewSpecificationReducer";
 import {reduceViewSpecificationResultsState} from "./viewSpecificationResultsReducer";
 import {reduceSelectSpecificationState} from "./selectSpecificationReducer";
 import {SelectSpecificationState} from "../states/SelectSpecificationState";
-import {ProviderState} from "../states/ProviderState";
-import {reduceProvider} from "./providerReducer";
 import {reduceDatasetState} from "./datasetReducer";
 import {DatasetState} from "../states/DatasetState";
 import {FeatureFlagsState} from "../states/FeatureFlagsState";
@@ -18,8 +16,6 @@ import {reduceFeatureFlagsState} from "./featureFlagsReducer";
 import {FundingLineStructureAction} from "../actions/FundingLineStructureAction";
 import {ViewSpecificationResultsActions} from "../actions/ViewSpecificationResultsActions";
 import {SelectSpecificationActions} from "../actions/SelectSpecificationActions";
-import {ProviderActions} from "../actions/ProviderActions";
-import {SpecificationActions} from "../actions/SpecificationActions";
 import {DatasetActions} from "../actions/DatasetActions";
 import {GetFeatureFlagsAction} from "../actions/FeatureFlagsActions";
 import {ViewSpecificationsActions} from "../actions/ViewSpecificationsActions";
@@ -34,22 +30,19 @@ export interface IStoreState {
     viewSpecificationResults: ViewSpecificationResultsState,
     viewSpecification: ViewSpecificationState,
     selectSpecification: SelectSpecificationState,
-    provider: ProviderState,
     datasets: DatasetState,
     fundingSelection: IFundingSelectionState,
     featureFlags: FeatureFlagsState
 }
 
 export type Actions =
-    IFundingSelectionActions |
     IUserActions |
     FundingLineStructureAction |
     ViewSpecificationResultsActions |
     ViewSpecificationsActions |
     SelectSpecificationActions |
-    ProviderActions |
-    SpecificationActions |
     DatasetActions |
+    IFundingSelectionActions |
     GetFeatureFlagsAction;
 
 export const rootReducer: Reducer<IStoreState, Actions> =
@@ -59,7 +52,6 @@ export const rootReducer: Reducer<IStoreState, Actions> =
         viewSpecificationResults: reduceViewSpecificationResultsState,
         viewSpecification: reduceViewSpecificationState,
         selectSpecification: reduceSelectSpecificationState,
-        provider: reduceProvider,
         datasets: reduceDatasetState,
         fundingSelection: reduceFundingSelectionState,
         featureFlags: reduceFeatureFlagsState

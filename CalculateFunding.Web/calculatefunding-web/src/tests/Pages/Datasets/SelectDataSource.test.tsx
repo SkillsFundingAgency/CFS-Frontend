@@ -54,7 +54,7 @@ const mockSpecification: SpecificationSummary = {
 const specificationResult: SpecificationSummaryQueryResult = {
     specification: mockSpecification,
     isLoadingSpecification: false,
-    errorCheckingForSpecification: "",
+    errorCheckingForSpecification: null,
     haveErrorCheckingForSpecification: false,
     isFetchingSpecification: false,
     isSpecificationFetched: false,

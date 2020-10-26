@@ -15,8 +15,11 @@ export const Tab: React.FC<ITabProps> = props => {
     }
 
     return (
-        <li hidden={props.hidden} className={activeTab === props.label ? "govuk-tabs__list-item govuk-tabs__list-item--selected" : "govuk-tabs__list-item"}>
-            <label className="govuk-tabs__tab" onClick={handleTabClick}>
+        <li hidden={props.hidden}
+            className={activeTab === props.label ? "govuk-tabs__list-item govuk-tabs__list-item--selected" : "govuk-tabs__list-item"}>
+            <label className="govuk-tabs__tab"
+                   data-testid={`tab-${props.label}`}
+                   onClick={handleTabClick}>
                 {props.children}
             </label>
         </li>

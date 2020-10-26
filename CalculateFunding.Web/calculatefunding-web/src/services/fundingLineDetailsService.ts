@@ -1,15 +1,14 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
 import {FundingLineChangeViewModel} from "../types/PublishedProvider/FundingLineProfile";
+import {FundingLineProfile} from "../types/FundingLineProfile";
 
 let baseURL = "/api/publishedproviderfundinglinedetails";
 
-export async function getCurrentProfileConfigService(specificationId: string, providerId: string, fundingStreamId: string) {
-    return axios(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
+export async function getCurrentProfileConfigService(
+    specificationId: string,
+    providerId: string,
+    fundingStreamId: string) {
+    return axios.get<FundingLineProfile[]>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}`);
 }
 
 export async function getPreviousProfilesForSpecificationForProviderForFundingLine(queryKey: string, specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string)

@@ -1,4 +1,4 @@
-export interface Profiling {
+export interface ProviderProfileTotalsForStreamAndPeriod {
     totalAllocation: number;
     previousAllocation: number;
     profilingInstallments: ProfilingInstallments [];

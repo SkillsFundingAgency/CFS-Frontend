@@ -1,34 +1,21 @@
 import axios, {AxiosResponse} from "axios"
 import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
-import {ProviderSummary} from "../types/ProviderSummary";
+import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
+import {ProviderProfileTotalsForStreamAndPeriod} from "../types/ProviderProfileTotalsForStreamAndPeriod";
 
 let baseURL = "/api/provider";
 
-export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string) : 
-    Promise<AxiosResponse<ProviderSummary>> {
-    return axios(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type':'application/json'
-        }
-    })
+export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string) {
+    return axios.get<ProviderSummary>(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`);
 }
+
 export async function getProviderTransactionsService(specificationId:string, providerId:string) {
-    return axios(`${baseURL}/getProviderTransactions/${specificationId}/${providerId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type':'application/json'
-        }
-    })
+    return axios.get<ProviderTransactionSummary>(`${baseURL}/getProviderTransactions/${specificationId}/${providerId}`);
 }
-export async function getProfilingService(fundingStreamId: string, fundingPeriodId: string, providerId: string) {
-    return axios(`${baseURL}/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileTotals`, {
-        method: 'GET',
-        headers: {
-            'Content-Type':'application/json'
-        }
-    })
+
+export async function getReleasedProfileTotalsService(fundingStreamId: string, fundingPeriodId: string, providerId: string) {
+    return axios.get(`${baseURL}/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileTotals`);
 }
 
 export async function getLocalAuthoritiesService(fundingStreamId: string, fundingPeriodId: string, searchText: string) {

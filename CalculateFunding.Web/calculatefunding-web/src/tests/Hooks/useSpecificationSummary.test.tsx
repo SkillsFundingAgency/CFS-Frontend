@@ -38,14 +38,14 @@ describe("useSpecificationSummary loads specification", () => {
 
     it("returns specification correctly", async () => {
         const {result, waitForValueToChange} =
-            renderHook(() => useSpecificationSummary(specificationId));
+            renderHook(() => useSpecificationSummary(specificationId, err => {}));
         await act(async () => {
             await waitForValueToChange(() => result.current.isLoadingSpecification);
         });
         expect(result.current.specification).toEqual(testSpec);
         expect(result.current.isLoadingSpecification).toBe(false);
         expect(result.current.haveErrorCheckingForSpecification).toBe(false);
-        expect(result.current.errorCheckingForSpecification).toBe("");
+        expect(result.current.errorCheckingForSpecification).toBeNull();
         expect(result.current.isFetchingSpecification).toBe(false);
         expect(result.current.isSpecificationFetched).toBe(true);
     });

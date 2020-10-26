@@ -2,38 +2,41 @@
 import {QueryConfig, useQuery} from "react-query";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {getSpecificationSummaryService} from "../services/specificationService";
+import {milliseconds} from "../helpers/TimeInMs";
 
 export type SpecificationSummaryQueryResult = {
     specification: SpecificationSummary | undefined,
     isLoadingSpecification: boolean,
-    errorCheckingForSpecification: string,
+    errorCheckingForSpecification: AxiosError | null,
     haveErrorCheckingForSpecification: boolean,
     isFetchingSpecification: boolean,
     isSpecificationFetched: boolean,
 }
-const oneHour = 1000 * 60 * 60;
 
 export const useSpecificationSummary = (specificationId: string,
-                                        queryConfig: QueryConfig<SpecificationSummary, AxiosError> =
-                                            {
-                                                cacheTime: oneHour,
-                                                staleTime: oneHour,
-                                                refetchOnWindowFocus: false,
-                                                enabled: specificationId && specificationId.length > 0
-                                            })
+                                        onError: (err: AxiosError) => void,
+                                        staleTime: number = milliseconds.OneHour)
     : SpecificationSummaryQueryResult => {
 
+    let config: QueryConfig<SpecificationSummary, AxiosError> = {
+        cacheTime: milliseconds.OneHour,
+        staleTime: staleTime,
+        refetchOnWindowFocus: false,
+        enabled: specificationId && specificationId.length > 0,
+        onError: onError
+    };
+    
     const {data, error, isFetching, isLoading, isError, isFetched} =
         useQuery<SpecificationSummary, AxiosError>(
             `specification-${specificationId}-summary`,
             async () => (await getSpecificationSummaryService(specificationId)).data,
-            queryConfig);
+            config);
 
     return {
         specification: data, 
         isLoadingSpecification: isError ? false : isLoading,
         haveErrorCheckingForSpecification: isError,
-        errorCheckingForSpecification: !isError ? "" : error ? `Error while fetching specification details: ${error.message}` : "Unknown error while fetching specification details", 
+        errorCheckingForSpecification: error, 
         isFetchingSpecification: isFetching, 
         isSpecificationFetched: isFetched
     };

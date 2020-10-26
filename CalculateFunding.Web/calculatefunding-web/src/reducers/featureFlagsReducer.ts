@@ -7,7 +7,7 @@ const initialState: FeatureFlagsState = {
     templateBuilderVisible: false,
     releaseTimetableVisible: false,
     enableReactQueryDevTool: false,
-    profilingPatternVisible: false
+    profilingPatternVisible: undefined
 };
 
 function isFeatureEnabled(featureFlags: FeatureFlag[], targetFeature: FeatureFlagKey): boolean {

@@ -70,7 +70,7 @@ const testSpec: SpecificationSummary = {
 const specResult: SpecificationSummaryQueryResult = {
     specification: testSpec,
     isLoadingSpecification: false,
-    errorCheckingForSpecification: "",
+    errorCheckingForSpecification: null,
     haveErrorCheckingForSpecification: false,
     isFetchingSpecification: false,
     isSpecificationFetched: true
@@ -409,7 +409,8 @@ describe("<SpecificationFundingApproval /> when results with errors", () => {
         jest.clearAllMocks();
     });
 
-    it('renders error summary heading', async () => {
+    it('renders error summary', async () => {
+        expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
         expect(await screen.findByText("There is a problem")).toBeInTheDocument();
     });
 

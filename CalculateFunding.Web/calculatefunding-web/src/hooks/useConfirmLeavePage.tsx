@@ -1,6 +1,7 @@
 ﻿import {useEffect, useRef} from 'react';
 import {UnregisterCallback} from "history";
 import {useHistory} from "react-router";
+import * as React from "react";
 
 export const useConfirmLeavePage = (preventDefault: boolean,
                                     message: string = 'Are you sure you want to leave without saving your changes?') => {

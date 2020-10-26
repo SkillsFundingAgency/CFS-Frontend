@@ -1,0 +1,31 @@
+﻿import * as React from "react";
+import {ErrorMessage} from "../types/ErrorMessage";
+
+export const useErrors = () => {
+    const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
+
+    const addErrorMessage = (errorMessage: string, description?: string, fieldName?: string) => {
+        const isDuplicateError = errors && errors.some(err => err.description === description && err.fieldName === fieldName && err.message === errorMessage);
+        if (isDuplicateError) {
+            return;
+        }
+        const errorCount: number = errors.length;
+        const error: ErrorMessage = {
+            id: errorCount + 1,
+            fieldName: fieldName,
+            description: description,
+            message: errorMessage
+        };
+        setErrors(errors => [...errors, error]);
+    };
+
+    const clearErrorMessages = () => {
+        setErrors([]);
+    };
+
+    return {
+        errors,
+        addErrorMessage,
+        clearErrorMessages
+    }
+}

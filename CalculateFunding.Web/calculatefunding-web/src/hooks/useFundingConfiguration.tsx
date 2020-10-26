@@ -2,8 +2,7 @@
 import {QueryConfig, useQuery} from "react-query";
 import {getFundingConfiguration} from "../services/policyService";
 import {FundingConfiguration} from "../types/FundingConfiguration";
-
-const oneDay = 1000 * 60 * 60 * 24;
+import {milliseconds} from "../helpers/TimeInMs";
 
 export type FundingConfigurationQueryResult = {
     fundingConfiguration: FundingConfiguration | undefined,
@@ -15,8 +14,8 @@ export const useFundingConfiguration = (fundingStreamId: string,
                                         fundingPeriodId: string,
                                         queryConfig: QueryConfig<FundingConfiguration, AxiosError> =
                                             {
-                                                cacheTime: oneDay,
-                                                staleTime: oneDay,
+                                                cacheTime: milliseconds.OneDay,
+                                                staleTime: milliseconds.OneDay,
                                                 refetchOnWindowFocus: false,
                                                 enabled: fundingStreamId && fundingPeriodId && fundingPeriodId.length > 0 && fundingStreamId.length > 0
                                             })

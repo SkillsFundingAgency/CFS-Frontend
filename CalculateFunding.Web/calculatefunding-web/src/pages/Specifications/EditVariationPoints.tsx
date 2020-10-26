@@ -10,7 +10,7 @@ import {
 } from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
-import {ProfilingInstallments} from "../../types/Profiling";
+import {ProfilingInstallments} from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {
     GetProfilePatternsService

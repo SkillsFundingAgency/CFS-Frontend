@@ -7,12 +7,13 @@ export interface FundingLineProfile {
  amountAlreadyPaid: number,
  remainingAmount?: number,
  carryOverAmount?: number,
+ providerId: string,
  providerName: string,
+ ukprn: string,
  profilePatternKey: string,
  profilePatternName: string,
  profilePatternDescription: string,
  lastUpdatedUser: Reference,
- name: string,
  lastUpdatedDate?: Date,
  profileTotalAmount: number,
  profileTotals: ProfileTotal[]
@@ -30,3 +31,4 @@ export interface ProfileTotal {
  actualDate?: Date,
  distributionPeriodId: string
 }
+

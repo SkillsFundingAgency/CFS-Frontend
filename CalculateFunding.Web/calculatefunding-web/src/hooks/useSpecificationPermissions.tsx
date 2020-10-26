@@ -3,6 +3,7 @@ import {getUserPermissionsService} from "../services/userService";
 import {QueryConfig, useQuery} from "react-query";
 import { AxiosError } from "axios";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
+import {milliseconds} from "../helpers/TimeInMs";
 
 export enum SpecificationPermissions {
     Create = "Create",
@@ -12,14 +13,13 @@ export enum SpecificationPermissions {
     Refresh = "Refresh",
     Approve = "Approve"
 }
-const oneHour = 1000 * 60 * 60;
 
 export const useSpecificationPermissions = (
     specificationId: string, 
     requiredPermissions: SpecificationPermissions[],
     queryOptions: QueryConfig<EffectiveSpecificationPermission, AxiosError> = {
-        cacheTime: oneHour, 
-        staleTime: oneHour, 
+        cacheTime: milliseconds.OneHour, 
+        staleTime: milliseconds.OneHour, 
         enabled: specificationId && specificationId.length > 0, 
         refetchOnWindowFocus: false
     }) => {
