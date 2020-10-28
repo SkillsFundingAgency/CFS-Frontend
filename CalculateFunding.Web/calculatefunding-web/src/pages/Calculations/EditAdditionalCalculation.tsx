@@ -214,7 +214,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
             </Breadcrumbs>
 
             {(isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies || isLoading) &&
-            <LoadingStatus title={loadingTitle} hidden={!isLoading} subTitle={loadingSubtitle}/>
+            <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>
             }
 
             <MultipleErrorSummary errors={errors}/>

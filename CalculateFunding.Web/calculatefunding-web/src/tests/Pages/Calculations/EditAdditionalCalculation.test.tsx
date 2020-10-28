@@ -103,6 +103,32 @@ describe("<EditAdditionalCalculation> tests", () => {
         });
     });
 
+    describe("<EditAdditionalCalculation> when loading circular ref errors", () => {
+        beforeEach(() => {
+            mockOutMonacoEditor();
+            mockSpecification();
+            mockCalculation();
+            mockCircularRefErrorsLoading();
+    
+            renderEditAdditionalCalculation();
+        });
+        afterEach(() => jest.clearAllMocks());
+    
+        it("renders the specification", async () => {
+            expect(screen.getByText(testSpec.name)).toBeInTheDocument();
+        });
+    
+        it("renders the calculation", async () => {
+            expect(screen.getByText("Calculation name")).toBeInTheDocument();
+            expect(screen.getByText(testCalc.publishStatus)).toBeInTheDocument();
+        });
+    
+        it("renders CircularReferenceErrors loading", async () => {
+            expect(screen.getByTestId("loader")).toBeInTheDocument();
+            expect(screen.getByText(/Checking for circular reference errors/)).toBeInTheDocument();
+        });
+    });
+
     describe("<EditAdditionalCalculation> with a circular ref error", () => {
         beforeEach(() => {
             mockOutMonacoEditor();
@@ -127,8 +153,6 @@ describe("<EditAdditionalCalculation> tests", () => {
             expect(screen.getByText("Calculations are not able to run due to the following problem")).toBeInTheDocument();
         });
     });
-
-
 });
 
 
@@ -200,6 +224,10 @@ const withCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = 
     }],
     isLoadingCircularDependencies: false
 }
+const loadingCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
+    circularReferenceErrors: undefined,
+    isLoadingCircularDependencies: true
+}
 const noCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
     circularReferenceErrors: [],
     isLoadingCircularDependencies: false
@@ -242,6 +270,8 @@ const mockCalculation = () => jest.spyOn(calcHook, 'useCalculation')
     .mockImplementation(() => (calcResult));
 const mockCircularRefErrors = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
     .mockImplementation(() => (withCircularRefErrorsResult));
+const mockCircularRefErrorsLoading = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
+    .mockImplementation(() => (loadingCircularRefErrorsResult));
 const mockNoCircularRefErrors = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
     .mockImplementation(() => (noCircularRefErrorsResult));
 const mockFailedBuild = () => {

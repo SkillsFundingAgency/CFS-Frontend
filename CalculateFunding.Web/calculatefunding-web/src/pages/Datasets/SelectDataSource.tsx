@@ -168,9 +168,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         {(isCheckingForJob || hasJob) &&
                         <div className="govuk-form-group">
                             <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
-                            {hasJob &&
-                            <MappingStatus job={latestJob} hasActiveJob={hasActiveJob}/>
-                            }
+                            {hasJob && <MappingStatus job={latestJob} />}
                         </div>}
                         {!isCheckingForPermissions && !hasMissingPermissions &&
                         <div className="govuk-form-group">
