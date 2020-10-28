@@ -12,7 +12,9 @@ export function MultipleErrorSummary(props: { errors: ErrorMessage[] }) {
                     <ul className="govuk-list govuk-error-summary__list">
                         {props.errors.map((error, i) =>
                             <li key={i}>
-                                {error.description}
+                                {error.description &&
+                                    <span>{error.description}: </span>
+                                }
                                 {error.fieldName && <a href={"#" + error.fieldName} className="govuk-link govuk-link-red">{error.message}</a>}
                                 {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
                             </li>

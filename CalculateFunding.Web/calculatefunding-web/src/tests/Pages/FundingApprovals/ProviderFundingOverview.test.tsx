@@ -39,7 +39,8 @@ const testSpec: SpecificationSummary = {
     fundingStreams: [fundingStream],
     id: "ABC123",
     isSelectedForFunding: true,
-    providerVersionId: ""
+    providerVersionId: "",
+    dataDefinitionRelationshipIds: []    
 };
 const specResult: SpecificationSummaryQueryResult = {
     specification: testSpec,
@@ -149,11 +150,6 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible false", () => 
     it("renders the funding period name", async () => {
         expect(screen.getByText("Funding period")).toBeInTheDocument();
         expect(screen.getByText(testSpec.fundingPeriod.name)).toBeInTheDocument();
-    });
-    
-    it("renders the specification name", async () => {
-        expect(screen.getByText("Specification")).toBeInTheDocument();
-        expect(screen.getByText(testSpec.name)).toBeInTheDocument();
     });
     
     it("renders the Provider name", async () => {

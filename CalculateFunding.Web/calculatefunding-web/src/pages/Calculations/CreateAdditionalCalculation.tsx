@@ -4,18 +4,20 @@ import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
-import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
 import {CalculationTypes, CreateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
 import {compileCalculationPreviewService, createAdditionalCalculationService} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
-import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
+import {CompilerOutputViewModel, CompileErrorSeverity} from "../../types/Calculations/CalculationCompilePreviewResponse";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {Footer} from "../../components/Footer";
-import {CompliationErrorMessageList} from "../../components/Calculations/CompliationErrorMessageList";
+import {CompilationErrorMessageList} from "../../components/Calculations/CompilationErrorMessageList";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {useErrors} from "../../hooks/useErrors";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export interface CreateAdditionalCalculationProps {
     excludeMonacoEditor?: boolean
@@ -27,7 +29,7 @@ export interface CreateAdditionalCalculationRouteProps {
 
 export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteComponentProps<CreateAdditionalCalculationRouteProps> & CreateAdditionalCalculationProps) {
     const specificationId = match.params.specificationId;
-    const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
+   const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
         id: "",
         name: "",
         description: "",
@@ -62,29 +64,29 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                         startLine: 0
                     },
                     message: "",
-                    severity: ""
+                    severity: CompileErrorSeverity.Hidden
                 }],
                 sourceFiles: [],
                 success: false
             }
         }
     };
-    const [additionalCalculationBuildSuccess, setAdditionalCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initialBuildSuccess);
+    const [additionalCalculationBuildSuccess, setCalculationBuild] = useState<CompilerOutputViewModel>(initialBuildSuccess);
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string>("");
     const [nameErrorMessage, setNameErrorMessage] = useState("")
-    const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
+    const [isBuilding, setIsBuilding] = useState<boolean>(false);
 
     let history = useHistory();
 
     useEffectOnce(() => {
         getSpecificationSummaryService(specificationId)
             .then((result) => {
-                const specificationResult = result.data as EditSpecificationViewModel;
+                const specificationResult = result.data as SpecificationSummary;
                 setSpecificationSummary(specificationResult);
             });
     });
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
 
     function submitAdditionalCalculation() {
         if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
@@ -108,14 +110,14 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                     let response = result.data as Calculation;
                     history.push(`/ViewSpecification/${response.specificationId}`);
                 } else {
-                    setErrorMessage(result.data);
+                    addErrorMessage(result.data);
                     setFormValid(prevState => {
                         return {...prevState, formSubmitted: true, formValid: false}
                     });
                     setIsLoading(false);
                 }
             }).catch((ex) => {
-                setErrorMessage(ex.response.data);
+                addErrorMessage(ex.response.data);
                 setFormValid({formSubmitted: true, formValid: false});
                 setIsLoading(false);
             });
@@ -125,45 +127,31 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
     }
 
     function buildCalculation() {
-        setIsBuildingCalculationCode(true);
-        setAdditionalCalculationBuildSuccess(initialBuildSuccess);
-        compileCalculationPreviewService(specificationId, 'temp-calc-id', additionalCalculationSourceCode).then((result) => {
-            if (result.status === 200) {
-                let response = result.data as PreviewResponse;
-                setAdditionalCalculationBuildSuccess(prevState => {
+        setIsBuilding(true);
+        setCalculationBuild(initialBuildSuccess);
+        
+        compileCalculationPreviewService(specificationId, 'temp-calc-id', additionalCalculationSourceCode)
+            .then((result) => {
+                setCalculationBuild(prevState => {
                     return {
                         ...prevState,
-                        buildSuccess: response.compilerOutput.success,
+                        buildSuccess: result.status === 200 && result.data?.compilerOutput?.success,
                         compileRun: true,
-                        previewResponse: response
+                        previewResponse: result.data
                     }
                 });
-            }
-
-            if (result.status === 400) {
-                setAdditionalCalculationBuildSuccess(prevState => {
-                    return {
-                        ...prevState,
-                        buildSuccess: false,
-                        compileRun: true,
-                    }
-                });
-
-                setErrorMessage((result.data as SourceFile).sourceCode);
-            }
-
-            setIsBuildingCalculationCode(false);
-        }).catch(() => {
-            setAdditionalCalculationBuildSuccess(prevState => {
-                return {...prevState, compileRun: true, buildSuccess: false}
+                setIsBuilding(false);
+            })
+            .catch(() => {
+            setCalculationBuild(prevState => {
+                return {...prevState, compileRun: false, buildSuccess: false}
             });
-
-            setIsBuildingCalculationCode(false);
+            setIsBuilding(false);
         });
     }
 
     function updateSourceCode(sourceCode: string) {
-        setAdditionalCalculationBuildSuccess(initialBuildSuccess);
+        setCalculationBuild(initialBuildSuccess);
         setAdditionalCalculationSourceCode(sourceCode);
     }
 
@@ -177,6 +165,8 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                 <Breadcrumb name={"Create additional calculation"}/>
             </Breadcrumbs>
 
+            <MultipleErrorSummary errors={errors} />
+            
             <LoadingStatus title={"Creating additional calculation"} hidden={!isLoading}
                            subTitle={"Please wait whilst the calculation is created"}/>
             <fieldset className="govuk-fieldset" hidden={isLoading}>
@@ -224,10 +214,10 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                         calculationType={"AdditionalCalculation"}
                         calculationName={additionalCalculationName}/>}
                     <button id={"build-calculation-button"} data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
-                            onClick={buildCalculation} disabled={isBuildingCalculationCode}>
+                            onClick={buildCalculation} disabled={isBuilding}>
                         Build calculation
                     </button>
-                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
+                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuilding}/>
                 </div>
 
                 <div className="govuk-panel govuk-panel--confirmation"
@@ -247,9 +237,8 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
                     </label>
-                    <CompliationErrorMessageList
+                    <CompilationErrorMessageList
                         compilerMessages={additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages}
-                        errorMessage={errorMessage}
                     />
                 </div>
                 <button id="save-calculation-button" className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"

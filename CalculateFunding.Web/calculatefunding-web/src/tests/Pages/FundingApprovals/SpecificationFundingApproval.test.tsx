@@ -65,7 +65,8 @@ const testSpec: SpecificationSummary = {
     fundingStreams: [fundingStream],
     id: "ABC123",
     isSelectedForFunding: true,
-    providerVersionId: ""
+    providerVersionId: "",
+    dataDefinitionRelationshipIds: []
 };
 const specResult: SpecificationSummaryQueryResult = {
     specification: testSpec,

@@ -2,8 +2,10 @@ import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
-import {CalculationSummary} from "../types/CalculationSummary";
+import {Calculation, CalculationSummary} from "../types/CalculationSummary";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
+import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
+import {CalculationCompilePreviewResponse} from "../types/Calculations/CalculationCompilePreviewResponse";
 
 export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel): Promise<AxiosResponse<CalculationSummary>> {
     return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
@@ -36,12 +38,7 @@ export async function getCalculationsByProviderService(calculationSearchRequestV
 }
 
 export async function getCalculationByIdService(calculationId: string) {
-    return axios(`/api/calcs/getcalculationbyid/${calculationId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+    return axios.get<Calculation>(`/api/calcs/getcalculationbyid/${calculationId}`)
 }
 
 export async function getCalculationProvidersService(calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel) {
@@ -74,7 +71,10 @@ export async function updateAdditionalCalculationService(updateAdditionalCalcula
     })
 }
 
-export async function compileCalculationPreviewService(specificationId: string, calculationId: string, sourceCode: string) {
+export async function compileCalculationPreviewService(
+    specificationId: string, 
+    calculationId: string, 
+    sourceCode: string): Promise<AxiosResponse<CalculationCompilePreviewResponse>> {
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/compilePreview`, {
         method: 'POST',
         headers: {
@@ -136,11 +136,6 @@ export async function getIsUserAllowedToApproveCalculationService(calculationId:
 }
 
 export async function getCalculationCircularDependencies(specificationId: string) {
-    return axios(`/api/graph/calculation/circulardependencies/${specificationId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+    return axios.get<CircularReferenceError[]>(`/api/graph/calculation/circulardependencies/${specificationId}`);
 }
 

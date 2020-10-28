@@ -1,7 +1,10 @@
 import React from "react";
-import {CompilerMessage} from "../../types/Calculations/PreviewResponse";
+import {CompilerMessage} from "../../types/Calculations/CalculationCompilePreviewResponse";
 
-export function CompliationErrorMessageList(props:{compilerMessages:CompilerMessage[], errorMessage:string}){
+export function CompilationErrorMessageList(props:{compilerMessages: CompilerMessage[]}) {
+    if (!props.compilerMessages) {
+        return null;
+    }
     return <div className="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
             There was a compilation error
@@ -29,10 +32,6 @@ export function CompliationErrorMessageList(props:{compilerMessages:CompilerMess
                 )}
                 </tbody>
             </table>
-            <ul className="govuk-error-summary__list">
-                <li hidden={props.errorMessage.length === 0}>{props.errorMessage}</li>
-
-            </ul>
         </div>
     </div>
 }

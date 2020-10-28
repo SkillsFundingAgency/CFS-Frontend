@@ -8,7 +8,6 @@ import {ErrorSummary} from "../../components/ErrorSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
-import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
 import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
 import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpecificationViewModel";
 import {Link} from "react-router-dom";
@@ -16,6 +15,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import {getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} from "../../services/policyService";
 import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -33,7 +33,7 @@ interface EditSpecificationTemplateVersion {
 
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
     const specificationId = match.params.specificationId;
-    const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
+    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
         id: "",
         name: "",
         description: "",
@@ -77,7 +77,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 setLoadingMessage({title: "Loading Specification", subTitle: "Please wait whilst we load the specification"});
                 setIsLoading(true);
                 const specificationResult = await getSpecificationSummaryService(specificationId);
-                const editSpecificationViewModel = specificationResult.data as EditSpecificationViewModel;
+                const editSpecificationViewModel = specificationResult.data as SpecificationSummary;
                 if (editSpecificationViewModel.fundingStreams.length === 0) {
                     throw new Error("Specification has no funding streams.");
                 }

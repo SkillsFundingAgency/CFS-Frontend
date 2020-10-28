@@ -1,7 +1,7 @@
-import {CompliationErrorMessageList} from "../../../components/Calculations/CompliationErrorMessageList";
-import {mount} from "enzyme";
-import {CompilerMessage} from "../../../types/Calculations/PreviewResponse";
 import React from "react";
+import {CompilationErrorMessageList} from "../../../components/Calculations/CompilationErrorMessageList";
+import {mount} from "enzyme";
+import {CompileErrorSeverity, CompilerMessage} from "../../../types/Calculations/CalculationCompilePreviewResponse";
 
 const compilerMessages : CompilerMessage[] = [{
     location: {
@@ -15,7 +15,7 @@ const compilerMessages : CompilerMessage[] = [{
         startLine:1,
     },
     message:"Test message 1",
-    severity:"Test severity 1"
+    severity: CompileErrorSeverity.Error
 },{
     location: {
         endChar:2,
@@ -28,18 +28,18 @@ const compilerMessages : CompilerMessage[] = [{
         startLine:1,
     },
     message:"Test message 2",
-    severity:"Test severity 2"
+    severity: CompileErrorSeverity.Error
 }];
 const errorMessage = "Error message";
 
 describe('<CompliationErrorMessageList /> renders ', () => {
     it('the title', () => {
-   const wrapper = mount(<CompliationErrorMessageList compilerMessages={compilerMessages} errorMessage={errorMessage} />);
+   const wrapper = mount(<CompilationErrorMessageList compilerMessages={compilerMessages} />);
         expect(wrapper.find('h2').text()).toBe("There was a compilation error")
     });
 
     it('a table of two rows for the compiler messages', () => {
-        const wrapper = mount(<CompliationErrorMessageList compilerMessages={compilerMessages} errorMessage={errorMessage} />);
+        const wrapper = mount(<CompilationErrorMessageList compilerMessages={compilerMessages} />);
         expect(wrapper.find('table>tbody>tr').length).toBe(2);
     });
 });

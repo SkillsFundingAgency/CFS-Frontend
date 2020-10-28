@@ -12,6 +12,9 @@ import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
+import {ValueType} from "../../types/ValueType";
+import {PublishStatus} from "../../types/PublishStatusModel";
+import {CalculationTypes} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -30,22 +33,24 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
         id: "",
         isSelectedForFunding: false,
         name: "",
-        providerVersionId: ""
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        providerSnapshotId: 0,
     });
     const [calculation, setCalculation] = useState<Calculation>({
-        calculationType: "",
-        description: null,
+        calculationType: CalculationTypes.Number,
         fundingStreamId: "",
         id: "",
-        lastUpdatedDate: new Date(),
-        lastUpdatedDateDisplay: "",
+        lastUpdated: new Date(),
         name: "",
         namespace: "",
         specificationId: "",
-        specificationName: "",
-        status: "",
-        valueType: "",
-        wasTemplateCalculation: false
+        publishStatus: PublishStatus.Draft,
+        valueType: ValueType.Currency,
+        wasTemplateCalculation: false,
+        author: null,
+        sourceCode: "",
+        sourceCodeName: "",
     });
     const [checkedVersions, setCheckedVersions] = useState<string[]>([]);
     const [disableCompare, setDisableCompare] = useState<boolean>(true);

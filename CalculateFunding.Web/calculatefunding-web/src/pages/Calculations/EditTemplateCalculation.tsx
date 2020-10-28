@@ -4,12 +4,7 @@ import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService} from "../../services/specificationService";
-import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {
-    CalculationTypes,
-    EditAdditionalCalculationViewModel,
-    UpdateAdditionalCalculationViewModel
-} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {UpdateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
 import {
     approveCalculationService,
     compileCalculationPreviewService,
@@ -19,7 +14,7 @@ import {
     getCalculationCircularDependencies
 } from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
-import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
+import {CompilerOutputViewModel, CompileErrorSeverity} from "../../types/Calculations/CalculationCompilePreviewResponse";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
@@ -32,7 +27,9 @@ import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
 import {CircularReferenceError} from "../../types/Calculations/CircularReferenceError";
-import {CompliationErrorMessageList} from "../../components/Calculations/CompliationErrorMessageList";
+import {CompilationErrorMessageList} from "../../components/Calculations/CompilationErrorMessageList";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {ValueType} from "../../types/ValueType";
 
 export interface EditTemplateCalculationProps {
     excludeMonacoEditor?: boolean
@@ -47,7 +44,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
     const [renderMonacoEditor] = useState<boolean>(!excludeMonacoEditor);
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
-    const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
+    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
         id: "",
         name: "",
         description: "",
@@ -64,7 +61,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
     });
     const [templateCalculationName, setTemplateCalculationName] = useState<string>("");
     const [templateCalculationFundingStreamId, setTemplateCalculationFundingStreamId] = useState<string>("");
-    const [templateCalculationType, setTemplateCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
+    const [templateCalculationType, setTemplateCalculationType] = useState<ValueType>(ValueType.Percentage);
     const [templateCalculationSourceCode, setTemplateCalculationSourceCode] = useState<string>("");
     const [initialSourceCode, setInitialSourceCode] = useState<string>("");
     const [templateCalculationStatus, setTemplateCalculationStatus] = useState<PublishStatus>();
@@ -86,14 +83,14 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                         startLine: 0
                     },
                     message: "",
-                    severity: ""
+                    severity: CompileErrorSeverity.Hidden
                 }],
                 sourceFiles: [],
                 success: false
             }
         }
     };
-    const [templateCalculationBuildSuccess, setTemplateCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initialBuildSuccess);
+    const [calculationBuild, setCalculationBuild] = useState<CompilerOutputViewModel>(initialBuildSuccess);
     const [calculationError, setCalculationError] = useState<string>();
     const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
     const [isLoading, setIsLoading] = useState(false);
@@ -116,7 +113,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 setCircularReferenceErrors([]);
                 setIsLoading(true);
                 const result = await getCalculationByIdService(calcId);
-                const calc = result.data as EditAdditionalCalculationViewModel;
+                const calc = result.data as Calculation;
                 setTemplateCalculationSourceCode(calc.sourceCode);
                 setTemplateCalculationName(calc.name);
                 setTemplateCalculationType(calc.valueType);
@@ -126,7 +123,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 setTemplateCalculationFundingStreamId(calc.fundingStreamId);
 
                 const specSummaryResult = await getSpecificationSummaryService(calc.specificationId);
-                const spec = specSummaryResult.data as EditSpecificationViewModel;
+                const spec = specSummaryResult.data as SpecificationSummary;
                 setSpecificationSummary(spec);
                 setSpecificationId(spec.id);
 
@@ -162,12 +159,12 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
     });
 
     function submitTemplateCalculation() {
-        if (templateCalculationName === "" || templateCalculationSourceCode === "" || !templateCalculationBuildSuccess.buildSuccess) {
+        if (templateCalculationName === "" || templateCalculationSourceCode === "" || !calculationBuild.buildSuccess) {
             setFormValid({formSubmitted: true, formValid: false});
             return;
         }
 
-        if (!(templateCalculationName !== "" && templateCalculationSourceCode !== "" && templateCalculationBuildSuccess.buildSuccess && templateCalculationBuildSuccess.compileRun)) {
+        if (!(templateCalculationName !== "" && templateCalculationSourceCode !== "" && calculationBuild.buildSuccess && calculationBuild.compileRun)) {
             setFormValid({formSubmitted: true, formValid: false});
             return;
         }
@@ -179,7 +176,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
 
         let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
             calculationName: templateCalculationName,
-            calculationType: templateCalculationType,
+            valueType: templateCalculationType,
             sourceCode: templateCalculationSourceCode,
         };
 
@@ -221,41 +218,28 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
         setIsDirty(initialSourceCode !== templateCalculationSourceCode);
         setIsBuildingCalculationCode(true);
         setCalculationError("");
-
-        compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode).then((result) => {
-            if (result.status === 200) {
-                let response = result.data as PreviewResponse;
-                setTemplateCalculationBuildSuccess(prevState => {
+        
+        compileCalculationPreviewService(specificationId, calculationId, templateCalculationSourceCode)
+            .then((result) => {
+                setCalculationBuild(prevState => {
                     return {
                         ...prevState,
-                        buildSuccess: response.compilerOutput.success,
+                        buildSuccess: result.status === 200 && result.data?.compilerOutput?.success,
                         compileRun: true,
-                        previewResponse: response
+                        previewResponse: result.data
                     }
                 });
-            }
-
-            if (result.status === 400) {
-                setTemplateCalculationBuildSuccess(prevState => {
-                    return {
-                        ...prevState,
-                        buildSuccess: false,
-                        compileRun: true,
-                    }
-                });
-                setErrorMessage((result.data as SourceFile).sourceCode);
-            }
+                setIsBuildingCalculationCode(false);
         }).catch(() => {
-            setTemplateCalculationBuildSuccess(prevState => {
-                return {...prevState, compileRun: true, buildSuccess: false}
+            setCalculationBuild(prevState => {
+                return {...prevState, compileRun: false, buildSuccess: false}
             });
-        }).finally(() => {
             setIsBuildingCalculationCode(false);
         });
     }
 
     function updateSourceCode(sourceCode: string) {
-        setTemplateCalculationBuildSuccess(initialBuildSuccess);
+        setCalculationBuild(initialBuildSuccess);
         setTemplateCalculationSourceCode(sourceCode);
         setIsDirty(initialSourceCode !== sourceCode);
     }
@@ -321,7 +305,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 </div>
 
                 <div
-                    className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    className={"govuk-form-group" + ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="more-detail">
                         Calculation script
                     </label>
@@ -345,15 +329,15 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 <div className="govuk-form-group">
                     <CalculationResultsLink calculationId={calculationId}/>
                 </div>
-                {templateCalculationBuildSuccess.buildSuccess &&
+                {calculationBuild.buildSuccess &&
                 <div className="govuk-panel govuk-panel--confirmation">
                     <div className="govuk-panel__body">
                         Build successful
                     </div>
                 </div>}
-                {isDirty && templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess &&
+                {isDirty && calculationBuild.compileRun && !calculationBuild.buildSuccess &&
                 <div className={"govuk-form-group" +
-                ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ?
+                ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ?
                     " govuk-form-group--error" : "")}>
                     <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
                 </div>}
@@ -362,12 +346,13 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                     <div className="govuk-body">Your calculation must be saved before you can approve it</div>
                 </div>}
                 <div
-                    hidden={(!templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) || (templateCalculationBuildSuccess.compileRun && templateCalculationBuildSuccess.buildSuccess)}
-                    className={"govuk-form-group" + ((templateCalculationBuildSuccess.compileRun && !templateCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    hidden={(!calculationBuild.compileRun && !calculationBuild.buildSuccess) || (calculationBuild.compileRun && calculationBuild.buildSuccess)}
+                    className={"govuk-form-group" + ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="build-output">
                         Build output
                     </label>
-                    <CompliationErrorMessageList compilerMessages={templateCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages} errorMessage={errorMessage} />
+                    <CompilationErrorMessageList 
+                        compilerMessages={calculationBuild.previewResponse.compilerOutput.compilerMessages} />
                 </div>
                 {isLoadingCircularDependencies &&
                 <div className="govuk-!-margin-bottom-4">
@@ -376,7 +361,7 @@ export function EditTemplateCalculation({match, excludeMonacoEditor}:
                 }
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitTemplateCalculation}
-                        disabled={!isDirty || isSaving || !templateCalculationBuildSuccess.buildSuccess}>
+                        disabled={!isDirty || isSaving || !calculationBuild.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"

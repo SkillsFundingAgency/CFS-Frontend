@@ -1,4 +1,4 @@
-import {PublishStatus} from "../PublishStatusModel";
+import {ValueType} from "../ValueType";
 
 export interface CreateAdditionalCalculationViewModel {
     sourceCode:string;
@@ -6,20 +6,10 @@ export interface CreateAdditionalCalculationViewModel {
     calculationType:CalculationTypes;
 }
 
-export interface EditAdditionalCalculationViewModel {
-    fundingStreamId: string;
-    sourceCode:string;
-    specificationId: string;
-    valueType: CalculationTypes;
-    name: string;
-    publishStatus: PublishStatus;
-    lastUpdated: Date
-}
-
 export interface UpdateAdditionalCalculationViewModel {
-    sourceCode:string;
+    sourceCode: string;
     calculationName: string;
-    calculationType: CalculationTypes
+    valueType: ValueType
 }
 
 export enum CalculationTypes{

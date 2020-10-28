@@ -878,9 +878,9 @@ export function GdsMonacoEditor(props: {
     function getHoverDescriptionForDefaultType(model: monaco.editor.IReadOnlyModel, position: monaco.Position, dataTypes: IDefaultTypeContainer, range: any) {
 
         // @ts-ignore
-        let word = model.getWordAtPosition(position).word;
+        let word = model.getWordAtPosition(position)?.word;
 
-        if (dataTypes[word.toLowerCase()]) {
+        if (word && dataTypes[word.toLowerCase()]) {
 
             let foundDefaultType = dataTypes[word.toLowerCase()];
 

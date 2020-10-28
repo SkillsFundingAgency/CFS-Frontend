@@ -1,23 +1,10 @@
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
-import {getSpecificationSummaryService} from "../../services/specificationService";
-import {EditSpecificationViewModel} from "../../types/Specifications/EditSpecificationViewModel";
-import {
-    CalculationTypes,
-    EditAdditionalCalculationViewModel,
-    UpdateAdditionalCalculationViewModel
-} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {
-    approveCalculationService,
-    compileCalculationPreviewService,
-    getCalculationByIdService,
-    getIsUserAllowedToApproveCalculationService,
-    updateAdditionalCalculationService,
-    getCalculationCircularDependencies
-} from "../../services/calculationService";
+import {UpdateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {approveCalculationService, compileCalculationPreviewService, getIsUserAllowedToApproveCalculationService, updateAdditionalCalculationService,} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
-import {CompilerOutputViewModel, PreviewResponse, SourceFile} from "../../types/Calculations/PreviewResponse";
+import {CalculationCompilePreviewResponse, CompileErrorSeverity, CompilerOutputViewModel} from "../../types/Calculations/CalculationCompilePreviewResponse";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -25,15 +12,17 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
-import {useEffect, useState} from "react";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
-import React from "react";
+import React, {useState} from "react";
 import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
-import {CircularReferenceError} from "../../types/Calculations/CircularReferenceError";
-import {CompliationErrorMessageList} from "../../components/Calculations/CompliationErrorMessageList";
+import {CompilationErrorMessageList} from "../../components/Calculations/CompilationErrorMessageList";
 import {DateFormatter} from "../../components/DateFormatter";
+import {useErrors} from "../../hooks/useErrors";
+import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useCalculation} from "../../hooks/Calculations/useCalculation";
+import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
 
 export interface EditAdditionalCalculationProps {
     excludeMonacoEditor?: boolean
@@ -47,38 +36,20 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
     const [renderMonacoEditor] = useState<boolean>(!excludeMonacoEditor);
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
-    const [specificationSummary, setSpecificationSummary] = useState<EditSpecificationViewModel>({
-        id: "",
-        name: "",
-        description: "",
-        fundingPeriod: {
-            name: "",
-            id: ""
-        },
-        providerVersionId: "",
-        approvalStatus: "",
-        isSelectedForFunding: false,
-        fundingStreams: [],
-        dataDefinitionRelationshipIds: [],
-        templateIds: {"": [""]}
-    });
-    const [originalAdditionalCalculation, setOriginalAdditionalCalculation] = useState<EditAdditionalCalculationViewModel>({
-        publishStatus: PublishStatus.Draft,
-        lastUpdated: new Date(),
-        specificationId: "",
-        name: "",
-        sourceCode: "",
-        valueType: CalculationTypes.Number,
-        fundingStreamId: ""
-    });
-    const [isDirty, setIsDirty] = useState<boolean>(false);
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {specification, isLoadingSpecification} =
+        useSpecificationSummary(specificationId,
+            err => addErrorMessage(err.message, "Error while loading specification"));
+    const {calculation, isLoadingCalculation} =
+        useCalculation(calculationId,
+            err => addErrorMessage(err.message, "Error while loading calculation"));
+    const {circularReferenceErrors, isLoadingCircularDependencies} =
+        useCalculationCircularDependencies(specificationId,
+            err => addErrorMessage(err.message, "Error while checking for circular reference errors"));
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
-    const [additionalCalculationType, setAdditionalCalculationType] = useState<CalculationTypes>(CalculationTypes.Percentage);
-    const [additionalCalculationSourceCode, setAdditionalCalculationSourceCode] = useState<string>("");
-    const [initialSourceCode, setInitialSourceCode] = useState<string>("");
-    const [additionalCalculationStatus, setAdditionalCalculationStatus] = useState<PublishStatus>();
-    const initialBuildSuccess: CompilerOutputViewModel = {
+    const [sourceCode, setSourceCode] = useState<string>("");
+    const [calculationStatus, setCalculationStatus] = useState<PublishStatus | undefined>(undefined);
+    const initialBuild: CompilerOutputViewModel = {
         buildSuccess: false,
         compileRun: false,
         previewResponse: {
@@ -95,7 +66,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                         startLine: 0
                     },
                     message: "",
-                    severity: ""
+                    severity: CompileErrorSeverity.Hidden
                 }],
                 sourceFiles: [{
                     fileName: "",
@@ -105,115 +76,33 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
             }
         }
     };
-    const [additionalCalculationBuildSuccess, setAdditionalCalculationBuildSuccess] = useState<CompilerOutputViewModel>(initialBuildSuccess);
-    const [calculationError, setCalculationError] = useState<string>();
-    const [formValidation, setFormValid] = useState({formValid: false, formSubmitted: false});
+    const [calculationBuild, setCalculationBuild] = useState<CompilerOutputViewModel>(initialBuild);
     const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string>("");
-    const [circularReferenceErrors, setCircularReferenceErrors] = useState<CircularReferenceError[]>([]);
     const [nameErrorMessage, setNameErrorMessage] = useState("");
     const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
-
-    useConfirmLeavePage(isDirty && !isSaving);
-
-    useEffect(() => {
-        const loadCalculation = async () => {
-            try {
-                setIsLoading(true);
-                setCalculationError("");
-                setCircularReferenceErrors([]);
-                const result = await getCalculationByIdService(calculationId);
-                const calc = result.data as EditAdditionalCalculationViewModel;
-                setOriginalAdditionalCalculation(calc);
-                setAdditionalCalculationSourceCode(calc.sourceCode);
-                setAdditionalCalculationName(calc.name);
-                setAdditionalCalculationType(calc.valueType);
-                setAdditionalCalculationStatus(calc.publishStatus);
-                setInitialSourceCode(calc.sourceCode);
-
-                const specSummaryResult = await getSpecificationSummaryService(calc.specificationId);
-                const spec = specSummaryResult.data as EditSpecificationViewModel;
-                setSpecificationSummary(spec);
-                setSpecificationId(spec.id);
-
-                const circularDependenciesResponse = await getCalculationCircularDependencies(spec.id);
-                const circularDependencies = circularDependenciesResponse.data as CircularReferenceError[];
-                if (circularDependencies.length > 0) {
-                    setCircularReferenceErrors(circularDependencies);
-                    setIsBuildingCalculationCode(false);
-                    window.scrollTo(0, 0);
-                }
-            } catch {
-                setCalculationError("There is a problem loading this calculation. Please try again.");
-            } finally {
-                setIsLoading(false);
-                setIsDirty(false);
-            }
-        }
-        loadCalculation();
-    }, [calculationId]);
-
-
     let history = useHistory();
 
-    useEffectOnce(() => {
-        getCalculationByIdService(calculationId).then((result) => {
-            const additionalCalculationResult = result.data as EditAdditionalCalculationViewModel;
-            setOriginalAdditionalCalculation(additionalCalculationResult);
-            setAdditionalCalculationSourceCode(additionalCalculationResult.sourceCode);
-            setAdditionalCalculationName(additionalCalculationResult.name);
-            setAdditionalCalculationType(additionalCalculationResult.valueType);
-            setAdditionalCalculationStatus(additionalCalculationResult.publishStatus);
-
-            getSpecificationSummaryService(additionalCalculationResult.specificationId).then((result) => {
-                const specificationResult = result.data as EditSpecificationViewModel;
-                setSpecificationSummary(specificationResult);
-                setSpecificationId(specificationResult.id);
-            });
-        })
-    });
-
-    useEffect(() => {
-        if (originalAdditionalCalculation &&
-            originalAdditionalCalculation.sourceCode &&
-            originalAdditionalCalculation.name &&
-            originalAdditionalCalculation.valueType) {
-            setIsDirty(originalAdditionalCalculation.sourceCode !== additionalCalculationSourceCode ||
-                originalAdditionalCalculation.name !== additionalCalculationName ||
-                originalAdditionalCalculation.valueType !== additionalCalculationType);
-        }
-    }, [additionalCalculationType, additionalCalculationName, additionalCalculationSourceCode, originalAdditionalCalculation])
-
     function submitAdditionalCalculation() {
-        if (additionalCalculationSourceCode === "" || !additionalCalculationBuildSuccess.buildSuccess) {
-            return setFormValid({formSubmitted: true, formValid: false});
+        if (!calculation || !calculation.valueType) {
+            return;
         }
-        if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
-            setNameErrorMessage("Please use a name between 4 and 180 characters");
-            return setFormValid({formSubmitted: true, formValid: false});
-        }
-        if (!((additionalCalculationName.length >= 4 && additionalCalculationName.length <= 180) &&
-            additionalCalculationSourceCode !== "" &&
-            additionalCalculationBuildSuccess.buildSuccess &&
-            additionalCalculationBuildSuccess.compileRun)) {
-            return setFormValid({formSubmitted: true, formValid: false});
+        if (sourceCode === "" || !calculationBuild.buildSuccess) {
+            return addErrorMessage("Please check the code and make sure it builds", "Validation error", "");
         }
 
-        setFormValid({formSubmitted: true, formValid: true});
         setNameErrorMessage("");
         setIsLoading(true);
         setIsSaving(true);
 
         let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
-            calculationName: additionalCalculationName,
-            calculationType: additionalCalculationType,
-            sourceCode: additionalCalculationSourceCode,
+            calculationName: calculation.name,
+            valueType: calculation.valueType,
+            sourceCode: sourceCode,
         };
 
         updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
             .then((result) => {
                 if (result.status === 200) {
-                    setIsDirty(false);
                     let response = result.data as Calculation;
                     history.push(`/ViewSpecification/${response.specificationId}`);
                 }
@@ -226,7 +115,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
 
     const approveTemplateCalculation = async () => {
         setIsLoading(true);
-        setCalculationError("");
+        clearErrorMessages();
 
         const checkCanApproveCalculation = async (id: string) => {
             const result = await getIsUserAllowedToApproveCalculationService(id);
@@ -242,12 +131,12 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
             const canUserApprove = await checkCanApproveCalculation(calculationId);
             if (canUserApprove) {
                 const publishStatus = await approveSpecification(specificationId, calculationId);
-                setAdditionalCalculationStatus(publishStatus);
+                setCalculationStatus(publishStatus);
             } else {
-                setCalculationError("Calculation can not be approved by calculation writer");
+                addErrorMessage("Permissions", "Calculation can not be approved by calculation writer", "calculation-status");
             }
         } catch (e) {
-            setCalculationError("There is a problem, calculation can not be approved, please try again");
+            addErrorMessage("There is a problem, calculation can not be approved, please try again. " + e);
         } finally {
             setIsLoading(false);
         }
@@ -255,51 +144,62 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
 
     async function buildCalculation() {
         setIsBuildingCalculationCode(true);
-        setAdditionalCalculationBuildSuccess(initialBuildSuccess);
-        setCalculationError("");
+        setCalculationBuild(initialBuild);
+        clearErrorMessages();
 
-        compileCalculationPreviewService(specificationId, calculationId, additionalCalculationSourceCode).then((result) => {
-            if (result.status === 200) {
-                let response = result.data as PreviewResponse;
-                setAdditionalCalculationBuildSuccess(prevState => {
+        compileCalculationPreviewService(specificationId, calculationId, sourceCode)
+            .then((result) => {
+                if (result.status !== 200 && result.status !== 400) {
+                    addErrorMessage("Unexpected response with status " + result.statusText, "Error while compiling calculation source code", "source-code")
+                }
+                setCalculationBuild(prevState => {
                     return {
                         ...prevState,
-                        buildSuccess: response.compilerOutput.success,
+                        buildSuccess: result.status === 200 && result.data?.compilerOutput?.success,
                         compileRun: true,
-                        previewResponse: response
+                        previewResponse: result.data
                     }
                 });
                 setIsBuildingCalculationCode(false);
-            }
-
-            if (result.status === 400) {
-                setAdditionalCalculationBuildSuccess(prevState => {
-                    return {
-                        ...prevState,
-                        buildSuccess: false,
-                        compileRun: true,
-                    }
+            })
+            .catch(err => {
+                addErrorMessage(err.toString(), "Error while building calculation", "source-code")
+                setCalculationBuild(prevState => {
+                    return {...prevState, compileRun: false, buildSuccess: false}
                 });
-
-                setErrorMessage((result.data as SourceFile).sourceCode);
-            }
-        }).catch(() => {
-            setAdditionalCalculationBuildSuccess(prevState => {
-                return {...prevState, compileRun: true, buildSuccess: false}
+                setIsBuildingCalculationCode(false);
             });
-            setIsBuildingCalculationCode(false);
-        });
     }
 
     function updateSourceCode(sourceCode: string) {
-        setAdditionalCalculationBuildSuccess(initialBuildSuccess);
-        setAdditionalCalculationSourceCode(sourceCode);
-        setIsDirty(initialSourceCode !== sourceCode);
+        setCalculationBuild(initialBuild);
+        setSourceCode(sourceCode);
     }
 
-    function updateSourceCodeForEditor(updatedSourceCode: string) {
-        setAdditionalCalculationSourceCode(updatedSourceCode);
+    function initCalculationData() {
+        if (!calculation || specificationId.length > 0) {
+            return;
+        }
+        setSpecificationId(calculation.specificationId);
+        setCalculationStatus(calculation.publishStatus);
+        setSourceCode(calculation.sourceCode);
     }
+
+    if (circularReferenceErrors && circularReferenceErrors.length > 0) {
+        window.scrollTo(0, 0);
+    }
+
+    initCalculationData();
+
+    let isDirty = calculation !== undefined && calculation.sourceCode !== sourceCode;
+
+    useConfirmLeavePage(isDirty && !isSaving);
+
+    const loadingTitle = isLoadingSpecification ? "Loading specification" :
+        isLoadingCalculation ? "Loading calculation" :
+            isLoadingCircularDependencies ? "Checking for circular reference errors" :
+                isLoading ? "Updating additional calculation" : "";
+    const loadingSubtitle = isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies ? "Please wait..." : isLoading ? "Please wait whilst the calculation is updated" : "";
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -307,45 +207,44 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={specificationSummary.name} url={`/ViewSpecification/${specificationSummary.id}`}/>
+                {specification &&
+                <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
+                }
                 <Breadcrumb name={"Edit additional calculation"}/>
             </Breadcrumbs>
-            <LoadingStatus title={"Updating additional calculation"} hidden={!isLoading} subTitle={"Please wait whilst the calculation is updated"}/>
-            <div hidden={(calculationError == null || calculationError === "" || isLoading)}
-                 className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                 data-module="govuk-error-summary">
-                <h2 className="govuk-error-summary__title">
-                    There is a problem
-                </h2>
-                <div className="govuk-error-summary__body">
-                    <ul className="govuk-list govuk-error-summary__list">
-                        <li>
-                            <a href="#calculation-status">{calculationError}</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
 
+            {(isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies || isLoading) &&
+            <LoadingStatus title={loadingTitle} hidden={!isLoading} subTitle={loadingSubtitle}/>
+            }
+
+            <MultipleErrorSummary errors={errors}/>
+
+            {circularReferenceErrors &&
             <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3}/>
+            }
 
             <fieldset className="govuk-fieldset" hidden={isLoading}>
                 <div className={"govuk-form-group" + (nameErrorMessage.length > 0 ? " govuk-form-group--error" : "")}>
                     <span className="govuk-caption-l">
                         Calculation name
                     </span>
-                    <h2 id="calculation-name-title" className={"govuk-heading-l"}>{additionalCalculationName}</h2>
+                    <h2 id="calculation-name-title" className={"govuk-heading-l"}>
+                        {!isLoadingCalculation && calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
+                    </h2>
                 </div>
                 <div id="calculation-status"
-                     className={"govuk-form-group" + (calculationError != null && calculationError !== "" ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (errors.some(err => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")}>
                     <span className="govuk-error-message">
-                        <span className="govuk-visually-hidden">Error:</span> {calculationError}
+                        <span className="govuk-visually-hidden">Error:</span> {errors.find(err => err.fieldName === "calculation-status")}
                     </span>
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-one-quarter">
                             <h3 className="govuk-caption-m govuk-!-font-weight-bold">Calculation status</h3>
                         </div>
                         <div className="govuk-grid-column-one-quarter">
-                            <span className="govuk-tag govuk-tag--green govuk-!-margin-top-4">{additionalCalculationStatus} </span>
+                            <span className="govuk-tag govuk-tag--green govuk-!-margin-top-4">
+                                {!isLoadingCalculation && calculationStatus ? calculationStatus : <LoadingFieldStatus title="Loading..."/>}
+                            </span>
                         </div>
                     </div>
                     <div className="govuk-grid-row">
@@ -355,24 +254,29 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                             </h3>
                         </div>
                         <div className="govuk-grid-column-one-quarter">
-                            <h3 className="govuk-caption-m govuk-">{additionalCalculationType}</h3>
+                            <h3 className="govuk-caption-m govuk-">
+                                {!isLoadingCalculation && calculation ? calculation.valueType : <LoadingFieldStatus title="Loading..."/>}
+                            </h3>
                         </div>
                     </div>
                 </div>
-                <div className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                <div id="source-code"
+                     className={"govuk-form-group" + ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <h3 className="govuk-caption-m govuk-!-font-weight-bold">
                         Calculation script
                     </h3>
                     {renderMonacoEditor && <GdsMonacoEditor
-                        value={additionalCalculationSourceCode}
+                        value={sourceCode}
                         change={updateSourceCode}
                         language={"vb"}
                         minimap={false}
                         specificationId={specificationId}
                         calculationType={"AdditionalCalculation"}
-                        calculationName={additionalCalculationName}
+                        calculationName={calculation ? calculation.name : ""}
                     />}
-                    <button data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
+                    <button data-prevent-double-click="true"
+                            className="govuk-button"
+                            data-module="govuk-button"
                             data-testid="build"
                             onClick={buildCalculation} disabled={isBuildingCalculationCode}>
                         Build calculation
@@ -382,48 +286,50 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                 <div className="govuk-form-group">
                     <CalculationResultsLink calculationId={calculationId}/>
                 </div>
-                {additionalCalculationBuildSuccess.buildSuccess &&
+                {calculationBuild.compileRun && calculationBuild.buildSuccess &&
                 <div className="govuk-panel govuk-panel--confirmation">
                     <div className="govuk-panel__body">
                         Build successful
                     </div>
                 </div>}
-                {isDirty && !additionalCalculationBuildSuccess.buildSuccess &&
+                {calculationBuild.compileRun && !calculationBuild.buildSuccess &&
+                <div className={"govuk-form-group" + ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
+                    <label className="govuk-label" htmlFor="build-output">
+                        Build output
+                    </label>
+                    <CompilationErrorMessageList compilerMessages={calculationBuild.previewResponse.compilerOutput.compilerMessages}/>
+                </div>
+                }
+                {isDirty && !calculationBuild.buildSuccess &&
                 <div className={"govuk-form-group" +
-                ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
+                ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
                 </div>}
                 {isDirty &&
                 <div className="govuk-form-group">
                     <div className="govuk-body">Your calculation must be saved before you can approve it</div>
                 </div>}
-                <div
-                    hidden={(!additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) || (additionalCalculationBuildSuccess.compileRun && additionalCalculationBuildSuccess.buildSuccess)}
-                    className={"govuk-form-group" + ((additionalCalculationBuildSuccess.compileRun && !additionalCalculationBuildSuccess.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <label className="govuk-label" htmlFor="build-output">
-                        Build output
-                    </label>
-                    <CompliationErrorMessageList compilerMessages={additionalCalculationBuildSuccess.previewResponse.compilerOutput.compilerMessages} errorMessage={errorMessage}/>
-                </div>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={submitAdditionalCalculation}
-                        disabled={!isDirty || isSaving || !additionalCalculationBuildSuccess.buildSuccess}>
+                        disabled={!isDirty || isSaving || !calculationBuild.buildSuccess}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                         onClick={approveTemplateCalculation}
-                        disabled={isDirty || additionalCalculationStatus === PublishStatus.Approved}>
+                        disabled={isDirty || !calculation || calculation.publishStatus === PublishStatus.Approved}>
                     Approve
                 </button>
                 <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
                       data-module="govuk-button">
                     Cancel
                 </Link>
+                {calculation &&
                 <div className={"govuk-form-group"}>
                     <span id="last-saved-date" className={"govuk-body"}>
-                    Last saved <DateFormatter date={originalAdditionalCalculation.lastUpdated} utc={false} />
+                    Last saved <DateFormatter date={calculation.lastUpdated} utc={false}/>
                     </span>
                 </div>
+                }
                 <div className={"govuk-form-group"}>
                     <Link className={"govuk-link"} to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
                 </div>

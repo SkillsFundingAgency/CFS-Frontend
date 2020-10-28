@@ -1,4 +1,4 @@
-﻿﻿import React from "react";
+﻿import React from "react";
 import {ListTemplates} from "../../../pages/Templates/ListTemplates";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";

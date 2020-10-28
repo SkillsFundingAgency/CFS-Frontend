@@ -1,4 +1,7 @@
 import {PublishStatus} from "./PublishStatusModel";
+import {Author} from "./Calculations/Author";
+import {CalculationTypes} from "./Calculations/CreateAdditonalCalculationViewModel";
+import {ValueType} from "./ValueType";
 
 export interface CalculationSummary {
     totalCount: number;
@@ -16,17 +19,19 @@ export interface CalculationSummary {
 export interface Calculation {
     id: string;
     name: string;
-    fundingStreamId: string;
     specificationId: string;
-    specificationName: string;
-    valueType: string;
-    calculationType: string;
+    fundingStreamId: string;
+    sourceCode: string;
+    calculationType: CalculationTypes;
+    sourceCodeName: string;
     namespace: string;
     wasTemplateCalculation: boolean;
-    description: null;
-    status: string;
-    lastUpdatedDate: Date;
-    lastUpdatedDateDisplay: string;
+    valueType: ValueType;
+    lastUpdated: Date;
+    author: Author | null;
+    version?: number | undefined;
+    publishStatus: PublishStatus;
+    description?: string | undefined;
 }
 
 interface PagerState {
