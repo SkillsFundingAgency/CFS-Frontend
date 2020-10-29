@@ -1,12 +1,6 @@
 ﻿// <copyright file="CalculationControllerTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
-
-using CalculateFunding.Common.ApiClient.Calcs;
-using CalculateFunding.Common.ApiClient.Calcs.Models;
-using CalculateFunding.Common.ApiClient.Results;
-using CalculateFunding.Common.ApiClient.Specifications;
-
 namespace CalculateFunding.Frontend.Controllers
 {
     using System;
@@ -28,6 +22,10 @@ namespace CalculateFunding.Frontend.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
+    using CalculateFunding.Common.ApiClient.Calcs;
+    using CalculateFunding.Common.ApiClient.Calcs.Models;
+    using CalculateFunding.Common.ApiClient.Results;
+    using CalculateFunding.Common.ApiClient.Specifications;
 
     [TestClass]
     public class CalculationControllerTests
@@ -389,6 +387,95 @@ namespace CalculateFunding.Frontend.Controllers
             actionResult
                 .Should()
                 .BeOfType<BadRequestObjectResult>();
+        }
+
+        [TestMethod]
+        public async Task ApproveAllCalculations_GivenUserDoesNotHaveCanApproveAllCalculationPermission_Returns403()
+        {
+            //Arrange
+
+            string specificationId = "abc123";
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+            
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
+                .Returns(false);
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+
+            // Act
+            IActionResult result = await controller.ApproveAllCalculations(specificationId);
+
+            // Assert
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [TestMethod]
+        public async Task ApproveAllCalculations_GivenApproveAllCalculationsReturnsBadRequest_ThrowsInvalidOperationException()
+        {
+            //Arrange
+
+            string specificationId = "abc123";
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .QueueApproveAllSpecificationCalculations(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Job>(HttpStatusCode.BadRequest));
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
+                .Returns(true);
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+
+            // Act
+            Action a = new Action(() =>
+            {
+                IActionResult result = controller.ApproveAllCalculations(specificationId).Result;
+            });
+
+            // Assert
+            a.Should().Throw<InvalidOperationException>();
+        }
+
+        [TestMethod]
+        public async Task ApproveAllCalculations_GivenApproveAllCalculationsReturnsJob_ReturnsOK()
+        {
+            //Arrange
+
+            string specificationId = "abc123";
+            string jobId = "job123";
+
+            Job job = new Job { Id = jobId };
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            calcsClient
+                .QueueApproveAllSpecificationCalculations(Arg.Is(specificationId))
+                .Returns(new ApiResponse<Job>(HttpStatusCode.OK, job));
+
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
+                .Returns(true);
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+
+            // Act
+            IActionResult result = await controller.ApproveAllCalculations(specificationId);
+
+            // Assert
+            result.Should().BeOfType<OkObjectResult>();
+            
+            OkObjectResult okObjectResult = result as OkObjectResult;
+            okObjectResult.Should().NotBeNull();
+            okObjectResult.Value.Should().NotBeNull();
+            okObjectResult.Value.Should().BeOfType<Job>();
+
+            Job actualJob = okObjectResult.Value as Job;
+            actualJob.Id.Should().Be(jobId);
         }
 
         [TestMethod]

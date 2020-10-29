@@ -71,7 +71,7 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="4.2.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="4.5.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="5.6.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="1.4.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.0.0" />
@@ -82,9 +82,8 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.16.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="2.6.0" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="1.7.0" />
-    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.3.0" />
+    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.4.0" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="2.1.0" />
 
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.1.0" />

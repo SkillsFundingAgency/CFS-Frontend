@@ -17,6 +17,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using Microsoft.AspNetCore.Mvc;
 using CalculationType = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationType;
+using Job = CalculateFunding.Common.ApiClient.Calcs.Models.Job;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -207,6 +208,34 @@ namespace CalculateFunding.Frontend.Controllers
             else
             {
                 throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            }
+        }
+
+        /// <summary>
+        /// Approve all calculations
+        /// </summary>
+        /// <param name="specificationId">Specification ID</param>
+        /// <returns></returns>
+        [Route("api/specs/{specificationId}/calculations/approveall")]
+        [HttpPut]
+        public async Task<IActionResult> ApproveAllCalculations([FromRoute] string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveAllCalculations))
+            {
+                return new ForbidResult();
+            }
+
+            ApiResponse<Job> response = await _calcClient.QueueApproveAllSpecificationCalculations(specificationId);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+            else
+            {
+                throw new InvalidOperationException($"An error occurred while approving all calculations. Status code={response.StatusCode}");
             }
         }
 
