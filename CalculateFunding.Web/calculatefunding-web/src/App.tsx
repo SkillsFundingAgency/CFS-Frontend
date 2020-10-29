@@ -27,8 +27,6 @@ import {SpecificationsList} from "./pages/Specifications/SpecificationsList";
 import {ViewSpecificationResults} from "./pages/Specifications/ViewSpecificationResults";
 import {ViewSpecification} from "./pages/Specifications/ViewSpecification";
 import {CreateAdditionalCalculation} from "./pages/Calculations/CreateAdditionalCalculation";
-import {EditAdditionalCalculation} from "./pages/Calculations/EditAdditionalCalculation";
-import {EditTemplateCalculation} from "./pages/Calculations/EditTemplateCalculation";
 import {ManageData} from "./pages/Datasets/ManageData";
 import {EditVariationPoints} from "./pages/Specifications/EditVariationPoints";
 import {CalculationVersionHistory} from "./pages/Calculations/CalculationVersionHistory";
@@ -58,6 +56,7 @@ import {
 } from "react-query";
 import {ReactQueryDevtools} from "react-query-devtools";
 import {ProfileHistory} from './pages/FundingApprovals/ProfileHistory';
+import {EditCalculation} from "./pages/Calculations/EditCalculation";
 
 const queryCache = new QueryCache();
 
@@ -135,8 +134,7 @@ const App: React.FunctionComponent = () => {
                         {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
                         {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
                         <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation}/>
-                        <Route path="/Specifications/EditAdditionalCalculation/:calculationId" component={EditAdditionalCalculation}/>
-                        <Route path="/Specifications/EditTemplateCalculation/:calculationId" component={EditTemplateCalculation}/>
+                        <Route path="/Specifications/EditCalculation/:calculationId" component={EditCalculation}/>
                         <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints}/>
                         <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
                         <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>

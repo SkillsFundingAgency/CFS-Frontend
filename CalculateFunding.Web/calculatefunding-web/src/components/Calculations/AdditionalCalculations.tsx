@@ -115,7 +115,7 @@ export function AdditionalCalculations(props: { specificationId: string }) {
             {additionalCalculations.results.map((ac, index) =>
                 <tr className="govuk-table__row" key={index}>
                     <td className="govuk-table__cell text-overflow">
-                        <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
+                        <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
                         <br />
                         {
                             circularReferenceErrors.some((error) =>

@@ -448,13 +448,15 @@ export function GdsMonacoEditor(props: {
             });
     }
 
-    if (!isloading) {
-        return create('div', {
-            className: "govuk-textarea--monaco-editor",
-            children: create('div', {
-                ref: element,
-                style: {height: height},
-            }),
-        })
+    if (isloading) {
+        return null;
     }
+
+    return create('div', {
+        className: "govuk-textarea--monaco-editor",
+        children: create('div', {
+            ref: element,
+            style: {height: height},
+        }),
+    })
 }

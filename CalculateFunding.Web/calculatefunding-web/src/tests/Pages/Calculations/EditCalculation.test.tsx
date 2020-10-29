@@ -1,15 +1,16 @@
 import React from "react";
-import {EditAdditionalCalculationRouteProps} from "../../../pages/Calculations/EditAdditionalCalculation";
+import {EditCalculationRouteProps} from "../../../pages/Calculations/EditCalculation";
 import {createLocation, createMemoryHistory} from 'history';
 import {match} from 'react-router';
 import {MemoryRouter} from 'react-router-dom';
-import {act, cleanup, render, screen} from '@testing-library/react';
+import {act, cleanup, render, screen, within} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
-import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
+import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
 import * as calcHook from "../../../hooks/Calculations/useCalculation";
-import {CalculationQueryResult} from "../../../hooks/Calculations/useCalculation";
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
+import {CalculationQueryResult} from "../../../hooks/Calculations/useCalculation";
+import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {CalculationTypes} from "../../../types/Calculations/CreateAdditonalCalculationViewModel";
@@ -19,15 +20,16 @@ import {Calculation} from "../../../types/CalculationSummary";
 import {ValueType} from "../../../types/ValueType";
 import userEvent from "@testing-library/user-event";
 import {CalculationCompilePreviewResponse, CompileErrorSeverity} from "../../../types/Calculations/CalculationCompilePreviewResponse";
+import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 
 const history = createMemoryHistory();
 
 
-function renderEditAdditionalCalculation() {
-    const {EditAdditionalCalculation} = require("../../../pages/Calculations/EditAdditionalCalculation");
+function renderEditCalculation() {
+    const {EditCalculation} = require("../../../pages/Calculations/EditCalculation");
     return render(
         <MemoryRouter>
-            <EditAdditionalCalculation
+            <EditCalculation
                 excludeMonacoEditor={true}
                 history={history}
                 location={location}
@@ -35,18 +37,19 @@ function renderEditAdditionalCalculation() {
         </MemoryRouter>);
 }
 
-describe("<EditAdditionalCalculation> tests", () => {
+describe("<EditCalculation> tests", () => {
 
-    describe("<EditAdditionalCalculation> when user builds invalid source code", () => {
+    describe("<EditCalculation> when user builds invalid source code", () => {
         beforeEach(() => {
             mockOutMonacoEditor();
+            mockWithFullPermissions();
             mockSpecification();
             mockCalculation();
             mockNoCircularRefErrors();
             mockFailedBuild();
 
-            renderEditAdditionalCalculation();
-            
+            renderEditCalculation();
+
         });
         afterEach(() => {
             cleanup();
@@ -57,21 +60,22 @@ describe("<EditAdditionalCalculation> tests", () => {
             const buildButton = screen.getByRole("button", {name: /Build calculation/});
 
             act(() => userEvent.click(buildButton));
-            
+
             expect(await screen.findByText(/There was a compilation error/)).toBeInTheDocument();
             expect(await screen.findByText(/Typo error/)).toBeInTheDocument();
             expect(screen.queryByText(/Build successful/)).not.toBeInTheDocument();
         });
     });
-    
-    describe("<EditAdditionalCalculation> with no circular ref errors", () => {
+
+    describe("<EditCalculation> with no circular ref errors", () => {
         beforeEach(() => {
             mockOutMonacoEditor();
+            mockWithFullPermissions();
             mockSpecification();
             mockCalculation();
             mockNoCircularRefErrors();
 
-            renderEditAdditionalCalculation();
+            renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
 
@@ -101,54 +105,90 @@ describe("<EditAdditionalCalculation> tests", () => {
         it("does not render CircularReferenceErrors when there are no circular reference errors", async () => {
             expect(screen.queryByText("Calculations are not able to run due to the following problem")).not.toBeInTheDocument();
         });
+
+        it('disables save button given user has not edited the calculation', async () => {
+            const saveButton = screen.getByRole("button", {name: /Save and continue/});
+            expect(saveButton).toBeDisabled();
+        });
+
+        it('enables approve button given user is allowed to approve calculation', async () => {
+            const approveButton = screen.getByRole("button", {name: /Approve/});
+            expect(approveButton).toBeEnabled();
+       });
+    });
+    describe("<EditCalculation> with no permissions", () => {
+        beforeEach(() => {
+            mockOutMonacoEditor();
+            mockWithNoPermissions();
+            mockSpecification();
+            mockCalculation();
+            mockNoCircularRefErrors();
+
+            renderEditCalculation();
+        });
+        afterEach(() => jest.clearAllMocks());
+
+        it("renders permissions warning", async () => {
+            const permissionsWarning = await screen.findByTestId("permission-alert-message");
+            expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following actions:/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Approve Calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Edit Calculations/)).toBeInTheDocument();
+
+            expect(screen.getByText(testSpec.name)).toBeInTheDocument();
+        });
+        
+        it('disables approve button given user is not allowed to approve calculation', async () => {
+            const approveButton = screen.getByRole("button", {name: /Approve/});
+            expect(approveButton).toBeDisabled();
+       });
     });
 
-    describe("<EditAdditionalCalculation> when loading circular ref errors", () => {
+    describe("<EditCalculation> when loading circular ref errors", () => {
         beforeEach(() => {
             mockOutMonacoEditor();
             mockSpecification();
             mockCalculation();
             mockCircularRefErrorsLoading();
-    
-            renderEditAdditionalCalculation();
+
+            renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
-    
+
         it("renders the specification", async () => {
             expect(screen.getByText(testSpec.name)).toBeInTheDocument();
         });
-    
+
         it("renders the calculation", async () => {
             expect(screen.getByText("Calculation name")).toBeInTheDocument();
             expect(screen.getByText(testCalc.publishStatus)).toBeInTheDocument();
         });
-    
+
         it("renders CircularReferenceErrors loading", async () => {
             expect(screen.getByTestId("loader")).toBeInTheDocument();
             expect(screen.getByText(/Checking for circular reference errors/)).toBeInTheDocument();
         });
     });
 
-    describe("<EditAdditionalCalculation> with a circular ref error", () => {
+    describe("<EditCalculation> with a circular ref error", () => {
         beforeEach(() => {
             mockOutMonacoEditor();
             mockSpecification();
             mockCalculation();
             mockCircularRefErrors();
-    
-            renderEditAdditionalCalculation();
+
+            renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
-    
+
         it("renders the specification", async () => {
             expect(screen.getByText(testSpec.name)).toBeInTheDocument();
         });
-    
+
         it("renders the calculation", async () => {
             expect(screen.getByText("Calculation name")).toBeInTheDocument();
             expect(screen.getByText(testCalc.publishStatus)).toBeInTheDocument();
         });
-    
+
         it("renders CircularReferenceErrors when there are circular reference errors", async () => {
             expect(screen.getByText("Calculations are not able to run due to the following problem")).toBeInTheDocument();
         });
@@ -156,7 +196,7 @@ describe("<EditAdditionalCalculation> tests", () => {
 });
 
 
-const matchMock: match<EditAdditionalCalculationRouteProps> = {
+const matchMock: match<EditCalculationRouteProps> = {
     isExact: true,
     path: "",
     url: "",
@@ -262,8 +302,40 @@ const mockSuccessfulBuildResponse: CalculationCompilePreviewResponse = {
         compilerMessages: [],
     }
 };
+const specFullPermsResult: SpecificationPermissionsResult = {
+    canApproveFunding: false,
+    canCreateSpecification: false,
+    canEditCalculation: true,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canApproveCalculation: true,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    isPermissionsFetched: true,
+    missingPermissions: []
+}
+const specNoPermsResult: SpecificationPermissionsResult = {
+    canApproveFunding: false,
+    canCreateSpecification: false,
+    canEditCalculation: false,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canApproveCalculation: false,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    isPermissionsFetched: true,
+    missingPermissions: ["Edit Calculations", "Approve Calculations",]
+}
 const location = createLocation(matchMock.url);
 const mockOutMonacoEditor = () => jest.mock("../../../components/GdsMonacoEditor", () => <></>);
+const mockWithFullPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
+    .mockImplementation(() => (specFullPermsResult));
+const mockWithNoPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
+    .mockImplementation(() => (specNoPermsResult));
 const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
     .mockImplementation(() => (specResult));
 const mockCalculation = () => jest.spyOn(calcHook, 'useCalculation')

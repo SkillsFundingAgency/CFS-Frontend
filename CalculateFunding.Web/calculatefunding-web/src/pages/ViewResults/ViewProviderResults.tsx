@@ -530,7 +530,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                     {additionalCalculations.results.map((ac, index) =>
                                         <tr className="govuk-table__row" key={index}>
                                             <td className="govuk-table__cell text-overflow">
-                                                <Link to={`/Specifications/EditAdditionalCalculation/${ac.id}`}>{ac.name}</Link>
+                                                <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
                                             </td>
                                             <td className="govuk-table__cell">{ac.valueType != null && ac.value != null ? ac.valueType : ""}</td>
                                             <td className="govuk-table__cell">{ac.value}</td>

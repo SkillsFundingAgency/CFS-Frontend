@@ -1,4 +1,4 @@
-export interface EffectiveSpecificationPermission{
+export interface EffectiveSpecificationPermission {
     canCreateQaTests:           boolean;
     canReleaseFunding:          boolean;
     canApproveFunding:          boolean;
@@ -7,6 +7,10 @@ export interface EffectiveSpecificationPermission{
     canMapDatasets:             boolean;
     canDeleteCalculations:      boolean;
     canEditCalculations:        boolean;
+    canApproveCalculations:     boolean;
+    canApplyCustomProfilePattern:     boolean;
+    canAssignProfilePattern:     boolean;
+    canApproveAnyCalculations:  boolean;
     canDeleteSpecification:     boolean;
     canApproveSpecification:    boolean;
     canEditSpecification:       boolean;

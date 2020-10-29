@@ -8,10 +8,27 @@ import {milliseconds} from "../helpers/TimeInMs";
 export enum SpecificationPermissions {
     Create = "Create",
     Edit = "Edit",
+    EditCalculations = "Edit Calculations",
+    ApproveCalculations = "Approve Calculations",
     MapDatasets = "Map Datasets",
     Release = "Release",
     Refresh = "Refresh",
     Approve = "Approve"
+}
+
+export interface SpecificationPermissionsResult {
+    isCheckingForPermissions: boolean,
+    isPermissionsFetched: boolean,
+    canCreateSpecification: boolean | undefined,
+    canEditSpecification: boolean | undefined,
+    canApproveFunding: boolean | undefined,
+    canRefreshFunding: boolean | undefined,
+    canReleaseFunding: boolean | undefined,
+    canMapDatasets: boolean | undefined,
+    canEditCalculation: boolean | undefined,
+    canApproveCalculation: boolean | undefined,
+    hasMissingPermissions: boolean,
+    missingPermissions: string[]
 }
 
 export const useSpecificationPermissions = (
@@ -22,7 +39,7 @@ export const useSpecificationPermissions = (
         staleTime: milliseconds.OneHour, 
         enabled: specificationId && specificationId.length > 0, 
         refetchOnWindowFocus: false
-    }) => {
+    }): SpecificationPermissionsResult => {
 
     const {data: permissions, isLoading, isFetched} =
         useQuery<EffectiveSpecificationPermission, AxiosError>(
@@ -36,6 +53,14 @@ export const useSpecificationPermissions = (
 
     const canEditSpecification = useMemo(() => {
         return permissions && permissions.canEditSpecification;
+    }, [permissions]);
+
+    const canEditCalculation = useMemo(() => {
+        return permissions && permissions.canEditCalculations;
+    }, [permissions]);
+
+    const canApproveCalculation = useMemo(() => {
+        return permissions && (permissions.canApproveAnyCalculations || permissions.canApproveCalculations);
     }, [permissions]);
 
     const canRefreshFunding = useMemo(() => {
@@ -75,8 +100,14 @@ export const useSpecificationPermissions = (
         if (!canMapDatasets && requiredPermissions.includes(SpecificationPermissions.MapDatasets)) {
             missing.push(SpecificationPermissions.MapDatasets);
         }
+        if (!canEditCalculation && requiredPermissions.includes(SpecificationPermissions.EditCalculations)) {
+            missing.push(SpecificationPermissions.EditCalculations);
+        }
+        if (!canApproveCalculation && requiredPermissions.includes(SpecificationPermissions.ApproveCalculations)) {
+            missing.push(SpecificationPermissions.ApproveCalculations);
+        }
         return missing;
-    }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canMapDatasets, requiredPermissions]);
+    }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canMapDatasets, requiredPermissions, canEditCalculation, canApproveCalculation]);
 
     return {
         isCheckingForPermissions: queryOptions.enabled ? isLoading : false,
@@ -87,6 +118,8 @@ export const useSpecificationPermissions = (
         canRefreshFunding,
         canReleaseFunding,
         canMapDatasets,
+        canEditCalculation,
+        canApproveCalculation,
         hasMissingPermissions: queryOptions.enabled ? missingPermissions && missingPermissions.length > 0: false,
         missingPermissions
     }

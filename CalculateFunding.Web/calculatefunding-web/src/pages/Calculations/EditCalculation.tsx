@@ -1,8 +1,8 @@
-import {Header} from "../../components/Header";
+﻿import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
-import {UpdateAdditionalCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {approveCalculationService, compileCalculationPreviewService, getIsUserAllowedToApproveCalculationService, updateAdditionalCalculationService,} from "../../services/calculationService";
+import {UpdateCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {approveCalculationService, compileCalculationPreviewService, getIsUserAllowedToApproveCalculationService, updateCalculationService,} from "../../services/calculationService";
 import {Calculation} from "../../types/CalculationSummary";
 import {CalculationCompilePreviewResponse, CompileErrorSeverity, CompilerOutputViewModel} from "../../types/Calculations/CalculationCompilePreviewResponse";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -23,20 +23,23 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useCalculation} from "../../hooks/Calculations/useCalculation";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {PermissionStatus} from "../../components/PermissionStatus";
 
-export interface EditAdditionalCalculationProps {
+export interface EditCalculationProps {
     excludeMonacoEditor?: boolean
 }
 
-export interface EditAdditionalCalculationRouteProps {
-    calculationId: string
+export interface EditCalculationRouteProps {
+    calculationId: string,
 }
 
-export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteComponentProps<EditAdditionalCalculationRouteProps> & EditAdditionalCalculationProps) {
-    const [renderMonacoEditor] = useState<boolean>(!excludeMonacoEditor);
+export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProps<EditCalculationRouteProps> & EditCalculationProps) {
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
     const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {canEditCalculation, canApproveCalculation, missingPermissions} =
+        useSpecificationPermissions(specificationId, [SpecificationPermissions.EditCalculations, SpecificationPermissions.ApproveCalculations]);
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId,
             err => addErrorMessage(err.message, "Error while loading specification"));
@@ -82,8 +85,8 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
     const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
     let history = useHistory();
 
-    function submitAdditionalCalculation() {
-        if (!calculation || !calculation.valueType) {
+    const onSaveCalculation = async () => {
+        if (!calculation || !calculation.valueType || !calculationBuild.buildSuccess) {
             return;
         }
         if (sourceCode === "" || !calculationBuild.buildSuccess) {
@@ -94,13 +97,13 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
         setIsLoading(true);
         setIsSaving(true);
 
-        let updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel = {
+        let updateAdditionalCalculationViewModel: UpdateCalculationViewModel = {
             calculationName: calculation.name,
             valueType: calculation.valueType,
             sourceCode: sourceCode,
         };
 
-        updateAdditionalCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
+        updateCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
             .then((result) => {
                 if (result.status === 200) {
                     let response = result.data as Calculation;
@@ -112,25 +115,15 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                 setIsSaving(false);
             });
     }
-
-    const approveTemplateCalculation = async () => {
+    
+    const onApproveCalculation = async () => {
         setIsLoading(true);
         clearErrorMessages();
 
-        const checkCanApproveCalculation = async (id: string) => {
-            const result = await getIsUserAllowedToApproveCalculationService(id);
-            return result.data as boolean;
-        };
-
-        const approveSpecification = async (specId: string, calcId: string) => {
-            const result = await approveCalculationService({publishStatus: PublishStatus.Approved} as PublishStatusModel, specId, calcId);
-            return result.data;
-        };
-
         try {
-            const canUserApprove = await checkCanApproveCalculation(calculationId);
-            if (canUserApprove) {
-                const publishStatus = await approveSpecification(specificationId, calculationId);
+            if (canApproveCalculation) {
+                const publishStatus = (await approveCalculationService({publishStatus: PublishStatus.Approved} as PublishStatusModel, specificationId, calculationId)).data;
+
                 setCalculationStatus(publishStatus);
             } else {
                 addErrorMessage("Permissions", "Calculation can not be approved by calculation writer", "calculation-status");
@@ -142,7 +135,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
         }
     }
 
-    async function buildCalculation() {
+    const buildCalculation = async () => {
         setIsBuildingCalculationCode(true);
         setCalculationBuild(initialBuild);
         clearErrorMessages();
@@ -171,12 +164,12 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
             });
     }
 
-    function updateSourceCode(sourceCode: string) {
+    const onUpdateSourceCode = async (sourceCode: string) => {
         setCalculationBuild(initialBuild);
         setSourceCode(sourceCode);
     }
 
-    function initCalculationData() {
+    const initCalculationData = () => {
         if (!calculation || specificationId.length > 0) {
             return;
         }
@@ -210,7 +203,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                 {specification &&
                 <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
                 }
-                <Breadcrumb name={"Edit additional calculation"}/>
+                <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`}/>
             </Breadcrumbs>
 
             {(isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies || isLoading) &&
@@ -232,6 +225,9 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                         {!isLoadingCalculation && calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
                     </h2>
                 </div>
+                
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={!calculation || !specification}/>
+
                 <div id="calculation-status"
                      className={"govuk-form-group" + (errors.some(err => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")}>
                     <span className="govuk-error-message">
@@ -265,9 +261,9 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                     <h3 className="govuk-caption-m govuk-!-font-weight-bold">
                         Calculation script
                     </h3>
-                    {renderMonacoEditor && <GdsMonacoEditor
+                    {excludeMonacoEditor !== true && <GdsMonacoEditor
                         value={sourceCode}
-                        change={updateSourceCode}
+                        change={onUpdateSourceCode}
                         language={"vb"}
                         minimap={false}
                         specificationId={specificationId}
@@ -310,17 +306,16 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                     <div className="govuk-body">Your calculation must be saved before you can approve it</div>
                 </div>}
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                        onClick={submitAdditionalCalculation}
-                        disabled={!isDirty || isSaving || !calculationBuild.buildSuccess}>
+                        onClick={onSaveCalculation}
+                        disabled={!isDirty || isSaving || !calculationBuild.buildSuccess || !canEditCalculation}>
                     Save and continue
                 </button>
                 <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                        onClick={approveTemplateCalculation}
-                        disabled={isDirty || !calculation || calculation.publishStatus === PublishStatus.Approved}>
+                        onClick={onApproveCalculation}
+                        disabled={isDirty || !calculation || calculation.publishStatus === PublishStatus.Approved || !canApproveCalculation}>
                     Approve
                 </button>
-                <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary"
-                      data-module="govuk-button">
+                <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">
                     Cancel
                 </Link>
                 {calculation &&
@@ -331,7 +326,7 @@ export function EditAdditionalCalculation({match, excludeMonacoEditor}: RouteCom
                 </div>
                 }
                 <div className={"govuk-form-group"}>
-                    <Link className={"govuk-link"} to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
+                    <Link className="govuk-link" to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
                 </div>
             </fieldset>
         </div>

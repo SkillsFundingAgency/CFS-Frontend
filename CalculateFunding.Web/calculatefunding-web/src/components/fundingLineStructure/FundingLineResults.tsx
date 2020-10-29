@@ -165,7 +165,7 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
                 fundingLines.map((f, index) => {
                     let linkValue = '';
                     if (f.calculationId != null && f.calculationId !== '') {
-                        linkValue = `/app/Specifications/EditTemplateCalculation/${f.calculationId}`;
+                        linkValue = `/app/Specifications/EditCalculation/${f.calculationId}`;
                     }
                     return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
                         <CollapsibleSteps

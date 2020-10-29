@@ -18,9 +18,8 @@ export const CircularReferenceErrorSummary = ({errors, defaultSize}: CircularRef
     }
 
     const createLink = (e: CircularReferenceError) =>
-        <Link className="govuk-link"
-            to={`/Specifications/${e.node.calculationType === "Template" ? "EditTemplateCalculation" : "EditAdditionalCalculation"}/${e.node.calculationid}/${e.node.calculationType === "Template" ? e.node.calculationName : ""}`}>
-                {e.node.calculationName}
+        <Link className="govuk-link" to={`/Specifications/EditCalculation/${e.node.calculationid}`}>
+            {e.node.calculationName}
         </Link>
 
     return (

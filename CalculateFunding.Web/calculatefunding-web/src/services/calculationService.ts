@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
-import { CreateAdditionalCalculationViewModel, UpdateAdditionalCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
+import { CreateAdditionalCalculationViewModel, UpdateCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
 import {Calculation, CalculationSummary} from "../types/CalculationSummary";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
@@ -61,13 +61,13 @@ export async function createAdditionalCalculationService(createAdditionalCalcula
     })
 }
 
-export async function updateAdditionalCalculationService(updateAdditionalCalculationViewModel: UpdateAdditionalCalculationViewModel, specificationId: string, calculationId: string) {
+export async function updateCalculationService(updateCalculationViewModel: UpdateCalculationViewModel, specificationId: string, calculationId: string) {
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/editadditionalcalculation`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        data: updateAdditionalCalculationViewModel
+        data: updateCalculationViewModel
     })
 }
 
@@ -127,12 +127,7 @@ export async function getMultipleVersionsByCalculationIdService(calculationId: s
 
 
 export async function getIsUserAllowedToApproveCalculationService(calculationId: string) {
-    return axios(`/api/calcs/${calculationId}/approvepermission`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+    return axios.get<boolean>(`/api/calcs/${calculationId}/approvepermission`)
 }
 
 export async function getCalculationCircularDependencies(specificationId: string) {

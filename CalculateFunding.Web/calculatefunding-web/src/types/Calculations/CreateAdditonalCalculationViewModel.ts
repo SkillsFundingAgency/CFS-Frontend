@@ -6,7 +6,7 @@ export interface CreateAdditionalCalculationViewModel {
     calculationType:CalculationTypes;
 }
 
-export interface UpdateAdditionalCalculationViewModel {
+export interface UpdateCalculationViewModel {
     sourceCode: string;
     calculationName: string;
     valueType: ValueType
