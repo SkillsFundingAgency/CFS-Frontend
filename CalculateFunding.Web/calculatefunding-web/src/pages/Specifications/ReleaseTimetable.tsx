@@ -10,15 +10,11 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {ConfirmationPanel} from "../../components/ConfirmationPanel";
 
 export function ReleaseTimetable(props: { specificationId: string }) {
-    const [navisionDate, setNavisionDate] = useState<Date>(DateTime.fromMillis(0).toJSDate());
-    const [releaseDate, setReleaseDate] = useState<Date>(DateTime.fromMillis(0).toJSDate());
+    const [navisionDate, setNavisionDate] = useState<Date>(new Date(0));
+    const [releaseDate, setReleaseDate] = useState<Date>(new Date(0));
     const [navisionTime, setNavisionTime] = useState<string>("");
     const [releaseTime, setReleaseTime] = useState<string>("");
     const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
-    const [releaseTimetable, setReleaseTimetable] = useState<ReleaseTimetableViewModel>({
-        navisionDate: DateTime.fromMillis(0).toJSDate(),
-        releaseDate: DateTime.fromMillis(0).toJSDate()
-    });
     const [isSavingReleaseTimetable, setIsSavingReleaseTimetable] = useState<boolean>(false);
     const [pageErrors, setPageErrors] = useState<string>("");
     const [saveSuccessful, setSaveSuccessful] = useState<boolean>(false);
@@ -31,20 +27,21 @@ export function ReleaseTimetable(props: { specificationId: string }) {
                 .then((response) => {
                     if (response.status === 200) {
                         let result = response.data as ReleaseTimetableSummary;
-
-                        let request: ReleaseTimetableViewModel = {
-                            releaseDate: DateTime.fromISO(result.content.earliestPaymentAvailableDate).toJSDate(),
-                            navisionDate: DateTime.fromISO(result.content.externalPublicationDate).toJSDate()
-                        };
-
-                        setReleaseTimetable(request);
+                        if (result.content.earliestPaymentAvailableDate != null)
+                        {
+                            setReleaseDate(DateTime.fromISO(result.content.earliestPaymentAvailableDate).toJSDate());
+                        }
+                        if (result.content.externalPublicationDate != null)
+                        {
+                            setNavisionDate(DateTime.fromISO(result.content.externalPublicationDate).toJSDate());
+                        }
                     }
                 });
         }
     }, [props.specificationId]);
 
     useEffect(() => {
-        if (DateTime.fromJSDate(navisionDate).toISO() == DateTime.fromMillis(0).toISO() || DateTime.fromJSDate(releaseDate).toISO() === DateTime.fromMillis(0).toISO()) {
+        if (navisionDate === new Date(0) || releaseDate === new Date(0)) {
             setCanTimetableBeUpdated(false);
         } else {
             setCanTimetableBeUpdated(true);
@@ -99,13 +96,15 @@ export function ReleaseTimetable(props: { specificationId: string }) {
         saveReleaseTimetableForSpecificationService(saveReleaseTimetable).then((response) => {
             if (response.status === 200) {
                 const result = response.data as ReleaseTimetableViewModel;
-                setReleaseTimetable(result);
-                setSaveSuccessful(true);
+
+                setReleaseDate(DateTime.fromISO(response.data.earliestPaymentAvailableDate).toJSDate());
+                setNavisionDate(DateTime.fromISO(response.data.externalPublicationDate).toJSDate());
             }
         }).catch((error: AxiosError) => {
             setPageErrors(error.message)
         }).finally(() => {
             setIsSavingReleaseTimetable(false);
+            if (pageErrors==="") setSaveSuccessful(true);
         })
     }
 
@@ -116,7 +115,7 @@ export function ReleaseTimetable(props: { specificationId: string }) {
             </div>
         </div>
         <LoadingStatus title={"Saving Release Timetable"} description={"Please wait whilst we save your changes"} hidden={!isSavingReleaseTimetable}/>
-        <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"} hidden={saveSuccessful} />
+        <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"} hidden={!saveSuccessful} />
         <div className={"govuk-form-group"} hidden={isSavingReleaseTimetable}>
             <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" data-module="govuk-error-summary" hidden={pageErrors === ""}>
                 <h2 className="govuk-error-summary__title" id="error-summary-title">
@@ -144,7 +143,7 @@ export function ReleaseTimetable(props: { specificationId: string }) {
             <DateInput date={navisionDate} callback={updateNavisionDate}/>
         </div>
         <div className="govuk-form-group govuk-!-margin-bottom-9" hidden={isSavingReleaseTimetable}>
-            <TimeInput time={DateTime.fromJSDate(navisionDate).toFormat("HH:mm") === DateTime.fromMillis(0).toFormat("HH:mm") ? "" : DateTime.fromJSDate(navisionDate).toFormat("HH")} callback={updateNavisionTime}/>
+            <TimeInput time={navisionDate.getFullYear() != DateTime.fromMillis(0).year ? DateTime.fromJSDate(navisionDate).toFormat("HH") : ""} callback={updateNavisionTime}/>
         </div>
         <div className="govuk-form-group" hidden={isSavingReleaseTimetable}>
             <fieldset className="govuk-fieldset" role="group">
@@ -160,7 +159,7 @@ export function ReleaseTimetable(props: { specificationId: string }) {
             <DateInput date={releaseDate} callback={updateReleaseDate}/>
         </div>
         <div className="govuk-form-group govuk-!-margin-bottom-9" hidden={isSavingReleaseTimetable}>
-            <TimeInput time={DateTime.fromJSDate(releaseDate).toFormat("HH:mm") === DateTime.fromMillis(0).toFormat("HH:mm") ? "" : DateTime.fromJSDate(releaseDate).toFormat("HH")} callback={updateReleaseTime}/>
+            <TimeInput time={releaseDate.getFullYear() != DateTime.fromMillis(0).year ? DateTime.fromJSDate(releaseDate).toFormat("HH") : ""} callback={updateReleaseTime}/>
         </div>
         <div className="govuk-form-group" hidden={isSavingReleaseTimetable}>
             <button className="govuk-button" onClick={confirmChanges} disabled={!canTimetableBeUpdated}>Confirm changes

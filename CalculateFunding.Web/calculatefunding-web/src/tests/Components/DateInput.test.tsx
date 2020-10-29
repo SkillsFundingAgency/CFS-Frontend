@@ -1,13 +1,14 @@
 import React from "react";
 import {mount} from "enzyme";
 import {DateInput} from "../../components/DateInput";
+import { DateTime } from "luxon";
 
 function mockCallback() {
     return false;
 }
 
 describe('Rendering the <DateInput> component', () => {
-    const wrapper = mount(<DateInput date={""} callback={mockCallback} inputName={"DateInputTest"}/>)
+    const wrapper = mount(<DateInput date={new Date(0)} callback={mockCallback} inputName={"DateInputTest"}/>)
 
     it(' with the correct heading label', () => {
         expect(wrapper.find("label").at(0).text()).toEqual("Day");
