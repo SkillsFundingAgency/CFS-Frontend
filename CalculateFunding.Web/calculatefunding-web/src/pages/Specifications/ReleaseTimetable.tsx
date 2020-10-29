@@ -72,7 +72,8 @@ export function ReleaseTimetable(props: { specificationId: string }) {
 
     function updateDateWithTime(date: Date, time: string) {
         let year = `${date.getFullYear()}`
-        let month = `${date.getMonth() < 10 ? "0" + date.getMonth() : date.getMonth()}`;
+        let monthNumber = date.getMonth() + 1;
+        let month = `${monthNumber < 10 ? "0" + monthNumber : monthNumber}`;
         let day = `${date.getDate()}`;
         let hours = `T${parseInt(time) < 10 ? "0" + parseInt(time) : parseInt(time)}:00:00.000`;
 
