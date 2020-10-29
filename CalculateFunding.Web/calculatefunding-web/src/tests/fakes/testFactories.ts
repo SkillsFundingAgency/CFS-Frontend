@@ -43,10 +43,10 @@ export const createPublishedProviderSearchQueryResult = (results: PublishedProvi
     };
 };
 
-export const createPublishedProviderErrorSearchQueryResult = (results: PublishedProviderSearchResults)
+export const createPublishedProviderErrorSearchQueryResult = (errors: string[])
     : PublishedProviderErrorSearchQueryResult => {
     return {
-        publishedProvidersWithErrors: results,
+        publishedProvidersWithErrors: errors,
         isLoadingPublishedProviderErrors: false,
         isErrorLoadingPublishedProviderErrors: false,
         errorLoadingPublishedProviderErrors: ""

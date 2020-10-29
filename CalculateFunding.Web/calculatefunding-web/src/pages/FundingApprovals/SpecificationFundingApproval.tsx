@@ -31,6 +31,7 @@ import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePu
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {buildInitialPublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
 import {formatDate} from "../../components/DateFormatter";
+import {useErrors} from "../../hooks/useErrors";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -56,22 +57,26 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const initialProviderPagedSearch = buildInitialPublishedProviderSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
     const initialProviderIdsSearch = buildInitialPublishedProviderIdsSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
     const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialProviderPagedSearch);
-    const {publishedProviderSearchResults, isLoadingSearchResults, errorLoadingSearchResults} =
-        usePublishedProviderSearch(searchCriteria, !isCheckingForJob && !hasActiveJob);
-    const {fundingConfiguration, isLoadingFundingConfiguration, errorLoadingFundingConfiguration} =
-        useFundingConfiguration(fundingStreamId, fundingPeriodId);
-    const {publishedProviderIds, isLoadingPublishedProviderIds, errorLoadingPublishedProviderIds} =
+    const {publishedProviderSearchResults, isLoadingSearchResults} =
+        usePublishedProviderSearch(searchCriteria, !isCheckingForJob && !hasActiveJob,
+            err => addErrorMessage(err.message, "", "Error while searching for provider results"));
+    const {fundingConfiguration, isLoadingFundingConfiguration} =
+        useFundingConfiguration(fundingStreamId, fundingPeriodId,
+            err => addErrorMessage(err.message, "", "Error while loading funding configuration"));
+    const {publishedProviderIds, isLoadingPublishedProviderIds} =
         usePublishedProviderIds(initialProviderIdsSearch,
-            !isCheckingForJob && !hasActiveJob && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches);
-    const {publishedProvidersWithErrors, errorLoadingPublishedProviderErrors} =
-        usePublishedProviderErrorSearch(initialProviderPagedSearch, !isCheckingForJob && !hasActiveJob);
+            !isCheckingForJob && !hasActiveJob && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches,
+            err => addErrorMessage(err.message, "", "Error while loading provider ids"));
+    const {publishedProvidersWithErrors} =
+        usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !hasActiveJob,
+    err => addErrorMessage(err.message, "Error while loading provider funding errors"));
     const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
     const [isConfirmingRelease, setConfirmRelease] = useState<boolean>(false);
-    const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const fundingSelectionState: IFundingSelectionState = useSelector<IStoreState, IFundingSelectionState>(state => state.fundingSelection);
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
     const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
 
 
     function pageChange(pageNumber: string) {
@@ -86,35 +91,14 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         clearErrorMessages();
     }
 
-    function addErrorMessage(errorMessage: string, fieldName?: string) {
-        if (!errorMessage || errorMessage.length === 0 ||
-            errors.some(err => err.message === errorMessage && err.fieldName === fieldName)) {
-            return;
-        }
-
-        const errorCount: number = errors.length;
-        const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
-        setErrors(errors => [...errors, error]);
-    }
-
-    function clearErrorMessages() {
-        setErrors([]);
-    }
-
-    addErrorMessage(errorLoadingSearchResults);
-    addErrorMessage(errorLoadingFundingConfiguration);
-    addErrorMessage(errorLoadingPublishedProviderIds);
-    addErrorMessage(errorLoadingPublishedProviderErrors);
-    if (publishedProvidersWithErrors) {
-        publishedProvidersWithErrors.providers.forEach(provider => {
-            const ref = `provider-approval-${provider.publishedProviderVersionId}`;
-            provider.errors.forEach(err => addErrorMessage(err, ref));
-        })
-    }
     if (hasFailedJob && latestJob && jobDisplayInfo) {
         addErrorMessage(`Job ${jobDisplayInfo.statusDescription}: ${jobDisplayInfo.jobDescription}. ` +
             `Created by ${latestJob.invokerUserDisplayName} at ${formatDate(latestJob.created, false)}. ` +
             `Last updated at ${formatDate(latestJob.lastUpdated, false)}`)
+    }
+    
+    if (publishedProvidersWithErrors) {
+        publishedProvidersWithErrors.forEach(err => addErrorMessage(err, "Provider error"));
     }
 
     const isLoading = errors.length === 0 && (isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);

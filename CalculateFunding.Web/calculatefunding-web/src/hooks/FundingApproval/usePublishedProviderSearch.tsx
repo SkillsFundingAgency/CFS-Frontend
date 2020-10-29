@@ -12,16 +12,16 @@ export type PublishedProviderSearchQueryResult = {
 }
 export const usePublishedProviderSearch = (searchRequest: PublishedProviderSearchRequest,
                                            isEnabled: boolean,
-                                           queryConfig: QueryConfig<PublishedProviderSearchResults, AxiosError> =
-                                               {
-                                                   enabled: searchRequest && searchRequest.fundingStreamId && searchRequest.fundingPeriodId && isEnabled
-                                               })
+                                           onError: (err: AxiosError) => void)
     : PublishedProviderSearchQueryResult => {
     const {data, isLoading, isError, error} =
         useQuery<PublishedProviderSearchResults, AxiosError>(
             ["published-provider-search", searchRequest],
             async () => (await searchForPublishedProviderResults(searchRequest)).data,
-            queryConfig);
+            {
+                onError,
+                enabled: searchRequest && searchRequest.fundingStreamId && searchRequest.fundingPeriodId && isEnabled
+            });
     return {
         publishedProviderSearchResults: data,
         isLoadingSearchResults: isLoading,

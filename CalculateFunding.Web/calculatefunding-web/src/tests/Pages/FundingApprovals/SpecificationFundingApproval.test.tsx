@@ -221,8 +221,8 @@ const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJob
 const hasFailedJob = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (failedJob));
 const hasFundingConfiguration = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (fundingConfigResult));
 const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullPermissions));
-const hasProvidersWithErrors = (providers: PublishedProviderResult[]) => jest.spyOn(providerErrorsHook, 'usePublishedProviderErrorSearch').mockImplementation(() => (
-    createPublishedProviderErrorSearchQueryResult(createPublishedProviderResult(providers))));
+const hasProvidersWithErrors = (errors: string[]) => jest.spyOn(providerErrorsHook, 'usePublishedProviderErrorSearch').mockImplementation(() => (
+    createPublishedProviderErrorSearchQueryResult(errors)));
 const hasProviderIds = (ids: string[]) => jest.spyOn(providerIdsSearchHook, 'usePublishedProviderIds').mockImplementation(() => (
     createPublishedProviderIdsQueryResult(ids)));
 const hasSearchResults = (providers: PublishedProviderResult[]) => jest.spyOn(providerSearchHook, 'usePublishedProviderSearch')
@@ -400,7 +400,7 @@ describe("<SpecificationFundingApproval /> when results with errors", () => {
         hasNoActiveJobsRunning();
         hasFundingConfiguration();
         hasFullPermissions();
-        hasProvidersWithErrors([providerWithError1]);
+        hasProvidersWithErrors(["Error: missing something"]);
         hasProviderIds([providerWithError1.publishedProviderVersionId]);
         hasSearchResults([providerWithError1]);
 
@@ -415,8 +415,8 @@ describe("<SpecificationFundingApproval /> when results with errors", () => {
         expect(await screen.findByText("There is a problem")).toBeInTheDocument();
     });
 
-    it('renders error messages', async () => {
+    it('renders error message', async () => {
         const alerts = await screen.findAllByRole("alert");
-        alerts.some(alert => within(alert).getByText(providerWithError1.errors[0]));
+        alerts.some(alert => within(alert).getByText(/Error: missing something/));
     });
 });

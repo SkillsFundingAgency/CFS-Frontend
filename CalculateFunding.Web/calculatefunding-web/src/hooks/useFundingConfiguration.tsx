@@ -12,18 +12,17 @@ export type FundingConfigurationQueryResult = {
 }
 export const useFundingConfiguration = (fundingStreamId: string,
                                         fundingPeriodId: string,
-                                        queryConfig: QueryConfig<FundingConfiguration, AxiosError> =
-                                            {
-                                                cacheTime: milliseconds.OneDay,
-                                                staleTime: milliseconds.OneDay,
-                                                refetchOnWindowFocus: false,
-                                                enabled: fundingStreamId && fundingPeriodId && fundingPeriodId.length > 0 && fundingStreamId.length > 0
-                                            })
+                                        onError: (err: AxiosError) => void)
     : FundingConfigurationQueryResult => {
     const {data, isLoading, isError, error} = useQuery<FundingConfiguration, AxiosError>(
         `funding-configuration-${fundingStreamId}-${fundingPeriodId}`,
         async () => (await getFundingConfiguration(fundingStreamId, fundingPeriodId)).data,
-        queryConfig);
+        {
+            cacheTime: milliseconds.OneDay,
+            staleTime: milliseconds.OneDay,
+            refetchOnWindowFocus: false,
+            enabled: fundingStreamId && fundingPeriodId && fundingPeriodId.length > 0 && fundingStreamId.length > 0
+        });
     
     return {
         fundingConfiguration: data,

@@ -11,22 +11,21 @@ export type PublishedProviderIdsQueryResult = {
 }
 export const usePublishedProviderIds = (searchRequest: PublishedProviderIdsSearchRequest,
                                         isEnabled: boolean,
-                                        queryConfig: QueryConfig<string[], AxiosError> =
-                                            {
-                                                enabled: searchRequest 
-                                                    && searchRequest.specificationId && searchRequest.specificationId.length > 0 
-                                                    && searchRequest.fundingStreamId && searchRequest.fundingStreamId.length > 0 
-                                                    && searchRequest.fundingPeriodId && searchRequest.fundingPeriodId.length > 0 
-                                                    && isEnabled
-                                            })
+                                        onError: (err: AxiosError) => void)
     : PublishedProviderIdsQueryResult => {
-    
+
     const {data, isLoading, isError, error} =
         useQuery<string[], AxiosError>(
             [`published-provider-ids`, searchRequest],
             async () => (await getAllProviderVersionIdsForSearch(searchRequest)).data,
-            queryConfig);
-
+            {
+                onError,
+                enabled: searchRequest
+                    && searchRequest.specificationId && searchRequest.specificationId.length > 0
+                    && searchRequest.fundingStreamId && searchRequest.fundingStreamId.length > 0
+                    && searchRequest.fundingPeriodId && searchRequest.fundingPeriodId.length > 0
+                    && isEnabled
+            });
     return {
         publishedProviderIds: data,
         isLoadingPublishedProviderIds: isLoading,

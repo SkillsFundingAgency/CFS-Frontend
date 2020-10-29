@@ -24,3 +24,6 @@ export async function getAllProviderVersionIdsForSearch(criteria: PublishedProvi
         data: criteria
     });
 }
+export async function getPublishedProviderErrors(specificationId: string) {
+    return axios.get<string[]>(`/api/publishedprovidererrors/${specificationId}`);
+}

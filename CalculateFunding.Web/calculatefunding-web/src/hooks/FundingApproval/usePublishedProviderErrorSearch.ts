@@ -1,26 +1,26 @@
 ﻿import {AxiosError} from "axios";
 import {QueryConfig, useQuery} from "react-query";
 import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
-import {searchForPublishedProviderResults} from "../../services/publishedProviderService";
+import {getPublishedProviderErrors, searchForPublishedProviderResults} from "../../services/publishedProviderService";
 import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
+import {milliseconds} from "../../helpers/TimeInMs";
 
 export type PublishedProviderErrorSearchQueryResult = {
-    publishedProvidersWithErrors: PublishedProviderSearchResults | undefined,
+    publishedProvidersWithErrors: string[] | undefined,
     isLoadingPublishedProviderErrors: boolean,
     isErrorLoadingPublishedProviderErrors: boolean,
     errorLoadingPublishedProviderErrors: string
 }
-export const usePublishedProviderErrorSearch = (searchRequest: PublishedProviderSearchRequest,
+export const usePublishedProviderErrorSearch = (specificationId: string,
                                                 isEnabled: boolean,
-                                                queryConfig: QueryConfig<PublishedProviderSearchResults, AxiosError> =
-                                               {
-                                                   enabled: searchRequest && searchRequest.fundingStreamId && searchRequest.fundingPeriodId && isEnabled
-                                               })
+                                                onError: (err: AxiosError) => void)
     : PublishedProviderErrorSearchQueryResult => {
-    const searchRequestWithJustErrors = {...searchRequest, hasErrors: true, pageSize: 20, pageNumber: 1};
-    const {data, isLoading, isError, error} = useQuery<PublishedProviderSearchResults, AxiosError>(["published-provider-errors", searchRequestWithJustErrors],
-        async () => (await searchForPublishedProviderResults(searchRequestWithJustErrors)).data,
-        queryConfig);
+    const {data, isLoading, isError, error} = useQuery<string[], AxiosError>(`published-provider-errors-for-spec-${specificationId}`,
+        async () => (await getPublishedProviderErrors(specificationId)).data,
+        {
+            onError,
+            enabled: specificationId && specificationId.length > 0 && isEnabled
+        });
     return {
         publishedProvidersWithErrors: data,
         isLoadingPublishedProviderErrors: isLoading,
