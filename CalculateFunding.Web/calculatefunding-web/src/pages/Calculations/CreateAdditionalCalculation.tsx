@@ -212,7 +212,9 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                         minimap={false}
                         specificationId={specificationId}
                         calculationType={"AdditionalCalculation"}
-                        calculationName={additionalCalculationName}/>}
+                        calculationName={additionalCalculationName}
+                        fundingStreamId={specificationSummary.fundingStreams[0]?.id}
+                    />}
                     <button id={"build-calculation-button"} data-prevent-double-click="true" className="govuk-button" data-module="govuk-button"
                             onClick={buildCalculation} disabled={isBuilding}>
                         Build calculation

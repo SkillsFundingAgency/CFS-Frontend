@@ -60,6 +60,6 @@ export interface IPropertyInformationResponse {
     friendlyName: string;
     description: string;
     type: string;
-    isAggregable: string;
+    isAggregable: boolean;
     children: Array<IPropertyInformationResponse>;
 }
