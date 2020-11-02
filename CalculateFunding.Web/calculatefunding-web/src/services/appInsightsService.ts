@@ -17,7 +17,13 @@ export async function initialiseAppInsights() {
             enableAutoRouteTracking: true
         }
     });
+
     ai.loadAppInsights();
+    ai.addTelemetryInitializer((envelope) => {
+        if (!envelope || !envelope.data) return;
+        envelope.data["Service"] = 'CalculateFunding.SPA';
+    });
     ai.trackPageView();
+
     (window as any).appInsights = ai;
 }
