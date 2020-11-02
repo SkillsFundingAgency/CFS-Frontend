@@ -52,7 +52,6 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [templateVersionData, setTemplateVersionData] = useState<EditSpecificationTemplateVersion[]>([]);
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
-    const [selectedProviderSnapshotId, setSelectedProviderSnapshotId] = useState<any>(null);
     const [providerSource, setProviderSource] = useState<ProviderSource>();
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
     const [selectedDescription, setSelectedDescription] = useState<string>("");
@@ -163,14 +162,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
-        if (providerSource === ProviderSource.CFS)
-        {
-            setSelectedProviderVersionId(coreProviderId as string);
-        }
-        else if (providerSource === ProviderSource.FDZ)
-        {
-            setSelectedProviderSnapshotId(parseInt(coreProviderId));
-        }
+        setSelectedProviderVersionId(coreProviderId);
     }
 
     function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -197,7 +189,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 fundingPeriodId: specificationSummary.fundingPeriod.id,
                 fundingStreamId: specificationSummary.fundingStreams[0].id,
                 name: selectedName,
-                providerVersionId: "",
+                providerVersionId: specificationSummary.providerVersionId,
                 assignedTemplateIds: assignedTemplateIdsValue,
             };
 
@@ -207,7 +199,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             }
             else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
             {
-                updateSpecificationViewModel.providerSnapshotId = selectedProviderSnapshotId
+                updateSpecificationViewModel.providerSnapshotId = parseInt(selectedProviderVersionId);
             }
 
             try {
