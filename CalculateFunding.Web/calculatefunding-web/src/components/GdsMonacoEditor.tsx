@@ -18,6 +18,7 @@ import {ILocalFunction} from "../types/GdsMonacoEditor/ILocalFunction";
 import {IDefaultType} from "../types/GdsMonacoEditor/IDefaultType";
 import {IKeyword} from "../types/GdsMonacoEditor/IKeyword";
 import {checkAggregableFunctionDeclared, convertClassToVariables, createCompletionItem, findDeclaredVariables, getDefaultDataTypesCompletionItems, getHoverDescriptionForDefaultType, getHoverDescriptionForLocalFunction, getHoverDescriptionForVariable, getKeywordsCompletionItems, getVariableForAggregatePath, getVariablesForPath, processSourceToRemoveComments} from "../services/IntellisenseProvider";
+import {FundingStream} from "../types/viewFundingTypes";
 
 export function GdsMonacoEditor(props: {
     value: string,
@@ -27,15 +28,14 @@ export function GdsMonacoEditor(props: {
     specificationId: string,
     calculationType: string,
     calculationName: string,
-    fundingStreamId?: string
+    fundingStreams: FundingStream[]
 }) {
     const height: number = 291;
     const element = useRef<HTMLElement>();
     const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
     const specificationId = props.specificationId;
-    const fundingStreamId = props.fundingStreamId ? props.fundingStreamId : "";
 
-    let isloading = false;
+    let isLoading = false;
 
     let variableAllowedNowPrefixes: Array<string> = [
         // If and If with brackets and spaces, but not matching End If - regex not supported in IE11
@@ -111,11 +111,12 @@ export function GdsMonacoEditor(props: {
                 }
             });
 
-
             editor.current.onDidChangeModelContent(() => {
                 if (editor.current && props.change) props.change(editor.current.getValue())
             })
         }
+
+        loadIntellisenseContext();
 
         return () => editor.current && editor.current.dispose()
     });
@@ -126,11 +127,6 @@ export function GdsMonacoEditor(props: {
         }
     }, [props.value]);
 
-    useEffect(() => {
-        if (specificationId !== "" && props.fundingStreamId !== undefined) {
-            loadIntellisenseContext();
-        }
-    }, [props.specificationId, props.fundingStreamId]);
 
     function loadIntellisenseContext() {
         getCodeContextService(specificationId)
@@ -444,11 +440,11 @@ export function GdsMonacoEditor(props: {
                     }
                 });
 
-                isloading = true;
+                isLoading = true;
             });
     }
 
-    if (isloading) {
+    if (isLoading) {
         return null;
     }
 

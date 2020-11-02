@@ -27,7 +27,7 @@ export enum CompileErrorSeverity
 export interface CompilerOutputViewModel {
     buildSuccess: boolean;
     compileRun: boolean;
-    previewResponse: CalculationCompilePreviewResponse
+    previewResponse: CalculationCompilePreviewResponse | undefined
 }
 
 export interface SourceFile {

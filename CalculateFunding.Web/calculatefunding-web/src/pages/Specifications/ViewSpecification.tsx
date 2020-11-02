@@ -16,7 +16,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {
     refreshFundingService,
 } from "../../services/publishService";
-import {getCalculationsService} from "../../services/calculationService";
+import {searchForCalculationsService} from "../../services/calculationService";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
@@ -30,6 +30,9 @@ import {AdditionalCalculations} from "../../components/Calculations/AdditionalCa
 import {Datasets} from "../../components/Specifications/Datasets";
 import {VariationManagement} from "../../components/Specifications/VariationManagement";
 import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useErrors} from "../../hooks/useErrors";
+import {CalculationType} from "../../types/CalculationSearchResponse";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -52,12 +55,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }],
         id: "",
         isSelectedForFunding: false,
-        providerVersionId: ""
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        templateIds: {}
     };
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     let specificationId = match.params.specificationId;
 
-    const [errors, setErrors] = useState<string[]>([]);
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
@@ -83,7 +88,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
-        resetErrors();
+        clearErrorMessages();
         fetchData();
     }, [specificationId]);
 
@@ -111,7 +116,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     };
 
     async function chooseForFunding() {
-        setErrors([]);
+        clearErrorMessages();
         try {
             const isAllowed: boolean = await isUserAllowedToChooseSpecification(specificationId);
             if (isAllowed) {
@@ -119,7 +124,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     refreshFunding, "Confirm", "Cancel");
             }
         } catch (e) {
-            setErrors(errors => [...errors, "A problem occurred while getting user permissions"]);
+            addErrorMessage("A problem occurred while getting user permissions");
         }
     }
 
@@ -130,10 +135,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 if (response.status === 200) {
                     history.push(`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
                 } else {
-                    setErrors(errors => [...errors, "A problem occurred while refreshing funding"]);
+                    addErrorMessage("A problem occurred while refreshing funding");
                 }
             } catch (err) {
-                setErrors(errors => [...errors, "A problem occurred while refreshing funding: " + err]);
+                addErrorMessage("A problem occurred while refreshing funding: " + err);
             }
         }
     }
@@ -144,31 +149,25 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         if (!permissions.canChooseFunding) {
             errors.push("You do not have permissions to choose this specification for funding");
         }
-        if (specification.approvalStatus.toLowerCase() !== PublishStatus.Approved.toLowerCase()) {
+        if (specification.approvalStatus !== PublishStatus.Approved) {
             errors.push("Specification must be approved before the specification can be chosen for funding.");
         }
         try {
-            const calc = (await getCalculationsService({
+            const calc = (await searchForCalculationsService({
                 specificationId: specificationId,
                 status: "",
                 pageNumber: 1,
                 searchTerm: "",
-                calculationType: "Template"
+                calculationType: CalculationType.Template
             })).data;
-            if (calc.results.some(calc => calc.status.toLowerCase() !== PublishStatus.Approved.toLowerCase())) {
-                errors.push("Template calculations must be approved before the specification can be chosen for funding.");
-                setErrors(errors);
+            if (calc.results.some(calc => calc.status !== PublishStatus.Approved)) {
+                addErrorMessage("Template calculations must be approved before the specification can be chosen for funding.");
             }
         } catch (err) {
-            errors.push("A problem occurred while choosing specification");
-            setErrors(errors);
+            addErrorMessage("A problem occurred while choosing specification");
         }
         return errors.length === 0;
     }
-
-    const resetErrors = () => {
-        setErrors([]);
-    };
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -178,21 +177,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
                 <Breadcrumb name={specification.name}/>
             </Breadcrumbs>
-            {errors.length > 0 &&
-            <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}
-                 data-module="govuk-error-summary">
-                <h2 className="govuk-error-summary__title" id="error-summary-title">
-                    There is a problem
-                </h2>
-                <div className="govuk-error-summary__body">
-                    <ul className="govuk-list govuk-error-summary__list">
-                        {errors.map((error, i) =>
-                            <li key={i}>{error}</li>
-                        )}
-                    </ul>
-                </div>
-            </div>
-            }
+            
+            <MultipleErrorSummary errors={errors}/>
+            
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-4">
                     <span className="govuk-caption-l">Specification Name</span>
@@ -217,10 +204,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
                         <li>
-                            <Link to={`/specifications/editspecification/${specificationId}`} className="govuk-link">Edit specification</Link>
+                            <Link to={`/specifications/EditCalculation/${specificationId}`} className="govuk-link">Edit specification</Link>
                         </li>
                         <li>
-                            <Link to={`/specifications/createadditionalcalculation/${specificationId}`} className="govuk-link">Create additional
+                            <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`} className="govuk-link">Create additional
                                 calculation</Link>
                         </li>
                         <li>
@@ -258,7 +245,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <FundingLineResults specificationId={specification.id} fundingStreamId={specification.fundingStreams[0].id} fundingPeriodId={specification.fundingPeriod.id} approvalStatus={specification.approvalStatus as PublishStatus} />
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
-                            <AdditionalCalculations specificationId={specificationId}/>
+                            <AdditionalCalculations specificationId={specificationId} addError={addErrorMessage}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
                            <Datasets specificationId={specificationId} />

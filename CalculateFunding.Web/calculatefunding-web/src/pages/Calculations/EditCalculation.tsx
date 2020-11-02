@@ -2,9 +2,7 @@
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
 import {UpdateCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {approveCalculationService, compileCalculationPreviewService, getIsUserAllowedToApproveCalculationService, updateCalculationService,} from "../../services/calculationService";
-import {Calculation} from "../../types/CalculationSummary";
-import {CalculationCompilePreviewResponse, CompileErrorSeverity, CompilerOutputViewModel} from "../../types/Calculations/CalculationCompilePreviewResponse";
+import {approveCalculationService, updateCalculationService,} from "../../services/calculationService";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -13,10 +11,8 @@ import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import React, {useState} from "react";
-import {GdsMonacoEditor} from "../../components/GdsMonacoEditor";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
-import {CompilationErrorMessageList} from "../../components/Calculations/CompilationErrorMessageList";
 import {DateFormatter} from "../../components/DateFormatter";
 import {useErrors} from "../../hooks/useErrors";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
@@ -25,8 +21,10 @@ import {useCalculation} from "../../hooks/Calculations/useCalculation";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
+import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
+import {CalculationDetails} from "../../types/CalculationDetails";
 
-export interface EditCalculationProps {
+export interface EditorProps {
     excludeMonacoEditor?: boolean
 }
 
@@ -34,7 +32,8 @@ export interface EditCalculationRouteProps {
     calculationId: string,
 }
 
-export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProps<EditCalculationRouteProps> & EditCalculationProps) {
+
+export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProps<EditCalculationRouteProps> & EditorProps) {
     const [specificationId, setSpecificationId] = useState<string>("");
     const calculationId = match.params.calculationId;
     const {errors, addErrorMessage, clearErrorMessages} = useErrors();
@@ -50,74 +49,48 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         useCalculationCircularDependencies(specificationId,
             err => addErrorMessage(err.message, "Error while checking for circular reference errors"));
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [sourceCode, setSourceCode] = useState<string>("");
-    const [calculationStatus, setCalculationStatus] = useState<PublishStatus | undefined>(undefined);
-    const initialBuild: CompilerOutputViewModel = {
-        buildSuccess: false,
-        compileRun: false,
-        previewResponse: {
-            compilerOutput: {
-                compilerMessages: [{
-                    location: {
-                        endChar: 0,
-                        endLine: 0,
-                        owner: {
-                            id: "",
-                            name: ""
-                        },
-                        startChar: 0,
-                        startLine: 0
-                    },
-                    message: "",
-                    severity: CompileErrorSeverity.Hidden
-                }],
-                sourceFiles: [{
-                    fileName: "",
-                    sourceCode: ""
-                }],
-                success: false
-            }
-        }
-    };
-    const [calculationBuild, setCalculationBuild] = useState<CompilerOutputViewModel>(initialBuild);
-    const [isLoading, setIsLoading] = useState(false);
-    const [nameErrorMessage, setNameErrorMessage] = useState("");
-    const [isBuildingCalculationCode, setIsBuildingCalculationCode] = useState<boolean>(false);
+    const [calculationStatus, setCalculationStatus] = useState<PublishStatus | undefined>();
+    const [isApproving, setIsApproving] = useState(false);
+    const [calculationState, setCalculationState] = useState<CalculationSourceCodeState | undefined>();
     let history = useHistory();
+    document.title = `Edit ${calculation?.calculationType} Calculation - Calculate Funding`;
+
+    const onCalculationChange = async (state: CalculationSourceCodeState) => {
+        setCalculationState(state);
+        if (state.errorMessage.length > 0) {
+            addErrorMessage(state.errorMessage, "An error occured related to the calculation source code", "source-code");
+        }
+    }
 
     const onSaveCalculation = async () => {
-        if (!calculation || !calculation.valueType || !calculationBuild.buildSuccess) {
+        if (!calculationState || !calculation || !calculation.valueType) {
+            return;
+        } else if (calculationState.isDirty && !calculationState.calculationBuild.buildSuccess) {
+            addErrorMessage("Please build your calculation source code to check it is valid", "Unvalidated source code", "source-code");
             return;
         }
-        if (sourceCode === "" || !calculationBuild.buildSuccess) {
-            return addErrorMessage("Please check the code and make sure it builds", "Validation error", "");
-        }
 
-        setNameErrorMessage("");
-        setIsLoading(true);
         setIsSaving(true);
 
         let updateAdditionalCalculationViewModel: UpdateCalculationViewModel = {
             calculationName: calculation.name,
             valueType: calculation.valueType,
-            sourceCode: sourceCode,
+            sourceCode: calculationState.sourceCode,
         };
 
         updateCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
             .then((result) => {
                 if (result.status === 200) {
-                    let response = result.data as Calculation;
-                    history.push(`/ViewSpecification/${response.specificationId}`);
+                    history.push(`/ViewSpecification/${specificationId}`);
                 }
             })
             .finally(() => {
-                setIsLoading(false);
                 setIsSaving(false);
             });
     }
-    
+
     const onApproveCalculation = async () => {
-        setIsLoading(true);
+        setIsApproving(true);
         clearErrorMessages();
 
         try {
@@ -131,42 +104,8 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         } catch (e) {
             addErrorMessage("There is a problem, calculation can not be approved, please try again. " + e);
         } finally {
-            setIsLoading(false);
+            setIsApproving(false);
         }
-    }
-
-    const buildCalculation = async () => {
-        setIsBuildingCalculationCode(true);
-        setCalculationBuild(initialBuild);
-        clearErrorMessages();
-
-        compileCalculationPreviewService(specificationId, calculationId, sourceCode)
-            .then((result) => {
-                if (result.status !== 200 && result.status !== 400) {
-                    addErrorMessage("Unexpected response with status " + result.statusText, "Error while compiling calculation source code", "source-code")
-                }
-                setCalculationBuild(prevState => {
-                    return {
-                        ...prevState,
-                        buildSuccess: result.status === 200 && result.data?.compilerOutput?.success,
-                        compileRun: true,
-                        previewResponse: result.data
-                    }
-                });
-                setIsBuildingCalculationCode(false);
-            })
-            .catch(err => {
-                addErrorMessage(err.toString(), "Error while building calculation", "source-code")
-                setCalculationBuild(prevState => {
-                    return {...prevState, compileRun: false, buildSuccess: false}
-                });
-                setIsBuildingCalculationCode(false);
-            });
-    }
-
-    const onUpdateSourceCode = async (sourceCode: string) => {
-        setCalculationBuild(initialBuild);
-        setSourceCode(sourceCode);
     }
 
     const initCalculationData = () => {
@@ -175,7 +114,6 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         }
         setSpecificationId(calculation.specificationId);
         setCalculationStatus(calculation.publishStatus);
-        setSourceCode(calculation.sourceCode);
     }
 
     if (circularReferenceErrors && circularReferenceErrors.length > 0) {
@@ -184,15 +122,18 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
     initCalculationData();
 
-    let isDirty = calculation !== undefined && calculation.sourceCode !== sourceCode;
+    useConfirmLeavePage(calculationState !== undefined && calculationState.isDirty && !isSaving);
 
-    useConfirmLeavePage(isDirty && !isSaving);
-
+    const isLoading = isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies || isSaving || isApproving;
     const loadingTitle = isLoadingSpecification ? "Loading specification" :
         isLoadingCalculation ? "Loading calculation" :
             isLoadingCircularDependencies ? "Checking for circular reference errors" :
-                isLoading ? "Updating additional calculation" : "";
-    const loadingSubtitle = isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies ? "Please wait..." : isLoading ? "Please wait whilst the calculation is updated" : "";
+                isSaving ? `Saving ${calculation?.calculationType} calculation` :
+                    isApproving ? `Approving ${calculation?.calculationType} calculation` : "";
+    const loadingSubtitle = isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies ?
+        "Please wait..." :
+        isApproving || isSaving ?
+            "Please wait whilst the calculation is updated" : "";
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -206,8 +147,10 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`}/>
             </Breadcrumbs>
 
-            {(isLoadingSpecification || isLoadingCalculation || isLoadingCircularDependencies || isLoading) &&
-            <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={!calculation || !specification}/>
+
+            {isLoading &&
+            <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle} />
             }
 
             <MultipleErrorSummary errors={errors}/>
@@ -216,8 +159,8 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
             <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3}/>
             }
 
-            <fieldset className="govuk-fieldset" hidden={isLoading}>
-                <div className={"govuk-form-group" + (nameErrorMessage.length > 0 ? " govuk-form-group--error" : "")}>
+            <fieldset className="govuk-fieldset" hidden={isSaving || isApproving}>
+                <div className="govuk-form-group">
                     <span className="govuk-caption-l">
                         Calculation name
                     </span>
@@ -225,8 +168,6 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                         {!isLoadingCalculation && calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
                     </h2>
                 </div>
-                
-                <PermissionStatus requiredPermissions={missingPermissions} hidden={!calculation || !specification}/>
 
                 <div id="calculation-status"
                      className={"govuk-form-group" + (errors.some(err => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")}>
@@ -256,68 +197,57 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                         </div>
                     </div>
                 </div>
-                <div id="source-code"
-                     className={"govuk-form-group" + ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <h3 className="govuk-caption-m govuk-!-font-weight-bold">
-                        Calculation script
-                    </h3>
-                    {excludeMonacoEditor !== true && <GdsMonacoEditor
-                        value={sourceCode}
-                        change={onUpdateSourceCode}
-                        language={"vb"}
-                        minimap={false}
-                        specificationId={specificationId}
-                        calculationType={"AdditionalCalculation"}
-                        calculationName={calculation ? calculation.name : ""}
-                    />}
-                    <button data-prevent-double-click="true"
-                            className="govuk-button"
-                            data-module="govuk-button"
-                            data-testid="build"
-                            onClick={buildCalculation} disabled={isBuildingCalculationCode}>
-                        Build calculation
-                    </button>
-                    <LoadingFieldStatus title={"Building source code"} hidden={!isBuildingCalculationCode}/>
-                </div>
+
+                {calculation && specification &&
+                <CalculationSourceCode
+                    excludeMonacoEditor={excludeMonacoEditor === true}
+                    specificationId={specificationId}
+                    calculationName={calculation.name}
+                    calculationType={calculation.calculationType}
+                    fundingStreams={specification.fundingStreams}
+                    onChange={onCalculationChange}
+                    originalSourceCode={calculation.sourceCode}
+                />
+                }
+
                 <div className="govuk-form-group">
                     <CalculationResultsLink calculationId={calculationId}/>
                 </div>
-                {calculationBuild.compileRun && calculationBuild.buildSuccess &&
-                <div className="govuk-panel govuk-panel--confirmation">
-                    <div className="govuk-panel__body">
-                        Build successful
-                    </div>
-                </div>}
-                {calculationBuild.compileRun && !calculationBuild.buildSuccess &&
-                <div className={"govuk-form-group" + ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
-                    <label className="govuk-label" htmlFor="build-output">
-                        Build output
-                    </label>
-                    <CompilationErrorMessageList compilerMessages={calculationBuild.previewResponse.compilerOutput.compilerMessages}/>
-                </div>
-                }
-                {isDirty && !calculationBuild.buildSuccess &&
+
+                {calculationState && calculationState.isDirty && !calculationState?.calculationBuild.buildSuccess &&
                 <div className={"govuk-form-group" +
-                ((calculationBuild.compileRun && !calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
+                ((calculationState.calculationBuild.compileRun && !calculationState.calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
                     <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
                 </div>}
-                {isDirty &&
+
+                {calculationState && calculationState.isDirty &&
                 <div className="govuk-form-group">
                     <div className="govuk-body">Your calculation must be saved before you can approve it</div>
-                </div>}
-                <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                        onClick={onSaveCalculation}
-                        disabled={!isDirty || isSaving || !calculationBuild.buildSuccess || !canEditCalculation}>
-                    Save and continue
-                </button>
-                <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                        onClick={onApproveCalculation}
-                        disabled={isDirty || !calculation || calculation.publishStatus === PublishStatus.Approved || !canApproveCalculation}>
-                    Approve
-                </button>
-                <Link to={`/ViewSpecification/${specificationId}`} className="govuk-button govuk-button--secondary" data-module="govuk-button">
-                    Cancel
-                </Link>
+                </div>
+                }
+
+                <div className="govuk-grid-row govuk-!-margin-top-9">
+                    <div className="govuk-grid-column-two-thirds">
+                        <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                                onClick={onSaveCalculation}
+                                disabled={!calculationState || !calculationState.calculationBuild.buildSuccess || isSaving || !canEditCalculation}>
+                            Save and continue
+                        </button>
+
+                        <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                                onClick={onApproveCalculation}
+                                disabled={!calculationState || calculationState.isDirty || !calculation || calculation.publishStatus === PublishStatus.Approved || !canApproveCalculation}>
+                            Approve
+                        </button>
+
+                        <Link to={`/ViewSpecification/${specificationId}`}
+                              className="govuk-button govuk-button--secondary"
+                              data-module="govuk-button">
+                            Cancel
+                        </Link>
+                    </div>
+                </div>
+
                 {calculation &&
                 <div className={"govuk-form-group"}>
                     <span id="last-saved-date" className={"govuk-body"}>
@@ -325,9 +255,11 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     </span>
                 </div>
                 }
+
                 <div className={"govuk-form-group"}>
                     <Link className="govuk-link" to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
                 </div>
+
             </fieldset>
         </div>
         <Footer/>

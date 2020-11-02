@@ -19,8 +19,14 @@ export const useErrors = () => {
         setErrors(errors => [...errors, error]);
     };
 
-    const clearErrorMessages = () => {
-        setErrors([]);
+    const clearErrorMessages = (fieldNames?: string[]) => {
+        if (errors.length > 0) {
+            if (fieldNames === undefined) {
+                setErrors([]);
+            } else {
+                setErrors(errors.filter(e => !e.fieldName || (e.fieldName && !fieldNames.includes(e.fieldName))));
+            }
+        }
     };
 
     return {

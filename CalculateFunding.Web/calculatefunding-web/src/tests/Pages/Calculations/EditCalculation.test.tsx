@@ -6,21 +6,21 @@ import {MemoryRouter} from 'react-router-dom';
 import {act, cleanup, render, screen, within} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
-import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
-import * as calcHook from "../../../hooks/Calculations/useCalculation";
-import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
-import {CalculationQueryResult} from "../../../hooks/Calculations/useCalculation";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
+import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import * as calcHook from "../../../hooks/Calculations/useCalculation";
+import {CalculationQueryResult} from "../../../hooks/Calculations/useCalculation";
+import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
-import {CalculationTypes} from "../../../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
-import {Calculation} from "../../../types/CalculationSummary";
+import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {ValueType} from "../../../types/ValueType";
 import userEvent from "@testing-library/user-event";
 import {CalculationCompilePreviewResponse, CompileErrorSeverity} from "../../../types/Calculations/CalculationCompilePreviewResponse";
-import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import {CalculationDetails} from "../../../types/CalculationDetails";
 
 const history = createMemoryHistory();
 
@@ -196,14 +196,6 @@ describe("<EditCalculation> tests", () => {
 });
 
 
-const matchMock: match<EditCalculationRouteProps> = {
-    isExact: true,
-    path: "",
-    url: "",
-    params: {
-        calculationId: "123",
-    }
-};
 const fundingStream: FundingStream = {
     name: "FS123",
     id: "Wizard Training Scheme"
@@ -231,9 +223,9 @@ const specResult: SpecificationSummaryQueryResult = {
     isFetchingSpecification: false,
     isSpecificationFetched: true
 };
-const testCalc: Calculation = {
+const testCalc: CalculationDetails = {
     author: {id: "testUserId", name: "Mr Test"},
-    calculationType: CalculationTypes.Number,
+    calculationType: CalculationType.Additional,
     description: undefined,
     fundingStreamId: fundingStream.id,
     id: "54723",
@@ -251,6 +243,15 @@ const calcResult: CalculationQueryResult = {
     calculation: testCalc,
     isLoadingCalculation: false
 }
+
+const matchMock: match<EditCalculationRouteProps> = {
+    isExact: true,
+    path: "",
+    url: "",
+    params: {
+        calculationId: testCalc.id,
+    }
+};
 const withCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
     circularReferenceErrors: [{
         node: {
@@ -314,7 +315,8 @@ const specFullPermsResult: SpecificationPermissionsResult = {
     hasMissingPermissions: false,
     isCheckingForPermissions: false,
     isPermissionsFetched: true,
-    missingPermissions: []
+    missingPermissions: [],
+    canCreateAdditionalCalculation: true
 }
 const specNoPermsResult: SpecificationPermissionsResult = {
     canApproveFunding: false,
@@ -328,7 +330,8 @@ const specNoPermsResult: SpecificationPermissionsResult = {
     hasMissingPermissions: false,
     isCheckingForPermissions: false,
     isPermissionsFetched: true,
-    missingPermissions: ["Edit Calculations", "Approve Calculations",]
+    missingPermissions: ["Edit Calculations", "Approve Calculations",],
+    canCreateAdditionalCalculation: false
 }
 const location = createLocation(matchMock.url);
 const mockOutMonacoEditor = () => jest.mock("../../../components/GdsMonacoEditor", () => <></>);

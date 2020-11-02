@@ -1,8 +1,8 @@
-import {CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 
 export interface ViewSpecificationResultsState {
     specification: SpecificationSummary,
-    additionalCalculations: CalculationSummary,
-    templateCalculations: CalculationSummary
+    additionalCalculations: CalculationSearchResponse,
+    templateCalculations: CalculationSearchResponse
 }

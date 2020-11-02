@@ -4,7 +4,6 @@ import {Footer} from "../components/Footer";
 import {Header} from "../components/Header";
 import {RouteComponentProps} from "react-router";
 import {CollapsiblePanel} from "../components/CollapsiblePanel";
-import {Calculation} from "../types/CalculationSummary";
 import {FundingStream} from "../types/viewFundingTypes";
 import {AccordianPanel} from "../components/AccordianPanel";
 import Pagination from "../components/Pagination";
@@ -23,6 +22,7 @@ import {LoadingStatus} from "../components/LoadingStatus";
 import {JobType} from "../types/jobType";
 import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {CalculationDetails} from "../types/CalculationDetails";
 
 export interface ViewCalculationResultsRoute {
     calculationId: string
@@ -67,7 +67,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         id: ""
     };
 
-    const [calculation, setCalculation] = useState<Calculation>({
+    const [calculation, setCalculation] = useState<CalculationDetails>({
         calculationType: "",
         description: null,
         fundingStreamId: "",
@@ -272,7 +272,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
     function getCalculationById(calculationId: string) {
         getCalculationByIdService(calculationId).then((response) => {
-            setCalculation(response.data as Calculation);
+            setCalculation(response.data as CalculationDetails);
         })
     }
 

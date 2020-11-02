@@ -4,7 +4,6 @@ import {Section} from "../../types/Sections";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import React, {useEffect, useState} from "react";
 import {getCalculationByIdService, getMultipleVersionsByCalculationIdService} from "../../services/calculationService";
-import {Calculation} from "../../types/CalculationSummary";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
@@ -13,6 +12,10 @@ import {GdsMonacoDiffEditor} from "../../components/GdsMonacoDiffEditor";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Link} from "react-router-dom";
 import {DateFormatter} from "../../components/DateFormatter";
+import {CalculationDetails} from "../../types/CalculationDetails";
+import {CalculationType} from "../../types/CalculationSearchResponse";
+import {ValueType} from "../../types/ValueType";
+import {PublishStatus} from "../../types/PublishStatusModel";
 
 export interface CompareCalculationVersionsRouteProps {
     calculationId: string;
@@ -41,22 +44,25 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         id: "",
         isSelectedForFunding: false,
         name: "",
-        providerVersionId: ""
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        templateIds: {}
     });
-    const [calculation, setCalculation] = useState<Calculation>({
-        calculationType: "",
-        description: null,
+    const [calculation, setCalculation] = useState<CalculationDetails>({
+        calculationType: CalculationType.Template,
         fundingStreamId: "",
         id: "",
-        lastUpdatedDate: new Date(),
-        lastUpdatedDateDisplay: "",
+        lastUpdated: new Date(),
         name: "",
         namespace: "",
         specificationId: "",
-        specificationName: "",
-        status: "",
-        valueType: "",
-        wasTemplateCalculation: false
+        publishStatus: PublishStatus.Draft,
+        valueType: ValueType.Percentage,
+        wasTemplateCalculation: false,
+        author: {id: "", name: ""},
+        sourceCode: "",
+        sourceCodeName: "",
+        version: 0
     });
     const [calculationVersions, setCalculationVersions] = useState<CalculationVersionHistorySummary[]>([{
         sourceCode: "",
@@ -96,7 +102,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
 
     function populateCalculation(calculationId: string) {
         getCalculationByIdService(calculationId).then((result) => {
-            const response = result.data as Calculation;
+            const response = result.data as CalculationDetails;
             setCalculation(response);
             setIsLoading(prevState => {
                 return {...prevState, calculations: false}

@@ -561,10 +561,16 @@ export function getHoverDescriptionForVariable(model: monaco.editor.IReadOnlyMod
 }
 
 export function convertClassToVariables(root: ITypeInformationResponse | undefined, result: Array<ITypeInformationResponse>) {
-    let variables :IVariableContainer={};
+    let variables: IVariableContainer = {};
 
-    root?.properties?.forEach(property => {
-        variables[property.name.toLowerCase()] = {
+    if (!root || !root.properties) {
+        return variables;
+    }
+    
+    root.properties.forEach(property => {
+        const propLowerCaseName = property.name.toLowerCase();
+        
+        variables[propLowerCaseName] = {
             description: property.description,
             friendlyName: property.friendlyName,
             isAggregable: property.isAggregable,
@@ -574,15 +580,15 @@ export function convertClassToVariables(root: ITypeInformationResponse | undefin
             variableType: languages.CompletionItemKind.Field
         };
 
-        let subItem = result.find(p => p.name=== property.type);
+        const subItem = result.find(p => p.name === property.type);
 
-        if(subItem)
+        if (subItem)
         {
-            variables[property.name.toLowerCase()].items = convertClassToVariables(subItem, result);
+            variables[propLowerCaseName].items = convertClassToVariables(subItem, result);
         }
     });
 
-    root?.methods?.forEach(method => {
+    root.methods.forEach(method => {
         variables[method.name.toLowerCase()] ={
             description:method.description,
             friendlyName: method.friendlyName,

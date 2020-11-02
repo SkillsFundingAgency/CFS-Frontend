@@ -1,6 +1,6 @@
 import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
-import {CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {
     approveFundingLineStructureService,
@@ -24,7 +24,7 @@ import {
 } from "./FundingLineStructureAction";
 import {getFundingLineStructureService} from "../services/fundingStructuresService";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
-import {getCalculationsService} from "../services/calculationService";
+import {searchForCalculationsService} from "../services/calculationService";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 
 export enum ViewSpecificationActionTypes {
@@ -40,7 +40,7 @@ export enum ViewSpecificationActionTypes {
 
 export interface GetAdditionalCalculations {
     type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS
-    payload: CalculationSummary
+    payload: CalculationSearchResponse
 }
 
 export interface GetDatasets {
@@ -98,10 +98,10 @@ export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, 
     };
 
     return async (dispatch: Dispatch) => {
-        const response = await getCalculationsService(searchRequest);
+        const response = await searchForCalculationsService(searchRequest);
         dispatch({
             type: ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS,
-            payload: response.data as CalculationSummary
+            payload: response.data as CalculationSearchResponse
         });
     }
 };

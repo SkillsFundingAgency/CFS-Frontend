@@ -8,11 +8,13 @@ import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationP
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {FundingPeriod, Specification} from "../types/viewFundingTypes";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 
 let baseURL = "/api/specs";
 
 
-export async function getSpecificationSummaryService(specificationId: string): Promise<AxiosResponse<SpecificationSummary>> {
+export async function getSpecificationSummaryService(specificationId: string): 
+    Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/specification-summary-by-id/${specificationId}`, {
         method: 'GET',
         headers: {
@@ -21,7 +23,9 @@ export async function getSpecificationSummaryService(specificationId: string): P
     });
 }
 
-export async function getAdditionalCalculationsForSpecificationService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel) {
+export async function getAdditionalCalculationsForSpecificationService(
+    calculationSearchRequestViewModel: CalculationSearchRequestViewModel):
+    Promise<AxiosResponse<CalculationSearchResponse>> {
     return axios(`/api/calculations/getcalculationsforspecification`, {
         method: 'POST',
         headers: {

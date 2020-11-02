@@ -2,12 +2,16 @@ import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import { CreateAdditionalCalculationViewModel, UpdateCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
 import {PublishStatusModel} from "../types/PublishStatusModel";
-import {Calculation, CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
 import {CalculationCompilePreviewResponse} from "../types/Calculations/CalculationCompilePreviewResponse";
+import {CalculationDetails} from "../types/CalculationDetails";
+import {AdditionalCalculationSearchResultViewModel} from "../types/Calculations/AdditionalCalculation";
+import {CalculationVersionHistorySummary} from "../types/Calculations/CalculationVersionHistorySummary";
 
-export async function getCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel): Promise<AxiosResponse<CalculationSummary>> {
+export async function searchForCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel): 
+    Promise<AxiosResponse<CalculationSearchResponse>> {
     return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}`, {
             method: 'GET',
             headers: {
@@ -22,7 +26,9 @@ export async function getCalculationsService(calculationSearchRequestViewModel: 
     );
 }
 
-export async function getCalculationsByProviderService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel, providerId: string) {
+export async function searchForCalculationsByProviderService(
+    calculationSearchRequestViewModel: CalculationSearchRequestViewModel, providerId: string):
+    Promise<AxiosResponse<AdditionalCalculationSearchResultViewModel>>{
     return axios(`/api/calcs/getcalculations/${calculationSearchRequestViewModel.specificationId}/${calculationSearchRequestViewModel.calculationType}/${calculationSearchRequestViewModel.pageNumber}/provider/${providerId}`, {
             method: 'GET',
             headers: {
@@ -38,7 +44,7 @@ export async function getCalculationsByProviderService(calculationSearchRequestV
 }
 
 export async function getCalculationByIdService(calculationId: string) {
-    return axios.get<Calculation>(`/api/calcs/getcalculationbyid/${calculationId}`)
+    return axios.get<CalculationDetails>(`/api/calcs/getcalculationbyid/${calculationId}`)
 }
 
 export async function getCalculationProvidersService(calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel) {
@@ -51,7 +57,8 @@ export async function getCalculationProvidersService(calculationProviderSearchRe
     })
 }
 
-export async function createAdditionalCalculationService(createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel, specificationId: string) {
+export async function createAdditionalCalculationService(
+    createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel, specificationId: string): Promise<AxiosResponse<CalculationDetails>> {
     return axios(`/api/specs/${specificationId}/calculations/createadditionalcalculation`, {
         method: 'POST',
         headers: {
@@ -97,7 +104,8 @@ export async function getCodeContextService(specificationId: string) {
     return response.data;
 }
 
-export async function getCalculationVersionHistoryService(calculationId: string) {
+export async function getCalculationVersionHistoryService(calculationId: string):
+    Promise<AxiosResponse<CalculationVersionHistorySummary[]>>{
     return axios(`/api/calcs/getcalculationversionhistory/${calculationId}`, {
         method: 'GET',
         headers: {

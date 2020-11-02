@@ -1,18 +1,18 @@
 ﻿import {useQuery} from "react-query";
 import {AxiosError} from "axios";
 import {getCalculationByIdService} from "../../services/calculationService";
-import {Calculation} from "../../types/CalculationSummary";
+import {CalculationDetails} from "../../types/CalculationDetails";
 
 
 export type CalculationQueryResult = {
-    calculation: Calculation | undefined,
+    calculation: CalculationDetails | undefined,
     isLoadingCalculation: boolean,
 }
 
 export const useCalculation = (calculationId: string,
                                    onError: (err: AxiosError) => void)
     : CalculationQueryResult => {
-    const {data, isLoading} = useQuery<Calculation, AxiosError>(
+    const {data, isLoading} = useQuery<CalculationDetails, AxiosError>(
         `calculation-${calculationId}`,
         async () => (await getCalculationByIdService(calculationId)).data,
         {

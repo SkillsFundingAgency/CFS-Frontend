@@ -10,6 +10,7 @@ export enum SpecificationPermissions {
     Edit = "Edit",
     EditCalculations = "Edit Calculations",
     ApproveCalculations = "Approve Calculations",
+    CreateAdditionalCalculations = "Create Additional Calculations",
     MapDatasets = "Map Datasets",
     Release = "Release",
     Refresh = "Refresh",
@@ -25,6 +26,7 @@ export interface SpecificationPermissionsResult {
     canRefreshFunding: boolean | undefined,
     canReleaseFunding: boolean | undefined,
     canMapDatasets: boolean | undefined,
+    canCreateAdditionalCalculation: boolean | undefined,
     canEditCalculation: boolean | undefined,
     canApproveCalculation: boolean | undefined,
     hasMissingPermissions: boolean,
@@ -78,6 +80,10 @@ export const useSpecificationPermissions = (
     const canMapDatasets = useMemo(() => {
         return permissions && permissions.canMapDatasets;
     }, [permissions]);
+    
+    const canCreateAdditionalCalculations = useMemo(() => {
+        return permissions && permissions.canEditCalculations;
+    }, [permissions]);
 
 
     const missingPermissions = useMemo(() => {
@@ -106,6 +112,9 @@ export const useSpecificationPermissions = (
         if (!canApproveCalculation && requiredPermissions.includes(SpecificationPermissions.ApproveCalculations)) {
             missing.push(SpecificationPermissions.ApproveCalculations);
         }
+        if (!canCreateAdditionalCalculations && requiredPermissions.includes(SpecificationPermissions.CreateAdditionalCalculations)) {
+            missing.push(SpecificationPermissions.CreateAdditionalCalculations);
+        }
         return missing;
     }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canMapDatasets, requiredPermissions, canEditCalculation, canApproveCalculation]);
 
@@ -118,6 +127,7 @@ export const useSpecificationPermissions = (
         canRefreshFunding,
         canReleaseFunding,
         canMapDatasets,
+        canCreateAdditionalCalculation: canCreateAdditionalCalculations,
         canEditCalculation,
         canApproveCalculation,
         hasMissingPermissions: queryOptions.enabled ? missingPermissions && missingPermissions.length > 0: false,

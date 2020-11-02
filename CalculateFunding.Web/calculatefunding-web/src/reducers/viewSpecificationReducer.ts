@@ -1,6 +1,6 @@
 import {ViewSpecificationState} from "../states/ViewSpecificationState";
 import {ViewSpecificationActionTypes, ViewSpecificationsActions} from "../actions/ViewSpecificationsActions";
-import {CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {DatasetSummary} from "../types/DatasetSummary";
 import {ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
 import {IFundingStructureItem} from "../types/FundingStructureItem";
@@ -71,7 +71,7 @@ export function reduceViewSpecificationState(state: ViewSpecificationState = ini
         case ViewSpecificationActionTypes.GET_SPECIFICATION:
             return {...state, specification: action.payload};
         case ViewSpecificationActionTypes.GET_ADDITIONALCALCULATIONS:
-            return {...state, additionalCalculations: action.payload as CalculationSummary};
+            return {...state, additionalCalculations: action.payload as CalculationSearchResponse};
         case ViewSpecificationActionTypes.GET_DATASETS:
             return {...state, datasets: action.payload as DatasetSummary};
         case ViewSpecificationActionTypes.GET_RELEASETIMETABLE:

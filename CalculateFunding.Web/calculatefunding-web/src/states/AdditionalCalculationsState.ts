@@ -1,5 +1,5 @@
-import {CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 
 export interface AdditionalCalculationsState {
-    additionalCalculations: CalculationSummary[]
+    additionalCalculations: CalculationSearchResponse[]
 }

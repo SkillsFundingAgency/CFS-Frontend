@@ -2,7 +2,7 @@ import {Header} from "../../components/Header";
 import React, {useEffect, useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
-import {Calculation} from "../../types/CalculationSummary";
+import {CalculationType} from "../../types/CalculationSearchResponse";
 import {getCalculationByIdService, getCalculationVersionHistoryService} from "../../services/calculationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
@@ -14,7 +14,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
 import {ValueType} from "../../types/ValueType";
 import {PublishStatus} from "../../types/PublishStatusModel";
-import {CalculationTypes} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
+import {CalculationDetails} from "../../types/CalculationDetails";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -37,8 +37,8 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
         dataDefinitionRelationshipIds: [],
         providerSnapshotId: 0,
     });
-    const [calculation, setCalculation] = useState<Calculation>({
-        calculationType: CalculationTypes.Number,
+    const [calculation, setCalculation] = useState<CalculationDetails>({
+        calculationType: CalculationType.Template,
         fundingStreamId: "",
         id: "",
         lastUpdated: new Date(),
@@ -60,15 +60,13 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
 
     function populateCalculation() {
         getCalculationByIdService(calculationId).then((result) => {
-            const response = result.data as Calculation;
-            setCalculation(response);
+            setCalculation(result.data);
         });
     }
 
     function populateSpecification(specificationId: string) {
         getSpecificationSummaryService(specificationId).then((result) => {
-            const response = result.data as SpecificationSummary;
-            setSpecification(response);
+            setSpecification(result.data);
             setIsLoading(false);
         })
     }

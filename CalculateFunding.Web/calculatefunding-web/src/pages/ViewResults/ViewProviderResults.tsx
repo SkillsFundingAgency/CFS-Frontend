@@ -11,7 +11,7 @@ import {approveFundingLineStructureService, getSpecificationSummaryService} from
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Tabs} from "../../components/Tabs";
 import {DateFormatter} from "../../components/DateFormatter";
-import {getCalculationsByProviderService} from "../../services/calculationService";
+import {searchForCalculationsByProviderService} from "../../services/calculationService";
 import {Link} from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import {getFundingLineStructureByProviderService} from "../../services/fundingStructuresService";
@@ -86,7 +86,9 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         id: "",
         isSelectedForFunding: false,
         name: "",
-        providerVersionId: ""
+        providerVersionId: "",
+        templateIds: {},
+        dataDefinitionRelationshipIds: [],
     })
 
     const [isLoading, setIsLoading] = useState({
@@ -229,7 +231,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     }, [fundingLines]);
 
     function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
-        getCalculationsByProviderService({
+        searchForCalculationsByProviderService({
             specificationId: specificationId,
             status: status,
             pageNumber: pageNumber,
@@ -238,8 +240,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         }, match.params.providerId)
             .then((response) => {
                 if (response.status === 200) {
-                    const result = response.data as AdditionalCalculationSearchResultViewModel;
-                    setAdditionalCalculations(result);
+                    setAdditionalCalculations(response.data);
                     setIsLoading(prevState => {
                         return {
                             ...prevState,

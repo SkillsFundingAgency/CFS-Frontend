@@ -1,4 +1,4 @@
-import {CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {DatasetSummary} from "../types/DatasetSummary";
 import {ReleaseTimetableViewModel} from "../types/ReleaseTimetableSummary";
@@ -7,7 +7,7 @@ import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationP
 
 export interface ViewSpecificationState {
     specification: SpecificationSummary,
-    additionalCalculations: CalculationSummary,
+    additionalCalculations: CalculationSearchResponse,
     datasets: DatasetSummary,
     releaseTimetable: ReleaseTimetableViewModel,
     fundingLineStructureResult: IFundingStructureItem[],

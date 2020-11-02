@@ -1,11 +1,9 @@
 import {PublishStatus} from "./PublishStatusModel";
-import {Author} from "./Calculations/Author";
-import {CalculationTypes} from "./Calculations/CreateAdditonalCalculationViewModel";
 import {ValueType} from "./ValueType";
 
-export interface CalculationSummary {
+export interface CalculationSearchResponse {
     totalCount: number;
-    results: Calculation[];
+    results: CalculationSearchResult[];
     totalResults: number;
     totalErrorResults: number;
     currentPage: number;
@@ -16,29 +14,31 @@ export interface CalculationSummary {
     facets: any[];
 }
 
-export interface Calculation {
+export interface CalculationSearchResult {
     id: string;
     name: string;
-    specificationId: string;
     fundingStreamId: string;
-    sourceCode: string;
-    calculationType: CalculationTypes;
-    sourceCodeName: string;
+    specificationId: string;
+    specificationName: string;
+    valueType: ValueType;
+    calculationType: CalculationType;
     namespace: string;
     wasTemplateCalculation: boolean;
-    valueType: ValueType;
-    lastUpdated: Date;
-    author: Author | null;
-    version?: number | undefined;
-    publishStatus: PublishStatus;
     description?: string | undefined;
+    status: PublishStatus;
+    lastUpdatedDate: Date;
 }
 
-interface PagerState {
+export interface PagerState {
     displayNumberOfPages: number;
     previousPage: number;
     nextPage: number;
     lastPage: number;
     pages: number[];
     currentPage: number;
+}
+
+export enum CalculationType {
+    Additional = "Additional",
+    Template = "Template"
 }

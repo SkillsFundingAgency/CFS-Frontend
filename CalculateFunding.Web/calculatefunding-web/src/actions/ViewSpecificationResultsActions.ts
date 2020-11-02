@@ -3,9 +3,9 @@ import {ThunkAction} from "redux-thunk";
 import {ActionCreator, Dispatch} from "redux";
 import {ViewSpecificationResultsState} from "../states/ViewSpecificationResultsState";
 import {SpecificationSummary} from "../types/SpecificationSummary";
-import {CalculationSummary} from "../types/CalculationSummary";
+import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
-import {getCalculationsService} from "../services/calculationService";
+import {searchForCalculationsService} from "../services/calculationService";
 
 export enum ViewSpecificationResultsActionTypes {
     GET_SPECIFICATIONSUMMARY = 'getSpecificationSummary',
@@ -20,12 +20,12 @@ export interface GetSpecificationAction {
 
 export interface GetTemplateCalculations {
     type: ViewSpecificationResultsActionTypes.GET_TEMPLATECALCULATIONS;
-    payload: CalculationSummary
+    payload: CalculationSearchResponse
 }
 
 export interface GetAdditionalCalculations {
     type: ViewSpecificationResultsActionTypes.GET_ADDITIONALCALCULATIONS
-    payload: CalculationSummary
+    payload: CalculationSearchResponse
 }
 
 export type ViewSpecificationResultsActions =
@@ -57,10 +57,10 @@ export const getTemplateCalculations: ActionCreator<ThunkAction<Promise<any>, Vi
     };
 
     return async (dispatch: Dispatch) => {
-        const response = await getCalculationsService(searchRequest);
+        const response = await searchForCalculationsService(searchRequest);
         dispatch({
             type: ViewSpecificationResultsActionTypes.GET_TEMPLATECALCULATIONS,
-            payload: response.data as CalculationSummary
+            payload: response.data as CalculationSearchResponse
         });
     }
 };
@@ -74,10 +74,10 @@ export const getAdditionalCalculations: ActionCreator<ThunkAction<Promise<any>, 
     };
 
     return async (dispatch: Dispatch) => {
-        const response = await getCalculationsService(searchRequest);
+        const response = await searchForCalculationsService(searchRequest);
         dispatch({
             type: ViewSpecificationResultsActionTypes.GET_ADDITIONALCALCULATIONS,
-            payload: response.data as CalculationSummary
+            payload: response.data as CalculationSearchResponse
         });
     }
 };

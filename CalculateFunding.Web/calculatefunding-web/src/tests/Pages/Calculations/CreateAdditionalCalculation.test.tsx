@@ -1,20 +1,20 @@
 import React from "react";
 import {match} from 'react-router';
 import {MemoryRouter} from 'react-router-dom';
-import {render, waitFor, cleanup, screen} from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
 import {CreateAdditionalCalculation, CreateAdditionalCalculationRouteProps} from "../../../pages/Calculations/CreateAdditionalCalculation";
+import userEvent from "@testing-library/user-event";
+import {act, cleanup, render, screen, within} from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
+import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
+import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
+import {CalculationCompilePreviewResponse, CompileErrorSeverity} from "../../../types/Calculations/CalculationCompilePreviewResponse";
+import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import {createLocation} from "history";
+import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
+import * as specHook from "../../../hooks/useSpecificationSummary";
 
-const matchMock: match<CreateAdditionalCalculationRouteProps> = {
-    isExact: true,
-    path: "",
-    url: "",
-    params: {
-        specificationId: "SPEC123",
-    }
-};
-
-function renderCreateAdditionalCalculation() {
+function renderPage() {
     const {CreateAdditionalCalculation} = require("../../../pages/Calculations/CreateAdditionalCalculation");
     return render(<MemoryRouter>
         <CreateAdditionalCalculation
@@ -25,75 +25,215 @@ function renderCreateAdditionalCalculation() {
     </MemoryRouter>);
 }
 
-beforeEach(() => {
-    function mockSpecificationService() {
-        const specificationService = jest.requireActual('../../../services/specificationService');
+
+describe("<CreateAdditionalCalculation> tests", () => {
+
+    describe("<CreateAdditionalCalculation> when user builds invalid source code", () => {
+        beforeEach(() => {
+            mockOutMonacoEditor();
+            mockWithFullPermissions();
+            mockSpecification();
+            mockFailedBuild();
+
+            renderPage();
+        });
+        afterEach(() => {
+            cleanup();
+            jest.clearAllMocks()
+        });
+
+        it("renders the error message", async () => {
+            const buildButton = screen.getByRole("button", {name: /Build calculation/});
+
+            act(() => userEvent.click(buildButton));
+
+            expect(await screen.findByText(/There was a compilation error/)).toBeInTheDocument();
+            expect(await screen.findByText(/Typo error/)).toBeInTheDocument();
+            expect(screen.queryByText(/Build successful/)).not.toBeInTheDocument();
+        });
+    });
+
+    describe("<CreateAdditionalCalculation> with no issues", () => {
+        beforeEach(() => {
+            mockOutMonacoEditor();
+            mockWithFullPermissions();
+            mockSpecification();
+
+            renderPage();
+        });
+        afterEach(() => jest.clearAllMocks());
+
+        it("does not render any errors", async () => {
+            expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+        });
+
+        it("renders the specification name", async () => {
+            expect(screen.getByText(testSpec.name)).toBeInTheDocument();
+        });
+
+        it("renders the calculation name label", async () => {
+            expect(screen.getByText(/Calculation name/)).toBeInTheDocument();
+        });
+
+        it("renders the calculation type label", async () => {
+            expect(screen.getByText(/Value type/)).toBeInTheDocument();
+        });
+    });
+    
+    describe("<CreateAdditionalCalculation> with no permissions", () => {
+        beforeEach(() => {
+            mockOutMonacoEditor();
+            mockWithNoPermissions();
+            mockSpecification();
+
+            renderPage();
+        });
+        afterEach(() => jest.clearAllMocks());
+
+        it("renders permissions warning", async () => {
+            const permissionsWarning = await screen.findByTestId("permission-alert-message");
+            expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following actions:/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Create Calculations/)).toBeInTheDocument();
+
+            expect(screen.getByText(testSpec.name)).toBeInTheDocument();
+        });
+
+        it('disables save button given user is not allowed to create calculations', async () => {
+            const button = screen.getByRole("button", {name: /Save and continue/});
+            expect(button).toBeDisabled();
+        });
+    });
+    
+});
+
+
+const fundingStream: FundingStream = {
+    name: "FS123",
+    id: "Wizard Training Scheme"
+};
+const fundingPeriod: FundingPeriod = {
+    id: "FP123",
+    name: "2019-20"
+};
+const testSpec: SpecificationSummary = {
+    name: "Wizard Training",
+    approvalStatus: "",
+    description: "",
+    fundingPeriod: fundingPeriod,
+    fundingStreams: [fundingStream],
+    id: "ABC123",
+    isSelectedForFunding: true,
+    providerVersionId: "",
+    dataDefinitionRelationshipIds: []
+};
+
+const matchMock: match<CreateAdditionalCalculationRouteProps> = {
+    isExact: true,
+    path: "",
+    url: "",
+    params: {
+        specificationId: testSpec.id,
+    }
+};
+const specResult: SpecificationSummaryQueryResult = {
+    specification: testSpec,
+    isLoadingSpecification: false,
+    errorCheckingForSpecification: null,
+    haveErrorCheckingForSpecification: false,
+    isFetchingSpecification: false,
+    isSpecificationFetched: true
+};
+const mockFailedBuildResponse: CalculationCompilePreviewResponse = {
+    compilerOutput: {
+        success: false,
+        sourceFiles: [{
+            fileName: "",
+            sourceCode: ""
+        }],
+        compilerMessages: [{
+            severity: CompileErrorSeverity.Error,
+            location: {
+                startChar: 1,
+                endChar: 2,
+                startLine: 1,
+                endLine: 1,
+                owner: {id: "TestUser3", name: "Mr Test"}
+            },
+            message: "Typo error"
+        }]
+    }
+};
+const mockSuccessfulBuildResponse: CalculationCompilePreviewResponse = {
+    compilerOutput: {
+        success: true,
+        sourceFiles: [{
+            fileName: "",
+            sourceCode: ""
+        }],
+        compilerMessages: [],
+    }
+};
+const specFullPermsResult: SpecificationPermissionsResult = {
+    canApproveFunding: false,
+    canCreateSpecification: false,
+    canEditCalculation: true,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canApproveCalculation: true,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    isPermissionsFetched: true,
+    missingPermissions: [],
+    canCreateAdditionalCalculation: true
+}
+const specNoPermsResult: SpecificationPermissionsResult = {
+    canApproveFunding: false,
+    canCreateSpecification: false,
+    canEditCalculation: false,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canApproveCalculation: false,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    isPermissionsFetched: true,
+    missingPermissions: ["Create Calculations"],
+    canCreateAdditionalCalculation: false
+}
+const location = createLocation(matchMock.url);
+const mockOutMonacoEditor = () => jest.mock("../../../components/GdsMonacoEditor", () => <></>);
+const mockWithFullPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
+    .mockImplementation(() => (specFullPermsResult));
+const mockWithNoPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
+    .mockImplementation(() => (specNoPermsResult));
+const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
+    .mockImplementation(() => (specResult));
+const mockFailedBuild = () => {
+    jest.mock("../../../services/calculationService", () => {
+        const mockService = jest.requireActual("../../../services/calculationService");
+
         return {
-            ...specificationService,
-            getSpecificationSummaryService: jest.fn((specificationId) => Promise.resolve({
-                data: {
-                    name: "Specification 123",
-                    id: "SPEC123",
-                    approvalStatus: "Approved",
-                    isSelectedForFunding: false,
-                    description: "Test Description",
-                    providerVersionId: "1",
-                    fundingStreams: [],
-                    fundingPeriod: {
-                        id: "FP321",
-                        name: "FPERIOD"
-                    }
-                }
+            ...mockService,
+            compileCalculationPreviewService: jest.fn(() => Promise.resolve({
+                data: mockFailedBuildResponse,
+                status: 400
             }))
         }
-    }
-
-    jest.mock('../../../services/specificationService', () => mockSpecificationService());
-    jest.mock("../../../components/GdsMonacoEditor", () => <></>);
-});
-
-afterEach(cleanup);
-
-describe("<CreateAdditionalCalculation> ", () => {
-    it("renders the H1 title", async () => {
-        const {container} = renderCreateAdditionalCalculation();
-        await waitFor(() => {
-            expect(container.querySelector("h1")).toHaveTextContent("Create additional calculation");
-        });
     });
+}
+const mockSuccessfulBuild = () => {
+    jest.mock("../../../services/calculationService", () => {
+        const service = jest.requireActual("../../../services/calculationService");
 
-    it("renders the calculation name label", async () => {
-        const {container} = renderCreateAdditionalCalculation();
-        await waitFor(() => {
-            expect(container.querySelector("label#calculation-name-label")).toHaveTextContent("Calculation name");
-        });
+        return {
+            ...service,
+            compileCalculationPreviewService: jest.fn(() => Promise.resolve({
+                data: mockSuccessfulBuildResponse,
+                status: 200
+            }))
+        }
     });
-
-    it("renders the calculation value label", async () => {
-        const {container} = renderCreateAdditionalCalculation();
-        await waitFor(() => {
-            expect(container.querySelector("label#calculation-value-label")).toHaveTextContent("Value type");
-        });
-    });
-
-    it("renders the build source button", async () => {
-        const {container} = renderCreateAdditionalCalculation();
-        await waitFor(() => {
-            expect(container.querySelector("button#build-calculation-button")).toHaveTextContent("Build calculation");
-        });
-    });
-
-    it("renders the build source button as enabled", async () => {
-        const {container} = renderCreateAdditionalCalculation();
-        await waitFor(() => {
-            expect(container.querySelector("button#build-calculation-button")).toBeEnabled();
-        });
-    });
-
-    it("renders the save calculation button as disabled", async () => {
-        const {container} = renderCreateAdditionalCalculation();
-        await waitFor(() => {
-            expect(container.querySelector("button#save-calculation-button")).toBeDisabled();
-        });
-    });
-});
+}

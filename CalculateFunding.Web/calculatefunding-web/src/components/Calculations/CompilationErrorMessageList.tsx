@@ -5,7 +5,7 @@ export function CompilationErrorMessageList(props:{compilerMessages: CompilerMes
     if (!props.compilerMessages) {
         return null;
     }
-    return <div className="govuk-error-summary">
+    return <div className="govuk-error-summary" id="build-output">
         <h2 className="govuk-error-summary__title">
             There was a compilation error
         </h2>
