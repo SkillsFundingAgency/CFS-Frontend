@@ -74,7 +74,7 @@ export function ReleaseTimetable(props: { specificationId: string }) {
         let year = `${date.getFullYear()}`
         let monthNumber = date.getMonth() + 1;
         let month = `${monthNumber < 10 ? "0" + monthNumber : monthNumber}`;
-        let day = `${date.getDate()}`;
+        let day = `${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`;
         let hours = `T${parseInt(time) < 10 ? "0" + parseInt(time) : parseInt(time)}:00:00.000`;
 
         let newDate = DateTime.fromISO(`${year}-${month}-${day}${hours}`)
