@@ -8,6 +8,7 @@ import {CalculationSearchResponse, CalculationType} from "../../types/Calculatio
 import {useEffect, useState} from "react";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
+import {LoadingFieldStatus} from "../LoadingFieldStatus";
 
 export interface AdditionalCalculationsProps {
     specificationId: string,
@@ -69,12 +70,8 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
 
 
     return <section className="govuk-tabs__panel" id="additional-calculations">
-        {(isLoadingAdditionalCalculations || isLoadingCircularDependencies) &&
-        <LoadingStatus title={isLoadingAdditionalCalculations ?
-            "Loading additional calculations" :
-            isLoadingCircularDependencies ?
-                "Checking for circular dependencies" : ""}
-                       hidden={!isLoadingAdditionalCalculations && !isLoadingCircularDependencies}
+        {isLoadingAdditionalCalculations &&
+        <LoadingStatus title="Loading additional calculations"
                        description="Please wait"/>
         }
         <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
@@ -111,7 +108,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
             </div>
         </div>
 
-        {!isLoadingAdditionalCalculations && circularReferenceErrors &&
+        {!isLoadingAdditionalCalculations && 
         <table className="govuk-table">
             <thead className="govuk-table__head">
             <tr className="govuk-table__row">
@@ -123,16 +120,16 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
             </thead>
             <tbody className="govuk-table__body">
             {additionalCalculations.results.map((ac, index) => {
-                const hasError = circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
+                const hasError = circularReferenceErrors && circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
                 
                 return <tr className="govuk-table__row" key={index}>
                         <td className="govuk-table__cell text-overflow">
                             <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
                             <br/>
-                            {hasError ? "circular reference detected in calculation script" : ""}
+                            {hasError ? <span className="govuk-error-message">circular reference detected in calculation script</span> : ""}
                         </td>
                         <td className="govuk-table__cell">
-                            {hasError ? "Error" : ac.status}
+                            {isLoadingCircularDependencies ? <LoadingFieldStatus title="Checking..."/> : hasError ? "Error" : ac.status}
                         </td>
                         <td className="govuk-table__cell">{ac.valueType}</td>
                         <td className="govuk-table__cell">
