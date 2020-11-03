@@ -204,7 +204,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
                         <li>
-                            <Link to={`/specifications/EditCalculation/${specificationId}`} className="govuk-link">Edit specification</Link>
+                            <Link to={`/specifications/EditSpecification/${specificationId}`} className="govuk-link">Edit specification</Link>
                         </li>
                         <li>
                             <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`} className="govuk-link">Create additional
