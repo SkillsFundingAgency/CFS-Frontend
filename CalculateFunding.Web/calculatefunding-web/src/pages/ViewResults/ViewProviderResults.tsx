@@ -125,35 +125,43 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             .then((response) => {
                 const specificationInformation = response.data;
                 if (specificationInformation && specificationInformation.length > 0) {
+
+                    const specificationIdQuerystring = querystringParams.specificationId as string;
                     const selectedSpecification = specificationInformation
                         .find((s) => 
-                            s.id === querystringParams.specificationId) ?? specificationInformation[0];
+                            s.id === specificationIdQuerystring) ?? specificationInformation[0];
 
-                    let selectedSpecificationId = selectedSpecification.id;
+                    let specificationId = selectedSpecification.id;
 
-                    if (specificationInformation.some((specInformation)=>
-                        specInformation.fundingStreamIds != null)) {
-                        let selectSpecificationByFundingStream = false;
-                        specificationInformation.map((specInfo) => {
-                            return specInfo.fundingStreamIds?.map((fundingStreamId) => {
-                                if (fundingStreamId === match.params.fundingStreamId) {
-                                    setSelectedSpecificationId(specInfo.id);
-                                    selectedSpecificationId = specInfo.id;
-                                    selectSpecificationByFundingStream = true;
-                                    return;
-                                }
+                    if (querystringParams.specificationId != null) {
+                        setSelectedSpecificationId(specificationIdQuerystring);
+                        specificationId = specificationIdQuerystring;
+                    }
+                    else {
+                        if (specificationInformation.some((specInformation) =>
+                            specInformation.fundingStreamIds != null)) {
+                            let selectSpecificationByFundingStream = false;
+                            specificationInformation.map((specInfo) => {
+                                return specInfo.fundingStreamIds?.map((fundingStreamId) => {
+                                    if (fundingStreamId === match.params.fundingStreamId) {
+                                        setSelectedSpecificationId(specInfo.id);
+                                        specificationId = specInfo.id;
+                                        selectSpecificationByFundingStream = true;
+                                        return;
+                                    }
+                                });
                             });
-                        });
 
-                        if (!selectSpecificationByFundingStream) {
-                            getFundingStreamByIdService(match.params.fundingStreamId)
-                                .then((fundingStreamResponse) => {
-                                    const fundingStream = fundingStreamResponse.data as FundingStream;
-                                    setDefaultFundingStreamName(fundingStream.name);
-                                })
+                            if (!selectSpecificationByFundingStream) {
+                                getFundingStreamByIdService(match.params.fundingStreamId)
+                                    .then((fundingStreamResponse) => {
+                                        const fundingStream = fundingStreamResponse.data as FundingStream;
+                                        setDefaultFundingStreamName(fundingStream.name);
+                                    })
+                            }
                         }
                     }
-                    populateSpecification(selectedSpecificationId);
+                    populateSpecification(specificationId);
 
                     setProviderResults(specificationInformation);
                     setIsLoading(prevState => {
