@@ -164,8 +164,7 @@ describe("<EditCalculation> tests", () => {
         });
 
         it("renders CircularReferenceErrors loading", async () => {
-            expect(screen.getByTestId("loader")).toBeInTheDocument();
-            expect(screen.getByText(/Checking for circular reference errors/)).toBeInTheDocument();
+            expect(await screen.findByText(/Checking for circular reference errors/)).toBeInTheDocument();
         });
     });
 

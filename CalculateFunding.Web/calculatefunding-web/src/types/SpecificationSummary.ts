@@ -10,6 +10,6 @@ export interface SpecificationSummary {
     fundingStreams: FundingStream[];
     fundingPeriod: FundingPeriod
     providerSnapshotId?: number;
-    templateIds?: { [key: string]: string };
+    templateIds: { [key: string]: string };
     dataDefinitionRelationshipIds: string[];
 }

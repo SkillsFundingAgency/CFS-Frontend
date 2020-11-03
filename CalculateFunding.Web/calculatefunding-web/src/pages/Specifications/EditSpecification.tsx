@@ -84,7 +84,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     throw new Error("Specification has no funding period.");
                 }
                 setSpecificationSummary(editSpecificationViewModel);
-                setSelectedDescription(editSpecificationViewModel.description);
+                setSelectedDescription(editSpecificationViewModel.description ? editSpecificationViewModel.description : "");
             }
             catch (error) {
                 setErrorSummary({

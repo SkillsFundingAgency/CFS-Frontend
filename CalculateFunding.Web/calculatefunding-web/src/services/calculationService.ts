@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import { CreateAdditionalCalculationViewModel, UpdateCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
-import {PublishStatusModel} from "../types/PublishStatusModel";
+import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
@@ -117,13 +117,13 @@ export async function getCalculationVersionHistoryService(calculationId: string)
     })
 }
 
-export async function approveCalculationService(publishStatusModel: PublishStatusModel, specificationId: string, calculationId: string) {
+export async function updateCalculationStatusService(newStatus: PublishStatus, specificationId: string, calculationId: string) {
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/status`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        data: publishStatusModel
+        data: {publishStatus: newStatus}
     })
 }
 

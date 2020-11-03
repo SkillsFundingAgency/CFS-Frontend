@@ -295,21 +295,29 @@ namespace CalculateFunding.Frontend.Controllers
                 return new BadRequestResult();
             }
 
-            return new StatusCodeResult((int)apiResponse.StatusCode);
+            return new StatusCodeResult((int) apiResponse.StatusCode);
         }
 
         [HttpPost]
         [Route("api/specs/create")]
         public async Task<IActionResult> CreateSpecification([FromBody] CreateSpecificationViewModel viewModel)
         {
-            //TODO: Could do with some validation here
-
             if (!ModelState.IsValid)
             {
                 return new BadRequestObjectResult(ModelState);
             }
 
             var fundingStreamIds = new List<string> {viewModel.FundingStreamId};
+
+            IEnumerable<FundingStreamPermission> fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
+            bool hasPermissionsOnAllTheseStreams = fundingStreamIds
+                .All(fundingStreamId => fundingStreamPermissions
+                    .Any(x =>
+                        x.FundingStreamId == fundingStreamId && x.CanCreateSpecification));
+            if (!hasPermissionsOnAllTheseStreams)
+            {
+                return new ForbidResult();
+            }
 
             CreateSpecificationModel specification = new CreateSpecificationModel
             {
@@ -322,13 +330,6 @@ namespace CalculateFunding.Frontend.Controllers
                 ProviderSnapshotId = viewModel.ProviderSnapshotId
             };
 
-            IEnumerable<FundingStreamPermission> fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
-
-            if (fundingStreamPermissions.All(x => x.CanCreateSpecification == false))
-            {
-                return new ForbidResult();
-            }
-
             ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.CreateSpecification(specification);
 
             if (result.IsBadRequest(out BadRequestObjectResult badRequest))
@@ -340,16 +341,8 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return new OkObjectResult(result.Content);
             }
-            else if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                result.AddValidationResultErrors(ModelState);
 
-                return new BadRequestObjectResult(result.ModelState);
-            }
-            else
-            {
-                return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
-            }
+            return new InternalServerErrorResult($"Unable to create specification - result '{result.StatusCode}'");
         }
 
         [Route("api/specs/{specificationId}/status")]

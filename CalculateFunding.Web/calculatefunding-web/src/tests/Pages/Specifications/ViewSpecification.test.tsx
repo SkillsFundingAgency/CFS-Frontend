@@ -1,6 +1,6 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
-import {act, cleanup, fireEvent, render, waitFor} from "@testing-library/react";
+import {act, cleanup, fireEvent, render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {ViewSpecification} from "../../../pages/Specifications/ViewSpecification";
 const Adapter = require('enzyme-adapter-react-16');
@@ -9,6 +9,7 @@ enzyme.configure({adapter: new Adapter()});
 import '@testing-library/jest-dom/extend-expect';
 import * as hooks from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {SpecificationSummary} from "../../../types/SpecificationSummary";
 
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
@@ -21,7 +22,14 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobInProgressMessage: "",
+    jobDisplayInfo: {
+        isActive: false,
+        isComplete: false,
+        isFailed: false,
+        isSuccessful: false,
+        jobDescription: "",
+        statusDescription: ""
+    },
 };
 jest.spyOn(hooks, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
 
@@ -40,26 +48,28 @@ const renderViewSpecificationPage = () => {
         </Switch>
     </MemoryRouter>)
 };
-
+const testSpec: SpecificationSummary = {
+    name: "A Test Spec Name",
+    id: "SPEC123",
+    approvalStatus: "Draft",
+    isSelectedForFunding: true,
+    description: "Test Description",
+    providerVersionId: "PROVID123",
+    fundingStreams: [{id: "", name: "PSG"}],
+    fundingPeriod: {
+        id: "fp123",
+        name: "fp 123"
+    },
+    templateIds: {},
+    dataDefinitionRelationshipIds: [],
+};
 beforeAll(() => {
     function mockSpecificationService() {
         const specificationService = jest.requireActual('../../../services/specificationService');
         return {
             ...specificationService,
             getSpecificationSummaryService: jest.fn(() => Promise.resolve({
-                data: {
-                    name: "A Test Spec Name",
-                    id: "SPEC123",
-                    approvalStatus: "Draft",
-                    isSelectedForFunding: true,
-                    description: "Test Description",
-                    providerVersionId: "PROVID123",
-                    fundingStreams: ["PSG"],
-                    fundingPeriod: {
-                        id: "fp123",
-                        name: "fp 123"
-                    }
-                }
+                data: testSpec
             })),
             getProfileVariationPointersService: jest.fn(() => Promise.resolve({
                 data: [{
@@ -152,6 +162,30 @@ describe('<ViewSpecification /> page render checks ', () => {
     it('expected number of tabs', async () => {
         const {container} = renderViewSpecificationPage();
         await waitFor(() => expect(container.querySelectorAll('.govuk-tabs__list-item')).toHaveLength(5))
+    });
+    
+    it('renders the edit specification link correctly', async () => {
+        renderViewSpecificationPage();
+
+        const button = await screen.findByRole("link", {name: /Edit specification/}) as HTMLAnchorElement;
+        expect(button).toBeInTheDocument();
+        expect(button.getAttribute("href")).toBe("/Specifications/EditSpecification/" + testSpec.id);
+    });
+    
+    it('renders the create calculation link correctly', async () => {
+        renderViewSpecificationPage();
+
+        const button = await screen.findByRole("link", {name: /Create additional calculation/}) as HTMLAnchorElement;
+        expect(button).toBeInTheDocument();
+        expect(button.getAttribute("href")).toBe("/Specifications/CreateAdditionalCalculation/" + testSpec.id);
+    });
+    
+    it('renders the create dataset link correctly', async () => {
+        renderViewSpecificationPage();
+        
+        const button = await screen.findByRole("link", {name: /Create dataset/}) as HTMLAnchorElement;
+        expect(button).toBeInTheDocument();
+        expect(button.getAttribute("href")).toBe("/Datasets/CreateDataset/" + testSpec.id);
     });
 
     it('shows Variation Management tab given specification is not chosen for funding', async () => {
