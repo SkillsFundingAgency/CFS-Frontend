@@ -105,6 +105,7 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
     }, [props.specificationId])
 
     const fetchData = async () => {
+        setIsLoadingFundingLineStructure(true);
         try {
             if(props.specificationId !== "" && props.fundingPeriodId !== "" && props.fundingStreamId !== "") {
                 const fundingStructureItem = (await getFundingLineStructureService(props.specificationId, props.fundingPeriodId, props.fundingStreamId)).data;
