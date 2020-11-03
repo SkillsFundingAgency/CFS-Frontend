@@ -9,6 +9,7 @@ import {CalculationCompilePreviewResponse} from "../types/Calculations/Calculati
 import {CalculationDetails} from "../types/CalculationDetails";
 import {AdditionalCalculationSearchResultViewModel} from "../types/Calculations/AdditionalCalculation";
 import {CalculationVersionHistorySummary} from "../types/Calculations/CalculationVersionHistorySummary";
+import {CalculationProviderResultList} from "../types/CalculationProviderResult";
 
 export async function searchForCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel): 
     Promise<AxiosResponse<CalculationSearchResponse>> {
@@ -43,11 +44,13 @@ export async function searchForCalculationsByProviderService(
     );
 }
 
-export async function getCalculationByIdService(calculationId: string) {
+export async function getCalculationByIdService(calculationId: string):
+    Promise<AxiosResponse<CalculationDetails>>{
     return axios.get<CalculationDetails>(`/api/calcs/getcalculationbyid/${calculationId}`)
 }
 
-export async function getCalculationProvidersService(calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel) {
+export async function getCalculationProvidersService(calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel):
+    Promise<AxiosResponse<CalculationProviderResultList>>{
     return axios(`/api/results/calculationproviderresultssearch`, {
         method: 'POST',
         headers: {

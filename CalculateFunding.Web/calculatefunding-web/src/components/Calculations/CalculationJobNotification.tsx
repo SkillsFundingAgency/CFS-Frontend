@@ -4,7 +4,7 @@ import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {ErrorSummary} from "../ErrorSummary";
 import {JobSummary} from "../../types/jobSummary";
-import {getJobDisplayProps} from "../../helpers/getJobDisplayProps";
+import {JobDisplayProps} from "../../helpers/getJobDisplayProps";
 
 export interface ICalculationJobNotificationProps {
     latestJob: JobSummary | undefined,
@@ -12,6 +12,7 @@ export interface ICalculationJobNotificationProps {
     isCheckingForJob: boolean,
     hasJobError: boolean,
     jobError: string,
+    jobDisplayInfo: JobDisplayProps | undefined
 }
 
 export function CalculationJobNotification(props: ICalculationJobNotificationProps) {
@@ -26,20 +27,18 @@ export function CalculationJobNotification(props: ICalculationJobNotificationPro
                              suggestion={"Please try again later"}/>
     }
 
-    if (!props.latestJob) {
+    if (!props.latestJob || !props.jobDisplayInfo) {
         return null;
     }
 
-    const jobDisplayProps = getJobDisplayProps(props.latestJob);
-
-    return (<div className={jobDisplayProps.isFailed ? "govuk-error-summary" :
-        jobDisplayProps.isActive ? "govuk-error-summary govuk-error-summary-orange" :
+    return (<div className={props.jobDisplayInfo.isFailed ? "govuk-error-summary" :
+        props.jobDisplayInfo.isActive ? "govuk-error-summary govuk-error-summary-orange" :
             "govuk-error-summary govuk-error-summary-green"}
                  aria-labelledby="error-summary-title" 
                  role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
-            Job {jobDisplayProps.statusDescription}: {jobDisplayProps.jobDescription}
+            Job {props.jobDisplayInfo.statusDescription}: {props.jobDisplayInfo.jobDescription}
         </h2>
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">

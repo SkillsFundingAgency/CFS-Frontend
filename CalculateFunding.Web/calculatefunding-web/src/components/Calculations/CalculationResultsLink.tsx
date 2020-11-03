@@ -3,6 +3,7 @@ import {CalculationProviderResultList} from "../../types/CalculationProviderResu
 import {getCalculationProvidersService} from "../../services/calculationService";
 import {Link} from "react-router-dom";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
+import {SearchMode} from "../../types/SearchMode";
 
 export function CalculationResultsLink(props: { calculationId: string }) {
     const [calculationProvidersResult, setCalculationProvidersResult] = useState<CalculationProviderResultList>({
@@ -32,9 +33,14 @@ export function CalculationResultsLink(props: { calculationId: string }) {
                 facetCount: 0,
                 includeFacets: false,
                 localAuthority: [],
-                pageNumber: 1, pageSize: 1,
-                providerSubType: [], providerType: [], resultsStatus: [], searchMode: "All", searchTerm: "",
-                calculationId: props.calculationId
+                pageNumber: 1, 
+                pageSize: 1,
+                providerSubType: [], providerType: [], 
+                resultsStatus: [], 
+                searchMode: SearchMode.All, 
+                searchTerm: "",
+                calculationId: props.calculationId, 
+                searchFields: []
 
             }).then((calculationProvidersResponse) => {
                 setCalculationProvidersResult(calculationProvidersResponse.data as CalculationProviderResultList);

@@ -1,78 +1,224 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
-import {act, cleanup, fireEvent, render, waitFor} from "@testing-library/react";
+import {act, render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {LatestSpecificationJobWithMonitoringResult} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {getCalculationProvidersService} from "../../services/calculationService";
 import userEvent from "@testing-library/user-event";
+import {CalculationDetails} from "../../types/CalculationDetails";
+import {ValueType} from "../../types/ValueType";
+import {CalculationType} from "../../types/CalculationSearchResponse";
+import {PublishStatus} from "../../types/PublishStatusModel";
+import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
+import {CalculationProviderSearchRequestViewModel} from "../../types/calculationProviderSearchRequestViewModel";
+import * as calcHook from "../../hooks/Calculations/useCalculation";
+import * as specHook from "../../hooks/useSpecificationSummary";
 
+const latestSpecJobMonitorResult: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: false,
+    hasActiveJob: false,
+    hasFailedJob: false,
+    hasJobError: false,
+    isCheckingForJob: true,
+    isFetched: false,
+    isFetching: false,
+    isMonitoring: false,
+    jobError: "",
+    latestJob: undefined,
+    jobDisplayInfo: undefined
+};
 jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
-    () => ({
-        anyJobsRunning: false,
-        hasJob: false,
-        hasActiveJob: false,
-        hasFailedJob: false,
-        hasJobError: false,
-        isCheckingForJob: true,
-        isFetched: false,
-        isFetching: false,
-        isMonitoring: false,
-        jobError: "",
-        jobInProgressMessage: "",
-        latestJob: undefined
-    }));
+    () => (latestSpecJobMonitorResult));
 
 const renderViewCalculationResultsPage = () => {
     const {ViewCalculationResults} = require('../../pages/ViewCalculationResults');
-    return render(<MemoryRouter initialEntries={['/ViewCalculationResults/12345']}>
+    return render(<MemoryRouter initialEntries={[`/ViewCalculationResults/${testCalc1.id}`]}>
         <Switch>
-            <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
+            <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
         </Switch>
     </MemoryRouter>)
 };
 
-beforeAll(() => {
-    function mockSummary() {
-        const specService = jest.requireActual('../../services/specificationService');
-        return {
-            ...specService,
-            getSpecificationSummaryService: jest.fn(() => Promise.resolve({
-                data: {
-                    name: "string",
-                    id: "123",
-                    approvalStatus: "Cal",
-                    isSelectedForFunding: true,
-                    description: "sgdsg",
-                    providerVersionId: "sgds",
-                    fundingStreams: [],
-                    fundingPeriod: {}
-                }
-            }))
-        }
-    }
-    function mockCalculationService() {
-        const calculationService = jest.requireActual('../../services/calculationService');
-        return {
-            ...calculationService,
-            getCalculationByIdService: jest.fn(() => Promise.resolve({
-                data: {
-                    id: "C123",
-                    name: "Calc123",
-                    fundingStreamId: "PSG",
-                    specificationId: "Spec123",
-                    specificationName: "Spec123",
-                    valueType: "TEST",
-                    calculationType: "Additional",
-                    namespace: "TestNamespace",
-                    wasTemplateCalculation: true,
-                    description: "Test Description",
-                    status: "Draft",
-                    lastUpdatedDate: new Date(),
-                    lastUpdatedDateDisplay: "Now"
-                }
-            })),
-            getCalculationProvidersService: jest.fn(() => Promise.resolve({
-                data:
+describe("<ViewCalculationResults />", () => {
+
+    beforeEach(() => {
+        mockCalculation();
+        mockSpecification();
+        jest.mock('../../services/calculationService', () => mockCalculationService());
+    });
+
+    afterEach(() => jest.clearAllMocks())
+
+    describe("<ViewCalculationResults /> service call checks ", () => {
+        it("it calls the calculationService", async () => {
+            const {getCalculationProvidersService} = require('../../services/calculationService');
+
+            renderViewCalculationResultsPage();
+
+            await waitFor(() => expect(getCalculationProvidersService).toBeCalledTimes(1));
+        });
+    });
+    
+    describe('<ViewCalculationResults /> page render checks ', () => {
+
+        it('renders the calculation name in heading', async () => {
+            renderViewCalculationResultsPage();
+            expect(await screen.findByRole('heading', {name: testCalc1.name}));
+        });
+
+        it('renders the view calculation button link correctly', async () => {
+            renderViewCalculationResultsPage();
+
+            const button = await screen.findByRole("button", {name: /View calculation/}) as HTMLInputElement;
+            expect(button).toBeInTheDocument();
+            expect(button.getAttribute("href")).toBe("/Specifications/EditCalculation/" + testCalc1.id);
+        });
+
+        it('the calculation results are populated', async () => {
+            const {container} = renderViewCalculationResultsPage();
+            await waitFor(() => expect(container.querySelectorAll('.govuk-accordion__section')).toHaveLength(2))
+        });
+
+        it("search filters exist", async () => {
+            const {container} = renderViewCalculationResultsPage();
+            expect(container.querySelector('#search-options-providers')).toBeInTheDocument();
+            expect(container.querySelector('#search-options-UKPRN')).toBeInTheDocument();
+            expect(container.querySelector('#search-options-UPIN')).toBeInTheDocument();
+            expect(container.querySelector('#search-options-URN')).toBeInTheDocument();
+        });
+    });
+
+    describe('<ViewCalculationResults /> search filters checks', () => {
+        it("search value changes when searching for providerName", async () => {
+            const {getCalculationProvidersService} = require('../../services/calculationService');
+            const {container} = renderViewCalculationResultsPage();
+            const searchQuery = "9";
+
+            const expected1: CalculationProviderSearchRequestViewModel = {
+                calculationId: testCalc1.id,
+                calculationValueType: testCalc1.valueType,
+                errorToggle: "",
+                facetCount: 0,
+                includeFacets: true,
+                localAuthority: [],
+                pageNumber: 1,
+                pageSize: 50,
+                providerSubType: [],
+                providerType: [],
+                resultsStatus: [],
+                searchFields: [],
+                searchMode: 1,
+                searchTerm: ""
+            };
+            await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith(expected1))
+
+            act(() => {
+                userEvent.type(container.querySelector('#providerName') as HTMLInputElement, searchQuery);
+            });
+
+            const expected2: CalculationProviderSearchRequestViewModel = {
+                ...expected1,
+                searchTerm: searchQuery
+            };
+            await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith(expected2))
+        });
+
+        it("search value changes when searching for urn", async () => {
+            const {getCalculationProvidersService} = require('../../services/calculationService');
+            const searchQuery = "9";
+
+            const {container} = renderViewCalculationResultsPage();
+
+            await act(() => {
+                userEvent.click(container.querySelector('#search-options-URN') as HTMLInputElement);
+            });
+
+            await act(() => {
+                userEvent.type(container.querySelector('#urn') as HTMLInputElement, searchQuery);
+            });
+
+            await waitFor(() => expect(getCalculationProvidersService)
+                .toBeCalledWith({
+                    "calculationId": testCalc1.id,
+                    "calculationValueType": testCalc1.valueType,
+                    "errorToggle": "",
+                    "facetCount": 0,
+                    "includeFacets": true,
+                    "localAuthority": [],
+                    "pageNumber": 1,
+                    "pageSize": 50,
+                    "providerSubType": [],
+                    "providerType": [],
+                    "resultsStatus": [],
+                    "searchFields": [],
+                    "searchMode": 1,
+                    "searchTerm": searchQuery
+                }));
+        });
+    });
+});
+
+
+const fundingStream: FundingStream = {
+    name: "FS123",
+    id: "Wizard Training Scheme"
+};
+const fundingPeriod: FundingPeriod = {
+    id: "FP123",
+    name: "2019-20"
+};
+const testSpec1: SpecificationSummary = {
+    name: "test spec name",
+    id: "3567357",
+    approvalStatus: "Cal",
+    isSelectedForFunding: true,
+    description: "sgdsg",
+    providerVersionId: "sgds",
+    fundingStreams: [fundingStream],
+    fundingPeriod: fundingPeriod,
+    dataDefinitionRelationshipIds: [],
+    templateIds: {}
+};
+const testCalc1: CalculationDetails = {
+    id: "C123",
+    name: "Calc123",
+    fundingStreamId: "PSG",
+    specificationId: testSpec1.id,
+    valueType: ValueType.Number,
+    calculationType: CalculationType.Additional,
+    namespace: "TestNamespace",
+    wasTemplateCalculation: true,
+    description: "Test Description",
+    publishStatus: PublishStatus.Draft,
+    lastUpdated: new Date(),
+    author: null,
+    sourceCode: "",
+    sourceCodeName: ""
+};
+
+const mockCalculation = () => jest.spyOn(calcHook, 'useCalculation')
+    .mockImplementation(() => ({
+        calculation: testCalc1,
+        isLoadingCalculation: false
+    }));
+const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
+    .mockImplementation(() => ({
+        specification: testSpec1,
+        isLoadingSpecification: false,
+        errorCheckingForSpecification: null,
+        haveErrorCheckingForSpecification: false,
+        isFetchingSpecification: false,
+        isSpecificationFetched: true
+    }));
+
+function mockCalculationService() {
+    const calculationService = jest.requireActual('../../services/calculationService');
+    return {
+        ...calculationService,
+        getCalculationProvidersService: jest.fn(() => Promise.resolve({
+            data:
                 {
                     "calculationProviderResults": [
                         {
@@ -280,90 +426,7 @@ beforeAll(() => {
                         }
                     ]
                 }
-            }))
-        }
+        }))
     }
-
-    jest.mock('../../services/calculationService', () => mockCalculationService());
-    jest.mock('../../services/specificationService', () => mockSummary());
-});
-
-afterEach(cleanup);
-afterEach(() => jest.clearAllMocks())
-
-describe("<ViewCalculationResults /> service call checks ", () => {
-    it("it calls the calculationService", async () => {
-        const {getCalculationByIdService} = require('../../services/calculationService');
-        const {getCalculationProvidersService} = require('../../services/calculationService');
-        const {getSpecificationSummaryService} = require('../../services/specificationService');
-        renderViewCalculationResultsPage();
-        await waitFor(() => expect(getCalculationByIdService).toBeCalledTimes(1))
-        await waitFor(() => expect(getCalculationProvidersService).toBeCalledTimes(1))
-        await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1))
-    });
-});
-
-describe('<ViewCalculationResults /> page render checks ', () => {
-    it('the breadcrumbs are correct', async () => {
-        const {queryAllByText} = renderViewCalculationResultsPage();
-        await waitFor(() => expect(queryAllByText('Calc123')[0]).toHaveClass("govuk-breadcrumbs__list-item"));
-    });
-
-    it('the page header is correct', async () => {
-        const {queryAllByText} = renderViewCalculationResultsPage();
-        await waitFor(() => expect(queryAllByText('Calc123')[1]).toHaveClass("govuk-heading-xl"));
-    });
-
-    it('the view calculation button exists', async () => {
-        const {container} = renderViewCalculationResultsPage();
-        await waitFor(() => expect(container.querySelector('#view-calculation-button')).toBeInTheDocument())
-    });
-
-    it('the calculation results are populated', async () => {
-        const {container} = renderViewCalculationResultsPage();
-        await waitFor(() => expect(container.querySelectorAll('.govuk-accordion__section')).toHaveLength(2))
-    })
-
-    it("search filters exist", async () => {
-        const {container} = renderViewCalculationResultsPage();
-        await waitFor(() => expect(container.querySelector('#search-options-providers')).toBeInTheDocument())
-        await waitFor(() => expect(container.querySelector('#search-options-UKPRN')).toBeInTheDocument())
-        await waitFor(() => expect(container.querySelector('#search-options-UPIN')).toBeInTheDocument())
-        await waitFor(() => expect(container.querySelector('#search-options-URN')).toBeInTheDocument())
-    });
-});
-
-describe('<ViewCalculationResults /> search filters checks', () => {
-    it("search value changes when searching for providerName", async () => {
-        const {getCalculationProvidersService} = require('../../services/calculationService');
-        const {container} = renderViewCalculationResultsPage();
-        const searchQuery = "9";
-
-        act(() => {
-            userEvent.type(container.querySelector('#providerName') as HTMLInputElement, searchQuery);
-        });
-
-        await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith( {"calculationId": "12345", "calculationValueType": "", "errorToggle": "", "facetCount": 0, "includeFacets": true, "localAuthority": [], "pageNumber": 1, "pageSize": 50, "providerSubType": [], "providerType": []
-            , "resultsStatus": [], "searchFields": [], "searchMode": 1, "searchTerm": searchQuery}
-        ))
-    });
-
-    it("search value changes when searching for urn", async () => {
-        const {getCalculationProvidersService} = require('../../services/calculationService');
-        const {container} = renderViewCalculationResultsPage();
-        const searchQuery = "9";
-
-        act(() => {
-            fireEvent.click(container.querySelector('#search-options-URN') as HTMLInputElement)
-        });
-
-        act(() => {
-            userEvent.type(container.querySelector('#urn') as HTMLInputElement, searchQuery);
-        });
-
-        await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith( {"calculationId": "12345", "calculationValueType": "", "errorToggle": "", "facetCount": 0, "includeFacets": true, "localAuthority": [], "pageNumber": 1, "pageSize": 50, "providerSubType": [], "providerType": []
-            , "resultsStatus": [], "searchFields": [], "searchMode": 1, "searchTerm": searchQuery}));
-    });
-})
-
+}
 

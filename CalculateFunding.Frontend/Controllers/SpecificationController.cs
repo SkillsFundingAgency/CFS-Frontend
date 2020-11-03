@@ -295,7 +295,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new BadRequestResult();
             }
 
-            return new StatusCodeResult(500);
+            return new StatusCodeResult((int)apiResponse.StatusCode);
         }
 
         [HttpPost]

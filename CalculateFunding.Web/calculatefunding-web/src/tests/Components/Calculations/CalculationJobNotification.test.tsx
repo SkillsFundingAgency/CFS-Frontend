@@ -75,7 +75,9 @@ const renderComponent = (params: ICalculationJobNotificationProps) => {
         anyJobsRunning={params.anyJobsRunning}
         hasJobError={params.hasJobError}
         isCheckingForJob={params.isCheckingForJob}
-        jobError={params.jobError}/>);
+        jobError={params.jobError}
+        jobDisplayInfo={params.jobDisplayInfo}
+    />);
 };
 
 describe('<CalculationJobNotification />', () => {
@@ -88,7 +90,8 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobError: ""
+                jobError: "",
+                jobDisplayInfo: undefined
             };
             await renderComponent(props);
 
@@ -107,7 +110,8 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: true,
                 hasJobError: false,
-                jobError: ""
+                jobError: "",
+                jobDisplayInfo: undefined
             };
             await renderComponent(props);
 
@@ -123,7 +127,8 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: true,
-                jobError: "Uh oh!"
+                jobError: "Uh oh!",
+                jobDisplayInfo: undefined
             };
             await renderComponent(props);
 
@@ -140,93 +145,21 @@ describe('<CalculationJobNotification />', () => {
                 anyJobsRunning: true,
                 isCheckingForJob: false,
                 hasJobError: false,
-                jobError: ""
+                jobError: "",
+                jobDisplayInfo: {
+                    isActive: true, 
+                    isSuccessful: false,
+                    isComplete: false, 
+                    isFailed: false, 
+                    statusDescription: "in queue", 
+                    jobDescription: "Refreshing funding"
+                }
             };
-            
+
             renderComponent(props);
-            
+
             expect(await screen.getByText("Job in queue: Refreshing funding")).toBeInTheDocument();
             expect(screen.getByText((content) => content.startsWith('Job initiated by')));
-        });
-    });
-    describe('when job is in progress', () => {
-        it('renders error message correctly', async () => {
-            const props: ICalculationJobNotificationProps = {
-                latestJob: mockJobInProgressResult,
-                anyJobsRunning: true,
-                isCheckingForJob: false,
-                hasJobError: false,
-                jobError: ""
-            };
-
-            await renderComponent(props);
-
-            expect(await screen.getByText("Job in progress: Refreshing funding")).toBeInTheDocument();
-            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
-        });
-    });
-    describe('when job has timed out', () => {
-        it('renders error message correctly', async () => {
-            const props: ICalculationJobNotificationProps = {
-                latestJob: mockTimedOutJobResult,
-                anyJobsRunning: false,
-                isCheckingForJob: false,
-                hasJobError: false,
-                jobError: ""
-            };
-
-            await renderComponent(props);
-
-            expect(await screen.getByText("Job timed out: Refreshing funding")).toBeInTheDocument();
-            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
-        });
-    });
-    describe('when job has been cancelled', () => {
-        it('renders error message correctly', async () => {
-            const props: ICalculationJobNotificationProps = {
-                latestJob: mockCancelledJobResult,
-                anyJobsRunning: false,
-                isCheckingForJob: false,
-                hasJobError: false,
-                jobError: ""
-            };
-
-            await renderComponent(props);
-
-            expect(screen.getByText("Job cancelled: Refreshing funding")).toBeInTheDocument();
-            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
-        });
-    });
-    describe('when job has failed', () => {
-        it('renders error message correctly', async () => {
-            const props: ICalculationJobNotificationProps = {
-                latestJob: mockFailedJobResult,
-                anyJobsRunning: false,
-                isCheckingForJob: false,
-                hasJobError: false,
-                jobError: ""
-            };
-
-            await renderComponent(props);
-
-            expect(await screen.getByText("Job failed: Refreshing funding")).toBeInTheDocument();
-            expect(screen.getByText((content) => content.startsWith('Job initiated by'))).toBeInTheDocument();
-        });
-    });
-    describe('when job was successfully completed', () => {
-        it('renders success message correctly', async () => {
-            const props: ICalculationJobNotificationProps = {
-                latestJob: mockSuccessfulJobResult,
-                anyJobsRunning: false,
-                isCheckingForJob: false,
-                hasJobError: false,
-                jobError: ""
-            };
-
-            await renderComponent(props);
-
-            expect(await screen.getByText("Job completed successfully: Refreshing funding")).toBeInTheDocument();
-            expect(screen.getByText((content) => content.startsWith('Job initiated by'))).toBeInTheDocument();
         });
     });
 });

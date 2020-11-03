@@ -16,20 +16,22 @@ import {Link} from "react-router-dom";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 import {getCalculationByIdService, getCalculationProvidersService} from "../services/calculationService";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
-import {getSpecificationSummaryService} from "../services/specificationService";
-import {SpecificationSummary} from "../types/SpecificationSummary";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {JobType} from "../types/jobType";
 import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {CalculationDetails} from "../types/CalculationDetails";
+import {LoadingFieldStatus} from "../components/LoadingFieldStatus";
+import {useSpecificationSummary} from "../hooks/useSpecificationSummary";
+import {useErrors} from "../hooks/useErrors";
+import {MultipleErrorSummary} from "../components/MultipleErrorSummary";
+import {useCalculation} from "../hooks/Calculations/useCalculation";
 
 export interface ViewCalculationResultsRoute {
     calculationId: string
 }
 
 export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculationResultsRoute>) {
-
     document.title = "Calculation Results - Calculate funding";
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [singleFire, setSingleFire] = useState(false);
@@ -44,7 +46,18 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         selected: false
     }]);
     const [filterLocalAuthority, setLocalAuthority] = useState<FacetValue[]>([]);
-    const initialSearch: CalculationProviderSearchRequestViewModel = {
+    const calculationId = match.params.calculationId;
+    const [specificationId, setSpecificationId] = useState<string>("");
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {calculation, isLoadingCalculation} =
+        useCalculation(calculationId,
+            err => addErrorMessage(err.message, "Error while loading calculation"));
+    const {specification, isLoadingSpecification} =
+        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
+    const {latestJob, hasActiveJob, jobError, hasJobError, isCheckingForJob, jobDisplayInfo} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
+    const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
         calculationValueType: "",
         errorToggle: "",
         facetCount: 0,
@@ -59,29 +72,13 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         searchTerm: "",
         calculationId: match.params.calculationId,
         searchFields: []
-    };
-    const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] = useState<CalculationProviderSearchRequestViewModel>(initialSearch);
-    const calculationId = match.params.calculationId;
+    });
+    const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] =
+        useState<CalculationProviderSearchRequestViewModel>(initialSearch);
     let fundingStream: FundingStream = {
         name: "",
         id: ""
     };
-
-    const [calculation, setCalculation] = useState<CalculationDetails>({
-        calculationType: "",
-        description: null,
-        fundingStreamId: "",
-        id: "",
-        lastUpdatedDate: new Date(),
-        lastUpdatedDateDisplay: "",
-        name: "",
-        namespace: "",
-        specificationId: "",
-        specificationName: "",
-        status: "",
-        valueType: "",
-        wasTemplateCalculation: false
-    });
     const [providers, setProviders] = useState<CalculationProviderResultList>({
         calculationProviderResults: [],
         currentPage: 0,
@@ -99,55 +96,11 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         totalErrorResults: 0,
         totalResults: 0
     });
-    const [specification, setSpecification] = useState<SpecificationSummary>({
-        approvalStatus: "",
-        description: "",
-        fundingPeriod: {
-            name: "",
-            id: ""
-        },
-        fundingStreams: [],
-        id: "",
-        isSelectedForFunding: false,
-        name: "",
-        providerVersionId: ""
-    })
-
-    const specificationId = calculation.specificationId.length > 0 ?
-        calculation.specificationId : specification.id.length > 0 ?
-            specification.id :
-            specification.id.length > 0 ?
-                specification.id : "";
-
-    const {latestJob, hasActiveJob, jobError, hasJobError, isCheckingForJob, jobInProgressMessage} =
-        useLatestSpecificationJobWithMonitoring(specificationId,
-            [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
-
-
+    
     useEffect(() => {
-        if (!singleFire && providers.totalResults > 0) {
-            setSingleFire(true);
-        }
-    }, [providers.totalResults]);
-
-    useEffect(() => {
-        getCalculationById(calculationId);
-    }, [calculationId]);
-
-    useEffect(() => {
-        if (calculation.specificationId !== "") {
-            getSpecificationSummary(calculation.specificationId);
-        }
-    }, [calculation.specificationId]);
-
-    useEffect(() => {
-        fundingStream = specification.fundingStreams[0];
-    }, [specification.fundingStreams]);
-
-    useEffect(() => {
-        setCalculationProviderSearchRequest(prevState => {
-            return {
-                ...prevState,
+        if (calculation) {
+            setSpecificationId(calculation.specificationId);
+            const searchParams = {
                 calculationValueType: calculation.valueType,
                 errorToggle: "",
                 facetCount: 0,
@@ -160,11 +113,14 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 resultsStatus: [],
                 searchMode: SearchMode.All,
                 searchTerm: "",
-                calculationId: calculationId,
-            }
-        });
-        getCalculationResults(calculationProviderSearchRequest);
-    }, [calculationId]);
+                calculationId: match.params.calculationId,
+                searchFields: []
+            };
+            setInitialSearch(searchParams);
+            setCalculationProviderSearchRequest(searchParams);
+            getCalculationResults(searchParams);
+        }
+    }, [calculation]);
 
     useEffect(() => {
         if (providers.facets.length > 0) {
@@ -270,24 +226,16 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         getCalculationResults(request);
     }
 
-    function getCalculationById(calculationId: string) {
-        getCalculationByIdService(calculationId).then((response) => {
-            setCalculation(response.data as CalculationDetails);
-        })
-    }
-
-    function getCalculationResults(calculationId: CalculationProviderSearchRequestViewModel) {
-        getCalculationProvidersService(calculationId).then((response) => {
-            setProviders(response.data as CalculationProviderResultList);
-        }).finally(() => {
+    function getCalculationResults(searchRequestViewModel: CalculationProviderSearchRequestViewModel) {
+        getCalculationProvidersService(searchRequestViewModel)
+            .then((response) => {
+                setProviders(response.data);
+                if (!singleFire && response.data.totalResults > 0) {
+                    setSingleFire(true);
+                }
+            }).finally(() => {
             setIsLoading(false);
         })
-    }
-
-    function getSpecificationSummary(specificationId: string) {
-        getSpecificationSummaryService(specificationId).then((response) => {
-            setSpecification(response.data as SpecificationSummary);
-        });
     }
 
     return <div>
@@ -297,28 +245,37 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"View results"} url={"/results"}/>
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
+                {specification &&
                 <Breadcrumb name={specification.name} url={`/ViewSpecificationResults/${specification.id}`}/>
+                }
+                {calculation &&
                 <Breadcrumb name={calculation.name}/>
+                }
             </Breadcrumbs>
+            <MultipleErrorSummary errors={errors}/>
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <h2 className="govuk-caption-xl">{specification.fundingPeriod.name}</h2>
-                        <h1 className="govuk-heading-xl">{calculation.name}</h1>
+                        <h2 className="govuk-caption-xl">{specification ? specification.fundingPeriod.name : <LoadingFieldStatus title="Loading..."/>}</h2>
+                        <h1 className="govuk-heading-xl">{calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
                         {specificationId.length > 0 &&
-                        <CalculationJobNotification 
-                            latestJob={latestJob} 
-                            anyJobsRunning={hasActiveJob} 
+                        <CalculationJobNotification
+                            latestJob={latestJob}
+                            anyJobsRunning={hasActiveJob}
                             isCheckingForJob={isCheckingForJob}
-                            jobProgressMessage={jobInProgressMessage}
+                            jobDisplayInfo={jobDisplayInfo}
                             hasJobError={hasJobError}
                             jobError={jobError}/>
                         }
-                        <Link id={"view-calculation-button"} to={`/Specifications/Edit${calculation.calculationType}Calculation/${calculation.id}`}
-                              className="govuk-button" role="button">
+                        {calculation &&
+                        <Link id={"view-calculation-button"}
+                              to={`/Specifications/EditCalculation/${calculation.id}`}
+                              className="govuk-button"
+                              role="button">
                             View calculation
                         </Link>
+                        }
                     </div>
                 </div>
                 <div className="govuk-grid-row">
@@ -429,9 +386,11 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                                            key={cpr.id} autoExpand={autoExpand}>
                                         <div id={"accordion-default-content-" + cpr.id}
                                              className="govuk-accordion__section-content">
+                                            {calculation &&
                                             <Link to={`/ViewResults/ViewProviderResults/${cpr.providerId}/${calculation.fundingStreamId}/?specificationId=${cpr.specificationId}`} className="govuk-link">
                                                 View provider calculations
                                             </Link>
+                                            }
                                             <dl className="govuk-summary-list govuk-!-margin-top-5">
                                                 <div className="govuk-summary-list__row">
                                                     <dt className="govuk-summary-list__key">
