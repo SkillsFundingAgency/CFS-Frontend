@@ -74,14 +74,12 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingStreamId,
                     fundingLineCode);
 
-            IActionResult errorResult =
-                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-            if (errorResult != null)
+            if (fundingLineApiResponse.StatusCode == HttpStatusCode.OK)
             {
-                return errorResult;
+                return Ok(fundingLineApiResponse.Content);
             }
 
-            return Ok(fundingLineApiResponse.Content);
+            return new InternalServerErrorResult($"An error occurred when checking for previous profiles.");
         }
 
         [HttpGet]
