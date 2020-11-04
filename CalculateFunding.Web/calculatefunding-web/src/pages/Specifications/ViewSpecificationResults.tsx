@@ -321,7 +321,9 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                                     <Link to={`/ViewCalculationResults/${tc.id}`}>{tc.name}</Link>
                                                 </td>
                                                 <td className="govuk-table__cell">{tc.status}</td>
-                                                <td className="govuk-table__cell">{tc.lastUpdatedDateDisplay}</td>
+                                                <td className="govuk-table__cell">
+                                                    <DateFormatter date={tc.lastUpdatedDate} utc={false}/>
+                                                </td>
                                             </tr>
                                         )}
                                         <tr className="govuk-table__row"

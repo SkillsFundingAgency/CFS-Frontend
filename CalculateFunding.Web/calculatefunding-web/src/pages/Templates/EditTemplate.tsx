@@ -1,4 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
+// @ts-ignore
 import {Link, useParams} from 'react-router-dom';
 import Sidebar from "react-sidebar";
 import {useTemplatePermissions} from '../../hooks/TemplateBuilder/useTemplatePermissions';

@@ -1,11 +1,8 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
-import {act, cleanup, fireEvent, render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {ViewSpecification} from "../../../pages/Specifications/ViewSpecification";
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
 import '@testing-library/jest-dom/extend-expect';
 import * as hooks from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -132,7 +129,6 @@ beforeAll(() => {
 });
 
 
-afterEach(cleanup);
 afterEach(() => jest.clearAllMocks());
 
 describe("<ViewSpecification /> service call checks ", () => {

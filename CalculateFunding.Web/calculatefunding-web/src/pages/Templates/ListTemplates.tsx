@@ -20,7 +20,7 @@ export const ListTemplates = () => {
         facets: [], results: [], totalCount: 0, totalErrorCount: 0
     });
     const initialSearch: { pageNumber: number; top: number } = {pageNumber: 1, top: 100};
-    const [searchCriteria, setSearchCriteria] = useState(initialSearch);
+    const [searchCriteria, setSearchCriteria] = useState<TemplateSearchRequest>(initialSearch as TemplateSearchRequest);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const {canCreateTemplate, missingPermissions} = useTemplatePermissions([TemplatePermissions.Create]);
 

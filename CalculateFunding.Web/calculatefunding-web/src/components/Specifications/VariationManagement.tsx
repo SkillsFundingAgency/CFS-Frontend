@@ -6,7 +6,7 @@ import {useEffect, useState} from "react";
 import {ProfileVariationPointer} from "../../types/Specifications/ProfileVariationPointer";
 import {getProfileVariationPointersService} from "../../services/specificationService";
 
-export function VariationManagement(props:{specificationId}){
+export function VariationManagement(props: {specificationId: string}) {
     const [profileVariationPointers, setProfileVariationPointers] = useState<ProfileVariationPointer[]>([]);
     const [isLoadingVariationManagement, setIsLoadingVariationManagement] = useState(true);
 
@@ -46,7 +46,7 @@ export function VariationManagement(props:{specificationId}){
                                     Installment {f.occurrence}
                                 </dd>
                                 <dd className="govuk-summary-list__actions">
-                                    <Link to={`/Specifications/EditVariationPoints/${specificationId}`}
+                                    <Link to={`/Specifications/EditVariationPoints/${props.specificationId}`}
                                           className="govuk-link">
                                         Change<span className="govuk-visually-hidden"> {f.periodType}</span>
                                     </Link>

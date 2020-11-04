@@ -13,6 +13,7 @@ import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {LoadingStatus} from "../../components/LoadingStatus";
+// @ts-ignore
 import {Link, useParams} from "react-router-dom";
 import {Footer} from "../../components/Footer";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
@@ -75,7 +76,7 @@ export const CloneTemplate = () => {
                 return;
             }
             // user has sufficient permissions?
-            if (!fundingStreamPermissions.some(f => f.permission === TemplatePermissions.Create &&
+            if (fundingStreamPermissions && !fundingStreamPermissions.some(f => f.permission === TemplatePermissions.Create &&
                 f.fundingStreamId === fundingStreamId)) {
                 addErrorMessage("Insufficient permissions to clone a template with this funding stream", "fundingStreamId");
                 return;

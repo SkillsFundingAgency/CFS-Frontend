@@ -42,6 +42,7 @@ export const CreateTemplate = () => {
                 const fundingStreamWithPeriodsResponse = await fetchData();
                 setIsLoading(false);
                 const permitted = fundingStreamWithPeriodsResponse.filter(available =>
+                    fundingStreamPermissions && 
                     fundingStreamPermissions.some(f => f.permission === TemplatePermissions.Create &&
                         f.fundingStreamId === available.fundingStream.id));
                 setPermittedFundingStreamsWithPeriods(permitted);

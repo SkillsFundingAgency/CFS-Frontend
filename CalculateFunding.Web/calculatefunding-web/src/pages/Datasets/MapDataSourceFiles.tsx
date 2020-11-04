@@ -34,7 +34,9 @@ export function MapDataSourceFiles() {
             specificationName: "",
             definitionRelationshipCount: 0,
             fundingStreamNames: [],
-            fundingPeriodName: ""
+            fundingPeriodName: "",
+            mapDatasetLastUpdated: null,
+            totalMappedDataSets: 0
         }],
         totalCount: 0,
         startItemNumber: 0,

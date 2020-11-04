@@ -54,7 +54,9 @@ const initialState: ViewSpecificationResultsState = {
         fundingStreams: [],
         id: "",
         isSelectedForFunding: false,
-        providerVersionId: ""
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        templateIds: {}
     }
 };
 

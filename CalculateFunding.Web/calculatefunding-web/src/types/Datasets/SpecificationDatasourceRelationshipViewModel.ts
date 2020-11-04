@@ -6,7 +6,7 @@ export interface SpecificationDatasourceRelationshipItemViewModel {
    definitionRelationshipCount: number,
    fundingStreamNames: string[],
    fundingPeriodName: string,
-   mapDatasetLastUpdated: Date,
+   mapDatasetLastUpdated: Date | null,
    totalMappedDataSets: number
 }
 

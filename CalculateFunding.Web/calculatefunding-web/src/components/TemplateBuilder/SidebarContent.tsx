@@ -15,14 +15,14 @@ export interface SidebarContentProps {
     data: Set<FundingLineOrCalculationSelectedItem>,
     isEditMode: boolean,
     calcs: CalculationDictionaryItem[],
-    updateNode: (p: FundingLineUpdateModel | CalculationUpdateModel) => void,
+    updateNode?: (p: FundingLineUpdateModel | CalculationUpdateModel) => void,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string) => Promise<void>,
-    cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
-    checkIfTemplateLineIdInUse: (id: number) => boolean,
-    checkFundingLineNameInUse: (name: string) => boolean,
-    refreshNextId: () => void,
-    canBeDeleted: (id: string) => boolean,
+    deleteNode?: (id: string) => Promise<void>,
+    cloneCalculation?: (targetCalculationId: string, sourceCalculationId: string) => void,
+    checkIfTemplateLineIdInUse?: (id: number) => boolean,
+    checkFundingLineNameInUse?: (name: string) => boolean,
+    refreshNextId?: () => void,
+    canBeDeleted?: (id: string) => boolean,
 }
 
 export function SidebarContent(
@@ -56,7 +56,7 @@ export function SidebarContent(
                             isTemplateLineIdInUse={checkIfTemplateLineIdInUse}
                             isFundingLineNameInUse={checkFundingLineNameInUse}
                             refreshNextId={refreshNextId}
-                            allowDelete={canBeDeleted(node.id)}
+                            allowDelete={canBeDeleted && canBeDeleted(node.id)}
                         />
                     )
                 }
@@ -73,7 +73,7 @@ export function SidebarContent(
                         openSideBar={openSideBar}
                         deleteNode={deleteNode}
                         refreshNextId={refreshNextId}
-                        allowDelete={canBeDeleted(node.id)}
+                        allowDelete={canBeDeleted && canBeDeleted(node.id)}
                     />
                 )
             })}

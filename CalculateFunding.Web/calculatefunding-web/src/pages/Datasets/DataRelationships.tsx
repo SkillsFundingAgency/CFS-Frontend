@@ -23,9 +23,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
         items: [],
         specification: {
             id: "",
-            templateIds: {
-                PSG: "",
-            },
+            templateIds: {},
             publishedResultsRefreshedAt: null,
             providerVersionId: "",
             name: "",
@@ -40,7 +38,9 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                 name: ""
             },
             description: "",
-            approvalStatus: ""
+            approvalStatus: "",
+            dataDefinitionRelationshipIds: [],
+            lastEditedDate: new Date()
         },
         specificationTrimmedViewModel: {
             description: "",

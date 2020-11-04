@@ -1,20 +1,20 @@
 import {Header} from "../../components/Header";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
-import {CalculationType} from "../../types/CalculationSearchResponse";
-import {getCalculationByIdService, getCalculationVersionHistoryService} from "../../services/calculationService";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {getCalculationVersionHistoryService} from "../../services/calculationService";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {getSpecificationSummaryService} from "../../services/specificationService";
 import {CalculationVersionHistorySummary} from "../../types/Calculations/CalculationVersionHistorySummary";
 import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
-import {ValueType} from "../../types/ValueType";
-import {PublishStatus} from "../../types/PublishStatusModel";
-import {CalculationDetails} from "../../types/CalculationDetails";
+import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
+import {useErrors} from "../../hooks/useErrors";
+import {useCalculation} from "../../hooks/Calculations/useCalculation";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {Link} from "react-router-dom";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -22,74 +22,29 @@ export interface CalculationVersionHistoryRoute {
 
 export function CalculationVersionHistory({match}: RouteComponentProps<CalculationVersionHistoryRoute>) {
     const calculationId = match.params.calculationId;
-    const [specification, setSpecification] = useState<SpecificationSummary>({
-        approvalStatus: "",
-        description: "",
-        fundingPeriod: {
-            id: "",
-            name: ""
-        },
-        fundingStreams: [],
-        id: "",
-        isSelectedForFunding: false,
-        name: "",
-        providerVersionId: "",
-        dataDefinitionRelationshipIds: [],
-        providerSnapshotId: 0,
-    });
-    const [calculation, setCalculation] = useState<CalculationDetails>({
-        calculationType: CalculationType.Template,
-        fundingStreamId: "",
-        id: "",
-        lastUpdated: new Date(),
-        name: "",
-        namespace: "",
-        specificationId: "",
-        publishStatus: PublishStatus.Draft,
-        valueType: ValueType.Currency,
-        wasTemplateCalculation: false,
-        author: null,
-        sourceCode: "",
-        sourceCodeName: "",
-    });
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {calculation, isLoadingCalculation} =
+        useCalculation(calculationId, err => addErrorMessage(err.message, "Error while loading calculation"));
+    const {specification, isLoadingSpecification} =
+        useSpecificationSummary(calculation ? calculation.specificationId : "", 
+                err => addErrorMessage(err.message, "Error while loading specification"));
+    const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(true);
     const [checkedVersions, setCheckedVersions] = useState<string[]>([]);
     const [disableCompare, setDisableCompare] = useState<boolean>(true);
     const [calculationVersionHistory, setCalculationVersionHistory] = useState<CalculationVersionHistorySummary[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     let history = useHistory();
-
-    function populateCalculation() {
-        getCalculationByIdService(calculationId).then((result) => {
-            setCalculation(result.data);
-        });
-    }
-
-    function populateSpecification(specificationId: string) {
-        getSpecificationSummaryService(specificationId).then((result) => {
-            setSpecification(result.data);
-            setIsLoading(false);
-        })
-    }
 
     function populateCalculationVersionHistory(calculationId: string) {
         getCalculationVersionHistoryService(calculationId).then((result) => {
             const response = result.data as CalculationVersionHistorySummary[];
             setCalculationVersionHistory(response);
+            setIsLoadingVersions(false);
         })
     }
 
     useEffectOnce(() => {
-        populateCalculation();
         populateCalculationVersionHistory(calculationId);
     })
-
-    useEffect(() => {
-
-        if (calculation.specificationId !== "") {
-            populateSpecification(calculation.specificationId);
-        }
-
-    }, [calculation.specificationId])
 
     function selectVersion(e: React.ChangeEvent<HTMLInputElement>) {
         const selectedVersion = e.target.value;
@@ -120,23 +75,32 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
     }
 
     return <div><Header location={Section.Specifications}/>
-        <LoadingStatus title={"Loading calculation version history"}
-                       description={"Please wait whilst calculation versions are loaded"} hidden={!isLoading}/>
-        <div className="govuk-width-container" hidden={isLoading}>
+        {(isLoadingCalculation || isLoadingSpecification || isLoadingVersions) &&
+        <LoadingStatus title={isLoadingCalculation ? "Loading calculation version history" : "Loading"}
+                       description={"Please wait"} />
+        }
+        <MultipleErrorSummary errors={errors} />
+        <div className="govuk-width-container">
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <Breadcrumbs>
                         <Breadcrumb name={"Calculate funding"} url={"/"}/>
                         <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
+                        {specification &&
                         <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
+                        }
+                        {calculation &&
                         <Breadcrumb name={calculation.name}/>
+                        }
                         <Breadcrumb name={"Calculation version history"}/>
                     </Breadcrumbs>
                 </div>
             </div>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
-                    <h1 className="govuk-heading-xl">{calculation.name}</h1>
+                    <h1 className="govuk-heading-xl">
+                        {!isLoadingCalculation && calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
+                    </h1>
                 </div>
             </div>
             <div className="govuk-grid-row">
@@ -146,7 +110,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                     </div>
                 </div>
             </div>
-            <div className="govuk-grid-row">
+            <div className="govuk-grid-row" hidden={isLoadingVersions}>
                 <div className="govuk-grid-column-full">
                     <table className="govuk-table table-vertical-align">
                         <caption className="govuk-table__caption">Specification</caption>
@@ -185,10 +149,12 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                             data-module="govuk-button"
                             disabled={disableCompare} onClick={compareVersions}>Compare calculations
                     </button>
-                    <br/>
-                    <a href="#" onClick={history.goBack} className="govuk-back-link">Back</a>
                 </div>
             </div>
+            <Link className="govuk-link govuk-back-link govuk-link--no-visited-state"
+                  to={`Specifications/EditCalculation/${calculationId}`}>
+                Back
+            </Link>
         </div>
         <Footer/>
     </div>

@@ -18,13 +18,13 @@ import {ErrorMessage} from "../../types/ErrorMessage";
 export interface CalculationItemProps {
     node: Calculation,
     calcs: CalculationDictionaryItem[],
-    updateNode: (p: CalculationUpdateModel) => void,
+    updateNode?: (p: CalculationUpdateModel) => void,
     isEditMode: boolean,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string) => Promise<void>,
-    cloneCalculation: (targetCalculationId: string, sourceCalculationId: string) => void,
-    refreshNextId: () => void,
-    allowDelete: boolean,
+    deleteNode?: (id: string) => Promise<void>,
+    cloneCalculation?: (targetCalculationId: string, sourceCalculationId: string) => void,
+    refreshNextId?: () => void,
+    allowDelete?: boolean,
 }
 
 export function CalculationItem({
@@ -105,7 +105,7 @@ export function CalculationItem({
                 setValueFormat(ValueFormatType.Currency);
                 break;
             default:
-                setValueFormat("");
+                setValueFormat(ValueFormatType[e.target.value as keyof typeof ValueFormatType]);
                 break;
         }
 
@@ -224,12 +224,15 @@ export function CalculationItem({
     };
 
     const handleConfirmDelete = async () => {
+        if (!deleteNode) {
+            return;
+        }
         await deleteNode(node.id);
         openSideBar(false);
     };
 
     const handleCloneClick = async () => {
-        if (cloneId.length === 0) {
+        if (!cloneCalculation || cloneId.length === 0) {
             return;
         }
         await cloneCalculation(node.id, cloneId);
@@ -252,7 +255,7 @@ export function CalculationItem({
     };
 
     const handleSubmit = async () => {
-        if (!validateForm()) return;
+        if (!validateForm() || !updateNode || !refreshNextId) return;
 
         setSaved(true);
 

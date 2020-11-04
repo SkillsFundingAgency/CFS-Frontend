@@ -68,7 +68,9 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
         id: "",
         isSelectedForFunding: false,
         name: "",
-        providerVersionId: ""
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        templateIds: {}
     })
     const [datasourceVersions, setDatasourceVersions] = useState<DatasetRelationshipPagedResponseViewModel>({
         endItemNumber: 0,

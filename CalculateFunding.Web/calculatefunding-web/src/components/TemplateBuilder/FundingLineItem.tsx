@@ -5,14 +5,14 @@ import {ErrorMessage} from "../../types/ErrorMessage";
 
 export interface FundingLineItemProps {
     node: FundingLine,
-    updateNode: (p: FundingLineUpdateModel) => void,
+    updateNode?: (p: FundingLineUpdateModel) => void,
     isEditMode: boolean,
     openSideBar: (open: boolean) => void,
-    deleteNode: (id: string) => Promise<void>,
-    isTemplateLineIdInUse: (templateLineId: number) => boolean,
-    isFundingLineNameInUse: (name: string) => boolean,
-    refreshNextId: () => void,
-    allowDelete: boolean,
+    deleteNode?: (id: string) => Promise<void>,
+    isTemplateLineIdInUse?: (templateLineId: number) => boolean,
+    isFundingLineNameInUse?: (name: string) => boolean,
+    refreshNextId?: () => void,
+    allowDelete?: boolean,
 }
 
 export function FundingLineItem({
@@ -40,6 +40,9 @@ export function FundingLineItem({
     }
 
     const validateName = (name: string) => {
+        if (!isFundingLineNameInUse) {
+            return;
+        }
         const fieldName = "fl-name";
         clearErrorMessages(fieldName);
 
@@ -94,7 +97,7 @@ export function FundingLineItem({
         const fieldName = "funding-line-id";
         clearErrorMessages(fieldName);
 
-        if (IsSameAsInitialId(id)) {
+        if (IsSameAsInitialId(id) || !isTemplateLineIdInUse) {
             return;
         }
 
@@ -133,12 +136,15 @@ export function FundingLineItem({
     };
 
     const handleConfirmDelete = async () => {
+        if (!deleteNode) {
+            return;
+        }
         await deleteNode(node.id);
         openSideBar(false);
     };
 
     const handleSubmit = async () => {
-        if (errors.length > 0) {
+        if (errors.length > 0 || !updateNode || !refreshNextId) {
             return;
         }
 

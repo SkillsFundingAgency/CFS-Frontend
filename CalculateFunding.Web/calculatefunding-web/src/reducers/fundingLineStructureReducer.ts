@@ -5,9 +5,7 @@ const initialState: IFundingLineStructureState = {
     specificationResult: {
         name: "",
         id: "",
-        templateIds: {
-            PSG: ""
-        },
+        templateIds: {},
         publishedResultsRefreshedAt: null,
         providerVersionId: "",
         lastCalculationUpdatedAt: "",
@@ -18,7 +16,9 @@ const initialState: IFundingLineStructureState = {
         },
         isSelectedForFunding: false,
         description: "",
-        approvalStatus: ""
+        approvalStatus: "",
+        lastEditedDate: new Date(),
+        dataDefinitionRelationshipIds: []
     },
     fundingLineStructureResult: [],
     fundingLineStatusResult: ""

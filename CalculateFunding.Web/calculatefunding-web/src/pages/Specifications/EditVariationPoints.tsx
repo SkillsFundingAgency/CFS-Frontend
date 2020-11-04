@@ -21,7 +21,7 @@ export interface EditVariationPointsRouteProps {
 }
 export function EditVariationPoints({match}: RouteComponentProps<EditVariationPointsRouteProps>) {
     const specificationId = match.params.specificationId;
-    const specificationSummaryInitialState =
+    const specificationSummaryInitialState: SpecificationSummary =
         {
             name: "",
             id: "",
@@ -36,7 +36,9 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
             fundingPeriod: {
                 id: "",
                 name: ""
-            }
+            },
+            templateIds: {},
+            dataDefinitionRelationshipIds: []
         };
     const profileVariationPointerInitialState = [{
         fundingStreamId: "",

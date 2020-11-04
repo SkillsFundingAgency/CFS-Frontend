@@ -1,12 +1,12 @@
 import React from "react";
 import {match, MemoryRouter} from "react-router";
 import {Provider} from "react-redux";
-import {IStoreState} from "../../../reducers/rootReducer";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {mount} from "enzyme";
-import configureStore from 'redux-mock-store';
-import {fakeHistory, fakeInitialState, fakeLocation} from "../../fakes/fakes";
 import {ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
 import {ViewSpecificationResults} from "../../../pages/Specifications/ViewSpecificationResults";
+import {createStore, Store} from "redux";
+import {createBrowserHistory, createLocation} from "history";
 
 describe("Provider Funding Overview ", () => {
     const specificationId = "056fcfcd-fb12-45ed-8a1b-079a0e2fc8c5";
@@ -18,10 +18,15 @@ describe("Provider Funding Overview ", () => {
         path: "",
         url: ""
     };
-    const initialState: IStoreState = fakeInitialState;
-    const mockStore = configureStore();
-    const store = mockStore(initialState);
+
+    const store: Store<IStoreState> = createStore(
+        rootReducer
+    );
+
     store.dispatch = jest.fn();
+    const fakeHistory = createBrowserHistory();
+
+    const fakeLocation = createLocation("", "", "", {search:"", pathname:"", hash:"", key:"", state: ""});
 
     it("renders the page with 3 tabs", async () => {
         const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);

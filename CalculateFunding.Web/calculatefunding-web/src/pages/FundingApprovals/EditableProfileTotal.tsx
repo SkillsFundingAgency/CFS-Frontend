@@ -1,5 +1,5 @@
 import "../../styles/EditableProfileTotal.scss";
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, ChangeEvent} from "react";
 import {formatNumber, FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {ProfileTotal} from "../../types/PublishedProvider/FundingLineProfile";
 import {clone} from "lodash";
@@ -47,12 +47,12 @@ export function EditableProfileTotal({
         return parseFloat(percent.replace(/,/g, ''));
     }
 
-    const handlePercentChange = (e) => {
+    const handlePercentChange = (e: ChangeEvent<HTMLInputElement>) => {
         let rawValue = e.target.value;
         setPercent(rawValue);
     }
 
-    const handleValueChange = (e) => {
+    const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
         let rawValue = e.target.value;
         setValue(rawValue);
     }

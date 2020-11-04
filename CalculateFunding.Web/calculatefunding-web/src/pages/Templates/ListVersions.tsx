@@ -1,6 +1,7 @@
 ﻿import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
+// @ts-ignore
 import {Link, useParams} from "react-router-dom";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {DateFormatter} from "../../components/DateFormatter";

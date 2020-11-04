@@ -1,4 +1,5 @@
 ﻿import React, {useRef, useState} from 'react';
+// @ts-ignore
 import {Link, useParams} from "react-router-dom";
 import {Header} from "../../components/Header";
 import {Footer} from "../../components/Footer";
@@ -222,7 +223,7 @@ export const PublishTemplate = () => {
                                     </label>
                                     <textarea className="govuk-textarea" id="publishNote" rows={4}
                                         maxLength={1000}
-                                        onClick={clearErrorMessages}
+                                        onClick={(e) => clearErrorMessages()}
                                         onChange={handlePublishNoteChange} />
                                     {errors.map(error => error.fieldName === "publishNote" &&
                                         <span key={error.id} id={"publishNote-error-" + error.id} className="govuk-error-message">

@@ -16,19 +16,19 @@ interface OrganisationChartNodeProps {
     draggable: boolean,
     collapsible: boolean,
     multipleSelect: boolean,
-    changeHierarchy: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
-    cloneNode: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
+    changeHierarchy?: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
+    cloneNode?: (draggedItemData: FundingLineOrCalculation, draggedItemDsKey: number, dropTargetId: string, dropTargetDsKey: number) => Promise<void>,
     isEditMode: boolean,
     onClickNode: (node: FundingLineOrCalculationSelectedItem) => void,
-    addNode: (id: string, newChild: FundingLine | Calculation) => Promise<void>,
+    addNode?: (id: string, newChild: FundingLine | Calculation) => Promise<void>,
     openSideBar: (open: boolean) => void,
-    nextId: number,
+    nextId?: number,
     dsKey: number,
-    addNodeToRefs: (id: string, ref: React.MutableRefObject<any>) => void,
+    addNodeToRefs?: (id: string, ref: React.MutableRefObject<any>) => void,
     expandAllChildren: boolean,
     hasCloneParent: boolean,
     expandParent?: () => void,
-};
+}
 
 const defaultProps = {
     draggable: false,
@@ -157,7 +157,7 @@ function OrganisationChartNode({
         setBottomEdgeExpanded(!bottomEdgeExpanded);
     };
 
-    const handleExpandAll = (e) => {
+    const handleExpandAll = () => {
         setIsChildrenCollapsed(!isChildrenCollapsed);
         setBottomEdgeExpanded(!bottomEdgeExpanded);
         setExpandAll(!expandAll);

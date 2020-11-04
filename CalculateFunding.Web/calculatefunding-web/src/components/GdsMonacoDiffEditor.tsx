@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from "react";
+import React, {RefObject, useEffect, useRef} from "react";
 import * as monaco from "monaco-editor";
 import {editor} from "monaco-editor";
 
@@ -7,8 +7,7 @@ export function GdsMonacoDiffEditor(props: {
     secondCalculationVersion: string,
     inlineCodeViewer: boolean
 }) {
-    const height: number = 291;
-    const element = useRef<HTMLElement>();
+    const element = useRef<HTMLDivElement>();
     const editor = useRef<monaco.editor.IStandaloneDiffEditor>();
     let isInline = props.inlineCodeViewer;
 
@@ -33,12 +32,8 @@ export function GdsMonacoDiffEditor(props: {
     }, [isInline]);
 
     const removeActionBarOverlay = () => {
-        var didUpdateDiffDisposable = editor.current.onDidUpdateDiff(() => {
-            didUpdateDiffDisposable.dispose();
-            setTimeout(() => {
-                const closeActionButton = document.getElementsByClassName("close-diff-review")[0];
-                closeActionButton && closeActionButton.click();
-            }, 500);
+        const didUpdateDiffDisposable = editor?.current?.onDidUpdateDiff(() => {
+            didUpdateDiffDisposable?.dispose();
         });
     }
 
@@ -54,7 +49,7 @@ export function GdsMonacoDiffEditor(props: {
 
     return (
         <div className="govuk-textarea--monaco-editor">
-            <div ref={element}></div>
+            <div ref={element as RefObject<HTMLDivElement>}></div>
         </div>
     );
 }

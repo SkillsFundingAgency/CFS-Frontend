@@ -32,7 +32,9 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
         id: "",
         isSelectedForFunding: false,
         name: "",
-        providerVersionId: ""
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        templateIds: {}
     })
     const [dataSchemas, setDataSchemas] = useState<DataschemaDetailsViewModel[]>([{
         id: "",
@@ -243,7 +245,9 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                                 <label className="govuk-label" htmlFor="sort">
                                     Select data schema
                                 </label>
-                                <select id={"select-data-schema"} className="govuk-select" id="sort" name="sort"
+                                <select id={"select-data-schema"} 
+                                        className="govuk-select" 
+                                        name="select-data-schema"
                                         onChange={(e) => changeDataschema(e)}>
                                     <option key={-1} value="">Please select</option>
                                     )
