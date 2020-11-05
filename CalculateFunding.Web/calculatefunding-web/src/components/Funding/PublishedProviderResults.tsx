@@ -29,6 +29,7 @@ export interface IPublishedProviderResultsProps {
     setConfirmRelease: (set: boolean) => void,
     setConfirmApproval: (set: boolean) => void,
     addError: (errorMessage: string, fieldName?: string) => void,
+    clearErrorMessages: () => void,
     setIsLoadingRefresh: (set: boolean) => void
 }
 
@@ -58,14 +59,17 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
     };
 
     async function handleApprove() {
+        props.clearErrorMessages();
         props.setConfirmApproval(true);
     }
 
     async function handleRelease() {
+        props.clearErrorMessages();
         props.setConfirmRelease(true);
     }
 
     async function handleRefresh() {
+        props.clearErrorMessages();
         props.setIsLoadingRefresh(true);
         try {
             await refreshFundingService(props.specificationId);

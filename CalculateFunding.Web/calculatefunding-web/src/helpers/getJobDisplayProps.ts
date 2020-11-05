@@ -4,7 +4,7 @@ import {RunningStatus} from "../types/RunningStatus";
 import {CompletionStatus} from "../types/CompletionStatus";
 
 
-export type JobDisplayProps = {
+export type JobStatusProps = {
     statusDescription: string,
     jobDescription: string,
     isSuccessful: boolean,
@@ -17,8 +17,8 @@ function getJobType(job: JobSummary): JobType | undefined {
     return JobType[job.jobType as keyof typeof JobType];
 }
 
-export function getJobDisplayProps(job: JobSummary): JobDisplayProps {
-    let result: JobDisplayProps = {
+export function getJobDisplayProps(job: JobSummary): JobStatusProps {
+    let result: JobStatusProps = {
         jobDescription: getJobProgressMessage(job),
         statusDescription: "",
         isSuccessful: false,

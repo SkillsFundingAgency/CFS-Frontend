@@ -1,5 +1,5 @@
 ﻿import {AxiosError} from "axios";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery} from "react-query";
 import {getFundingConfiguration} from "../services/policyService";
 import {FundingConfiguration} from "../types/FundingConfiguration";
 import {milliseconds} from "../helpers/TimeInMs";

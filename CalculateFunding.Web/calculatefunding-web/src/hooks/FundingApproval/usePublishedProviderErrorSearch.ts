@@ -1,9 +1,6 @@
 ﻿import {AxiosError} from "axios";
-import {QueryConfig, useQuery} from "react-query";
-import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
-import {getPublishedProviderErrors, searchForPublishedProviderResults} from "../../services/publishedProviderService";
-import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import {milliseconds} from "../../helpers/TimeInMs";
+import {useQuery} from "react-query";
+import {getPublishedProviderErrors} from "../../services/publishedProviderService";
 
 export type PublishedProviderErrorSearchQueryResult = {
     publishedProvidersWithErrors: string[] | undefined,

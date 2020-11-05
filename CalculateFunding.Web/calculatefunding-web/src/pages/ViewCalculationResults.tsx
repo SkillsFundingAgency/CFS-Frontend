@@ -54,7 +54,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             err => addErrorMessage(err.message, "Error while loading calculation"));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {latestJob, hasActiveJob, jobError, hasJobError, isCheckingForJob, jobDisplayInfo} =
+    const {latestJob, hasActiveJob, jobError, hasJobError, isCheckingForJob, jobStatus} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
     const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
@@ -262,9 +262,8 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         {specificationId.length > 0 &&
                         <CalculationJobNotification
                             latestJob={latestJob}
-                            anyJobsRunning={hasActiveJob}
                             isCheckingForJob={isCheckingForJob}
-                            jobDisplayInfo={jobDisplayInfo}
+                            jobStatus={jobStatus}
                             hasJobError={hasJobError}
                             jobError={jobError}/>
                         }

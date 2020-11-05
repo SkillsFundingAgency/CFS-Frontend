@@ -439,7 +439,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return errorResult;
             }
 
-            return new OkObjectResult(apiResponse.Content);
+            return new OkObjectResult(apiResponse.Content.Where(x => x != null).ToList());
         }
 
         private static ProfilingViewModel MapToProfilingViewModel(

@@ -70,7 +70,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobDisplayInfo: undefined,
+    jobStatus: undefined,
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
@@ -89,7 +89,7 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobDisplayInfo: {
+    jobStatus: {
         statusDescription: "in progress",
         jobDescription: "test",
         isComplete: false,

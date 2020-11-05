@@ -4,18 +4,17 @@ import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {ErrorSummary} from "../ErrorSummary";
 import {JobSummary} from "../../types/jobSummary";
-import {JobDisplayProps} from "../../helpers/getJobDisplayProps";
+import {JobStatusProps} from "../../helpers/getJobDisplayProps";
 
-export interface ICalculationJobNotificationProps {
+export interface CalculationJobNotificationProps {
     latestJob: JobSummary | undefined,
-    anyJobsRunning: boolean,
     isCheckingForJob: boolean,
     hasJobError: boolean,
     jobError: string,
-    jobDisplayInfo: JobDisplayProps | undefined
+    jobStatus: JobStatusProps | undefined
 }
 
-export function CalculationJobNotification(props: ICalculationJobNotificationProps) {
+export function CalculationJobNotification(props: CalculationJobNotificationProps) {
     if (props.isCheckingForJob) {
         return <div className=" govuk-!-margin-bottom-4">
             <LoadingFieldStatus title={"Checking for running jobs"}/>
@@ -27,18 +26,18 @@ export function CalculationJobNotification(props: ICalculationJobNotificationPro
                              suggestion={"Please try again later"}/>
     }
 
-    if (!props.latestJob || !props.jobDisplayInfo) {
+    if (!props.latestJob || !props.jobStatus) {
         return null;
     }
 
-    return (<div className={props.jobDisplayInfo.isFailed ? "govuk-error-summary" :
-        props.jobDisplayInfo.isActive ? "govuk-error-summary govuk-error-summary-orange" :
+    return (<div className={props.jobStatus.isFailed ? "govuk-error-summary" :
+        props.jobStatus.isActive ? "govuk-error-summary govuk-error-summary-orange" :
             "govuk-error-summary govuk-error-summary-green"}
                  aria-labelledby="error-summary-title" 
                  role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
-            Job {props.jobDisplayInfo.statusDescription}: {props.jobDisplayInfo.jobDescription}
+            Job {props.jobStatus.statusDescription}: {props.jobStatus.jobDescription}
         </h2>
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">

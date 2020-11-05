@@ -18,7 +18,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobDisplayInfo: {
+    jobStatus: {
         isActive: false,
         isComplete: false,
         isFailed: false,

@@ -2,9 +2,7 @@
 import {useFetchLatestSpecificationJob} from "./useFetchLatestSpecificationJob";
 import {JobSummary} from "../../types/jobSummary";
 import {useMonitorForNewSpecificationJob} from "./useMonitorForNewSpecificationJob";
-import {RunningStatus} from "../../types/RunningStatus";
-import {CompletionStatus} from "../../types/CompletionStatus";
-import {getJobDisplayProps, JobDisplayProps} from "../../helpers/getJobDisplayProps";
+import {getJobDisplayProps, JobStatusProps} from "../../helpers/getJobDisplayProps";
 
 export type LatestSpecificationJobWithMonitoringResult = {
     latestJob: JobSummary | undefined,
@@ -17,7 +15,7 @@ export type LatestSpecificationJobWithMonitoringResult = {
     isFetching: boolean,
     isFetched: boolean,
     isCheckingForJob: boolean,
-    jobDisplayInfo: JobDisplayProps | undefined
+    jobStatus: JobStatusProps | undefined
 }
 
 export const useLatestSpecificationJobWithMonitoring =
@@ -29,18 +27,19 @@ export const useLatestSpecificationJobWithMonitoring =
             useMonitorForNewSpecificationJob(specificationId, jobTypes);
 
         const latestJob: JobSummary | undefined = newJob !== undefined ? newJob : lastJob;
+        const jobDisplayInfo = latestJob ? getJobDisplayProps(latestJob) : undefined;
 
         return {
             latestJob,
             hasJob: latestJob !== undefined,
-            hasActiveJob: latestJob !== undefined && latestJob.runningStatus !== RunningStatus.Completed,
-            hasFailedJob: latestJob !== undefined && latestJob.runningStatus === RunningStatus.Completed && lastJob?.completionStatus !== CompletionStatus.Succeeded,
+            hasActiveJob: jobDisplayInfo !== undefined && jobDisplayInfo.isActive,
+            hasFailedJob: jobDisplayInfo !== undefined && jobDisplayInfo.isFailed,
             jobError: haveErrorCheckingForJob ? errorCheckingForJob : haveErrorWhileMonitoringJobs ? errorWhileMonitoringJobs : "",
             hasJobError: haveErrorCheckingForJob || haveErrorWhileMonitoringJobs,
             isMonitoring,
             isFetching,
             isFetched,
             isCheckingForJob,
-            jobDisplayInfo: latestJob ? getJobDisplayProps(latestJob) : undefined
+            jobStatus: jobDisplayInfo
         };
     };

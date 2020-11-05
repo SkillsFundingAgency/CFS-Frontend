@@ -10,7 +10,6 @@ import {
 } from "../../types/publishedProviderSearchRequest";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
-import {ErrorMessage} from "../../types/ErrorMessage";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {PublishedProviderResults} from "../../components/Funding/PublishedProviderResults";
 import {ConfirmFundingApproval} from "../../components/Funding/ConfirmFundingApproval";
@@ -30,8 +29,8 @@ import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {buildInitialPublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
-import {formatDate} from "../../components/DateFormatter";
 import {useErrors} from "../../hooks/useErrors";
+import {CalculationJobNotification} from "../../components/Calculations/CalculationJobNotification";
 
 export interface SpecificationFundingApprovalRoute {
     fundingStreamId: string;
@@ -44,7 +43,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
 
-    const {hasJob, hasActiveJob, hasFailedJob, latestJob, isCheckingForJob, jobDisplayInfo} =
+    const {hasActiveJob, hasJobError, jobError, latestJob, isCheckingForJob, jobStatus} =
         useLatestSpecificationJobWithMonitoring(
             specificationId,
             [JobType.RefreshFundingJob,
@@ -90,24 +89,19 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         setConfirmRelease(false);
         clearErrorMessages();
     }
-
-    if (hasFailedJob && latestJob && jobDisplayInfo) {
-        addErrorMessage(`Job ${jobDisplayInfo.statusDescription}: ${jobDisplayInfo.jobDescription}. ` +
-            `Created by ${latestJob.invokerUserDisplayName} at ${formatDate(latestJob.created, false)}. ` +
-            `Last updated at ${formatDate(latestJob.lastUpdated, false)}`)
-    }
     
     if (publishedProvidersWithErrors) {
         publishedProvidersWithErrors.forEach(err => addErrorMessage(err, "Provider error"));
     }
 
-    const isLoading = errors.length === 0 && (isLoadingSpecification || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);
+    const isLoading = errors.length === 0 && (isLoadingSpecification || isLoadingFundingConfiguration || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);
     const loadingTitle =
         isLoadingSpecification ? "Loading specification..." :
             isLoadingRefresh ? "Updating..." :
                 isCheckingForJob ? "Checking for jobs..." :
-                    hasActiveJob && jobDisplayInfo ? `Job ${jobDisplayInfo.statusDescription}: ${jobDisplayInfo.jobDescription}` :
+                    hasActiveJob && jobStatus ? `Job ${jobStatus.statusDescription}: ${jobStatus.jobDescription}` :
                         isLoadingSearchResults ? "Loading provider funding data..." :
+                            isLoadingFundingConfiguration ? "Loading funding configuration..." :
                             ""
     const loadingSubtitle =
         isLoadingRefresh ? "Refreshing data" :
@@ -130,6 +124,15 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
                 <MultipleErrorSummary errors={errors}/>
 
+                {!isCheckingForJob && jobStatus && jobStatus.isComplete &&
+                <CalculationJobNotification
+                    latestJob={latestJob}
+                    isCheckingForJob={isCheckingForJob}
+                    jobStatus={jobStatus}
+                    hasJobError={hasJobError}
+                    jobError={jobError}/>
+                }
+                
                 <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-padding-top-5">
                     <div className="govuk-grid-column-two-thirds">
                         <SpecificationSummarySection
@@ -154,7 +157,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>
                         </div>
                         }
-                        {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults && !isLoadingFundingConfiguration &&
+                        {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults &&
                         !isLoadingPublishedProviderIds && !isLoadingSpecification && specification &&
                         <PublishedProviderResults specificationId={specificationId}
                                                   enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
@@ -171,6 +174,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                                   setConfirmApproval={setConfirmApproval}
                                                   addError={addErrorMessage}
                                                   setIsLoadingRefresh={setIsLoadingRefresh}
+                                                  clearErrorMessages={clearErrorMessages}
                         />
                         }
                     </div>
@@ -185,6 +189,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             publishedProviderResults={publishedProviderSearchResults}
                             handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
+                            clearErrorMessages={clearErrorMessages}
                         />
                         :
                         <ConfirmFundingRelease
@@ -193,6 +198,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             publishedProviderResults={publishedProviderSearchResults}
                             handleBackToResults={handleBackToResults}
                             addError={addErrorMessage}
+                            clearErrorMessages={clearErrorMessages}
                         />
                     }
                 </div>

@@ -43,7 +43,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
 
-    const {hasJob, latestJob, hasActiveJob, hasFailedJob, isCheckingForJob} =
+    const {hasJob, latestJob, isCheckingForJob, hasActiveJob, jobStatus} =
         useLatestSpecificationJobWithMonitoring(specificationId, [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation]);
     
     function getCurrentDataset() {

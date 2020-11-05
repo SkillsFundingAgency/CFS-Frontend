@@ -27,7 +27,7 @@ const latestSpecJobMonitorResult: LatestSpecificationJobWithMonitoringResult = {
     isMonitoring: false,
     jobError: "",
     latestJob: undefined,
-    jobDisplayInfo: undefined
+    jobStatus: undefined
 };
 jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
     () => (latestSpecJobMonitorResult));

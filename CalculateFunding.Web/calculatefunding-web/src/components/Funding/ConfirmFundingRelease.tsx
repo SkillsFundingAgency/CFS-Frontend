@@ -13,12 +13,14 @@ export interface IConfirmFundingReleaseProps {
     canReleaseFunding: boolean | undefined,
     handleBackToResults: () => void,
     addError: (errorMessage: string, fieldName?: string) => void,
+    clearErrorMessages: () => void,
 }
 
 export function ConfirmFundingRelease(props: IConfirmFundingReleaseProps) {
     const [isLoadingRelease, setIsLoadingRelease] = useState<boolean>(false);
 
     async function handleConfirmRelease() {
+        props.clearErrorMessages();
         setIsLoadingRelease(true);
         try {
             await releaseFundingService(props.specificationSummary.id);

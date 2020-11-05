@@ -13,6 +13,7 @@ export interface IConfirmFundingApprovalProps {
     canApproveFunding: boolean | undefined,
     handleBackToResults: () => void,
     addError: (errorMessage: string, fieldName?: string) => void,
+    clearErrorMessages: () => void,
 }
 
 export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
@@ -23,6 +24,7 @@ export function ConfirmFundingApproval(props: IConfirmFundingApprovalProps) {
     }
 
     async function handleConfirmApprove() {
+        props.clearErrorMessages();
         setIsLoadingApproval(true);
         try {
             await approveFundingService(props.specificationSummary.id);
