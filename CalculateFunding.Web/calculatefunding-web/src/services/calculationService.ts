@@ -6,7 +6,7 @@ import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
 import {CalculationCompilePreviewResponse} from "../types/Calculations/CalculationCompilePreviewResponse";
-import {CalculationDetails} from "../types/CalculationDetails";
+import {CalculationDetails, CalculationSummary} from "../types/CalculationDetails";
 import {AdditionalCalculationSearchResultViewModel} from "../types/Calculations/AdditionalCalculation";
 import {CalculationVersionHistorySummary} from "../types/Calculations/CalculationVersionHistorySummary";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
@@ -47,6 +47,11 @@ export async function searchForCalculationsByProviderService(
 export async function getCalculationByIdService(calculationId: string):
     Promise<AxiosResponse<CalculationDetails>>{
     return axios.get<CalculationDetails>(`/api/calcs/getcalculationbyid/${calculationId}`)
+}
+
+export async function getCalculationSummaryBySpecificationId(specificationId: string):
+    Promise<AxiosResponse<CalculationSummary[]>>{
+    return axios.get<CalculationSummary[]>(`/api/calcs/calculation-summaries-for-specification?specificationId=${specificationId}`)
 }
 
 export async function getCalculationProvidersService(calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel):

@@ -20,3 +20,18 @@ export interface CalculationDetails {
     publishStatus: PublishStatus;
     description?: string | undefined;
 }
+
+export interface CalculationSummary {
+    calculationType: CalculationType,
+    publishStatus: PublishStatus,
+    version: number,
+    calculationValueType: CalculationValueType
+}
+
+export enum CalculationValueType {
+    Number = "Number",
+    Percentage = "Percentage",
+    Currency = "Currency",
+    Boolean = "Boolean",
+    String = "String"
+}

@@ -16,7 +16,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {
     refreshFundingService,
 } from "../../services/publishService";
-import {searchForCalculationsService} from "../../services/calculationService";
+import {getCalculationSummaryBySpecificationId} from "../../services/calculationService";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
@@ -33,6 +33,7 @@ import {FundingLineResults} from "../../components/fundingLineStructure/FundingL
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
 import {CalculationType} from "../../types/CalculationSearchResponse";
+import {CalculationSummary} from "../../types/CalculationDetails";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -153,14 +154,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             errors.push("Specification must be approved before the specification can be chosen for funding.");
         }
         try {
-            const calc = (await searchForCalculationsService({
-                specificationId: specificationId,
-                status: "",
-                pageNumber: 1,
-                searchTerm: "",
-                calculationType: CalculationType.Template
-            })).data;
-            if (calc.results.some(calc => calc.status !== PublishStatus.Approved)) {
+            const calcs: CalculationSummary[] = (await getCalculationSummaryBySpecificationId(specificationId)).data;
+            if (calcs.filter(calc => calc.calculationType === CalculationType.Template)
+                .some(calc => calc.publishStatus !== PublishStatus.Approved)) {
                 addErrorMessage("Template calculations must be approved before the specification can be chosen for funding.");
             }
         } catch (err) {
@@ -170,22 +166,22 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     return <div>
-        <Header location={Section.Specifications}/>
+        <Header location={Section.Specifications} />
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={specification.name}/>
+                <Breadcrumb name={"Calculate funding"} url={"/"} />
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
+                <Breadcrumb name={specification.name} />
             </Breadcrumbs>
-            
-            <MultipleErrorSummary errors={errors}/>
-            
+
+            <MultipleErrorSummary errors={errors} />
+
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-4">
                     <span className="govuk-caption-l">Specification Name</span>
                     <h2 className="govuk-heading-l govuk-!-margin-bottom-2">{specification.name}</h2>
                     {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
-                    <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                        <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
                     }
                 </div>
             </div>
@@ -199,7 +195,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <span className="govuk-caption-m">Funding period</span>
                         <h3 className="govuk-heading-m">{specification.fundingPeriod.name}</h3>
                     </div>
-                    <Details title={`What is ${specification.name}`} body={specification.description}/>
+                    <Details title={`What is ${specification.name}`} body={specification.description} />
                 </div>
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
@@ -214,19 +210,19 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
                         {isLoadingSelectedForFunding &&
-                        <LoadingFieldStatus title={"checking funding status..."}/>
+                            <LoadingFieldStatus title={"checking funding status..."} />
                         }
                         {!isLoadingSelectedForFunding &&
-                        <li>
-                            {specification.isSelectedForFunding || selectedForFundingSpecId ?
-                                <Link className="govuk-link govuk-link--no-visited-state"
-                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
-                                    View funding
+                            <li>
+                                {specification.isSelectedForFunding || selectedForFundingSpecId ?
+                                    <Link className="govuk-link govuk-link--no-visited-state"
+                                        to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
+                                        View funding
                                 </Link>
-                                :
-                                <button type="button" className="govuk-link" onClick={chooseForFunding}>Choose for funding</button>
-                            }
-                        </li>
+                                    :
+                                    <button type="button" className="govuk-link" onClick={chooseForFunding}>Choose for funding</button>
+                                }
+                            </li>
                         }
                     </ul>
                 </div>
@@ -245,24 +241,24 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <FundingLineResults specificationId={specification.id} fundingStreamId={specification.fundingStreams[0].id} fundingPeriodId={specification.fundingPeriod.id} approvalStatus={specification.approvalStatus as PublishStatus} />
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
-                            <AdditionalCalculations specificationId={specificationId} addError={addErrorMessage}/>
+                            <AdditionalCalculations specificationId={specificationId} addError={addErrorMessage} />
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
-                           <Datasets specificationId={specificationId} />
+                            <Datasets specificationId={specificationId} />
                         </Tabs.Panel>
                         <Tabs.Panel label="release-timetable">
                             <section className="govuk-tabs__panel">
-                                <ReleaseTimetable specificationId={specificationId}/>
+                                <ReleaseTimetable specificationId={specificationId} />
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>
-                            <VariationManagement specificationId={specificationId}/>
+                            <VariationManagement specificationId={specificationId} />
                         </Tabs.Panel>
                     </Tabs>
                 </div>
             </div>}
         </div>
         &nbsp;
-        <Footer/>
+        <Footer />
     </div>
 }
