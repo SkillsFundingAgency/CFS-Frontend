@@ -29,6 +29,8 @@ import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useProviderVersion} from "../../hooks/Providers/useProviderVersion";
 import {ProviderSummarySection} from "../../components/Providers/ProviderSummarySection";
 import {useErrors} from "../../hooks/useErrors";
+import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
+import {PublishStatus} from "../../types/PublishStatusModel";
 
 interface ProviderFundingOverviewProps {
     providerFundingId: string
@@ -143,6 +145,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="funding-stream-history">Funding stream history</Tabs.Tab>
                             <Tabs.Tab label="profiling">Profiling</Tabs.Tab>
+                            <Tabs.Tab label="calculations">Calculations</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="funding-stream-history">
                             {isLoadingTransactions &&
@@ -167,6 +170,11 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                 routeParams={match.params}
                                 profilingPatterns={profilingPatterns}/>
                             }
+                        </Tabs.Panel>
+                        <Tabs.Panel label="calculations">
+                            <FundingLineResults specificationId={specificationId} fundingStreamId={fundingStreamId}
+                                                fundingPeriodId={fundingPeriodId} approvalStatus={PublishStatus.Approved}
+                                                providerVersionId={providerVersionId}/>
                         </Tabs.Panel>
                     </Tabs>
                 </div>

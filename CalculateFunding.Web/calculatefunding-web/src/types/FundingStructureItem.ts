@@ -20,3 +20,19 @@ export enum FundingStructureType{
     Calculation = "Calculation",
     "Funding Line" = FundingLine,
 }
+
+
+export interface PublishedProviderFundingStructure {
+    items : PublishedProviderFundingStructureItem[];
+    PublishedProviderVersion: number;
+}
+
+export interface PublishedProviderFundingStructureItem {
+    level : number;
+    name : string;
+    calculationId : string;
+    type : FundingStructureType;
+    value: string;
+    calculationType: string;
+    fundingStructureItems: PublishedProviderFundingStructureItem[];
+}

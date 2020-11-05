@@ -172,6 +172,12 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible false", () => 
         expect(screen.queryByTestId(`tab-panel-profiling`)).not.toBeInTheDocument();
     });
 
+    it('renders calculations tab as inactive', () => {
+        expect(screen.getByTestId(`tab-calculations`)).toBeInTheDocument();
+        expect(within(screen.getByTestId(`tab-calculations`)).getByText("Calculations")).toBeInTheDocument();
+        expect(screen.queryByTestId(`tab-panel-calculations`)).not.toBeInTheDocument();
+    });
+
     it('does not render profiling patterns', () => {
         expect(within(screen.getByTestId(`tab-profiling`))
             .queryByText(/View and makes changes to profile patterns by funding line/)).not.toBeInTheDocument();

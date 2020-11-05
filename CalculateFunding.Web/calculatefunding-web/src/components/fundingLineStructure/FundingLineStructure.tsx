@@ -1,5 +1,5 @@
 import {
-    FundingStructureType, IFundingStructureItem
+    FundingStructureType, IFundingStructureItem, PublishedProviderFundingStructureItem
 } from "../../types/FundingStructureItem";
 import React, {MutableRefObject, useRef} from "react";
 
@@ -107,4 +107,24 @@ export function updateFundingLineExpandStatus(fundingStructureItems: IFundingStr
             }
         }
     );
+}
+
+export function mapPublishedProviderFundingStructureItemsToFundingStructureItems(PublishedProviderFundingStructureItems: PublishedProviderFundingStructureItem[]) {
+    return PublishedProviderFundingStructureItems.map(
+        function mapFundingLines(publishedProviderFundingStructureItem: PublishedProviderFundingStructureItem): IFundingStructureItem {
+            return {
+                level: publishedProviderFundingStructureItem.level,
+                name: publishedProviderFundingStructureItem.name,
+                type: publishedProviderFundingStructureItem.type,
+                value: publishedProviderFundingStructureItem.value,
+                calculationType: publishedProviderFundingStructureItem.calculationType,
+                fundingStructureItems: publishedProviderFundingStructureItem.fundingStructureItems ?
+                    publishedProviderFundingStructureItem.fundingStructureItems.map(mapFundingLines)
+                    : [],
+                calculationId: "",
+                calculationPublishStatus: "",
+                parentName: "",
+                expanded: false
+            };
+        });
 }

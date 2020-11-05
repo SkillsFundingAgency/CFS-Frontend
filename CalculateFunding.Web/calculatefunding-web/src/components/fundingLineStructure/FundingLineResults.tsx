@@ -2,17 +2,33 @@ import {LoadingStatus} from "../LoadingStatus";
 import {ApproveStatusButton} from "../ApproveStatusButton";
 import {AutoComplete} from "../AutoComplete";
 import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../CollapsibleSteps";
-import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
+import {
+    FundingStructureType,
+    IFundingStructureItem
+} from "../../types/FundingStructureItem";
 import {FundingLineStep} from "./FundingLineStep";
 import {BackToTop} from "../BackToTop";
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
 import {approveFundingLineStructureService} from "../../services/specificationService";
 import {PublishStatus} from "../../types/PublishStatusModel";
-import {checkIfShouldOpenAllSteps, expandCalculationsByName, getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName, setInitialExpandedStatus, updateFundingLineExpandStatus} from "./FundingLineStructure";
-import {getFundingLineStructureService} from "../../services/fundingStructuresService";
+import {
+    checkIfShouldOpenAllSteps,
+    expandCalculationsByName,
+    getDistinctOrderedFundingLineCalculations,
+    mapPublishedProviderFundingStructureItemsToFundingStructureItems,
+    setExpandStatusByFundingLineName,
+    setInitialExpandedStatus,
+    updateFundingLineExpandStatus
+} from "./FundingLineStructure";
+import {
+    getFundingLineStructureByProviderService,
+    getFundingLineStructureService
+} from "../../services/fundingStructuresService";
+import {getPublishedProviderFundingStructureService} from "../../services/publishedProviderFundingLineService";
 
-export function FundingLineResults(props:{specificationId:string, fundingPeriodId:string, fundingStreamId:string, approvalStatus:PublishStatus})
+export function FundingLineResults(props:{specificationId:string, fundingPeriodId:string, fundingStreamId:string,
+    approvalStatus:PublishStatus, providerId?: string, providerVersionId?: string})
 {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
@@ -25,9 +41,7 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
-    const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [errors, setErrors] = useState<string[]>([]);
-    const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
 
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
@@ -108,14 +122,26 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
         setIsLoadingFundingLineStructure(true);
         try {
             if(props.specificationId !== "" && props.fundingPeriodId !== "" && props.fundingStreamId !== "") {
-                const fundingStructureItem = (await getFundingLineStructureService(props.specificationId, props.fundingPeriodId, props.fundingStreamId)).data;
-                setInitialExpandedStatus(fundingStructureItem, false);
-                setFundingLines(fundingStructureItem);
+                let  fundingStructureItems: IFundingStructureItem[];
+                if (props.providerVersionId != null) {
+                    const publishedProviderFundingStructure = (await getPublishedProviderFundingStructureService(props.providerVersionId)).data;
+                    fundingStructureItems = mapPublishedProviderFundingStructureItemsToFundingStructureItems(publishedProviderFundingStructure.items);
+                }
+                else if (props.providerId != null)
+                {
+                    fundingStructureItems = (await getFundingLineStructureByProviderService(props.specificationId, props.fundingPeriodId, props.fundingStreamId, props.providerId)).data;
+                }
+                else
+                {
+                    fundingStructureItems = (await getFundingLineStructureService(props.specificationId, props.fundingPeriodId, props.fundingStreamId)).data;
+                }
+
+                setInitialExpandedStatus(fundingStructureItems, false);
+                setFundingLines(fundingStructureItems);
                 setFundingLinePublishStatus(props.approvalStatus);
             }
         } catch (err) {
             setFundingLineStructureError(true);
-
             setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
         } finally {
             setIsLoadingFundingLineStructure(false);

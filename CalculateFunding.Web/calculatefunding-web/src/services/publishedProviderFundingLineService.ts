@@ -1,6 +1,7 @@
 import axios, {AxiosResponse} from "axios"
 import {FundingLineProfile} from "../types/PublishedProvider/FundingLineProfile";
 import {ApplyCustomProfileRequest} from "../types/PublishedProvider/ApplyCustomProfileRequest";
+import {PublishedProviderFundingStructure} from "../types/FundingStructureItem";
 
 const baseUrl = "/api/publishedproviderfundinglinedetails";
 
@@ -22,4 +23,13 @@ export async function applyCustomProfile(profile: ApplyCustomProfileRequest) {
         },
         data: profile
     });
+}
+
+export async function getPublishedProviderFundingStructureService(publishedProviderVersionId: string): Promise<AxiosResponse<PublishedProviderFundingStructure>> {
+    return axios(`/api/publishedproviderfundingstructure/${publishedProviderVersionId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
 }
