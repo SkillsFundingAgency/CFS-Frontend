@@ -11,4 +11,6 @@ export interface ReleaseTimetableSummary {
 export interface ReleaseTimetableViewModel {
     navisionDate: Date;
     releaseDate: Date;
+    earliestPaymentAvailableDate: string;
+    externalPublicationDate: string;
 }
