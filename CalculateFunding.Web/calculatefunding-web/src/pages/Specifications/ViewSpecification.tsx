@@ -117,8 +117,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     };
 
     async function chooseForFunding() {
-        clearErrorMessages();
         try {
+            clearErrorMessages();
             const isAllowed: boolean = await isUserAllowedToChooseSpecification(specificationId);
             if (isAllowed) {
                 UserConfirmLeavePageModal("Are you sure you want to choose this specification?",
@@ -146,23 +146,26 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     async function isUserAllowedToChooseSpecification(specificationId: string) {
         const permissions = (await getUserPermissionsService(specificationId)).data;
-        let errors: string[] = [];
         if (!permissions.canChooseFunding) {
-            errors.push("You do not have permissions to choose this specification for funding");
+            addErrorMessage("You do not have permissions to choose this specification for funding");
+            return false;
         }
         if (specification.approvalStatus !== PublishStatus.Approved) {
-            errors.push("Specification must be approved before the specification can be chosen for funding.");
+            addErrorMessage("Specification must be approved before the specification can be chosen for funding.");
+            return false;
         }
         try {
             const calcs: CalculationSummary[] = (await getCalculationSummaryBySpecificationId(specificationId)).data;
             if (calcs.filter(calc => calc.calculationType === CalculationType.Template)
                 .some(calc => calc.publishStatus !== PublishStatus.Approved)) {
                 addErrorMessage("Template calculations must be approved before the specification can be chosen for funding.");
+                return false;
             }
         } catch (err) {
             addErrorMessage("A problem occurred while choosing specification");
+            return false;
         }
-        return errors.length === 0;
+        return true;
     }
 
     return <div>
