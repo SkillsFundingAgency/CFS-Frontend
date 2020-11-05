@@ -5,7 +5,6 @@ using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Frontend.Controllers;
-using CalculateFunding.Frontend.ViewModels.Results;
 using FizzWare.NBuilder;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;

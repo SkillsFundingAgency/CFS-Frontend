@@ -8,7 +8,6 @@ using CalculateFunding.Common.ApiClient.FundingDataZone;
 using CalculateFunding.Common.ApiClient.Graph;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Jobs;
-using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -17,6 +16,7 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.Caching;
 using CalculateFunding.Common.Config.ApiClient.Profiling;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.ScenariosClient;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient;
@@ -189,7 +189,13 @@ namespace CalculateFunding.Frontend.Modules
                 .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services
-	            .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
+                .AddSingleton<IUserProfileProvider, UserProfileProvider>();
+
+            services
+                .AddSingleton<ICacheProvider, StackExchangeRedisClientCacheProvider>();
+
+            services
+                .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
 
             services
                 .AddSingleton<IResultsApiClient, ResultsApiClient>();
@@ -233,34 +239,7 @@ namespace CalculateFunding.Frontend.Modules
 
             services.AddSingleton(redisSettings);
 
-            services.AddSingleton<ICacheProvider, StackExchangeRedisClientCacheProvider>();
-
             services.AddProfilingInterServiceClient(Configuration);
-        }
-
-        private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, string apiBase)
-        {
-            string baseAddress = options.ApiEndpoint;
-            if (!baseAddress.EndsWith("/", StringComparison.CurrentCulture))
-            {
-                baseAddress = $"{baseAddress}/";
-            }
-
-            baseAddress += apiBase;
-
-            if (!baseAddress.EndsWith("/", StringComparison.CurrentCulture))
-            {
-                baseAddress = $"{baseAddress}/";
-            }
-
-            httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
-            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.ApiKey, options.ApiKey);
-            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.Username, "testuser");
-            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.UserId, "b001af14-3754-4cb1-9980-359e850700a8");
-
-            httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            httpClient.DefaultRequestHeaders?.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, IServiceCollection services)
@@ -284,7 +263,7 @@ namespace CalculateFunding.Frontend.Modules
 
             IUserProfileService userProfileService = serviceProvider.GetService<IUserProfileService>();
 
-            UserProfile userProfile = userProfileService.GetUser();
+            Common.ApiClient.Models.UserProfile userProfile = userProfileService.GetUser();
 
             httpClient.BaseAddress = new Uri(baseAddress, UriKind.Absolute);
             httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.ApiKey, options.ApiKey);

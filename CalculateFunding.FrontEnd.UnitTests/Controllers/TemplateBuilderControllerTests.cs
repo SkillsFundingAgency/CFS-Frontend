@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Serilog;
-using PublishStatus = CalculateFunding.Common.Models.Versioning.PublishStatus;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {

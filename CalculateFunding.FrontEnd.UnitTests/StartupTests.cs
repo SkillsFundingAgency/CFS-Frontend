@@ -66,6 +66,7 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<TestScenarioSearchController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioSearchController));
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
             ResolveType<ProviderController>(serviceProvider).Should().NotBeNull(nameof(ProviderController));
+            ResolveType<ProfilingController>(serviceProvider).Should().NotBeNull(nameof(ProfilingController));
         }
 
         protected virtual IConfigurationRoot CreateTestConfiguration()
@@ -104,7 +105,8 @@ namespace CalculateFunding.Frontend.UnitTests
                 { "publishingClient:ApiEndpoint", "https://localhost:7012/api" },
                 { "publishingClient:ApiKey", "Local" },
                 { "fdzClient:ApiEndpoint", "https://localhost:7109/api" },
-                { "fdzClient:ApiKey", "Local" }
+                { "fdzClient:ApiKey", "Local" },
+                { "providerProfilingClient:ApiEndpoint", "https://localhost:5001/api"}
             };
 
             var cb = new ConfigurationBuilder()
