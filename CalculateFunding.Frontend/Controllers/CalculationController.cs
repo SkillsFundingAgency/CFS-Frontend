@@ -502,6 +502,22 @@ namespace CalculateFunding.Frontend.Controllers
 
         }
 
+        [Route("api/calcs/calculation-summaries-for-specification")]
+        [HttpGet]
+        public async Task<IActionResult> GetCalculationSummaryForSpecification([FromQuery] string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<IEnumerable<CalculationSummary>> response = await _calcClient.GetCalculationSummariesForSpecification(specificationId);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return Ok(response.Content);
+            }
+
+            throw new InvalidOperationException($"An error occurred while retrieving calculation summary. Status code={response.StatusCode}");
+        }
+
         private async Task<bool> CanUserApproveCalculation(Calculation calculation)
         {
             if (await _authorizationHelper.DoesUserHavePermission(User, calculation.SpecificationId, SpecificationActionTypes.CanApproveAnyCalculations))
