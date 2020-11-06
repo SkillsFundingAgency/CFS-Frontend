@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 
 export function Breadcrumbs(props: { children: any }) {
-    return <div className="govuk-breadcrumbs">
+    return <div className="govuk-breadcrumbs govuk-!-margin-bottom-5">
         <ol className="govuk-breadcrumbs__list">
             {props.children}
         </ol>

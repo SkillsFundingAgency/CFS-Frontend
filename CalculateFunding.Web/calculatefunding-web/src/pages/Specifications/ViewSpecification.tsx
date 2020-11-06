@@ -180,24 +180,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <MultipleErrorSummary errors={errors} />
 
             <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-4">
-                    <span className="govuk-caption-l">Specification Name</span>
-                    <h2 className="govuk-heading-l govuk-!-margin-bottom-2">{specification.name}</h2>
+                <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
+                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
+                    <span className="govuk-caption-l">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
                     {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
-                        <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                    <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
                     }
                 </div>
-            </div>
-            <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
-                    <div>
-                        <span className="govuk-caption-m">Funding streams</span>
-                        <h3 className="govuk-heading-m">{specification.fundingStreams[0].name}</h3>
-                    </div>
-                    <div>
-                        <span className="govuk-caption-m">Funding period</span>
-                        <h3 className="govuk-heading-m">{specification.fundingPeriod.name}</h3>
-                    </div>
                     <Details title={`What is ${specification.name}`} body={specification.description} />
                 </div>
                 <div className="govuk-grid-column-one-third">

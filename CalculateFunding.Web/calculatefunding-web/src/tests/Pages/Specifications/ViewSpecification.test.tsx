@@ -146,7 +146,7 @@ describe('<ViewSpecification /> page render checks ', () => {
 
     it('the page header is correct', async () => {
         const {queryAllByText} = renderViewSpecificationPage();
-        await waitFor(() => expect(queryAllByText('A Test Spec Name')[1]).toHaveClass("govuk-heading-l"));
+        await waitFor(() => expect(queryAllByText('A Test Spec Name')[1]).toHaveClass("govuk-heading-xl"));
     });
 
     it('shows approve status in funding line structure tab', async () => {
