@@ -94,7 +94,7 @@ describe("<ViewCalculationResults />", () => {
         it("search value changes when searching for providerName", async () => {
             const {getCalculationProvidersService} = require('../../services/calculationService');
             const {container} = renderViewCalculationResultsPage();
-            const searchQuery = "9";
+            const searchQuery = "999";
 
             const expected1: CalculationProviderSearchRequestViewModel = {
                 calculationId: testCalc1.id,
@@ -120,14 +120,14 @@ describe("<ViewCalculationResults />", () => {
 
             const expected2: CalculationProviderSearchRequestViewModel = {
                 ...expected1,
-                searchTerm: searchQuery
+                searchTerm: searchQuery, searchFields: ["providerName"]
             };
             await waitFor(() => expect(getCalculationProvidersService).toBeCalledWith(expected2))
         });
 
         it("search value changes when searching for urn", async () => {
             const {getCalculationProvidersService} = require('../../services/calculationService');
-            const searchQuery = "9";
+            const searchQuery = "999";
 
             const {container} = renderViewCalculationResultsPage();
 
@@ -152,7 +152,7 @@ describe("<ViewCalculationResults />", () => {
                     "providerSubType": [],
                     "providerType": [],
                     "resultsStatus": [],
-                    "searchFields": [],
+                    "searchFields": ["urn"],
                     "searchMode": 1,
                     "searchTerm": searchQuery
                 }));

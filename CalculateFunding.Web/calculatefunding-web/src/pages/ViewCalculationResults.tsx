@@ -70,7 +70,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         resultsStatus: [],
         searchMode: SearchMode.All,
         searchTerm: "",
-        calculationId: match.params.calculationId,
+        calculationId: "",
         searchFields: []
     });
     const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] =
@@ -118,7 +118,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             };
             setInitialSearch(searchParams);
             setCalculationProviderSearchRequest(searchParams);
-            getCalculationResults(searchParams);
         }
     }, [calculation]);
 
@@ -129,6 +128,12 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             setLocalAuthority(providers.facets[8].facetValues)
         }
     }, [singleFire]);
+
+    useEffect(() => {
+        if (calculationProviderSearchRequest.calculationId != null && calculationProviderSearchRequest.calculationId !== "") {
+            getCalculationResults(calculationProviderSearchRequest);
+        }
+    }, [calculationProviderSearchRequest]);
 
     function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
         setIsLoading(true);
@@ -143,7 +148,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         setCalculationProviderSearchRequest(prevState => {
             return {...prevState, providerType: filterUpdate}
         });
-        getCalculationResults(calculationProviderSearchRequest);
     }
 
     function filterByProviderSubTypes(e: React.ChangeEvent<HTMLInputElement>) {
@@ -159,7 +163,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         setCalculationProviderSearchRequest(prevState => {
             return {...prevState, providerSubType: filterUpdate}
         });
-        getCalculationResults(calculationProviderSearchRequest);
     }
 
     function filterByResultStatus(e: React.ChangeEvent<HTMLInputElement>) {
@@ -178,7 +181,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
         const request = calculationProviderSearchRequest;
         request.errorToggle = filterUpdate;
-        getCalculationResults(request);
     }
 
     function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
@@ -194,26 +196,27 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         setCalculationProviderSearchRequest(prevState => {
             return {...prevState, localAuthority: filterUpdate}
         });
-        getCalculationResults(calculationProviderSearchRequest);
     }
 
     function filterBySearchTerm(searchField: string, searchTerm: string) {
-        setIsLoading(true);
-        let filterUpdate = searchTerm;
-        calculationProviderSearchRequest.searchTerm = filterUpdate;
+        if (searchTerm.length === 0 || searchTerm.length > 2) {
+            setIsLoading(true);
 
-        setCalculationProviderSearchRequest(prevState => {
-            return {...prevState, searchTerm: filterUpdate, searchField: searchField}
-        });
+            let searchFields: string[] = [];
+            if (searchField != null && searchField !== "") {
+                searchFields.push(searchField);
+            }
 
-        getCalculationResults(calculationProviderSearchRequest);
+            setCalculationProviderSearchRequest(prevState => {
+                return {...prevState, searchTerm: searchTerm, searchFields: searchFields}
+            });
+        }
     }
 
     function clearFilters() {
         setCalculationProviderSearchRequest(initialSearch);
         // @ts-ignore
         document.getElementById("searchProviders").reset();
-        getCalculationResults(initialSearch);
     }
 
     function setPagination(e: number) {
@@ -222,8 +225,6 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         setCalculationProviderSearchRequest(prevState => {
             return {...prevState, pageNumber: e}
         });
-
-        getCalculationResults(request);
     }
 
     function getCalculationResults(searchRequestViewModel: CalculationProviderSearchRequestViewModel) {
