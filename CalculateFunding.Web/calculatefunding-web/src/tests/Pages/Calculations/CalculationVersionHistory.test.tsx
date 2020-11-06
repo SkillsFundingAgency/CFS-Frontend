@@ -6,7 +6,7 @@ import {
     CalculationVersionHistory,
     CalculationVersionHistoryRoute
 } from "../../../pages/Calculations/CalculationVersionHistory";
-import {render, screen} from "@testing-library/react";
+import {render, screen, waitFor, within} from "@testing-library/react";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {CalculationDetails} from "../../../types/CalculationDetails";
@@ -15,6 +15,8 @@ import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import * as calcHook from "../../../hooks/Calculations/useCalculation";
 import * as specHook from "../../../hooks/useSpecificationSummary";
+import {CalculationVersionHistorySummary} from "../../../types/Calculations/CalculationVersionHistorySummary";
+import {QueryCache, ReactQueryCacheProvider} from "react-query";
 
 const history = createBrowserHistory();
 const location = createLocation("", "", "", {search: "", pathname: "", hash: "", key: "", state: ""});
@@ -23,7 +25,9 @@ function renderPage() {
     const {CalculationVersionHistory} = require("../../../pages/Calculations/CalculationVersionHistory");
     return render(
         <MemoryRouter>
+            <ReactQueryCacheProvider queryCache={new QueryCache()}>
             <CalculationVersionHistory match={mockRoute} history={history} location={location}/>
+            </ReactQueryCacheProvider>
         </MemoryRouter>);
 }
 
@@ -31,6 +35,7 @@ describe("<CalculationVersionHistory> tests", () => {
     beforeEach(() => {
         mockSpecification();
         mockCalculation();
+        mockCalcService();
 
         renderPage();
     });
@@ -60,8 +65,24 @@ describe("<CalculationVersionHistory> tests", () => {
         expect(link).toBeInTheDocument();
         expect(link.getAttribute("href")).toBe(`/Specifications/EditCalculation/${testCalc.id}`);
     });
+
+    it('calls the calculation versions correctly', async () => {
+        await waitFor(() => expect(mockCalcVersionCall).toHaveBeenCalledWith(testCalc.id));
+    });
+
+    it('renders the calculation versions correctly', async () => {
+        await waitFor(() => expect(mockCalcVersionCall).toHaveBeenCalledWith(testCalc.id));
+        
+        const resultsTableBody = screen.getByTestId("calc-versions");
+        expect(resultsTableBody).toBeInTheDocument();
+        mockTestCalcVersions.map(calcVersion => {
+            const row = screen.getByText(calcVersion.version.toString()).closest("tr") as HTMLTableRowElement;
+            expect(within(row).getByText(calcVersion.publishStatus)).toBeInTheDocument();
+            expect(within(row).getByText(calcVersion.author.name)).toBeInTheDocument();
+        })
+    });
 });
-    
+
 
 const fundingStream: FundingStream = {
     name: "FS123",
@@ -93,7 +114,7 @@ const testCalc: CalculationDetails = {
     namespace: "TestNamespace",
     wasTemplateCalculation: true,
     description: "Test Description",
-    publishStatus: PublishStatus.Draft,
+    publishStatus: PublishStatus.Approved,
     lastUpdated: new Date(),
     author: null,
     sourceCode: "",
@@ -122,3 +143,44 @@ const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
         isFetchingSpecification: false,
         isSpecificationFetched: true
     }));
+const mockTestCalcVersions: CalculationVersionHistorySummary[] = [{
+    calculationId: "Calc0001",
+    calculationType: testCalc.calculationType,
+    description: "lorem ipsum",
+    author: {id: "123", name: "Bob"},
+    lastUpdated: new Date(),
+    name: testCalc.name,
+    namespace: "Blah blah",
+    publishStatus: PublishStatus.Draft,
+    sourceCode: "a + b",
+    sourceCodeName: "blah",
+    version: 34252,
+    wasTemplateCalculation: false
+}, {
+    calculationId: testCalc.id,
+    calculationType: testCalc.calculationType,
+    description: null,
+    author: {id: "", name: "TestUser3"},
+    lastUpdated: new Date(),
+    name: testCalc.name,
+    namespace: "Blah blah",
+    publishStatus: PublishStatus.Approved,
+    sourceCode: "a + b + c",
+    sourceCodeName: "blah",
+    version: 99999,
+    wasTemplateCalculation: false
+}];
+const mockCalcVersionCall =  jest.fn(() => Promise.resolve({
+    data: mockTestCalcVersions,
+    status: 200
+}))
+const mockCalcService = () => {
+    jest.mock("../../../services/calculationService", () => {
+        const mockService = jest.requireActual("../../../services/calculationService");
+
+        return {
+            ...mockService,
+            getCalculationVersionHistoryService: mockCalcVersionCall
+        }
+    });
+};

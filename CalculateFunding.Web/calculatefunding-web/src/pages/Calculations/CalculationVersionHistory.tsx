@@ -2,8 +2,6 @@ import {Header} from "../../components/Header";
 import React, {useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
-import {getCalculationVersionHistoryService} from "../../services/calculationService";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {CalculationVersionHistorySummary} from "../../types/Calculations/CalculationVersionHistorySummary";
 import {DateFormatter} from "../../components/DateFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -15,6 +13,9 @@ import {useCalculation} from "../../hooks/Calculations/useCalculation";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {Link} from "react-router-dom";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useQuery} from "react-query";
+import {AxiosError} from "axios";
+import {getCalculationVersionHistoryService} from "../../services/calculationService";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -26,26 +27,20 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
     const {calculation, isLoadingCalculation} =
         useCalculation(calculationId, err => addErrorMessage(err.message, "Error while loading calculation"));
     const {specification, isLoadingSpecification} =
-        useSpecificationSummary(calculation ? calculation.specificationId : "", 
-                err => addErrorMessage(err.message, "Error while loading specification"));
-    const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(true);
+        useSpecificationSummary(calculation ? calculation.specificationId : "",
+            err => addErrorMessage(err.message, "Error while loading specification"));
+    const {data: calculationVersionHistory, isLoading: isLoadingVersions} =
+        useQuery<CalculationVersionHistorySummary[], AxiosError>(
+            `calc-${calculationId}-versions`,
+            async () => (await getCalculationVersionHistoryService(calculationId)).data,
+            {
+                onError: err => addErrorMessage(err.message, "Error while loading calculation versions")
+            });
+
     const [checkedVersions, setCheckedVersions] = useState<string[]>([]);
     const [disableCompare, setDisableCompare] = useState<boolean>(true);
-    const [calculationVersionHistory, setCalculationVersionHistory] = useState<CalculationVersionHistorySummary[]>([]);
     let history = useHistory();
-
-    function populateCalculationVersionHistory(calculationId: string) {
-        getCalculationVersionHistoryService(calculationId).then((result) => {
-            const response = result.data as CalculationVersionHistorySummary[];
-            setCalculationVersionHistory(response);
-            setIsLoadingVersions(false);
-        })
-    }
-
-    useEffectOnce(() => {
-        populateCalculationVersionHistory(calculationId);
-    })
-
+    
     function selectVersion(e: React.ChangeEvent<HTMLInputElement>) {
         const selectedVersion = e.target.value;
         let versions = checkedVersions;
@@ -76,10 +71,10 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
 
     return <div><Header location={Section.Specifications}/>
         {(isLoadingCalculation || isLoadingSpecification || isLoadingVersions) &&
-        <LoadingStatus title={isLoadingCalculation ? "Loading calculation version history" : "Loading"}
-                       description={"Please wait"} />
+        <LoadingStatus title={isLoadingCalculation ? "Loading calculation" : isLoadingVersions ? "Loading calculation version history" : "Loading specification"}
+                       description={"Please wait"}/>
         }
-        <MultipleErrorSummary errors={errors} />
+        <MultipleErrorSummary errors={errors}/>
         <div className="govuk-width-container">
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
@@ -123,8 +118,8 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                             <th scope="col" className="govuk-table__header">Author</th>
                         </tr>
                         </thead>
-                        <tbody className="govuk-table__body">
-                        {calculationVersionHistory.map(cvh =>
+                        <tbody className="govuk-table__body" data-testid="calc-versions">
+                        {calculationVersionHistory && calculationVersionHistory.map(cvh =>
                             <tr className="govuk-table__row" key={cvh.version}>
                                 <th scope="row" className="govuk-table__header">
                                     <div className="govuk-checkboxes__item govuk-checkboxes--small">

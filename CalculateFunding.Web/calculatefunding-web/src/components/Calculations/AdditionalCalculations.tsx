@@ -61,7 +61,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
         }).then((response) => {
             setAdditionalCalculations(response.data);
             setIsLoadingAdditionalCalculations(false);
-        }).catch((err) => props.addError(err.toString(), "additional-calculations", "Error while fetching additional calculations"));
+        }).catch((err) => props.addError(err.toString(), "Error while fetching additional calculations", "additional-calculations"));
     }
 
     function movePage(pageNumber: number) {
