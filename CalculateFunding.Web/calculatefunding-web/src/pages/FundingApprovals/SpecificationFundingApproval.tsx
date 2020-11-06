@@ -132,15 +132,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     hasJobError={hasJobError}
                     jobError={jobError}/>
                 }
-                
-                <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-padding-top-5">
-                    <div className="govuk-grid-column-two-thirds">
-                        <SpecificationSummarySection
-                            specification={specification}
-                            isLoadingSpecification={isLoadingSpecification}
-                        />
-                    </div>
-                </div>
+
+                <SpecificationSummarySection
+                    specification={specification}
+                    isLoadingSpecification={isLoadingSpecification}
+                />
 
                 {!isConfirmingApproval && !isConfirmingRelease &&
                 <div className="govuk-grid-row">

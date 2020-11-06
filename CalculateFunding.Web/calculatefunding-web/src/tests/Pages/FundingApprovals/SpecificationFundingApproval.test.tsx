@@ -209,10 +209,8 @@ describe("<SpecificationFundingApproval />", () => {
         it('renders Specification details', async () => {
             expect(screen.getByTestId("specName")).toBeInTheDocument();
             expect(screen.getByTestId("specName")).toHaveTextContent(testSpec.name);
-            expect(screen.getByTestId("fundingPeriodName")).toBeInTheDocument();
-            expect(screen.getByTestId("fundingPeriodName")).toHaveTextContent(testSpec.fundingPeriod.name);
-            expect(screen.getByTestId("fundingStreamName")).toBeInTheDocument();
-            expect(screen.getByTestId("fundingStreamName")).toHaveTextContent(testSpec.fundingStreams[0].name);
+            expect(screen.getByTestId("fundingDetails")).toBeInTheDocument();
+            expect(screen.getByTestId("fundingDetails")).toHaveTextContent(`${testSpec.fundingStreams[0].name} for ${testSpec.fundingPeriod.name}`);
         });
     });
 
