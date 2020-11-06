@@ -251,7 +251,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         </Tabs.Panel>
                         <Tabs.Panel label="release-timetable">
                             <section className="govuk-tabs__panel">
-                                <ReleaseTimetable specificationId={specificationId} />
+                                <ReleaseTimetable specificationId={specificationId}
+                                    addErrorMessage={addErrorMessage} clearErrorMessages={clearErrorMessages} />
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>

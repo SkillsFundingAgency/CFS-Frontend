@@ -7,10 +7,14 @@ import {ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../../types/Re
 import {SaveReleaseTimetableViewModel} from "../../types/SaveReleaseTimetableViewModel";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {ConfirmationPanel} from "../../components/ConfirmationPanel";
-import {useErrors} from "../../hooks/useErrors";
-import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
-export function ReleaseTimetable(props: {specificationId: string}) {
+export interface ReleaseTimetableProps {
+    specificationId: string,
+    addErrorMessage: (errorMessage: any, description?: string, fieldName?: string) => void,
+    clearErrorMessages: (fieldNames?: string[]) => void,
+}
+
+export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMessages}: ReleaseTimetableProps) {
     const [navisionDate, setNavisionDate] = useState<Date>(new Date(0));
     const [releaseDate, setReleaseDate] = useState<Date>(new Date(0));
     const [navisionTime, setNavisionTime] = useState<string>("");
@@ -18,13 +22,12 @@ export function ReleaseTimetable(props: {specificationId: string}) {
     const [canTimetableBeUpdated, setCanTimetableBeUpdated] = useState(true);
     const [isSavingReleaseTimetable, setIsSavingReleaseTimetable] = useState<boolean>(false);
     const [saveSuccessful, setSaveSuccessful] = useState<boolean>(false);
-    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
 
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
 
     useEffect(() => {
-        if (props.specificationId !== "") {
-            getReleaseTimetableForSpecificationService(props.specificationId)
+        if (specificationId !== "") {
+            getReleaseTimetableForSpecificationService(specificationId)
                 .then((response) => {
                     if (response.status === 200) {
                         let result = response.data as ReleaseTimetableSummary;
@@ -37,7 +40,7 @@ export function ReleaseTimetable(props: {specificationId: string}) {
                     }
                 });
         }
-    }, [props.specificationId]);
+    }, [specificationId]);
 
     useEffect(() => {
         if (navisionDate === new Date(0) || releaseDate === new Date(0)) {
@@ -85,7 +88,8 @@ export function ReleaseTimetable(props: {specificationId: string}) {
         setCanTimetableBeUpdated(false);
 
         if (!navisionDate || !releaseDate || navisionTime.length === 0 || releaseTime.length === 0) {
-            addErrorMessage("Please a enter release date and time for funding and statement.");
+            addErrorMessage("Please a enter release date and time for funding and statement", undefined, "release-timetable");
+            window.scrollTo(0, 0);
             return;
         }
 
@@ -94,7 +98,7 @@ export function ReleaseTimetable(props: {specificationId: string}) {
         let navisionDateTime = updateDateWithTime(navisionDate, navisionTime);
         let releaseDateTime = updateDateWithTime(releaseDate, releaseTime);
         saveReleaseTimetable = {
-            specificationId: props.specificationId,
+            specificationId: specificationId,
             statementDate: navisionDateTime,
             fundingDate: releaseDateTime
         };
@@ -105,9 +109,10 @@ export function ReleaseTimetable(props: {specificationId: string}) {
             setReleaseDate(DateTime.fromISO(result.earliestPaymentAvailableDate).toJSDate());
             setNavisionDate(DateTime.fromISO(result.externalPublicationDate).toJSDate());
             setSaveSuccessful(true);
-            clearErrorMessages();
+            clearErrorMessages(["release-timetable"]);
         } catch (error) {
-            addErrorMessage(error.message)
+            addErrorMessage(error.message, undefined, "release-timetable");
+            window.scrollTo(0, 0);
         } finally {
             setIsSavingReleaseTimetable(false);
         }
@@ -122,7 +127,6 @@ export function ReleaseTimetable(props: {specificationId: string}) {
         <LoadingStatus title={"Saving Release Timetable"} description={"Please wait whilst we save your changes"} hidden={!isSavingReleaseTimetable} />
         <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"} hidden={!saveSuccessful} />
         <div className={"govuk-form-group"} hidden={isSavingReleaseTimetable}>
-            <MultipleErrorSummary errors={errors} />
             <fieldset className="govuk-fieldset" role="group"
                 aria-describedby="passport-issued-hint">
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
