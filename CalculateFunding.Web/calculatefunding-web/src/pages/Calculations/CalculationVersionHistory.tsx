@@ -152,7 +152,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                 </div>
             </div>
             <Link className="govuk-link govuk-back-link govuk-link--no-visited-state"
-                  to={`Specifications/EditCalculation/${calculationId}`}>
+                  to={`/Specifications/EditCalculation/${calculationId}`}>
                 Back
             </Link>
         </div>

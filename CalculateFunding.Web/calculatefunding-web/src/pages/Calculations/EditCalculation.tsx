@@ -61,7 +61,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
     const onSaveCalculation = async () => {
         if (!calculationState || !calculation || !calculation.valueType) {
             return;
-        } else if (calculationState.isDirty && !calculationState.calculationBuild.buildSuccess) {
+        } else if (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) {
             addErrorMessage("Please build your calculation source code to check it is valid", "Unvalidated source code", "source-code");
             return;
         }
@@ -77,13 +77,16 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         updateCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
             .then((result) => {
                 if (result.status === 200) {
-                    history.push(`/ViewSpecification/${specificationId}`);
+                    history.go(0);
                 } else {
                     addErrorMessage(result.data, "Failed to save calculation");
+                    setIsSaving(false);
                 }
             })
-            .catch((err) => addErrorMessage(err, "Failed to save calculation"))
-            .finally(() => setIsSaving(false));
+            .catch((err) => {
+                addErrorMessage(err, "Failed to save calculation");
+                setIsSaving(false);
+            });
     }
 
     const onApproveCalculation = async () => {
@@ -122,7 +125,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
     initCalculationData();
     
-    useConfirmLeavePage(!isSaving && calculation !== undefined && calculationState !== undefined && calculationState.isDirty);
+    useConfirmLeavePage(!isSaving && calculationState !== undefined && calculationState.isDirty);
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -135,13 +138,14 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 }
                 <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`}/>
             </Breadcrumbs>
+            
             <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingCalculation || isLoadingSpecification}/>
 
             {(isApproving || isSaving) && calculation &&
             <LoadingStatus title={isSaving ? `Saving ${calculation.calculationType} calculation` : `Approving ${calculation.calculationType} calculation`} 
                            subTitle="Please wait whilst the calculation is updated" />
             }
-
+            
             <MultipleErrorSummary errors={errors}/>
 
             <fieldset className="govuk-fieldset" hidden={isSaving || isApproving}>
@@ -206,9 +210,9 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     <CalculationResultsLink calculationId={calculationId}/>
                 </div>
 
-                {calculationState && calculationState.isDirty && !calculationState?.calculationBuild.buildSuccess &&
+                {calculationState && calculationState.isDirty && !calculationState?.calculationBuild.hasCodeBuiltSuccessfully &&
                 <div className={"govuk-form-group" +
-                ((calculationState.calculationBuild.compileRun && !calculationState.calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
+                ((calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) ? " govuk-form-group--error" : "")}>
                     <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
                 </div>}
 
@@ -222,7 +226,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     <div className="govuk-grid-column-two-thirds">
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onSaveCalculation}
-                                disabled={!calculationState || !calculationState.calculationBuild.buildSuccess || isSaving || !canEditCalculation}>
+                                disabled={!calculationState || !calculationState.calculationBuild.hasCodeBuiltSuccessfully || isSaving || !canEditCalculation}>
                             Save and continue
                         </button>
 

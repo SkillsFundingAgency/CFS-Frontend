@@ -31,8 +31,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         isDirty: false,
         errorMessage: "",
         calculationBuild: {
-            buildSuccess: false,
-            compileRun: false,
+            hasCodeBuiltSuccessfully: undefined,
             previewResponse: undefined
         }
     });
@@ -43,7 +42,12 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                 return {
                     ...prevState,
                     sourceCode: props.originalSourceCode,
-                    isDirty: false
+                    isDirty: false,
+                    isBuilding: false,
+                    calculationBuild: {
+                        hasCodeBuiltSuccessfully: undefined,
+                        previewResponse: undefined
+                    }
                 }
             });
         }
@@ -61,8 +65,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                         return {
                             ...prevState,
                             calculationBuild: {
-                                buildSuccess: result.status === 200 && result.data?.compilerOutput?.success,
-                                compileRun: true,
+                                hasCodeBuiltSuccessfully: result.status === 200 && result.data?.compilerOutput?.success === true,
                                 previewResponse: result.data
                             },
                             errorMessage: result.status !== 200 && result.status !== 400 ?
@@ -76,8 +79,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                         return {
                             ...prevState,
                             calculationBuild: {
-                                buildSuccess: false,
-                                compileRun: false,
+                                hasCodeBuiltSuccessfully: false,
                                 previewResponse: undefined
                             },
                             errorMessage: err.toString(),
@@ -95,8 +97,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                     ...prevState,
                     sourceCode: newSourceCode,
                     calculationBuild: {
-                        buildSuccess: false,
-                        compileRun: false,
+                        hasCodeBuiltSuccessfully: undefined,
                         previewResponse: undefined
                     },
                     isDirty: props.originalSourceCode !== newSourceCode
@@ -115,7 +116,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
     };
 
     return <div id="source-code"
-                className={"govuk-form-group" + ((state.calculationBuild.compileRun && !state.calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
+                className={"govuk-form-group" + ((state.calculationBuild.hasCodeBuiltSuccessfully === false) ? " govuk-form-group--error" : "")}>
         <h3 className="govuk-caption-m govuk-!-font-weight-bold">
             Calculation script
         </h3>
@@ -140,17 +141,17 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         </button>
         <LoadingFieldStatus title={"Building source code"} hidden={!state.isBuilding}/>
 
-        {state.calculationBuild.compileRun &&
-        <div className={"govuk-inset-text" + ((state.calculationBuild.compileRun && !state.calculationBuild.buildSuccess) ? " govuk-form-group--error" : "")}>
+        {state.calculationBuild.hasCodeBuiltSuccessfully !== undefined &&
+        <div className={"govuk-inset-text" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
             <label className="govuk-label" htmlFor="build-output">
                 <h4 className="govuk-heading-s">
                     Build output
                 </h4>
             </label>
-            {state.calculationBuild.buildSuccess &&
+            {state.calculationBuild.hasCodeBuiltSuccessfully &&
             <p id="build-output" className="govuk-body">Code compiled successfully </p>
             }
-            {!state.calculationBuild.buildSuccess && state.calculationBuild.previewResponse &&
+            {!state.calculationBuild.hasCodeBuiltSuccessfully && state.calculationBuild.previewResponse &&
             <CompilationErrorMessageList compilerMessages={state.calculationBuild.previewResponse.compilerOutput.compilerMessages}/>
             }
         </div>

@@ -51,7 +51,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
     function onSaveCalculation() {
         if (!calculationState) {
             return;
-        } else if (calculationState.isDirty && !calculationState.calculationBuild.buildSuccess) {
+        } else if (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) {
             addErrorMessage("Please build your calculation source code to check it is valid", "Unvalidated source code", "source-code");
             return;
         } else if (additionalCalculationName === "" || additionalCalculationName.length < 4 || additionalCalculationName.length > 180) {
@@ -146,7 +146,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                 />
                 }
 
-                {calculationState && calculationState.isDirty && !calculationState.calculationBuild.buildSuccess &&
+                {calculationState && calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully &&
                 <div className="govuk-form-group govuk-form-group--error">
                     <div className="govuk-body">Your calculation’s build output must be successful before you can save it</div>
                 </div>
@@ -156,7 +156,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                     <div className="govuk-grid-column-two-thirds">
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onSaveCalculation}
-                                disabled={!calculationState || (calculationState.isDirty && !calculationState.calculationBuild.buildSuccess) || isSaving || !canCreateAdditionalCalculation}>
+                                disabled={!calculationState || (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) || isSaving || !canCreateAdditionalCalculation}>
                             Save and continue
                         </button>
 
