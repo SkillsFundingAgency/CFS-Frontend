@@ -26,20 +26,23 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
     let saveReleaseTimetable: SaveReleaseTimetableViewModel;
 
     useEffect(() => {
-        if (specificationId !== "") {
-            getReleaseTimetableForSpecificationService(specificationId)
-                .then((response) => {
-                    if (response.status === 200) {
-                        let result = response.data as ReleaseTimetableSummary;
-                        if (result.content.earliestPaymentAvailableDate != null) {
-                            setReleaseDate(DateTime.fromISO(result.content.earliestPaymentAvailableDate).toJSDate());
-                        }
-                        if (result.content.externalPublicationDate != null) {
-                            setNavisionDate(DateTime.fromISO(result.content.externalPublicationDate).toJSDate());
-                        }
-                    }
-                });
+        async function getReleaseTimetable() {
+            try {
+                const response = await getReleaseTimetableForSpecificationService(specificationId);
+                let result = response.data as ReleaseTimetableSummary;
+                if (result.content.earliestPaymentAvailableDate != null) {
+                    setReleaseDate(DateTime.fromISO(result.content.earliestPaymentAvailableDate).toJSDate());
+                }
+                if (result.content.externalPublicationDate != null) {
+                    setNavisionDate(DateTime.fromISO(result.content.externalPublicationDate).toJSDate());
+                }
+            }
+            catch (error) {
+                addErrorMessage(error.message, undefined, "release-timetable");
+            }
         }
+
+        getReleaseTimetable();
     }, [specificationId]);
 
     useEffect(() => {
@@ -84,15 +87,14 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
     }
 
     async function confirmChanges() {
-        setSaveSuccessful(false);
-        setCanTimetableBeUpdated(false);
-
         if (!navisionDate || !releaseDate || navisionTime.length === 0 || releaseTime.length === 0) {
             addErrorMessage("Please a enter release date and time for funding and statement", undefined, "release-timetable");
             window.scrollTo(0, 0);
             return;
         }
 
+        setSaveSuccessful(false);
+        setCanTimetableBeUpdated(false);
         setIsSavingReleaseTimetable(true);
 
         let navisionDateTime = updateDateWithTime(navisionDate, navisionTime);

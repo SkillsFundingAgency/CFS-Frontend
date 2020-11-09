@@ -1,6 +1,6 @@
 export interface Content {
-    externalPublicationDate: string;
-    earliestPaymentAvailableDate: string;
+    externalPublicationDate?: string;
+    earliestPaymentAvailableDate?: string;
 }
 
 export interface ReleaseTimetableSummary {
