@@ -149,41 +149,42 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
             <MultipleErrorSummary errors={errors}/>
 
             <fieldset className="govuk-fieldset" hidden={isSaving || isApproving}>
-                <div className="govuk-form-group">
-                    <span className="govuk-caption-l">
-                        Calculation name
-                    </span>
+
+                <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                    <span className="govuk-caption-l">Calculation name</span>
                     <h2 id="calculation-name-title" className={"govuk-heading-l"}>
                         {!isLoadingCalculation && calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
                     </h2>
-                </div>
+                </legend>
 
                 <div id="calculation-status"
-                     className={"govuk-form-group" + (errors.some(err => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")}>
+                     className={"govuk-grid-row govuk-!-margin-bottom-2 govuk-form-group" + (errors.some(err => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")}>
                     <span className="govuk-error-message">
                         <span className="govuk-visually-hidden">Error:</span> {errors.find(err => err.fieldName === "calculation-status")}
                     </span>
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-one-quarter">
-                            <h3 className="govuk-caption-m govuk-!-font-weight-bold">Calculation status</h3>
-                        </div>
-                        <div className="govuk-grid-column-one-quarter">
-                            <span className="govuk-tag govuk-tag--green govuk-!-margin-top-4">
-                                {!isLoadingCalculation && calculationStatus ? calculationStatus : <LoadingFieldStatus title="Loading..."/>}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="govuk-grid-row">
-                        <div className="govuk-grid-column-one-quarter">
-                            <h3 className="govuk-caption-m govuk-!-font-weight-bold">
-                                Value type
-                            </h3>
-                        </div>
-                        <div className="govuk-grid-column-one-quarter">
-                            <h3 className="govuk-caption-m govuk-">
-                                {!isLoadingCalculation && calculation ? calculation.valueType : <LoadingFieldStatus title="Loading..."/>}
-                            </h3>
-                        </div>
+                    <div className="govuk-grid-column-full">
+                        <dl className="govuk-summary-list govuk-summary-list--no-border">
+                            <div className="govuk-summary-list__row">
+                                <dt className="govuk-summary-list__key">
+                                    Calculation status
+                                </dt>
+                                <dd className="govuk-summary-list__value">
+                                    <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2 calc-status">
+                                        {!isLoadingCalculation && calculationStatus ? calculationStatus : <LoadingFieldStatus title="Loading..."/>}
+                                    </strong>
+                                </dd>
+                            </div>
+
+                            <div className="govuk-summary-list__row">
+                                <dt className="govuk-summary-list__key">
+                                    Value type
+                                </dt>
+                                <dd className="govuk-summary-list__value">
+                                    {!isLoadingCalculation && calculation ? calculation.valueType : <LoadingFieldStatus title="Loading..."/>}
+                                </dd>
+                            </div>
+                        </dl>
+
                     </div>
                 </div>
 
@@ -206,9 +207,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 />
                 }
 
-                <div className="govuk-form-group">
-                    <CalculationResultsLink calculationId={calculationId}/>
-                </div>
+                <CalculationResultsLink calculationId={calculationId}/>
 
                 {calculationState && calculationState.isDirty && !calculationState?.calculationBuild.hasCodeBuiltSuccessfully &&
                 <div className={"govuk-form-group" +
@@ -245,15 +244,13 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 </div>
 
                 {calculation &&
-                <div className={"govuk-form-group"}>
-                    <span id="last-saved-date" className={"govuk-body"}>
+                <p id="last-saved-date" className={"govuk-body"}>
                     Last saved <DateFormatter date={calculation.lastUpdated} utc={false}/>
-                    </span>
-                </div>
+                </p>
                 }
 
                 <div className={"govuk-form-group"}>
-                    <Link className="govuk-link" to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
+                    <Link className="govuk-body" to={`/Calculations/CalculationVersionHistory/${calculationId}`}>View calculation history</Link>
                 </div>
 
             </fieldset>

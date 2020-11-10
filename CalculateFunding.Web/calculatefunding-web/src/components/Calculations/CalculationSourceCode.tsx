@@ -116,10 +116,10 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
     };
 
     return <div id="source-code"
-                className={"govuk-form-group" + ((state.calculationBuild.hasCodeBuiltSuccessfully === false) ? " govuk-form-group--error" : "")}>
-        <h3 className="govuk-caption-m govuk-!-font-weight-bold">
+                className={"govuk-form-group govuk-!-margin-bottom-0 govuk-!-margin-top-3" + ((state.calculationBuild.hasCodeBuiltSuccessfully === false) ? " govuk-form-group--error" : "")}>
+        <h4 className="govuk-heading-s">
             Calculation script
-        </h3>
+        </h4>
         {!props.excludeMonacoEditor &&
         <GdsMonacoEditor
             value={state.sourceCode}
@@ -142,7 +142,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         <LoadingFieldStatus title={"Building source code"} hidden={!state.isBuilding}/>
 
         {state.calculationBuild.hasCodeBuiltSuccessfully !== undefined &&
-        <div className={"govuk-inset-text" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
+        <div className={"govuk-textarea" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
             <label className="govuk-label" htmlFor="build-output">
                 <h4 className="govuk-heading-s">
                     Build output

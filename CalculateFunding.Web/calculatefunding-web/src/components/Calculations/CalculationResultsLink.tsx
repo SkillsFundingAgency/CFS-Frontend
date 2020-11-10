@@ -53,7 +53,7 @@ export function CalculationResultsLink(props: { calculationId: string }) {
 
     return <>
         <LoadingFieldStatus title={"Checking for calculation results"} hidden={!isLoading} />
-        <Link to={`/ViewCalculationResults/${props.calculationId}`} className="govuk-link" hidden={isLoading || calculationProvidersResult.totalResults < 1}>View calculation results</Link>
+        <Link to={`/ViewCalculationResults/${props.calculationId}`} className="govuk-body" hidden={isLoading || calculationProvidersResult.totalResults < 1}>View calculation results</Link>
         <div hidden={isLoading || calculationProvidersResult.totalResults !== 0}>
             <span className="govuk-error-message">There are currently no calculation results available</span>
         </div>
