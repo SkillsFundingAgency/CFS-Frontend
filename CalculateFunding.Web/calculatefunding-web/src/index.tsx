@@ -8,8 +8,10 @@ import { composeWithDevTools } from "redux-devtools-extension";
 import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
 import {initialiseAppInsights} from "./services/appInsightsService";
+import {initialiseAxios} from './services/axiosInterceptor';
 
 initialiseAppInsights();
+initialiseAxios();
 
 let middleware = [thunk as ThunkMiddleware<IStoreState>];
 

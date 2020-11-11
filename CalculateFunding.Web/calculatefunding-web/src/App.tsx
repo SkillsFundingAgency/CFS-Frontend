@@ -4,7 +4,6 @@ import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {IStoreState} from './reducers/rootReducer';
 import {FeatureFlagsState} from './states/FeatureFlagsState';
 import {getHasUserConfirmedSkills, getUserFundingStreamPermissions} from "./actions/userAction";
-import {initialiseAxios} from './services/axiosInterceptor';
 import './App.scss'
 import {Footer} from "./components/Footer";
 import {Section} from "./types/Sections";
@@ -66,8 +65,6 @@ const App: React.FunctionComponent = () => {
     let hasConfirmedSkills: boolean | undefined = useSelector((state: IStoreState) => state.userState && state.userState.hasConfirmedSkills);
     const dispatch = useDispatch();
 
-    initialiseAxios();
-    
     useEffect(() => {
         dispatch(getHasUserConfirmedSkills());
     }, []);
