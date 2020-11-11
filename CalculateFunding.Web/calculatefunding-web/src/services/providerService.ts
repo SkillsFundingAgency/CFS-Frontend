@@ -2,7 +2,6 @@ import axios, {AxiosResponse} from "axios"
 import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
 import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
-import {ProviderProfileTotalsForStreamAndPeriod} from "../types/ProviderProfileTotalsForStreamAndPeriod";
 
 let baseURL = "/api/provider";
 

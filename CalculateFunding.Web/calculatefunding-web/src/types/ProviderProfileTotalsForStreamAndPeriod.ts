@@ -16,7 +16,8 @@ export interface FundingStreamPeriodProfilePattern {
     fundingPeriodId: string,
     fundingStreamId: string,
     fundingLineId: string,
-    profilePatternKey: string,
+    roundingStrategy: string,
+    profilePatternKey: string | null,
     fundingStreamPeriodStartDate: Date,
     fundingStreamPeriodEndDate: Date,
     reProfilePastPeriods: boolean,
@@ -24,6 +25,7 @@ export interface FundingStreamPeriodProfilePattern {
     allowUserToEditProfilePattern: boolean,
     profilePattern: ProfilePeriodPattern[],
     profilePatternDisplayName: string,
+    profilePatternDescription: string | null,
     providerTypeSubTypes: ProviderTypeSubType[],
     id: string
 }

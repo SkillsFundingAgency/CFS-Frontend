@@ -7,12 +7,7 @@ const baseUrl = "/api/publishedproviderfundinglinedetails";
 
 export async function getFundingLinePublishedProviderDetails(specificationId: string, providerId: string,
     fundingStreamId: string, fundingLineCode: string): Promise<AxiosResponse<FundingLineProfile>> {
-    return axios(`${baseUrl}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+    return axios.get<FundingLineProfile>(`${baseUrl}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}`);
 }
 
 export async function applyCustomProfile(profile: ApplyCustomProfileRequest) {

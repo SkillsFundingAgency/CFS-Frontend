@@ -50,6 +50,7 @@ import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
 import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculationVersions";
 import {ViewFundingLineProfile} from "./pages/FundingApprovals/ViewFundingLineProfile";
+import {ChangeProfileType} from "./pages/FundingApprovals/ChangeProfileType";
 import {
     QueryCache,
     ReactQueryCacheProvider,
@@ -107,6 +108,8 @@ const App: React.FunctionComponent = () => {
                         <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
                         <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
                         <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
+                               component={ChangeProfileType}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
                                component={ViewFundingLineProfile}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"

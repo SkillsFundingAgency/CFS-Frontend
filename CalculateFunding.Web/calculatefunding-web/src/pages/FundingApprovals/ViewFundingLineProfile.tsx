@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useHistory} from "react-router";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -16,7 +16,7 @@ import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {IStoreState} from "../../reducers/rootReducer";
 import {DateFormatter} from "../../components/DateFormatter";
 import {PermissionStatus} from "../../components/PermissionStatus";
-import {EditableProfileTotal} from "./EditableProfileTotal";
+import {EditableProfileTotal} from "../../components/Funding/EditableProfileTotal";
 import {cloneDeep} from "lodash";
 import {ApplyCustomProfileRequest, ProfilePeriodType} from "../../types/PublishedProvider/ApplyCustomProfileRequest";
 import {ProfileTotal} from "../../types/FundingLineProfile";
@@ -39,6 +39,8 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
     const fundingLineId = match.params.fundingLineId;
     const providerId = match.params.providerId;
     const providerVersionId = match.params.providerVersionId;
+
+    let history = useHistory();
 
     const [fundingLineProfile, setFundingLineProfile] = useState<FundingLineProfile>();
     const [editedFundingLineProfile, setEditedFundingLineProfile] = useState<FundingLineProfile>();
@@ -142,6 +144,10 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
         setIsEditMode(false);
     }
 
+    const handleChangeToRuleBasedProfileClick = () => {
+        history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/change-profile-type`);
+    }
+
     function updateProfileTotal(instalmentNumber: number, newProfileTotal: ProfileTotal) {
         if (!editedFundingLineProfile) return;
         let cloneOfFundingLineProfile: FundingLineProfile = cloneDeep(editedFundingLineProfile);
@@ -202,7 +208,8 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
 
     const fundingLineName = fundingLineProfile && fundingLineProfile.fundingLineName ?
         fundingLineProfile.fundingLineName : "Missing funding line name";
-    const remainingAmount = fundingLineProfile && fundingLineProfile.remainingAmount !== undefined ?
+    const remainingAmount = fundingLineProfile &&
+        fundingLineProfile.remainingAmount !== undefined && fundingLineProfile.remainingAmount !== null ?
         fundingLineProfile.remainingAmount : 0;
     const originalCarryForwardAmount = fundingLineProfile && fundingLineProfile.carryOverAmount !== null ?
         fundingLineProfile.carryOverAmount : 0;
@@ -357,13 +364,14 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
                             </div>
                             <div className="govuk-grid-row">
                                 <div className="govuk-grid-column-two-thirds">
-                                    <button className="govuk-button govuk-!-margin-right-2" disabled={!canEditProfile}
+                                    <button className="govuk-button govuk-!-margin-right-1" disabled={!canEditProfile}
                                         onClick={handleEditProfileClick} data-testid="edit-profile-btn">
                                         {isEditMode ? "Apply profile" : "Edit profile"}
                                     </button>
-                                    {isEditMode && <button className="govuk-button govuk-button--secondary" onClick={handleCancelClick} data-testid="cancel-btn">
+                                    {isEditMode && <button className="govuk-button govuk-button--secondary govuk-!-margin-right-1" onClick={handleCancelClick} data-testid="cancel-btn">
                                         Cancel
                                     </button>}
+                                    <button className="govuk-button" onClick={handleChangeToRuleBasedProfileClick}>Change to rule based profile</button>
                                 </div>
                             </div>
                         </div>

@@ -23,12 +23,6 @@ export interface ProfileHistoryProps {
     providerVersionId: string;
 }
 
-function useProfileHistory(specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string) {
-    return useQuery<FundingLineChangeViewModel>(
-        [`profile-history`, specificationId, providerId, fundingStreamId, fundingLineCode],
-        getPreviousProfilesForSpecificationForProviderForFundingLine, {retry: 1});
-}
-
 export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>) {
     const fundingStreamId = match.params.fundingStreamId;
     const specificationId = match.params.specificationId;
@@ -38,7 +32,11 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
     const providerVersionId = match.params.providerVersionId;
     const [allExpanded, setAllExpanded] = useState<boolean>(false);
 
-    const {isLoading, isError, error, data} = useProfileHistory(specificationId, providerId, fundingStreamId, fundingLineCode);
+    const {data, isLoading, isError, error} =
+        useQuery<FundingLineChangeViewModel>(`profile-history-${specificationId}-${providerId}-${fundingStreamId}-${fundingLineCode}`,
+            async () => (
+                await getPreviousProfilesForSpecificationForProviderForFundingLine(specificationId, providerId, fundingStreamId, fundingLineCode)).data
+        );
 
     const getErrorMessage = () => {
         let message = "Profiling history could not be loaded.";
@@ -67,7 +65,7 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
             <Header location={Section.Approvals} />
             <div className="govuk-width-container">
                 {isLoading ?
-                    <LoadingStatus title="Loading profiling history"/> :
+                    <LoadingStatus title="Loading profiling history" /> :
                     <>
                         {isError || !data ? <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">

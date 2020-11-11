@@ -89,7 +89,8 @@ const providerResult: ProviderVersionQueryResult = {
     providerVersion: testProvider,
     isLoadingProviderVersion: false,
     errorLoadingProviderVersion: null,
-    isErrorLoadingProviderVersion: false
+    isErrorLoadingProviderVersion: false,
+    isFetchingProviderVersion: false,
 };
 const matchMock: match<ProviderFundingOverviewRoute> = {
     params: {

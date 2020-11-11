@@ -22,7 +22,7 @@ export function formatNumber(value: number, type: NumberType, decimalPlaces: num
     return formattedNumber
 }
 
-export function FormattedNumber(props: {value?: number, type: NumberType, decimalPlaces?: number}) {
+export function FormattedNumber(props: {value?: number, type: NumberType, decimalPlaces?: number | null}) {
     if (props.value === undefined || props.value === null) return <span></span>;
 
     let decimalPoint = props.decimalPlaces != null && props.decimalPlaces !== undefined ? props.decimalPlaces : 2;

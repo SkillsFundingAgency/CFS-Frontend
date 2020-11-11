@@ -1,6 +1,6 @@
 import "../../styles/EditableProfileTotal.scss";
 import React, {useState, useEffect, ChangeEvent} from "react";
-import {formatNumber, FormattedNumber, NumberType} from "../../components/FormattedNumber";
+import {formatNumber, FormattedNumber, NumberType} from "../FormattedNumber";
 import {ProfileTotal} from "../../types/PublishedProvider/FundingLineProfile";
 import {clone} from "lodash";
 import {ErrorMessage} from "../../types/ErrorMessage";

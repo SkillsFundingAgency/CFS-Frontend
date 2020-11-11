@@ -10,7 +10,7 @@ export interface FundingLineProfile {
  providerId: string,
  providerName: string,
  ukprn: string,
- profilePatternKey: string,
+ profilePatternKey: string | null,
  profilePatternName: string,
  profilePatternDescription: string,
  lastUpdatedUser: Reference,

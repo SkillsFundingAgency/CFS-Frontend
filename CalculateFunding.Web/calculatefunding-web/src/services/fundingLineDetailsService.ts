@@ -1,6 +1,6 @@
-import axios, {AxiosResponse} from "axios"
-import {FundingLineChangeViewModel} from "../types/PublishedProvider/FundingLineProfile";
+import axios from "axios";
 import {FundingLineProfile} from "../types/FundingLineProfile";
+import {FundingLineChangeViewModel} from "../types/PublishedProvider/FundingLineProfile";
 
 let baseURL = "/api/publishedproviderfundinglinedetails";
 
@@ -11,24 +11,14 @@ export async function getCurrentProfileConfigService(
     return axios.get<FundingLineProfile[]>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}`);
 }
 
-export async function getPreviousProfilesForSpecificationForProviderForFundingLine(queryKey: string, specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string)
-    : Promise<FundingLineChangeViewModel> {
-    const {data} = await axios(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/changes`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
-    return data;
+export async function getFundingLinePublishedProviderDetails(specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string) {
+    return axios.get<FundingLineProfile>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}`);
 }
 
-export async function getPreviousProfileExistsForSpecificationForProviderForFundingLine(queryKey: string, specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string)
-    : Promise<boolean> {
-    const {data} = await axios(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/change-exists`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-    });
-    return data;
+export async function getPreviousProfilesForSpecificationForProviderForFundingLine(specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string) {
+    return axios.get<FundingLineChangeViewModel>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/changes`);
+}
+
+export async function getPreviousProfileExistsForSpecificationForProviderForFundingLine(specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string) {
+    return axios.get<boolean>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/change-exists`);
 }
