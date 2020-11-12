@@ -200,6 +200,7 @@ namespace CalculateFunding.Frontend
             using (StreamReader iisUrlRewriteStreamReader = File.OpenText("spa-url-rewrite.xml"))
             {
                 RewriteOptions options = new RewriteOptions();
+                options.AddRewrite(@"^assets/fonts/(.*)", "app/assets/fonts/$1", false);
                 options.AddRewrite("^app$", "app/index.html", true);
                 options.AddIISUrlRewrite(iisUrlRewriteStreamReader, true);
 
