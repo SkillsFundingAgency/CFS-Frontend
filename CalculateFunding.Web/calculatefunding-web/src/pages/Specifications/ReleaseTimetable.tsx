@@ -7,14 +7,16 @@ import {ReleaseTimetableSummary, ReleaseTimetableViewModel} from "../../types/Re
 import {SaveReleaseTimetableViewModel} from "../../types/SaveReleaseTimetableViewModel";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {ConfirmationPanel} from "../../components/ConfirmationPanel";
+import {ErrorMessage} from "../../types/ErrorMessage";
 
 export interface ReleaseTimetableProps {
     specificationId: string,
     addErrorMessage: (errorMessage: any, description?: string, fieldName?: string) => void,
     clearErrorMessages: (fieldNames?: string[]) => void,
+    errors: ErrorMessage[],
 }
 
-export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMessages}: ReleaseTimetableProps) {
+export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMessages, errors}: ReleaseTimetableProps) {
     const [navisionDate, setNavisionDate] = useState<Date>(new Date(0));
     const [releaseDate, setReleaseDate] = useState<Date>(new Date(0));
     const [navisionTime, setNavisionTime] = useState<string>("");
@@ -55,10 +57,12 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
 
     function updateNavisionDate(e: Date) {
         setNavisionDate(e);
+        clearErrorMessages(["release-timetable-funding"]);
     }
 
     function updateReleaseDate(e: Date) {
         setReleaseDate(e);
+        clearErrorMessages(["release-timetable-statement"]);
     }
 
     function updateNavisionTime(e: string) {
@@ -86,12 +90,39 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
         return newDate.toJSDate();
     }
 
-    async function confirmChanges() {
-        if (!navisionDate || !releaseDate || navisionTime.length === 0 || releaseTime.length === 0) {
-            addErrorMessage("Please a enter release date and time for funding and statement", undefined, "release-timetable");
-            window.scrollTo(0, 0);
-            return;
+    const isValidForm = (): boolean => {
+        let isValid = true;
+        const now = new Date();
+
+        if (!navisionDate || navisionTime.length === 0) {
+            addErrorMessage("Please enter a release date and time for funding", undefined, "release-timetable-funding");
+            isValid = false;
         }
+
+        if (!releaseDate || releaseTime.length === 0) {
+            addErrorMessage("Please enter a release date and time for statement", undefined, "release-timetable-statement");
+            isValid = false;
+        }
+
+        if (navisionDate < now && navisionDate.getFullYear() !== DateTime.fromMillis(0).year) {
+            addErrorMessage("Release date of funding cannot be in the past", undefined, "release-timetable-funding");
+            isValid = false;
+        }
+
+        if (releaseDate < now && releaseDate.getFullYear() !== DateTime.fromMillis(0).year) {
+            addErrorMessage("Release date of statement cannot be in the past", undefined, "release-timetable-statement");
+            isValid = false;
+        }
+
+        if (!isValid) {
+            window.scrollTo(0, 0);
+        }
+
+        return isValid;
+    }
+
+    async function confirmChanges() {
+        if (!isValidForm()) return;
 
         setSaveSuccessful(false);
         setCanTimetableBeUpdated(false);
@@ -111,7 +142,7 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
             setReleaseDate(DateTime.fromISO(result.earliestPaymentAvailableDate).toJSDate());
             setNavisionDate(DateTime.fromISO(result.externalPublicationDate).toJSDate());
             setSaveSuccessful(true);
-            clearErrorMessages(["release-timetable"]);
+            clearErrorMessages(["release-timetable-funding", "release-timetable-statement"]);
         } catch (error) {
             addErrorMessage(error.message, undefined, "release-timetable");
             window.scrollTo(0, 0);
@@ -128,12 +159,19 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
         </div>
         <LoadingStatus title={"Saving Release Timetable"} description={"Please wait whilst we save your changes"} hidden={!isSavingReleaseTimetable} />
         <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"} hidden={!saveSuccessful} />
-        <div className={"govuk-form-group"} hidden={isSavingReleaseTimetable}>
+        <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "release-timetable-funding").length > 0 ? 'govuk-form-group--error' : ''}`} hidden={isSavingReleaseTimetable}>
             <fieldset className="govuk-fieldset" role="group"
                 aria-describedby="passport-issued-hint">
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h3 id="business-central-title" className="govuk-heading-m">Release date of funding to Business Central?</h3>
                 </legend>
+                {errors.filter(e => e.fieldName === "release-timetable-funding").length === 0 ?
+                    <span id="release-timetable-funding-hint" className="govuk-hint">The name of the calculation</span>
+                    : errors.map(error => error.fieldName === "release-timetable-funding" &&
+                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                        </span>
+                    )}
                 <span id="business-central-date-hint" className="govuk-hint">
                     Set the date and time that the statement will be published externally for this funding stream.
                                             <br />
@@ -147,11 +185,18 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
         <div className="govuk-form-group govuk-!-margin-bottom-9" hidden={isSavingReleaseTimetable}>
             <TimeInput time={navisionDate.getFullYear() != DateTime.fromMillis(0).year ? DateTime.fromJSDate(navisionDate).toFormat("HH") : ""} callback={updateNavisionTime} />
         </div>
-        <div className="govuk-form-group" hidden={isSavingReleaseTimetable}>
+        <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "release-timetable-statement").length > 0 ? 'govuk-form-group--error' : ''}`} hidden={isSavingReleaseTimetable}>
             <fieldset className="govuk-fieldset" role="group">
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h3 id="statement-providers-title" className="govuk-heading-m">Release date of statement to providers?</h3>
                 </legend>
+                {errors.filter(e => e.fieldName === "release-timetable-statement").length === 0 ?
+                    <span id="release-timetable-statement-hint" className="govuk-hint">The name of the calculation</span>
+                    : errors.map(error => error.fieldName === "release-timetable-statement" &&
+                        <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                        </span>
+                    )}
                 <span id="release-date-hint" className="govuk-hint">
                     Set the date and time that the statement will be published externally for this funding stream. <br />
                                             For example, 12 11 2019</span>

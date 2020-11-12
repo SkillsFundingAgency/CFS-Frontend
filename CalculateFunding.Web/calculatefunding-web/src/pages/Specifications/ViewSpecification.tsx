@@ -184,7 +184,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
                     <span className="govuk-caption-l">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
                     {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
-                    <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                        <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
                     }
                 </div>
                 <div className="govuk-grid-column-two-thirds">
@@ -242,7 +242,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel label="release-timetable">
                             <section className="govuk-tabs__panel">
                                 <ReleaseTimetable specificationId={specificationId}
-                                    addErrorMessage={addErrorMessage} clearErrorMessages={clearErrorMessages} />
+                                    addErrorMessage={addErrorMessage}
+                                        clearErrorMessages={clearErrorMessages}
+                                            errors={errors} />
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>
