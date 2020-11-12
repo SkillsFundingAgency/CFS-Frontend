@@ -17,50 +17,6 @@
     <Content Remove="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Scripts\approvals.chooseforfunding.ts" />
-    <None Remove="Scripts\approvals.ts" />
-    <None Remove="Scripts\bindingHandler.monacoDiff.ts" />
-    <None Remove="Scripts\bindingHandler.monacoEditor.ts" />
-    <None Remove="Scripts\bindingHandler.multiselect.ts" />
-    <None Remove="Scripts\bootstrap-multiselect.d.ts" />
-    <None Remove="Scripts\calculationspec.create-edit.ts" />
-    <None Remove="Scripts\common.d.ts" />
-    <None Remove="Scripts\compare.ts" />
-    <None Remove="Scripts\component.approveStatusButton.ts" />
-    <None Remove="Scripts\confirm.funding-specification.ts" />
-    <None Remove="Scripts\createadditionalcalculation.ts" />
-    <None Remove="Scripts\createspecification.ts" />
-    <None Remove="Scripts\dataset-relationships.ts" />
-    <None Remove="Scripts\createdataset.ts" />
-    <None Remove="Scripts\dataset.common.ts" />
-    <None Remove="Scripts\diffeditoroptions.d.ts" />
-    <None Remove="Scripts\edit.specification.ts" />
-    <None Remove="Scripts\editadditionalcalculation.ts" />
-    <None Remove="Scripts\edittemplatecalculation.ts" />
-    <None Remove="Scripts\expander.ts" />
-    <None Remove="Scripts\navbar.ts" />
-    <None Remove="Scripts\notifications.ts" />
-    <None Remove="Scripts\provider.completion.gherkin.ts" />
-    <None Remove="Scripts\provider.completion.vb.ts" />
-    <None Remove="Scripts\releasetimetable.ts" />
-    <None Remove="Scripts\search.additionalCalculations.ts" />
-    <None Remove="Scripts\search.calcuation-results.ts" />
-    <None Remove="Scripts\search.calcuations.ts" />
-    <None Remove="Scripts\search.calculationProviderResults.ts" />
-    <None Remove="Scripts\search.datasetDefinitions.ts" />
-    <None Remove="Scripts\search.datasets.ts" />
-    <None Remove="Scripts\search.providers.ts" />
-    <None Remove="Scripts\search.specifications.ts" />
-    <None Remove="Scripts\search.testScenarioResults.ts" />
-    <None Remove="Scripts\search.ts" />
-    <None Remove="Scripts\specification.common.ts" />
-    <None Remove="Scripts\submit.disabler.ts" />
-    <None Remove="Scripts\table.expander.sequential.ts" />
-    <None Remove="Scripts\table.expander.ts" />
-    <None Remove="Scripts\Tests\bindingHandler.showModal.ts" />
-    <None Remove="Scripts\Tests\provideCompletionGherkin.unitTests.ts" />
-    <None Remove="Scripts\Tests\list-provider-test-results.ts" />
-    <None Remove="Scripts\Tests\provideCompletionVb.unitTests.ts" />
     <None Remove="spa-url-rewrite.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -113,15 +69,19 @@
   <ItemGroup>
     <Compile Remove="Clients\CalcsClient\**" />
     <Compile Remove="Clients\SpecsClient\**" />
+    <Compile Remove="Scripts\**" />
     <Compile Remove="ViewModels\Preview\**" />
     <Content Remove="Clients\CalcsClient\**" />
     <Content Remove="Clients\SpecsClient\**" />
+    <Content Remove="Scripts\**" />
     <Content Remove="ViewModels\Preview\**" />
     <EmbeddedResource Remove="Clients\CalcsClient\**" />
     <EmbeddedResource Remove="Clients\SpecsClient\**" />
+    <EmbeddedResource Remove="Scripts\**" />
     <EmbeddedResource Remove="ViewModels\Preview\**" />
     <None Remove="Clients\CalcsClient\**" />
     <None Remove="Clients\SpecsClient\**" />
+    <None Remove="Scripts\**" />
     <None Remove="ViewModels\Preview\**" />
   </ItemGroup>
   <ItemGroup>
@@ -174,7 +134,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\Middleware" />
-    <Folder Include="Scripts" />
     <Folder Include="wwwroot" />
   </ItemGroup>
   <ItemGroup>
