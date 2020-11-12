@@ -171,7 +171,7 @@ describe('<ReleaseTimetable /> calls ', () => {
         });
         fireEvent.click(screen.getByText("Confirm changes"));
         await waitFor(() =>
-            expect(clearErrorMessagesMock).toHaveBeenLastCalledWith(["release-timetable-funding", "release-timetable-statement"])
+            expect(clearErrorMessagesMock).toHaveBeenLastCalledWith(["release-timetable-funding", "release-timetable-statement", "release-timetable"])
         );
     })
 });

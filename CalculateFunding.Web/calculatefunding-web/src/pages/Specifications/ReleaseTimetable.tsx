@@ -68,6 +68,8 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
     function updateNavisionTime(e: string) {
         if (e === "") {
             setCanTimetableBeUpdated(false);
+        } else if (!canTimetableBeUpdated) {
+            setCanTimetableBeUpdated(true);
         }
         setNavisionTime(e);
     }
@@ -75,6 +77,8 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
     function updateReleaseTime(e: string) {
         if (e === "") {
             setCanTimetableBeUpdated(false);
+        } else if (!canTimetableBeUpdated) {
+            setCanTimetableBeUpdated(true);
         }
         setReleaseTime(e);
     }
@@ -142,7 +146,7 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
             setReleaseDate(DateTime.fromISO(result.earliestPaymentAvailableDate).toJSDate());
             setNavisionDate(DateTime.fromISO(result.externalPublicationDate).toJSDate());
             setSaveSuccessful(true);
-            clearErrorMessages(["release-timetable-funding", "release-timetable-statement"]);
+            clearErrorMessages(["release-timetable-funding", "release-timetable-statement", "release-timetable"]);
         } catch (error) {
             addErrorMessage(error.message, undefined, "release-timetable");
             window.scrollTo(0, 0);
