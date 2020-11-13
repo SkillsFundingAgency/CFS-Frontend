@@ -10,27 +10,37 @@ export const useTemplateUndo = (updateFunction: Function, enabled: boolean) => {
     const templateBuilderPastStateKey = () => `templateBuilderPastState-${localStorageKey}`;
     const templateBuilderFutureStateKey = () => `templateBuilderFutureState-${localStorageKey}`;
 
+    const cleanUpDatabase = async () => {
+        await clearItems();
+    }
+
     const initialiseDatabase = async () => {
         await open();
     }
 
     const clearItems = async () => {
-        await clear(localStorageKey).catch(() => {});
+        await clear(localStorageKey);
     }
 
     React.useEffect(() => {
         if (enabled) {
+            window.addEventListener('beforeunload', cleanUpDatabase);
             initialiseDatabase();
         }
 
         return () => {
             enabled && clearItems();
+            window.removeEventListener('beforeunload', cleanUpDatabase);
         }
     }, []);
 
     const initialiseState = async (ds: FundingLineDictionaryEntry[]) => {
         if (enabled) {
-            await update({key: templateBuilderStateKey(), storageKey: localStorageKey, templateJson: JSON.stringify(ds)});
+            await update({
+                key: templateBuilderStateKey(),
+                storageKey: localStorageKey,
+                templateJson: JSON.stringify(ds)
+            });
         }
         updateFunction(ds);
     }

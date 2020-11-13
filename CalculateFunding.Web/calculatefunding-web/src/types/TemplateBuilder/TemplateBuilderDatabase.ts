@@ -1,7 +1,7 @@
 import Dexie from 'dexie';
 
 export class TemplateBuilderDatabase extends Dexie {
-    history!: Dexie.Table<ITemplateBuilderHistory, string>;
+    history!: Dexie.Table<ITemplateBuilderHistory, number>;
 
     constructor() {
         super("TemplateBuilderDatabase");
@@ -14,7 +14,7 @@ export class TemplateBuilderDatabase extends Dexie {
 }
 
 export class TemplateBuilderHistoryItem implements ITemplateBuilderHistory {
-    id: number;
+    id?: number;
     key: string;
     storageKey: string;
     templateJson: string;
