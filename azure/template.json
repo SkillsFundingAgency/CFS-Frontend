@@ -227,9 +227,7 @@
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/master/templates/",
         "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
-        "frontEndCertificateName": "frontendcert",
-        "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]",
-        "signalRName": "[concat('sr-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
+        "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfsapi-', parameters('productVersion'))]",
         "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]"
     },
     "resources": [
