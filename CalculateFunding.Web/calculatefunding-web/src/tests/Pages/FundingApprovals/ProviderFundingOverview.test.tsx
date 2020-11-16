@@ -17,6 +17,15 @@ import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {createStore, Store} from "redux";
 import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
 
+jest.mock('../../../services/fundingLineDetailsService', () => ({
+    getCurrentProfileConfigService: jest.fn()
+}));
+
+jest.mock('../../../services/providerService', () => ({
+    getProviderTransactionsService: jest.fn(),
+    getReleasedProfileTotalsService: jest.fn()
+}));
+
 const history = createBrowserHistory();
 const location = createLocation("", "", "", {search: "", pathname: "", hash: "", key: "", state: ""});
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
@@ -40,7 +49,7 @@ const testSpec: SpecificationSummary = {
     id: "ABC123",
     isSelectedForFunding: true,
     providerVersionId: "",
-    dataDefinitionRelationshipIds: []    
+    dataDefinitionRelationshipIds: []
 };
 const specResult: SpecificationSummaryQueryResult = {
     specification: testSpec,

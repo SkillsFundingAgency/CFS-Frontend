@@ -7,6 +7,10 @@ import {waitFor, fireEvent, render, act} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 
+jest.mock('../../../services/fundingLineDetailsService', () => ({
+    getPreviousProfileExistsForSpecificationForProviderForFundingLine: jest.fn()
+}));
+
 describe("<ViewFundingLineProfile />", () => {
     beforeAll(() => {
         jest.mock("../../../services/publishedProviderFundingLineService", () => mockPublishedProviderFundingLineService());
