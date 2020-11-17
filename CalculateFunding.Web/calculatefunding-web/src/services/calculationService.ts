@@ -141,7 +141,6 @@ export async function getMultipleVersionsByCalculationIdService(calculationId: s
         }});
 }
 
-
 export async function getIsUserAllowedToApproveCalculationService(calculationId: string) {
     return axios.get<boolean>(`/api/calcs/${calculationId}/approvepermission`)
 }
@@ -150,3 +149,11 @@ export async function getCalculationCircularDependencies(specificationId: string
     return axios.get<CircularReferenceError[]>(`/api/graph/calculation/circulardependencies/${specificationId}`);
 }
 
+export async function approveAllCalculationsService(specificationId: string) {
+    return axios(`/api/specs/${specificationId}/calculations/approveall`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}

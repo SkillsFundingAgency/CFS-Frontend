@@ -11,6 +11,7 @@ export interface EffectiveSpecificationPermission {
     canApplyCustomProfilePattern:     boolean;
     canAssignProfilePattern:     boolean;
     canApproveAnyCalculations:  boolean;
+    canApproveAllCalculations:  boolean;
     canDeleteSpecification:     boolean;
     canApproveSpecification:    boolean;
     canEditSpecification:       boolean;

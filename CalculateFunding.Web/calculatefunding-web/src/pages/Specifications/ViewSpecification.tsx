@@ -1,7 +1,7 @@
 import {RouteComponentProps, useHistory, useLocation} from "react-router";
 import {Header} from "../../components/Header";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
 import {Details} from "../../components/Details";
@@ -13,15 +13,10 @@ import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {
-    refreshSpecificationFundingService,
-} from "../../services/publishService";
-import {getCalculationSummaryBySpecificationId} from "../../services/calculationService";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
 import {useSelector} from "react-redux";
-import {getUserPermissionsService} from "../../services/userService";
 import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageModal";
 import * as QueryString from "query-string";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
@@ -34,6 +29,11 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
 import {CalculationType} from "../../types/CalculationSearchResponse";
 import {CalculationSummary} from "../../types/CalculationDetails";
+import {LoadingStatus} from "../../components/LoadingStatus";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {PermissionStatus} from "../../components/PermissionStatus";
+import {refreshSpecificationFundingService} from "../../services/publishService";
+import {approveAllCalculationsService, getCalculationSummaryBySpecificationId} from "../../services/calculationService";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -65,8 +65,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     const {errors, addErrorMessage, clearErrorMessages} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
+    const [isApprovingAllCalculations, setIsApprovingAllCalculations] = useState(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
+    const {canApproveAllCalculations, canChooseFunding, missingPermissions} =
+        useSpecificationPermissions(specificationId,
+            [SpecificationPermissions.ApproveAllCalculations, SpecificationPermissions.ChooseFunding]);
 
     let history = useHistory();
     const location = useLocation();
@@ -116,6 +120,36 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }
     };
 
+    async function approveAllCalculations(){
+        try {
+            clearErrorMessages();
+            const isAllowed: boolean = await isUserAllowedToApproveAllCalculations();
+            if (isAllowed) {
+                UserConfirmLeavePageModal("Are you sure you want to approve all calculations?",
+                    submitApproveAllCalculations, "Confirm", "Cancel");
+            }
+        } catch (e) {
+            addErrorMessage("A problem occurred while getting user permissions");
+        }
+    }
+
+    async function submitApproveAllCalculations(confirm: boolean) {
+        if (confirm) {
+            setIsApprovingAllCalculations(true);
+            try {
+                const response = await approveAllCalculationsService(specificationId);
+                if (response.status !== 200) {
+                    addErrorMessage("A problem occurred while approving all calculations");
+                }
+            } catch (err) {
+                addErrorMessage("A problem occurred while approving all calculations: " + err);
+            }
+            finally {
+                setIsApprovingAllCalculations(false);
+            }
+        }
+    }
+
     async function chooseForFunding() {
         try {
             clearErrorMessages();
@@ -145,8 +179,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     async function isUserAllowedToChooseSpecification(specificationId: string) {
-        const permissions = (await getUserPermissionsService(specificationId)).data;
-        if (!permissions.canChooseFunding) {
+        if (!canChooseFunding) {
             addErrorMessage("You do not have permissions to choose this specification for funding");
             return false;
         }
@@ -168,6 +201,27 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         return true;
     }
 
+    async function isUserAllowedToApproveAllCalculations() {
+        alert(canApproveAllCalculations)
+        if (!canApproveAllCalculations)
+        {
+            addErrorMessage("You don't have permission to approve calculations");
+            return false;
+        }
+        try {
+            const calcs: CalculationSummary[] = (await getCalculationSummaryBySpecificationId(specificationId)).data;
+            if (!calcs.some(calc => calc.calculationType === CalculationType.Template
+                && calc.publishStatus !== PublishStatus.Approved)) {
+                addErrorMessage("All calculations have already been approved");
+                return false;
+            }
+        } catch (err) {
+            addErrorMessage("Approve all calculations failed - try again");
+            return false;
+        }
+        return true;
+    }
+
     return <div>
         <Header location={Section.Specifications} />
         <div className="govuk-width-container">
@@ -177,9 +231,16 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name} />
             </Breadcrumbs>
 
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={isApprovingAllCalculations}/>
+
             <MultipleErrorSummary errors={errors} />
 
-            <div className="govuk-grid-row">
+            <LoadingStatus title={"Checking calculations"}
+                           hidden={!isApprovingAllCalculations}
+                           subTitle={"Please wait, this could take several minutes"}
+                           description={"Please do not refresh the page, you will be redirected automatically"}/>
+
+            <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>
                 <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
                     <span className="govuk-caption-l">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
@@ -198,6 +259,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             <Link to={`/Specifications/CreateAdditionalCalculation/${specificationId}`} className="govuk-link">Create additional
                                 calculation</Link>
+                        </li>
+                        <li>
+                            <button type="button" className="govuk-link" onClick={approveAllCalculations}>Approve all calculations</button>
                         </li>
                         <li>
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
@@ -220,7 +284,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     </ul>
                 </div>
             </div>
-            {initialTab.length > 0 && <div className="govuk-main-wrapper  govuk-!-padding-top-2">
+            {initialTab.length > 0 && !isApprovingAllCalculations && <div className="govuk-main-wrapper  govuk-!-padding-top-2">
                 <div className="govuk-grid-row">
                     <Tabs initialTab={"fundingline-structure"}>
                         <ul className="govuk-tabs__list">
