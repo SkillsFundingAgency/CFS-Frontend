@@ -49,7 +49,8 @@ const testSpec: SpecificationSummary = {
     id: "ABC123",
     isSelectedForFunding: true,
     providerVersionId: "",
-    dataDefinitionRelationshipIds: []
+    dataDefinitionRelationshipIds: [],
+    templateIds: {},
 };
 const specResult: SpecificationSummaryQueryResult = {
     specification: testSpec,

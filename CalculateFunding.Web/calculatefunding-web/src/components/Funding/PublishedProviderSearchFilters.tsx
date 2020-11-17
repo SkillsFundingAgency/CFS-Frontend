@@ -1,82 +1,83 @@
 ﻿import {CollapsiblePanel} from "../CollapsiblePanel";
 import {CollapsibleSearchBox} from "../CollapsibleSearchBox";
 import React, {useEffect, useState} from "react";
-import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import {FacetValue} from "../../types/Facet";
-import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
+import {Facet, FacetValue} from "../../types/Facet";
+import {PublishedProviderSearchFacet, PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
+import {useDispatch, useSelector} from "react-redux";
+import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
+import {IStoreState} from "../../reducers/rootReducer";
+import {updateFundingSearch} from "../../actions/FundingSearchSelectionActions";
 
 export interface IPublishedProviderSearchFiltersProps {
-    publishedProviderResults: PublishedProviderSearchResults | undefined,
-    searchCriteria: PublishedProviderSearchRequest,
-    setSearchCriteria: (searchCriteria: PublishedProviderSearchRequest) => void,
+    facets: Facet[],
     numberOfProvidersWithErrors: number
 }
 
 export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFiltersProps) {
+    const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
     const [statusFacets, setStatusFacets] = useState<FacetValue[]>([]);
     const [providerTypeFacets, setProviderTypeFacets] = useState<FacetValue[]>([]);
     const [providerSubTypeFacets, setProviderSubTypeFacets] = useState<FacetValue[]>([]);
     const [localAuthorityFacets, setLocalAuthorityFacets] = useState<FacetValue[]>([]);
-    const [filterWithErrors, setFilterWithErrors] = useState<boolean>(props.searchCriteria.hasErrors ? props.searchCriteria.hasErrors : false);
-    const [filterWithoutErrors, setFilterWithoutErrors] = useState<boolean>(props.searchCriteria.hasErrors ? !props.searchCriteria.hasErrors : false);
+    const [filterWithErrors, setFilterWithErrors] = useState<boolean>(state.searchCriteria && state.searchCriteria.hasErrors ? state.searchCriteria.hasErrors : false);
+    const [filterWithoutErrors, setFilterWithoutErrors] = useState<boolean>(state.searchCriteria && state.searchCriteria.hasErrors ? !state.searchCriteria.hasErrors : false);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        if (props.publishedProviderResults && props.publishedProviderResults.facets != null) {
-            props.publishedProviderResults.facets.forEach((facet) => {
+            props.facets.forEach((facet) => {
                 switch (facet.name) {
-                    case "providerType":
+                    case PublishedProviderSearchFacet.ProviderType:
                         setProviderTypeFacets(facet.facetValues);
                         break;
-                    case "providerSubType":
+                    case PublishedProviderSearchFacet.ProviderSubType:
                         setProviderSubTypeFacets(facet.facetValues);
                         break;
-                    case "localAuthority":
+                    case PublishedProviderSearchFacet.LocalAuthority:
                         setLocalAuthorityFacets(facet.facetValues);
                         break;
-                    case "fundingStatus":
+                    case PublishedProviderSearchFacet.FundingStatus:
                         setStatusFacets(facet.facetValues);
                         break;
                 }
             });
-        }
-    }, [props.publishedProviderResults]);
+    }, [props.facets]);
 
 
     function changeLocalAuthorityFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = props.searchCriteria.localAuthority;
+        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).localAuthority;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        props.setSearchCriteria({...props.searchCriteria, localAuthority: filterUpdate, pageNumber: 1});
+        dispatch(updateFundingSearch({...state.searchCriteria, localAuthority: filterUpdate, pageNumber: 1}));
     }
 
     function changeStatusFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = props.searchCriteria.status;
+        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).status;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        props.setSearchCriteria({...props.searchCriteria, status: filterUpdate, pageNumber: 1});
+        dispatch(updateFundingSearch({...state.searchCriteria, status: filterUpdate, pageNumber: 1}));
     }
 
     function changeProviderTypeFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = props.searchCriteria.providerType;
+        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).providerType;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        props.setSearchCriteria({...props.searchCriteria, providerType: filterUpdate, pageNumber: 1});
+        dispatch(updateFundingSearch({...state.searchCriteria, providerType: filterUpdate, pageNumber: 1}));
     }
 
     function changeProviderSubTypeFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = props.searchCriteria.providerSubType;
+        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).providerSubType;
 
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
@@ -84,27 +85,27 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        props.setSearchCriteria({...props.searchCriteria, providerSubType: filterUpdate, pageNumber: 1});
+        dispatch(updateFundingSearch({...state.searchCriteria, providerSubType: filterUpdate, pageNumber: 1}));
     }
 
     function changeSearchTextFilter(searchField: string, searchTerm: string) {
-        if ((searchTerm.length === 0 && props.searchCriteria.searchTerm.length !== 0) || searchTerm.length > 2) {
+        if ((searchTerm.length === 0 && (state.searchCriteria as PublishedProviderSearchRequest).searchTerm.length !== 0) || searchTerm.length > 2) {
             let searchFields: string[] = [];
             if (searchField != null && searchField !== "") {
                 searchFields.push(searchField);
             }
-            props.setSearchCriteria({...props.searchCriteria, searchTerm: searchTerm, searchFields: searchFields, pageNumber: 1});
+            dispatch(updateFundingSearch({...state.searchCriteria, searchTerm: searchTerm, searchFields: searchFields, pageNumber: 1}));
         }
     }
 
     function changeErrorFilter(e: React.ChangeEvent<HTMLInputElement>) {
         const withErrors = e.target.value === "with-errors" ? e.target.checked : filterWithErrors;
         const withoutErrors = e.target.value === "without-errors" ? e.target.checked : filterWithoutErrors;
-        props.setSearchCriteria({...props.searchCriteria, hasErrors: withErrors === withoutErrors ? undefined : withErrors, pageNumber: 1});
+        dispatch(updateFundingSearch({...(state.searchCriteria as PublishedProviderSearchRequest), hasErrors: withErrors === withoutErrors ? undefined : withErrors, pageNumber: 1}));
         setFilterWithoutErrors(withoutErrors);
         setFilterWithErrors(withErrors);
     }
-    
+
     return <>
         <CollapsiblePanel title={"Search"} expanded={true}>
             <fieldset className="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
@@ -112,8 +113,8 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
                     <h4 className="govuk-heading-s">Search</h4>
                 </legend>
                 <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span">
-                                Select one option.
-                            </span>
+                    Select one option.
+                </span>
                 <CollapsibleSearchBox searchTerm={""} callback={changeSearchTextFilter}/>
             </fieldset>
         </CollapsiblePanel>

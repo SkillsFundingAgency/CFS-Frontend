@@ -2,13 +2,14 @@
 import {PublishedProviderSearchQueryResult} from "../../hooks/FundingApproval/usePublishedProviderSearch";
 import {PublishedProviderErrorSearchQueryResult} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import {PublishedProviderIdsQueryResult} from "../../hooks/FundingApproval/usePublishedProviderIds";
+import {PublishedProviderSearchFacet} from "../../types/publishedProviderSearchRequest";
 
 export const defaultFacets = [
-    {name: "hasErrors", facetValues: [{"name": "True", "count": 1}, {"name": "False", "count": 0}]},
-    {name: "providerType", facetValues: []},
-    {name: "providerSubType", facetValues: []},
-    {name: "localAuthority", facetValues: [{"name": "East London", "count": 1}]},
-    {name: "providerType", facetValues: []}
+    {name: PublishedProviderSearchFacet.HasErrors, facetValues: [{"name": "True", "count": 1}, {"name": "False", "count": 0}]},
+    {name: PublishedProviderSearchFacet.ProviderType, facetValues: []},
+    {name: PublishedProviderSearchFacet.ProviderSubType, facetValues: []},
+    {name: PublishedProviderSearchFacet.LocalAuthority, facetValues: [{"name": "East London", "count": 1}]},
+    {name: PublishedProviderSearchFacet.ProviderType, facetValues: []}
 ];
 
 export const createPublishedProviderResult = (providers: PublishedProviderResult[],
@@ -57,7 +58,5 @@ export const createPublishedProviderIdsQueryResult = (ids: string[])
     return {
         publishedProviderIds: ids,
         isLoadingPublishedProviderIds: false,
-        isErrorLoadingPublishedProviderIds: false,
-        errorLoadingPublishedProviderIds: ""
     };
 };

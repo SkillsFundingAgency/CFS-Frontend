@@ -1,12 +1,13 @@
 import {Facet} from "../Facet";
 import {PagerState} from "../PagerState";
+import {PublishStatus} from "../PublishStatusModel";
 
 export interface PublishedProviderResult {
     publishedProviderVersionId: string;
     providerType: string;
     providerSubType: string;
     localAuthority: string;
-    fundingStatus: string;
+    fundingStatus: PublishStatus;
     providerName: string;
     ukprn: string;
     upin: string;

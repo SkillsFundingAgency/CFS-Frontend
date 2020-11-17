@@ -14,7 +14,7 @@ import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {
-    refreshFundingService,
+    refreshSpecificationFundingService,
 } from "../../services/publishService";
 import {getCalculationSummaryBySpecificationId} from "../../services/calculationService";
 import {PublishStatus} from "../../types/PublishStatusModel";
@@ -132,7 +132,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     async function refreshFunding(confirm: boolean) {
         if (confirm) {
             try {
-                const response = await refreshFundingService(specificationId);
+                const response = await refreshSpecificationFundingService(specificationId);
                 if (response.status === 200) {
                     history.push(`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
                 } else {

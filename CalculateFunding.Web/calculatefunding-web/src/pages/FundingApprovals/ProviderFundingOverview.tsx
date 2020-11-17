@@ -32,10 +32,6 @@ import {useErrors} from "../../hooks/useErrors";
 import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
 import {PublishStatus} from "../../types/PublishStatusModel";
 
-interface ProviderFundingOverviewProps {
-    providerFundingId: string
-}
-
 export interface ProviderFundingOverviewRoute {
     providerId: string;
     providerVersionId: string;
@@ -44,7 +40,7 @@ export interface ProviderFundingOverviewRoute {
     fundingPeriodId: string;
 }
 
-export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFundingOverviewRoute>, props: ProviderFundingOverviewProps) {
+export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFundingOverviewRoute>) {
     const specificationId = match.params.specificationId;
     const providerId = match.params.providerId;
     const fundingStreamId = match.params.fundingStreamId;
@@ -106,7 +102,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 <Breadcrumb name={"Approvals"}/>
                 <Breadcrumb name={"Select specification"} url={"/Approvals/Select"}/>
                 <Breadcrumb name={"Funding approval results"}
-                            url={`/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`}/>
+                            url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}/>
                 <Breadcrumb name={"Provider funding overview"}/>
             </Breadcrumbs>
 

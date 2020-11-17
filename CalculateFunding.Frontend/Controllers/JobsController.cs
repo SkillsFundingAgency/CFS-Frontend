@@ -27,6 +27,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("api/jobs/{specificationId}/{jobTypes}")]
         public async Task<IActionResult> GetSpecificationJobs([FromRoute] string specificationId, [FromRoute] string jobTypes)
         {

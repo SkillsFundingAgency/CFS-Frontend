@@ -6,7 +6,7 @@ import {ErrorSummary} from "../ErrorSummary";
 import {JobSummary} from "../../types/jobSummary";
 import {JobStatusProps} from "../../helpers/getJobDisplayProps";
 
-export interface CalculationJobNotificationProps {
+export interface JobNotificationBannerProps {
     latestJob: JobSummary | undefined,
     isCheckingForJob: boolean,
     hasJobError: boolean,
@@ -14,7 +14,7 @@ export interface CalculationJobNotificationProps {
     jobStatus: JobStatusProps | undefined
 }
 
-export function CalculationJobNotification(props: CalculationJobNotificationProps) {
+export function JobNotificationBanner(props: JobNotificationBannerProps) {
     if (props.isCheckingForJob) {
         return <div className=" govuk-!-margin-bottom-4">
             <LoadingFieldStatus title={"Checking for running jobs"}/>
@@ -34,10 +34,13 @@ export function CalculationJobNotification(props: CalculationJobNotificationProp
         props.jobStatus.isActive ? "govuk-error-summary govuk-error-summary-orange" :
             "govuk-error-summary govuk-error-summary-green"}
                  aria-labelledby="error-summary-title" 
+                 aria-label="job-notification"
                  role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
             Job {props.jobStatus.statusDescription}: {props.jobStatus.jobDescription}
+            {props.jobStatus.isActive &&
+            <LoadingFieldStatus title={`Monitoring...`} />}
         </h2>
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">

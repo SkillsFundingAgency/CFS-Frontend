@@ -103,6 +103,7 @@ const testSpec: SpecificationSummary = {
     id: "ABC123",
     isSelectedForFunding: true,
     providerVersionId: "",
+    templateIds: {},
     dataDefinitionRelationshipIds: []
 };
 const testCalc1: CalculationSearchResult = {

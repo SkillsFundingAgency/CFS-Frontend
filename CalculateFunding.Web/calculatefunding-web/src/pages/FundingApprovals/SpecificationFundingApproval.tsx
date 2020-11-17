@@ -1,23 +1,17 @@
-import {RouteComponentProps} from "react-router";
-import React, {useState} from "react";
+import {RouteComponentProps, useHistory} from "react-router";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {
-    buildInitialPublishedProviderSearchRequest,
-    PublishedProviderSearchRequest
-} from "../../types/publishedProviderSearchRequest";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {PublishedProviderResults} from "../../components/Funding/PublishedProviderResults";
-import {ConfirmFundingApproval} from "../../components/Funding/ConfirmFundingApproval";
-import {ConfirmFundingRelease} from "../../components/Funding/ConfirmFundingRelease";
 import {PublishedProviderSearchFilters} from "../../components/Funding/PublishedProviderSearchFilters";
 import {ApprovalMode} from "../../types/ApprovalMode";
-import {IFundingSelectionState} from "../../states/IFundingSelectionState";
-import {useSelector} from "react-redux";
+import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
+import {useDispatch, useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {SpecificationSummarySection} from "../../components/Funding/SpecificationSummarySection";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
@@ -28,21 +22,24 @@ import {usePublishedProviderSearch} from "../../hooks/FundingApproval/usePublish
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
-import {buildInitialPublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
 import {useErrors} from "../../hooks/useErrors";
-import {CalculationJobNotification} from "../../components/Calculations/CalculationJobNotification";
+import {JobNotificationBanner} from "../../components/Calculations/JobNotificationBanner";
+import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
+import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import {refreshSpecificationFundingService} from "../../services/publishService";
 
-export interface SpecificationFundingApprovalRoute {
+export interface SpecificationFundingApprovalRouteProps {
     fundingStreamId: string;
     fundingPeriodId: string;
     specificationId: string;
 }
 
-export function SpecificationFundingApproval({match}: RouteComponentProps<SpecificationFundingApprovalRoute>) {
+export function SpecificationFundingApproval({match}: RouteComponentProps<SpecificationFundingApprovalRouteProps>) {
     const fundingStreamId = match.params.fundingStreamId;
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
 
+    const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
     const {hasActiveJob, hasJobError, jobError, latestJob, isCheckingForJob, jobStatus} =
         useLatestSpecificationJobWithMonitoring(
             specificationId,
@@ -52,44 +49,60 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob]);
     const {specification, isLoadingSpecification} =
-        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification") );
-    const initialProviderPagedSearch = buildInitialPublishedProviderSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
-    const initialProviderIdsSearch = buildInitialPublishedProviderIdsSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
-    const [searchCriteria, setSearchCriteria] = useState<PublishedProviderSearchRequest>(initialProviderPagedSearch);
+        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
     const {publishedProviderSearchResults, isLoadingSearchResults} =
-        usePublishedProviderSearch(searchCriteria, !isCheckingForJob && !hasActiveJob,
-            err => addErrorMessage(err.message, "", "Error while searching for provider results"));
+        usePublishedProviderSearch(state.searchCriteria, true,
+            err => addErrorMessage(err.message, "", "Error while searching for providers"));
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
             err => addErrorMessage(err.message, "", "Error while loading funding configuration"));
     const {publishedProviderIds, isLoadingPublishedProviderIds} =
-        usePublishedProviderIds(initialProviderIdsSearch,
+        usePublishedProviderIds(fundingStreamId, fundingPeriodId, specificationId,
             !isCheckingForJob && !hasActiveJob && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches,
             err => addErrorMessage(err.message, "", "Error while loading provider ids"));
     const {publishedProvidersWithErrors} =
         usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !hasActiveJob,
-    err => addErrorMessage(err.message, "Error while loading provider funding errors"));
-    const [isConfirmingApproval, setConfirmApproval] = useState<boolean>(false);
-    const [isConfirmingRelease, setConfirmRelease] = useState<boolean>(false);
-    const fundingSelectionState: IFundingSelectionState = useSelector<IStoreState, IFundingSelectionState>(state => state.fundingSelection);
+            err => addErrorMessage(err.message, "Error while loading provider funding errors"));
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
     const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
     const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const dispatch = useDispatch();
+    const history = useHistory();
 
 
-    function pageChange(pageNumber: string) {
-        setSearchCriteria(prevState => {
-            return {...prevState, pageNumber: parseInt(pageNumber)}
-        });
+    useEffect(() => {
+        if (!state.searchCriteria ||
+            (state.searchCriteria &&
+            state.searchCriteria.specificationId !== specificationId)) {
+            dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
+        }
+    }, [match, state]);
+
+    async function handleApprove() {
+        if (publishedProviderSearchResults && canApproveFunding && publishedProviderSearchResults.canApprove) {
+            history.push(`/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${FundingActionType.Approve}`);
+        }
     }
 
-    function handleBackToResults() {
-        setConfirmApproval(false);
-        setConfirmRelease(false);
+    async function handleRelease() {
+        if (publishedProviderSearchResults && publishedProviderSearchResults.canPublish && canReleaseFunding) {
+            history.push(`/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${FundingActionType.Release}`);
+        }
+    }
+
+    async function handleRefresh() {
         clearErrorMessages();
+        setIsLoadingRefresh(true);
+        try {
+            await refreshSpecificationFundingService(specificationId);
+        } catch (e) {
+            addErrorMessage("An error occured whilst calling the server to refresh: " + e);
+        } finally {
+            setIsLoadingRefresh(false);
+        }
     }
-    
+
     if (publishedProvidersWithErrors) {
         publishedProvidersWithErrors.forEach(err => addErrorMessage(err, "Provider error"));
     }
@@ -102,11 +115,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     hasActiveJob && jobStatus ? `Job ${jobStatus.statusDescription}: ${jobStatus.jobDescription}` :
                         isLoadingSearchResults ? "Loading provider funding data..." :
                             isLoadingFundingConfiguration ? "Loading funding configuration..." :
-                            ""
+                                ""
     const loadingSubtitle =
         isLoadingRefresh ? "Refreshing data" :
             isCheckingForJob ? "Searching for any running jobs" :
-                hasActiveJob ? "Monitoring job progress. Please wait, this could take several minutes" : 
+                hasActiveJob ? "Monitoring job progress. Please wait, this could take several minutes" :
                     "";
 
     return (
@@ -125,7 +138,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 <MultipleErrorSummary errors={errors}/>
 
                 {!isCheckingForJob && jobStatus && jobStatus.isComplete &&
-                <CalculationJobNotification
+                <JobNotificationBanner
                     latestJob={latestJob}
                     isCheckingForJob={isCheckingForJob}
                     jobStatus={jobStatus}
@@ -138,13 +151,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     isLoadingSpecification={isLoadingSpecification}
                 />
 
-                {!isConfirmingApproval && !isConfirmingRelease &&
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third" hidden={hasActiveJob || isCheckingForJob}>
-                        <PublishedProviderSearchFilters publishedProviderResults={publishedProviderSearchResults}
-                                                        searchCriteria={searchCriteria}
-                                                        setSearchCriteria={setSearchCriteria}
-                                                        numberOfProvidersWithErrors={0}
+                        <PublishedProviderSearchFilters
+                            facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
+                            numberOfProvidersWithErrors={0}
                         />
                     </div>
                     <div className="govuk-grid-column-two-thirds">
@@ -155,50 +166,41 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         }
                         {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults &&
                         !isLoadingPublishedProviderIds && !isLoadingSpecification && specification &&
-                        <PublishedProviderResults specificationId={specificationId}
-                                                  enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
-                                                  specProviderVersionId={specification.providerVersionId}
-                                                  providerSearchResults={publishedProviderSearchResults}
-                                                  canRefreshFunding={canRefreshFunding}
-                                                  canApproveFunding={canApproveFunding}
-                                                  canReleaseFunding={canReleaseFunding}
-                                                  selectedResults={fundingSelectionState.providerVersionIds.length}
-                                                  totalResults={publishedProviderIds ? publishedProviderIds.length : publishedProviderSearchResults ? publishedProviderSearchResults.totalResults : 0}
-                                                  pageChange={pageChange}
-                                                  allPublishedProviderIds={publishedProviderIds}
-                                                  setConfirmRelease={setConfirmRelease}
-                                                  setConfirmApproval={setConfirmApproval}
-                                                  addError={addErrorMessage}
-                                                  setIsLoadingRefresh={setIsLoadingRefresh}
-                                                  clearErrorMessages={clearErrorMessages}
+                        <PublishedProviderResults
+                            specificationId={specificationId}
+                            fundingStreamId={fundingStreamId}
+                            fundingPeriodId={fundingPeriodId}
+                            versionId={specification.providerVersionId}
+                            enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
+                            providerSearchResults={publishedProviderSearchResults}
+                            canRefreshFunding={canRefreshFunding}
+                            canApproveFunding={canApproveFunding}
+                            canReleaseFunding={canReleaseFunding}
+                            totalResults={publishedProviderIds ? publishedProviderIds.length : publishedProviderSearchResults ? publishedProviderSearchResults.totalResults : 0}
+                            allPublishedProviderIds={publishedProviderIds}
+                            setIsLoadingRefresh={setIsLoadingRefresh}
+                            addError={addErrorMessage}
+                            clearErrorMessages={clearErrorMessages}
                         />
                         }
                     </div>
+                    <div className="govuk-grid-column-two-thirds">
+                        <div className="right-align">
+                            <button className="govuk-button govuk-!-margin-right-1"
+                                    disabled={hasActiveJob || !canRefreshFunding}
+                                    onClick={handleRefresh}>Refresh funding
+                            </button>
+                            <button className="govuk-button govuk-!-margin-right-1"
+                                    disabled={hasActiveJob || !publishedProviderSearchResults?.canApprove || !canApproveFunding}
+                                    onClick={handleApprove}>Approve funding
+                            </button>
+                            <button className="govuk-button govuk-button--warning"
+                                    disabled={hasActiveJob || !publishedProviderSearchResults?.canPublish || !canReleaseFunding}
+                                    onClick={handleRelease}>Release funding
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                }
-                {!isLoadingSearchResults && (isConfirmingApproval || isConfirmingRelease) && specification &&
-                <div className="govuk-grid-row">
-                    {isConfirmingApproval && !isConfirmingRelease ?
-                        <ConfirmFundingApproval
-                            canApproveFunding={canApproveFunding}
-                            specificationSummary={specification}
-                            publishedProviderResults={publishedProviderSearchResults}
-                            handleBackToResults={handleBackToResults}
-                            addError={addErrorMessage}
-                            clearErrorMessages={clearErrorMessages}
-                        />
-                        :
-                        <ConfirmFundingRelease
-                            canReleaseFunding={canReleaseFunding}
-                            specificationSummary={specification}
-                            publishedProviderResults={publishedProviderSearchResults}
-                            handleBackToResults={handleBackToResults}
-                            addError={addErrorMessage}
-                            clearErrorMessages={clearErrorMessages}
-                        />
-                    }
-                </div>
-                }
             </div>
             <Footer/>
         </div>

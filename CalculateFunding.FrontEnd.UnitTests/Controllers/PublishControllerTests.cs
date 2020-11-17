@@ -414,7 +414,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .GetPublishedProviderErrors(ValidSpecificationId)
                 .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.NotFound));
 
-            IActionResult result = await _publishController.GetPublishedProviderErrors(ValidSpecificationId);
+            IActionResult result = await _publishController.GetSpecProviderErrors(ValidSpecificationId);
 
             result.Should().BeOfType<NotFoundObjectResult>();
         }
@@ -433,7 +433,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .GetPublishedProviderErrors(ValidSpecificationId)
                 .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, errorSummaries));
 
-            IActionResult result = await _publishController.GetPublishedProviderErrors(ValidSpecificationId);
+            IActionResult result = await _publishController.GetSpecProviderErrors(ValidSpecificationId);
 
             result.Should().BeOfType<OkObjectResult>();
             OkObjectResult okObjectResult = result as OkObjectResult;

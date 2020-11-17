@@ -120,7 +120,7 @@ export function CreateSpecification() {
                     if (error.response.status === 404) {
                         addErrorMessage("No provider data exists for your selections.");
                     } else {
-                        addErrorMessage(`There was a problem loading the core providersfor the following reason: ${error.message}. Please try again.`);
+                        addErrorMessage(`There was a problem loading the core providers for the following reason: ${error.message}. Please try again.`);
                     }
                 }
             }

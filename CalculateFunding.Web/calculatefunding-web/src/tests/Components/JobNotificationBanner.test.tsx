@@ -1,12 +1,10 @@
 ﻿import React from "react";
 import '@testing-library/jest-dom/extend-expect';
-import {act} from 'react-test-renderer';
 import {render, screen} from '@testing-library/react';
-import {CalculationJobNotification, CalculationJobNotificationProps} from "../../../components/Calculations/CalculationJobNotification";
-import {JobSummary} from "../../../types/jobSummary";
-import {JobType} from "../../../types/jobType";
-import {RunningStatus} from "../../../types/RunningStatus";
-import {CompletionStatus} from "../../../types/CompletionStatus";
+import {JobNotificationBanner, JobNotificationBannerProps} from "../../components/Calculations/JobNotificationBanner";
+import {JobSummary} from "../../types/jobSummary";
+import {JobType} from "../../types/jobType";
+import {RunningStatus} from "../../types/RunningStatus";
 
 const mockQueuedJobResult: JobSummary = {
     jobId: "sdfg",
@@ -19,10 +17,9 @@ const mockQueuedJobResult: JobSummary = {
     invokerUserDisplayName: "Bob"
 };
 
-const renderComponent = (params: CalculationJobNotificationProps) => {
-    return render(<CalculationJobNotification
+const renderComponent = (params: JobNotificationBannerProps) => {
+    return render(<JobNotificationBanner
         latestJob={params.latestJob}
-        anyJobsRunning={params.anyJobsRunning}
         hasJobError={params.hasJobError}
         isCheckingForJob={params.isCheckingForJob}
         jobError={params.jobError}
@@ -30,14 +27,13 @@ const renderComponent = (params: CalculationJobNotificationProps) => {
     />);
 };
 
-describe('<CalculationJobNotification />', () => {
+describe('<JobNotificationBanner />', () => {
     beforeAll(() => jest.clearAllMocks());
 
     describe('with no job running', () => {
         it('renders null', async () => {
-            const props: CalculationJobNotificationProps = {
+            const props: JobNotificationBannerProps = {
                 latestJob: undefined,
-                anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: false,
                 jobError: "",
@@ -55,9 +51,8 @@ describe('<CalculationJobNotification />', () => {
 
     describe('when still loading latest spec job', () => {
         it('renders loading message correctly', async () => {
-            const props: CalculationJobNotificationProps = {
+            const props: JobNotificationBannerProps = {
                 latestJob: undefined,
-                anyJobsRunning: false,
                 isCheckingForJob: true,
                 hasJobError: false,
                 jobError: "",
@@ -72,9 +67,8 @@ describe('<CalculationJobNotification />', () => {
 
     describe('when has error loading latest spec job', () => {
         it('renders error message correctly', async () => {
-            const props: CalculationJobNotificationProps = {
+            const props: JobNotificationBannerProps = {
                 latestJob: undefined,
-                anyJobsRunning: false,
                 isCheckingForJob: false,
                 hasJobError: true,
                 jobError: "Uh oh!",
@@ -90,9 +84,8 @@ describe('<CalculationJobNotification />', () => {
 
     describe('when job is queued', () => {
         it('renders error message correctly', async () => {
-            const props: CalculationJobNotificationProps = {
+            const props: JobNotificationBannerProps = {
                 latestJob: mockQueuedJobResult,
-                anyJobsRunning: true,
                 isCheckingForJob: false,
                 hasJobError: false,
                 jobError: "",

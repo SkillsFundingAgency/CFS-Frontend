@@ -1,37 +1,35 @@
 ﻿import {AxiosError} from "axios";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery} from "react-query";
 import {getAllProviderVersionIdsForSearch} from "../../services/publishedProviderService";
-import {PublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
+import {buildInitialPublishedProviderIdsSearchRequest, PublishedProviderIdsSearchRequest} from "../../types/publishedProviderIdsSearchRequest";
 
 export type PublishedProviderIdsQueryResult = {
     publishedProviderIds: string[] | undefined,
     isLoadingPublishedProviderIds: boolean,
-    isErrorLoadingPublishedProviderIds: boolean,
-    errorLoadingPublishedProviderIds: string
 }
-export const usePublishedProviderIds = (searchRequest: PublishedProviderIdsSearchRequest,
+export const usePublishedProviderIds = (fundingStreamId: string, 
+                                        fundingPeriodId: string, 
+                                        specificationId: string,
                                         isEnabled: boolean,
                                         onError: (err: AxiosError) => void)
     : PublishedProviderIdsQueryResult => {
 
-    const {data, isLoading, isError, error} =
+    const {data, isLoading} =
         useQuery<string[], AxiosError>(
-            [`published-provider-ids`, searchRequest],
-            async () => (await getAllProviderVersionIdsForSearch(searchRequest)).data,
+            `published-provider-ids-for-spec-${specificationId}-${fundingStreamId}-${fundingPeriodId}`,
+            async () => {
+                const searchRequest: PublishedProviderIdsSearchRequest = buildInitialPublishedProviderIdsSearchRequest(fundingStreamId, fundingPeriodId, specificationId);
+                return (await getAllProviderVersionIdsForSearch(searchRequest)).data
+            },
             {
                 onError,
-                enabled: searchRequest
-                    && searchRequest.specificationId && searchRequest.specificationId.length > 0
-                    && searchRequest.fundingStreamId && searchRequest.fundingStreamId.length > 0
-                    && searchRequest.fundingPeriodId && searchRequest.fundingPeriodId.length > 0
+                enabled: specificationId && specificationId.length > 0
+                    && fundingStreamId && fundingStreamId.length > 0
+                    && fundingPeriodId && fundingPeriodId.length > 0
                     && isEnabled
             });
     return {
         publishedProviderIds: data,
         isLoadingPublishedProviderIds: isLoading,
-        isErrorLoadingPublishedProviderIds: isError,
-        errorLoadingPublishedProviderIds: !isError ? "" : error ?
-            `Error while fetching published providers IDs: ${error.message}` :
-            "Unknown error while fetching published providers IDs"
     }
 };

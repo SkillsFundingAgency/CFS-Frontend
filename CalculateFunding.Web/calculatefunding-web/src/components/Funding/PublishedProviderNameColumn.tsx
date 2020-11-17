@@ -18,7 +18,9 @@ export const PublishedProviderNameColumn = (props: IPublishedProviderNameColumnP
         return <td className="govuk-table__cell govuk-!-padding-bottom-0">
             <div className="govuk-checkboxes govuk-checkboxes--small">
                 <label className="govuk-label govuk-form-group--error" htmlFor={props.id}>
-                    <Link id={props.id} to={props.fundingOverviewUrl}>
+                    <Link id={props.id}
+                          to={props.fundingOverviewUrl}
+                          className="govuk-link govuk-link--no-visited-state">
                         {provider.providerName}
                     </Link>
                     {provider.errors.map((err, index) =>
@@ -42,7 +44,8 @@ export const PublishedProviderNameColumn = (props: IPublishedProviderNameColumnP
                        onChange={props.handleItemSelectionToggle}
                 />
                 <label className="govuk-label govuk-checkboxes__label" htmlFor={props.id}>
-                    <Link to={props.fundingOverviewUrl}>
+                    <Link to={props.fundingOverviewUrl}
+                          className="govuk-link govuk-link--no-visited-state">
                         {provider.providerName}
                     </Link>
                 </label>
@@ -50,7 +53,9 @@ export const PublishedProviderNameColumn = (props: IPublishedProviderNameColumnP
         </td>
     } else {
         return <td className="govuk-table__cell govuk-!-padding-bottom-0">
-            <Link id={props.id} to={props.fundingOverviewUrl}>
+            <Link id={props.id} 
+                  to={props.fundingOverviewUrl}
+                  className="govuk-link govuk-link--no-visited-state">
                 {provider.providerName}
             </Link>
         </td>

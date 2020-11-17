@@ -5,11 +5,13 @@ import {SpecificationInformation} from "../types/Provider/SpecificationInformati
 
 let baseURL = "/api/provider";
 
-export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string) {
+export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string): 
+    Promise<AxiosResponse<ProviderSummary>> {
     return axios.get<ProviderSummary>(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`);
 }
 
-export async function getProviderTransactionsService(specificationId:string, providerId:string) {
+export async function getProviderTransactionsService(specificationId:string, providerId:string): 
+    Promise<AxiosResponse<ProviderTransactionSummary>> {
     return axios.get<ProviderTransactionSummary>(`${baseURL}/getProviderTransactions/${specificationId}/${providerId}`);
 }
 

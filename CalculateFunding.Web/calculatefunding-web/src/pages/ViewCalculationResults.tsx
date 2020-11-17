@@ -10,7 +10,7 @@ import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 import {SearchMode} from "../types/SearchMode";
-import {CalculationJobNotification} from "../components/Calculations/CalculationJobNotification";
+import {JobNotificationBanner} from "../components/Calculations/JobNotificationBanner";
 import {FacetValue} from "../types/Facet";
 import {Link} from "react-router-dom";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
@@ -261,7 +261,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         <h1 className="govuk-heading-xl">{calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
                         {specificationId.length > 0 &&
-                        <CalculationJobNotification
+                        <JobNotificationBanner
                             latestJob={latestJob}
                             isCheckingForJob={isCheckingForJob}
                             jobStatus={jobStatus}

@@ -143,6 +143,10 @@ function getJobProgressMessage(job: JobSummary) {
             return "Releasing all provider funding";
         case JobType.PublishBatchProviderFundingJob:
             return "Releasing batch provider funding";
+        case JobType.SearchIndexWriterJob:
+            return "Indexing search";
+        case JobType.ApproveAllCalculationsJob:
+            return "Approving all calculations";
         case undefined:
             return "";
         default:

@@ -124,7 +124,8 @@ const testSpec: SpecificationSummary = {
     id: "ABC123",
     isSelectedForFunding: true,
     providerVersionId: "",
-    dataDefinitionRelationshipIds: []
+    dataDefinitionRelationshipIds: [],
+    templateIds: {},
 };
 
 const matchMock: match<CreateAdditionalCalculationRouteProps> = {

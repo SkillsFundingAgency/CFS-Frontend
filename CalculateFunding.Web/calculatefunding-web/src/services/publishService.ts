@@ -1,69 +1,90 @@
 import axios, {AxiosResponse} from "axios"
 import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewModel";
 import {ReleaseTimetableSummary} from "../types/ReleaseTimetableSummary";
+import {PublishedProviderFundingCount} from "../types/PublishedProvider/PublishedProviderFundingCount";
+import {JobCreatedResponse} from "../types/JobCreatedResponse";
 
-const baseUrl = "/api/publish";
+export async function getFundingSummaryForApprovingService(specificationId: string, publishedProviderIds: string[]): 
+    Promise<AxiosResponse<PublishedProviderFundingCount>> {
+    return axios(`/api/specs/${specificationId}/funding-summary-for-approval`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: {publishedProviderIds: publishedProviderIds}
+    });
+}
 
-export async function getReleaseTimetableForSpecificationService(specificationId: string): Promise<AxiosResponse<ReleaseTimetableSummary>> {
-    return axios(`${baseUrl}/gettimetable/${specificationId}`, {
+export async function getFundingSummaryForReleasingService(specificationId: string, publishedProviderIds: string[]): 
+    Promise<AxiosResponse<PublishedProviderFundingCount>> {
+    return axios(`/api/specs/${specificationId}/funding-summary-for-release`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: {publishedProviderIds: publishedProviderIds}
+    });
+}
+
+export async function getReleaseTimetableForSpecificationService(specificationId: string): 
+    Promise<AxiosResponse<ReleaseTimetableSummary>> {
+    return axios(`/api/publish/getTimetable/${specificationId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'}
     });
 }
 
 export async function saveReleaseTimetableForSpecificationService(saveReleaseTimetable: SaveReleaseTimetableViewModel) {
-    return axios(`${baseUrl}/savetimetable`, {
+    return axios(`/api/publish/saveTimetable`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: saveReleaseTimetable
     });
 }
 
-export async function refreshFundingService(specificationId: string): Promise<AxiosResponse<string>> {
-    return axios(`${baseUrl}/refreshfunding/${specificationId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+export async function prevalidateForRefreshFundingService(specificationId: string): 
+    Promise<AxiosResponse> {
+    return axios(`/api/specs/${specificationId}/validate-for-refresh`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
     });
 }
 
-export async function approveFundingService(specificationId: string): Promise<AxiosResponse<string>> {
-    return axios(`${baseUrl}/approvefunding/${specificationId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+export async function refreshSpecificationFundingService(specificationId: string): 
+    Promise<AxiosResponse<JobCreatedResponse>> {
+    return axios(`/api/specs/${specificationId}/refresh`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
     });
 }
 
-export async function releaseFundingService(specificationId: string): Promise<AxiosResponse<string>> {
-        return axios(`${baseUrl}/publishfunding/${specificationId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+export async function approveSpecificationFundingService(specificationId: string): 
+    Promise<AxiosResponse<JobCreatedResponse>> {
+    return axios(`/api/specs/${specificationId}/approve`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'}
+    });
+}
+
+export async function releaseSpecificationFundingService(specificationId: string): 
+    Promise<AxiosResponse<JobCreatedResponse>> {
+        return axios(`/api/specs/${specificationId}/release`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'}
         });
 }
 
-export async function getProfileHistoryService(fundingStreamId:string, fundingPeriodId:string, providerId:string) {
-    return axios(`/api/publish/get-profile-history/${fundingStreamId}/${fundingPeriodId}/${providerId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+export async function approveProvidersFundingService(specificationId: string, providers: string[]): 
+    Promise<AxiosResponse<JobCreatedResponse>> {
+    return axios(`/api/specs/${specificationId}/funding-approval/providers`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: {publishedProviderIds: providers}
     });
 }
 
-export async function getProfileArchiveService(fundingStreamId:string, fundingPeriodId:string, providerId:string) {
-    return axios(`/api/provider/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileArchive`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+export async function releaseProvidersFundingService(specificationId: string, providers: string[]): 
+    Promise<AxiosResponse<JobCreatedResponse>> {
+        return axios(`/api/specs/${specificationId}/funding-release/providers`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            data: {publishedProviderIds: providers}
+        });
 }
+

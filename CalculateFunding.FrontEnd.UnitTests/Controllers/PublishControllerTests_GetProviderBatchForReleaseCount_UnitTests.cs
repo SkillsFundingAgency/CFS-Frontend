@@ -31,7 +31,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetProviderBatchForReleaseCount_Returns_OkObjectResult_Given_ValidSpecificationIdAndPublishProviderIds()
         {
             string specificationId = "Specification-Id";
-            PublishProvidersRequest publishedProviderIds = new PublishProvidersRequest() { Providers = new[] { "p1"} };
+            PublishedProviderIdsRequest publishedProviderIds = new PublishedProviderIdsRequest() { PublishedProviderIds = new[] { "p1"} };
             _publishingApiClient.GetProviderBatchForReleaseCount(publishedProviderIds, specificationId)
                 .Returns(new ApiResponse<PublishedProviderFundingCount>(HttpStatusCode.OK, new PublishedProviderFundingCount()));
 
@@ -44,7 +44,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetProviderBatchForReleaseCount_Returns_BadRequestObjectResult_Given_InvalidInputs()
         {
             string specificationId = "spec1";
-            PublishProvidersRequest publishedProviderIds = new PublishProvidersRequest();
+            PublishedProviderIdsRequest publishedProviderIds = new PublishedProviderIdsRequest();
             _publishingApiClient.GetProviderBatchForReleaseCount(publishedProviderIds, specificationId)
                 .Returns(new ApiResponse<PublishedProviderFundingCount>(HttpStatusCode.BadRequest, null));
 

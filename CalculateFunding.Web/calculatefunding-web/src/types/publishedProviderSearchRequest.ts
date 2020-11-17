@@ -1,5 +1,13 @@
 import {SearchMode} from "./SearchMode";
 
+export enum PublishedProviderSearchFacet {
+    HasErrors = "hasErrors",
+    ProviderType = "providerType",
+    ProviderSubType = "providerSubType",
+    LocalAuthority = "localAuthority",
+    FundingStatus = "fundingStatus"
+}
+
 export interface PublishedProviderSearchRequest {
     pageNumber: number,
     searchTerm: string,
@@ -19,23 +27,25 @@ export interface PublishedProviderSearchRequest {
     searchFields: string[],
 }
 
-export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: string, fundingPeriodId: string, specificationId: string): 
-    PublishedProviderSearchRequest => {return {
-    searchTerm: "",
-    status: [],
-    providerType: [],
-    providerSubType: [],
-    localAuthority: [],
-    fundingStreamId: fundingStreamId,
-    specificationId: specificationId,
-    hasErrors: undefined,
-    searchMode: SearchMode.All,
-    pageSize: 50,
-    pageNumber: 1,
-    includeFacets: true,
-    facetCount: 0,
-    fundingPeriodId: fundingPeriodId,
-    errorToggle: "",
-    searchFields: []
-}};
+export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: string, fundingPeriodId: string, specificationId: string):
+    PublishedProviderSearchRequest => {
+    return {
+        searchTerm: "",
+        status: [],
+        providerType: [],
+        providerSubType: [],
+        localAuthority: [],
+        fundingStreamId: fundingStreamId,
+        specificationId: specificationId,
+        hasErrors: undefined,
+        searchMode: SearchMode.All,
+        pageSize: 50,
+        pageNumber: 1,
+        includeFacets: true,
+        facetCount: 0,
+        fundingPeriodId: fundingPeriodId,
+        errorToggle: "",
+        searchFields: []
+    }
+};
 

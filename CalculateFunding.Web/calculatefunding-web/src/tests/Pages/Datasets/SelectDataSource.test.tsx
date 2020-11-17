@@ -50,6 +50,8 @@ const mockSpecification: SpecificationSummary = {
     fundingStreams: [],
     isSelectedForFunding: false,
     providerVersionId: "",
+    templateIds: {},
+    dataDefinitionRelationshipIds: []
 };
 const specificationResult: SpecificationSummaryQueryResult = {
     specification: mockSpecification,
@@ -108,7 +110,7 @@ const withoutPermissions = {
     canCreateSpecification: false,
     canEditSpecification: false,
     canRefreshFunding: false,
-    canReleaseFunding: false
+    canReleaseFunding: false,
 };
 const withPermissions = {
     isCheckingForPermissions: false,

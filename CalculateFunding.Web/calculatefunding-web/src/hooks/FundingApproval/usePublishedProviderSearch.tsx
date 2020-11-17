@@ -3,6 +3,7 @@ import {QueryConfig, useQuery} from "react-query";
 import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {searchForPublishedProviderResults} from "../../services/publishedProviderService";
 import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
+import {PublishedProviderFundingCount} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 
 export type PublishedProviderSearchQueryResult = {
     publishedProviderSearchResults: PublishedProviderSearchResults | undefined,
@@ -10,14 +11,15 @@ export type PublishedProviderSearchQueryResult = {
     isErrorLoadingSearchResults: boolean,
     errorLoadingSearchResults: string
 }
-export const usePublishedProviderSearch = (searchRequest: PublishedProviderSearchRequest,
+
+export const usePublishedProviderSearch = (searchRequest: PublishedProviderSearchRequest | undefined,
                                            isEnabled: boolean,
                                            onError: (err: AxiosError) => void)
     : PublishedProviderSearchQueryResult => {
     const {data, isLoading, isError, error} =
         useQuery<PublishedProviderSearchResults, AxiosError>(
             ["published-provider-search", searchRequest],
-            async () => (await searchForPublishedProviderResults(searchRequest)).data,
+            async () => (await searchForPublishedProviderResults(searchRequest as PublishedProviderSearchRequest)).data,
             {
                 onError,
                 enabled: searchRequest && searchRequest.fundingStreamId && searchRequest.fundingPeriodId && isEnabled

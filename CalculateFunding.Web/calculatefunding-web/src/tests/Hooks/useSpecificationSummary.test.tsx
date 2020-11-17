@@ -20,7 +20,9 @@ export const testSpec: SpecificationSummary = {
     }],
     id: "ABC123",
     isSelectedForFunding: true,
-    providerVersionId: ""
+    providerVersionId: "",
+    templateIds: {},
+    dataDefinitionRelationshipIds: []
 };
 
 

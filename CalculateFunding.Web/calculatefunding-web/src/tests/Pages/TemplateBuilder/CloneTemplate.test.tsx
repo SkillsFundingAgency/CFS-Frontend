@@ -88,7 +88,6 @@ const mockTemplateToCloneFrom: TemplateResponse = {
     authorId: "",
     authorName: "",
     lastModificationDate: new Date(),
-    publishStatus: "",
     comments: ""
 };
 

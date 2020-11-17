@@ -1,8 +1,7 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {
-    SpecificationFundingApproval,
-    SpecificationFundingApprovalRoute
+    SpecificationFundingApproval, SpecificationFundingApprovalRouteProps,
 } from "../../../pages/FundingApprovals/SpecificationFundingApproval";
 import {createLocation, createMemoryHistory} from "history";
 import {render, screen, within} from "@testing-library/react";
@@ -37,10 +36,14 @@ import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import * as redux from "react-redux";
+import {FundingSearchSelectionState} from "../../../states/FundingSearchSelectionState";
+import {buildInitialPublishedProviderSearchRequest} from "../../../types/publishedProviderSearchRequest";
+import {PublishStatus} from "../../../types/PublishStatusModel";
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
-
+const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 const store: Store<IStoreState> = createStore(rootReducer);
 
 const renderPage = () => {
@@ -54,7 +57,6 @@ const renderPage = () => {
         </ReactQueryCacheProvider>
     </MemoryRouter>);
 };
-
 const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));
 const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
 const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));
@@ -75,6 +77,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when page initially renders before loading specification", () => {
         it('renders Specification loading', async () => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasNoActiveJobsRunning();
             renderPage();
             expect(await screen.getByText("Loading specification...")).toBeInTheDocument();
@@ -83,6 +86,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when job is active", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasActiveJobRunning();
             hasSpecification();
             hasFundingConfiguration();
@@ -111,13 +115,28 @@ describe("<SpecificationFundingApproval />", () => {
             expect(screen.queryByTestId("published-provider-results")).not.toBeInTheDocument();
         });
 
-        it('does not render refresh button', async () => {
-            expect(screen.queryByRole("button", {name: /Refresh funding/})).not.toBeInTheDocument();
+        it('renders refresh button as disabled', async () => {
+            const button = screen.queryByRole("button", {name: /Refresh funding/});
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
+        });
+
+        it('renders approve button as disabled', async () => {
+            const button = screen.queryByRole("button", {name: /Approve/});
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
+        });
+
+        it('renders release button as disabled', async () => {
+            const button = screen.queryByRole("button", {name: /Release/});
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
         });
     });
 
     describe("<SpecificationFundingApproval /> when job has failed", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasFailedJob();
             hasSpecification();
             hasFundingConfiguration();
@@ -157,6 +176,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when job has completed successfully", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasSuccessfulCompletedJob();
             hasSpecification();
             hasFundingConfiguration();
@@ -201,6 +221,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when loading specification, no active jobs", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasNoActiveJobsRunning();
             hasSpecification();
             renderPage();
@@ -216,6 +237,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when results with facets", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasNoActiveJobsRunning();
             hasSearchResults([provider1]);
             renderPage();
@@ -237,6 +259,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when results with no errors", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasSpecification();
             hasNoActiveJobsRunning();
             hasFundingConfiguration();
@@ -279,6 +302,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     describe("<SpecificationFundingApproval /> when results with errors", () => {
         beforeEach(() => {
+            useSelectorSpy.mockReturnValue(fundingSearchSelectionState);
             hasSpecification();
             hasNoActiveJobsRunning();
             hasFundingConfiguration();
@@ -442,7 +466,7 @@ const fundingConfigResult: FundingConfigurationQueryResult = {
 const provider1: PublishedProviderResult = {
     errors: [],
     fundingPeriodId: fundingPeriod.id,
-    fundingStatus: "Updated",
+    fundingStatus: PublishStatus.Updated,
     fundingStreamId: fundingStream.id,
     fundingValue: 3456.43,
     hasErrors: false,
@@ -459,7 +483,7 @@ const provider1: PublishedProviderResult = {
 const providerWithError1: PublishedProviderResult = {
     errors: ["Error: Something went wrong"],
     fundingPeriodId: fundingPeriod.id,
-    fundingStatus: "Updated",
+    fundingStatus: PublishStatus.Updated,
     fundingStreamId: fundingStream.id,
     fundingValue: 10000,
     hasErrors: true,
@@ -489,7 +513,12 @@ const fullPermissions: SpecificationPermissionsResult = {
     canCreateAdditionalCalculation: false
 };
 
-const matchMock: match<SpecificationFundingApprovalRoute> = {
+const fundingSearchSelectionState: FundingSearchSelectionState = {
+    providerVersionIds: [],
+    searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, testSpec.id)
+}
+
+const matchMock: match<SpecificationFundingApprovalRouteProps> = {
     params: {
         specificationId: testSpec.id,
         fundingStreamId: fundingStream.id,

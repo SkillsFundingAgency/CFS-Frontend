@@ -57,6 +57,7 @@ import {
 import {ReactQueryDevtools} from "react-query-devtools";
 import {ProfileHistory} from './pages/FundingApprovals/ProfileHistory';
 import {EditCalculation} from "./pages/Calculations/EditCalculation";
+import {ConfirmFunding} from "./pages/FundingApprovals/ConfirmFunding";
 
 const queryCache = new QueryCache();
 
@@ -94,8 +95,8 @@ const App: React.FunctionComponent = () => {
                         <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
                         <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
                         <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
-                        <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
-                               component={SpecificationFundingApproval}/>
+                        <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId" component={SpecificationFundingApproval}/>
+                        <Route path="/Approvals/ConfirmFunding/:fundingStreamId/:fundingPeriodId/:specificationId/:mode" component={ConfirmFunding}/>
                         <Route path="/Results/" component={ViewResults}/>
                         <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
                         <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>

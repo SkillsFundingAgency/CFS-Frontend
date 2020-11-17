@@ -1,6 +1,3 @@
-import {reduceViewSpecificationState} from "../../reducers/viewSpecificationReducer";
-import {ViewSpecificationActionTypes} from "../../actions/ViewSpecificationsActions";
-import {ViewSpecificationState} from "../../states/ViewSpecificationState";
 import {DatasetState} from "../../states/DatasetState";
 import {reduceDatasetState} from "../../reducers/datasetReducer";
 import {DatasetActionTypes} from "../../actions/DatasetActions";

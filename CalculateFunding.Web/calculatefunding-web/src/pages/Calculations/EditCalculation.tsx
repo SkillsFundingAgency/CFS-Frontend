@@ -231,7 +231,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onApproveCalculation}
-                                disabled={(calculationState && calculationState.isDirty) || !calculation || calculation.publishStatus === PublishStatus.Approved || !canApproveCalculation}>
+                                disabled={(calculationState && calculationState.isDirty) || !calculation || calculationStatus === PublishStatus.Approved || !canApproveCalculation}>
                             Approve
                         </button>
 

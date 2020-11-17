@@ -36,4 +36,6 @@
     ReIndexSpecificationJob = "ReIndexSpecificationJob",
     MergeSpecificationInformationForProviderJob = "MergeSpecificationInformationForProviderJob",
     UpdateCodeContextJob = "UpdateCodeContextJob",
+    SearchIndexWriterJob = "SearchIndexWriterJob",
+    ApproveAllCalculationsJob = "ApproveAllCalculationsJob",
 }
