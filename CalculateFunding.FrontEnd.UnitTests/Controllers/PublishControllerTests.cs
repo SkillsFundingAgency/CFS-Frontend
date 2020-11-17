@@ -18,6 +18,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using StackExchange.Redis;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
@@ -448,6 +449,62 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             string actualErrorSummary = actualErrorSummaries.FirstOrDefault();
             actualErrorSummary.Should().Be(errorSummary);
         }
+
+        [TestMethod]
+        public void RunSqlImportJobGuardsAgainstMissingSpecificationId()
+        {
+            Func<Task<IActionResult>> invocation = () => WhenTheRunSqlJobIsCreated(null, "something");
+
+            invocation
+                .Should()
+                .ThrowAsync<ArgumentNullException>()
+                .Result
+                .Which
+                .ParamName
+                .Should()
+                .Be("specificationId");
+        }
+
+        [TestMethod]
+        public void RunSqlImportJobGuardsAgainstMissingFundingStreamId()
+        {
+            Func<Task<IActionResult>> invocation = () => WhenTheRunSqlJobIsCreated("something", null);
+
+            invocation
+                .Should()
+                .ThrowAsync<ArgumentNullException>()
+                .Result
+                .Which
+                .ParamName
+                .Should()
+                .Be("fundingStreamId");
+        }
+
+        [TestMethod]
+        public async Task RunSqlImportJobDelegatesToPublishingEndPointAndReturnsJobDetails()
+        {
+            string specificationId = NewRandomString();
+            string fundingStreamId = NewRandomString();
+
+            JobCreationResponse expectedJob = new JobCreationResponse();
+
+            _publishingApiClient
+                .QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId)
+                .Returns(new ApiResponse<JobCreationResponse>(HttpStatusCode.OK, expectedJob));
+
+            OkObjectResult result = await WhenTheRunSqlJobIsCreated(specificationId, fundingStreamId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedJob);
+        }
+
+        private static string NewRandomString() => Guid.NewGuid().ToString();
+
+        private async Task<IActionResult> WhenTheRunSqlJobIsCreated(string specificationId,
+            string fundingStreamId)
+            => await _publishController.RunSqlImportJob(specificationId, fundingStreamId);
 
         private void SetupAuthorizedUser(SpecificationActionTypes specificationActionType)
         {

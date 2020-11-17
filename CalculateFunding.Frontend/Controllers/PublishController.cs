@@ -498,6 +498,26 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new OkObjectResult(apiResponse.Content?.Where(x => x != null).ToList());
         }
+        
+        [HttpGet("/api/sqlqa/specifications/{specificationId}/funding-streams/{fundingStreamId}/import/queue")]
+        public async Task<IActionResult> RunSqlImportJob([FromRoute] string specificationId,
+            [FromRoute] string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<JobCreationResponse> createJobResponse = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
+            
+            IActionResult errorResult =
+                createJobResponse.IsSuccessOrReturnFailureResult(nameof(Specification));
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return new OkObjectResult(createJobResponse.Content);
+        }
 
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
         {
