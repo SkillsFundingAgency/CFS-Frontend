@@ -202,7 +202,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     async function isUserAllowedToApproveAllCalculations() {
-        alert(canApproveAllCalculations)
         if (!canApproveAllCalculations)
         {
             addErrorMessage("You don't have permission to approve calculations");
