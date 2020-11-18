@@ -499,12 +499,36 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Should()
                 .BeSameAs(expectedJob);
         }
+        
+        [TestMethod]
+        public async Task GetLatestPublishedDateDelegatesToPublishingEndPointAndReturnsLatestDate()
+        {
+            string fundingPeriodId = NewRandomString();
+            string fundingStreamId = NewRandomString();
+
+            LatestPublishedDate expectedLatestDate = new LatestPublishedDate();
+
+            _publishingApiClient
+                .GetLatestPublishedDate(fundingStreamId, fundingPeriodId)
+                .Returns(new ApiResponse<LatestPublishedDate>(HttpStatusCode.OK, expectedLatestDate));
+
+            OkObjectResult result = await WhenTheLatestPublishedDateIsQueried(fundingPeriodId, fundingStreamId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedLatestDate);
+        }
 
         private static string NewRandomString() => Guid.NewGuid().ToString();
 
         private async Task<IActionResult> WhenTheRunSqlJobIsCreated(string specificationId,
             string fundingStreamId)
             => await _publishController.RunSqlImportJob(specificationId, fundingStreamId);
+        
+        private async Task<IActionResult> WhenTheLatestPublishedDateIsQueried(string fundingStreamId,
+            string fundingPeriodId)
+            => await _publishController.GetLatestPublishedDate(fundingStreamId, fundingPeriodId);
 
         private void SetupAuthorizedUser(SpecificationActionTypes specificationActionType)
         {
