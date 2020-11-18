@@ -190,7 +190,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         try {
             const calcs: CalculationSummary[] = (await getCalculationSummaryBySpecificationId(specificationId)).data;
             if (calcs.filter(calc => calc.calculationType === CalculationType.Template)
-                .some(calc => calc.publishStatus !== PublishStatus.Approved)) {
+                .some(calc => calc.status !== PublishStatus.Approved)) {
                 addErrorMessage("Template calculations must be approved before the specification can be chosen for funding.");
                 return false;
             }
@@ -210,7 +210,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         try {
             const calcs: CalculationSummary[] = (await getCalculationSummaryBySpecificationId(specificationId)).data;
             if (!calcs.some(calc => calc.calculationType === CalculationType.Template
-                && calc.publishStatus !== PublishStatus.Approved)) {
+                && calc.status !== PublishStatus.Approved)) {
                 addErrorMessage("All calculations have already been approved");
                 return false;
             }

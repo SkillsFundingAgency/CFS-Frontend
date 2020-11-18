@@ -23,7 +23,7 @@ export interface CalculationDetails {
 
 export interface CalculationSummary {
     calculationType: CalculationType,
-    publishStatus: PublishStatus,
+    status: PublishStatus,
     version: number,
     calculationValueType: CalculationValueType
 }
