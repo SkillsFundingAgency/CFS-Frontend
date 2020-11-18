@@ -2,14 +2,8 @@ import React from "react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import {act, fireEvent, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import {FundingLineResults} from "../../../components/fundingLineStructure/FundingLineResults";
 import {PublishStatus} from "../../../types/PublishStatusModel";
-import {
-    getFundingLineStructureByProviderService,
-    getFundingLineStructureService
-} from "../../../services/fundingStructuresService";
 import {FundingStructureType, IFundingStructureItem} from "../../../types/FundingStructureItem";
-import {getPublishedProviderFundingStructureService} from "../../../services/publishedProviderFundingLineService";
 
 const renderFundingLineResults = () => {
     const {FundingLineResults} = require('../../../components/fundingLineStructure/FundingLineResults');
@@ -20,7 +14,9 @@ const renderFundingLineResults = () => {
                     approvalStatus={PublishStatus.Approved}
                     fundingPeriodId={"test fundingPeriodId"}
                     fundingStreamId={"test fundingStreamId"}
-                    specificationId={"test spec id"} />
+                    specificationId={"test spec id"}
+                    addErrorMessage={jest.fn()}
+                    clearErrorMessages={jest.fn()} />
             </Route>
         </Switch>
     </MemoryRouter>)
@@ -36,7 +32,9 @@ const renderFundingLineResultsWithProviderId = () => {
                     fundingPeriodId={"test fundingPeriodId"}
                     fundingStreamId={"test fundingStreamId"}
                     specificationId={"test spec id"}
-                    providerId = {"test provider id"} />
+                    providerId={"test provider id"}
+                    addErrorMessage={jest.fn()}
+                    clearErrorMessages={jest.fn()} />
             </Route>
         </Switch>
     </MemoryRouter>)
@@ -52,7 +50,9 @@ const renderFundingLineResultsWithProviderVersionId = () => {
                     fundingPeriodId={"test fundingPeriodId"}
                     fundingStreamId={"test fundingStreamId"}
                     specificationId={"test spec id"}
-                    providerVersionId = {"test provider version id"} />
+                    providerVersionId={"test provider version id"}
+                    addErrorMessage={jest.fn()}
+                    clearErrorMessages={jest.fn()} />
             </Route>
         </Switch>
     </MemoryRouter>)
@@ -60,27 +60,27 @@ const renderFundingLineResultsWithProviderVersionId = () => {
 
 
 const mockFundingLineStructureService = () => {
-        const fundingLineStructureService = jest.requireActual('../../../services/fundingStructuresService');
-        const mockedFundingStructureItems: IFundingStructureItem[] = [{
-            level: 1,
-            name: "",
-            calculationId: "",
-            calculationPublishStatus: "",
-            type: FundingStructureType.Calculation,
-            fundingStructureItems: [],
-            parentName: "",
-            expanded: false
-        }];
-        return {
-            ...fundingLineStructureService,
-            getFundingLineStructureService: jest.fn(() => Promise.resolve({
-                data: mockedFundingStructureItems
-            })),
-            getFundingLineStructureByProviderService: jest.fn(() => Promise.resolve({
-                data: mockedFundingStructureItems
-            }))
-        }
+    const fundingLineStructureService = jest.requireActual('../../../services/fundingStructuresService');
+    const mockedFundingStructureItems: IFundingStructureItem[] = [{
+        level: 1,
+        name: "",
+        calculationId: "",
+        calculationPublishStatus: "",
+        type: FundingStructureType.Calculation,
+        fundingStructureItems: [],
+        parentName: "",
+        expanded: false
+    }];
+    return {
+        ...fundingLineStructureService,
+        getFundingLineStructureService: jest.fn(() => Promise.resolve({
+            data: mockedFundingStructureItems
+        })),
+        getFundingLineStructureByProviderService: jest.fn(() => Promise.resolve({
+            data: mockedFundingStructureItems
+        }))
     }
+}
 
 const mockPublishedProviderFundingLineService = () => {
     const publishedProviderFundingLineService = jest.requireActual('../../../services/publishedProviderFundingLineService');
@@ -89,10 +89,10 @@ const mockPublishedProviderFundingLineService = () => {
         getPublishedProviderFundingStructureService: jest.fn(() => Promise.resolve({
             data: {
                 items: [{
-                    level : 1,
-                    name : "",
-                    calculationId : "",
-                    type : FundingStructureType.Calculation,
+                    level: 1,
+                    name: "",
+                    calculationId: "",
+                    type: FundingStructureType.Calculation,
                     value: "",
                     calculationType: "",
                     fundingStructureItems: null
@@ -102,9 +102,6 @@ const mockPublishedProviderFundingLineService = () => {
         }))
     }
 }
-
-
-//afterEach(cleanup);
 
 describe("<FundingLineResults service checks />  ", () => {
     beforeEach(() => {

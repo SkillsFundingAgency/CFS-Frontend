@@ -34,6 +34,7 @@ import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {refreshSpecificationFundingService} from "../../services/publishService";
 import {approveAllCalculationsService, getCalculationSummaryBySpecificationId} from "../../services/calculationService";
+import {cloneDeep} from "lodash";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -120,7 +121,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }
     };
 
-    async function approveAllCalculations(){
+    async function approveAllCalculations() {
         try {
             clearErrorMessages();
             const isAllowed: boolean = await isUserAllowedToApproveAllCalculations();
@@ -202,8 +203,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     async function isUserAllowedToApproveAllCalculations() {
-        if (!canApproveAllCalculations)
-        {
+        if (!canApproveAllCalculations) {
             addErrorMessage("You don't have permission to approve calculations");
             return false;
         }
@@ -221,6 +221,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         return true;
     }
 
+    const setApprovalStatusToApproved = () => {
+        const updatedSpecification = cloneDeep(specification);
+        updatedSpecification.approvalStatus = PublishStatus.Approved;
+        setSpecification(updatedSpecification);
+    }
+
     return <div>
         <Header location={Section.Specifications} />
         <div className="govuk-width-container">
@@ -230,14 +236,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name} />
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={isApprovingAllCalculations}/>
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={isApprovingAllCalculations} />
 
             <MultipleErrorSummary errors={errors} />
 
             <LoadingStatus title={"Checking calculations"}
-                           hidden={!isApprovingAllCalculations}
-                           subTitle={"Please wait, this could take several minutes"}
-                           description={"Please do not refresh the page, you will be redirected automatically"}/>
+                hidden={!isApprovingAllCalculations}
+                subTitle={"Please wait, this could take several minutes"}
+                description={"Please do not refresh the page, you will be redirected automatically"} />
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>
                 <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
@@ -294,10 +300,17 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variation-management-tab"} label="variation-management">Variation Management</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
-                            <FundingLineResults specificationId={specification.id} fundingStreamId={specification.fundingStreams[0].id} fundingPeriodId={specification.fundingPeriod.id} approvalStatus={specification.approvalStatus as PublishStatus} />
+                            <FundingLineResults specificationId={specification.id}
+                                fundingStreamId={specification.fundingStreams[0].id}
+                                fundingPeriodId={specification.fundingPeriod.id}
+                                approvalStatus={specification.approvalStatus as PublishStatus}
+                                addErrorMessage={addErrorMessage}
+                                clearErrorMessages={clearErrorMessages}
+                                setApprovalStatusToApproved={setApprovalStatusToApproved} />
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
-                            <AdditionalCalculations specificationId={specificationId} addError={addErrorMessage} />
+                            <AdditionalCalculations specificationId={specificationId}
+                                addError={addErrorMessage} />
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
                             <Datasets specificationId={specificationId} />
@@ -306,8 +319,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <section className="govuk-tabs__panel">
                                 <ReleaseTimetable specificationId={specificationId}
                                     addErrorMessage={addErrorMessage}
-                                        clearErrorMessages={clearErrorMessages}
-                                            errors={errors} />
+                                    clearErrorMessages={clearErrorMessages}
+                                    errors={errors} />
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>

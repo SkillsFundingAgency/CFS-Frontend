@@ -82,7 +82,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                     addErrorMessage("No profile totals found for this provider", "Error while loading profile totals") :
                     addErrorMessage(err.message, "Error while loading profile totals")
             });
-    const {errors, addErrorMessage} = useErrors();
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
 
     useEffect(() => {
         const params = QueryString.parse(location.search);
@@ -170,7 +170,8 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                         <Tabs.Panel label="calculations">
                             <FundingLineResults specificationId={specificationId} fundingStreamId={fundingStreamId}
                                                 fundingPeriodId={fundingPeriodId} approvalStatus={PublishStatus.Approved}
-                                                providerVersionId={providerVersionId}/>
+                                                providerVersionId={providerVersionId} addErrorMessage={addErrorMessage}
+                                                clearErrorMessages={clearErrorMessages} />
                         </Tabs.Panel>
                     </Tabs>
                 </div>

@@ -27,9 +27,29 @@ import {
 } from "../../services/fundingStructuresService";
 import {getPublishedProviderFundingStructureService} from "../../services/publishedProviderFundingLineService";
 
-export function FundingLineResults(props:{specificationId:string, fundingPeriodId:string, fundingStreamId:string,
-    approvalStatus:PublishStatus, providerId?: string, providerVersionId?: string})
-{
+export interface FundingLineResultsProps {
+    specificationId: string,
+    fundingPeriodId: string,
+    fundingStreamId: string,
+    approvalStatus: PublishStatus,
+    providerId?: string,
+    providerVersionId?: string,
+    addErrorMessage: (errorMessage: any, description?: string, fieldName?: string) => void,
+    clearErrorMessages: (fieldNames?: string[]) => void,
+    setApprovalStatusToApproved?: () => void,
+}
+
+export function FundingLineResults({
+    specificationId,
+    fundingPeriodId,
+    fundingStreamId,
+    approvalStatus,
+    providerId,
+    providerVersionId,
+    addErrorMessage,
+    clearErrorMessages,
+    setApprovalStatusToApproved
+}: FundingLineResultsProps) {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
@@ -41,17 +61,18 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
-    const [errors, setErrors] = useState<string[]>([]);
 
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
         const response = await approveFundingLineStructureService(specificationId);
         if (response.status === 200) {
             setFundingLinePublishStatus(PublishStatus.Approved);
+            if (setApprovalStatusToApproved) {
+                setApprovalStatusToApproved();
+            }
         } else {
-            // could this be a callback?
-            setErrors(errors => [...errors, `Error whilst approving funding line structure: ${response.statusText} ${response.data}`]);
-            setFundingLinePublishStatus(props.approvalStatus);
+            addErrorMessage(`Error whilst approving funding line structure: ${response.statusText} ${response.data}`, undefined, "funding-line-results");
+            setFundingLinePublishStatus(approvalStatus);
         }
     };
 
@@ -116,33 +137,32 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
 
     useEffect(() => {
         fetchData();
-    }, [props.specificationId])
+    }, [specificationId])
 
     const fetchData = async () => {
         setIsLoadingFundingLineStructure(true);
         try {
-            if(props.specificationId !== "" && props.fundingPeriodId !== "" && props.fundingStreamId !== "") {
-                let  fundingStructureItems: IFundingStructureItem[];
-                if (props.providerVersionId != null) {
-                    const publishedProviderFundingStructure = (await getPublishedProviderFundingStructureService(props.providerVersionId)).data;
+            if (specificationId !== "" && fundingPeriodId !== "" && fundingStreamId !== "") {
+                let fundingStructureItems: IFundingStructureItem[];
+                if (providerVersionId != null) {
+                    const publishedProviderFundingStructure = (await getPublishedProviderFundingStructureService(providerVersionId)).data;
                     fundingStructureItems = mapPublishedProviderFundingStructureItemsToFundingStructureItems(publishedProviderFundingStructure.items);
                 }
-                else if (props.providerId != null)
-                {
-                    fundingStructureItems = (await getFundingLineStructureByProviderService(props.specificationId, props.fundingPeriodId, props.fundingStreamId, props.providerId)).data;
+                else if (providerId != null) {
+                    fundingStructureItems = (await getFundingLineStructureByProviderService(specificationId, fundingPeriodId, fundingStreamId, providerId)).data;
                 }
-                else
-                {
-                    fundingStructureItems = (await getFundingLineStructureService(props.specificationId, props.fundingPeriodId, props.fundingStreamId)).data;
+                else {
+                    fundingStructureItems = (await getFundingLineStructureService(specificationId, fundingPeriodId, fundingStreamId)).data;
                 }
 
                 setInitialExpandedStatus(fundingStructureItems, false);
                 setFundingLines(fundingStructureItems);
-                setFundingLinePublishStatus(props.approvalStatus);
+                setFundingLinePublishStatus(approvalStatus);
+                clearErrorMessages(["funding-line-results"]);
             }
         } catch (err) {
             setFundingLineStructureError(true);
-            setErrors(errors => [...errors, `A problem occurred while loading funding line structure: ${err.message}`]);
+            addErrorMessage(`A problem occurred while loading funding line structure: ${err.message}`, undefined, "funding-line-results");
         } finally {
             setIsLoadingFundingLineStructure(false);
         }
@@ -150,8 +170,8 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
 
     return <section className="govuk-tabs__panel" id="fundingline-structure">
         <LoadingStatus title={"Loading funding line structure"}
-                       hidden={!isLoadingFundingLineStructure}
-                       description={"Please wait whilst funding line structure is loading"}/>
+            hidden={!isLoadingFundingLineStructure}
+            description={"Please wait whilst funding line structure is loading"} />
         <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
             <div className="govuk-grid-column-two-thirds">
                 <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
@@ -162,30 +182,30 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
                 <h2 className="govuk-heading-l">Funding line structure</h2>
             </div>
             <div className="govuk-grid-column-one-third">
-                <ApproveStatusButton id={props.specificationId}
-                                     status={fundingLinePublishStatus}
-                                     callback={handleApproveFundingLineStructure}/>
+                <ApproveStatusButton id={specificationId}
+                    status={fundingLinePublishStatus}
+                    callback={handleApproveFundingLineStructure} />
             </div>
             <div className="govuk-grid-column-two-thirds">
                 <div className="govuk-form-group search-container">
                     <label className="govuk-label">
                         Search by calculation
                     </label>
-                    <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
+                    <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
                 </div>
             </div>
         </div>
         <div className="govuk-accordion__controls" hidden={isLoadingFundingLineStructure || fundingLineStructureError}>
             <button type="button" className="govuk-accordion__open-all"
-                    aria-expanded="false"
-                    onClick={()=>openCloseAllFundingLines(true)}
-                    hidden={fundingLinesExpandedStatus}>Open all<span
-                className="govuk-visually-hidden"> sections</span></button>
+                aria-expanded="false"
+                onClick={() => openCloseAllFundingLines(true)}
+                hidden={fundingLinesExpandedStatus}>Open all<span
+                    className="govuk-visually-hidden"> sections</span></button>
             <button type="button" className="govuk-accordion__open-all"
-                    aria-expanded="true"
-                    onClick={()=>openCloseAllFundingLines(false)}
-                    hidden={!fundingLinesExpandedStatus}>Close all<span
-                className="govuk-visually-hidden"> sections</span></button>
+                aria-expanded="true"
+                onClick={() => openCloseAllFundingLines(false)}
+                hidden={!fundingLinesExpandedStatus}>Close all<span
+                    className="govuk-visually-hidden"> sections</span></button>
         </div>
         <ul className="collapsible-steps">
             {
@@ -208,14 +228,14 @@ export function FundingLineResults(props:{specificationId:string, fundingPeriodI
                             hasChildren={f.fundingStructureItems != null}
                             callback={collapsibleStepsChanged}>
                             <FundingLineStep key={f.name.replace(" ", "") + index}
-                                             showResults={false}
-                                             expanded={fundingLinesExpandedStatus}
-                                             fundingStructureItem={f}
-                                             callback={collapsibleStepsChanged}/>
+                                showResults={false}
+                                expanded={fundingLinesExpandedStatus}
+                                fundingStructureItem={f}
+                                callback={collapsibleStepsChanged} />
                         </CollapsibleSteps>
                     </li>
                 })}
         </ul>
-        <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0}/>
+        <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0} />
     </section>
 }
