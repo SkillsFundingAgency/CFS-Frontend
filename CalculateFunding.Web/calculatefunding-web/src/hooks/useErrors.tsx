@@ -1,5 +1,5 @@
 ﻿import * as React from "react";
-import {ErrorMessage} from "../types/ErrorMessage";
+import {ErrorMessage, ValidationErrors} from "../types/ErrorMessage";
 
 export const useErrors = () => {
     const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
@@ -14,9 +14,22 @@ export const useErrors = () => {
             id: errorCount + 1,
             fieldName: fieldName,
             description: description,
-            message: errorMessage.toString()
+            message: errorMessage.toString(),
+            validationErrors: undefined
         };
         setErrors(errors => [...errors, error]);
+    };
+    
+    const addValidationErrors = (validationErrors: ValidationErrors, message: string, description?: string, fieldName?: string) => {
+        const errorCount: number = errors.length;
+        const errorMessage: ErrorMessage = {
+            id: errorCount + 1,
+            fieldName: fieldName,
+            description: description,
+            message: message,
+            validationErrors: validationErrors
+        };
+        setErrors(errors => [...errors, errorMessage]);
     };
 
     const clearErrorMessages = (fieldNames?: string[]) => {
@@ -32,6 +45,7 @@ export const useErrors = () => {
     return {
         errors,
         addErrorMessage,
+        addValidationErrors,
         clearErrorMessages
     }
 }

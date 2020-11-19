@@ -6,7 +6,7 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
-import {UserConfirmLeavePageModal} from "../../../components/UserConfirmLeavePageModal";
+import {ConfirmationModal} from "../../../components/ConfirmationModal";
 import * as hooks from "../../../hooks/TemplateBuilder/useTemplateUndo";
 
 jest.useFakeTimers();
@@ -110,7 +110,7 @@ const renderEditTemplatePage = () => {
     return render(
         <MemoryRouter
             getUserConfirmation={(message, callback) => {
-                UserConfirmLeavePageModal(message, callback)
+                ConfirmationModal(message, callback)
             }}>
             <EditTemplate/>
         </MemoryRouter>);
@@ -292,8 +292,8 @@ describe("EditTemplate Page tests", () => {
             });
 
             await waitFor(() => {
-                expect(getByTestId("user-leave-page-confirmation-placeholder")).toBeInTheDocument();
-                expect(getByText("Are you sure you want to leave without saving your changes?")).toBeInTheDocument();
+                expect(getByTestId("modal-confirmation-placeholder")).toBeInTheDocument();
+                expect(getByText(/Are you sure you want to leave without saving your changes?/)).toBeInTheDocument();
             });
         });
 

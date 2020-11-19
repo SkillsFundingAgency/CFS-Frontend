@@ -44,7 +44,7 @@ import {DataRelationships} from "./pages/Datasets/DataRelationships";
 import {SelectDataSource} from "./pages/Datasets/SelectDataSource";
 import {SelectDataSourceExpanded} from "./pages/Datasets/SelectDataSourceExpanded";
 import {ViewProviderResults} from "./pages/ViewResults/ViewProviderResults";
-import {UserConfirmLeavePageModal} from "./components/UserConfirmLeavePageModal";
+import {ConfirmationModal} from "./components/ConfirmationModal";
 import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
 import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculationVersions";
@@ -89,7 +89,7 @@ const App: React.FunctionComponent = () => {
     if (hasConfirmedSkills === true) {
         return (
             <BrowserRouter basename="/app"
-                           getUserConfirmation={(message, callback) => UserConfirmLeavePageModal(message, callback)}>
+                           getUserConfirmation={(message, callback) => ConfirmationModal(message, callback, 'Leave this page', 'Stay on this page')}>
                 <ReactQueryCacheProvider queryCache={queryCache}>
                     <Switch>
                         <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>

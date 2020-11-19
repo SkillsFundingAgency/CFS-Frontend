@@ -29,10 +29,10 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
     if (!props.latestJob || !props.jobStatus) {
         return null;
     }
-
+    
     return (<div className={props.jobStatus.isFailed ? "govuk-error-summary" :
-        props.jobStatus.isActive ? "govuk-error-summary govuk-error-summary-orange" :
-            "govuk-error-summary govuk-error-summary-green"}
+        props.jobStatus.isActive ? "govuk-error-summary-orange" :
+            "govuk-error-summary-green"}
                  aria-labelledby="error-summary-title" 
                  aria-label="job-notification"
                  role="alert"

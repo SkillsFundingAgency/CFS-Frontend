@@ -38,8 +38,8 @@ export async function saveReleaseTimetableForSpecificationService(saveReleaseTim
     });
 }
 
-export async function prevalidateForRefreshFundingService(specificationId: string): 
-    Promise<AxiosResponse> {
+export async function preValidateForRefreshFundingService(specificationId: string): 
+    Promise<AxiosResponse<string[]>> {
     return axios(`/api/specs/${specificationId}/validate-for-refresh`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}

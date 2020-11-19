@@ -17,7 +17,7 @@ import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
 import {useSelector} from "react-redux";
-import {UserConfirmLeavePageModal} from "../../components/UserConfirmLeavePageModal";
+import {ConfirmationModal} from "../../components/ConfirmationModal";
 import * as QueryString from "query-string";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {ReleaseTimetable} from "./ReleaseTimetable";
@@ -126,7 +126,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             clearErrorMessages();
             const isAllowed: boolean = await isUserAllowedToApproveAllCalculations();
             if (isAllowed) {
-                UserConfirmLeavePageModal("Are you sure you want to approve all calculations?",
+                ConfirmationModal("Are you sure you want to approve all calculations?",
                     submitApproveAllCalculations, "Confirm", "Cancel");
             }
         } catch (e) {
@@ -156,7 +156,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             clearErrorMessages();
             const isAllowed: boolean = await isUserAllowedToChooseSpecification(specificationId);
             if (isAllowed) {
-                UserConfirmLeavePageModal("Are you sure you want to choose this specification?",
+                ConfirmationModal(<div className="govuk-row govuk-!-width-full">Are you sure you want to choose this specification?</div>,
                     refreshFunding, "Confirm", "Cancel");
             }
         } catch (e) {

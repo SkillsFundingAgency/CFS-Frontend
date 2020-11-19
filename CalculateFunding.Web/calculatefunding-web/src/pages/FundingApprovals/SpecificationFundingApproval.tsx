@@ -26,7 +26,11 @@ import {useErrors} from "../../hooks/useErrors";
 import {JobNotificationBanner} from "../../components/Calculations/JobNotificationBanner";
 import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
 import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import {refreshSpecificationFundingService} from "../../services/publishService";
+import {preValidateForRefreshFundingService, refreshSpecificationFundingService} from "../../services/publishService";
+import {ConfirmationModal} from "../../components/ConfirmationModal";
+import {RunningStatus} from "../../types/RunningStatus";
+import {AxiosError} from "axios";
+import {ValidationErrors} from "../../types/ErrorMessage";
 
 export interface SpecificationFundingApprovalRouteProps {
     fundingStreamId: string;
@@ -66,7 +70,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
     const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
-    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const [jobId, setJobId] = useState<string>("");
+    const {errors, addErrorMessage, addValidationErrors, clearErrorMessages} = useErrors();
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -74,7 +79,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     useEffect(() => {
         if (!state.searchCriteria ||
             (state.searchCriteria &&
-            state.searchCriteria.specificationId !== specificationId)) {
+                state.searchCriteria.specificationId !== specificationId)) {
             dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
         }
     }, [match, state]);
@@ -94,30 +99,68 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     async function handleRefresh() {
         clearErrorMessages();
         setIsLoadingRefresh(true);
+
         try {
-            await refreshSpecificationFundingService(specificationId);
+            await preValidateForRefreshFundingService(specificationId);
+            
+            ConfirmationModal(<ConfirmRefreshModelBody/>, refreshFunding, "Confirm", "Cancel");
         } catch (e) {
-            addErrorMessage("An error occured whilst calling the server to refresh: " + e);
-        } finally {
+            if (e.isAxiosError) {
+                const axiosError = e as AxiosError;
+                if (axiosError.response) {
+                    addValidationErrors(axiosError.response.data, "Error trying to refresh funding");
+                }
+            } else {
+                addErrorMessage(e, "Error trying to refresh funding");
+            }
             setIsLoadingRefresh(false);
         }
+    }
+
+    async function refreshFunding() {
+        try {
+            setJobId((await refreshSpecificationFundingService(specificationId)).data.jobId);
+        } catch (e) {
+            setIsLoadingRefresh(false);
+            addErrorMessage(e, "Error trying to refresh funding");
+        }
+    }
+
+    const ConfirmRefreshModelBody = () => {
+        return <div className="govuk-grid-column-full left-align">
+            <h1 className="govuk-heading-l">Confirm funding refresh</h1>
+            <p className="govuk-body">A refresh of funding will update the following data:</p>
+            <ul className="govuk-list govuk-list--bullet">
+                <li>Allocation values</li>
+                <li>Profile values</li>
+            </ul>
+            <p className="govuk-body">
+                This update will affect providers in specification {specification?.name} for the funding
+                stream {specification?.fundingStreams[0].name} and period {specification?.fundingPeriod.name}.
+            </p>
+        </div>
     }
 
     if (publishedProvidersWithErrors) {
         publishedProvidersWithErrors.forEach(err => addErrorMessage(err, "Provider error"));
     }
 
+    if (latestJob && latestJob.jobId === jobId && latestJob.runningStatus === RunningStatus.Completed) {
+        setIsLoadingRefresh(false);
+        setJobId("");
+    }
+
     const isLoading = errors.length === 0 && (isLoadingSpecification || isLoadingFundingConfiguration || isCheckingForJob || hasActiveJob || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);
     const loadingTitle =
         isLoadingSpecification ? "Loading specification..." :
-            isLoadingRefresh ? "Updating..." :
+            isLoadingRefresh ? "Requesting refresh of funding..." :
                 isCheckingForJob ? "Checking for jobs..." :
                     hasActiveJob && jobStatus ? `Job ${jobStatus.statusDescription}: ${jobStatus.jobDescription}` :
                         isLoadingSearchResults ? "Loading provider funding data..." :
                             isLoadingFundingConfiguration ? "Loading funding configuration..." :
                                 ""
     const loadingSubtitle =
-        isLoadingRefresh ? "Refreshing data" :
+        isLoadingRefresh ? "Updating, please wait" :
             isCheckingForJob ? "Searching for any running jobs" :
                 hasActiveJob ? "Monitoring job progress. Please wait, this could take several minutes" :
                     "";
@@ -152,7 +195,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 />
 
                 <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-one-third" hidden={hasActiveJob || isCheckingForJob}>
+                    <div className="govuk-grid-column-one-third" hidden={hasActiveJob || isCheckingForJob || isLoadingRefresh}>
                         <PublishedProviderSearchFilters
                             facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
                             numberOfProvidersWithErrors={0}
@@ -164,7 +207,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>
                         </div>
                         }
-                        {!isCheckingForJob && !hasActiveJob && !isLoadingSearchResults &&
+                        {!isCheckingForJob && !hasActiveJob && !isLoadingRefresh && !isLoadingSearchResults &&
                         !isLoadingPublishedProviderIds && !isLoadingSpecification && specification &&
                         <PublishedProviderResults
                             specificationId={specificationId}
@@ -184,18 +227,20 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         />
                         }
                     </div>
-                    <div className="govuk-grid-column-two-thirds">
+                </div>
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-full right-align">
                         <div className="right-align">
                             <button className="govuk-button govuk-!-margin-right-1"
-                                    disabled={hasActiveJob || !canRefreshFunding}
+                                    disabled={hasActiveJob || !canRefreshFunding || isLoadingRefresh}
                                     onClick={handleRefresh}>Refresh funding
                             </button>
-                            <button className="govuk-button govuk-!-margin-right-1"
-                                    disabled={hasActiveJob || !publishedProviderSearchResults?.canApprove || !canApproveFunding}
+                            <button className="govuk-button"
+                                    disabled={hasActiveJob || !publishedProviderSearchResults?.canApprove || !canApproveFunding || isLoadingRefresh}
                                     onClick={handleApprove}>Approve funding
                             </button>
-                            <button className="govuk-button govuk-button--warning"
-                                    disabled={hasActiveJob || !publishedProviderSearchResults?.canPublish || !canReleaseFunding}
+                            <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+                                    disabled={hasActiveJob || !publishedProviderSearchResults?.canPublish || !canReleaseFunding || isLoadingRefresh}
                                     onClick={handleRelease}>Release funding
                             </button>
                         </div>
