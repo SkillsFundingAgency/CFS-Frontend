@@ -10,6 +10,7 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {IStoreState} from "../../reducers/rootReducer";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {Section} from "../../types/Sections";
+import {PreviewProfileModal} from "../../components/Funding/PreviewProfileModal";
 import {useErrors} from "../../hooks/useErrors";
 import {useQuery} from "react-query";
 import {assignProfilePatternKeyToPublishedProvider, getAllProfilePatterns} from "../../services/profilingService";
@@ -66,6 +67,8 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
     const [ruleBasedPatternKey, setRuleBasedPatternKey] = useState<string | undefined>();
     const [validated, setValidated] = useState<boolean>(false);
     const [missingData, setMissingData] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState<boolean>(false);
+    const [previewProfilePatternKey, setPreviewProfilePatternKey] = useState<string | null | undefined>();
 
     useEffect(() => {
         setMissingPermissions([]);
@@ -149,6 +152,17 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
         const newValue = e.target.value;
         setRuleBasedPatternKey(newValue);
         setProfilePatternKey(newValue);
+    }
+
+    useEffect(() => {
+        if (previewProfilePatternKey !== undefined) {
+            setShowModal(true);
+        }
+    }, [previewProfilePatternKey]);
+
+    const handlePreviewProfile = (key: string | null) => {
+        clearErrorMessages(["preview-profile"]);
+        setPreviewProfilePatternKey(key);
     }
 
     const getNationalPattern: FundingStreamPeriodProfilePattern | undefined = useMemo(() => {
@@ -237,6 +251,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                         <span className="govuk-hint">
                                             <strong>Description:</strong> {getNationalPatternDescription()}
                                         </span>
+                                        <button className="govuk-link" onClick={e => handlePreviewProfile(null)}>Preview profile</button>
                                     </label>
                                 </div>
                                 <div className="govuk-form-group">
@@ -275,6 +290,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                                                             rbp.profilePatternDisplayName : "Unknown name"}
                                                                         <span className="govuk-hint">{rbp.profilePatternDescription && rbp.profilePatternDescription !== null ?
                                                                             rbp.profilePatternDescription : "Unknown description"}</span>
+                                                                        <button className="govuk-link" onClick={e => handlePreviewProfile(patternKey)}>Preview profile</button>
                                                                     </label>
                                                                 </div>
                                                             }
@@ -303,6 +319,18 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                         </div>
                     </>}
             </div>
+            {previewProfilePatternKey !== undefined && <PreviewProfileModal
+                specificationId={specificationId}
+                fundingStreamId={fundingStreamId}
+                fundingPeriodId={fundingPeriodId}
+                providerId={providerId}
+                fundingLineId={fundingLineId}
+                previewProfilePatternKey={previewProfilePatternKey}
+                addErrorMessage={addErrorMessage}
+                showModal={showModal}
+                toggleModal={setShowModal}
+                setPreviewProfilePatternKey={setPreviewProfilePatternKey}
+            />}
             <Footer />
         </div>
     )

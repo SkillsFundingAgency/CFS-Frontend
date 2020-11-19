@@ -1,6 +1,6 @@
 import React from "react";
 import * as redux from "react-redux";
-import {render, waitFor, screen, fireEvent, cleanup} from "@testing-library/react";
+import {render, waitFor, screen, fireEvent, cleanup, waitForElementToBeRemoved} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {ChangeProfileTypeProps} from "../../../pages/FundingApprovals/ChangeProfileType";
@@ -156,6 +156,63 @@ describe("<ChangeProfileType /> ", () => {
                     expect(mockHistoryPush).toBeCalledWith("/Approvals/ProviderFundingOverview/specId/10005143/dsg-2019-12-16/DSG/FY-2021/DSG-004");
                 });
             });
+
+            it("hides preview modal by default", async () => {
+                const {queryByRole} = renderPage();
+                await waitFor(() => {
+                    expect(queryByRole("dialog")).not.toBeInTheDocument();
+                });
+            });
+
+            it("shows preview modal when preview link clicked and loads data", async () => {
+                const {getByRole, getByText, getAllByText} = renderPage();
+                await waitFor(() => {
+                    expect(getByText(/Apply/).closest("button")).not.toBeDisabled();
+                });
+
+                fireEvent.click(getAllByText(/Preview profile/i)[0]);
+
+                await waitFor(() => {
+                    expect(getByRole("dialog")).toBeInTheDocument();
+                });
+
+                expect(mockPreviewProfile).toBeCalledTimes(1);
+            });
+
+            it("can close preview modal", async () => {
+                const {getByRole, getByText, getAllByText, queryByRole} = renderPage();
+                await waitFor(() => {
+                    expect(getByText(/Apply/).closest("button")).not.toBeDisabled();
+                });
+
+                fireEvent.click(getAllByText(/Preview profile/i)[0]);
+
+                await waitFor(() => {
+                    expect(getByRole("dialog")).toBeInTheDocument();
+                });
+
+                fireEvent.click(getAllByText(/Close/i)[0]);
+
+                expect(queryByRole("dialog")).not.toBeInTheDocument();
+            });
+
+            it("displays errors and closes preview modal on error loading preview data", async () => {
+                mockPreviewProfile.mockRejectedValue("fail");
+
+                const {getByText, getAllByText, queryByRole} = renderPage();
+                await waitFor(() => {
+                    expect(getByText(/Apply/).closest("button")).not.toBeDisabled();
+                });
+
+                fireEvent.click(getAllByText(/Preview profile/i)[0]);
+
+                await waitFor(() => {
+                    expect(queryByRole("dialog")).not.toBeInTheDocument();
+                });
+
+                expect(mockPreviewProfile).toBeCalledTimes(1);
+                expect(getByText(/There is a problem/i)).toBeInTheDocument();
+            });
         });
     });
 
@@ -207,7 +264,13 @@ describe("<ChangeProfileType /> ", () => {
 });
 
 // Setup module mocks
+const mockGetFundingLinePublishedProviderDetails = jest.fn();
+const mockPreviewProfile = jest.fn(() => Promise.resolve({
+    data: []
+}));
+
 jest.mock('../../../services/profilingService', () => ({
+    previewProfile: mockPreviewProfile,
     assignProfilePatternKeyToPublishedProvider: jest.fn(() => Promise.resolve()),
     getAllProfilePatterns: jest.fn(() => Promise.resolve({
         data: [{
@@ -310,8 +373,6 @@ jest.mock('../../../services/providerService', () => ({
         }
     })),
 }));
-
-const mockGetFundingLinePublishedProviderDetails = jest.fn();
 
 jest.mock('../../../services/fundingLineDetailsService', () => ({
     getFundingLinePublishedProviderDetails: mockGetFundingLinePublishedProviderDetails

@@ -1,4 +1,5 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
+import {ProfileTotal} from "../types/FundingLineProfile";
 import {FundingStreamPeriodProfilePattern} from "../types/ProviderProfileTotalsForStreamAndPeriod";
 
 let baseURL = "/api/profiling";
@@ -8,7 +9,7 @@ export async function getProfilePatternsService(fundingStreamId: string, funding
 }
 
 export async function getAllProfilePatterns(fundingStreamId: string, fundingPeriodId: string) {
-    return axios.get<FundingStreamPeriodProfilePattern[]>(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}/all`);
+    return axios.get<Promise<FundingStreamPeriodProfilePattern[]>>(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}/all`);
 }
 
 export async function assignProfilePatternKeyToPublishedProvider(
@@ -36,5 +37,25 @@ export async function getProfileArchiveService(fundingStreamId:string, fundingPe
     return axios(`/api/provider/${fundingStreamId}/${fundingPeriodId}/${providerId}/profileArchive`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
+    });
+}
+
+export async function previewProfile(specificationId: string, fundingStreamId: string,
+    fundingPeriodId: string, providerId: string, fundingLineCode: string, profilePatternKey: string | null)
+        : Promise<AxiosResponse<ProfileTotal[]>> {
+    return axios(`${baseURL}/preview`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: {
+            specificationId: specificationId,
+            fundingStreamId: fundingStreamId,
+            fundingPeriodId: fundingPeriodId,
+            providerId: providerId,
+            fundingLineCode: fundingLineCode,
+            profilePatternKey: profilePatternKey,
+            configurationType: "RuleBased"
+        }
     });
 }
