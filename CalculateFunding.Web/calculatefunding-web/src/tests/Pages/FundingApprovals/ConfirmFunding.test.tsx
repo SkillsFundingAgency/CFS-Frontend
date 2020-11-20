@@ -67,7 +67,7 @@ describe("<ConfirmFunding />", () => {
 
         it('renders job progress message', async () => {
             const alert = await screen.findByRole("alert", {name: "job-notification"});
-            expect(within(alert).getByText(/Monitoring.../)).toBeInTheDocument();
+            expect(within(alert).getByRole("alert", /Monitoring job/)).toBeInTheDocument();
             expect(within(alert).getByText(`Job ${activeJob?.latestJob?.statusDescription}: ${activeJob?.latestJob?.jobDescription}`)).toBeInTheDocument();
         });
 

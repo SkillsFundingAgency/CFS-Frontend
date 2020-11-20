@@ -37,12 +37,10 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
             Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
+            {props.job.isActive &&
+            <div className="loader loader-small" role="alert" aria-live="assertive" aria-label="Monitoring job"/>
+            }
         </h2>
-        {props.job.isActive &&
-        <h3>
-            <LoadingFieldStatus title={`Monitoring...`}/>
-        </h3>
-        }
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">
                 <li>

@@ -588,13 +588,15 @@ svg.app-back-to-top__icon {
 }
 
 /// Custom Error Summary ////
-.govuk-error-summary-green {
+.govuk-error-summary-green,
+.govuk-error-summary.govuk-error-summary-green {
   border: 5px solid #00703c;
   @include govuk-responsive-padding(4);
   @include govuk-responsive-margin(8, "bottom");
 }
 
-.govuk-error-summary-orange {
+.govuk-error-summary-orange,
+.govuk-error-summary.govuk-error-summary-orange {
   border: 5px solid #f47738;
   @include govuk-responsive-padding(4);
   @include govuk-responsive-margin(8, "bottom");

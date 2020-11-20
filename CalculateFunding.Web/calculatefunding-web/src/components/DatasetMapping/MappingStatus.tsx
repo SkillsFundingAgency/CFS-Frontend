@@ -23,10 +23,11 @@ export function MappingStatus(props: MappingStatusProps) {
         data-module="govuk-error-summary"
         data-testid="job-notification">
         <h2 className="govuk-error-summary__title" id="error-summary-title">
-            <span
-                data-testid="job-notification-title">Job {props.job.statusDescription}: {props.job.jobDescription}</span>
+            <span data-testid="job-notification-title">
+                Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
+                </span>
             {props.job.isActive &&
-            <div className="loader loader-small" role="alert" aria-live="assertive"/>
+            <div className="loader loader-small" role="alert" aria-live="assertive" aria-label="Monitoring job"/>
             }
         </h2>
         <div className="govuk-error-summary__body">

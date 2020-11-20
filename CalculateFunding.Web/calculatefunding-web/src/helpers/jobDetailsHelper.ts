@@ -25,16 +25,10 @@ export type JobDetails = {
     created?: Date
 }
 
-function getJobType(jobTypeString: string | undefined): JobType | undefined {
-    return JobType[jobTypeString as keyof typeof JobType];
-}
-
 export function getJobDetailsFromJobMessage(job: JobMessage): JobDetails {
     let result: JobDetails = {
         jobId: job.jobId,
-        jobDescription: (job.trigger.message && job.trigger.message?.length > 0) ? 
-            job.trigger.message : 
-            getJobProgressMessage(job.jobType),
+        jobDescription: buildDescription(job.jobType, job.trigger.message),
         statusDescription: "",
         outcome: job.outcome ? job.outcome : "",
         isSuccessful: false,
@@ -53,15 +47,15 @@ export function getJobDetailsFromJobMessage(job: JobMessage): JobDetails {
     };
 
     setStatusFields(result);
-    
+
     return result;
 }
 
 export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
-    let result: JobDetails = {
+        let result: JobDetails = {
         jobId: job.jobId,
-        jobDescription: (job.message && job.message?.length > 0) ? job.message : getJobProgressMessage(job.jobType),
         statusDescription: "",
+        jobDescription: buildDescription(job.jobType, job.message),
         outcome: job.outcome ? job.outcome : "",
         isSuccessful: false,
         isActive: false,
@@ -78,9 +72,20 @@ export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
         specificationId: job.specificationId
     };
 
-    setStatusFields(result);
-    
+        setStatusFields(result);
+
     return result;
+}
+
+function getJobType(jobTypeString: string | undefined): JobType | undefined {
+    return JobType[jobTypeString as keyof typeof JobType];
+}
+
+function buildDescription(jobType: string | undefined, message: string | undefined) {
+    const d1 = getJobProgressMessage(jobType);
+    const d2 = (message && message.length > 0) ? message : "";
+    const same = (d1 && d2 && d1.trim().toLowerCase() == d2.trim().toLowerCase()) 
+    return  d1 && d2 ? same ? d1 : `${d1}: ${d2}` : d1 && !d2 ? d1 : !d1 && d2 ? d2 : "";
 }
 
 function setStatusFields(job: JobDetails) {
