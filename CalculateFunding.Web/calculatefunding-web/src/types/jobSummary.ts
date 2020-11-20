@@ -13,6 +13,6 @@ export interface JobSummary {
     invokerUserId?: string;
     invokerUserDisplayName?: string;
     parentJobId?: string;
-    lastUpdated?: Date
+    lastUpdated: Date
     created?: Date;
 }

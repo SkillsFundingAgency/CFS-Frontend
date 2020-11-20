@@ -14,7 +14,7 @@ export type FetchLatestSpecificationJobResult = {
 }
 
 export const useFetchLatestSpecificationJob = (
-    specificationId: string, 
+    specificationId: string,
     jobTypes: JobType[],
     onError?: (err: AxiosError) => void)
     : FetchLatestSpecificationJobResult => {
@@ -30,14 +30,12 @@ export const useFetchLatestSpecificationJob = (
 
     const checkForJob = async (specId: string, listOfJobTypes: string): Promise<JobDetails | undefined> => {
         const response = await getJobStatusUpdatesForSpecification(specId, listOfJobTypes);
-        const result = response.data
+        const results = response.data
             .filter(item => item && item.jobId !== "" && item.lastUpdated)
-            .sort((a, b) => {
-                return Number(b.lastUpdated) - Number(a.lastUpdated);
-            });
-        return result && result.length > 0 ? getJobDetailsFromJobSummary(result[0]) : undefined;
+            .sort((a, b) => Number(new Date(b.lastUpdated)) - Number(new Date(a.lastUpdated)));
+        return results ? getJobDetailsFromJobSummary(results[0]) : undefined;
     };
-    
+
     if (isError) {
         return {lastJob: undefined, isCheckingForJob: isLoading, errorCheckingForJob: error?.response?.data, haveErrorCheckingForJob: isError, isFetching, isFetched};
     }

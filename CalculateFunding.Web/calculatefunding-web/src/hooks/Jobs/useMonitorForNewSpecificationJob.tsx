@@ -35,9 +35,7 @@ export const useMonitorForNewSpecificationJob = (specificationId: string, jobTyp
             hubConnect.on('NotificationEvent', (job: JobMessage) => {
                 const jobType: JobType | undefined = JobType[job.jobType as keyof typeof JobType];
                 if (isThisJobValid(job) && amInterestedInJobType(jobType)) {
-                    getJobDetailsFromJobMessage(job);
-                } else {
-                    setNewJob(undefined);
+                    setNewJob(getJobDetailsFromJobMessage(job));
                 }
             });
             await hubConnect.invoke("StartWatchingForSpecificationNotifications", specId);

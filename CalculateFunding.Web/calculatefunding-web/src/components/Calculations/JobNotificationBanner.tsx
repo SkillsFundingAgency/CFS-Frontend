@@ -38,11 +38,11 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
         <h2 className="govuk-error-summary__title">
             Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
         </h2>
+        {props.job.isActive &&
         <h3>
-            {props.job.isActive &&
             <LoadingFieldStatus title={`Monitoring...`}/>
-            }
         </h3>
+        }
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">
                 <li>
