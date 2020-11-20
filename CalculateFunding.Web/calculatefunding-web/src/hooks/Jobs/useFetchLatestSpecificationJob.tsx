@@ -31,9 +31,9 @@ export const useFetchLatestSpecificationJob = (
     const checkForJob = async (specId: string, listOfJobTypes: string): Promise<JobDetails | undefined> => {
         const response = await getJobStatusUpdatesForSpecification(specId, listOfJobTypes);
         const results = response.data
-            .filter(item => item && item.jobId !== "" && item.lastUpdated)
+            .filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated)
             .sort((a, b) => Number(new Date(b.lastUpdated)) - Number(new Date(a.lastUpdated)));
-        return results ? getJobDetailsFromJobSummary(results[0]) : undefined;
+        return results && results.length > 0 ? getJobDetailsFromJobSummary(results[0]) : undefined;
     };
 
     if (isError) {

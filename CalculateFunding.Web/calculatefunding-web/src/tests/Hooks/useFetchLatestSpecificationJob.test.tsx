@@ -9,26 +9,26 @@ import {RunningStatus} from "../../types/RunningStatus";
 
 const specificationId = "abc123";
 const mockQueuedJobResult1: JobSummary = {
-        jobId: "sdfg",
-        jobType: JobType.RefreshFundingJob,
-        specificationId: specificationId,
-        runningStatus: RunningStatus.Queued,
-        completionStatus: undefined,
-        lastUpdated: new Date("2020-11-20T10:29:03.2643188+00:00"),
-        created: new Date("2020-11-20T10:28:03.2643188+00:00"),
-    };
+    jobId: "sdfg",
+    jobType: JobType.RefreshFundingJob,
+    specificationId: specificationId,
+    runningStatus: RunningStatus.Queued,
+    completionStatus: undefined,
+    lastUpdated: new Date("2020-11-20T10:29:03.2643188+00:00"),
+    created: new Date("2020-11-20T10:28:03.2643188+00:00"),
+};
 const mockQueuedJobResult2: JobSummary = {
-        jobId: "tyije5",
-        jobType: JobType.RefreshFundingJob,
-        specificationId: specificationId,
-        runningStatus: RunningStatus.InProgress,
-        completionStatus: undefined,
-        lastUpdated: new Date("2020-11-20T10:31:03.2643188+00:00"),
-        created: new Date("2020-11-20T10:29:03.2643188+00:00"),
-    };
+    jobId: "tyije5",
+    jobType: JobType.RefreshFundingJob,
+    specificationId: specificationId,
+    runningStatus: RunningStatus.InProgress,
+    completionStatus: undefined,
+    lastUpdated: new Date("2020-11-20T10:31:03.2643188+00:00"),
+    created: new Date("2020-11-20T10:29:03.2643188+00:00"),
+};
 
 describe("useFetchLatestSpecificationJob tests", () => {
-    
+
     describe("Handles invalid inputs correctly", () => {
         it("when specification id is null", async () => {
             const {result} =
@@ -55,28 +55,28 @@ describe("useFetchLatestSpecificationJob tests", () => {
             expect(result.current.isFetched).toBe(false);
         });
     });
-    
+
     describe("When passing valid inputs", () => {
         const mock = new MockAdapter(axios);
 
         beforeAll(() => {
             mock.onGet(`/api/jobs/${specificationId}/${JobType.RefreshFundingJob}`)
-                .reply(200, [{}, mockQueuedJobResult1, {}, mockQueuedJobResult2, {}]);
+                .replyOnce(200, [{}, mockQueuedJobResult1, {}, mockQueuedJobResult2, {}]);
         });
         afterAll(() => {
             mock.reset();
-            jest.clearAllMocks()
+            jest.resetAllMocks()
         });
-        
+
         it("returns correct latest job", async () => {
-            const {result, waitForNextUpdate} = 
-                renderHook(() => 
+            const {result, waitForNextUpdate} =
+                renderHook(() =>
                     useFetchLatestSpecificationJob(specificationId, [JobType.RefreshFundingJob]));
 
             await act(async () => {
                 await waitForNextUpdate();
             });
-            
+
             expect(result.current.lastJob).not.toBeUndefined();
             if (result.current.lastJob) {
                 expect(result.current.lastJob.jobId).toEqual(mockQueuedJobResult2.jobId);
