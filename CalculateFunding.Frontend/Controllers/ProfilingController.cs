@@ -39,7 +39,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<IEnumerable<ProfileTotal>> profilePreview = await _publishingApiClient.PreviewProfileChange(new ProfilePreviewRequest
             {
-                ConfigurationType = requestViewModel.ConfigurationType.AsMatchingEnum<ProfileConfigurationType>(),
+                ConfigurationType = requestViewModel.ConfigurationType.AsMatchingEnum<CalculateFunding.Common.ApiClient.Publishing.Models.ProfileConfigurationType>(),
                 ProviderId = requestViewModel.ProviderId,
                 SpecificationId = requestViewModel.SpecificationId,
                 FundingLineCode = requestViewModel.FundingLineCode,

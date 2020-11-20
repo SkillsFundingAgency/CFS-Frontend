@@ -10,10 +10,10 @@ export interface UpdateNewDatasetVersionResponseViewModel {
     fundingStreamId: string;
     filename: string;
     version: number;
+    mergeExisting: boolean;
 }
 
-export interface DatasetValidateStatusResponse
-{
+export interface DatasetValidateStatusResponse {
     operationId: string;
     currentOperation: string;
     errorMessage: string;

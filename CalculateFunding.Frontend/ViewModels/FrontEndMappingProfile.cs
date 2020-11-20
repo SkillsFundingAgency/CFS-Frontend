@@ -116,6 +116,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(d => d.SpecificationId, opt => opt.Ignore())
                 .ForMember(d => d.CalculationId, opt => opt.Ignore())
                 .ForMember(d => d.Name, opt => opt.Ignore())
+                .ForMember(d => d.ProviderId, opt => opt.Ignore())
                 ;
 
             CreateMap<CalculationUpdateViewModel, CalculationEditModel>()

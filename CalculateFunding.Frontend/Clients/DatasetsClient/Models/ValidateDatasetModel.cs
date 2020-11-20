@@ -13,5 +13,7 @@
         public string Description { get; set; }
 
         public string Comment { get; set; }
+        
+        public bool MergeExistingVersion { get; set; }
     }
 }

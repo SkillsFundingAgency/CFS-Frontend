@@ -27,19 +27,19 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="4.5.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="5.7.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="1.4.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.0.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.2.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="3.0.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.8.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="4.5.3" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="5.7.2" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="1.4.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.0.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.3.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="3.0.2" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.9.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.19.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.1.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.2.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.16.0" />
-    <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="1.7.0" />
-    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.4.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.1.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.2.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.16.1" />
+    <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="1.8.1" />
+    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.4.1" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="2.1.1" />
 
     <PackageReference Include="Collector.Serilog.Enrichers.Correlation" Version="2.1.0" />

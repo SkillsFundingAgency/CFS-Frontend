@@ -148,7 +148,8 @@ namespace CalculateFunding.Frontend.Controllers
                     Filename = vm.Filename,
                     Description = vm.Description,
                     Comment = vm.Comment,
-                    FundingStreamId = vm.FundingStreamId
+                    FundingStreamId = vm.FundingStreamId,
+                    MergeExistingVersion = vm.MergeExistingVersion
                 });
 
             if (apiResponse == null)
@@ -478,6 +479,20 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+        }
+
+        [HttpGet]
+        [Route("/api/datasets/get-current-dataset-version-by-dataset-id/{datasetId}")]
+        public async Task<IActionResult> GetCurrentDatasetVersionByDatasetId(string datasetId)
+        {
+            Guard.IsNullOrWhiteSpace(nameof(datasetId), datasetId);
+            
+            ApiResponse<DatasetVersionResponseViewModel> result = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(datasetId);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+                return new OkObjectResult(result.Content);
+            
+            return new InternalServerErrorResult(result.StatusCode.ToString());
         }
         
         private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)

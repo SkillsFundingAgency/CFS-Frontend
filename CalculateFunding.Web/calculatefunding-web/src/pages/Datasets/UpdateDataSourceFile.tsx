@@ -7,18 +7,15 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {DatasetVersionHistoryViewModel, Result} from "../../types/Datasets/DatasetVersionHistoryViewModel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {
-    getDatasetHistoryService, getDatasetValidateStatusService,
-    updateDatasetService,
-    uploadDatasetVersionService,
-    validateDatasetService
-} from "../../services/datasetService";
+import {getCurrentDatasetVersionByDatasetId, getDatasetHistoryService, getDatasetValidateStatusService, updateDatasetService, uploadDatasetVersionService, validateDatasetService} from "../../services/datasetService";
 import {DateFormatter} from "../../components/DateFormatter";
-import {
-    DatasetValidateStatusResponse, UpdateNewDatasetVersionResponseViewModel,
-    ValidationStates
-} from "../../types/Datasets/UpdateDatasetRequestViewModel";
+import {DatasetValidateStatusResponse, UpdateNewDatasetVersionResponseViewModel, ValidationStates} from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import {Footer} from "../../components/Footer";
+import {UpdateStatus} from "../../types/Datasets/UpdateStatus";
+import {MergeSummary} from "./MergeSummary/MergeSummary";
+import {MergeMatch} from "./MergeSummary/MergeMatch";
+import {MergeDatasetViewModel} from "../../types/Datasets/MergeDatasetViewModel";
+
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
     datasetId: string;
@@ -38,6 +35,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         version: 0
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [updateType, setUpdateType] = useState<string>("");
     const [uploadFileName, setUploadFileName] = useState<string>("");
     const [uploadFile, setUploadFile] = useState<File>();
     const [uploadFileExtension, setUploadFileExtension] = useState<string>("");
@@ -48,9 +46,11 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const validExtensions = [".csv", ".xls", ".xlsx"];
     const [validation, setValidation] = useState({
         fileValid: true,
-        changeNoteValid: true
+        changeNoteValid: true,
+        updateTypeValid: true
     });
-    let history = useHistory();
+    const [mergeResults, setMergeResults] = useState<MergeDatasetViewModel>();
+    const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
 
     useEffectOnce(() => {
         setIsLoading(true);
@@ -66,8 +66,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
     function submitDataSourceFile() {
 
-        if (!validateForm())
-        {
+        if (!validateForm()) {
             return;
         }
 
@@ -76,10 +75,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         updateDatasetService(match.params.fundingStreamId, match.params.datasetId, uploadFileName).then((result) => {
             if (result.status === 200 || result.status === 201) {
                 const newDataset = result.data as UpdateNewDatasetVersionResponseViewModel;
+                newDataset.mergeExisting = updateType === "merge";
                 uploadFileToServer(newDataset);
-            }
-            else
-            {
+            } else {
                 setValidationFailures({"error-message": ["Unable to update data source"]});
                 setIsLoading(false);
             }
@@ -92,15 +90,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     function uploadFileToServer(request: UpdateNewDatasetVersionResponseViewModel) {
         if (uploadFile !== undefined) {
             uploadDatasetVersionService(
-                request.blobUrl,
-                uploadFile,
-                request.datasetId,
-                request.fundingStreamId,
-                request.author.name,
-                request.author.id,
-                request.definitionId,
-                request.name,
-                request.version.toString())
+                request,
+                uploadFile
+            )
                 .then((uploadDatasetVersionResponse) => {
                     if (uploadDatasetVersionResponse.status === 200 || uploadDatasetVersionResponse.status === 201) {
                         validateDatasetService(
@@ -108,20 +100,18 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             request.fundingStreamId,
                             request.filename,
                             request.version.toString(),
+                            request.mergeExisting,
                             description,
                             changeNote).then((validateDatasetResponse) => {
                             if (validateDatasetResponse.status === 200 || validateDatasetResponse.status === 201) {
                                 const validateOperationId: any = validateDatasetResponse.data.operationId;
-                                if (!validateOperationId)
-                                {
+                                if (!validateOperationId) {
                                     setValidationFailures({"error-message": ["Unable to locate dataset validate operationId"]});
                                     setIsLoading(false);
                                     return;
                                 }
                                 getDatasetValidateStatus(validateOperationId)
-                            }
-                            else
-                            {
+                            } else {
                                 setValidationFailures({"error-message": ["Unable to validate dataset"]});
                                 setIsLoading(false);
                                 return;
@@ -130,29 +120,36 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             setValidationFailures({"error-message": ["Unable to validate dataset"]});
                             setIsLoading(false);
                         })
-                    }
-                    else
-                    {
+                    } else {
                         setValidationFailures({"error-message": ["Unable to upload file"]});
                         setIsLoading(false);
                         return;
                     }
                 })
-        }
-        else
-        {
+        } else {
             setIsLoading(false);
             return;
         }
     }
 
-    function getDatasetValidateStatus(operationId: string)
-    {
+    function getDatasetValidateStatus(operationId: string) {
         getDatasetValidateStatusService(operationId).then((datasetValidateStatusResponse) => {
             if (datasetValidateStatusResponse.status === 200 || datasetValidateStatusResponse.status === 201) {
                 const result: DatasetValidateStatusResponse = datasetValidateStatusResponse.data;
                 if (result.currentOperation === "Validated") {
-                    history.push("/Datasets/ManageDataSourceFiles");
+                    getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
+                    ((response) => {
+                            const mergeDatasetResult = response.data as MergeDatasetViewModel;
+
+                            if (mergeDatasetResult.amendedRowCount === 0 && mergeDatasetResult.newRowCount === 0) {
+                                setUpdateStatus(UpdateStatus.Matched)
+                            } else {
+                                setUpdateStatus(UpdateStatus.Successful);
+                            }
+
+                            setMergeResults(mergeDatasetResult);
+                        }
+                    );
                     return;
                 } else if (result.currentOperation === "FailedValidation") {
                     setValidationFailures(result.validationFailures);
@@ -165,9 +162,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     }
                     setLoadingStatus(message);
                 }
-            }
-            else
-            {
+            } else {
                 setValidationFailures({"error-message": ["Unable to get dataset validation status"]});
                 setIsLoading(false);
                 return;
@@ -183,8 +178,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         });
     }
 
-    function validateForm()
-    {
+    function validateForm() {
         setValidation(prevState => {
             return {
                 ...prevState,
@@ -196,8 +190,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
         let isValid = true;
 
-        if (uploadFile === undefined)
-        {
+        if (uploadFile === undefined) {
             setValidation(prevState => {
                 return {
                     ...prevState,
@@ -206,10 +199,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             });
 
             isValid = false;
-        }
-        else {
-            if (validExtensions.indexOf(uploadFileExtension) < 0)
-            {
+        } else {
+            if (validExtensions.indexOf(uploadFileExtension) < 0) {
                 setValidation(prevState => {
                     return {
                         ...prevState,
@@ -220,8 +211,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             }
         }
 
-        if (changeNote === "" )
-        {
+        if (changeNote === "") {
             setValidation(prevState => {
                 return {
                     ...prevState,
@@ -229,6 +219,15 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 }
             });
             isValid = false;
+        }
+
+        if (updateType === "") {
+            setValidation(prevState => {
+                return {
+                    ...prevState,
+                    updateTypeValid: false
+                }
+            })
         }
 
         return isValid;
@@ -263,11 +262,11 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     There is a problem
                 </h2>
                 <div className="govuk-error-summary__body">
-                    <ul className="govuk-list govuk-error-summary__list">
+                    <ul id="error-summary-list" className="govuk-list govuk-error-summary__list">
                         {
                             (!validation.fileValid) ?
-                            <li><a href={"#select-data-source"}>Upload a xls or xlsx file</a></li>
-                            : ""
+                                <li><a href={"#select-data-source"}>Upload a xls or xlsx file</a></li>
+                                : ""
                         }
                         {
                             (validationFailures !== undefined && validationFailures["error-message"] != null) ?
@@ -280,7 +279,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 : ""
                         }
                         {
-                            (validationFailures !== undefined && validationFailures["blobUrl"] != null)?
+                            (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
                                 <li><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></li>
                                 : ""
                         }
@@ -289,10 +288,15 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 <li><a href={"#change-note"}>Enter change note</a></li>
                                 : ""
                         }
+                        {
+                            (!validation.updateTypeValid) ?
+                                <li><a href={"#update-type"}>Select update type</a></li>
+                                : ""
+                        }
                     </ul>
                 </div>
             </div>
-            <fieldset className="govuk-fieldset" hidden={isLoading}>
+            <fieldset className="govuk-fieldset" hidden={isLoading || updateStatus !== UpdateStatus.Unset}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">
                         Update data source
@@ -300,23 +304,48 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 </legend>
                 <details className="govuk-details" data-module="govuk-details">
                     <summary className="govuk-details__summary">
-                <span className="govuk-details__summary-text">
+                <span id={"summary-text"} className="govuk-details__summary-text">
                     {dataset.name} (version {dataset.version})
                 </span>
                     </summary>
-                    <div className="govuk-details__text">
-                        {dataset.lastUpdatedByName}
-                        <span className="govuk-!-margin-left-2"><DateFormatter utc={false} date={dataset.lastUpdatedDate}/></span>
+                    <div id={"last-updated-by-author"} className="govuk-details__text">
+                        {dataset.lastUpdatedByName} <span className="govuk-!-margin-left-2"><DateFormatter utc={false} date={dataset.lastUpdatedDate}/></span>
                     </div>
                 </details>
+                <div id="update-type"
+                     className={"govuk-form-group" + (validationFailures !== undefined || !validation.updateTypeValid ? " govuk-form-group--error" : "")}>
+                    <div className="govuk-radios">
+                        <label className="govuk-label" htmlFor="update-type-radios">
+                            Select update type
+                        </label>
+                        <div className="govuk-radios__item">
+                            <input className="govuk-radios__input" id="update-type-merge" name="update-type" type="radio" value="merge" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                            <label className="govuk-label govuk-radios__label" htmlFor="update-type-merge">
+                                Merge existing version
+                            </label>
+                            <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
+                                Combine a new data source with the existing file
+                            </div>
+                        </div>
+                        <div className="govuk-radios__item">
+                            <input className="govuk-radios__input" id="update-type-new" name="update-type" type="radio" value="new" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                            <label className="govuk-label govuk-radios__label" htmlFor="update-type-new">
+                                Create new version
+                            </label>
+                            <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
+                                Replace the existing data source with a new file
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="select-data-source"
-                    className={"govuk-form-group" + (validationFailures !== undefined || !validation.fileValid ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (validationFailures !== undefined || !validation.fileValid ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="file-upload-data-source">
                         Select data source file
                     </label>
                     {
                         (validationFailures !== undefined || !validation.fileValid) ?
-                            <span className="govuk-error-message">
+                            <span id="data-source-error-message" className="govuk-error-message">
                                 <span className="govuk-visually-hidden">Error:</span>
                                 {
                                     (!validation.fileValid) ?
@@ -334,12 +363,12 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                         : ""
                                 }
                                 {
-                                    (validationFailures !== undefined && validationFailures["blobUrl"] != null)?
+                                    (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
                                         <span><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></span>
                                         : ""
                                 }
                             </span>
-                        : ""
+                            : ""
                     }
                     <input className={"govuk-file-upload" + (validationFailures !== undefined && validationFailures["error-message"] !== undefined ? " govuk-file-upload--error" : "")}
                            id="file-upload-data-source" name="file-upload-data-source" type="file" onChange={(e) => storeFileUpload(e)}
@@ -381,15 +410,34 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     </textarea>
                 </div>
 
-                <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={submitDataSourceFile}>
+                <button id={"submit-datasource-file"} className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                        onClick={submitDataSourceFile}>
                     Save
                 </button>
-                <Link to={`/Datasets/ManageData`} className="govuk-button govuk-button--secondary"
+                <Link id={"cancel-datasource-link"} to={`/Datasets/ManageData`} className="govuk-button govuk-button--secondary"
                       data-module="govuk-button">
                     Cancel
                 </Link>
             </fieldset>
+            {(mergeResults !== undefined) ?
+                <>
+                    <MergeSummary additionalRowsCreated={mergeResults.newRowCount}
+                                dataSchemaName={dataset.definitionName}
+                                dataSource={mergeResults.name}
+                                dataSourceVersion={mergeResults.version}
+                                existingRowsAmended={mergeResults.amendedRowCount}
+                                hidden={updateStatus !== UpdateStatus.Successful}
+                />
+                    <MergeMatch additionalRowsCreated={mergeResults.newRowCount}
+                                dataSchemaName={dataset.definitionName}
+                                dataSource={mergeResults.name}
+                                dataSourceVersion={mergeResults.version}
+                                existingRowsAmended={mergeResults.amendedRowCount}
+                                hidden={updateStatus !== UpdateStatus.Matched}
+                    />
+                    </>
+                : ""
+            }
         </div>
         <Footer/>
     </div>

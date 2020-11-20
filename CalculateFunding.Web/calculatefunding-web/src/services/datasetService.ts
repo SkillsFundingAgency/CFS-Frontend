@@ -5,6 +5,7 @@ import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequ
 import axios, { AxiosResponse } from "axios"
 import {DatasourceVersionSearchModel} from "../types/Datasets/DatasourceVersionSearchModel";
 import {RelationshipData} from "../types/Datasets/RelationshipData";
+import {UpdateNewDatasetVersionResponseViewModel} from "../types/Datasets/UpdateDatasetRequestViewModel";
 
 const baseUrl = "/api/datasets";
 
@@ -111,25 +112,25 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
     })
 }
 
-export async function uploadDatasetVersionService(blobUrl: string, file: File, datasetId: string, fundingStreamId: string, authorName: string, authorId: string, definitionId: string, name: string, version: string) {
-    return axios(`${blobUrl}`, {
+export async function uploadDatasetVersionService(request:UpdateNewDatasetVersionResponseViewModel, file: File) {
+    return axios(`${request.blobUrl}`, {
         method: 'PUT',
         headers: {
             "x-ms-blob-type": "BlockBlob",
-            "x-ms-meta-dataDefinitionId": definitionId,
-            "x-ms-meta-datasetId": datasetId,
-            "x-ms-meta-fundingStreamId": fundingStreamId,
-            "x-ms-meta-authorName": authorName,
-            "x-ms-meta-authorId": authorId,
+            "x-ms-meta-dataDefinitionId": request.definitionId,
+            "x-ms-meta-datasetId": request.datasetId,
+            "x-ms-meta-fundingStreamId": request.fundingStreamId,
+            "x-ms-meta-authorName": request.author.name,
+            "x-ms-meta-authorId": request.author.id,
             "x-ms-meta-filename": file.name,
-            "x-ms-meta-name": name,
-            "x-ms-meta-version": version,
+            "x-ms-meta-name": request.name,
+            "x-ms-meta-version": request.version,
         },
         data: file
     })
 }
 
-export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, description: string, changeNote: string) {
+export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, mergeExisting:boolean, description: string, changeNote: string) {
     return axios(`${baseUrl}/validate-dataset`, {
         method: 'POST',
         headers: {
@@ -200,7 +201,6 @@ export async function searchDatasetRelationshipsService(request: DatasetDefiniti
     })
 }
 
-
 export async function assignDataSourceService(relationshipId: string, specificationId: string, datasetVersionId: string) {
     return axios(`${baseUrl}/assign-datasource-version-to-relationship/${specificationId}/${relationshipId}/${datasetVersionId}`, {
         method: 'POST',
@@ -217,5 +217,15 @@ export async function getExpandedDataSources(relationshipId: string, datasetId: 
             'Content-Type': 'application/json'
         },
         data: searchRequest
+    })
+}
+
+export async function getCurrentDatasetVersionByDatasetId(datasetId:string)
+{
+    return axios(`${baseUrl}/get-current-dataset-version-by-dataset-id/${datasetId}`, {
+        method: "GET",
+        headers:{
+            'Content-Type': 'application/json'
+        }
     })
 }

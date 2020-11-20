@@ -85,7 +85,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private void GivenTheProfilePreview(ProfilePreviewRequestViewModel requestViewModel,
             IEnumerable<ProfileTotal> profileTotals)
             => _publishingApiClient.Setup(_ => _.PreviewProfileChange(It.Is<ProfilePreviewRequest>(req =>
-                    req.ConfigurationType == requestViewModel.ConfigurationType.AsMatchingEnum<ProfileConfigurationType>() &&
+                    req.ConfigurationType == requestViewModel.ConfigurationType.AsMatchingEnum<CalculateFunding.Common.ApiClient.Publishing.Models.ProfileConfigurationType>() &&
                     req.ProviderId == requestViewModel.ProviderId &&
                     req.FundingLineCode == requestViewModel.FundingLineCode &&
                     req.FundingPeriodId == requestViewModel.FundingPeriodId &&
