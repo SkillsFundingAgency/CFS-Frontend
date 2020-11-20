@@ -2,73 +2,129 @@
 import {JobType} from "../types/jobType";
 import {RunningStatus} from "../types/RunningStatus";
 import {CompletionStatus} from "../types/CompletionStatus";
+import {JobMessage} from "../types/jobMessage";
 
 
-export type JobStatusProps = {
+export type JobDetails = {
+    jobId: string,
+    jobType?: string,
+    specificationId?: string,
     statusDescription: string,
     jobDescription: string,
+    outcome: string,
+    runningStatus: RunningStatus,
+    completionStatus?: CompletionStatus | undefined,
     isSuccessful: boolean,
     isFailed: boolean,
     isActive: boolean,
-    isComplete: boolean
+    isComplete: boolean,
+    parentJobId?: string,
+    invokerUserId?: string,
+    invokerUserDisplayName?: string,
+    lastUpdated?: Date,
+    created?: Date
 }
 
-function getJobType(job: JobSummary): JobType | undefined {
-    return JobType[job.jobType as keyof typeof JobType];
+function getJobType(jobTypeString: string | undefined): JobType | undefined {
+    return JobType[jobTypeString as keyof typeof JobType];
 }
 
-export function getJobDisplayProps(job: JobSummary): JobStatusProps {
-    let result: JobStatusProps = {
-        jobDescription: getJobProgressMessage(job),
+export function getJobDetailsFromJobMessage(job: JobMessage): JobDetails {
+    let result: JobDetails = {
+        jobId: job.jobId,
+        jobDescription: (job.trigger.message && job.trigger.message?.length > 0) ? 
+            job.trigger.message : 
+            getJobProgressMessage(job.jobType),
         statusDescription: "",
+        outcome: job.outcome ? job.outcome : "",
         isSuccessful: false,
         isActive: false,
         isComplete: false,
-        isFailed: false
+        isFailed: false,
+        completionStatus: job.completionStatus,
+        runningStatus: job.runningStatus,
+        created: job.jobCreatedDateTime,
+        lastUpdated: job.statusDateTime,
+        invokerUserDisplayName: job.invokerUserDisplayName,
+        invokerUserId: job.invokerUserId,
+        jobType: job.jobType,
+        parentJobId: job.parentJobId,
+        specificationId: job.specificationId
     };
 
-    switch (job.runningStatus) {
-        case RunningStatus.Queued:
-        case RunningStatus.QueuedWithService:
-            result.statusDescription = "in queue";
-            result.isActive = true;
-            break;
-        case RunningStatus.InProgress:
-            result.statusDescription = "in progress";
-            result.isActive = true;
-            break;
-        default:
-            result.isComplete = true;
-            switch (job.completionStatus) {
-                case CompletionStatus.Succeeded:
-                    result.statusDescription = "completed successfully";
-                    result.isSuccessful = true;
-                    break;
-                case CompletionStatus.Cancelled:
-                    result.statusDescription = "cancelled";
-                    result.isFailed = true;
-                    break;
-                case CompletionStatus.Failed:
-                    result.statusDescription = "failed";
-                    result.isFailed = true;
-                    break;
-                case CompletionStatus.TimedOut:
-                    result.statusDescription = "timed out";
-                    result.isFailed = true;
-                    break;
-                default:
-                    result.statusDescription = job.completionStatus ? job.completionStatus.toString() : "";
-                    result.isFailed = true;
-                    break;
-            }
-            break;
-    }
+    setStatusFields(result);
     
     return result;
 }
 
-function getJobProgressMessage(job: JobSummary) {
-    switch (getJobType(job)) {
+export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
+    let result: JobDetails = {
+        jobId: job.jobId,
+        jobDescription: (job.message && job.message?.length > 0) ? job.message : getJobProgressMessage(job.jobType),
+        statusDescription: "",
+        outcome: job.outcome ? job.outcome : "",
+        isSuccessful: false,
+        isActive: false,
+        isComplete: false,
+        isFailed: false,
+        completionStatus: job.completionStatus,
+        runningStatus: job.runningStatus,
+        created: job.created,
+        lastUpdated: job.lastUpdated,
+        invokerUserDisplayName: job.invokerUserDisplayName,
+        invokerUserId: job.invokerUserId,
+        jobType: job.jobType,
+        parentJobId: job.parentJobId,
+        specificationId: job.specificationId
+    };
+
+    setStatusFields(result);
+    
+    return result;
+}
+
+function setStatusFields(job: JobDetails) {
+    switch (job.runningStatus) {
+        case RunningStatus.Queued:
+        case RunningStatus.QueuedWithService:
+            job.statusDescription = "in queue";
+            job.isActive = true;
+            break;
+        case RunningStatus.InProgress:
+            job.statusDescription = "in progress";
+            job.isActive = true;
+            break;
+        default:
+            job.isComplete = true;
+            switch (job.completionStatus) {
+                case CompletionStatus.Succeeded:
+                    job.statusDescription = "completed successfully";
+                    job.isSuccessful = true;
+                    break;
+                case CompletionStatus.Cancelled:
+                    job.statusDescription = "cancelled";
+                    job.isFailed = true;
+                    break;
+                case CompletionStatus.Failed:
+                    job.statusDescription = "failed";
+                    job.isFailed = true;
+                    break;
+                case CompletionStatus.TimedOut:
+                    job.statusDescription = "timed out";
+                    job.isFailed = true;
+                    break;
+                default:
+                    job.statusDescription = job.completionStatus ? job.completionStatus.toString() : "";
+                    job.isFailed = true;
+                    break;
+            }
+            break;
+    }
+    return job;
+}
+
+function getJobProgressMessage(jobTypeString: string | undefined) {
+    switch (getJobType(jobTypeString)) {
         case JobType.MapDatasetJob:
             return "Mapping dataset";
         case JobType.AssignTemplateCalculationsJob:
@@ -150,6 +206,6 @@ function getJobProgressMessage(job: JobSummary) {
         case undefined:
             return "";
         default:
-            return job.jobType ? job.jobType : "";
+            return jobTypeString ? jobTypeString : "";
     }
 }

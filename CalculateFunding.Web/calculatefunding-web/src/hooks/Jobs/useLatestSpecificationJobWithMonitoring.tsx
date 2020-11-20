@@ -1,45 +1,40 @@
 ﻿import {JobType} from "../../types/jobType";
 import {useFetchLatestSpecificationJob} from "./useFetchLatestSpecificationJob";
-import {JobSummary} from "../../types/jobSummary";
 import {useMonitorForNewSpecificationJob} from "./useMonitorForNewSpecificationJob";
-import {getJobDisplayProps, JobStatusProps} from "../../helpers/getJobDisplayProps";
+import {JobDetails} from "../../helpers/jobDetailsHelper";
+import {AxiosError} from "axios";
 
 export type LatestSpecificationJobWithMonitoringResult = {
-    latestJob: JobSummary | undefined,
+    latestJob: JobDetails | undefined,
     hasJob: boolean,
-    hasActiveJob: boolean,
-    hasFailedJob: boolean,
     jobError: string,
     hasJobError: boolean,
     isMonitoring: boolean,
     isFetching: boolean,
     isFetched: boolean,
-    isCheckingForJob: boolean,
-    jobStatus: JobStatusProps | undefined
+    isCheckingForJob: boolean
 }
 
 export const useLatestSpecificationJobWithMonitoring =
-    (specificationId: string, jobTypes: JobType[] = [])
+    (specificationId: string, 
+     jobTypes: JobType[] = [],
+     onError?: (err: AxiosError) => void)
         : LatestSpecificationJobWithMonitoringResult => {
         const {lastJob, isCheckingForJob, errorCheckingForJob, haveErrorCheckingForJob, isFetching, isFetched} =
-            useFetchLatestSpecificationJob(specificationId, jobTypes);
+            useFetchLatestSpecificationJob(specificationId, jobTypes, onError);
         const {newJob, isMonitoring, errorWhileMonitoringJobs, haveErrorWhileMonitoringJobs} =
             useMonitorForNewSpecificationJob(specificationId, jobTypes);
 
-        const latestJob: JobSummary | undefined = newJob !== undefined ? newJob : lastJob;
-        const jobDisplayInfo = latestJob ? getJobDisplayProps(latestJob) : undefined;
+        const latestJob: JobDetails | undefined = newJob !== undefined ? newJob : lastJob;
 
         return {
             latestJob,
             hasJob: latestJob !== undefined,
-            hasActiveJob: jobDisplayInfo !== undefined && jobDisplayInfo.isActive,
-            hasFailedJob: jobDisplayInfo !== undefined && jobDisplayInfo.isFailed,
             jobError: haveErrorCheckingForJob ? errorCheckingForJob : haveErrorWhileMonitoringJobs ? errorWhileMonitoringJobs : "",
             hasJobError: haveErrorCheckingForJob || haveErrorWhileMonitoringJobs,
             isMonitoring,
             isFetching,
             isFetched,
             isCheckingForJob,
-            jobStatus: jobDisplayInfo
         };
     };

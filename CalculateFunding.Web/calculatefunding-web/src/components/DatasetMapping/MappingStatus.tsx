@@ -1,20 +1,18 @@
 import React from "react";
 import {DateFormatter} from "../DateFormatter";
-import {JobSummary} from "../../types/jobSummary";
-import {getJobDisplayProps} from "../../helpers/getJobDisplayProps";
+import {JobDetails} from "../../helpers/jobDetailsHelper";
 
 export interface MappingStatusProps {
-    job: JobSummary | undefined,
+    job: JobDetails | undefined,
 }
 
 export function MappingStatus(props: MappingStatusProps) {
     if (!props.job) {
         return null;
     }
-    const jobProps = getJobDisplayProps(props.job);
-    const cssClass = jobProps.isFailed ? "govuk-error-summary-red" :
-        jobProps.isSuccessful ? "govuk-error-summary-green" :
-            jobProps.isActive ? "govuk-error-summary-orange" :
+    const cssClass = props.job.isFailed ? "govuk-error-summary-red" :
+        props.job.isSuccessful ? "govuk-error-summary-green" :
+            props.job.isActive ? "govuk-error-summary-orange" :
                 "";
 
     return <div
@@ -26,8 +24,8 @@ export function MappingStatus(props: MappingStatusProps) {
         data-testid="job-notification">
         <h2 className="govuk-error-summary__title" id="error-summary-title">
             <span
-                data-testid="job-notification-title">Job {jobProps.statusDescription}: {jobProps.jobDescription}</span>
-            {jobProps.isActive &&
+                data-testid="job-notification-title">Job {props.job.statusDescription}: {props.job.jobDescription}</span>
+            {props.job.isActive &&
             <div className="loader loader-small" role="alert" aria-live="assertive"/>
             }
         </h2>
@@ -40,7 +38,7 @@ export function MappingStatus(props: MappingStatusProps) {
                                                                                   utc={false}/></span>
                     </p>
                 </li>
-                {jobProps.isComplete &&
+                {props.job.isComplete &&
                 <li>
                     <p className="govuk-body-s">
                         <strong>Completed: </strong>

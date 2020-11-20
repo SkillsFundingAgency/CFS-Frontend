@@ -30,6 +30,7 @@ import {buildInitialPublishedProviderSearchRequest} from "../../../types/publish
 import {ConfirmFundingRouteProps} from "../../../pages/FundingApprovals/ConfirmFunding";
 import {FundingActionType, PublishedProviderFundingCount} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import {createPublishedProviderIdsQueryResult} from "../../fakes/testFactories";
+import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
@@ -67,7 +68,7 @@ describe("<ConfirmFunding />", () => {
         it('renders job progress message', async () => {
             const alert = await screen.findByRole("alert", {name: "job-notification"});
             expect(within(alert).getByText(/Monitoring.../)).toBeInTheDocument();
-            expect(within(alert).getByText(`Job ${activeJob.jobStatus?.statusDescription}: ${activeJob.jobStatus?.jobDescription}`)).toBeInTheDocument();
+            expect(within(alert).getByText(`Job ${activeJob?.latestJob?.statusDescription}: ${activeJob?.latestJob?.jobDescription}`)).toBeInTheDocument();
         });
 
         it('does not render warning message', async () => {
@@ -212,41 +213,29 @@ const specResult: SpecificationSummaryQueryResult = {
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: false,
     jobError: "",
     latestJob: undefined,
     hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobStatus: undefined
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: true,
     jobError: "",
-    latestJob: {
+    latestJob: getJobDetailsFromJobSummary({
+        jobId: "dfgwer",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.InProgress,
         invokerUserDisplayName: "testUser",
         created: new Date(),
         lastUpdated: new Date()
-    },
+    }),
     hasJobError: false,
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
-    jobStatus: {
-        statusDescription: "in progress",
-        jobDescription: "refreshing funding",
-        isComplete: false,
-        isFailed: false,
-        isActive: true,
-        isSuccessful: false
-    },
+    isMonitoring: true
 };
 const mockFundingConfigWithApprovalAllMode: FundingConfigurationQueryResult = {
     fundingConfiguration: {
@@ -307,6 +296,8 @@ const provider2: PublishedProviderResult = {
     urn: "82096"
 };
 const fullPermissions: SpecificationPermissionsResult = {
+    canApproveAllCalculations: false, 
+    canChooseFunding: false,
     canRefreshFunding: true,
     canApproveFunding: true,
     canReleaseFunding: true,

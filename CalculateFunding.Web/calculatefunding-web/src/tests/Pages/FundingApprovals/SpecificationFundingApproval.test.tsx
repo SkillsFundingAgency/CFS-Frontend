@@ -44,6 +44,7 @@ import {PublishStatus} from "../../../types/PublishStatusModel";
 import userEvent from "@testing-library/user-event";
 import {ValidationErrors} from "../../../types/ErrorMessage";
 import {createMockAxiosError} from "../../fakes/fakeAxios";
+import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
@@ -111,7 +112,7 @@ describe("<SpecificationFundingApproval />", () => {
 
         it('renders job progress spinner', async () => {
             expect(screen.getByTestId("loader")).toBeInTheDocument();
-            expect(await screen.findByText(`Job ${activeJob.jobStatus?.statusDescription}: ${activeJob.jobStatus?.jobDescription}`)).toBeInTheDocument();
+            expect(await screen.findByText(`Job ${activeJob?.latestJob?.statusDescription}: ${activeJob?.latestJob?.jobDescription}`)).toBeInTheDocument();
         });
 
         it('does not render filters', async () => {
@@ -165,7 +166,7 @@ describe("<SpecificationFundingApproval />", () => {
 
         it('renders job error', async () => {
             expect(await screen.findByText(component => component.startsWith(
-                `Job ${failedJob.jobStatus?.statusDescription}: ${failedJob.jobStatus?.jobDescription}`))).toBeInTheDocument();
+                `Job ${failedJob?.latestJob?.statusDescription}: ${failedJob?.latestJob?.jobDescription}`))).toBeInTheDocument();
         });
 
         it('renders filters', async () => {
@@ -209,7 +210,7 @@ describe("<SpecificationFundingApproval />", () => {
 
         it('renders job completed successfully', async () => {
             expect(screen.getByText(component => component.startsWith(
-                `Job ${successfulCompletedJob.jobStatus?.statusDescription}: ${successfulCompletedJob.jobStatus?.jobDescription}`)))
+                `Job ${successfulCompletedJob?.latestJob?.statusDescription}: ${successfulCompletedJob?.latestJob?.jobDescription}`)))
                 .toBeInTheDocument();
         });
 
@@ -477,95 +478,65 @@ const specResult: SpecificationSummaryQueryResult = {
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: false,
     jobError: "",
     latestJob: undefined,
     hasJobError: false,
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
-    jobStatus: undefined
+    isMonitoring: true
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: true,
     jobError: "",
-    latestJob: {
+    latestJob: getJobDetailsFromJobSummary({
+            jobId: "rt56w",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.InProgress,
         invokerUserDisplayName: "testUser",
         created: new Date(),
         lastUpdated: new Date()
-    },
+    }),
     hasJobError: false,
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
-    jobStatus: {
-        statusDescription: "in progress",
-        jobDescription: "refreshing funding",
-        isComplete: false,
-        isFailed: false,
-        isActive: true,
-        isSuccessful: false
-    },
+    isMonitoring: true
 };
 const failedJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    hasFailedJob: true,
-    hasActiveJob: false,
-    latestJob: {
+    latestJob: getJobDetailsFromJobSummary({
+        jobId: "sd64",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.Completed,
         completionStatus: CompletionStatus.Failed,
         invokerUserDisplayName: "testUser",
         created: new Date(),
         lastUpdated: new Date()
-    },
+    }),
     hasJobError: false,
     jobError: "",
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
-    jobStatus: {
-        statusDescription: "failed",
-        jobDescription: "refreshing funding",
-        isComplete: true,
-        isFailed: true,
-        isActive: false,
-        isSuccessful: false
-    }
+    isMonitoring: true
 };
 const successfulCompletedJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: false,
-    latestJob: {
+    latestJob: getJobDetailsFromJobSummary({
+        jobId: "rfgd",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.Completed,
         completionStatus: CompletionStatus.Succeeded,
         invokerUserDisplayName: "testUser",
         created: new Date(),
         lastUpdated: new Date()
-    },
+    }),
     hasJobError: false,
     jobError: "",
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
-    jobStatus: {
-        statusDescription: "completed successfully",
-        jobDescription: "refreshing funding",
-        isComplete: true,
-        isFailed: false,
-        isActive: false,
-        isSuccessful: true
-    }
+    isMonitoring: true
 };
 const fundingConfigResult: FundingConfigurationQueryResult = {
     fundingConfiguration: {

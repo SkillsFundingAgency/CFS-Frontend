@@ -14,13 +14,12 @@ import {JobNotificationBanner} from "../components/Calculations/JobNotificationB
 import {FacetValue} from "../types/Facet";
 import {Link} from "react-router-dom";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
-import {getCalculationByIdService, getCalculationProvidersService} from "../services/calculationService";
+import {getCalculationProvidersService} from "../services/calculationService";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {JobType} from "../types/jobType";
 import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import {CalculationDetails} from "../types/CalculationDetails";
 import {LoadingFieldStatus} from "../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../hooks/useSpecificationSummary";
 import {useErrors} from "../hooks/useErrors";
@@ -54,7 +53,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             err => addErrorMessage(err.message, "Error while loading calculation"));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {latestJob, hasActiveJob, jobError, hasJobError, isCheckingForJob, jobStatus} =
+    const {latestJob, jobError, hasJobError, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
     const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
@@ -262,9 +261,8 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
                         {specificationId.length > 0 &&
                         <JobNotificationBanner
-                            latestJob={latestJob}
+                            job={latestJob}
                             isCheckingForJob={isCheckingForJob}
-                            jobStatus={jobStatus}
                             hasJobError={hasJobError}
                             jobError={jobError}/>
                         }

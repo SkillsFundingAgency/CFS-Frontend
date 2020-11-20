@@ -43,7 +43,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
 
-    const {hasJob, latestJob, isCheckingForJob, hasActiveJob, jobStatus} =
+    const {hasJob, latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId, [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation]);
     
     function getCurrentDataset() {
@@ -185,7 +185,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                               suggestion={"Please check your permissions or data."}/>
                             </div>
                         </div>}
-                        {!isCheckingForPermissions && !hasMissingPermissions && !hasActiveJob &&
+                        {!isCheckingForPermissions && !hasMissingPermissions && !(latestJob && latestJob.isActive) &&
                         <div className="govuk-form-group">
                             <fieldset className="govuk-fieldset">
                                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -242,16 +242,16 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         </div>
                         }
                         <div className="govuk-form-group">
-                            {!hasActiveJob &&
+                            {!(latestJob && latestJob.isActive) &&
                             <button className="govuk-button govuk-!-margin-right-1"
                                     name="saveButton"
                                     aria-label="saveButton"
                                     onClick={changeSpecificationDataMapping}
-                                    disabled={!newVersionNumber || hasMissingPermissions || isCheckingForJob || hasActiveJob || isUpdating}>
+                                    disabled={!newVersionNumber || hasMissingPermissions || isCheckingForJob || (latestJob && latestJob.isActive) || isUpdating}>
                                 Save
                             </button>
                             }
-                            {(hasMissingPermissions || isUpdating || hasActiveJob) ?
+                            {(hasMissingPermissions || isUpdating || (latestJob && latestJob.isActive)) ?
                                 <button className="govuk-button govuk-button--secondary" name="backButton" aria-label="backButton" onClick={goBack}>Back</button>
                                 :
                                 <button className="govuk-button govuk-button--secondary" name="cancelButton" aria-label="cancelButton" onClick={goBack}>Cancel</button>

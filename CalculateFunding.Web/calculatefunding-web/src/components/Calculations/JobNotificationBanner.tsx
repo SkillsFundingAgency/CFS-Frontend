@@ -3,15 +3,13 @@ import {DateFormatter} from "../DateFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {ErrorSummary} from "../ErrorSummary";
-import {JobSummary} from "../../types/jobSummary";
-import {JobStatusProps} from "../../helpers/getJobDisplayProps";
+import {JobDetails} from "../../helpers/jobDetailsHelper";
 
 export interface JobNotificationBannerProps {
-    latestJob: JobSummary | undefined,
+    job: JobDetails | undefined,
     isCheckingForJob: boolean,
     hasJobError: boolean,
     jobError: string,
-    jobStatus: JobStatusProps | undefined
 }
 
 export function JobNotificationBanner(props: JobNotificationBannerProps) {
@@ -26,34 +24,37 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
                              suggestion={"Please try again later"}/>
     }
 
-    if (!props.latestJob || !props.jobStatus) {
+    if (!props.job) {
         return null;
     }
-    
-    return (<div className={props.jobStatus.isFailed ? "govuk-error-summary" :
-        props.jobStatus.isActive ? "govuk-error-summary-orange" :
+
+    return (<div className={props.job.isFailed ? "govuk-error-summary" :
+        props.job.isActive ? "govuk-error-summary-orange" :
             "govuk-error-summary-green"}
-                 aria-labelledby="error-summary-title" 
+                 aria-labelledby="error-summary-title"
                  aria-label="job-notification"
                  role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
-            Job {props.jobStatus.statusDescription}: {props.jobStatus.jobDescription}
-            {props.jobStatus.isActive &&
-            <LoadingFieldStatus title={`Monitoring...`} />}
+            Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
         </h2>
+        <h3>
+            {props.job.isActive &&
+            <LoadingFieldStatus title={`Monitoring...`}/>
+            }
+        </h3>
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">
                 <li>
                     <p className="govuk-body">
-                        Job initiated by {props.latestJob.invokerUserDisplayName} on <DateFormatter
-                        date={props.latestJob.created as Date} utc={true}/>
+                        Job initiated by {props.job.invokerUserDisplayName} on <DateFormatter
+                        date={props.job.created as Date} utc={true}/>
                     </p>
                 </li>
-                <li hidden={props.latestJob.completionStatus == null || props.latestJob.runningStatus === RunningStatus.InProgress}>
+                <li hidden={props.job.completionStatus == null || props.job.runningStatus === RunningStatus.InProgress}>
                     <p className="govuk-body-s">
                         <strong>Results updated: </strong>
-                        <DateFormatter date={props.latestJob.lastUpdated as Date} utc={true}/>
+                        <DateFormatter date={props.job.lastUpdated as Date} utc={true}/>
                     </p>
                 </li>
             </ul>

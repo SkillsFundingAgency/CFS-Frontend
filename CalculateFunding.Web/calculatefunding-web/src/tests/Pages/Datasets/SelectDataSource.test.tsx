@@ -14,11 +14,10 @@ import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSum
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {RelationshipData} from "../../../types/Datasets/RelationshipData";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
-import {QueryResult} from "react-query/types/core/types";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
-import {AxiosError} from 'axios';
 import {RelationshipDataQueryResult} from "../../../hooks/useRelationshipData";
+import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
@@ -64,41 +63,29 @@ const specificationResult: SpecificationSummaryQueryResult = {
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: false,
     jobError: "",
     latestJob: undefined,
     hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
-    jobStatus: undefined,
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    hasFailedJob: false,
-    hasActiveJob: true,
     jobError: "",
-    latestJob: {
+    latestJob: getJobDetailsFromJobSummary({
+        jobId: "kdfghjboer",
         jobType: JobType.MapDatasetJob,
         invokerUserDisplayName: "test user",
         runningStatus: RunningStatus.InProgress,
         created: new Date(),
         lastUpdated: new Date()
-    },
+    }),
     hasJobError: false,
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
-    jobStatus: {
-        statusDescription: "in progress",
-        jobDescription: "test",
-        isComplete: false,
-        isFailed: false,
-        isActive: true,
-        isSuccessful: false
-    },
+    isMonitoring: true
 };
 const withoutPermissions = {
     isCheckingForPermissions: false,

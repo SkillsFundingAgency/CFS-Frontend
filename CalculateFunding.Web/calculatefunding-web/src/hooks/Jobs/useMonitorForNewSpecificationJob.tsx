@@ -1,12 +1,11 @@
 ﻿import {JobType} from "../../types/jobType";
 import {useState} from "react";
-import {JobSummary} from "../../types/jobSummary";
 import {HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../../types/jobMessage";
-import {RunningStatus} from "../../types/RunningStatus";
+import {getJobDetailsFromJobMessage, JobDetails} from "../../helpers/jobDetailsHelper";
 
 export type MonitorForNewSpecificationJobResult = {
-    newJob: JobSummary | undefined,
+    newJob: JobDetails | undefined,
     errorWhileMonitoringJobs: string,
     haveErrorWhileMonitoringJobs: boolean,
     isMonitoring: boolean,
@@ -14,7 +13,7 @@ export type MonitorForNewSpecificationJobResult = {
 
 export const useMonitorForNewSpecificationJob = (specificationId: string, jobTypes: JobType[] = [])
     : MonitorForNewSpecificationJobResult => {
-    const [newJob, setNewJob] = useState<JobSummary>();
+    const [newJob, setNewJob] = useState<JobDetails>();
     const [error, setError] = useState<string>();
     const [isMonitoring, setIsMonitoring] = useState<boolean>(false);
 
@@ -36,16 +35,7 @@ export const useMonitorForNewSpecificationJob = (specificationId: string, jobTyp
             hubConnect.on('NotificationEvent', (job: JobMessage) => {
                 const jobType: JobType | undefined = JobType[job.jobType as keyof typeof JobType];
                 if (isThisJobValid(job) && amInterestedInJobType(jobType)) {
-                    setNewJob({
-                        jobId: job.jobId,
-                        jobType: job.jobType,
-                        completionStatus: job.completionStatus,
-                        runningStatus: job.runningStatus as unknown as RunningStatus,
-                        invokerUserId: job.invokerUserId,
-                        invokerUserDisplayName: job.invokerUserDisplayName,
-                        created: job.jobCreatedDateTime,
-                        lastUpdated: job.statusDateTime as unknown as Date
-                    });
+                    getJobDetailsFromJobMessage(job);
                 } else {
                     setNewJob(undefined);
                 }

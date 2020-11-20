@@ -6,8 +6,9 @@ import {JobType} from "../../../types/jobType";
 import {render, screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {MappingStatus} from "../../../components/DatasetMapping/MappingStatus";
+import {getJobDetailsFromJobSummary, JobDetails} from "../../../helpers/jobDetailsHelper";
 
-const renderComponent = (job: JobSummary) => {
+const renderComponent = (job: JobDetails) => {
   const {MappingStatus} = require("../../../components/DatasetMapping/MappingStatus");
   return render(<MappingStatus job={job} hasActiveJob={job.runningStatus !== RunningStatus.Completed} />);
 };
@@ -80,8 +81,8 @@ describe('<MappingStatus />', () => {
 
 });
 
-function createTestJob(completionStatus: CompletionStatus | null, runningStatus: RunningStatus) : JobSummary {
-  return {
+function createTestJob(completionStatus: CompletionStatus | undefined, runningStatus: RunningStatus) : JobDetails {
+  return getJobDetailsFromJobSummary({
     completionStatus: completionStatus,
     invokerUserDisplayName: "Harry Potter",
     invokerUserId: "",
@@ -91,5 +92,5 @@ function createTestJob(completionStatus: CompletionStatus | null, runningStatus:
     specificationId: "",
     created: new Date("2020-09-02T09:50:45.4873729+00:00"),
     lastUpdated: new Date(Date.now())
-  };
+  });
 }
