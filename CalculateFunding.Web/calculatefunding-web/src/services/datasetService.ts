@@ -142,6 +142,7 @@ export async function validateDatasetService(datasetId: string, fundingStreamId:
             filename: filename,
             version: version,
             description: description,
+            mergeExistingVersion: mergeExisting,
             comment: changeNote
         }
     })
