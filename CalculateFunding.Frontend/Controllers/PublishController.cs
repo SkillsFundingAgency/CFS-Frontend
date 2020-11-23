@@ -483,7 +483,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(ModelState); 
             }
 
             ApiResponse<IEnumerable<string>> apiResponse = await _publishingApiClient.GetPublishedProviderErrors(specificationId);
@@ -505,6 +505,14 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            
+            if (!await _authorizationHelper.DoesUserHavePermission(
+                User,
+                specificationId,
+                SpecificationActionTypes.CanRefreshPublishedQa))
+            {
+                return new ForbidResult();
+            }
 
             ApiResponse<JobCreationResponse> createJobResponse = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
             

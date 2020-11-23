@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -9,6 +10,7 @@ using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
@@ -488,6 +490,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             JobCreationResponse expectedJob = new JobCreationResponse();
 
+            _authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(),
+                    specificationId,
+                    SpecificationActionTypes.CanRefreshPublishedQa)
+                .Returns(Task.FromResult(true));
+
             _publishingApiClient
                 .QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId)
                 .Returns(new ApiResponse<JobCreationResponse>(HttpStatusCode.OK, expectedJob));
@@ -498,6 +505,23 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Value
                 .Should()
                 .BeSameAs(expectedJob);
+        }
+        
+        [TestMethod]
+        public async Task RunSqlImportJobGuardedByCanRefreshPublishedQaPermission()
+        {
+            string specificationId = NewRandomString();
+            string fundingStreamId = NewRandomString();
+
+            ForbidResult result = await WhenTheRunSqlJobIsCreated(specificationId, fundingStreamId) as ForbidResult;
+
+            result
+                .Should()
+                .NotBeNull();
+
+            await _publishingApiClient
+                .Received(0)
+                .QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
         }
         
         [TestMethod]
