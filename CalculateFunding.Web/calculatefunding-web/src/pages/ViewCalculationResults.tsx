@@ -149,7 +149,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             filterUpdate.splice(position, 1);
         }
         setCalculationProviderSearchRequest(prevState => {
-            return {...prevState, providerType: filterUpdate}
+            return {...prevState, providerType: filterUpdate, pageNumber: 1}
         });
     }
 
@@ -164,7 +164,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             filterUpdate.splice(position, 1);
         }
         setCalculationProviderSearchRequest(prevState => {
-            return {...prevState, providerSubType: filterUpdate}
+            return {...prevState, providerSubType: filterUpdate, pageNumber: 1}
         });
     }
 
@@ -179,7 +179,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         }
 
         setCalculationProviderSearchRequest(prevState => {
-            return {...prevState, errorToggle: filterUpdate}
+            return {...prevState, errorToggle: filterUpdate, pageNumber: 1}
         });
 
         const request = calculationProviderSearchRequest;
@@ -197,7 +197,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             filterUpdate.splice(position, 1);
         }
         setCalculationProviderSearchRequest(prevState => {
-            return {...prevState, localAuthority: filterUpdate}
+            return {...prevState, localAuthority: filterUpdate, pageNumber: 1}
         });
     }
 
@@ -211,7 +211,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
             }
 
             setCalculationProviderSearchRequest(prevState => {
-                return {...prevState, searchTerm: searchTerm, searchFields: searchFields}
+                return {...prevState, searchTerm: searchTerm, searchFields: searchFields, pageNumber: 1}
             });
         }
     }
