@@ -1,4 +1,5 @@
-﻿import * as React from "react";
+﻿import { AxiosError } from "axios";
+import * as React from "react";
 import {ErrorMessage, ValidationErrors} from "../types/ErrorMessage";
 
 export const useErrors = () => {
@@ -18,6 +19,19 @@ export const useErrors = () => {
             validationErrors: undefined
         };
         setErrors(errors => [...errors, error]);
+    };
+    
+    const addError = (error: AxiosError | Error | string, description?: string, fieldName?: string) => {
+        let errorMessage = "";
+        const axiosError = (error as AxiosError);
+        if (axiosError && axiosError.isAxiosError) {
+            errorMessage = axiosError.response && axiosError.response.data ? axiosError.response.data : `Server returned ${axiosError.response?.status} ${axiosError.response?.statusText}`;
+        }
+        const err = error as Error;
+        if (err && err.message) {
+            errorMessage = err.message;
+        }
+        addErrorMessage(errorMessage.length > 0 ? errorMessage : error.toString(), description, fieldName);
     };
     
     const addValidationErrors = (validationErrors: ValidationErrors, message: string, description?: string, fieldName?: string) => {
@@ -44,6 +58,7 @@ export const useErrors = () => {
 
     return {
         errors,
+        addError,
         addErrorMessage,
         addValidationErrors,
         clearErrorMessages

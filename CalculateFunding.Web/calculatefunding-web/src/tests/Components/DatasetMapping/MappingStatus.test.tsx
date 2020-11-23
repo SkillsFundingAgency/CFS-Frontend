@@ -1,5 +1,4 @@
 import React from "react";
-import {JobSummary} from "../../../types/jobSummary";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {JobType} from "../../../types/jobType";
@@ -16,7 +15,7 @@ const renderComponent = (job: JobDetails) => {
 describe('<MappingStatus />', () => {
 
   it("renders status based on Queued job", () => {
-    const job = createTestJob(null, RunningStatus.Queued);
+    const job = createTestJob(undefined, RunningStatus.Queued);
 
     renderComponent(job);
 
@@ -32,7 +31,7 @@ describe('<MappingStatus />', () => {
   });
   
   it("renders status based on InProgress job", () => {
-    const job = createTestJob(null, RunningStatus.InProgress);
+    const job = createTestJob(undefined, RunningStatus.InProgress);
     
     renderComponent(job);
 

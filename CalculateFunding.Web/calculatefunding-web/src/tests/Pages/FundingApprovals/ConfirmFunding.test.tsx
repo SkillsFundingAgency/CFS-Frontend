@@ -66,8 +66,8 @@ describe("<ConfirmFunding />", () => {
         afterEach(() => jest.clearAllMocks());
 
         it('renders job progress message', async () => {
-            const alert = await screen.findByRole("alert", {name: "job-notification"});
-            expect(within(alert).getByRole("alert", /Monitoring job/)).toBeInTheDocument();
+            const alert = await screen.findByRole("alert", {name: /job-notification/});
+            expect(within(alert).getByRole("alert", {name: /Monitoring job/})).toBeInTheDocument();
             expect(within(alert).getByText(`Job ${activeJob?.latestJob?.statusDescription}: ${activeJob?.latestJob?.jobDescription}`)).toBeInTheDocument();
         });
 
@@ -213,9 +213,7 @@ const specResult: SpecificationSummaryQueryResult = {
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
-    jobError: "",
     latestJob: undefined,
-    hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
@@ -223,7 +221,6 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    jobError: "",
     latestJob: getJobDetailsFromJobSummary({
         jobId: "dfgwer",
         jobType: JobType.RefreshFundingJob,
@@ -232,7 +229,6 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
         created: new Date(),
         lastUpdated: new Date()
     }),
-    hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true

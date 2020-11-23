@@ -77,15 +77,21 @@ export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
     return result;
 }
 
-function getJobType(jobTypeString: string | undefined): JobType | undefined {
+function getJobType(jobTypeString: string): JobType | undefined {
     return JobType[jobTypeString as keyof typeof JobType];
 }
 
-function buildDescription(jobType: string | undefined, message: string | undefined) {
-    const d1 = getJobProgressMessage(jobType);
-    const d2 = (message && message.length > 0) ? message : "";
-    const same = (d1 && d2 && d1.trim().toLowerCase() == d2.trim().toLowerCase()) 
-    return  d1 && d2 ? same ? d1 : `${d1}: ${d2}` : d1 && !d2 ? d1 : !d1 && d2 ? d2 : "";
+function buildDescription(jobType: string, message: string | undefined) {
+    const descFromJobType = getJobProgressMessage(jobType).trim();
+    const haveDescFromJobType = descFromJobType && descFromJobType.length > 0;
+    const descFromServer = (message && message.length > 0) ? message.trim().replace(/[\W_]+/g," ") : "";
+    const haveDescFromServer = descFromServer && descFromServer.length > 0;
+    const same = (descFromJobType && descFromServer && 
+        (descFromJobType.toLowerCase() == descFromServer.toLowerCase() || descFromServer.includes(descFromJobType))) 
+    return  haveDescFromJobType && haveDescFromServer ? 
+        same ? descFromServer : `${descFromJobType}: ${descFromServer}` :
+        (haveDescFromJobType && !haveDescFromServer) ? descFromJobType : 
+            (!haveDescFromJobType && haveDescFromServer) ? descFromServer : "";
 }
 
 function setStatusFields(job: JobDetails) {
@@ -128,7 +134,7 @@ function setStatusFields(job: JobDetails) {
     return job;
 }
 
-function getJobProgressMessage(jobTypeString: string | undefined) {
+function getJobProgressMessage(jobTypeString: string) {
     switch (getJobType(jobTypeString)) {
         case JobType.MapDatasetJob:
             return "Mapping dataset";

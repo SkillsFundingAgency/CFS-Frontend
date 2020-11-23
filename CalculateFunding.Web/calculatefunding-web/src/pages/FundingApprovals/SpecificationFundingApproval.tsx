@@ -44,14 +44,15 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const specificationId = match.params.specificationId;
 
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
-    const {hasJobError, jobError, latestJob, isCheckingForJob} =
+    const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(
             specificationId,
             [JobType.RefreshFundingJob,
                 JobType.ApproveAllProviderFundingJob,
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
-                JobType.PublishAllProviderFundingJob]);
+                JobType.PublishAllProviderFundingJob],
+            err => addError(err, "Error while checking for job"));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
     const {publishedProviderSearchResults, isLoadingSearchResults} =
@@ -71,7 +72,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
     const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
     const [jobId, setJobId] = useState<string>("");
-    const {errors, addErrorMessage, addValidationErrors, clearErrorMessages} = useErrors();
+    const {errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages} = useErrors();
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -98,11 +99,12 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
     async function handleRefresh() {
         clearErrorMessages();
-        setIsLoadingRefresh(true);
 
         try {
+            setIsLoadingRefresh(true);
             await preValidateForRefreshFundingService(specificationId);
-            
+            setIsLoadingRefresh(false);
+
             ConfirmationModal(<ConfirmRefreshModelBody/>, refreshFunding, "Confirm", "Cancel");
         } catch (e) {
             if (e.isAxiosError) {
@@ -118,6 +120,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }
 
     async function refreshFunding() {
+        setIsLoadingRefresh(true);
         try {
             setJobId((await refreshSpecificationFundingService(specificationId)).data.jobId);
         } catch (e) {
@@ -183,9 +186,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 {!isCheckingForJob && (latestJob && latestJob.isComplete) &&
                 <JobNotificationBanner
                     job={latestJob}
-                    isCheckingForJob={isCheckingForJob}
-                    hasJobError={hasJobError}
-                    jobError={jobError}/>
+                    isCheckingForJob={isCheckingForJob}/>
                 }
 
                 <SpecificationSummarySection

@@ -20,9 +20,7 @@ const mockQueuedJobResult: JobDetails = getJobDetailsFromJobSummary({
 const renderComponent = (params: JobNotificationBannerProps) => {
     return render(<JobNotificationBanner
         job={params.job}
-        hasJobError={params.hasJobError}
         isCheckingForJob={params.isCheckingForJob}
-        jobError={params.jobError}
     />);
 };
 
@@ -34,8 +32,6 @@ describe('<JobNotificationBanner />', () => {
             const props: JobNotificationBannerProps = {
                 job: undefined,
                 isCheckingForJob: false,
-                hasJobError: false,
-                jobError: "",
             };
             await renderComponent(props);
 
@@ -52,28 +48,10 @@ describe('<JobNotificationBanner />', () => {
             const props: JobNotificationBannerProps = {
                 job: undefined,
                 isCheckingForJob: true,
-                hasJobError: false,
-                jobError: "",
             };
             await renderComponent(props);
 
             expect(screen.getByText("Checking for running jobs")).toBeInTheDocument();
-            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
-        });
-    });
-
-    describe('when has error loading latest spec job', () => {
-        it('renders error message correctly', async () => {
-            const props: JobNotificationBannerProps = {
-                job: undefined,
-                isCheckingForJob: false,
-                hasJobError: true,
-                jobError: "Uh oh!",
-            };
-            await renderComponent(props);
-
-            expect(screen.queryByText("Error while checking for latest job")).toBeInTheDocument();
-            expect(screen.queryByText("Uh oh!")).toBeInTheDocument();
             expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
         });
     });
@@ -83,8 +61,6 @@ describe('<JobNotificationBanner />', () => {
             const props: JobNotificationBannerProps = {
                 job: mockQueuedJobResult,
                 isCheckingForJob: false,
-                hasJobError: false,
-                jobError: ""
             };
 
             renderComponent(props);

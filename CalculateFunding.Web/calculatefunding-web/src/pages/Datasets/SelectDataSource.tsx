@@ -19,7 +19,7 @@ import {useRelationshipData} from "../../hooks/useRelationshipData";
 import {Dataset} from "../../types/Datasets/RelationshipData";
 import {DatasetVersionSelection} from "../../components/DatasetMapping/DatasetVersionSelection";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {ErrorMessage} from "../../types/ErrorMessage";
+import {useErrors} from "../../hooks/useErrors";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
@@ -31,20 +31,22 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [missingVersion, setMissingVersion] = useState<boolean>(false);
     const [saveErrorOccurred, setSaveErrorOccurred] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const {errors, addErrorMessage, addError} = useErrors();
     let history = useHistory();
-    const [errors, setErrors] = useState<ErrorMessage[]>([]);
 
     const {relationshipData, isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
 
     const specificationId = relationshipData && relationshipData.specificationId ? relationshipData.specificationId : "";
     const {specification, isLoadingSpecification} = 
-        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification") );
+        useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
 
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
 
     const {hasJob, latestJob, isCheckingForJob} =
-        useLatestSpecificationJobWithMonitoring(specificationId, [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation]);
+        useLatestSpecificationJobWithMonitoring(specificationId, 
+            [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation],
+            err => addError(err, "Error while checking for job"));
     
     function getCurrentDataset() {
         return newDataset ? newDataset :
@@ -102,17 +104,6 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
 
     function goBack() {
         history.goBack();
-    }
-
-    function addErrorMessage(errorMessage: string, description?: string, fieldName?: string) {
-        const errorCount: number = errors.length;
-        const error: ErrorMessage = {
-            id: errorCount + 1,
-            fieldName: fieldName,
-            description: description,
-            message: errorMessage
-        };
-        setErrors(errors => [...errors, error]);
     }
 
     async function changeSpecificationDataMapping() {

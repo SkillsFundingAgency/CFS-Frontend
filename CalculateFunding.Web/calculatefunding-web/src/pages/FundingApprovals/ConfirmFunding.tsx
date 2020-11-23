@@ -40,7 +40,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const mode = match.params.mode;
 
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
-    const {hasJobError, jobError, latestJob, isCheckingForJob} =
+    const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(
             match.params.specificationId,
             [JobType.RefreshFundingJob,
@@ -48,7 +48,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 JobType.ApproveAllProviderFundingJob,
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
-                JobType.PublishAllProviderFundingJob]);
+                JobType.PublishAllProviderFundingJob],
+            err => addError(err, "Error checking for job"));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
     const {canApproveFunding, canReleaseFunding, missingPermissions} =
@@ -56,7 +57,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
             err => addErrorMessage(err.message, "", "Error while loading funding configuration"));
-    const {errors, addErrorMessage} = useErrors();
+    const {errors, addErrorMessage, addError} = useErrors();
     const [jobId, setJobId] = useState<string>("");
     const [isConfirming, setIsConfirming] = useState<boolean>(false);
     const history = useHistory();
@@ -128,9 +129,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                     <div className="govuk-grid-column-three-quarters">
                         <JobNotificationBanner
                             job={latestJob}
-                            isCheckingForJob={isCheckingForJob}
-                            hasJobError={hasJobError}
-                            jobError={jobError}/>
+                            isCheckingForJob={isCheckingForJob} />
                     </div>
                 </div>
                 }

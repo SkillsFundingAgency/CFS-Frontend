@@ -341,7 +341,7 @@ describe("<SpecificationFundingApproval />", () => {
         });
     });
 
-    
+
     describe("when user confirms refresh", () => {
 
         describe("and there is a validation error", () => {
@@ -478,9 +478,7 @@ const specResult: SpecificationSummaryQueryResult = {
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
-    jobError: "",
     latestJob: undefined,
-    hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true
@@ -488,16 +486,14 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    jobError: "",
     latestJob: getJobDetailsFromJobSummary({
-            jobId: "rt56w",
+        jobId: "rt56w",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.InProgress,
         invokerUserDisplayName: "testUser",
         created: new Date(),
         lastUpdated: new Date()
     }),
-    hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true
@@ -514,8 +510,6 @@ const failedJob: LatestSpecificationJobWithMonitoringResult = {
         created: new Date(),
         lastUpdated: new Date()
     }),
-    hasJobError: false,
-    jobError: "",
     isFetched: true,
     isFetching: false,
     isMonitoring: true
@@ -532,8 +526,6 @@ const successfulCompletedJob: LatestSpecificationJobWithMonitoringResult = {
         created: new Date(),
         lastUpdated: new Date()
     }),
-    hasJobError: false,
-    jobError: "",
     isFetched: true,
     isFetching: false,
     isMonitoring: true
@@ -585,7 +577,7 @@ const providerWithError1: PublishedProviderResult = {
     urn: "82096"
 };
 const fullPermissions: SpecificationPermissionsResult = {
-    canApproveAllCalculations: false, 
+    canApproveAllCalculations: false,
     canChooseFunding: false,
     canRefreshFunding: true,
     canApproveFunding: true,

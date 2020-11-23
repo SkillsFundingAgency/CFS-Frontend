@@ -47,15 +47,19 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     const [filterLocalAuthority, setLocalAuthority] = useState<FacetValue[]>([]);
     const calculationId = match.params.calculationId;
     const [specificationId, setSpecificationId] = useState<string>("");
-    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {errors, addErrorMessage, addError} = useErrors();
     const {calculation, isLoadingCalculation} =
         useCalculation(calculationId,
             err => addErrorMessage(err.message, "Error while loading calculation"));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {latestJob, jobError, hasJobError, isCheckingForJob} =
+    const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
-            [JobType.CreateInstructAllocationJob, JobType.GenerateGraphAndInstructAllocationJob, JobType.CreateInstructGenerateAggregationsAllocationJob, JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob]);
+            [JobType.CreateInstructAllocationJob,
+                JobType.GenerateGraphAndInstructAllocationJob,
+                JobType.CreateInstructGenerateAggregationsAllocationJob,
+                JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob],
+            err => addError(err, "Error checking for job"));
     const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
         calculationValueType: "",
         errorToggle: "",
@@ -95,7 +99,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         totalErrorResults: 0,
         totalResults: 0
     });
-    
+
     useEffect(() => {
         if (calculation) {
             setSpecificationId(calculation.specificationId);
@@ -262,9 +266,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                         {specificationId.length > 0 &&
                         <JobNotificationBanner
                             job={latestJob}
-                            isCheckingForJob={isCheckingForJob}
-                            hasJobError={hasJobError}
-                            jobError={jobError}/>
+                            isCheckingForJob={isCheckingForJob}/>
                         }
                         {calculation &&
                         <Link id={"view-calculation-button"}

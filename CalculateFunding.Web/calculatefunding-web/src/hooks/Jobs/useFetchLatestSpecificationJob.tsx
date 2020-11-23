@@ -16,7 +16,7 @@ export type FetchLatestSpecificationJobResult = {
 export const useFetchLatestSpecificationJob = (
     specificationId: string,
     jobTypes: JobType[],
-    onError?: (err: AxiosError) => void)
+    onError?: (err: AxiosError | Error) => void)
     : FetchLatestSpecificationJobResult => {
     const jobTypeList = jobTypes.join(",");
 
@@ -25,7 +25,7 @@ export const useFetchLatestSpecificationJob = (
             async () => await checkForJob(specificationId, jobTypeList),
             {
                 enabled: specificationId && specificationId.length > 0 && jobTypes.length > 0,
-                onError: err => onError
+                onError: onError
             });
 
     const checkForJob = async (specId: string, listOfJobTypes: string): Promise<JobDetails | undefined> => {

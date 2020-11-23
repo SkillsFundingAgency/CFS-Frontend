@@ -3,7 +3,7 @@ import {CompletionStatus} from "./CompletionStatus";
 
 export interface JobSummary {
     jobId: string;
-    jobType?: string;
+    jobType: string;
     specificationId?: string;
     entityId?: string;
     outcome?: string;

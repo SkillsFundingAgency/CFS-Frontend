@@ -5,7 +5,7 @@ import {SelectDataSourceRouteProps} from "../../../pages/Datasets/SelectDataSour
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as useSpecificationPermissionsHook from "../../../hooks/useSpecificationPermissions";
-import {SpecificationPermissions} from "../../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
 import * as useLatestSpecificationJobWithMonitoringHook
     from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -63,9 +63,7 @@ const specificationResult: SpecificationSummaryQueryResult = {
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
-    jobError: "",
     latestJob: undefined,
-    hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
@@ -73,7 +71,6 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    jobError: "",
     latestJob: getJobDetailsFromJobSummary({
         jobId: "kdfghjboer",
         jobType: JobType.MapDatasetJob,
@@ -82,12 +79,16 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
         created: new Date(),
         lastUpdated: new Date()
     }),
-    hasJobError: false,
     isFetched: true,
     isFetching: false,
     isMonitoring: true
 };
-const withoutPermissions = {
+const withoutPermissions: SpecificationPermissionsResult = {
+    canApproveAllCalculations: false, 
+    canApproveCalculation: false, 
+    canChooseFunding: false, 
+    canCreateAdditionalCalculation: false, 
+    canEditCalculation: false,
     isCheckingForPermissions: false,
     hasMissingPermissions: true,
     isPermissionsFetched: true,
@@ -97,9 +98,14 @@ const withoutPermissions = {
     canCreateSpecification: false,
     canEditSpecification: false,
     canRefreshFunding: false,
-    canReleaseFunding: false,
+    canReleaseFunding: false
 };
-const withPermissions = {
+const withPermissions: SpecificationPermissionsResult = {
+    canApproveAllCalculations: false,
+    canApproveCalculation: false,
+    canChooseFunding: false,
+    canCreateAdditionalCalculation: false,
+    canEditCalculation: false,
     isCheckingForPermissions: false,
     hasMissingPermissions: false,
     isPermissionsFetched: true,
