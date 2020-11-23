@@ -22,6 +22,7 @@ import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCa
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
+import {ValueType} from "../../types/ValueType";
 
 export interface EditorProps {
     excludeMonacoEditor?: boolean
@@ -48,6 +49,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
     const [calculationStatus, setCalculationStatus] = useState<PublishStatus | undefined>();
     const [isApproving, setIsApproving] = useState(false);
     const [calculationState, setCalculationState] = useState<CalculationSourceCodeState | undefined>();
+    const [calculationType, setCalculationType] = useState<ValueType | undefined>();
     let history = useHistory();
     document.title = `Edit ${calculation?.calculationType} Calculation - Calculate Funding`;
 
@@ -70,7 +72,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
         let updateAdditionalCalculationViewModel: UpdateCalculationViewModel = {
             calculationName: calculation.name,
-            valueType: calculation.valueType,
+            valueType: calculationType ?? calculation.valueType,
             sourceCode: calculationState.sourceCode,
         };
 
@@ -117,6 +119,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         }
         setSpecificationId(calculation.specificationId);
         setCalculationStatus(calculation.publishStatus);
+        setCalculationType(calculation.valueType)
     }
 
     if (circularReferenceErrors && circularReferenceErrors.length > 0) {
@@ -180,7 +183,11 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                                     Value type
                                 </dt>
                                 <dd className="govuk-summary-list__value">
-                                    {!isLoadingCalculation && calculation ? calculation.valueType : <LoadingFieldStatus title="Loading..."/>}
+                                    {!isLoadingCalculation && calculation ? <select className="govuk-select" onChange={(e) => setCalculationType(e.target.value as ValueType)}>
+                                        <option selected={calculationType === ValueType.Percentage}>Percentage</option>
+                                        <option selected={calculationType === ValueType.Currency}>Currency</option>
+                                        <option selected={calculationType === ValueType.Number}>Number</option>
+                                    </select> : <LoadingFieldStatus title="Loading..."/>}
                                 </dd>
                             </div>
                         </dl>
