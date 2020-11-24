@@ -44,7 +44,6 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         useLatestSpecificationJobWithMonitoring(
             match.params.specificationId,
             [JobType.RefreshFundingJob,
-                JobType.GeneratePublishedFundingCsvJob,
                 JobType.ApproveAllProviderFundingJob,
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
@@ -63,18 +62,19 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const history = useHistory();
 
     useEffect(() => {
-        const redirectIfActionJobComplete = () => {
-            if (jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
-                setIsConfirming(false);
-                if (latestJob.isComplete) {
-                    history.push(`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`);
+            const handleActionJobComplete = () => {
+                if (jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
+                    setIsConfirming(false);
+                    if (latestJob.isComplete && latestJob.isSuccessful) {
+                        history.push(`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`);
+                    }
                 }
-            }
-        };
+            };
 
-        redirectIfActionJobComplete();
-    }, [latestJob])
-    
+            handleActionJobComplete();
+        }, [latestJob]
+    )
+
     const handleConfirm = async () => {
         if (!fundingConfiguration) {
             return;
@@ -129,11 +129,11 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                     <div className="govuk-grid-column-three-quarters">
                         <JobNotificationBanner
                             job={latestJob}
-                            isCheckingForJob={isCheckingForJob} />
+                            isCheckingForJob={isCheckingForJob}/>
                     </div>
                 </div>
                 }
-                
+
                 {(isLoadingSpecification || isCheckingForJob || isLoadingFundingConfiguration || isConfirming) &&
                 <div className="govuk-grid-row govuk-!-margin-bottom-3">
                     <div className="govuk-grid-column-full govuk-!-margin-bottom-5">
@@ -193,7 +193,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                                     data-module="govuk-button"
                                     disabled={isLoadingFundingConfiguration || isCheckingForJob || isConfirming || latestJob && latestJob.runningStatus !== RunningStatus.Completed}
                                     onClick={handleConfirm}>
-                                    Confirm {mode === FundingActionType.Approve ? "approval" : "release"}
+                                Confirm {mode === FundingActionType.Approve ? "approval" : "release"}
                             </button>
                             <Link className="govuk-button govuk-button--secondary"
                                   data-module="govuk-button"

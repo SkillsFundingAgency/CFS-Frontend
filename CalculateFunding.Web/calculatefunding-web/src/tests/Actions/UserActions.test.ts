@@ -60,48 +60,11 @@ const storeWithData: IStoreState = {
         fundingStreamPermissions: [],
         hasConfirmedSkills: true
     },
-    selectSpecification: {
-        fundingStreams: [],
-        fundingPeriods: [],
-        specifications: []
-    },
-    datasets: {
-        dataSchemas: [
-            {
-                name: '',
-                id: '',
-                description: '',
-                tableDefinitions: []
-            }
-        ]
-    },
     featureFlags: {
         templateBuilderVisible: false,
         enableReactQueryDevTool: false,
         releaseTimetableVisible: false,
         profilingPatternVisible: false
-    },
-    fundingLineStructureState: {
-        specificationResult: {
-            name: '',
-            id: '',
-            templateIds: {},
-            publishedResultsRefreshedAt: null,
-            providerVersionId: '',
-            lastCalculationUpdatedAt: '',
-            fundingStreams: [],
-            fundingPeriod: {
-                id: '',
-                name: ''
-            },
-            isSelectedForFunding: false,
-            description: '',
-            approvalStatus: '',
-            dataDefinitionRelationshipIds: [],
-            lastEditedDate: new Date()
-        },
-        fundingLineStructureResult: [],
-        fundingLineStatusResult: ''
     },
     viewSpecificationResults: {
         additionalCalculations: {

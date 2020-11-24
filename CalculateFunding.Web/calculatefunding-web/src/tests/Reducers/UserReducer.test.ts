@@ -1,30 +1,8 @@
 ﻿import {UserActionEvent} from "../../actions/userAction";
 import {reduceUserState} from "../../reducers/userReducer";
+import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 
-const payload = [{
-    "userId": "",
-    "fundingStreamId": "DSG",
-    "canAdministerFundingStream": false,
-    "canCreateSpecification": false,
-    "canEditSpecification": false,
-    "canApproveSpecification": false,
-    "canDeleteSpecification": false,
-    "canEditCalculations": false,
-    "canDeleteCalculations": false,
-    "canMapDatasets": false,
-    "canChooseFunding": false,
-    "canRefreshFunding": false,
-    "canApproveFunding": false,
-    "canReleaseFunding": false,
-    "canCreateQaTests": false,
-    "canEditQaTests": false,
-    "canDeleteQaTests": false,
-    "canCreateTemplates": true,
-    "canEditTemplates": true,
-    "canDeleteTemplates": true,
-    "canApproveTemplates": true
-}];
-const fundingStreamPermissionsDsgState = {
+const payload: [FundingStreamPermissions] = [{
     canAdministerFundingStream: false,
     canApproveFunding: false,
     canApproveSpecification: false,
@@ -44,6 +22,39 @@ const fundingStreamPermissionsDsgState = {
     canEditTemplates: true,
     canDeleteTemplates: true,
     canApproveTemplates: true,
+    canEditProfilePattern: false,
+    canDeleteProfilePattern: false,
+    canCreateProfilePattern: false,
+    canAssignProfilePattern: false,
+    canApplyCustomProfilePattern: false,
+    fundingStreamId: "DSG",
+    userId: ""
+}];
+export const fundingStreamPermissionsDsgState: FundingStreamPermissions = {
+    canAdministerFundingStream: false,
+    canApproveFunding: false,
+    canApproveSpecification: false,
+    canChooseFunding: false,
+    canCreateQaTests: false,
+    canCreateSpecification: false,
+    canDeleteCalculations: false,
+    canDeleteQaTests: false,
+    canDeleteSpecification: false,
+    canEditCalculations: false,
+    canEditQaTests: false,
+    canEditSpecification: false,
+    canMapDatasets: false,
+    canRefreshFunding: false,
+    canReleaseFunding: false,
+    canCreateTemplates: true,
+    canEditTemplates: true,
+    canDeleteTemplates: true,
+    canApproveTemplates: true,
+    canEditProfilePattern: false,
+    canDeleteProfilePattern: false,
+    canCreateProfilePattern: false,
+    canAssignProfilePattern: false,
+    canApplyCustomProfilePattern: false,
     fundingStreamId: "DSG",
     userId: ""
 };

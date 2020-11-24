@@ -2,13 +2,13 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
-import {render, screen, waitFor, waitForElementToBeRemoved, within} from "@testing-library/react";
+import {act, render, screen, waitFor, waitForElementToBeRemoved, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import * as redux from "react-redux";
 import {Provider} from "react-redux";
-import {createStore, Store} from "redux";
-import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
+import {createStore, Reducer, Store} from "redux";
+import {Actions, IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {QueryCache, ReactQueryCacheProvider} from "react-query";
 import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
@@ -31,6 +31,7 @@ import {ConfirmFundingRouteProps} from "../../../pages/FundingApprovals/ConfirmF
 import {FundingActionType, PublishedProviderFundingCount} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import {createPublishedProviderIdsQueryResult} from "../../fakes/testFactories";
 import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
+import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
@@ -47,12 +48,12 @@ const renderConfirmApprovalPage = () => {
         </ReactQueryCacheProvider>
     </MemoryRouter>);
 };
+const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 describe("<ConfirmFunding />", () => {
 
     describe("<ConfirmFunding /> when job is active", () => {
         beforeEach(() => {
-            const useSelectorSpy = jest.spyOn(redux, 'useSelector');
             useSelectorSpy.mockReturnValueOnce(stateWithNoProvidersSelected);
             hasActiveJobRunning();
             hasSpecification();
@@ -88,7 +89,6 @@ describe("<ConfirmFunding />", () => {
 
     describe("<ConfirmFunding /> when confirming approval of all funding", () => {
         beforeEach(() => {
-            const useSelectorSpy = jest.spyOn(redux, 'useSelector');
             useSelectorSpy.mockReturnValueOnce(stateWithNoProvidersSelected);
             hasNoActiveJobsRunning();
             hasSpecification();
@@ -107,7 +107,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render job progress spinner', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader"));
+            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
         });
 
         it('renders warning message', async () => {
@@ -115,7 +115,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders funding summary section', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader"));
+            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
             const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
             screen.debug(fundingSummaryTable);
             expect(fundingSummaryTable).toBeInTheDocument();
@@ -135,7 +135,6 @@ describe("<ConfirmFunding />", () => {
 
     describe("<ConfirmFunding /> when confirming approval of batch funding", () => {
         beforeEach(() => {
-            const useSelectorSpy = jest.spyOn(redux, 'useSelector');
             useSelectorSpy.mockReturnValueOnce(stateWithProvidersSelected(["p1", "p2"]));
             hasNoActiveJobsRunning();
             hasSpecification();
@@ -154,7 +153,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render job progress spinner', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader"));
+            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
         });
 
         it('renders warning message', async () => {
@@ -162,9 +161,8 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders funding summary section', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader"));
+            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
             const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
-            screen.debug(fundingSummaryTable);
             expect(fundingSummaryTable).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
@@ -174,7 +172,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders approve button as enabled', async () => {
-            const button = screen.queryByRole("button", {name: /Confirm approval/});
+            const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
             expect(button).toBeInTheDocument();
             expect(button).toBeEnabled();
         });
@@ -292,7 +290,7 @@ const provider2: PublishedProviderResult = {
     urn: "82096"
 };
 const fullPermissions: SpecificationPermissionsResult = {
-    canApproveAllCalculations: false, 
+    canApproveAllCalculations: false,
     canChooseFunding: false,
     canRefreshFunding: true,
     canApproveFunding: true,
@@ -352,16 +350,21 @@ const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPe
 const hasProviderIds = (ids: string[]) => jest.spyOn(providerIdsSearchHook, 'usePublishedProviderIds')
     .mockImplementation(() => (createPublishedProviderIdsQueryResult(ids)));
 const mockFundingSummary: PublishedProviderFundingCount = {
-        count: 2,
-        fundingStreamsFundings: [{totalFunding: 534.53, fundingStreamId: fundingStream.id}],
-        localAuthorities: [],
-        localAuthoritiesCount: 0,
-        providerTypes: [],
-        providerTypesCount: 2,
-        totalFunding: 123456.99
+    count: 2,
+    fundingStreamsFundings: [{totalFunding: 534.53, fundingStreamId: fundingStream.id}],
+    localAuthorities: [],
+    localAuthoritiesCount: 0,
+    providerTypes: [],
+    providerTypesCount: 2,
+    totalFunding: 123456.99
 };
 const mockFundingSummaryForApprovingService = jest.fn(() => Promise.resolve({
     data: {mockFundingSummary},
+    status: 200
+}));
+const mockApproveJobCreatedResponse: JobCreatedResponse = {jobId: "135235"}
+const mockApproveSpecService = jest.fn(() => Promise.resolve({
+    data: {mockApproveJobCreatedResponse},
     status: 200
 }));
 const hasFundingApprovalSummary = () => {
@@ -370,7 +373,8 @@ const hasFundingApprovalSummary = () => {
 
         return {
             ...mockService,
-            getFundingSummaryForApprovingService: mockFundingSummaryForApprovingService
+            getFundingSummaryForApprovingService: mockFundingSummaryForApprovingService,
+            approveSpecificationFundingService: mockApproveSpecService,
         }
     });
 };

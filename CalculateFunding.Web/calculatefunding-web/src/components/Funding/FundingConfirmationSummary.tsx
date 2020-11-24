@@ -12,6 +12,7 @@ import {getFundingSummaryForApprovingService, getFundingSummaryForReleasingServi
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
+import {LoadingFieldStatus} from "../LoadingFieldStatus";
 
 export interface FundingConfirmationSummaryProps {
     fundingStreamId: string,
@@ -59,7 +60,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
     if (!fundingSummary) {
         return (
             <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
-                <LoadingStatus title={"Loading funding summary"} description="Please wait..."/>
+                <LoadingFieldStatus title={"Loading funding summary"}/>
             </div>
         );
 
