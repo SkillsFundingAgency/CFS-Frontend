@@ -6,5 +6,7 @@
     {
         [Required]
         public string SourceCode { get; set; }
+
+        public string ProviderId { get; set; }
     }
 }

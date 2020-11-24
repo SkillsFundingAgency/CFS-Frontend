@@ -100,7 +100,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/specs/{specificationId}/calculations/{calculationId}/compilePreview")]
         [HttpPost]
-        public async Task<IActionResult> CompilePreview([FromRoute] string specificationId, [FromRoute] string calculationId, [FromBody] PreviewCompileRequestViewModel vm)
+        public async Task<IActionResult> CompilePreview([FromRoute] string specificationId, [FromRoute] string calculationId
+            , [FromBody] PreviewCompileRequestViewModel vm)
         {
             if (!ModelState.IsValid)
             {
@@ -123,6 +124,7 @@ namespace CalculateFunding.Frontend.Controllers
             PreviewRequest request = _mapper.Map<PreviewRequest>(vm);
             request.CalculationId = calculationId;
             request.SpecificationId = specificationId;
+            request.ProviderId = vm.ProviderId;
 
             ApiResponse<PreviewResponse> response = await _calcClient.PreviewCompile(request);
 

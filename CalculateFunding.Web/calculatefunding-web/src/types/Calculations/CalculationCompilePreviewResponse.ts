@@ -1,7 +1,35 @@
 import {Author} from "./Author";
+import {Reference} from "../Reference";
+import {CalculationType} from "../CalculationSearchResponse";
+import {CalculationDetails} from "../CalculationDetails";
 
 export interface CalculationCompilePreviewResponse {
     compilerOutput: CompilerOutput
+    calculation: CalculationDetails,
+    previewProviderCalculation: PreviewProviderCalculationResponseModel
+}
+
+export interface PreviewProviderCalculationResponseModel {
+    providerName: string;
+    calculationResult: CalculationResult;
+}
+
+export interface CalculationResult {
+    calculation: Reference;
+    value: object | undefined;
+    exceptionType: string,
+    exceptionMessage: string,
+    exceptionStackTrace: string,
+    calculationType: CalculationType,
+    calculationDataType: CalculationDataType
+}
+
+export enum CalculationDataType
+{
+    Decimal,
+    String,
+    Boolean,
+    Enum,
 }
 
 export interface CompilerOutput {
@@ -24,9 +52,16 @@ export enum CompileErrorSeverity
     Error,
 }
 
+export interface PreviewCompileRequestViewModel{
+    sourceCode: string,
+    providerId: string
+}
+
 export interface CompilerOutputViewModel {
     hasCodeBuiltSuccessfully: boolean | undefined;
     previewResponse: CalculationCompilePreviewResponse | undefined
+    isProviderValid: boolean | undefined;
+    providerRuntimeException: string;
 }
 
 export interface SourceFile {

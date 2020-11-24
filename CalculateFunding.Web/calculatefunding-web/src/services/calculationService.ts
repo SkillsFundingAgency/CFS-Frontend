@@ -5,7 +5,10 @@ import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
-import {CalculationCompilePreviewResponse} from "../types/Calculations/CalculationCompilePreviewResponse";
+import {
+    CalculationCompilePreviewResponse,
+    PreviewCompileRequestViewModel
+} from "../types/Calculations/CalculationCompilePreviewResponse";
 import {CalculationDetails, CalculationSummary} from "../types/CalculationDetails";
 import {AdditionalCalculationSearchResultViewModel} from "../types/Calculations/AdditionalCalculation";
 import {CalculationVersionHistorySummary} from "../types/Calculations/CalculationVersionHistorySummary";
@@ -88,16 +91,14 @@ export async function updateCalculationService(updateCalculationViewModel: Updat
 
 export async function compileCalculationPreviewService(
     specificationId: string, 
-    calculationId: string, 
-    sourceCode: string): Promise<AxiosResponse<CalculationCompilePreviewResponse>> {
+    calculationId: string,
+    previewCompileRequestViewModel: PreviewCompileRequestViewModel): Promise<AxiosResponse<CalculationCompilePreviewResponse>> {
     return axios(`/api/specs/${specificationId}/calculations/${calculationId}/compilePreview`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        data: {
-            sourceCode: sourceCode
-        }
+        data: previewCompileRequestViewModel
     })
 }
 

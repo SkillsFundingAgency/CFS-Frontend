@@ -1,5 +1,8 @@
 ﻿import React, {useEffect, useState} from "react";
-import {CompilerOutputViewModel} from "../../types/Calculations/CalculationCompilePreviewResponse";
+import {
+    CompilerOutputViewModel,
+    PreviewCompileRequestViewModel
+} from "../../types/Calculations/CalculationCompilePreviewResponse";
 import {GdsMonacoEditor} from "../GdsMonacoEditor";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {CompilationErrorMessageList} from "./CompilationErrorMessageList";
@@ -21,7 +24,8 @@ export interface CalculationSourceCodeState {
     isBuilding: boolean,
     isDirty: boolean,
     sourceCode: string,
-    errorMessage: string
+    errorMessage: string,
+    providerId: string
 }
 
 export function CalculationSourceCode(props: CalculationSourceCodeProps) {
@@ -32,8 +36,11 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         errorMessage: "",
         calculationBuild: {
             hasCodeBuiltSuccessfully: undefined,
-            previewResponse: undefined
-        }
+            previewResponse: undefined,
+            isProviderValid: undefined,
+            providerRuntimeException: ""
+        },
+        providerId: ""
     });
     
     useEffect(() => {
@@ -46,7 +53,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                     isBuilding: false,
                     calculationBuild: {
                         hasCodeBuiltSuccessfully: undefined,
-                        previewResponse: undefined
+                        previewResponse: undefined,
+                        isProviderValid: undefined,
+                        providerRuntimeException: ""
                     }
                 }
             });
@@ -59,14 +68,21 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
     
     useEffect(() => {
         if (state.isBuilding) {
-            compileCalculationPreviewService(props.specificationId, 'temp-calc-id', state.sourceCode)
+            const previewCompileRequestViewModel: PreviewCompileRequestViewModel = {
+                sourceCode: state.sourceCode,
+                providerId: state.providerId
+            }
+            compileCalculationPreviewService(props.specificationId, 'temp-calc-id', previewCompileRequestViewModel)
                 .then((result) => {
                     setState(prevState => {
                         return {
                             ...prevState,
                             calculationBuild: {
                                 hasCodeBuiltSuccessfully: result.status === 200 && result.data?.compilerOutput?.success === true,
-                                previewResponse: result.data
+                                previewResponse: result.data,
+                                isProviderValid: state.providerId !== "" &&
+                                    (result.data?.previewProviderCalculation?.providerName !== undefined && result.data?.previewProviderCalculation?.providerName !== ""),
+                                providerRuntimeException: result.data?.previewProviderCalculation?.calculationResult?.exceptionMessage
                             },
                             errorMessage: result.status !== 200 && result.status !== 400 ?
                                 "Unexpected response with status " + result.statusText : "",
@@ -80,7 +96,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                             ...prevState,
                             calculationBuild: {
                                 hasCodeBuiltSuccessfully: false,
-                                previewResponse: undefined
+                                previewResponse: undefined,
+                                isProviderValid: undefined,
+                                providerRuntimeException: ""
                             },
                             errorMessage: err.toString(),
                             isBuilding: false
@@ -98,14 +116,25 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                     sourceCode: newSourceCode,
                     calculationBuild: {
                         hasCodeBuiltSuccessfully: undefined,
-                        previewResponse: undefined
+                        previewResponse: undefined,
+                        isProviderValid: undefined,
+                        providerRuntimeException: ""
                     },
                     isDirty: props.originalSourceCode !== newSourceCode
                 }
             });
         }
     };
-    
+
+    function onUpdateUKPRN(e: React.ChangeEvent<HTMLInputElement>) {
+        setState(prevState => {
+            return {
+                ...prevState,
+                providerId: e.target.value
+            }
+        });
+    }
+
     const onBuildCalculation = async () => {
         setState(prevState => {
             return {
@@ -131,6 +160,21 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             calculationName={props.calculationName ? props.calculationName : ""}
             fundingStreams={props.fundingStreams}
         />}
+
+        <h4 className="govuk-heading-s">
+            UKPRN
+            <span className="govuk-hint">
+            Optional: Enter a UKPRN to view calculation results for this provider
+          </span>
+        </h4>
+
+        <div className="govuk-form-group govuk-!-margin-bottom-5">
+            <input className="govuk-input govuk-input--width-10" type="text" aria-label="enter UKPRN"
+                   data-testid="providerId"
+            onChange={onUpdateUKPRN}
+                   value={state.providerId} />
+        </div>
+
         <button data-prevent-double-click="true"
                 className="govuk-button"
                 data-module="govuk-button"
@@ -142,14 +186,22 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         <LoadingFieldStatus title={"Building source code"} hidden={!state.isBuilding}/>
 
         {state.calculationBuild.hasCodeBuiltSuccessfully !== undefined &&
-        <div className={"govuk-textarea" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
-            <label className="govuk-label" htmlFor="build-output">
+        <div className={"govuk-inset-text" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
+            <label className="govuk-label">
                 <h4 className="govuk-heading-s">
                     Build output
                 </h4>
             </label>
             {state.calculationBuild.hasCodeBuiltSuccessfully &&
-            <p id="build-output" className="govuk-body">Code compiled successfully </p>
+            <div>
+                <p className="govuk-body">Code compiled successfully </p>
+                {!state.calculationBuild.isProviderValid &&
+                    <p className="govuk-body"><strong>No provider found. Try a different UKPRN.</strong></p>
+                }
+                {state.calculationBuild.isProviderValid && state.calculationBuild.providerRuntimeException !== "" &&
+                    <p className="govuk-body"><strong>{state.calculationBuild.providerRuntimeException}</strong></p>
+                }
+            </div>
             }
             {!state.calculationBuild.hasCodeBuiltSuccessfully && state.calculationBuild.previewResponse &&
             <CompilationErrorMessageList compilerMessages={state.calculationBuild.previewResponse.compilerOutput.compilerMessages}/>
