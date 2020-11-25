@@ -10,6 +10,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
@@ -21,6 +22,7 @@ using Microsoft.AspNetCore.Routing;
 using Serilog;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Common.Models.Search;
+using Microsoft.AspNetCore.Authentication;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -28,7 +30,7 @@ namespace CalculateFunding.Frontend.Controllers
     {
         private readonly IDatasetsApiClient _datasetApiClient;
         private readonly ISpecificationsApiClient _specificationsApiClient;
-        private IAuthorizationHelper _authorizationHelper;
+        private readonly IAuthorizationHelper _authorizationHelper;
         private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
@@ -134,6 +136,14 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> ValidateDataset([FromBody] ValidateDatasetModel vm)
         {
             Guard.ArgumentNotNull(vm, nameof(vm));
+            
+            FundingStreamPermission permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User, vm.FundingStreamId);
+            
+            if (permissions?.CanUploadDataSourceFiles != true)
+            {
+                _logger.Error($"User [{User?.Identity?.Name}] has insufficient permissions to upload a dataset file for {vm.FundingStreamId}");
+                return Forbid(new AuthenticationProperties());
+            }
 
             if (!ModelState.IsValid)
             {

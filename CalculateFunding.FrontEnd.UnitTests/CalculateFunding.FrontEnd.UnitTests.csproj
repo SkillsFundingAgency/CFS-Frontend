@@ -33,7 +33,7 @@
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="4.5.3" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.19.0" />
-    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.5.0" />
+    <PackageReference Include="CalculateFunding.Common.Identity" Version="2.6.1" />
 
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.RazorPages" Version="2.2.5" />

@@ -5,11 +5,14 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
@@ -207,12 +210,34 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Should()
                 .ThrowExactly<ArgumentNullException>();
         }
+        
+        [TestMethod]
+        public async Task ValidateDataset_GivenNoUploadDatasetFilePermission_ReturnsForbidden()
+        {
+            // Act
+            ForbidResult forbidResult = await _controller.ValidateDataset(new ValidateDatasetModel()) as ForbidResult;
+
+            // Assert
+            forbidResult
+                .Should()
+                .NotBeNull();
+        }
 
         [TestMethod]
         public async Task ValidateDataset_GivenViewModelButResponseIsBadRequest_ReturnsBadRequestObjectResult()
         {
+            string fundingStreamId = Guid.NewGuid().ToString();
+            
             // Arrange
-            ValidateDatasetModel viewModel = new ValidateDatasetModel();
+            ValidateDatasetModel viewModel = new ValidateDatasetModel
+            {
+                FundingStreamId = fundingStreamId
+            };
+
+            GivenTheUserHasPermissionToUploadDataSourceFilesForFundingStream(fundingStreamId, new FundingStreamPermission
+            {
+                CanUploadDataSourceFiles = true
+            });
 
             ValidatedApiResponse<DatasetValidationStatusModel> response = new ValidatedApiResponse<DatasetValidationStatusModel>(HttpStatusCode.BadRequest)
             {
@@ -239,8 +264,18 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task ValidateDataset_GivenViewModelButResponseIsBadRequestAndHasModelState_ReturnsBadRequestObjectResult()
         {
+            string fundingStreamId = Guid.NewGuid().ToString();
+            
             // Arrange
-            ValidateDatasetModel viewModel = new ValidateDatasetModel();
+            ValidateDatasetModel viewModel = new ValidateDatasetModel
+            {
+                FundingStreamId = fundingStreamId
+            };
+
+            GivenTheUserHasPermissionToUploadDataSourceFilesForFundingStream(fundingStreamId, new FundingStreamPermission
+            {
+                CanUploadDataSourceFiles = true
+            });
 
             IDictionary<string, IEnumerable<string>> modelState = new Dictionary<string, IEnumerable<string>>();
             modelState.Add("error",
@@ -274,9 +309,18 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task ValidateDataset_GivenViewModelAndResponseIsSuccess_ReturnsStatusModel()
         {
+            string fundingStreamId = Guid.NewGuid().ToString();
+            
             // Arrange
-            ValidateDatasetModel viewModel = new ValidateDatasetModel();
+            ValidateDatasetModel viewModel = new ValidateDatasetModel
+            {
+                FundingStreamId = fundingStreamId
+            };
 
+            GivenTheUserHasPermissionToUploadDataSourceFilesForFundingStream(fundingStreamId, new FundingStreamPermission
+            {
+                CanUploadDataSourceFiles = true
+            });
 
             DatasetValidationStatusModel statusModel = new DatasetValidationStatusModel
             {
@@ -322,5 +366,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                MappingHelper.CreateFrontEndMapper(),
                 _specifications.Object,
                 _authorisationHelper.Object);
+
+        private void GivenTheUserHasPermissionToUploadDataSourceFilesForFundingStream(string fundingSteamId,
+            FundingStreamPermission fundingStreamPermission)
+            => _authorisationHelper
+                .Setup(_ => _.GetUserFundingStreamPermissions(It.IsAny<ClaimsPrincipal>(), fundingSteamId))
+                .ReturnsAsync(fundingStreamPermission);
     }
 }
