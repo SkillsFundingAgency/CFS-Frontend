@@ -112,7 +112,6 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                     return;
                                 }
                                 getDatasetValidateStatus(validateOperationId)
-                                setIsLoading(false);
                             } else {
                                 setValidationFailures({"error-message": ["Unable to validate dataset"]});
                                 setIsLoading(false);
