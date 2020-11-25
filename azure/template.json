@@ -2,6 +2,21 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "environmentTag": {
+            "type": "string"
+        },
+        "parentBusinessTag": {
+            "type": "string"
+        },
+        "portfolioTag": {
+            "type": "string"
+        },
+        "productTag": {
+            "type": "string"
+        },
+        "serviceLineTag": {
+            "type": "string"
+        },
         "aadClientId": {
             "type": "string",
             "metadata": {
@@ -225,7 +240,7 @@
         }
     },
     "variables": {
-        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/master/templates/",
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/resourceTags/templates/",
         "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
         "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfsapi-', parameters('productVersion'))]",
         "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]"
@@ -240,10 +255,25 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'app-service.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-zero-downtime-deploy.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
                     "appServiceName": {
                         "value": "[variables('webSiteName')]"
                     },
@@ -253,8 +283,256 @@
                     "appServicePlanResourceGroup": {
                         "value": "[parameters('sharedResourceGroupName')]"
                     },
-                    "appServiceConnectionStrings": {
+                    "appServiceAppSettings": {
                         "value": [
+                            {
+                                "name": "WEBSITE_TIME_ZONE",
+                                "value": "GMT Standard Time"
+                            },
+                            {
+                                "name": "specsClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapispecs'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "specsClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-specs-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "calcsClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapicalcs'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "calcsClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-calcs-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "datasetsClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapidatasets'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "datasetsClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-datasets-',parameters('productVersion'),'.azurewebsites.net/api')]"
+                            },
+                            {
+                                "name": "resultsClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiresults'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "resultsClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-results-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "scenariosClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiscenarios'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "scenariosClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-scenarios-',parameters('productVersion'),'.azurewebsites.net/api/scenarios')]"
+                            },
+                            {
+                                "name": "testEngineClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapitestengine'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "testEngineClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-testengine-',parameters('productVersion'),'.azurewebsites.net/api/tests')]"
+                            },
+                            {
+                                "name": "usersClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiusers'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "usersClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-users-',parameters('productVersion'),'.azurewebsites.net/api/users')]"
+                            },
+                            {
+                                "name": "jobsClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapijobs'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "jobsClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-jobs-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "policiesClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapipolicy'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "policiesClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-policy-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "providersClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiproviders'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "providersClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-providers-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "publishingClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapipublishing'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "publishingClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-publishing-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+                            },
+                            {
+                                "name": "ApplicationInsightsOptions:InstrumentationKey",
+                                "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+                            },
+                            {
+                                "name": "ApplicationInsights:InstrumentationKey",
+                                "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]"
+                            },
+                            {
+                                "name": "AzureAd:Instance",
+                                "value": "[parameters('aadInstance')]"
+                            },
+                            {
+                                "name": "AzureAd:CallbackPath",
+                                "value": "/signin-oidc"
+                            },
+                            {
+                                "name": "AzureAd:Domain",
+                                "value": "[parameters('aadDomain')]"
+                            },
+                            {
+                                "name": "AzureAd:TenantId",
+                                "value": "[parameters('aadTenantId')]"
+                            },
+                            {
+                                "name": "AzureAd:ClientId",
+                                "value": "[parameters('aadClientId')]"
+                            },
+                            {
+                                "name": "AzureAd:Groups",
+                                "value": "[parameters('aadGroups')]"
+                            },
+                            {
+                                "name": "AzureAd:IsEnabled",
+                                "value": "[parameters('aadEnabled')]"
+                            },
+                            {
+                                "name": "healthCheck:ApiKey",
+                                "value": "[parameters('healthCheckKey')]"
+                            },
+                            {
+                                "name": "Azure:SignalR:ConnectionString",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'AzureSignalRConnectionString'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "features:publishButtonEnabled",
+                                "value": "[parameters('publishButtonEnabled')]"
+                            },
+                            {
+                                "name": "features:allocationLineMajorMinorVersioningEnabled",
+                                "value": "[parameters('allocationLineMajorMinorVersioningEnabled')]"
+                            },
+                            {
+                                "name": "features:publishAndApprovePageFiltersEnabled",
+                                "value": "[parameters('publishAndApprovePageFiltersEnabled')]"
+                            },
+                            {
+                                "name": "features:roleBasedAccessEnabled",
+                                "value": "[parameters('enableRoleBasedAccess')]"
+                            },
+                            {
+                                "name": "permissionOptions:AdminGroupId",
+                                "value": "[parameters('adminGroupId')]"
+                            },
+                            {
+                                "name": "features:newEditCalculationPageEnabled",
+                                "value": "[parameters('EnableNewEditCalculationPage')]"
+                            },
+                            {
+                                "name": "features:newManageDataSourcesPageEnabled",
+                                "value": "[parameters('EnableNewManageDataSourcesPage')]"
+                            },
+                            {
+                                "name": "features:providerInformationViewInViewFundingPageEnabled",
+                                "value": "[parameters('EnableProviderInformationViewInViewFundingPage')]"
+                            },
+                            {
+                                "name": "features:checkJobStatusForChooseAndRefreshEnabled",
+                                "value": "[parameters('EnableCheckJobStatusForChooseAndRefresh')]"
+                            },
+                            {
+                                "name": "features:duplicateCalculationNameCheckEnabled",
+                                "value": "[parameters('EnableDuplicateCalculationNameCheck')]"
+                            },
+                            {
+                                "name": "features:searchModeAllEnabled",
+                                "value": "[parameters('EnableSearchModeAll')]"
+                            },
+                            {
+                                "name": "features:exceptionMessagesEnabled",
+                                "value": "[parameters('EnableExceptionMessages')]"
+                            },
+                            {
+                                "name": "AzureConfiguration:ConnectionString",
+                                "value": "[parameters('AzureConfigurationConnectionString')]"
+                            },
+                            {
+                                "name": "providerProfilingClient:ApiEndpoint",
+                                "value": "[parameters('providerProfilingApiUrl')]"
+                            },
+                            {
+                                "name": "providerProfilingAzureBearerTokenOptions:Url",
+                                "value": "[parameters('providerProfilingAzureBearerTokenUrl')]"
+                            },
+                            {
+                                "name": "providerProfilingAzureBearerTokenOptions:GrantType",
+                                "value": "[parameters('providerProfilingAzureBearerTokenGrantType')]"
+                            },
+                            {
+                                "name": "providerProfilingAzureBearerTokenOptions:Scope",
+                                "value": "[parameters('providerProfilingAzureBearerTokenScope')]"
+                            },
+                            {
+                                "name": "providerProfilingAzureBearerTokenOptions:ClientId",
+                                "value": "[parameters('providerProfilingAzureBearerTokenClientId')]"
+                            },
+                            {
+                                "name": "providerProfilingAzureBearerTokenOptions:ClientSecret",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'providerProfilingAzureBearerTokenClientSecret'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "RedisSettings:CacheConnection",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "features:enablePlatformAuth",
+                                "value": "[if(parameters('enablePlatformAuth'), 'True', 'False')]"
+                            },
+                            {
+                                "name": "HandlerEnabled",
+                                "value": "true"
+                            },
+                            {
+                                "name": "FrontendBaseUrl",
+                                "value": "[concat('https://', parameters('aadDomain'), '/')]"
+                            },
+                            {
+                                "name": "fdzClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "fdzClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "graphClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'), '-graph-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                            },
+                            {
+                                "name": "graphClient:ApiKey",
+                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapigraph'),'2018-02-14').secretUriWithVersion, ')')]"
+                            }
                         ]
                     },
                     "ipSecurityRestrictions": {
@@ -268,7 +546,7 @@
             "name": "[concat(variables('webSiteName'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
             "type": "Microsoft.Web/sites/siteextensions",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]"
+                "Deploy_Frontend_App"
             ],
             "properties": {
             }
@@ -278,157 +556,9 @@
             "name": "[concat(variables('webSiteName'),'/staging/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
             "type": "Microsoft.Web/sites/slots/siteextensions",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]"
+                "Deploy_Frontend_App"
             ],
             "properties": {
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(variables('webSiteName'), '/appsettings')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]",
-                "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
-            ],
-            "properties": {
-                "WEBSITE_TIME_ZONE": "GMT Standard Time",
-                "specsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapispecs'),'2018-02-14').secretUriWithVersion, ')')]",
-                "specsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-specs-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "calcsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapicalcs'),'2018-02-14').secretUriWithVersion, ')')]",
-                "calcsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-calcs-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "datasetsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapidatasets'),'2018-02-14').secretUriWithVersion, ')')]",
-                "datasetsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-datasets-',parameters('productVersion'),'.azurewebsites.net/api')]",
-                "resultsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiresults'),'2018-02-14').secretUriWithVersion, ')')]",
-                "resultsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-results-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "scenariosClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiscenarios'),'2018-02-14').secretUriWithVersion, ')')]",
-                "scenariosClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-scenarios-',parameters('productVersion'),'.azurewebsites.net/api/scenarios')]",
-                "testEngineClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapitestengine'),'2018-02-14').secretUriWithVersion, ')')]",
-                "testEngineClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-testengine-',parameters('productVersion'),'.azurewebsites.net/api/tests')]",
-                "usersClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiusers'),'2018-02-14').secretUriWithVersion, ')')]",
-                "usersClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-users-',parameters('productVersion'),'.azurewebsites.net/api/users')]",
-                "jobsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapijobs'),'2018-02-14').secretUriWithVersion, ')')]",
-                "jobsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-jobs-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "policiesClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapipolicy'),'2018-02-14').secretUriWithVersion, ')')]",
-                "policiesClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-policy-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "providersClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiproviders'),'2018-02-14').secretUriWithVersion, ')')]",
-                "providersClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-providers-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "publishingClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapipublishing'),'2018-02-14').secretUriWithVersion, ')')]",
-                "publishingClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-publishing-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
-                "ApplicationInsightsOptions:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
-                "ApplicationInsights:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
-                "AzureAd:Instance": "[parameters('aadInstance')]",
-                "AzureAd:CallbackPath": "/signin-oidc",
-                "AzureAd:Domain": "[parameters('aadDomain')]",
-                "AzureAd:TenantId": "[parameters('aadTenantId')]",
-                "AzureAd:ClientId": "[parameters('aadClientId')]",
-                "AzureAd:Groups": "[parameters('aadGroups')]",
-                "AzureAd:IsEnabled": "[parameters('aadEnabled')]",
-                "healthCheck:ApiKey": "[parameters('healthCheckKey')]",
-                "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'AzureSignalRConnectionString'),'2018-02-14').secretUriWithVersion, ')')]",
-                "features:publishButtonEnabled": "[parameters('publishButtonEnabled')]",
-                "features:allocationLineMajorMinorVersioningEnabled": "[parameters('allocationLineMajorMinorVersioningEnabled')]",
-                "features:publishAndApprovePageFiltersEnabled": "[parameters('publishAndApprovePageFiltersEnabled')]",
-                "features:roleBasedAccessEnabled": "[parameters('enableRoleBasedAccess')]",
-                "permissionOptions:AdminGroupId": "[parameters('adminGroupId')]",
-                "features:newEditCalculationPageEnabled": "[parameters('EnableNewEditCalculationPage')]",
-                "features:newManageDataSourcesPageEnabled": "[parameters('EnableNewManageDataSourcesPage')]",
-                "features:providerInformationViewInViewFundingPageEnabled": "[parameters('EnableProviderInformationViewInViewFundingPage')]",
-                "features:checkJobStatusForChooseAndRefreshEnabled": "[parameters('EnableCheckJobStatusForChooseAndRefresh')]",
-                "features:duplicateCalculationNameCheckEnabled": "[parameters('EnableDuplicateCalculationNameCheck')]",
-                "features:searchModeAllEnabled": "[parameters('EnableSearchModeAll')]",
-                "features:exceptionMessagesEnabled": "[parameters('EnableExceptionMessages')]",
-                "AzureConfiguration:ConnectionString": "[parameters('AzureConfigurationConnectionString')]",
-                "providerProfilingClient:ApiEndpoint": "[parameters('providerProfilingApiUrl')]",
-                "providerProfilingAzureBearerTokenOptions:Url": "[parameters('providerProfilingAzureBearerTokenUrl')]",
-                "providerProfilingAzureBearerTokenOptions:GrantType": "[parameters('providerProfilingAzureBearerTokenGrantType')]",
-                "providerProfilingAzureBearerTokenOptions:Scope": "[parameters('providerProfilingAzureBearerTokenScope')]",
-                "providerProfilingAzureBearerTokenOptions:ClientId": "[parameters('providerProfilingAzureBearerTokenClientId')]",
-                "providerProfilingAzureBearerTokenOptions:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'providerProfilingAzureBearerTokenClientSecret'),'2018-02-14').secretUriWithVersion, ')')]",
-                "RedisSettings:CacheConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]",
-                "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]",
-                "HandlerEnabled": "true",
-                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]",
-                "fdzClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]",
-                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "graphClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-graph-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "graphClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapigraph'),'2018-02-14').secretUriWithVersion, ')')]"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites/slots/config",
-            "apiVersion": "2018-11-01",
-            "name": "[concat(variables('webSiteName'), '/staging/appsettings')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_KeyVault_Policies')]",
-                "[resourceId('Microsoft.Web/sites/slots/siteextensions', variables('webSiteName'), 'staging', 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
-            ],
-            "properties": {
-                "WEBSITE_TIME_ZONE": "GMT Standard Time",
-                "specsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapispecs'),'2018-02-14').secretUriWithVersion, ')')]",
-                "specsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-specs-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "calcsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapicalcs'),'2018-02-14').secretUriWithVersion, ')')]",
-                "calcsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-calcs-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "datasetsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapidatasets'),'2018-02-14').secretUriWithVersion, ')')]",
-                "datasetsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-datasets-',parameters('productVersion'),'.azurewebsites.net/api')]",
-                "resultsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiresults'),'2018-02-14').secretUriWithVersion, ')')]",
-                "resultsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-results-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "scenariosClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiscenarios'),'2018-02-14').secretUriWithVersion, ')')]",
-                "scenariosClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-scenarios-',parameters('productVersion'),'.azurewebsites.net/api/scenarios')]",
-                "testEngineClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapitestengine'),'2018-02-14').secretUriWithVersion, ')')]",
-                "testEngineClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-testengine-',parameters('productVersion'),'.azurewebsites.net/api/tests')]",
-                "usersClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiusers'),'2018-02-14').secretUriWithVersion, ')')]",
-                "usersClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-users-',parameters('productVersion'),'.azurewebsites.net/api/users')]",
-                "jobsClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapijobs'),'2018-02-14').secretUriWithVersion, ')')]",
-                "jobsClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-jobs-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "policiesClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapipolicy'),'2018-02-14').secretUriWithVersion, ')')]",
-                "policiesClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-policy-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "providersClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapiproviders'),'2018-02-14').secretUriWithVersion, ')')]",
-                "providersClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-providers-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "publishingClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapipublishing'),'2018-02-14').secretUriWithVersion, ')')]",
-                "publishingClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-publishing-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
-                "ApplicationInsightsOptions:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
-                "ApplicationInsights:InstrumentationKey": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2014-04-01').InstrumentationKey]",
-                "AzureAd:Instance": "[parameters('aadInstance')]",
-                "AzureAd:CallbackPath": "/signin-oidc",
-                "AzureAd:Domain": "[parameters('aadDomain')]",
-                "AzureAd:TenantId": "[parameters('aadTenantId')]",
-                "AzureAd:ClientId": "[parameters('aadClientId')]",
-                "AzureAd:Groups": "[parameters('aadGroups')]",
-                "AzureAd:IsEnabled": "[parameters('aadEnabled')]",
-                "healthCheck:ApiKey": "[parameters('healthCheckKey')]",
-                "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'AzureSignalRConnectionString'),'2018-02-14').secretUriWithVersion, ')')]",
-                "features:publishButtonEnabled": "[parameters('publishButtonEnabled')]",
-                "features:allocationLineMajorMinorVersioningEnabled": "[parameters('allocationLineMajorMinorVersioningEnabled')]",
-                "features:publishAndApprovePageFiltersEnabled": "[parameters('publishAndApprovePageFiltersEnabled')]",
-                "features:roleBasedAccessEnabled": "[parameters('enableRoleBasedAccess')]",
-                "permissionOptions:AdminGroupId": "[parameters('adminGroupId')]",
-                "features:newEditCalculationPageEnabled": "[parameters('EnableNewEditCalculationPage')]",
-                "features:newManageDataSourcesPageEnabled": "[parameters('EnableNewManageDataSourcesPage')]",
-                "features:providerInformationViewInViewFundingPageEnabled": "[parameters('EnableProviderInformationViewInViewFundingPage')]",
-                "features:checkJobStatusForChooseAndRefreshEnabled": "[parameters('EnableCheckJobStatusForChooseAndRefresh')]",
-                "features:duplicateCalculationNameCheckEnabled": "[parameters('EnableDuplicateCalculationNameCheck')]",
-                "features:searchModeAllEnabled": "[parameters('EnableSearchModeAll')]",
-                "features:exceptionMessagesEnabled": "[parameters('EnableExceptionMessages')]",
-                "AzureConfiguration:ConnectionString": "[parameters('AzureConfigurationConnectionString')]",
-                "providerProfilingClient:ApiEndpoint": "[parameters('providerProfilingApiUrl')]",
-                "providerProfilingAzureBearerTokenOptions:Url": "[parameters('providerProfilingAzureBearerTokenUrl')]",
-                "providerProfilingAzureBearerTokenOptions:GrantType": "[parameters('providerProfilingAzureBearerTokenGrantType')]",
-                "providerProfilingAzureBearerTokenOptions:Scope": "[parameters('providerProfilingAzureBearerTokenScope')]",
-                "providerProfilingAzureBearerTokenOptions:ClientId": "[parameters('providerProfilingAzureBearerTokenClientId')]",
-                "providerProfilingAzureBearerTokenOptions:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'providerProfilingAzureBearerTokenClientSecret'),'2018-02-14').secretUriWithVersion, ')')]",
-                "RedisSettings:CacheConnection": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'RedisSettings'),'2018-02-14').secretUriWithVersion, ')')]",
-                "features:enablePlatformAuth": "[if(parameters('enablePlatformAuth'), 'True', 'False')]",
-                "HandlerEnabled": "true",
-                "FrontendBaseUrl": "[concat('https://', parameters('aadDomain'), '/')]",
-                "fdzClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapifdz'),'2018-02-14').secretUriWithVersion, ')')]",
-                "fdzClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-fdz-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "graphClient:ApiEndpoint": "[concat('https://app-', parameters('environmentKey'), '-graph-',parameters('productVersion'),'.azurewebsites.net/api/')]",
-                "graphClient:ApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapigraph'),'2018-02-14').secretUriWithVersion, ')')]"
             }
         },
         {
@@ -437,7 +567,7 @@
             "name": "[concat(variables('webSiteName'), '/authsettings')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]",
+                "Deploy_Frontend_App",
                 "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
@@ -462,7 +592,7 @@
             "name": "[concat(variables('webSiteName'), '/staging/authsettings')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]",
+                "Deploy_Frontend_App",
                 "[resourceId('Microsoft.Web/sites/slots/siteextensions', variables('webSiteName'), 'staging', 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
@@ -516,7 +646,7 @@
                 }
             },
             "dependsOn": [
-                        "[concat('Microsoft.Resources/deployments/', 'Deploy_Frontend_App')]"
+                "Deploy_Frontend_App"
             ]
         }
     ],
