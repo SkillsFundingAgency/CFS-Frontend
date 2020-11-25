@@ -84,6 +84,7 @@ namespace CalculateFunding.Frontend.Helpers
                     CanAssignProfilePattern = true,
                     CanApplyCustomProfilePattern = true,
                     CanDeleteSpecification = true,
+                    CanRefreshPublishedQa = true,
                     UserId = user.GetUserProfile()?.Id,
                     FundingStreamId = "DSG"
                 },
@@ -113,6 +114,7 @@ namespace CalculateFunding.Frontend.Helpers
                     CanAssignProfilePattern = true,
                     CanApplyCustomProfilePattern = true,
                     CanDeleteSpecification = true,
+                    CanRefreshPublishedQa = true,
                     UserId = user.GetUserProfile()?.Id,
                     FundingStreamId = "PSG"
                 },
@@ -141,6 +143,7 @@ namespace CalculateFunding.Frontend.Helpers
                     CanAssignProfilePattern = true,
                     CanApplyCustomProfilePattern = true,
                     CanDeleteSpecification = true,
+                    CanRefreshPublishedQa = true,
                     UserId = user.GetUserProfile()?.Id,
                     FundingStreamId = "DSG-AT"
                 }

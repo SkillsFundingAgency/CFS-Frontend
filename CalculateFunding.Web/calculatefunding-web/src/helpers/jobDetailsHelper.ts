@@ -214,6 +214,8 @@ function getJobProgressMessage(jobTypeString: string) {
             return "Indexing search";
         case JobType.ApproveAllCalculationsJob:
             return "Approving all calculations";
+        case JobType.RunSqlImportJob:
+            return "Running SQL import";
         case undefined:
             return "";
         default:

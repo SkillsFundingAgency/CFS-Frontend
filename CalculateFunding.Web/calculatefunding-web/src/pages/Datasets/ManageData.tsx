@@ -20,7 +20,7 @@ export function ManageData() {
                         <span className="govuk-caption-xl">Manage data source files or map them to datasets for a specification</span>
                     </div>
                 </div>
-                <div className="govuk-grid-row govuk-!-margin-bottom-9  govuk-!-margin-top-9">
+                <div className="govuk-grid-row govuk-!-margin-top-9">
                     <div className="govuk-grid-column-one-third">
                         <h3 id={"manage-data-source-files-title"} className="govuk-heading-m">
                            <Link to={"/Datasets/ManageDataSourceFiles"}>Manage data source files</Link>
@@ -38,6 +38,14 @@ export function ManageData() {
                             <Link to="/Datasets/DownloadDataSchema">Download data schemas</Link>
                         </h3>
                         <p className="govuk-body">Download the data schema for data source</p>
+                    </div>
+                </div>
+                <div className="govuk-grid-row">
+                    <div className="govuk-grid-column-one-third">
+                        <h3 id={"refresh-sql-title"} className="govuk-heading-m">
+                           <Link to={"/Datasets/RefreshSql"}>Refresh SQL</Link>
+                        </h3>
+                        <p className="govuk-body">Refresh SQL funding</p>
                     </div>
                 </div>
             </div>

@@ -38,4 +38,5 @@
     UpdateCodeContextJob = "UpdateCodeContextJob",
     SearchIndexWriterJob = "SearchIndexWriterJob",
     ApproveAllCalculationsJob = "ApproveAllCalculationsJob",
+    RunSqlImportJob = "RunSqlImportJob",
 }

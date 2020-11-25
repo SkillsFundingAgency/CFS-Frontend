@@ -3,6 +3,7 @@ import {SaveReleaseTimetableViewModel} from "../types/SaveReleaseTimetableViewMo
 import {ReleaseTimetableSummary} from "../types/ReleaseTimetableSummary";
 import {PublishedProviderFundingCount} from "../types/PublishedProvider/PublishedProviderFundingCount";
 import {JobCreatedResponse} from "../types/JobCreatedResponse";
+import {LatestPublishedDate} from "../types/PublishedProvider/LatestPublishedDate";
 
 export async function getFundingSummaryForApprovingService(specificationId: string, publishedProviderIds: string[]): 
     Promise<AxiosResponse<PublishedProviderFundingCount>> {
@@ -86,5 +87,21 @@ export async function releaseProvidersFundingService(specificationId: string, pr
             headers: {'Content-Type': 'application/json'},
             data: {publishedProviderIds: providers}
         });
+}
+
+export async function runSqlImportJob(specificationId: string, fundingStreamId: string): 
+    Promise<AxiosResponse<JobCreatedResponse>> {
+    return axios(`/api/sqlqa/specifications/${specificationId}/funding-streams/${fundingStreamId}/import/queue`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    });
+}
+
+export async function getLatestPublishedDate(fundingStreamId: string, fundingPeriodId: string): 
+    Promise<AxiosResponse<LatestPublishedDate>> {
+    return axios(`/api/publishedproviders/${fundingStreamId}/${fundingPeriodId}/lastupdated`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    });
 }
 

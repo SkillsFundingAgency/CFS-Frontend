@@ -1,6 +1,4 @@
-﻿import {BooleanLiteral} from "@babel/types";
-
-export interface FundingStreamPermissions {
+﻿export interface FundingStreamPermissions {
     userId:                         string;
     fundingStreamId:                string;
     canCreateQaTests:               boolean;
@@ -27,4 +25,5 @@ export interface FundingStreamPermissions {
     canDeleteProfilePattern:        boolean;
     canEditProfilePattern:          boolean;
     canCreateProfilePattern:        boolean;
+    canRefreshPublishedQa:          boolean;
 }

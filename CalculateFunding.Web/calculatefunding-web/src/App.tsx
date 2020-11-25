@@ -58,6 +58,7 @@ import {ReactQueryDevtools} from "react-query-devtools";
 import {ProfileHistory} from './pages/FundingApprovals/ProfileHistory';
 import {EditCalculation} from "./pages/Calculations/EditCalculation";
 import {ConfirmFunding} from "./pages/FundingApprovals/ConfirmFunding";
+import {RefreshSql} from "./pages/Datasets/RefreshSql";
 
 const queryCache = new QueryCache();
 
@@ -125,6 +126,7 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource}/>
                         <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId"
                                component={SelectDataSourceExpanded}/>
+                        <Route path="/Datasets/RefreshSql" component={RefreshSql} />
                         <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
                         <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
                         {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
