@@ -51,7 +51,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     });
     const [mergeResults, setMergeResults] = useState<MergeDatasetViewModel>();
     const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
-
+    let history = useHistory();
+    
     useEffectOnce(() => {
         setIsLoading(true);
         getDatasetHistoryService(match.params.datasetId, 1, 1).then((result) => {
@@ -138,21 +139,29 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             if (datasetValidateStatusResponse.status === 200 || datasetValidateStatusResponse.status === 201) {
                 const result: DatasetValidateStatusResponse = datasetValidateStatusResponse.data;
                 if (result.currentOperation === "Validated") {
-                    getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
-                    ((response) => {
-                            const mergeDatasetResult = response.data as MergeDatasetViewModel;
+                    if (updateType === "merge")
+                    {
+                        getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
+                        ((response) => {
+                                const mergeDatasetResult = response.data as MergeDatasetViewModel;
 
-                            if (mergeDatasetResult.amendedRowCount === 0 && mergeDatasetResult.newRowCount === 0) {
-                                setUpdateStatus(UpdateStatus.Matched)
-                            } else {
-                                setUpdateStatus(UpdateStatus.Successful);
+                                if (mergeDatasetResult.amendedRowCount === 0 && mergeDatasetResult.newRowCount === 0) {
+                                    setUpdateStatus(UpdateStatus.Matched)
+                                } else {
+                                    setUpdateStatus(UpdateStatus.Successful);
+                                }
+
+                                setMergeResults(mergeDatasetResult);
                             }
-
-                            setMergeResults(mergeDatasetResult);
-                        }
-                    );
-                    return;
-                } else if (result.currentOperation === "FailedValidation") {
+                        );
+                        return;
+                    }
+                    else
+                    {
+                        history.push("/Datasets/ManageDataSourceFiles");
+                        return;
+                    }
+                } else if (result.currentOperation === "FailedValidation" || result.currentOperation === "MergeFailed") {
                     setValidationFailures(result.validationFailures);
                     setIsLoading(false);
                     return;
