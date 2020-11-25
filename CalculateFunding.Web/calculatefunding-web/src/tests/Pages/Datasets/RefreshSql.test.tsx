@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {MemoryRouter} from "react-router";
 import * as monitor from "../../../hooks/Jobs/useMonitorForNewSpecificationJob";
-import * as fetchLatestSpecification from "../../../hooks/Jobs/useFetchLatestSpecificationJob";
+import * as fetchLatestSpecificationJobs from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 
@@ -27,14 +27,14 @@ describe("<ChangeProfileType /> ", () => {
         useSelectorSpy.mockReset();
     });
 
-    describe("when no previous job exists", () => {
+    describe("when no previous sql job exists", () => {
         beforeAll(() => {
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
-                    lastJob: undefined,
-                    isCheckingForJob: false,
-                    errorCheckingForJob: "",
-                    haveErrorCheckingForJob: false,
+                    allJobs: undefined,
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
                     isFetching: false,
                     isFetched: true
                 }
@@ -132,12 +132,12 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
                 expect(screen.getByText("N/A")).toBeInTheDocument();
             });
-            fireEvent.click(screen.getByText(/Push data/).closest("button"));
+            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
             expect(screen.getByText(/Please do not refresh the page, you will be redirected automatically/i)).toBeInTheDocument();
         });
     });
 
-    describe("when a previous job exists", () => {
+    describe("when a previous sql job exists", () => {
         afterEach(() => {
             useFetchLatestSpecificationJobSpy.mockReset();
         });
@@ -145,7 +145,7 @@ describe("<ChangeProfileType /> ", () => {
         it("shows previous job run date and enables push data button if new data exists", async () => {
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
-                    lastJob: {
+                    allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
                         jobType: "RunSqlImportJob",
                         specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
@@ -163,10 +163,10 @@ describe("<ChangeProfileType /> ", () => {
                         parentJobId: "",
                         lastUpdated: new Date("2020-11-19T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
-                    },
-                    isCheckingForJob: false,
-                    errorCheckingForJob: "",
-                    haveErrorCheckingForJob: false,
+                    }],
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
                     isFetching: false,
                     isFetched: true
                 }
@@ -187,7 +187,7 @@ describe("<ChangeProfileType /> ", () => {
         it("shows previous job run date and shows warning message if job already run", async () => {
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
-                    lastJob: {
+                    allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
                         jobType: "RunSqlImportJob",
                         specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
@@ -205,10 +205,10 @@ describe("<ChangeProfileType /> ", () => {
                         parentJobId: "",
                         lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
-                    },
-                    isCheckingForJob: false,
-                    errorCheckingForJob: "",
-                    haveErrorCheckingForJob: false,
+                    }],
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
                     isFetching: false,
                     isFetched: true
                 }
@@ -224,6 +224,45 @@ describe("<ChangeProfileType /> ", () => {
             });
 
             expect(screen.getByText(/Refresh SQL data is not available as the latest version has already been pushed/i)).toBeInTheDocument();
+            expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
+        });
+
+        it("push button is disabled when funding job in progress", async () => {
+            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+                return {
+                    allJobs: [{
+                        jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                        jobType: "RefreshFundingJob",
+                        specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                        statusDescription: "",
+                        jobDescription: "",
+                        outcome: "",
+                        runningStatus: RunningStatus.InProgress,
+                        completionStatus: undefined,
+                        isSuccessful: false,
+                        isFailed: false,
+                        isActive: true,
+                        isComplete: false,
+                        invokerUserId: "testid",
+                        invokerUserDisplayName: "test",
+                        parentJobId: "",
+                        lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                        created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                    }],
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
+                    isFetching: false,
+                    isFetched: true
+                }
+            });
+
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "FY-2021"}});
+            await waitFor(() => {
+                expect(screen.getByText(/Funding job running/i)).toBeInTheDocument();
+            });
             expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
         });
     });
@@ -303,7 +342,7 @@ jobMonitorSpy.mockImplementation(() => {
     }
 });
 
-const useFetchLatestSpecificationJobSpy = jest.spyOn(fetchLatestSpecification, 'useFetchLatestSpecificationJob');
+const useFetchLatestSpecificationJobSpy = jest.spyOn(fetchLatestSpecificationJobs, 'useFetchAllLatestSpecificationJobs');
 
 // Setup router mocks
 const mockHistoryPush = jest.fn();

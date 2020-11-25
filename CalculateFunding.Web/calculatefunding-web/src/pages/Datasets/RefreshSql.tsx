@@ -19,7 +19,7 @@ import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {useMonitorForNewSpecificationJob} from "../../hooks/Jobs/useMonitorForNewSpecificationJob";
-import {useFetchLatestSpecificationJob} from "../../hooks/Jobs/useFetchLatestSpecificationJob";
+import {useFetchAllLatestSpecificationJobs} from "../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useHistory} from "react-router";
 import {RunningStatus} from "../../types/RunningStatus";
@@ -30,7 +30,7 @@ export function RefreshSql() {
     const {errors, addErrorMessage} = useErrors()
     const history = useHistory();
     const [sqlJobStatusMessage, setSqlJobStatusMessage] = useState<string>('Data push queued');
-    const [fundingStatusMessage, setFundingStatusMessage] = useState<string>('Job queued');
+    const [fundingStatusMessage, setFundingStatusMessage] = useState<string>('Funding job running');
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
     const [isAnotherUserRunningSqlJob, setIsAnotherUserRunningSqlJob] = useState<boolean>(false);
@@ -50,14 +50,18 @@ export function RefreshSql() {
         JobType.ReIndexPublishedProvidersJob],
         err => addErrorMessage("An error occurred while monitoring the running jobs.")
     );
-    const {lastJob: lastSqlJob, isCheckingForJob: isCheckingForSqlJob} = useFetchLatestSpecificationJob(
+    const {allJobs, isCheckingForJobs} = useFetchAllLatestSpecificationJobs(
         specificationId,
-        [JobType.RunSqlImportJob],
-        err => addErrorMessage("An error occurred while monitoring the running jobs.")
+        [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob, JobType.ApproveAllProviderFundingJob,
+        JobType.RefreshFundingJob, JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
+        JobType.ReIndexPublishedProvidersJob],
+        err => addErrorMessage("An error occurred while fetching the latest jobs.")
     );
     const fundingStreamId = selectedFundingStream ? selectedFundingStream.id : "";
     const fundingPeriodId = selectedFundingPeriod ? selectedFundingPeriod.id : "";
-
+    const lastSqlJob = allJobs?.filter(job => job.jobType !== undefined && job.jobType === JobType.RunSqlImportJob)[0];
+    const hasRunningFundingJobs: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
+        && job.jobType !== JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed).length > 0 || false;
     const fetchLatestPublishedDate = async () => {
         if (!fundingStreamId || !fundingPeriodId) return {
             value: null
@@ -199,7 +203,7 @@ export function RefreshSql() {
     }
 
     function LastSqlUpdate() {
-        if (isCheckingForSqlJob) {
+        if (isCheckingForJobs) {
             return <LoadingFieldStatus title="Loading..." />
         }
         if (isAnotherUserRunningSqlJob) {
@@ -226,7 +230,7 @@ export function RefreshSql() {
         if (isLoadingLatestPublishedDate) {
             return <LoadingFieldStatus title="Loading..." />
         }
-        if (isAnotherUserRunningFundingJob) {
+        if (isAnotherUserRunningFundingJob || hasRunningFundingJobs) {
             return <LoadingFieldStatus title={fundingStatusMessage} />
         }
         if (!latestPublishedDate || latestPublishedDate.value === null) {
@@ -326,9 +330,9 @@ export function RefreshSql() {
 
     function RefreshButton() {
         const isDisabled = !((lastSqlJob === undefined || !lastSqlJob.lastUpdated || latestPublishedDate === undefined ||
-                latestPublishedDate.value === null || latestPublishedDate.value > lastSqlJob.lastUpdated)
+            latestPublishedDate.value === null || latestPublishedDate.value > lastSqlJob.lastUpdated)
             && missingPermissions.length === 0 && !isLoadingOptions
-            && !isCheckingForSqlJob && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob);
+            && !isCheckingForJobs && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob && !hasRunningFundingJobs);
 
         return (
             <button className="govuk-button" onClick={handlePushData} disabled={isDisabled}>
