@@ -1,5 +1,3 @@
-@import '~govuk-frontend';
-
 #preview-profile-modal {
   .modal {
       display: none;
@@ -17,7 +15,7 @@
   .modal-content {
     background-color: #fefefe;
     margin: 15% auto;
-    border: 3px solid govuk-colour("black");
+    border: 3px solid "#0b0c0c";
     width: 50%;
   }
 
@@ -42,7 +40,7 @@
       padding: 2px;
     }
     button:hover {
-      background-color: govuk-colour("yellow");
+      background-color: "#ffdd00";
       color: black;
     }
   }
@@ -56,7 +54,7 @@
     background-color: transparent;
     border: none;
     font-size: inherit;
-    color: govuk-colour("blue");
+    color: "#1d70b8";
     text-decoration: underline;
     cursor: pointer;
   }
