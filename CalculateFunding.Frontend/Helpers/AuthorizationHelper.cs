@@ -107,8 +107,11 @@ namespace CalculateFunding.Frontend.Helpers
                             CanDeleteQaTests = true,
                             CanDeleteSpecification = true,
                             CanEditProfilePattern = true,
+                            CanApproveAllCalculations = true,
+                            CanRefreshPublishedQa = true,
+                            CanUploadDataSourceFiles = true,
                             UserId = user.GetUserProfile()?.Id
-                        });
+                        }); ;
                     }
 
                     return permissions;
@@ -241,6 +244,8 @@ namespace CalculateFunding.Frontend.Helpers
                     CanApproveAnyCalculations = true,
                     CanApproveCalculations = true,
                     CanAssignProfilePattern = true,
+                    CanApproveAllCalculations = true,
+                    CanRefreshPublishedQa = true
                 };
             }
 
@@ -274,6 +279,8 @@ namespace CalculateFunding.Frontend.Helpers
                     CanApproveAnyCalculations = false,
                     CanApproveCalculations = false,
                     CanAssignProfilePattern = false,
+                    CanApproveAllCalculations = false,
+                    CanRefreshPublishedQa = false
                 };
             }
             else
