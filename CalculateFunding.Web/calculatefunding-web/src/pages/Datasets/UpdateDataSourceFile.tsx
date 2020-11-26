@@ -151,6 +151,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 }
 
                                 setMergeResults(mergeDatasetResult);
+                                setIsLoading(false);
                             }
                         );
                         return;
@@ -236,7 +237,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     ...prevState,
                     updateTypeValid: false
                 }
-            })
+            });
+            isValid = false;
         }
 
         return isValid;
