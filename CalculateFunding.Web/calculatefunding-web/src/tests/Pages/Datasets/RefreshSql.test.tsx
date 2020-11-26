@@ -265,6 +265,45 @@ describe("<ChangeProfileType /> ", () => {
             });
             expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
         });
+
+        it("push button is disabled when sql job in progress", async () => {
+            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+                return {
+                    allJobs: [{
+                        jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                        jobType: "RunSqlImportJob",
+                        specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                        statusDescription: "",
+                        jobDescription: "",
+                        outcome: "",
+                        runningStatus: RunningStatus.InProgress,
+                        completionStatus: undefined,
+                        isSuccessful: false,
+                        isFailed: false,
+                        isActive: true,
+                        isComplete: false,
+                        invokerUserId: "testid",
+                        invokerUserDisplayName: "test",
+                        parentJobId: "",
+                        lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                        created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                    }],
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
+                    isFetching: false,
+                    isFetched: true
+                }
+            });
+
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "FY-2021"}});
+            await waitFor(() => {
+                expect(screen.getByText(/Data push queued/i)).toBeInTheDocument();
+            });
+            expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
+        });
     });
 });
 

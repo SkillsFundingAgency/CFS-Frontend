@@ -61,7 +61,17 @@ export function RefreshSql() {
     const fundingPeriodId = selectedFundingPeriod ? selectedFundingPeriod.id : "";
     const lastSqlJob = allJobs?.filter(job => job.jobType !== undefined && job.jobType === JobType.RunSqlImportJob)[0];
     const hasRunningFundingJobs: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
-        && job.jobType !== JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed).length > 0 || false;
+        && job.jobType !== JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed
+        && job.specificationId === specificationId).length > 0 || false;
+    const hasRunningSqlJob: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
+        && job.jobType === JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed
+        && job.specificationId === specificationId).length > 0 || false;
+    if (hasRunningSqlJob && !isAnotherUserRunningSqlJob) {
+        setIsAnotherUserRunningSqlJob(true);
+    }
+    if (!hasRunningSqlJob && isAnotherUserRunningSqlJob) {
+        setIsAnotherUserRunningSqlJob(false);
+    }
     const fetchLatestPublishedDate = async () => {
         if (!fundingStreamId || !fundingPeriodId) return {
             value: null
@@ -244,6 +254,10 @@ export function RefreshSql() {
     }
 
     function SqlJobStatusPanel() {
+        if (!isRefreshing) {
+            return null;
+        }
+
         return (
             <LoadingStatus title={sqlJobStatusMessage}
                 subTitle="Please wait, this could take several minutes"
@@ -332,7 +346,8 @@ export function RefreshSql() {
         const isDisabled = !((lastSqlJob === undefined || !lastSqlJob.lastUpdated || latestPublishedDate === undefined ||
             latestPublishedDate.value === null || latestPublishedDate.value > lastSqlJob.lastUpdated)
             && missingPermissions.length === 0 && !isLoadingOptions
-            && !isCheckingForJobs && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob && !hasRunningFundingJobs);
+            && !isCheckingForJobs && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob
+            && !hasRunningFundingJobs);
 
         return (
             <button className="govuk-button" onClick={handlePushData} disabled={isDisabled}>
