@@ -187,7 +187,12 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                 </span>
                                 {relationshipData && relationshipData.datasets &&
                                 <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                                    {relationshipData.datasets.map(dataset =>
+                                    {relationshipData.datasets
+                                        .sort((dataset1, dataset2) =>
+                                            new Date(dataset2.versions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date).getTime()
+                                                - new Date(dataset1.versions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].date).getTime()
+                                        )
+                                        .map(dataset =>
                                         <React.Fragment key={dataset.id}>
                                             <div className="govuk-radios__item">
                                                 <input className="govuk-radios__input"
@@ -222,7 +227,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                                 <p className="govuk-body govuk-!-margin-top-5">
                                                     <Link
                                                         to={`/Datasets/SelectDataSourceExpanded/${specification.id}/${dataset.id}/${relationshipData.relationshipId}`}
-                                                        className="govuk-link">View {relationshipData.datasets.length - 5} more versions</Link>
+                                                        className="govuk-link">View all versions</Link>
                                                 </p>}
                                             </div>
                                             }

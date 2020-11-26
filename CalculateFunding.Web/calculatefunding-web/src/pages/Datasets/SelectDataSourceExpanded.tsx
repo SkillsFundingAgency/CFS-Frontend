@@ -26,7 +26,7 @@ export interface SelectDataSourceExpandedRouteProps {
 export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectDataSourceExpandedRouteProps>) {
     const initialSearchRequest: DatasourceVersionSearchModel = {
         pageNumber: 1,
-        top: 5,
+        top: 50,
         searchTerm: "",
         errorToggle: false,
         orderBy: [],
@@ -204,7 +204,10 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                             </legend>
 
                                             <div className="govuk-radios govuk-radios--small">
-                                                {datasourceVersions.items.map(v =>
+                                                {datasourceVersions.items
+                                                    .sort((datasourceVersions1, datasourceVersions2) =>
+                                                        datasourceVersions2.version - datasourceVersions1.version)
+                                                    .map(v =>
                                                         <div className="govuk-radios__item">
                                                             <input className="govuk-radios__input" id={`datasource-${v.version}`} name={`datasource-${v.version}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)}/>
                                                             <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.version}`}>
