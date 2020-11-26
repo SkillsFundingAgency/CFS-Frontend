@@ -17,7 +17,8 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using Microsoft.AspNetCore.Mvc;
 using CalculationType = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationType;
-using Job = CalculateFunding.Common.ApiClient.Calcs.Models.Job;
+using CalcsJob = CalculateFunding.Common.ApiClient.Calcs.Models.Job;
+using ResultsJob = CalculateFunding.Common.ApiClient.Results.Models.Job;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -229,7 +230,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ApiResponse<Job> response = await _calcClient.QueueApproveAllSpecificationCalculations(specificationId);
+            ApiResponse<CalcsJob> response = await _calcClient.QueueApproveAllSpecificationCalculations(specificationId);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -401,6 +402,18 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return BadRequest(result.Content);
+        }
+
+        [HttpPost]
+        [Route("api/calcs/specifications/{specificationId}/generate-calculation-csv-results")]
+        public async Task<IActionResult> RunGenerateCalculationCsvResultsJob(string specificationId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            ApiResponse<ResultsJob> result =
+                await _resultsApiClient.RunGenerateCalculationCsvResultsJob(specificationId);
+
+            return result.IsSuccessOrReturnFailureResult(nameof(specificationId)) ?? Ok(result.Content);
         }
 
         [HttpGet]

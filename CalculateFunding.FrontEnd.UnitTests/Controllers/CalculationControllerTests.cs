@@ -26,6 +26,7 @@ namespace CalculateFunding.Frontend.Controllers
     using CalculateFunding.Common.ApiClient.Calcs.Models;
     using CalculateFunding.Common.ApiClient.Results;
     using CalculateFunding.Common.ApiClient.Specifications;
+    using ResultsJob = CalculateFunding.Common.ApiClient.Results.Models.Job;
 
     [TestClass]
     public class CalculationControllerTests
@@ -795,6 +796,53 @@ namespace CalculateFunding.Frontend.Controllers
             await authorizationHelper
                 .Received(1)
                 .DoesUserHavePermission(Arg.Is(user), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations));
+        }
+
+        [TestMethod]
+        public async Task Should_RunGenerateCalculationCsvResultsJob_ValidId_ReturnCalculation()
+        {
+            string specificationId = "specId";
+            string jobId = "jobId";
+
+            ResultsJob job = new ResultsJob { Id = jobId };
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+
+            resultsApiClient
+                .RunGenerateCalculationCsvResultsJob(Arg.Is(specificationId))
+                .Returns(new ApiResponse<ResultsJob>(HttpStatusCode.OK, job));
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+
+            IActionResult actual = await controller.RunGenerateCalculationCsvResultsJob(specificationId);
+
+            actual.Should().BeOfType<OkObjectResult>();
+        }
+
+        [TestMethod]
+        public async Task Should_RunGenerateCalculationCsvResultsJob_InvalidId_ReturnError()
+        {
+            string specificationId = "specId";
+
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+
+            IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
+            resultsApiClient
+                .RunGenerateCalculationCsvResultsJob(Arg.Is(specificationId))
+                .Returns(new ApiResponse<ResultsJob>(HttpStatusCode.OK, (ResultsJob) null));
+
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+
+            IActionResult actual = await controller.RunGenerateCalculationCsvResultsJob(specificationId);
+
+            actual.Should().BeOfType<NotFoundObjectResult>();
         }
 
         private static CalculationController CreateCalculationController(
