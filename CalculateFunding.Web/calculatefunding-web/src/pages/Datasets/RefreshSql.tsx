@@ -196,16 +196,20 @@ export function RefreshSql() {
             if (specificationId.length === 0) {
                 throw new Error("The specification id has not been set.");
             }
-            setIsRefreshing(true);
-            const jobId = (await runSqlImportJob(specificationId, selectedFundingStream.id)).data.jobId;
-            setRefreshJobId(jobId);
+            try {
+                setIsRefreshing(true);
+                const jobId = (await runSqlImportJob(specificationId, selectedFundingStream.id)).data.jobId;
+                if (jobId === undefined || jobId === null) {
+                    throw new Error("No job ID was returned");
+                }
+                setRefreshJobId(jobId);
+            } catch (error) {
+                addErrorMessage("The refresh sql import job could not be started: " + error.message);
+                setIsRefreshing(false);
+            }
         }
 
-        try {
-            pushData()
-        } catch (error) {
-            addErrorMessage(error.message);
-        }
+        pushData();
     }
 
     function handleContinueClick() {

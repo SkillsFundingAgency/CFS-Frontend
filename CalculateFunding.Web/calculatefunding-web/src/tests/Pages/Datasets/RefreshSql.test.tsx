@@ -1,6 +1,6 @@
 import React from "react";
 import * as redux from "react-redux";
-import {render, waitFor, screen, fireEvent, cleanup, waitForElementToBeRemoved, act} from "@testing-library/react";
+import {render, waitFor, screen, fireEvent, waitForElementToBeRemoved, act} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {MemoryRouter} from "react-router";
@@ -8,6 +8,8 @@ import * as monitor from "../../../hooks/Jobs/useMonitorForNewSpecificationJob";
 import * as fetchLatestSpecificationJobs from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
+import * as publishService from "../../../services/publishService";
+import {createMockAxiosError} from "../../fakes/fakeAxios";
 
 describe("<ChangeProfileType /> ", () => {
     beforeAll(() => {
@@ -40,6 +42,10 @@ describe("<ChangeProfileType /> ", () => {
                 }
             });
         });
+
+        afterEach(() => {
+            runSqlImportJobSpy.mockReset();
+        })
 
         afterAll(() => {
             useFetchLatestSpecificationJobSpy.mockReset();
@@ -125,6 +131,16 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("shows sql job status panel when push data button clicked", async () => {
+            const promise = Promise.resolve();
+            runSqlImportJobSpy.mockResolvedValue({
+                data: {
+                    jobId: "job123"
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
@@ -134,6 +150,70 @@ describe("<ChangeProfileType /> ", () => {
             });
             fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
             expect(screen.getByText(/Please do not refresh the page, you will be redirected automatically/i)).toBeInTheDocument();
+            await act(() => promise);
+        });
+
+        it("does not show sql job status panel when push data button clicked when endpoint returns server error", async () => {
+            runSqlImportJobSpy.mockRejectedValue(createMockAxiosError({}, 500));
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
+            await waitFor(() => {
+                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText("N/A")).toBeInTheDocument();
+            });
+            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            await waitForElementToBeRemoved(screen.queryByText(/Please do not refresh the page, you will be redirected automatically/i));
+            expect(screen.getByText(/There is a problem/i)).toBeInTheDocument();
+            expect(screen.getByText(/The refresh sql import job could not be started/i)).toBeInTheDocument();
+        });
+
+        it("does not show sql job status panel when push data button clicked when endpoint returns null job id", async () => {
+            runSqlImportJobSpy.mockResolvedValue({
+                data: {
+                    jobId: null
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
+            await waitFor(() => {
+                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText("N/A")).toBeInTheDocument();
+            });
+            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            await waitForElementToBeRemoved(screen.queryByText(/Please do not refresh the page, you will be redirected automatically/i));
+            expect(screen.getByText(/There is a problem/i)).toBeInTheDocument();
+            expect(screen.getByText(/The refresh sql import job could not be started/i)).toBeInTheDocument();
+            expect(screen.getByText(/No job ID was returned/i)).toBeInTheDocument();
+        });
+
+        it("does not show sql job status panel when push data button clicked when endpoint returns no job id", async () => {
+            runSqlImportJobSpy.mockResolvedValue({
+                data: {
+                    jobId: undefined
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
+            await waitFor(() => {
+                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText("N/A")).toBeInTheDocument();
+            });
+            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            await waitForElementToBeRemoved(screen.queryByText(/Please do not refresh the page, you will be redirected automatically/i));
+            expect(screen.getByText(/There is a problem/i)).toBeInTheDocument();
+            expect(screen.getByText(/The refresh sql import job could not be started/i)).toBeInTheDocument();
+            expect(screen.getByText(/No job ID was returned/i)).toBeInTheDocument();
         });
     });
 
@@ -308,19 +388,6 @@ describe("<ChangeProfileType /> ", () => {
 });
 
 // Setup services
-jest.mock('../../../services/publishService', () => ({
-    getLatestPublishedDate: jest.fn(() => Promise.resolve({
-        data: {
-            value: new Date("2020-11-23T17:35:01.1080915+00:00")
-        }
-    })),
-    runSqlImportJob: jest.fn(() => Promise.resolve({
-        data: {
-            jobId: "job123"
-        }
-    }))
-}));
-
 jest.mock('../../../services/specificationService', () => ({
     getSpecificationsSelectedForFundingService: jest.fn(() => Promise.resolve({
         data: [
@@ -371,6 +438,19 @@ jest.mock('../../../services/specificationService', () => ({
 }));
 
 // Setup spies
+const getLatestPublishedDateSpy = jest.spyOn(publishService, 'getLatestPublishedDate');
+getLatestPublishedDateSpy.mockResolvedValue({
+    data: {
+        value: new Date("2020-11-23T17:35:01.1080915+00:00")
+    },
+    status: 200,
+    statusText: "",
+    headers: {},
+    config: {}
+});
+
+const runSqlImportJobSpy = jest.spyOn(publishService, 'runSqlImportJob');
+
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 const jobMonitorSpy = jest.spyOn(monitor, 'useMonitorForNewSpecificationJob');
