@@ -1,5 +1,5 @@
 import React from "react";
-import {act, cleanup, screen, within} from '@testing-library/react';
+import {act, cleanup, screen, waitFor, within} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {EditCalculationTestData} from "./EditCalculationTestData";
@@ -67,7 +67,7 @@ describe("<EditCalculation> tests ", () => {
 
         it("renders the calculation type", async () => {
             expect(screen.getByText("Value type")).toBeInTheDocument();
-            expect(screen.getByText(testData.testCalc.valueType)).toBeInTheDocument();
+            expect(screen.getAllByText(testData.testCalc.valueType)[0]).toBeInTheDocument();
         });
 
         it("does not render CircularReferenceErrors when there are no circular reference errors", async () => {

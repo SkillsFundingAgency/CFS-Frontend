@@ -23,6 +23,7 @@ import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
 import {ValueType} from "../../types/ValueType";
+import {CalculationType} from "../../types/CalculationSearchResponse";
 
 export interface EditorProps {
     excludeMonacoEditor?: boolean
@@ -183,11 +184,15 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                                     Value type
                                 </dt>
                                 <dd className="govuk-summary-list__value">
-                                    {!isLoadingCalculation && calculation ? <select className="govuk-select" onChange={(e) => setCalculationType(e.target.value as ValueType)}>
+                                    {!isLoadingCalculation && calculation ?
+                                        <>
+                                            <select className="govuk-select" onChange={(e) => setCalculationType(e.target.value as ValueType)} hidden={calculation.calculationType === CalculationType.Template}>
                                         <option selected={calculationType === ValueType.Percentage}>Percentage</option>
                                         <option selected={calculationType === ValueType.Currency}>Currency</option>
                                         <option selected={calculationType === ValueType.Number}>Number</option>
-                                    </select> : <LoadingFieldStatus title="Loading..."/>}
+                                    </select>
+                                            <span hidden={calculation.calculationType === CalculationType.Additional}>{calculation.valueType}</span>
+                                        </> : <LoadingFieldStatus title="Loading..."/>}
                                 </dd>
                             </div>
                         </dl>

@@ -69,7 +69,7 @@ export function EditCalculationTestData() {
     };
     const testCalc: CalculationDetails = {
         author: {id: "testUserId", name: "Mr Test"},
-        calculationType: CalculationType.Additional,
+        calculationType: CalculationType.Template,
         description: undefined,
         fundingStreamId: fundingStream.id,
         id: "54723",
