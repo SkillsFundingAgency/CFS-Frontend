@@ -35,6 +35,9 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {refreshSpecificationFundingService} from "../../services/publishService";
 import {approveAllCalculationsService, getCalculationSummaryBySpecificationId} from "../../services/calculationService";
 import {cloneDeep} from "lodash";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {JobType} from "../../types/jobType";
+import {MappingStatus} from "../../components/DatasetMapping/MappingStatus";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -64,7 +67,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     const specificationId = match.params.specificationId;
 
-    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {errors, addErrorMessage, clearErrorMessages, addError} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isApprovingAllCalculations, setIsApprovingAllCalculations] = useState(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
@@ -75,6 +78,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     const history = useHistory();
     const location = useLocation();
+
+    const {hasJob, latestJob, isCheckingForJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.ApproveAllCalculationsJob],
+            err => addError(err, "Error while checking for approve all calculation job"));
 
     useEffect(() => {
         const params = QueryString.parse(location.search);
@@ -244,6 +252,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 hidden={!isApprovingAllCalculations}
                 subTitle={"Please wait, this could take several minutes"}
                 description={"Please do not refresh the page, you will be redirected automatically"} />
+
+            {(isCheckingForJob || hasJob) &&
+            <div className="govuk-form-group">
+                <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
+                {hasJob && <MappingStatus job={latestJob} />}
+            </div>}
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>
                 <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
