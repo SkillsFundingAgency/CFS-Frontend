@@ -290,12 +290,12 @@
                                 "value": "GMT Standard Time"
                             },
                             {
-                                "name": "specsClient:ApiKey",
+                                "name": "specificationsClient:ApiKey",
                                 "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapispecs'),'2018-02-14').secretUriWithVersion, ')')]"
                             },
                             {
-                                "name": "specsClient:ApiEndpoint",
-                                "value": "[concat('https://app-', parameters('environmentKey'), '-specs-',parameters('productVersion'),'.azurewebsites.net/api/')]"
+                                "name": "specificationsClient:ApiEndpoint",
+                                "value": "[concat('https://app-', parameters('environmentKey'),'-specs-',parameters('productVersion'), '.azurewebsites.net/api/')]"
                             },
                             {
                                 "name": "specificationsClient:ApiKey",
