@@ -1,4 +1,5 @@
 import {ValueType} from "../ValueType";
+import { CalculationDataType } from "./CalculationCompilePreviewResponse";
 
 export interface CreateAdditionalCalculationViewModel {
     sourceCode:string;
@@ -9,5 +10,6 @@ export interface CreateAdditionalCalculationViewModel {
 export interface UpdateCalculationViewModel {
     sourceCode: string;
     calculationName: string;
-    valueType: ValueType
+    valueType: ValueType;
+    dataType: CalculationDataType;
 }

@@ -75,6 +75,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
             calculationName: calculation.name,
             valueType: calculationType ?? calculation.valueType,
             sourceCode: calculationState.sourceCode,
+            dataType: calculation.dataType
         };
 
         updateCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)

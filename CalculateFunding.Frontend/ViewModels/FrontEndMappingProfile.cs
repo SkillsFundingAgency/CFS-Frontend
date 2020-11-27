@@ -125,6 +125,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(d => d.CalculationId, opt => opt.Ignore())
                 .ForMember(d => d.Name, opt => opt.Ignore())
                 .ForMember(d => d.ValueType, opt => opt.Ignore())
+                .ForMember(d => d.DataType, opt => opt.Ignore())
                 ;
 
             CreateMap<CalculationVersion, CalculationVersionsCompareModel>()

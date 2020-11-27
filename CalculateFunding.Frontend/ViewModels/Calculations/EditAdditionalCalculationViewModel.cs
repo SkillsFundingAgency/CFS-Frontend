@@ -12,6 +12,9 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
 		public string CalculationName { get; set; }
 
 		[Required]
-		public CalculationValueType CalculationType { get; set; }
-	}
+		public CalculationValueType ValueType { get; set; }
+
+        [Required]
+        public CalculationDataType DataType { get; set; }
+    }
 }

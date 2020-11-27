@@ -343,7 +343,8 @@ namespace CalculateFunding.Frontend.Controllers
             editCalculation.SpecificationId = specificationId;
             editCalculation.CalculationId = calculationId;
             editCalculation.Name = vm.CalculationName;
-            editCalculation.ValueType = vm.CalculationType;
+            editCalculation.ValueType = vm.ValueType;
+            editCalculation.DataType = vm.DataType;
 
             ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, editCalculation);
                 
