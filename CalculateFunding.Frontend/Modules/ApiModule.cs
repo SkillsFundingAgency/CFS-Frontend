@@ -2,20 +2,20 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CalculateFunding.Common.ApiClient;
-using CalculateFunding.Common.ApiClient.Calcs;
-using CalculateFunding.Common.ApiClient.DataSets;
-using CalculateFunding.Common.ApiClient.FundingDataZone;
-using CalculateFunding.Common.ApiClient.Graph;
 using CalculateFunding.Common.ApiClient.Interfaces;
-using CalculateFunding.Common.ApiClient.Jobs;
-using CalculateFunding.Common.ApiClient.Policies;
-using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Publishing;
-using CalculateFunding.Common.ApiClient.Results;
-using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.Caching;
+using CalculateFunding.Common.Config.ApiClient.Calcs;
+using CalculateFunding.Common.Config.ApiClient.Dataset;
+using CalculateFunding.Common.Config.ApiClient.FundingDataZone;
+using CalculateFunding.Common.Config.ApiClient.Graph;
+using CalculateFunding.Common.Config.ApiClient.Jobs;
+using CalculateFunding.Common.Config.ApiClient.Policies;
 using CalculateFunding.Common.Config.ApiClient.Profiling;
+using CalculateFunding.Common.Config.ApiClient.Providers;
+using CalculateFunding.Common.Config.ApiClient.Results;
+using CalculateFunding.Common.Config.ApiClient.Specifications;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.ScenariosClient;
@@ -44,71 +44,16 @@ namespace CalculateFunding.Frontend.Modules
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
 
-            services.AddHttpClient(HttpClientKeys.Calculations,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("calcsClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.Results,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("resultsClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.Providers,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("providersClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.Policies,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("policiesClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.Specifications,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("specsClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.Datasets,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("datasetsClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
+            services.AddCalculationsInterServiceClient(Configuration);
+            services.AddResultsInterServiceClient(Configuration);
+            services.AddProvidersInterServiceClient(Configuration);
+            services.AddPoliciesInterServiceClient(Configuration);
+            services.AddSpecificationsInterServiceClient(Configuration);
+            services.AddDatasetsInterServiceClient(Configuration);
+            services.AddJobsInterServiceClient(Configuration);
+            services.AddGraphInterServiceClient(Configuration);
+            services.AddFundingDataServiceInterServiceClient(Configuration);
+            services.AddProfilingInterServiceClient(Configuration);
 
             services.AddHttpClient(HttpClientKeys.Scenarios,
                 c =>
@@ -143,44 +88,10 @@ namespace CalculateFunding.Frontend.Modules
              .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
               .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
-            services.AddHttpClient(HttpClientKeys.Jobs,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("jobsClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-          
             services.AddHttpClient(HttpClientKeys.Publishing,
                 c =>
                 {
                     ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("publishingClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.Graph,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("graphClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-
-            services.AddHttpClient(HttpClientKeys.FDZ,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("fdzClient");
 
                     SetDefaultApiClientConfigurationOptions(c, opts, services);
                 })
@@ -195,25 +106,7 @@ namespace CalculateFunding.Frontend.Modules
                 .AddSingleton<ICacheProvider, StackExchangeRedisClientCacheProvider>();
 
             services
-                .AddSingleton<ICalculationsApiClient, CalculationsApiClient>();
-
-            services
-                .AddSingleton<IResultsApiClient, ResultsApiClient>();
-
-            services
-                .AddSingleton<IProvidersApiClient, ProvidersApiClient>();
-            
-            services
-                .AddSingleton<IFundingDataZoneApiClient, FundingDataZoneApiClient>();
-
-            services
-                .AddSingleton<IPoliciesApiClient, PoliciesApiClient>();
-
-            services
                 .AddSingleton<ITemplateBuilderApiClient, TemplateBuilderApiClient>();
-
-            services
-               .AddSingleton<IDatasetsApiClient, DatasetsApiClient>();
 
             services
                 .AddSingleton<IScenariosApiClient, ScenariosApiClient>();
@@ -225,13 +118,7 @@ namespace CalculateFunding.Frontend.Modules
               .AddSingleton<IUsersApiClient, UsersApiClient>();
 
             services
-                .AddSingleton<IJobsApiClient, JobsApiClient>();
-
-            services.AddSingleton<IPublishingApiClient, PublishingApiClient>();
-
-            services.AddSingleton<ISpecificationsApiClient, SpecificationsApiClient>();
-
-            services.AddSingleton<IGraphApiClient, GraphApiClient>();
+                .AddSingleton<IPublishingApiClient, PublishingApiClient>();
 
             RedisSettings redisSettings = new RedisSettings();
 
@@ -239,7 +126,6 @@ namespace CalculateFunding.Frontend.Modules
 
             services.AddSingleton(redisSettings);
 
-            services.AddProfilingInterServiceClient(Configuration);
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, IServiceCollection services)

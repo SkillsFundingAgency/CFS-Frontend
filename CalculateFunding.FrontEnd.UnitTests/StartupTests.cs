@@ -1,7 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.DataSets;
+using CalculateFunding.Common.ApiClient.FundingDataZone;
+using CalculateFunding.Common.ApiClient.Graph;
+using CalculateFunding.Common.ApiClient.Interfaces;
+using CalculateFunding.Common.ApiClient.Jobs;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Profiling;
+using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Publishing;
+using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Users;
+using CalculateFunding.Frontend.Clients.ScenariosClient;
+using CalculateFunding.Frontend.Clients.TestEngineClient;
 using CalculateFunding.Frontend.Controllers;
+using CalculateFunding.Frontend.Interfaces.ApiClient;
 using FluentAssertions;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Channel;
@@ -67,6 +83,22 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
             ResolveType<ProviderController>(serviceProvider).Should().NotBeNull(nameof(ProviderController));
             ResolveType<ProfilingController>(serviceProvider).Should().NotBeNull(nameof(ProfilingController));
+
+            serviceProvider.GetService<ICalculationsApiClient>().Should().NotBeNull(nameof(CalculationsApiClient));
+            serviceProvider.GetService<IResultsApiClient>().Should().NotBeNull(nameof(ResultsApiClient));
+            serviceProvider.GetService<IProvidersApiClient>().Should().NotBeNull(nameof(ProvidersApiClient));
+            serviceProvider.GetService<IPoliciesApiClient>().Should().NotBeNull(nameof(PoliciesApiClient));
+            serviceProvider.GetService<ISpecificationsApiClient>().Should().NotBeNull(nameof(SpecificationsApiClient));
+            serviceProvider.GetService<IDatasetsApiClient>().Should().NotBeNull(nameof(DatasetsApiClient));
+            serviceProvider.GetService<IJobsApiClient>().Should().NotBeNull(nameof(JobsApiClient));
+            serviceProvider.GetService<IGraphApiClient>().Should().NotBeNull(nameof(GraphApiClient));
+            serviceProvider.GetService<IFundingDataZoneApiClient>().Should().NotBeNull(nameof(FundingDataZoneApiClient));
+            serviceProvider.GetService<IProfilingApiClient>().Should().NotBeNull(nameof(ProfilingApiClient));
+
+            serviceProvider.GetService<IScenariosApiClient>().Should().NotBeNull(nameof(ScenariosApiClient));
+            serviceProvider.GetService<ITestEngineApiClient>().Should().NotBeNull(nameof(TestEngineApiClient));
+            serviceProvider.GetService<IUsersApiClient>().Should().NotBeNull(nameof(UsersApiClient));
+            serviceProvider.GetService<IPublishingApiClient>().Should().NotBeNull(nameof(PublishingApiClient));
         }
 
         protected virtual IConfigurationRoot CreateTestConfiguration()
@@ -84,12 +116,16 @@ namespace CalculateFunding.Frontend.UnitTests
                 { "AzureAd:CallbackPath", "/signin-oidc" },
                 { "AzureAd:IsEnabled", "true" },
                 { "AzureAd:Groups", "FDC440B9-3DF9-40CD-9F33-9690C547E7E8" },
-                { "specsClient:ApiEndpoint", "https://localhost:7001/api/specs" },
-                { "specsClient:ApiKey", "Local" },
+                { "specificationsClient:ApiEndpoint", "https://localhost:7001/api/specs" },
+                { "specificationsClient:ApiKey", "Local" },
                 { "calcsClient:ApiEndpoint", "https://localhost:7002/api/calcs" },
                 { "calcsClient:ApiKey", "Local" },
                 { "datasetsClient:ApiEndpoint", "https://localhost:7004/api/datasets" },
                 { "datasetsClient:ApiKey", "Local" },
+                { "jobsClient:ApiEndpoint", "https://localhost:7010/api" },
+                { "jobsClient:ApiKey", "Local" },
+                { "graphClient:ApiEndpoint", "https://localhost:7020/api" },
+                { "graphClient:ApiKey", "Local" },
                 { "resultsClient:ApiEndpoint", "https://localhost:7005/api/results" },
                 { "resultsClient:ApiKey", "Local" },
                 { "scenariosClient:ApiEndpoint", "https://localhost:7006/api/scenarios" },
