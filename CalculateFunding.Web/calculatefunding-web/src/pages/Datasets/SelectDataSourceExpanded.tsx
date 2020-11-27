@@ -95,7 +95,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
     const [errorState, setErrorState] = useState<boolean>(false);
     const [saveErrorState, setSaveErrorState] = useState<boolean>(false);
 
-    let history = useHistory();
+    const history = useHistory();
 
     useEffectOnce(() => {
         getSpecificationSummaryService(match.params.specificationId).then((response) => {
@@ -146,7 +146,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
     }
 
     function setPagination(e: number) {
-        let search = searchRequest;
+        const search = searchRequest;
         search.pageNumber = e;
         setSearchRequest(search);
         populateExpandedDatasources(match.params.datasetId, searchRequest);

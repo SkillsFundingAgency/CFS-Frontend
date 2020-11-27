@@ -44,7 +44,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
 
 
     function changeLocalAuthorityFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).localAuthority;
+        const filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).localAuthority;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
@@ -55,7 +55,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
     }
 
     function changeStatusFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).status;
+        const filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).status;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
@@ -66,7 +66,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
     }
 
     function changeProviderTypeFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).providerType;
+        const filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).providerType;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
@@ -77,7 +77,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
     }
 
     function changeProviderSubTypeFilter(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).providerSubType;
+        const filterUpdate = (state.searchCriteria as PublishedProviderSearchRequest).providerSubType;
 
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
@@ -90,7 +90,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
 
     function changeSearchTextFilter(searchField: string, searchTerm: string) {
         if ((searchTerm.length === 0 && (state.searchCriteria as PublishedProviderSearchRequest).searchTerm.length !== 0) || searchTerm.length > 2) {
-            let searchFields: string[] = [];
+            const searchFields: string[] = [];
             if (searchField != null && searchField !== "") {
                 searchFields.push(searchField);
             }

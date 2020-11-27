@@ -49,7 +49,7 @@ export function CreateSpecification() {
     const [newSpecificationId, setNewSpecificationId] = useState<string>('');
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [providerSource, setProviderSource] = useState<ProviderSource>();
-    let history = useHistory();
+    const history = useHistory();
 
     useEffect(() => {
         const getStreams = async () => {
@@ -244,10 +244,10 @@ export function CreateSpecification() {
             setIsLoading(true);
             clearErrorMessages();
             setNewSpecificationId('');
-            let assignedTemplateIdsValue: any = {};
+            const assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[selectedFundingStream] = selectedTemplateVersion;
 
-            let createSpecificationViewModel: CreateSpecificationViewModel = {
+            const createSpecificationViewModel: CreateSpecificationViewModel = {
                 description: selectedDescription,
                 fundingPeriodId: selectedFundingPeriod,
                 fundingStreamId: selectedFundingStream,

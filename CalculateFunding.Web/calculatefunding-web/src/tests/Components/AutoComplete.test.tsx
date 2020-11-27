@@ -36,7 +36,7 @@ describe('<AutoComplete />', () => {
     it('renders a panel', () => {
         const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
 
-        let actual = wrapper.find('div.govuk-form-group');
+        const actual = wrapper.find('div.govuk-form-group');
 
         expect(actual.length).toBe(1);
     });
@@ -50,7 +50,7 @@ describe('<AutoComplete />', () => {
             }
         });
 
-        let actual = wrapper.find('ul.govuk-list');
+        const actual = wrapper.find('ul.govuk-list');
         expect(actual.length).toBe(1);
         expect(actual.children().length).toBe(validData.length);
     });
@@ -64,7 +64,7 @@ describe('<AutoComplete />', () => {
             }
         });
 
-        let actual = wrapper.find('ul.govuk-list');
+        const actual = wrapper.find('ul.govuk-list');
         expect(actual.length).toBe(1);
         expect(actual.children().length).toBe(1);
     });
@@ -78,7 +78,7 @@ describe('<AutoComplete />', () => {
             }
         });
 
-        let actual = wrapper.find('ul.govuk-list');
+        const actual = wrapper.find('ul.govuk-list');
         expect(actual.length).toBe(1);
         expect(actual.children().length).toBe(2);
     });
@@ -98,7 +98,7 @@ describe('<AutoComplete />', () => {
             }
         });
 
-        let actual = wrapper.find('ul.govuk-list');
+        const actual = wrapper.find('ul.govuk-list');
         expect(actual.length).toBe(1);
         expect(actual.children().length).toBe(validData.length);
     });

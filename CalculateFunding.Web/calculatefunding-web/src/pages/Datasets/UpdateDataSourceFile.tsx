@@ -51,7 +51,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     });
     const [mergeResults, setMergeResults] = useState<MergeDatasetViewModel>();
     const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
-    let history = useHistory();
+    const history = useHistory();
     
     useEffectOnce(() => {
         setIsLoading(true);

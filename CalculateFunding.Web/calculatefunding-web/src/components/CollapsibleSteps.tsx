@@ -105,7 +105,7 @@ export function CollapsibleSteps (props: React.PropsWithChildren<ICollapsibleSte
 
 export function setCollapsibleStepsAllStepsStatus(fundingLines: IFundingStructureItem[])
 {
-    let collapsibleStepsAllStepsStatus: ICollapsibleStepsAllStepsStatus = {
+    const collapsibleStepsAllStepsStatus: ICollapsibleStepsAllStepsStatus = {
         openAllSteps: true,
         closeAllSteps: true
     }

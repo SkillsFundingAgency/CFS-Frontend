@@ -4,9 +4,9 @@ import {useHistory} from "react-router";
 import * as React from "react";
 
 export const useConfirmLeavePage = (preventDefault: boolean,
-                                    message: string = 'Are you sure you want to leave without saving your changes?') => {
+                                    message = 'Are you sure you want to leave without saving your changes?') => {
     const self = useRef<UnregisterCallback | null>();
-    let history = useHistory();
+    const history = useHistory();
     
     const onWindowOrTabClose = (event: BeforeUnloadEvent) => {
         if (!preventDefault) {

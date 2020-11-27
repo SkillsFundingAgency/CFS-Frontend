@@ -48,12 +48,12 @@ export function EditableProfileTotal({
     }
 
     const handlePercentChange = (e: ChangeEvent<HTMLInputElement>) => {
-        let rawValue = e.target.value;
+        const rawValue = e.target.value;
         setPercent(rawValue);
     }
 
     const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
-        let rawValue = e.target.value;
+        const rawValue = e.target.value;
         setValue(rawValue);
     }
 

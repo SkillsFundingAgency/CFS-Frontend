@@ -44,7 +44,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
     const providerId = match.params.providerId;
     const providerVersionId = match.params.providerVersionId;
 
-    let history = useHistory();
+    const history = useHistory();
 
     const {data: profilePatterns, isFetching: isFetchingProfilePatterns} =
         useQuery<FundingStreamPeriodProfilePattern[], AxiosError>(`profile-patterns-${fundingStreamId}-${fundingPeriodId}`,

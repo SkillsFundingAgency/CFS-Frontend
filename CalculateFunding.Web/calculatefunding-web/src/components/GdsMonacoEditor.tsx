@@ -30,14 +30,14 @@ export function GdsMonacoEditor(props: {
     calculationName: string,
     fundingStreams: FundingStream[]
 }) {
-    const height: number = 291;
+    const height = 291;
     const element = useRef<HTMLElement>();
     const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
     const specificationId = props.specificationId;
 
     let isLoading = false;
 
-    let variableAllowedNowPrefixes: Array<string> = [
+    const variableAllowedNowPrefixes: Array<string> = [
         // If and If with brackets and spaces, but not matching End If - regex not supported in IE11
         //"(?<!End )If(\s)*(\\()?( )*",
         "If(\s)*(\\()?( )*",
@@ -132,25 +132,25 @@ export function GdsMonacoEditor(props: {
         getCodeContextService(specificationId)
             .then((result: Array<ITypeInformationResponse>) => {
                 let variables: IVariableContainer = {};
-                let functions: ILocalFunctionContainer = {};
+                const functions: ILocalFunctionContainer = {};
 
-                let dataTypes = result.filter(item => {
+                const dataTypes = result.filter(item => {
                     return item.type === "DefaultType";
                 });
 
-                let keywordList = result.filter(item => {
+                const keywordList = result.filter(item => {
                     return item.type === "Keyword";
                 });
 
-                let root = result.find(item => item.name === "CalculationContext");
+                const root = result.find(item => item.name === "CalculationContext");
 
                 variables = convertClassToVariables(root, result);
 
-                let defaultTypes: IDefaultTypeContainer = {};
+                const defaultTypes: IDefaultTypeContainer = {};
 
                 if (dataTypes) {
-                    for (let dt in dataTypes) {
-                        let defaultType: IDefaultType = {
+                    for (const dt in dataTypes) {
+                        const defaultType: IDefaultType = {
                             label: dataTypes[dt].name,
                             description: dataTypes[dt].description,
                             items: {}
@@ -160,11 +160,11 @@ export function GdsMonacoEditor(props: {
                     }
                 }
 
-                let keywords: IKeywordsContainer = {};
+                const keywords: IKeywordsContainer = {};
 
                 if (keywordList) {
-                    for (let kw in keywordList) {
-                        let keyword: IKeyword = {
+                    for (const kw in keywordList) {
+                        const keyword: IKeyword = {
                             label: keywordList[kw].name
                         }
 
@@ -172,35 +172,35 @@ export function GdsMonacoEditor(props: {
                     }
                 }
 
-                let contextVariables = variables;
-                let contextFunctions = functions;
-                let contextDefaultTypes = defaultTypes;
-                let contextKeywords = keywords;
+                const contextVariables = variables;
+                const contextFunctions = functions;
+                const contextDefaultTypes = defaultTypes;
+                const contextKeywords = keywords;
 
                 monaco.languages.registerCompletionItemProvider('vb', {
                     triggerCharacters: [".", " ", "("],
                     provideCompletionItems: function (model: monaco.editor.ITextModel, position: IPosition,) {
 
-                        let results = {
+                        const results = {
                             suggestions: []
                         };
 
-                        let lastCharacterTyped: string = "";
+                        let lastCharacterTyped = "";
                         if (position.column > 0) {
-                            let range: monaco.Range = new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column);
+                            const range: monaco.Range = new monaco.Range(position.lineNumber, position.column - 1, position.lineNumber, position.column);
 
                             lastCharacterTyped = model.getValueInRange(range);
                         }
 
-                        let lineContentsSoFar = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
+                        const lineContentsSoFar = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
 
                         // @ts-ignore
-                        let previousPosition = new monaco.Position(position.lineNumber, position.column - 1);
+                        const previousPosition = new monaco.Position(position.lineNumber, position.column - 1);
 
-                        let previousPositionWord = model.getWordAtPosition(previousPosition);
+                        const previousPositionWord = model.getWordAtPosition(previousPosition);
 
-                        let word = model.getWordUntilPosition(position);
-                        let editorRange = {
+                        const word = model.getWordUntilPosition(position);
+                        const editorRange = {
                             startLineNumber: position.lineNumber,
                             endLineNumber: position.lineNumber,
                             startColumn: word.startColumn,
@@ -211,20 +211,20 @@ export function GdsMonacoEditor(props: {
                         if (lastCharacterTyped === ".") {
                             if (previousPositionWord) {
 
-                                let previousSpace = lineContentsSoFar.lastIndexOf(" ");
-                                let previousOpenBracket = lineContentsSoFar.lastIndexOf("(");
+                                const previousSpace = lineContentsSoFar.lastIndexOf(" ");
+                                const previousOpenBracket = lineContentsSoFar.lastIndexOf("(");
 
-                                let previousCharacter: number = previousSpace > previousOpenBracket ? previousSpace : previousOpenBracket;
+                                const previousCharacter: number = previousSpace > previousOpenBracket ? previousSpace : previousOpenBracket;
 
-                                let path = lineContentsSoFar.substr(previousCharacter + 1, lineContentsSoFar.length - previousCharacter - 2);
+                                const path = lineContentsSoFar.substr(previousCharacter + 1, lineContentsSoFar.length - previousCharacter - 2);
 
                                 if (path) {
-                                    let pathItems = getVariablesForPath(path, contextVariables);
+                                    const pathItems = getVariablesForPath(path, contextVariables);
                                     if (pathItems && pathItems.length > 0) {
 
-                                        for (let variableResultKey in pathItems) {
-                                            let variable: IVariable = pathItems[variableResultKey];
-                                            let pathVariable = {
+                                        for (const variableResultKey in pathItems) {
+                                            const variable: IVariable = pathItems[variableResultKey];
+                                            const pathVariable = {
                                                 label: variable.name,
                                                 kind: variable.variableType,
                                                 detail: variable.type,
@@ -267,35 +267,35 @@ export function GdsMonacoEditor(props: {
                                 }
                             }
                         } else {
-                            let foundPrefix: boolean = false;
-                            for (let i in variableAllowedNowPrefixes) {
-                                let prefix = variableAllowedNowPrefixes[i];
-                                let exists = new RegExp(prefix + "$").test(lineContentsSoFar);
+                            let foundPrefix = false;
+                            for (const i in variableAllowedNowPrefixes) {
+                                const prefix = variableAllowedNowPrefixes[i];
+                                const exists = new RegExp(prefix + "$").test(lineContentsSoFar);
                                 if (exists) {
                                     foundPrefix = true;
                                     break;
                                 }
                             }
 
-                            let whitespaceRegex = new RegExp(/(\s)?/);
+                            const whitespaceRegex = new RegExp(/(\s)?/);
 
                             if (foundPrefix || position.column === 1 || whitespaceRegex.test(lineContentsSoFar)) {
 
                                 let variables: Array<IVariable>;
-                                let isAggregableFunctionDeclared = checkAggregableFunctionDeclared(lineContentsSoFar);
+                                const isAggregableFunctionDeclared = checkAggregableFunctionDeclared(lineContentsSoFar);
 
                                 if (isAggregableFunctionDeclared === true) {
 
                                     variables = getVariableForAggregatePath(lineContentsSoFar, contextVariables);
 
-                                    for (let i in variables) {
+                                    for (const i in variables) {
                                         // @ts-ignore
                                         results.suggestions.push(createCompletionItem(variables[i], editorRange));
                                     }
                                 } else {
-                                    for (let key in contextVariables) {
+                                    for (const key in contextVariables) {
 
-                                        let variable = contextVariables[key];
+                                        const variable = contextVariables[key];
 
                                         // @ts-ignore
                                         results.suggestions.push(createCompletionItem(variable, editorRange));
@@ -303,7 +303,7 @@ export function GdsMonacoEditor(props: {
                                 }
 
                                 if (isAggregableFunctionDeclared === true) {
-                                    let defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, editorRange);
+                                    const defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, editorRange);
 
                                     if (defaultTypeCompletionItems) {
                                         defaultTypeCompletionItems.forEach(d => {
@@ -313,12 +313,12 @@ export function GdsMonacoEditor(props: {
                                     }
                                 }
 
-                                let codeWithNoComments = processSourceToRemoveComments(model.getValueInRange(new monaco.Range(1, 1, position.lineNumber, position.column)));
+                                const codeWithNoComments = processSourceToRemoveComments(model.getValueInRange(new monaco.Range(1, 1, position.lineNumber, position.column)));
 
-                                let declaredVariables = findDeclaredVariables(codeWithNoComments);
+                                const declaredVariables = findDeclaredVariables(codeWithNoComments);
 
                                 declaredVariables.forEach(d => {
-                                    let variableItem = {
+                                    const variableItem = {
                                         label: d,
                                         kind: monaco.languages.CompletionItemKind.Field,
                                         insertText: d,
@@ -331,10 +331,10 @@ export function GdsMonacoEditor(props: {
                                 });
 
 
-                                for (let i in contextFunctions) {
-                                    let localFunction: ILocalFunction = contextFunctions[i];
+                                for (const i in contextFunctions) {
+                                    const localFunction: ILocalFunction = contextFunctions[i];
 
-                                    let localFunctionItem = {
+                                    const localFunctionItem = {
                                         label: localFunction.label,
                                         kind: monaco.languages.CompletionItemKind.Function,
                                         detail: localFunction.getFunctionAndParameterDescription(),
@@ -369,7 +369,7 @@ export function GdsMonacoEditor(props: {
                                     }
 
                                     // @ts-ignore
-                                    let indexOfDuplicateFunction = results.suggestions.findIndex(x => x.label === localFunction.label);
+                                    const indexOfDuplicateFunction = results.suggestions.findIndex(x => x.label === localFunction.label);
 
                                     if (indexOfDuplicateFunction > -1) {
                                         // @ts-ignore
@@ -380,7 +380,7 @@ export function GdsMonacoEditor(props: {
                                     }
                                 }
 
-                                let defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, editorRange);
+                                const defaultTypeCompletionItems = getDefaultDataTypesCompletionItems(lineContentsSoFar, contextDefaultTypes, editorRange);
 
                                 if (defaultTypeCompletionItems) {
                                     defaultTypeCompletionItems.forEach(dt => {
@@ -389,14 +389,14 @@ export function GdsMonacoEditor(props: {
                                     })
                                 }
 
-                                let keywordCompletionItems = getKeywordsCompletionItems(lineContentsSoFar, contextKeywords, editorRange);
+                                const keywordCompletionItems = getKeywordsCompletionItems(lineContentsSoFar, contextKeywords, editorRange);
 
                                 if (keywordCompletionItems) {
                                     keywordCompletionItems.forEach(kc => {
                                         // @ts-ignore
                                         results.suggestions.push(kc)
                                     })
-                                    for (let kc in keywordCompletionItems) {
+                                    for (const kc in keywordCompletionItems) {
                                     }
                                 }
                             }
@@ -407,30 +407,30 @@ export function GdsMonacoEditor(props: {
 
                 monaco.languages.registerHoverProvider('vb', {
                     provideHover: function (model: monaco.editor.IReadOnlyModel, position: monaco.Position, token: monaco.CancellationToken) {
-                        let lineContents = model.getLineContent(position.lineNumber);
-                        let forwardTextForCurrentLine = model.getValueInRange(new monaco.Range(position.lineNumber, position.column, position.lineNumber, lineContents.length + 1));
+                        const lineContents = model.getLineContent(position.lineNumber);
+                        const forwardTextForCurrentLine = model.getValueInRange(new monaco.Range(position.lineNumber, position.column, position.lineNumber, lineContents.length + 1));
 
                         // @ts-ignore
-                        let word = model.getWordAtPosition(position);
+                        const word = model.getWordAtPosition(position);
 
-                        let range = {
+                        const range = {
                             startLineNumber: position.lineNumber,
                             endLineNumber: position.lineNumber,
                             startColumn: word ? word.startColumn : 0,
                             endColumn: word ? word.endColumn : 0
                         };
 
-                        let variableHover = getHoverDescriptionForVariable(model, position, forwardTextForCurrentLine, contextVariables, range);
+                        const variableHover = getHoverDescriptionForVariable(model, position, forwardTextForCurrentLine, contextVariables, range);
                         if (variableHover) {
                             return variableHover;
                         }
 
-                        let variableLocalFunction = getHoverDescriptionForLocalFunction(model, position, forwardTextForCurrentLine, contextFunctions, range);
+                        const variableLocalFunction = getHoverDescriptionForLocalFunction(model, position, forwardTextForCurrentLine, contextFunctions, range);
                         if (variableLocalFunction) {
                             return variableLocalFunction;
                         }
 
-                        let defaultDataTypes = getHoverDescriptionForDefaultType(model, position, contextDefaultTypes, range);
+                        const defaultDataTypes = getHoverDescriptionForDefaultType(model, position, contextDefaultTypes, range);
                         if (defaultDataTypes) {
                             return defaultDataTypes;
                         }

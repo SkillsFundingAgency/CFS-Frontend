@@ -55,7 +55,7 @@ export function EditVariationPoints({match}: RouteComponentProps<EditVariationPo
     const [profilingInstallments, setProfilingInstallments] = useState<ProfilingInstallments[]>(profilingInstallmentsInitialState);
     const [isLoading, setIsLoading] = useState(false);
 
-    let history = useHistory();
+    const history = useHistory();
 
     function SetFutureInstallment(e: React.ChangeEvent<HTMLSelectElement>) {
         if (e.target.value !== null && e.target.value !== "-1") {

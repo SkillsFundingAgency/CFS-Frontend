@@ -26,7 +26,7 @@ export type JobDetails = {
 }
 
 export function getJobDetailsFromJobMessage(job: JobMessage): JobDetails {
-    let result: JobDetails = {
+    const result: JobDetails = {
         jobId: job.jobId,
         jobDescription: buildDescription(job.jobType, job.trigger.message),
         statusDescription: "",
@@ -52,7 +52,7 @@ export function getJobDetailsFromJobMessage(job: JobMessage): JobDetails {
 }
 
 export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
-        let result: JobDetails = {
+        const result: JobDetails = {
         jobId: job.jobId,
         statusDescription: "",
         jobDescription: buildDescription(job.jobType, job.message),

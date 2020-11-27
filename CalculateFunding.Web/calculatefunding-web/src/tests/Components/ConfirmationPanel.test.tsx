@@ -10,14 +10,14 @@ describe('<ConfirmationPanel />', () => {
     it(' renders a panel with the title as expected', () => {
         const wrapper = mount(<ConfirmationPanel title="Test title" body="Test body" hidden={false} />);
 
-        let actual = wrapper.find('h1.govuk-panel__title');
+        const actual = wrapper.find('h1.govuk-panel__title');
 
         expect(actual.text()).toBe('Test title');
     });
     it(' renders a panel with the body as expected', () => {
         const wrapper = mount(<ConfirmationPanel title="Test title" body="Test body" hidden={false} />);
 
-        let actual = wrapper.find('div.govuk-panel__body');
+        const actual = wrapper.find('div.govuk-panel__body');
 
         expect(actual.text()).toBe('Test body');
     });
@@ -25,7 +25,7 @@ describe('<ConfirmationPanel />', () => {
     it(' hides itself when passed a true in hidden prop', () => {
         const wrapper = mount(<ConfirmationPanel title="Test title" body="Test body" hidden={true} />);
 
-        let actual = wrapper.find('div.govuk-panel');
+        const actual = wrapper.find('div.govuk-panel');
 
         expect(actual.props().hidden).toBeTruthy();
     });

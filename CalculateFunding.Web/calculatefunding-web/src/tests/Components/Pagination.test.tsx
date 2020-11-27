@@ -11,7 +11,7 @@ describe('<Pagination />', () => {
         const wrapper = shallow(<Pagination callback={() => {
         }} currentPage={1} lastPage={1}/>);
 
-        let actual = wrapper.find('ul');
+        const actual = wrapper.find('ul');
 
         expect(actual).toBeTruthy();
     });
@@ -20,7 +20,7 @@ describe('<Pagination />', () => {
         const wrapper = shallow(<Pagination callback={() => {
         }} currentPage={1} lastPage={1}/>);
 
-        let actual = wrapper.find('ul').find('li');
+        const actual = wrapper.find('ul').find('li');
 
         expect(actual.hasOwnProperty("disabled")).toBeFalsy();
     });
@@ -29,7 +29,7 @@ describe('<Pagination />', () => {
         const wrapper = shallow(<Pagination callback={() => {
         }} currentPage={1} lastPage={10}/>);
 
-        let actual = wrapper.find('ul');
+        const actual = wrapper.find('ul');
 
         expect(actual.children()).toHaveLength(4);
     });

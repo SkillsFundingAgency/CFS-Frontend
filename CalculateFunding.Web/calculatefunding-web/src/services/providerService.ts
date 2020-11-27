@@ -3,7 +3,7 @@ import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearc
 import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
 
-let baseURL = "/api/provider";
+const baseURL = "/api/provider";
 
 export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string): 
     Promise<AxiosResponse<ProviderSummary>> {

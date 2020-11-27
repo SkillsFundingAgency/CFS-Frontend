@@ -40,7 +40,7 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
     const providerId = match.params.providerId;
     const providerVersionId = match.params.providerVersionId;
 
-    let history = useHistory();
+    const history = useHistory();
 
     const [fundingLineProfile, setFundingLineProfile] = useState<FundingLineProfile>();
     const [editedFundingLineProfile, setEditedFundingLineProfile] = useState<FundingLineProfile>();
@@ -150,7 +150,7 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
 
     function updateProfileTotal(instalmentNumber: number, newProfileTotal: ProfileTotal) {
         if (!editedFundingLineProfile) return;
-        let cloneOfFundingLineProfile: FundingLineProfile = cloneDeep(editedFundingLineProfile);
+        const cloneOfFundingLineProfile: FundingLineProfile = cloneDeep(editedFundingLineProfile);
         cloneOfFundingLineProfile.profileTotals = cloneOfFundingLineProfile.profileTotals.map(
             profile => profile.installmentNumber === instalmentNumber ? newProfileTotal : profile
         );

@@ -6,7 +6,7 @@ import {CollapsibleSteps} from "../CollapsibleSteps";
 export function FundingLineStepProviderResults(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean, callback: any}) {
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
-    let fundingType: string = "";
+    let fundingType = "";
     function collapsibleStepsChanged(expanded: boolean, name: string) {
         props.callback(expanded, name);
     }

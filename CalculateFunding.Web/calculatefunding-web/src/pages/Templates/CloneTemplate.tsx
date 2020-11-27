@@ -22,7 +22,7 @@ import {FundingStreamAndPeriodSelection} from "../../components/TemplateBuilder/
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export const CloneTemplate = () => {
-    let {templateId, version} = useParams();
+    const {templateId, version} = useParams();
     const [fundingStream, setFundingStream] = useState<FundingStream>();
     const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
     const [templateToClone, setTemplateToClone] = useState<TemplateResponse>();

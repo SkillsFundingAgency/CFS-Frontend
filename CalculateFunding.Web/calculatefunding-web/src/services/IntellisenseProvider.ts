@@ -12,7 +12,7 @@ import {ILocalMethod} from "../types/GdsMonacoEditor/IMethodContainer";
 import {languages} from "monaco-editor";
 
 export function convertMethodInformationResponseToVariable(method: IMethodInformationResponse, types: Array<ITypeInformationResponse>, level?: number) {
-    let methodItem: ILocalMethod = {
+    const methodItem: ILocalMethod = {
         description: "",
         friendlyName: "",
         isCustom: false,
@@ -29,7 +29,7 @@ export function convertMethodInformationResponseToVariable(method: IMethodInform
 
 export function createCompletionItem(variable: IVariable, range: any) {
 
-    let variableItem = {
+    const variableItem = {
             label: variable.name,
             kind: monaco.languages.CompletionItemKind.Field,
             insertText: variable.name,
@@ -72,15 +72,15 @@ export function createCompletionItem(variable: IVariable, range: any) {
 
 export function getDefaultDataTypesCompletionItems(path: string, defaultDataTypes: IDefaultTypeContainer, range: any) {
 
-    let asWithWhitespaceRegex = new RegExp(/(\s)as(\s)/i);
+    const asWithWhitespaceRegex = new RegExp(/(\s)as(\s)/i);
 
-    let items = [];
+    const items = [];
 
     if (asWithWhitespaceRegex.test(path)) {
-        for (let i in defaultDataTypes) {
-            let defaultType: IDefaultType = defaultDataTypes[i];
+        for (const i in defaultDataTypes) {
+            const defaultType: IDefaultType = defaultDataTypes[i];
 
-            let defaultTypeItem: monaco.languages.CompletionItem = {
+            const defaultTypeItem: monaco.languages.CompletionItem = {
                 label: defaultType.label,
                 kind: monaco.languages.CompletionItemKind.Keyword,
                 detail: defaultType.description,
@@ -89,7 +89,7 @@ export function getDefaultDataTypesCompletionItems(path: string, defaultDataType
             };
 
             let description = "";
-            let friendlyName = defaultType.label;
+            const friendlyName = defaultType.label;
 
             if (typeof defaultType.description !== "undefined") {
                 description = defaultType.description;
@@ -124,13 +124,13 @@ export function getDefaultDataTypesCompletionItems(path: string, defaultDataType
 
 export function getKeywordsCompletionItems(path: string, keywords: IKeywordsContainer, range: any) {
 
-    let items = [];
+    const items = [];
 
     if (path.trim() === "" || path.trim().toLowerCase() === "i") {
-        for (let k in keywords) {
-            let keyword: IKeyword = keywords[k];
+        for (const k in keywords) {
+            const keyword: IKeyword = keywords[k];
 
-            let keywordItem = {
+            const keywordItem = {
                 label: keyword.label,
                 kind: monaco.languages.CompletionItemKind.Keyword,
                 detail: keyword.label,
@@ -160,16 +160,16 @@ export function getVariablesForPath(path: string, variables: IVariableContainer)
 
     path = path.toLowerCase();
 
-    let pathArray: Array<string> = path.split(".");
+    const pathArray: Array<string> = path.split(".");
     let currentVariableContainer: IVariableContainer = variables;
 
-    for (let variableKey in pathArray) {
+    for (const variableKey in pathArray) {
         if (currentVariableContainer === null) {
             break;
         }
 
-        let variableContainerKey = pathArray[variableKey];
-        let currentVariable: IVariable = currentVariableContainer[variableContainerKey];
+        const variableContainerKey = pathArray[variableKey];
+        const currentVariable: IVariable = currentVariableContainer[variableContainerKey];
         if (!currentVariable) {
             currentVariableContainer = {};
             break;
@@ -183,8 +183,8 @@ export function getVariablesForPath(path: string, variables: IVariableContainer)
     }
 
     if (currentVariableContainer) {
-        let result: Array<IVariable> = [];
-        for (let i in currentVariableContainer) {
+        const result: Array<IVariable> = [];
+        for (const i in currentVariableContainer) {
             result.push(currentVariableContainer[i]);
         }
 
@@ -197,17 +197,17 @@ export function getVariablesForPath(path: string, variables: IVariableContainer)
 export function getVariableByPath(path: string, variables: IVariableContainer) {
     path = path.toLowerCase();
 
-    let pathArray: Array<string> = path.split(".");
+    const pathArray: Array<string> = path.split(".");
     let currentVariableContainer: IVariableContainer = variables;
 
     if (pathArray.length > 1) {
-        for (let variableKey in pathArray.slice(0, pathArray.length - 1)) {
+        for (const variableKey in pathArray.slice(0, pathArray.length - 1)) {
             if (currentVariableContainer == null) {
                 break;
             }
 
-            let variableContainerKey = pathArray[variableKey];
-            let currentVariable: IVariable = currentVariableContainer[variableContainerKey];
+            const variableContainerKey = pathArray[variableKey];
+            const currentVariable: IVariable = currentVariableContainer[variableContainerKey];
             if (!currentVariable) {
                 currentVariableContainer = {};
                 break;
@@ -231,23 +231,23 @@ export function getVariableByPath(path: string, variables: IVariableContainer) {
 }
 
 export function getVariableForAggregatePath(path: string, variables: IVariableContainer): Array<IVariable> {
-    let clonedVariableContainer = Object.assign({}, variables) as IVariableContainer;
-    let clonedVariable = clonedVariableContainer["datasets"];
-    let variablesArray: Array<IVariable> = [];
+    const clonedVariableContainer = Object.assign({}, variables) as IVariableContainer;
+    const clonedVariable = clonedVariableContainer["datasets"];
+    const variablesArray: Array<IVariable> = [];
 
-    let datasets = getVariablesForPath("Datasets", clonedVariableContainer);
+    const datasets = getVariablesForPath("Datasets", clonedVariableContainer);
 
     if (datasets && datasets.length > 0) {
-        for (let i in datasets) {
-            let datasetVariable: IVariable = datasets[i];
-            let fields = getVariablesForPath("Datasets." + datasetVariable.name, clonedVariableContainer);
+        for (const i in datasets) {
+            const datasetVariable: IVariable = datasets[i];
+            const fields = getVariablesForPath("Datasets." + datasetVariable.name, clonedVariableContainer);
 
-            let filteredVariables: IVariableContainer = {};
+            const filteredVariables: IVariableContainer = {};
 
             let hasAggregateFields = false;
 
-            for (let f in fields) {
-                let fieldVariable: IVariable = fields[f];
+            for (const f in fields) {
+                const fieldVariable: IVariable = fields[f];
                 if (fieldVariable.isAggregable) {
                     hasAggregateFields = true;
                     filteredVariables[fieldVariable.name.toLowerCase()] = fieldVariable;
@@ -266,8 +266,8 @@ export function getVariableForAggregatePath(path: string, variables: IVariableCo
 
     variablesArray.push(clonedVariable);
 
-    for (let c in clonedVariableContainer) {
-        let calcVariable: IVariable = clonedVariableContainer[c];
+    for (const c in clonedVariableContainer) {
+        const calcVariable: IVariable = clonedVariableContainer[c];
 
         if (calcVariable.isAggregable !== null && calcVariable.isAggregable) {
 
@@ -288,19 +288,19 @@ export function processSourceToRemoveComments(contents: string) {
         return "";
     }
 
-    let lines = contents.split("\r\n");
+    const lines = contents.split("\r\n");
     let result = "";
 
-    let newLine = "\r\n";
+    const newLine = "\r\n";
 
-    for (let i in lines) {
-        let line = lines[i];
+    for (const i in lines) {
+        const line = lines[i];
         if (line) {
-            let previousCharacter: string = "";
-            let withinString: boolean = false;
-            let firstMatch: number = -1;
+            let previousCharacter = "";
+            let withinString = false;
+            let firstMatch = -1;
             for (let i = 0; i < line.length; i++) {
-                let character: string = line[i];
+                const character: string = line[i];
                 if (character === "'" && !withinString) {
                     firstMatch = i;
                     break;
@@ -330,23 +330,23 @@ export function processSourceToRemoveComments(contents: string) {
 }
 
 export function findDeclaredVariables(contents: string) {
-    let variableRegex = /\b(\s)?Dim\s+([a-zA-Z][(\w}|\d){0-254}]*([,]([ ])?)*)+/g;
-    let regex = new RegExp(variableRegex);
+    const variableRegex = /\b(\s)?Dim\s+([a-zA-Z][(\w}|\d){0-254}]*([,]([ ])?)*)+/g;
+    const regex = new RegExp(variableRegex);
     let match = null;
 
-    let result: Array<string> = [];
+    const result: Array<string> = [];
 
     while (match = regex.exec(contents)) {
         if (!match) {
             break;
         }
 
-        let variableNames = match[0].substr(3).trim();
+        const variableNames = match[0].substr(3).trim();
 
         // Support multiple variables declared at once eg Dim var1, var2, var3
-        let variableNamesSplit: Array<string> = variableNames.split(",");
-        for (let k in variableNamesSplit) {
-            let variableName = variableNamesSplit[k].trim();
+        const variableNamesSplit: Array<string> = variableNames.split(",");
+        for (const k in variableNamesSplit) {
+            const variableName = variableNamesSplit[k].trim();
 
             // Make sure there are no duplicates (if the user has defined a variable twice)
             if (result.indexOf(variableName) < 0) {
@@ -365,11 +365,11 @@ export function checkAggregableFunctionDeclared(path: string) {
         return false;
     }
 
-    let pathRegex = "( Min|Avg|Max|Sum\\()";
+    const pathRegex = "( Min|Avg|Max|Sum\\()";
 
-    let regex = new RegExp(pathRegex);
+    const regex = new RegExp(pathRegex);
 
-    let match = regex.exec(path);
+    const match = regex.exec(path);
 
     return match ? true : false;
 }
@@ -377,11 +377,11 @@ export function checkAggregableFunctionDeclared(path: string) {
 export function getHoverDescriptionForDefaultType(model: monaco.editor.IReadOnlyModel, position: monaco.Position, dataTypes: IDefaultTypeContainer, range: any) {
 
     // @ts-ignore
-    let word = model.getWordAtPosition(position)?.word;
+    const word = model.getWordAtPosition(position)?.word;
 
     if (word && dataTypes[word.toLowerCase()]) {
 
-        let foundDefaultType = dataTypes[word.toLowerCase()];
+        const foundDefaultType = dataTypes[word.toLowerCase()];
 
         let documentationValue = "Type: " + foundDefaultType.label;
 
@@ -399,7 +399,7 @@ export function getHoverDescriptionForDefaultType(model: monaco.editor.IReadOnly
             documentationValue = documentationValue + description;
         }
 
-        let hover: monaco.languages.Hover = {
+        const hover: monaco.languages.Hover = {
             contents: [
                 {
                     value: documentationValue,
@@ -417,11 +417,11 @@ export function getHoverDescriptionForDefaultType(model: monaco.editor.IReadOnly
 }
 
 export function getHoverDescriptionForLocalFunction(model: monaco.editor.IReadOnlyModel, position: monaco.Position, forwardText: string, functions: ILocalFunctionContainer, range: any) {
-    let backwardsFunctionNameText: string = "";
+    let backwardsFunctionNameText = "";
     if (position.column > 1) {
-        let backwardsText = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
+        const backwardsText = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
 
-        let localFunctionNameRegexBack = new RegExp(/\b(([a-zA-Z_])([a-zA-Z0-9_]{0,254}))+/g);
+        const localFunctionNameRegexBack = new RegExp(/\b(([a-zA-Z_])([a-zA-Z0-9_]{0,254}))+/g);
         let reversedTextRegexResult;
 
         let result;
@@ -439,23 +439,23 @@ export function getHoverDescriptionForLocalFunction(model: monaco.editor.IReadOn
         }
     }
 
-    let forwardsLocalFunctionText: string = "";
+    let forwardsLocalFunctionText = "";
     if (forwardText) {
-        let variableDetectionRegex = new RegExp(/\b(([a-zA-Z_])([a-zA-Z0-9_]{0,254}))+/g);
+        const variableDetectionRegex = new RegExp(/\b(([a-zA-Z_])([a-zA-Z0-9_]{0,254}))+/g);
 
-        let forwardsVariableResult = variableDetectionRegex.exec(forwardText);
+        const forwardsVariableResult = variableDetectionRegex.exec(forwardText);
         if (forwardsVariableResult) {
             forwardsLocalFunctionText = forwardsVariableResult[0];
         }
     }
 
 
-    let localFunctionText = (backwardsFunctionNameText + forwardsLocalFunctionText).trim();
+    const localFunctionText = (backwardsFunctionNameText + forwardsLocalFunctionText).trim();
     if (localFunctionText) {
 
-        let localFunctionKey = localFunctionText.toLowerCase();
+        const localFunctionKey = localFunctionText.toLowerCase();
 
-        let foundLocalFunction: ILocalFunction = functions[localFunctionKey];
+        const foundLocalFunction: ILocalFunction = functions[localFunctionKey];
         if (foundLocalFunction) {
 
             let description = "";
@@ -473,7 +473,7 @@ export function getHoverDescriptionForLocalFunction(model: monaco.editor.IReadOn
                 documentationValue = documentationValue + description;
             }
 
-            let hover: monaco.languages.Hover = {
+            const hover: monaco.languages.Hover = {
                 contents: [
                     {
                         value: documentationValue,
@@ -491,11 +491,11 @@ export function getHoverDescriptionForLocalFunction(model: monaco.editor.IReadOn
 }
 
 export function getHoverDescriptionForVariable(model: monaco.editor.IReadOnlyModel, position: monaco.Position, forwardText: string, variables: IVariableContainer, range: any) {
-    let backwardsVariableText: string = "";
+    let backwardsVariableText = "";
     if (position.column > 1) {
-        let backwardsText = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
+        const backwardsText = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
 
-        let variableDetectionRegexBack = new RegExp(/\b(([a-zA-Z])([a-zA-Z0-9]{0,254})(\.)?)+/g);
+        const variableDetectionRegexBack = new RegExp(/\b(([a-zA-Z])([a-zA-Z0-9]{0,254})(\.)?)+/g);
         let reversedTextRegexResult;
 
         let result;
@@ -513,20 +513,20 @@ export function getHoverDescriptionForVariable(model: monaco.editor.IReadOnlyMod
         }
     }
 
-    let forwardsVariableText: string = "";
+    let forwardsVariableText = "";
     if (forwardText) {
-        let variableDetectionRegex = new RegExp(/\b(([a-zA-Z])([a-zA-Z0-9]{0,254})+)/);
+        const variableDetectionRegex = new RegExp(/\b(([a-zA-Z])([a-zA-Z0-9]{0,254})+)/);
 
-        let forwardsVariableResult = variableDetectionRegex.exec(forwardText);
+        const forwardsVariableResult = variableDetectionRegex.exec(forwardText);
         if (forwardsVariableResult) {
             forwardsVariableText = forwardsVariableResult[0];
         }
     }
 
-    let variableText = (backwardsVariableText + forwardsVariableText).trim();
+    const variableText = (backwardsVariableText + forwardsVariableText).trim();
     if (variableText) {
 
-        let foundVariable: IVariable = getVariableByPath(variableText, variables);
+        const foundVariable: IVariable = getVariableByPath(variableText, variables);
         if (foundVariable) {
             let description = "";
             let documentationValue = "Type: " + foundVariable.type;
@@ -543,7 +543,7 @@ export function getHoverDescriptionForVariable(model: monaco.editor.IReadOnlyMod
                 documentationValue = documentationValue + description;
             }
 
-            let hover: monaco.languages.Hover = {
+            const hover: monaco.languages.Hover = {
                 contents: [
                     {
                         value: documentationValue,
@@ -561,7 +561,7 @@ export function getHoverDescriptionForVariable(model: monaco.editor.IReadOnlyMod
 }
 
 export function convertClassToVariables(root: ITypeInformationResponse | undefined, result: Array<ITypeInformationResponse>) {
-    let variables: IVariableContainer = {};
+    const variables: IVariableContainer = {};
 
     if (!root || !root.properties) {
         return variables;

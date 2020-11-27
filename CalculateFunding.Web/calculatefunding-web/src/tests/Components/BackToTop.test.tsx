@@ -11,7 +11,7 @@ describe('<BackToTop />', () => {
     it(' renders a panel', () => {
         const wrapper = mount(<BackToTop id={"testId"}/>);
 
-        let actual = wrapper.find('.app-back-to-top');
+        const actual = wrapper.find('.app-back-to-top');
 
         expect(actual.children().length).toBe(1);
     });
@@ -19,7 +19,7 @@ describe('<BackToTop />', () => {
     it(' has the correct href', () => {
         const wrapper = mount(<BackToTop id={"testId"}/>);
 
-        let actual = wrapper.find('a');
+        const actual = wrapper.find('a');
 
         expect(actual.prop("href")).toBe("#testId");
 
@@ -28,7 +28,7 @@ describe('<BackToTop />', () => {
     it(' has the correct body text', () => {
         const wrapper = mount(<BackToTop id={"testId"}/>);
 
-        let actual = wrapper.find('a');
+        const actual = wrapper.find('a');
 
         expect(actual.text()).toBe("Back to top");
 
@@ -37,7 +37,7 @@ describe('<BackToTop />', () => {
     it(' has the correct body text', () => {
         const wrapper = mount(<BackToTop id={"testId"}/>);
 
-        let actual = wrapper.find('a');
+        const actual = wrapper.find('a');
 
         expect(actual.text()).toBe("Back to top");
 
@@ -46,7 +46,7 @@ describe('<BackToTop />', () => {
     it(' is hidden', () => {
         const wrapper = mount(<BackToTop id={"testId"} hidden={true}/>);
 
-        let actual = wrapper.find('.app-back-to-top');
+        const actual = wrapper.find('.app-back-to-top');
 
         expect(actual.props().hidden).toBeTruthy();
     });
@@ -54,7 +54,7 @@ describe('<BackToTop />', () => {
     it(' is visible', () => {
         const wrapper = mount(<BackToTop id={"testId"} hidden={false}/>);
 
-        let actual = wrapper.find('.app-back-to-top');
+        const actual = wrapper.find('.app-back-to-top');
 
         expect(actual.props().hidden).toBeFalsy();
     });
@@ -62,7 +62,7 @@ describe('<BackToTop />', () => {
     it(' is visible when hidden is not used', () => {
         const wrapper = mount(<BackToTop id={"testId"} />);
 
-        let actual = wrapper.find('.app-back-to-top');
+        const actual = wrapper.find('.app-back-to-top');
 
         expect(actual.props().hidden).toBeFalsy();
     });

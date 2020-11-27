@@ -11,7 +11,7 @@ export function Breadcrumbs(props: { children: any }) {
 }
 
 export function Breadcrumb(props: { name: string, url?: string, legacy?:boolean, goBack?:boolean }) {
-    let history = useHistory();
+    const history = useHistory();
     if(props.legacy)
     {
         return <li className="govuk-breadcrumbs__list-item">

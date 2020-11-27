@@ -4,8 +4,8 @@ import "../styles/ConfirmationModal.scss";
 
 export function ConfirmationModal(message: any,
                                   callback: any,
-                                  confirmButtonText: string = 'Leave this page',
-                                  cancelButtonText: string = 'Stay on this page') {
+                                  confirmButtonText = 'Leave this page',
+                                  cancelButtonText = 'Stay on this page') {
     const container = document.createElement("div");
     container.setAttribute("modal-confirmation-placeholder", "");
     container.setAttribute("data-testid", "modal-confirmation-placeholder");

@@ -14,7 +14,7 @@ it("is visible when showModal is true", () => {
         toggleModal={toggleModalMock}
         saveDescription={saveDescriptionMock} />);
 
-    let actual = wrapper.find('#edit-desc-modal');
+    const actual = wrapper.find('#edit-desc-modal');
 
     expect(actual.prop('style')).toHaveProperty('display', 'block');
 });
@@ -30,7 +30,7 @@ it("renders renders original description", () => {
         toggleModal={toggleModalMock}
         saveDescription={saveDescriptionMock} />);
 
-    let actual = wrapper.find('#original-description');
+    const actual = wrapper.find('#original-description');
 
     expect(actual.text()).toBe(originalDescription);
 });
@@ -46,7 +46,7 @@ it("hides itself when showModal is false", () => {
         toggleModal={toggleModalMock}
         saveDescription={saveDescriptionMock} />);
 
-    let actual = wrapper.find('#edit-desc-modal');
+    const actual = wrapper.find('#edit-desc-modal');
 
     expect(actual.prop('style')).toHaveProperty('display', 'none');
 });
@@ -62,7 +62,7 @@ it("toggles modal visibility when closed button called", () => {
         toggleModal={toggleModalMock}
         saveDescription={saveDescriptionMock} />);
 
-    let actual = wrapper.find('#close').simulate('click');
+    const actual = wrapper.find('#close').simulate('click');
 
     expect(toggleModalMock).toHaveBeenCalledTimes(1);
 });

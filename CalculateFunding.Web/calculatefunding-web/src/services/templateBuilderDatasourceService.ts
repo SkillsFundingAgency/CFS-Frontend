@@ -52,7 +52,7 @@ export const addNode = async (ds: Array<FundingLineDictionaryEntry>, id: string,
             catch {
                 // ignore
             }
-        };
+        }
     }
 }
 
@@ -104,7 +104,7 @@ export const removeNode = async (ds: Array<FundingLineDictionaryEntry>, id: stri
             catch {
                 // ignore
             }
-        };
+        }
     }
 
     rootNodesToDelete.forEach(k => {
@@ -229,10 +229,10 @@ export const updateNode = async (ds: Array<FundingLineDictionaryEntry>, updateMo
         catch {
             // ignore
         }
-    };
+    }
 }
 
-let id: number = 0;
+let id = 0;
 let templateLineAndCalculationIds: any = {};
 
 function initialiseId() {
@@ -251,7 +251,7 @@ function getId(templateLineOrCalculationId: number) {
 
 function getChildren(fundingLinesOrCalculations: Array<TemplateFundingLine> | Array<TemplateCalculation> | undefined,
     id: number, key: number): Array<FundingLineOrCalculation> {
-    let children: Array<FundingLineOrCalculation> = [];
+    const children: Array<FundingLineOrCalculation> = [];
     if (fundingLinesOrCalculations) {
         for (let i = 0; i < fundingLinesOrCalculations.length; i++) {
             const node: TemplateFundingLine | TemplateCalculation = fundingLinesOrCalculations[i];
@@ -268,7 +268,7 @@ function getChildren(fundingLinesOrCalculations: Array<TemplateFundingLine> | Ar
     return children;
 }
 
-export function getStringArray(options: string | undefined, delimiter: string = ","): string[] | undefined {
+export function getStringArray(options: string | undefined, delimiter = ","): string[] | undefined {
     if (!options || options.length === 0) {
         return undefined;
     }
@@ -276,7 +276,7 @@ export function getStringArray(options: string | undefined, delimiter: string = 
     return options.split(`${delimiter}`).map(s => s.trim());
 }
 
-export function stringArrayToString(options: string[] | undefined, delimiter: string = ","): string | undefined {
+export function stringArrayToString(options: string[] | undefined, delimiter = ","): string | undefined {
     if (!options || options.length === 0) {
         return undefined;
     }
@@ -285,7 +285,7 @@ export function stringArrayToString(options: string[] | undefined, delimiter: st
 }
 
 function getCalculation(templateCalculation: TemplateCalculation, id: number, key: number): Calculation {
-    let currentId = id;
+    const currentId = id;
     const childCalculations = getChildren(templateCalculation.calculations, currentId, key);
 
     return {
@@ -306,7 +306,7 @@ function getCalculation(templateCalculation: TemplateCalculation, id: number, ke
 }
 
 function getFundingLine(templateFundingLine: TemplateFundingLine, id: number, key: number): FundingLine {
-    let currentId = id;
+    const currentId = id;
     const childFundingLines = getChildren(templateFundingLine.fundingLines, currentId, key);
     const childCalculations = getChildren(templateFundingLine.calculations, currentId, key);
     return {
@@ -323,8 +323,8 @@ function getFundingLine(templateFundingLine: TemplateFundingLine, id: number, ke
 
 export const templateFundingLinesToDatasource = (templateFundingLines: Array<TemplateFundingLine>): Array<FundingLineDictionaryEntry> => {
     initialiseId();
-    let datasource: Array<FundingLineDictionaryEntry> = [];
-    let id = 0;
+    const datasource: Array<FundingLineDictionaryEntry> = [];
+    const id = 0;
     for (let i = 0; i < templateFundingLines.length; i++) {
         const key: number = i + 1;
         const fundingLine: FundingLine = getFundingLine(templateFundingLines[i], id, key);
@@ -334,7 +334,7 @@ export const templateFundingLinesToDatasource = (templateFundingLines: Array<Tem
 }
 
 function getTemplateFundingLines(fundingLines: FundingLineOrCalculation[] | undefined): TemplateFundingLine[] {
-    let result: TemplateFundingLine[] = [];
+    const result: TemplateFundingLine[] = [];
 
     if (fundingLines === undefined || fundingLines.length === 0) {
         return result;
@@ -345,7 +345,7 @@ function getTemplateFundingLines(fundingLines: FundingLineOrCalculation[] | unde
             continue;
         }
         const fundingLine = fundingLines[fl] as FundingLine;
-        let templateFundingLine: TemplateFundingLine = getTemplateFundingLine(fundingLine);
+        const templateFundingLine: TemplateFundingLine = getTemplateFundingLine(fundingLine);
         result.push(templateFundingLine);
     }
 
@@ -353,7 +353,7 @@ function getTemplateFundingLines(fundingLines: FundingLineOrCalculation[] | unde
 }
 
 function getTemplateCalculations(fundingLines: FundingLineOrCalculation[] | undefined): TemplateCalculation[] {
-    let result: TemplateCalculation[] = [];
+    const result: TemplateCalculation[] = [];
 
     if (fundingLines === undefined || fundingLines.length === 0) {
         return result;
@@ -364,7 +364,7 @@ function getTemplateCalculations(fundingLines: FundingLineOrCalculation[] | unde
             continue;
         }
         const calculation = fundingLines[fl] as Calculation;
-        let templateCalculation: TemplateCalculation = getTemplateCalculation(calculation);
+        const templateCalculation: TemplateCalculation = getTemplateCalculation(calculation);
         result.push(templateCalculation);
     }
 
@@ -423,7 +423,7 @@ export const datasourceToTemplateFundingLines = (ds: Array<FundingLineDictionary
 }
 
 export function getLastUsedId(fundingLines: TemplateFundingLine[] | FundingLineDictionaryEntry[]): number {
-    let ids = [];
+    const ids = [];
     const flString = JSON.stringify(fundingLines);
     const flMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
     for (const match of flMatches) {
@@ -437,7 +437,7 @@ export function getLastUsedId(fundingLines: TemplateFundingLine[] | FundingLineD
 }
 
 export function getAllTemplateCalculationIds(fundingLines: FundingLineDictionaryEntry[]): number[] {
-    let ids = [];
+    const ids = [];
     const flString = JSON.stringify(fundingLines);
     const calcMatches = flString.matchAll(/"templateCalculationId":(.*?)"/g);
     for (const match of calcMatches) {
@@ -447,7 +447,7 @@ export function getAllTemplateCalculationIds(fundingLines: FundingLineDictionary
 }
 
 export function getAllTemplateLineIds(fundingLines: FundingLineDictionaryEntry[]): number[] {
-    let ids = [];
+    const ids = [];
     const flString = JSON.stringify(fundingLines);
     const calcMatches = flString.matchAll(/"templateLineId":(.*?)"/g);
     for (const match of calcMatches) {
@@ -458,7 +458,7 @@ export function getAllTemplateLineIds(fundingLines: FundingLineDictionaryEntry[]
 
 export const findParentId = (fundingLines: FundingLine[], childId: string) => {
     for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
-        let stack: FundingLineOrCalculation[] = [];
+        const stack: FundingLineOrCalculation[] = [];
 
         stack.push(fundingLines[fundingLine]);
 
@@ -478,13 +478,13 @@ export const findParentId = (fundingLines: FundingLine[], childId: string) => {
     return "";
 }
 
-export const getAllCalculations = (fundingLines: FundingLine[], includeClones: boolean = false): CalculationDictionaryItem[] => {
+export const getAllCalculations = (fundingLines: FundingLine[], includeClones = false): CalculationDictionaryItem[] => {
     const result: CalculationDictionaryItem[] = [];
 
     for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
-        let stack: FundingLineOrCalculation[] = [];
-        let array: CalculationDictionaryItem[] = [];
-        let hashMap: any = {};
+        const stack: FundingLineOrCalculation[] = [];
+        const array: CalculationDictionaryItem[] = [];
+        const hashMap: any = {};
 
         stack.push(fundingLines[fundingLine]);
 
@@ -510,13 +510,13 @@ export const getAllCalculations = (fundingLines: FundingLine[], includeClones: b
     return result.sort(compareNode);
 }
 
-export const getAllFundingLines = (fundingLines: FundingLine[], includeClones: boolean = false): FundingLineDictionaryItem[] => {
+export const getAllFundingLines = (fundingLines: FundingLine[], includeClones = false): FundingLineDictionaryItem[] => {
     const result: FundingLineDictionaryItem[] = [];
 
     for (let fundingLine = 0; fundingLine < fundingLines.length; fundingLine++) {
-        let stack: FundingLineOrCalculation[] = [];
-        let array: FundingLineDictionaryItem[] = [];
-        let hashMap: any = {};
+        const stack: FundingLineOrCalculation[] = [];
+        const array: FundingLineDictionaryItem[] = [];
+        const hashMap: any = {};
 
         stack.push(fundingLines[fundingLine]);
 

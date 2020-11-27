@@ -1,6 +1,6 @@
 ﻿import {AxiosError} from "axios";
 
-export function createMockAxiosError(data: any, status: number = 400, message: string = "This is a mock Axios error") {
+export function createMockAxiosError(data: any, status = 400, message = "This is a mock Axios error") {
     const mockError: AxiosError = {
         toJSON(): object {
             return {};

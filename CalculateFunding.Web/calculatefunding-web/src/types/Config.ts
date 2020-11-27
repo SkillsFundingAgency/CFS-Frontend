@@ -5,4 +5,4 @@ export interface Config {
     debugOn: boolean,
     tracingOn: boolean,
     appInsightsKey: string
-};
+}

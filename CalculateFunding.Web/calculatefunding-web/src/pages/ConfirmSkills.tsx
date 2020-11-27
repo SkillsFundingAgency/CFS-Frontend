@@ -8,7 +8,7 @@ import {updateUserConfirmedSkills} from "../actions/userAction";
 import {IStoreState} from "../reducers/rootReducer";
 
 export const ConfirmSkills = () => {
-    let hasConfirmedSkills: boolean | undefined = useSelector((state: IStoreState) => state.userState && state.userState.hasConfirmedSkills);
+    const hasConfirmedSkills: boolean | undefined = useSelector((state: IStoreState) => state.userState && state.userState.hasConfirmedSkills);
 
     const dispatch = useDispatch();
     const history = useHistory();

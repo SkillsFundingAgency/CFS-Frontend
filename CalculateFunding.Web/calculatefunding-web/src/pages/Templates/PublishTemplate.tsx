@@ -43,7 +43,7 @@ export const PublishTemplate = () => {
     const [template, setTemplate] = useState<TemplateResponse>();
     const {canApproveTemplate, missingPermissions} = useTemplatePermissions(["approve"], template ? [template.fundingStreamId] : []);
     let errorCount = 0;
-    let {templateId} = useParams();
+    const {templateId} = useParams();
 
     useEffectOnce(() => {
         window.scrollTo(0, 0);

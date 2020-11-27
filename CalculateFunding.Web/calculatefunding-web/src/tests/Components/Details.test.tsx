@@ -13,7 +13,7 @@ describe('<Details />', () => {
     it(' renders a panel', () => {
         const wrapper = mount(<Details body={"Test Body"} title="Test Title"/>);
 
-        let actual = wrapper.find('.govuk-details');
+        const actual = wrapper.find('.govuk-details');
 
         expect(actual.children().length).toBe(2);
     });
@@ -21,7 +21,7 @@ describe('<Details />', () => {
     it(' has the correct title', () => {
         const wrapper = mount(<Details body="Test Body" title="Test Title"/>);
 
-        let actual = wrapper.find('.govuk-details__summary-text');
+        const actual = wrapper.find('.govuk-details__summary-text');
 
         expect(actual.text() === "Test Title").toBeTruthy();
 
@@ -30,7 +30,7 @@ describe('<Details />', () => {
     it(' has the correct body text', () => {
         const wrapper = mount(<Details body="Test Body" title="Test Title"/>);
 
-        let actual = wrapper.find('.govuk-details__text');
+        const actual = wrapper.find('.govuk-details__text');
 
         expect(actual.contains("Test Body")).toBeTruthy();
 

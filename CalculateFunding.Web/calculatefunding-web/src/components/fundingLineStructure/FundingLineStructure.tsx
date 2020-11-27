@@ -5,7 +5,7 @@ import React, {MutableRefObject, useRef} from "react";
 
 export function getDistinctOrderedFundingLineCalculations(fundingLinesToFilter: IFundingStructureItem[])
 {
-    let calculationNames: string[] = [];
+    const calculationNames: string[] = [];
     fundingLinesToFilter.map(function searchFundingLines(fundingStructureItem: IFundingStructureItem) : any {
         if (fundingStructureItem.type === FundingStructureType.Calculation)
         {
@@ -70,7 +70,7 @@ export function setExpandStatusByFundingLineName(fundingLines: IFundingStructure
 }
 
 export function checkIfShouldOpenAllSteps(fundingStructureItems: IFundingStructureItem[]) {
-    let openAllSteps: boolean = true;
+    let openAllSteps = true;
     fundingStructureItems.map(
         function searchFundingLines(fundingStructureItem: IFundingStructureItem) {
             if (!fundingStructureItem.expanded && fundingStructureItem.fundingStructureItems != null) {

@@ -55,7 +55,7 @@ export function SpecificationsList() {
             return result;
         };
         getAllSpecifications().then((result) => {
-            let specifications = result.data as SpecificationListResults;
+            const specifications = result.data as SpecificationListResults;
             setSpecificationListResults(specifications);
             setIsLoading(false);
         });
@@ -84,14 +84,14 @@ export function SpecificationsList() {
             }
         });
 
-        let criteria = searchCriteria;
+        const criteria = searchCriteria;
         criteria.page = pageNumber;
 
         populateSpecifications(criteria);
     }
 
     function filterByFundingPeriod(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = searchCriteria.fundingPeriods;
+        const filterUpdate = searchCriteria.fundingPeriods;
         if (e.target.checked) {
 
             filterUpdate.push(e.target.value);
@@ -103,13 +103,13 @@ export function SpecificationsList() {
             return {...prevState, fundingPeriods: filterUpdate}
         });
 
-        let request = searchCriteria;
+        const request = searchCriteria;
         request.fundingPeriods = filterUpdate;
         populateSpecifications(request);
     }
 
     function filterByFundingStream(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = searchCriteria.fundingStreams;
+        const filterUpdate = searchCriteria.fundingStreams;
         if (e.target.checked) {
 
             filterUpdate.push(e.target.value);
@@ -121,13 +121,13 @@ export function SpecificationsList() {
             return {...prevState, fundingStreams: filterUpdate}
         });
 
-        let request = searchCriteria;
+        const request = searchCriteria;
         request.fundingStreams = filterUpdate;
         populateSpecifications(request);
     }
 
     function filterByStatus(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = searchCriteria.status;
+        const filterUpdate = searchCriteria.status;
         if (e.target.checked) {
 
             filterUpdate.push(e.target.value);
@@ -139,20 +139,20 @@ export function SpecificationsList() {
             return {...prevState, status: filterUpdate}
         });
 
-        let request = searchCriteria;
+        const request = searchCriteria;
         request.status = filterUpdate;
 
         populateSpecifications(searchCriteria);
     }
 
     function filterBySearchTerm(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = e.target.value;
+        const filterUpdate = e.target.value;
 
         setSearchCriteria(prevState => {
             return {...prevState, searchTerm: filterUpdate}
         });
 
-        let request = searchCriteria;
+        const request = searchCriteria;
         request.searchText = filterUpdate;
         populateSpecifications(request);
     }

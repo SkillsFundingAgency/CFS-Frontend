@@ -75,11 +75,11 @@ export function DownloadDataSchema() {
     }
 
     function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-        let filters: string [] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
+        const filters: string [] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
         if (enableFilter) {
             if (filters.indexOf(filterValue) === -1) {
                 filters.push(filterValue);
-                let newFiltersValue: any = {};
+                const newFiltersValue: any = {};
                 newFiltersValue[filterKey] = filters;
                 setSearchRequest(prevState => {
                     return {...prevState, filters: newFiltersValue, pageNumber: 1}
@@ -97,7 +97,7 @@ export function DownloadDataSchema() {
                 }
                 else
                 {
-                    let newFiltersValue: any = {};
+                    const newFiltersValue: any = {};
                     newFiltersValue[filterKey] = filters;
                     setSearchRequest(prevState => {
                         return {...prevState, filters: newFiltersValue, pageNumber: 1}
@@ -140,7 +140,7 @@ export function DownloadDataSchema() {
     function filterSearch(keywords: string, originalFilters: SearchFacetValue[], currentFilters: SearchFacetValue[])
     {
         if (keywords.length >= 3) {
-            let copyOfFilters: SearchFacetValue[] = originalFilters as SearchFacetValue[];
+            const copyOfFilters: SearchFacetValue[] = originalFilters as SearchFacetValue[];
             return copyOfFilters.filter(x => x.name.toLowerCase().includes(keywords.toLowerCase()));
         }
         if (keywords.length === 0)

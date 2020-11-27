@@ -13,7 +13,7 @@ export function ViewProvidersFundingStreamSelection() {
     const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
     const [isFormValid, setIsFormValid] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState(false);
-    let history = useHistory();
+    const history = useHistory();
 
     useEffectOnce(() => {
         setIsLoading(true);

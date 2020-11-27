@@ -99,7 +99,7 @@ export const useSpecificationPermissions = (
 
 
     const missingPermissions = useMemo(() => {
-        let missing: string[] = [];
+        const missing: string[] = [];
         if (!canEditSpecification && requiredPermissions.includes(SpecificationPermissions.Edit)) {
             missing.push(SpecificationPermissions.Edit);
         }

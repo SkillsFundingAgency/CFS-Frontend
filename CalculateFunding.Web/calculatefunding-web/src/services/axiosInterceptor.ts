@@ -10,7 +10,7 @@ const configurationPromise: Promise<Config> = (window as any)['configuration'];
 
 export function initialiseAxios() {
     configurationPromise.then(response => {
-        let configuration = response;
+        const configuration = response;
 
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 

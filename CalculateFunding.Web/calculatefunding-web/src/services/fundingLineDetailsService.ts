@@ -2,7 +2,7 @@ import axios from "axios";
 import {FundingLineProfile} from "../types/FundingLineProfile";
 import {FundingLineChangeViewModel} from "../types/PublishedProvider/FundingLineProfile";
 
-let baseURL = "/api/publishedproviderfundinglinedetails";
+const baseURL = "/api/publishedproviderfundinglinedetails";
 
 export async function getCurrentProfileConfigService(
     specificationId: string,

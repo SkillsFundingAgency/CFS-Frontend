@@ -10,7 +10,7 @@ import {FundingPeriod, Specification} from "../types/viewFundingTypes";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
 import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
 
-let baseURL = "/api/specs";
+const baseURL = "/api/specs";
 
 
 export async function getSpecificationSummaryService(specificationId: string): 

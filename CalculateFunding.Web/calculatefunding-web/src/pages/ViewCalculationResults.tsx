@@ -78,7 +78,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     });
     const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] =
         useState<CalculationProviderSearchRequestViewModel>(initialSearch);
-    let fundingStream: FundingStream = {
+    const fundingStream: FundingStream = {
         name: "",
         id: ""
     };
@@ -140,7 +140,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
     function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
         setIsLoading(true);
-        let filterUpdate = calculationProviderSearchRequest.providerType;
+        const filterUpdate = calculationProviderSearchRequest.providerType;
         if (e.target.checked) {
 
             filterUpdate.push(e.target.value);
@@ -155,7 +155,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
     function filterByProviderSubTypes(e: React.ChangeEvent<HTMLInputElement>) {
         setIsLoading(true);
-        let filterUpdate = calculationProviderSearchRequest.providerSubType;
+        const filterUpdate = calculationProviderSearchRequest.providerSubType;
         if (e.target.checked) {
 
             filterUpdate.push(e.target.value);
@@ -188,7 +188,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
     function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
         setIsLoading(true);
-        let filterUpdate = calculationProviderSearchRequest.localAuthority;
+        const filterUpdate = calculationProviderSearchRequest.localAuthority;
 
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
@@ -205,7 +205,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
         if (searchTerm.length === 0 || searchTerm.length > 2) {
             setIsLoading(true);
 
-            let searchFields: string[] = [];
+            const searchFields: string[] = [];
             if (searchField != null && searchField !== "") {
                 searchFields.push(searchField);
             }
@@ -223,7 +223,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     }
 
     function setPagination(e: number) {
-        let request = calculationProviderSearchRequest;
+        const request = calculationProviderSearchRequest;
         request.pageNumber = e;
         setCalculationProviderSearchRequest(prevState => {
             return {...prevState, pageNumber: e}
@@ -380,7 +380,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
 
                             </div>
                             {providers.calculationProviderResults.map(cpr => {
-                                    let value = cpr.calculationResultDisplay;
+                                    const value = cpr.calculationResultDisplay;
                                     return <AccordianPanel id={cpr.id} expanded={false} title={cpr.providerName}
                                                            subtitle={"Value:"} boldSubtitle={` ${value}`}
                                                            key={cpr.id} autoExpand={autoExpand}>

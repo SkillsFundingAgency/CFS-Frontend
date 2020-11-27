@@ -1,6 +1,6 @@
 import axios from "axios"
 
-let baseURL = "/api/providerversions";
+const baseURL = "/api/providerversions";
 
 export async function getProviderByFundingStreamIdService(fundingStreamId:string) {
     return axios(`${baseURL}/getbyfundingstream/${fundingStreamId}`, {

@@ -299,7 +299,7 @@ function OrganisationChartNode({
             )}
         </li>
     );
-};
+}
 
 OrganisationChartNode.defaultProps = defaultProps;
 

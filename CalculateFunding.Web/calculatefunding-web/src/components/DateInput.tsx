@@ -26,7 +26,7 @@ export function DateInput(props: { date: Date, callback: any, inputName?: string
     function setDateTime(day: string) {
         if (!isNaN(Date.parse(day)))
         {
-            let newDate = DateTime.fromISO(day, {zone: 'utc'});
+            const newDate = DateTime.fromISO(day, {zone: 'utc'});
             const updatedDate: Date = newDate.toJSDate();
             setDate(getDateString(updatedDate));
             if (updatedDate !== undefined && !isNaN(updatedDate.getDate())) {

@@ -49,7 +49,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const [initialTab, setInitialTab] = useState<string>("");
     const location = useLocation();
-    let history = useHistory();
+    const history = useHistory();
 
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));

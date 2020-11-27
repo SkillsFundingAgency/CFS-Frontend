@@ -12,7 +12,7 @@ describe('<ErrorSummary />', () => {
         const wrapper = shallow(<ErrorSummary title="Test title" error="Error message"
                                               suggestion="Suggestion to user"/>);
 
-        let actual = wrapper.find('div.govuk-error-summary');
+        const actual = wrapper.find('div.govuk-error-summary');
 
         expect(actual.children().length).toBe(2);
     });
@@ -21,7 +21,7 @@ describe('<ErrorSummary />', () => {
         const wrapper = shallow(<ErrorSummary title="" error="Error message"
                                               suggestion="Suggestion to user"/>);
 
-        let actual = wrapper.find('div.govuk-error-summary');
+        const actual = wrapper.find('div.govuk-error-summary');
 
         expect(actual.props('hidden')).toBeTruthy();
     });

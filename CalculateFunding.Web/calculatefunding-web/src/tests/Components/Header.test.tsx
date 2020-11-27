@@ -11,7 +11,7 @@ const {shallow} = enzyme;
 it('shows the Beta panel', () => {
     const wrapper = shallow(<Header location={Section.Home} />);
 
-    let actual = wrapper.find('strong.govuk-phase-banner__content__tag');
+    const actual = wrapper.find('strong.govuk-phase-banner__content__tag');
 
     expect(actual).toBeTruthy();
 });
@@ -19,7 +19,7 @@ it('shows the Beta panel', () => {
 it('shows Calculate funding in the service name', ()=>{
    const wrapper = shallow(<Header location={Section.Home} />);
 
-   let actual = wrapper.find('govuk-header__link--service-name');
+   const actual = wrapper.find('govuk-header__link--service-name');
 
    expect(actual.contains("Calculate funding"));
 });
@@ -27,7 +27,7 @@ it('shows Calculate funding in the service name', ()=>{
 it('shows GOV.UK in the logotype text area', ()=>{
    const wrapper = shallow(<Header location={Section.Home} />);
 
-   let actual = wrapper.find('govuk-header__logotype-text');
+   const actual = wrapper.find('govuk-header__logotype-text');
 
    expect(actual.contains("GOV.UK"));
 });

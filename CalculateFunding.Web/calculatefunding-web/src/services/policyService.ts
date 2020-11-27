@@ -2,9 +2,9 @@ import axios, {AxiosResponse} from "axios"
 import {PublishedFundingTemplate} from "../types/TemplateBuilderDefinitions";
 import {FundingConfiguration} from "../types/FundingConfiguration";
 
-let baseURL = "/api/policy";
+const baseURL = "/api/policy";
 
-export async function getFundingStreamsService(securityTrimmed: boolean = false) {
+export async function getFundingStreamsService(securityTrimmed = false) {
     return axios(`${baseURL}/fundingstreams/${securityTrimmed}`, {
         method: 'GET',
         headers: {

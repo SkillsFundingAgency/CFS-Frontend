@@ -67,7 +67,7 @@ export function CalculationItem({
     const validateName = (name: string) => {
         const fieldName = "calculation-name";
         clearErrorMessages(fieldName);
-        let isValid: boolean = true;
+        let isValid = true;
 
         if (IsSameAsInitialName(name)) {
             return true;
@@ -183,7 +183,7 @@ export function CalculationItem({
     const validateCalculationId = (id: string) => {
         const fieldName = "calculation-id";
         clearErrorMessages(fieldName);
-        let isValid: boolean = true;
+        let isValid = true;
 
         if (IsSameAsInitialId(id)) {
             return true;

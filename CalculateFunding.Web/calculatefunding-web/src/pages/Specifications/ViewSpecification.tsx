@@ -62,7 +62,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         templateIds: {}
     };
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
-    let specificationId = match.params.specificationId;
+    const specificationId = match.params.specificationId;
 
     const {errors, addErrorMessage, clearErrorMessages} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
@@ -73,7 +73,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         useSpecificationPermissions(specificationId,
             [SpecificationPermissions.ApproveAllCalculations, SpecificationPermissions.ChooseFunding]);
 
-    let history = useHistory();
+    const history = useHistory();
     const location = useLocation();
 
     useEffect(() => {

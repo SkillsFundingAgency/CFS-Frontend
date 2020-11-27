@@ -156,7 +156,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     }
 
     function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-        let filters: string [] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
+        const filters: string [] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
         if (enableFilter) {
             if (filters.indexOf(filterValue) === -1) {
                 filters.push(filterValue);
@@ -167,7 +167,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                 filters.splice(index, 1)
             }
         }
-        let newFiltersValue: any = {};
+        const newFiltersValue: any = {};
         newFiltersValue[filterKey] = filters;
         setSearchRequest(prevState => {
             return {...prevState, filters: newFiltersValue, pageNumber: 1}

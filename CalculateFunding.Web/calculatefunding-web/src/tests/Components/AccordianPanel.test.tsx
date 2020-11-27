@@ -12,7 +12,7 @@ describe('<AccordianPanel />', () => {
                                                 boldSubtitle="Bold Test Subtitle" expanded={false}
                                                 subtitle="Test Subtitle" title="Test Title"/>);
 
-        let actual = wrapper.find('#testPanel');
+        const actual = wrapper.find('#testPanel');
 
         expect(actual.children().length).toBe(1);
     });
@@ -22,7 +22,7 @@ describe('<AccordianPanel />', () => {
                                                 boldSubtitle="Bold Test Subtitle" expanded={true}
                                                 subtitle="Test Subtitle" title="Test Title"/>);
 
-        let actual = wrapper.find('#testPanel');
+        const actual = wrapper.find('#testPanel');
 
         expect(actual.hasClass('govuk-accordion__section--expanded')).toBeTruthy();
     });
@@ -32,7 +32,7 @@ describe('<AccordianPanel />', () => {
                                                 boldSubtitle="Bold Test Subtitle" expanded={true}
                                                 subtitle="Test Subtitle" title="Test Title"/>);
 
-        let actual = wrapper.find('#testPanel');
+        const actual = wrapper.find('#testPanel');
 
         expect(actual.hasClass('govuk-accordion__section--expanded')).toBeTruthy();
 
@@ -43,7 +43,7 @@ describe('<AccordianPanel />', () => {
                                                 boldSubtitle="Bold Test Subtitle" expanded={true}
                                                 subtitle="Test Subtitle" title="Test Title"/>);
 
-        let actual = wrapper.find('#accordion-default-heading-testPanel');
+        const actual = wrapper.find('#accordion-default-heading-testPanel');
 
         expect(actual.text() === "Test Title").toBeTruthy();
 
@@ -54,7 +54,7 @@ describe('<AccordianPanel />', () => {
                                                 boldSubtitle="Bold Test Subtitle" expanded={true}
                                                 subtitle="Test Subtitle" title="Test Title"/>);
 
-        let actual = wrapper.find('p');
+        const actual = wrapper.find('p');
 
         expect(actual.contains("Test Subtitle")).toBeTruthy();
 
@@ -65,7 +65,7 @@ describe('<AccordianPanel />', () => {
                                                 boldSubtitle="Bold Test Subtitle" expanded={true}
                                                 subtitle="Test Subtitle" title="Test Title"/>);
 
-        let actual = wrapper.find('p');
+        const actual = wrapper.find('p');
 
         expect(actual.contains("Bold Test Subtitle")).toBeTruthy();
 

@@ -40,7 +40,7 @@ export const useTemplatePermissions = (requiredPermissions: string[], requiredFu
     }, [permissions, requiredFundingStreams]);
 
     const missingPermissions = useMemo(() => {
-        let missing: string[] = [];
+        const missing: string[] = [];
         if (!canEditTemplate && requiredPermissions.includes(TemplatePermissions.Edit)) {
             missing.push(TemplatePermissions.Edit);
         }
@@ -60,7 +60,7 @@ export const useTemplatePermissions = (requiredPermissions: string[], requiredFu
         if (!permissions) {
             return;
         }
-        let permissibleFundingStreams: { "fundingStreamId": string, "permission": string }[] = permissions.map(p => {
+        const permissibleFundingStreams: { "fundingStreamId": string, "permission": string }[] = permissions.map(p => {
             return [{
                 "fundingStreamId": p.fundingStreamId,
                 "permission": p.canCreateTemplates ? TemplatePermissions.Create : ""

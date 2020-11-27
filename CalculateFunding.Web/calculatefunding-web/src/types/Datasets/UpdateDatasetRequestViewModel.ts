@@ -23,7 +23,7 @@ export interface DatasetValidateStatusResponse {
     validationFailures: { [key: string]: string[] };
 }
 
-export let ValidationStates: { [state: string]: string } = {
+export const ValidationStates: { [state: string]: string } = {
     "Queued": "Queued for processing",
     "Processing": "Processing and prevalidation checks",
     "ValidatingExcelWorkbook": "Validating Excel Workbook",

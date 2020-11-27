@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from "axios"
 import {IFundingStructureItem} from "../types/FundingStructureItem";
 
-let baseURL = "/api/fundingstructures";
+const baseURL = "/api/fundingstructures";
 
 export async function getFundingLineStructureService(specificationId: string, fundingPeriodId: string, fundingStreamId: string): Promise<AxiosResponse<IFundingStructureItem[]>> {
     return axios(`${baseURL}/specifications/${specificationId}/fundingperiods/${fundingPeriodId}/fundingstreams/${fundingStreamId}`, {

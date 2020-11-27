@@ -39,11 +39,11 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
 
     const [checkedVersions, setCheckedVersions] = useState<string[]>([]);
     const [disableCompare, setDisableCompare] = useState<boolean>(true);
-    let history = useHistory();
+    const history = useHistory();
     
     function selectVersion(e: React.ChangeEvent<HTMLInputElement>) {
         const selectedVersion = e.target.value;
-        let versions = checkedVersions;
+        const versions = checkedVersions;
 
         if (!e.target.checked) {
 

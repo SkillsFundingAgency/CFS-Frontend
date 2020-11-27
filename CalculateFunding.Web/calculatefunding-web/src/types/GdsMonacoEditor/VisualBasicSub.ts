@@ -14,23 +14,23 @@ export class VisualBasicSub implements ILocalFunction {
         }
     }
 
-    public label: string = "";
+    public label = "";
 
-    public friendlyName: string = "";
+    public friendlyName = "";
 
-    public description: string = "";
+    public description = "";
 
     public parameters: Array<IFunctionParameter> = [];
 
-    public returnType: string = "";
+    public returnType = "";
 
-    public isCustom: boolean = false;
+    public isCustom = false;
 
     public getFunctionAndParameterDescription(): string {
 
-        let parameterDescription: Array<string> = [];
+        const parameterDescription: Array<string> = [];
         if (this.parameters) {
-            for (let p in this.parameters) {
+            for (const p in this.parameters) {
                 parameterDescription.push(this.parameters[p].type + " " + this.parameters[p].name);
             }
         }

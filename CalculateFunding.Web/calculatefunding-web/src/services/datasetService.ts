@@ -28,7 +28,7 @@ export async function getDatasetDefinitionsService() {
 }
 
 export async function assignDatasetSchemaUpdateService(name: string, description: string, dataSchemaId: string, specificationId: string, isSetAsProviderData: boolean) {
-    let data: AssignDatasetSchemaUpdateViewModel = {
+    const data: AssignDatasetSchemaUpdateViewModel = {
         datasetDefinitionId: dataSchemaId,
         description: description,
         name: name,

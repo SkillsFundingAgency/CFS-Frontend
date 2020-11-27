@@ -40,7 +40,7 @@ interface OrganisationChartProps {
     itemRefs?: React.MutableRefObject<{}> | undefined,
     chartScale?: number,
     targetScale?: number,
-};
+}
 
 const defaultProps = {
     pan: false,
@@ -188,7 +188,7 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
                     );
                 }
             } else {
-                let matrix = transform.split(",");
+                const matrix = transform.split(",");
                 if (transform.indexOf("3d") === -1) {
                     matrix[4] = newX.toString();
                     matrix[5] = newY + ")";
@@ -211,7 +211,7 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
             let lastX = 0;
             let lastY = 0;
             if (transform !== "") {
-                let matrix = transform.split(",");
+                const matrix = transform.split(",");
                 if (transform.indexOf("3d") === -1) {
                     lastX = parseInt(matrix[4]);
                     lastY = parseInt(matrix[5]);
@@ -262,7 +262,7 @@ const OrganisationChart = forwardRef<HTMLDivElement, OrganisationChartProps>(
         };
 
         const zoomHandler = (e: {deltaY: number;}) => {
-            let newScale = 1 + (e.deltaY > 0 ? -0.1 : 0.05);
+            const newScale = 1 + (e.deltaY > 0 ? -0.1 : 0.05);
             updateChartScale(newScale);
         };
 

@@ -68,10 +68,22 @@
     "start": "set HTTPS=true&&react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test --testResultsProcessor ./node_modules/jest-junit-reporter",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:jest/recommended"
+    ],
+    "plugins": [
+      "react",
+      "@typescript-eslint",
+      "jest"
+    ],
+    "parser": "@typescript-eslint/parser"
   },
   "browserslist": {
     "production": [

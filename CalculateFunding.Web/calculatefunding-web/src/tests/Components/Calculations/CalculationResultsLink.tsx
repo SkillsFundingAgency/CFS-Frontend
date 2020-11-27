@@ -10,7 +10,7 @@ describe('<CalculationResultsLink />', () => {
     it(' renders a link', () => {
         const wrapper = shallow(<CalculationResultsLink calculationId="1234" />);
 
-        let actual = wrapper.find('Link');
+        const actual = wrapper.find('Link');
 
         expect(actual.children().length).toBe(1);
     });

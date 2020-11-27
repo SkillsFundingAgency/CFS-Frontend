@@ -32,7 +32,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [saveErrorOccurred, setSaveErrorOccurred] = useState<boolean>(false);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
     const {errors, addErrorMessage, addError} = useErrors();
-    let history = useHistory();
+    const history = useHistory();
 
     const {relationshipData, isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
 

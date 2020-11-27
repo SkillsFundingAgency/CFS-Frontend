@@ -18,7 +18,7 @@ export const useSpecificationSummary = (specificationId: string,
                                         staleTime: number = milliseconds.OneHour)
     : SpecificationSummaryQueryResult => {
 
-    let config: QueryConfig<SpecificationSummary, AxiosError> = {
+    const config: QueryConfig<SpecificationSummary, AxiosError> = {
         cacheTime: milliseconds.OneHour,
         staleTime: staleTime,
         refetchOnWindowFocus: false,

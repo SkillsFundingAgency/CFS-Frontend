@@ -57,7 +57,7 @@ export function ManageDataSourceFiles() {
     })
 
     function setPagination(e: number) {
-        let request = searchRequest;
+        const request = searchRequest;
         request.pageNumber = e;
         setSearchRequest(prevState => {
             return {...prevState, pageNumber: e}
@@ -91,7 +91,7 @@ export function ManageDataSourceFiles() {
         const term = e.target.value;
 
         if ((term.length === 0 && searchRequest.searchTerm.length !== 0) || term.length > 2) {
-            let request = searchRequest;
+            const request = searchRequest;
             request.searchTerm = term;
             request.pageNumber = 1;
             setSearchRequest(prevState => {
@@ -102,7 +102,7 @@ export function ManageDataSourceFiles() {
     }
 
     function filterByDataSchema(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = searchRequest.dataSchemas;
+        const filterUpdate = searchRequest.dataSchemas;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
@@ -113,14 +113,14 @@ export function ManageDataSourceFiles() {
             return {...prevState, dataSchemas: filterUpdate, pageNumber: 1}
         });
 
-        let request = searchRequest;
+        const request = searchRequest;
         request.dataSchemas = filterUpdate;
         request.pageNumber = 1
         searchDataSourceFiles(request);
     }
 
     function filterByFundingStreams(e: React.ChangeEvent<HTMLInputElement>) {
-        let filterUpdate = searchRequest.fundingStreams;
+        const filterUpdate = searchRequest.fundingStreams;
         if (e.target.checked) {
             filterUpdate.push(e.target.value);
         } else {
@@ -131,7 +131,7 @@ export function ManageDataSourceFiles() {
             return {...prevState, fundingStreams: filterUpdate, pageNumber: 1}
         });
 
-        let request = searchRequest;
+        const request = searchRequest;
         request.fundingStreams = filterUpdate;
         request.pageNumber = 1;
         searchDataSourceFiles(request);

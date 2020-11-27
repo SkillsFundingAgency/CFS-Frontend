@@ -61,9 +61,9 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
 
-    let specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
+    const specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
-    let specificationId = match.params.specificationId;
+    const specificationId = match.params.specificationId;
 
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
@@ -73,7 +73,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
 
         getDownloadableReportsService(specificationId)
             .then((result) => {
-                    let response = result.data as ReportMetadataViewModel[];
+                    const response = result.data as ReportMetadataViewModel[];
                     setDownloadableReports(response);
             });
     }, [specificationId]);

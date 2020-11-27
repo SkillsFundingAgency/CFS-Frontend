@@ -40,7 +40,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
     const [isSaving, setIsSaving] = useState(false);
     document.title = `Create Additional Calculation - Calculate Funding`;
 
-    let history = useHistory();
+    const history = useHistory();
 
     const onCalculationChange = async (state: CalculationSourceCodeState) => {
         setCalculationState(state);
@@ -62,7 +62,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
             clearErrorMessages();
             setIsSaving(true);
 
-            let createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel = {
+            const createAdditionalCalculationViewModel: CreateAdditionalCalculationViewModel = {
                 calculationName: additionalCalculationName,
                 calculationType: additionalCalculationType,
                 sourceCode: calculationState.sourceCode

@@ -104,7 +104,7 @@ export async function compileCalculationPreviewService(
 }
 
 export async function getCodeContextService(specificationId: string) {
-    let response = await axios(`/api/specs/${specificationId}/codeContext`, {
+    const response = await axios(`/api/specs/${specificationId}/codeContext`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

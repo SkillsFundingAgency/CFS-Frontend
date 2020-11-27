@@ -19,7 +19,7 @@ interface CreateDatasetPageRoute {
 
 export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRoute>) {
     const specificationId = match.params.specificationId;
-    let history = useHistory();
+    const history = useHistory();
 
     const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
         approvalStatus: "",
@@ -71,7 +71,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
 
         getSpecificationSummaryService(match.params.specificationId).then((response) => {
             if (response.status === 200) {
-                let result = response.data as SpecificationSummary
+                const result = response.data as SpecificationSummary
                 setSpecificationSummary(result);
                 getDatasetsForFundingStreamService(result.fundingStreams[0].id).then((response) => {
                     if (response.status === 200) {

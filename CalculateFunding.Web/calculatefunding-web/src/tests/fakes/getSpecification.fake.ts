@@ -26,4 +26,4 @@ export function fakeSpecification (specificationId : string) : void  {
         "id": "1-fakeId-1",
         "name": "Fake specification"
     });
-};
+}

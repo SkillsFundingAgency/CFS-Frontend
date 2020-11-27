@@ -51,7 +51,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
     const [isApproving, setIsApproving] = useState(false);
     const [calculationState, setCalculationState] = useState<CalculationSourceCodeState | undefined>();
     const [calculationType, setCalculationType] = useState<ValueType | undefined>();
-    let history = useHistory();
+    const history = useHistory();
     document.title = `Edit ${calculation?.calculationType} Calculation - Calculate Funding`;
 
     const onCalculationChange = async (state: CalculationSourceCodeState) => {
@@ -71,7 +71,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
         setIsSaving(true);
 
-        let updateAdditionalCalculationViewModel: UpdateCalculationViewModel = {
+        const updateAdditionalCalculationViewModel: UpdateCalculationViewModel = {
             calculationName: calculation.name,
             valueType: calculationType ?? calculation.valueType,
             sourceCode: calculationState.sourceCode,

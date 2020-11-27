@@ -13,8 +13,8 @@ export const defaultFacets = [
 ];
 
 export const createPublishedProviderResult = (providers: PublishedProviderResult[],
-                                              canApprove: boolean = true,
-                                              canPublish: boolean = true,
+                                              canApprove = true,
+                                              canPublish = true,
                                               facets = defaultFacets)
     : PublishedProviderSearchResults => {
     return {

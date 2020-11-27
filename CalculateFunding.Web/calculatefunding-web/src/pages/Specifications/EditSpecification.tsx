@@ -68,7 +68,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         error: ""
     });
     const [isLoading, setIsLoading] = useState(false);
-    let history = useHistory();
+    const history = useHistory();
 
     useEffectOnce(() => {
         const getSpecification = async () => {
@@ -181,10 +181,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             setFormValid({formValid: true, formSubmitted: true});
             setLoadingMessage({title: "Updating Specification", subTitle: "Please wait whilst we update the specification"});
             setIsLoading(true);
-            let assignedTemplateIdsValue: any = {};
+            const assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[specificationSummary.fundingStreams[0].id] = selectedTemplateVersion;
 
-            let updateSpecificationViewModel: UpdateSpecificationViewModel = {
+            const updateSpecificationViewModel: UpdateSpecificationViewModel = {
                 description: selectedDescription,
                 fundingPeriodId: specificationSummary.fundingPeriod.id,
                 fundingStreamId: specificationSummary.fundingStreams[0].id,

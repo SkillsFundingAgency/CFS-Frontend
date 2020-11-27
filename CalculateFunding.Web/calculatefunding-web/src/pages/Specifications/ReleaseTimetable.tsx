@@ -31,7 +31,7 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
         async function getReleaseTimetable() {
             try {
                 const response = await getReleaseTimetableForSpecificationService(specificationId);
-                let result = response.data as ReleaseTimetableSummary;
+                const result = response.data as ReleaseTimetableSummary;
                 if (result.content.earliestPaymentAvailableDate != null) {
                     setReleaseDate(DateTime.fromISO(result.content.earliestPaymentAvailableDate).toJSDate());
                 }
@@ -84,13 +84,13 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
     }
 
     function updateDateWithTime(date: Date, time: string) {
-        let year = `${date.getFullYear()}`
-        let monthNumber = date.getMonth() + 1;
-        let month = `${monthNumber < 10 ? "0" + monthNumber : monthNumber}`;
-        let day = `${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`;
-        let hours = `T${parseInt(time) < 10 ? "0" + parseInt(time) : parseInt(time)}:00:00.000`;
+        const year = `${date.getFullYear()}`
+        const monthNumber = date.getMonth() + 1;
+        const month = `${monthNumber < 10 ? "0" + monthNumber : monthNumber}`;
+        const day = `${date.getDate() < 10 ? "0" + date.getDate() : date.getDate()}`;
+        const hours = `T${parseInt(time) < 10 ? "0" + parseInt(time) : parseInt(time)}:00:00.000`;
 
-        let newDate = DateTime.fromISO(`${year}-${month}-${day}${hours}`)
+        const newDate = DateTime.fromISO(`${year}-${month}-${day}${hours}`)
         return newDate.toJSDate();
     }
 
@@ -132,8 +132,8 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
         setCanTimetableBeUpdated(false);
         setIsSavingReleaseTimetable(true);
 
-        let navisionDateTime = updateDateWithTime(navisionDate, navisionTime);
-        let releaseDateTime = updateDateWithTime(releaseDate, releaseTime);
+        const navisionDateTime = updateDateWithTime(navisionDate, navisionTime);
+        const releaseDateTime = updateDateWithTime(releaseDate, releaseTime);
         saveReleaseTimetable = {
             specificationId: specificationId,
             statementDate: navisionDateTime,

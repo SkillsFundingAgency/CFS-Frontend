@@ -13,7 +13,7 @@ export class LoggerService {
     
     trace(msg: string) {
         configurationPromise.then(response => {
-            let configuration = response;
+            const configuration = response;
             if (configuration.tracingOn)
             {
                 console.log(msg);
@@ -23,7 +23,7 @@ export class LoggerService {
 
     debug(msg: string) {
         configurationPromise.then(response => {
-            let configuration = response;
+            const configuration = response;
             if( configuration.debugOn )
             {
                 console.log(msg);

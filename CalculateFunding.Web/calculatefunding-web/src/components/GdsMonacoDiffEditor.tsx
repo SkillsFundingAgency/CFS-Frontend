@@ -9,11 +9,11 @@ export function GdsMonacoDiffEditor(props: {
 }) {
     const element = useRef<HTMLDivElement>();
     const editor = useRef<monaco.editor.IStandaloneDiffEditor>();
-    let isInline = props.inlineCodeViewer;
+    const isInline = props.inlineCodeViewer;
 
     useEffect(() => {
         if (element.current) {
-            let model: editor.IDiffEditorModel = {
+            const model: editor.IDiffEditorModel = {
                 original: monaco.editor.createModel(props.firstCalculationVersion, "text/plain"),
                 modified: monaco.editor.createModel(props.secondCalculationVersion, "text/plain")
             }
@@ -39,7 +39,7 @@ export function GdsMonacoDiffEditor(props: {
 
     useEffect(() => {
         if (editor.current && (editor.current.getOriginalEditor().getValue() !== props.firstCalculationVersion || editor.current.getModifiedEditor().getValue() !== props.secondCalculationVersion)) {
-            let model: editor.IDiffEditorModel = {
+            const model: editor.IDiffEditorModel = {
                 original: monaco.editor.createModel(props.firstCalculationVersion, "text/plain"),
                 modified: monaco.editor.createModel(props.secondCalculationVersion, "text/plain")
             }

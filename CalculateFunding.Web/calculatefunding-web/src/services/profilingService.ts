@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios"
 import {ProfileTotal} from "../types/FundingLineProfile";
 import {FundingStreamPeriodProfilePattern} from "../types/ProviderProfileTotalsForStreamAndPeriod";
 
-let baseURL = "/api/profiling";
+const baseURL = "/api/profiling";
 
 export async function getProfilePatternsService(fundingStreamId: string, fundingPeriodId: string) {
     return axios.get(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}`);

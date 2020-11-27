@@ -7,7 +7,7 @@ export enum NumberType {
 }
 
 export function formatNumber(value: number, type: NumberType, decimalPlaces: number) {
-    let decimalPointedNumber = parseFloat(String(Math.round(value * 100) / 100)).toFixed(decimalPlaces);
+    const decimalPointedNumber = parseFloat(String(Math.round(value * 100) / 100)).toFixed(decimalPlaces);
 
     let formattedNumber = decimalPointedNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
@@ -25,7 +25,7 @@ export function formatNumber(value: number, type: NumberType, decimalPlaces: num
 export function FormattedNumber(props: {value?: number, type: NumberType, decimalPlaces?: number | null}) {
     if (props.value === undefined || props.value === null) return <span></span>;
 
-    let decimalPoint = props.decimalPlaces != null && props.decimalPlaces !== undefined ? props.decimalPlaces : 2;
+    const decimalPoint = props.decimalPlaces != null && props.decimalPlaces !== undefined ? props.decimalPlaces : 2;
 
     const formattedNumber = formatNumber(props.value, props.type, decimalPoint);
 

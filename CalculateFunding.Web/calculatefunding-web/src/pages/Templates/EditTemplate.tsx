@@ -75,7 +75,7 @@ export function EditTemplate() {
     const orgchart = useRef<HTMLDivElement>(null);
     const descriptionRef = useRef<HTMLSpanElement>(null);
     const itemRefs = useRef({});
-    let {templateId, version} = useParams();
+    const {templateId, version} = useParams();
     const [enableUndo, setEnableUndo] = useState<boolean>(true);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isDirty, setIsDirty] = useState<boolean>(false);
@@ -182,12 +182,12 @@ export function EditTemplate() {
         setErrors([]);
     }
 
-    function getCalculations(includeClones: boolean = false): CalculationDictionaryItem[] {
+    function getCalculations(includeClones = false): CalculationDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
         return getAllCalculations(fundingLines, includeClones);
     }
 
-    function getFundingLines(includeClones: boolean = false): FundingLineDictionaryItem[] {
+    function getFundingLines(includeClones = false): FundingLineDictionaryItem[] {
         const fundingLines: FundingLine[] = ds.map(fl => fl.value);
         return getAllFundingLines(fundingLines, includeClones);
     }

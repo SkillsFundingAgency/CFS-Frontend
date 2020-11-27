@@ -48,7 +48,7 @@ export function LoadNewDataSource() {
         fundingStreamValid: true
     });
     const [errorResponse, setErrorResponse] = useState<NewDatasetVersionResponseErrorModel>();
-    let history = useHistory();
+    const history = useHistory();
 
     function getDatasetValidateStatus(operationId: string) {
         getDatasetValidateStatusService(operationId)
@@ -97,7 +97,7 @@ export function LoadNewDataSource() {
     }
 
     function updateDataSchemaSelection(e: string) {
-        let selection = dataSchemaSuggestions.filter(x => x.name === e)[0];
+        const selection = dataSchemaSuggestions.filter(x => x.name === e)[0];
 
         if (selection != null) {
             setSelectedDataSchema(selection.id);
@@ -168,7 +168,7 @@ export function LoadNewDataSource() {
     }
 
     function createDataset() {
-        let request: CreateDatasetRequestViewModel = {
+        const request: CreateDatasetRequestViewModel = {
             name: datasetSourceFileName,
             filename: uploadFileName,
             dataDefinitionId: selectedDataSchema,

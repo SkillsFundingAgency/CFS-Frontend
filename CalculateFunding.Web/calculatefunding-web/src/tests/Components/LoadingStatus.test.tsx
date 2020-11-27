@@ -11,7 +11,7 @@ describe('<LoadingStatus />', () => {
     it(' renders a loading status', () => {
         const wrapper = shallow(<LoadingStatus id={"testLoading"} title={"test title"} />);
 
-        let actual = wrapper.find("#testLoading");
+        const actual = wrapper.find("#testLoading");
 
         expect(actual.children().length).toBe(1);
     });
@@ -19,7 +19,7 @@ describe('<LoadingStatus />', () => {
     it(' has the correct title', () => {
         const wrapper = shallow(<LoadingStatus title={"test title"} />);
 
-        let actual = wrapper.find('h2.govuk-heading-l');
+        const actual = wrapper.find('h2.govuk-heading-l');
 
         expect(actual.text() === "test title").toBeTruthy();
     });
@@ -27,7 +27,7 @@ describe('<LoadingStatus />', () => {
     it(' has the correct sub title', () => {
         const wrapper = shallow(<LoadingStatus title={"test title"} subTitle={"test sub title"} />);
 
-        let actual = wrapper.find('h3.govuk-heading-m');
+        const actual = wrapper.find('h3.govuk-heading-m');
 
         expect(actual.text() === "test sub title").toBeTruthy();
     });
@@ -35,7 +35,7 @@ describe('<LoadingStatus />', () => {
     it(' has the correct description', () => {
         const wrapper = shallow(<LoadingStatus title={"test title"}  description={"test description"} />);
 
-        let actual = wrapper.find('p');
+        const actual = wrapper.find('p');
 
         expect(actual.text() === "test description").toBeTruthy();
     });
@@ -43,7 +43,7 @@ describe('<LoadingStatus />', () => {
     it(' hides component given hidden property is set to true', () => {
         const wrapper = shallow(<LoadingStatus id={"testLoading"} title={"test title"}  hidden={true} />);
 
-        let actual = wrapper.find("#testLoading");
+        const actual = wrapper.find("#testLoading");
 
         expect(actual.props().hidden).toBeTruthy();
     });

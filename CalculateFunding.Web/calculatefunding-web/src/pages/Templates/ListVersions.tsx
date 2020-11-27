@@ -17,7 +17,7 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {ErrorMessage} from "../../types/ErrorMessage";
 
 export const ListVersions = () => {
-    let {templateId} = useParams();
+    const {templateId} = useParams();
     const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(true);
     const [isLoadingTemplate, setIsLoadingTemplate] = useState<boolean>(true);
     const [template, setTemplate] = useState<TemplateResponse>();

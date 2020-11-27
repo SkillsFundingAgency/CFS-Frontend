@@ -19,7 +19,7 @@ interface TemplateBuilderNodeProps {
     isEditMode: boolean,
     dsKey: number,
     nextId: number,
-};
+}
 
 function TemplateBuilderNode({nodeData, addNode, openSideBar, onClickNode, isEditMode, dsKey, nextId}: TemplateBuilderNodeProps) {
     const handleAddLine = () => {
@@ -95,6 +95,6 @@ function TemplateBuilderNode({nodeData, addNode, openSideBar, onClickNode, isEdi
             }
         </div>
     );
-};
+}
 
 export default TemplateBuilderNode;

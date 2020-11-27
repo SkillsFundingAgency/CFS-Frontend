@@ -10,7 +10,7 @@ export function Home(props: { featureFlags: FeatureFlagsState }){
         fetch("/api/account/IsAuthenticated", {
             method: 'GET'
         }).then(function (response) {
-            let username = document.getElementById("username");
+            const username = document.getElementById("username");
 
             if (username != null) {
                 username.innerText = "";
