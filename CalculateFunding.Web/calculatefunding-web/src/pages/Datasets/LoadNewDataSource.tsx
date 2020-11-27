@@ -18,20 +18,25 @@ import {FundingStream} from "../../types/viewFundingTypes";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {NewDatasetVersionResponseErrorModel, NewDatasetVersionResponseViewModel} from "../../types/Datasets/NewDatasetVersionResponseViewModel";
-import {AxiosError, AxiosResponse} from "axios";
+import {AxiosError} from "axios";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
 import {DatasetValidateStatusResponse, ValidationStates} from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import {getFundingStreamsService} from "../../services/policyService";
 import {Footer} from "../../components/Footer";
+import {PermissionStatus} from "../../components/PermissionStatus";
+import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
+import {useSelector} from "react-redux";
+import {IStoreState} from "../../reducers/rootReducer";
 
 export function LoadNewDataSource() {
-
+    const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
     const [dataSchemaSuggestions, setDataSchemaSuggestions] = useState<DatasetDefinition[]>([]);
-    const [selectedFundingStream, setSelectedFundingStream] = useState<string>("");
+    const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream | undefined>();
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
-    const [validationFailures, setValidationFailures] = useState<{ [key: string]: string[] }>();
+    const [validationFailures, setValidationFailures] = useState<{[key: string]: string[]}>();
+    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState<string>("Create data source");
     const [description, setDescription] = useState<string>("");
@@ -49,6 +54,15 @@ export function LoadNewDataSource() {
     });
     const [errorResponse, setErrorResponse] = useState<NewDatasetVersionResponseErrorModel>();
     const history = useHistory();
+
+    useEffect(() => {
+        setMissingPermissions([]);
+        if (!selectedFundingStream) return;
+        const fundingStreamPermission = permissions.find(p => p.fundingStreamId === selectedFundingStream.id);
+        if (!fundingStreamPermission || !fundingStreamPermission.canUploadDataSourceFiles) {
+            setMissingPermissions([`create a datasource file for the ${selectedFundingStream.name} funding stream`]);
+        }
+    }, [permissions, selectedFundingStream]);
 
     function getDatasetValidateStatus(operationId: string) {
         getDatasetValidateStatusService(operationId)
@@ -87,11 +101,11 @@ export function LoadNewDataSource() {
 
     function updateFundingStreamSelection(e: string) {
         const result = fundingStreamSuggestions.filter(x => x.name === e)[0];
-        if (result != null) {
-            setSelectedFundingStream(result.id);
+        if (result) {
+            setSelectedFundingStream(result);
             populateDataSchemaSuggestions(result.id);
         } else {
-            setSelectedFundingStream("");
+            setSelectedFundingStream(undefined);
             populateDataSchemaSuggestions();
         }
     }
@@ -99,7 +113,7 @@ export function LoadNewDataSource() {
     function updateDataSchemaSelection(e: string) {
         const selection = dataSchemaSuggestions.filter(x => x.name === e)[0];
 
-        if (selection != null) {
+        if (selection) {
             setSelectedDataSchema(selection.id);
         } else {
             setSelectedDataSchema("");
@@ -108,7 +122,7 @@ export function LoadNewDataSource() {
 
     function populateDataSchemaSuggestions(fundingStreamId?: string) {
         setDataSchemaIsLoading(true);
-        if (fundingStreamId != null) {
+        if (fundingStreamId) {
             getDatasetsForFundingStreamService(fundingStreamId)
                 .then((datasetsResponse) => setDataSchemaSuggestions(datasetsResponse.data as DatasetDefinition[]))
                 .finally(() => setDataSchemaIsLoading(false));
@@ -127,7 +141,7 @@ export function LoadNewDataSource() {
     }
 
     async function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
-        if (uploadFile !== undefined) {
+        if (uploadFile) {
             try {
                 const uploadResponse = await uploadDataSourceService(
                     request.blobUrl,
@@ -144,6 +158,7 @@ export function LoadNewDataSource() {
                     setIsLoading(false);
                     return;
                 }
+
                 const validationResponse = await validateDatasetService(
                     request.datasetId,
                     request.fundingStreamId,
@@ -152,6 +167,7 @@ export function LoadNewDataSource() {
                     false,
                     description,
                     "");
+
                 if (validationResponse) {
                     const validateOperationId: any = validationResponse.data.operationId;
                     if (validateOperationId) {
@@ -164,6 +180,13 @@ export function LoadNewDataSource() {
                 setValidationFailures({"error-message": ["Unable to validate dataset: " + err.message]});
                 setIsLoading(false);
             }
+        } else {
+            setValidateForm(prevState => {
+                return {
+                    ...prevState,
+                    filenameValid: false
+                }
+            });
         }
     }
 
@@ -173,7 +196,7 @@ export function LoadNewDataSource() {
             filename: uploadFileName,
             dataDefinitionId: selectedDataSchema,
             description: description,
-            fundingStreamId: selectedFundingStream
+            fundingStreamId: selectedFundingStream !== undefined ? selectedFundingStream.id : ""
         };
 
         if (request.name !== "" && request.filename !== "" && request.description !== "" && request.dataDefinitionId !== "" && request.fundingStreamId !== "") {
@@ -333,7 +356,7 @@ export function LoadNewDataSource() {
 
     useEffect(() => {
         if (fundingStreamSuggestions.length > 0) {
-            if (selectedFundingStream !== "") {
+            if (selectedFundingStream && selectedFundingStream.id !== "") {
                 setValidateForm(prevState => {
                     return {
                         ...prevState,
@@ -352,7 +375,7 @@ export function LoadNewDataSource() {
     }, [selectedFundingStream]);
 
     function storeFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.files != null) {
+        if (e.target.files !== null) {
             const file: File = e.target.files[0];
             setUploadFileName(file.name);
             setUploadFile(file);
@@ -369,33 +392,48 @@ export function LoadNewDataSource() {
         }
     }
 
+    function CreateDataSourceButton() {
+        const isDisabled = missingPermissions.length > 0;
+        return (
+            <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                onClick={createDataset} disabled={isDisabled} data-testid="create-button">
+                Create data source
+            </button>
+        );
+    }
+
     return (<div>
-            <Header location={Section.Datasets}/>
-            <div className="govuk-width-container">
-                <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-full">
-                        <Breadcrumbs>
-                            <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                            <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"}/>
-                            <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"}/>
-                            <Breadcrumb name={"Load new data source file"}/>
-                        </Breadcrumbs>
-                    </div>
+        <Header location={Section.Datasets} />
+        <div className="govuk-width-container">
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                    <Breadcrumbs>
+                        <Breadcrumb name={"Calculate funding"} url={"/"} />
+                        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+                        <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
+                        <Breadcrumb name={"Load new data source file"} />
+                    </Breadcrumbs>
                 </div>
-                <LoadingStatus title={loadingStatus} hidden={!isLoading}
-                               subTitle={"Please wait whilst the data source is created"}/>
-                <div hidden={(validationFailures === undefined || isLoading)}
-                     className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                     data-module="govuk-error-summary">
-                    <h2 className="govuk-error-summary__title">
-                        There is a problem
+            </div>
+            <LoadingStatus title={loadingStatus} hidden={!isLoading}
+                subTitle={"Please wait whilst the data source is created"} />
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                    <PermissionStatus requiredPermissions={missingPermissions} hidden={permissions.length === 0} />
+                </div>
+            </div>
+            <div hidden={(validationFailures === undefined || isLoading)}
+                className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
+                data-module="govuk-error-summary">
+                <h2 className="govuk-error-summary__title">
+                    There is a problem
                     </h2>
-                    {validationFailures && Object.keys(validationFailures).length > 0 &&
+                {validationFailures && Object.keys(validationFailures).length > 0 &&
                     <div className="govuk-error-summary__body">
                         <ul className="govuk-list govuk-error-summary__list">
                             {Object.keys(validationFailures).map((errKey, index) =>
                                 errKey === "blobUrl" ?
-                                    <li>
+                                    <li key={index}>
                                         <span>Please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a>
                                     </li>
                                     :
@@ -403,97 +441,99 @@ export function LoadNewDataSource() {
                             )}
                         </ul>
                     </div>}
-                </div>
-                <div className="govuk-grid-row" hidden={isLoading}>
-                    <div className="govuk-grid-column-two-thirds">
-                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">Upload new data source</h1>
-                        <p className="govuk-body">Load a new data source file to create a dataset to use in calculations.</p>
-                        {uploadErrorMessage &&
+            </div>
+            <div className="govuk-grid-row" hidden={isLoading}>
+                <div className="govuk-grid-column-two-thirds">
+                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">Upload new data source</h1>
+                    <p className="govuk-body">Load a new data source file to create a dataset to use in calculations.</p>
+                    {uploadErrorMessage &&
                         <div className="govuk-form-group">
                             <ErrorSummary title={"Correct errors to continue with the process"}
-                                          error={uploadErrorMessage}
-                                          suggestion={""}/>
+                                error={uploadErrorMessage}
+                                suggestion={""} />
                         </div>}
-                        <div className={"govuk-form-group" + (validateForm.fundingStreamValid ? "" : " govuk-form-group--error")}>
-                            <label className="govuk-label" htmlFor="sort">
-                                Funding stream
+                    <div className={"govuk-form-group" + (validateForm.fundingStreamValid ? "" : " govuk-form-group--error")}>
+                        <label className="govuk-label" htmlFor="sort">
+                            Funding stream
                             </label>
+                        <span className="govuk-hint">
+                            Select a funding stream you have permissions for
+                        </span>
+                        {fundingStreamIsLoading ? <div className="loader-inline">
+                            <LoadingFieldStatus title={"loading funding streams"} />
+                        </div> :
                             <AutoComplete suggestions={fundingStreamSuggestions.map(fs => fs.name)} callback={updateFundingStreamSelection}
-                                          disabled={fundingStreamIsLoading}/>
-                            <div className="loader-inline">
-                                <LoadingFieldStatus title={"loading funding streams"} hidden={!fundingStreamIsLoading}/>
-                            </div>
-                        </div>
+                                disabled={fundingStreamIsLoading} />}
 
-                        <div className={"govuk-form-group" + (validateForm.dataDefinitionIdValid ? "" : " govuk-form-group--error")}>
-                            <label className="govuk-label" htmlFor="sort">
-                                Data schema
-                            </label>
-                            <AutoComplete suggestions={dataSchemaSuggestions.map(dss => dss.name)} callback={updateDataSchemaSelection}
-                                          disabled={dataSchemaIsLoading}/>
-                            <LoadingFieldStatus title={"loading data schemas"} hidden={!dataSchemaIsLoading}/>
-                        </div>
-
-                        <div className={"govuk-form-group" + (validateForm.nameValid ? "" : " govuk-form-group--error")}>
-                            <label className="govuk-label" htmlFor="address-line-1">
-                                Dataset source file name
-                            </label>
-                            <span id="event-name-hint" className="govuk-hint">
-                              Use a descriptive unique name other users can understand
-                            </span>
-                            <input className="govuk-input" id="dataset-source-filename" name="dataset-source-filename" type="text"
-                                   onChange={(e) => setDatasetSourceFileName(e.target.value)}/>
-                        </div>
-
-                        <div className={"govuk-form-group" + (validateForm.descriptionValid ? "" : " govuk-form-group--error")}>
-                            <label className="govuk-label" htmlFor="more-detail">
-                                Description
-                            </label>
-                            <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8} aria-describedby="more-detail-hint"
-                                      onChange={(e) => setDescription(e.target.value)}/>
-                        </div>
-
-                        <div className={"govuk-form-group" + (validateForm.filenameValid ? "" : " govuk-form-group--error")}>
-                            <div className="govuk-form-group">
-                                <label className="govuk-label" htmlFor="file-upload-1">
-                                    Upload data source file
-                                </label>
-                                {
-                                    (validationFailures !== undefined) ?
-                                        <span className="govuk-error-message">
-                                            <span className="govuk-visually-hidden">Error:</span>
-                                            {
-                                                (validationFailures !== undefined && validationFailures["error-message"] != null) ?
-                                                    validationFailures["error-message"]
-                                                    : ""
-                                            }
-                                            {
-                                                (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
-                                                    validationFailures["FundingStreamId"]
-                                                    : ""
-                                            }
-                                            {
-                                                (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
-                                                    <span><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></span>
-                                                    : ""
-                                            }
-                                        </span>
-                                        : ""
-                                }
-                                <input className="govuk-file-upload" id="file-upload-1" name="file-upload-1" type="file"
-                                       onChange={(e) => storeFileUpload(e)}/>
-                            </div>
-                        </div>
-                        <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button" onClick={() => createDataset()}>
-                            Create data source
-                        </button>
-                        <Link to="/Datasets/ManageDataSourceFiles" className="govuk-button govuk-button--secondary" data-module="govuk-button">
-                            Cancel
-                        </Link>
                     </div>
+                    <div className={"govuk-form-group" + (validateForm.dataDefinitionIdValid ? "" : " govuk-form-group--error")}>
+                        <label className="govuk-label" htmlFor="sort">
+                            Data schema
+                            </label>
+                        {dataSchemaIsLoading ? <LoadingFieldStatus title={"loading data schemas"} /> :
+                            <AutoComplete suggestions={dataSchemaSuggestions.map(dss => dss.name)} callback={updateDataSchemaSelection}
+                                disabled={dataSchemaIsLoading} />}
+
+                    </div>
+
+                    <div className={"govuk-form-group" + (validateForm.nameValid ? "" : " govuk-form-group--error")}>
+                        <label className="govuk-label" htmlFor="address-line-1">
+                            Dataset source file name
+                            </label>
+                        <span id="event-name-hint" className="govuk-hint">
+                            Use a descriptive unique name other users can understand
+                            </span>
+                        <input className="govuk-input" id="dataset-source-filename" name="dataset-source-filename" type="text"
+                            onChange={(e) => setDatasetSourceFileName(e.target.value)} />
+                    </div>
+
+                    <div className={"govuk-form-group" + (validateForm.descriptionValid ? "" : " govuk-form-group--error")}>
+                        <label className="govuk-label" htmlFor="more-detail">
+                            Description
+                            </label>
+                        <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8} aria-describedby="more-detail-hint"
+                            onChange={(e) => setDescription(e.target.value)} />
+                    </div>
+
+                    <div className={"govuk-form-group" + (validateForm.filenameValid ? "" : " govuk-form-group--error")}>
+                        <div className="govuk-form-group">
+                            <label className="govuk-label" htmlFor="file-upload-1">
+                                Upload data source file
+                                </label>
+                            {
+                                (validationFailures !== undefined) ?
+                                    <span className="govuk-error-message">
+                                        <span className="govuk-visually-hidden">Error:</span>
+                                        {
+                                            (validationFailures !== undefined && validationFailures["error-message"] != null) ?
+                                                validationFailures["error-message"]
+                                                : ""
+                                        }
+                                        {
+                                            (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
+                                                validationFailures["FundingStreamId"]
+                                                : ""
+                                        }
+                                        {
+                                            (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
+                                                <span><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></span>
+                                                : ""
+                                        }
+                                    </span>
+                                    : ""
+                            }
+                            <input className="govuk-file-upload" id="file-upload-1" name="file-upload-1" type="file"
+                                onChange={(e) => storeFileUpload(e)} />
+                        </div>
+                    </div>
+                    <CreateDataSourceButton />
+                    <Link to="/Datasets/ManageDataSourceFiles" className="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Cancel
+                    </Link>
                 </div>
             </div>
-            <Footer/>
         </div>
+        <Footer />
+    </div>
     )
 }

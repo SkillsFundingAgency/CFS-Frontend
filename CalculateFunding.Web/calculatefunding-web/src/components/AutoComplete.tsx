@@ -145,6 +145,7 @@ export function AutoComplete({suggestions, hidden, disabled, includePager, callb
             </label>}
             <div className="govuk-form-group" hidden={hidden}>
                 <input className="govuk-input" id="input-auto-complete"
+                    data-testid="input-auto-complete"
                     type="text" disabled={autoCompleteState.disabled} autoComplete={"off"}
                     onChange={onChange} onClick={onClickInput} value={autoCompleteState.userInput} />
                 <ul hidden={!autoCompleteState.showSuggestions} className="govuk-list autocomplete">

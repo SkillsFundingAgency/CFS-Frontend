@@ -26,4 +26,5 @@
     canEditProfilePattern:          boolean;
     canCreateProfilePattern:        boolean;
     canRefreshPublishedQa:          boolean;
+    canUploadDataSourceFiles:       boolean;
 }
