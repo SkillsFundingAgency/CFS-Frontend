@@ -298,14 +298,6 @@
                                 "value": "[concat('https://app-', parameters('environmentKey'),'-specs-',parameters('productVersion'), '.azurewebsites.net/api/')]"
                             },
                             {
-                                "name": "specificationsClient:ApiKey",
-                                "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapispecs'),'2018-02-14').secretUriWithVersion, ')')]"
-                            },
-                            {
-                                "name": "specificationsClient:ApiEndpoint",
-                                "value": "[concat('https://app-', parameters('environmentKey'),'-specs-',parameters('productVersion'), '.azurewebsites.net/api/')]"
-                            },
-                            {
                                 "name": "calcsClient:ApiKey",
                                 "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapicalcs'),'2018-02-14').secretUriWithVersion, ')')]"
                             },
