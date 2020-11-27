@@ -2,6 +2,7 @@
 import {Author} from "./Calculations/Author";
 import {PublishStatus} from "./PublishStatusModel";
 import {CalculationType} from "./CalculationSearchResponse";
+import { CalculationDataType } from "./Calculations/CalculationCompilePreviewResponse";
 
 export interface CalculationDetails {
     id: string;
@@ -14,6 +15,7 @@ export interface CalculationDetails {
     namespace: string;
     wasTemplateCalculation: boolean;
     valueType: ValueType;
+    dataType: CalculationDataType;
     lastUpdated: Date;
     author: Author | null;
     version?: number | undefined;

@@ -54,7 +54,8 @@ export enum CompileErrorSeverity
 
 export interface PreviewCompileRequestViewModel{
     sourceCode: string,
-    providerId: string
+    providerId: string,
+    dataType: CalculationDataType
 }
 
 export interface CompilerOutputViewModel {

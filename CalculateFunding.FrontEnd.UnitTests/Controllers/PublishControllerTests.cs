@@ -10,7 +10,6 @@ using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
@@ -20,7 +19,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using StackExchange.Redis;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {

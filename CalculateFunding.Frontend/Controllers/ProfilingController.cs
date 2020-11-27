@@ -10,7 +10,6 @@ using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.ViewModels.Profiles;
 using CalculateFunding.Frontend.ViewModels.Publish;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +38,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<IEnumerable<ProfileTotal>> profilePreview = await _publishingApiClient.PreviewProfileChange(new ProfilePreviewRequest
             {
-                ConfigurationType = requestViewModel.ConfigurationType.AsMatchingEnum<CalculateFunding.Common.ApiClient.Publishing.Models.ProfileConfigurationType>(),
+                ConfigurationType = requestViewModel.ConfigurationType.AsMatchingEnum<Common.ApiClient.Publishing.Models.ProfileConfigurationType>(),
                 ProviderId = requestViewModel.ProviderId,
                 SpecificationId = requestViewModel.SpecificationId,
                 FundingLineCode = requestViewModel.FundingLineCode,

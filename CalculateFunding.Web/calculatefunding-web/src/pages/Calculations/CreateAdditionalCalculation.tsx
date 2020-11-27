@@ -16,6 +16,7 @@ import {ValueType} from "../../types/ValueType";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {InlineError} from "../../components/InlineError";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
+import { CalculationDataType } from "../../types/Calculations/CalculationCompilePreviewResponse";
 
 export interface CreateAdditionalCalculationProps {
     excludeMonacoEditor?: boolean
@@ -140,6 +141,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                     specificationId={specificationId}
                     calculationName=""
                     calculationType="Additional"
+                    dataType = {CalculationDataType.Decimal}
                     fundingStreams={specification.fundingStreams}
                     onChange={onCalculationChange}
                     originalSourceCode={"Return 0"}

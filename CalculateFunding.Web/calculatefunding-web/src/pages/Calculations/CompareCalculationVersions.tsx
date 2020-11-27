@@ -16,6 +16,7 @@ import {CalculationDetails} from "../../types/CalculationDetails";
 import {CalculationType} from "../../types/CalculationSearchResponse";
 import {ValueType} from "../../types/ValueType";
 import {PublishStatus} from "../../types/PublishStatusModel";
+import { CalculationDataType } from "../../types/Calculations/CalculationCompilePreviewResponse";
 
 export interface CompareCalculationVersionsRouteProps {
     calculationId: string;
@@ -56,6 +57,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         name: "",
         namespace: "",
         specificationId: "",
+        dataType: CalculationDataType.Decimal,
         publishStatus: PublishStatus.Draft,
         valueType: ValueType.Percentage,
         wasTemplateCalculation: false,

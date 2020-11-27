@@ -7,6 +7,7 @@ import {CalculationProviderSearchRequestViewModel} from "../types/calculationPro
 import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
 import {
     CalculationCompilePreviewResponse,
+    CalculationDataType,
     PreviewCompileRequestViewModel
 } from "../types/Calculations/CalculationCompilePreviewResponse";
 import {CalculationDetails, CalculationSummary} from "../types/CalculationDetails";

@@ -1,5 +1,6 @@
 ﻿import React, {useEffect, useState} from "react";
 import {
+    CalculationDataType,
     CompilerOutputViewModel,
     PreviewCompileRequestViewModel
 } from "../../types/Calculations/CalculationCompilePreviewResponse";
@@ -14,6 +15,7 @@ export interface CalculationSourceCodeProps {
     specificationId: string,
     calculationName: string,
     calculationType: string,
+    dataType: CalculationDataType,
     fundingStreams: FundingStream[],
     originalSourceCode: string,
     onChange: (state: CalculationSourceCodeState) => void,
@@ -25,7 +27,8 @@ export interface CalculationSourceCodeState {
     isDirty: boolean,
     sourceCode: string,
     errorMessage: string,
-    providerId: string
+    providerId: string,
+    dataType: CalculationDataType
 }
 
 export function CalculationSourceCode(props: CalculationSourceCodeProps) {
@@ -40,7 +43,8 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             isProviderValid: undefined,
             providerRuntimeException: ""
         },
-        providerId: ""
+        providerId: "",
+        dataType: CalculationDataType.Decimal
     });
     
     useEffect(() => {
@@ -51,6 +55,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                     sourceCode: props.originalSourceCode,
                     isDirty: false,
                     isBuilding: false,
+                    dataType: props.dataType,
                     calculationBuild: {
                         hasCodeBuiltSuccessfully: undefined,
                         previewResponse: undefined,
@@ -70,7 +75,8 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         if (state.isBuilding) {
             const previewCompileRequestViewModel: PreviewCompileRequestViewModel = {
                 sourceCode: state.sourceCode,
-                providerId: state.providerId
+                providerId: state.providerId,
+                dataType: state.dataType
             }
             compileCalculationPreviewService(props.specificationId, 'temp-calc-id', previewCompileRequestViewModel)
                 .then((result) => {

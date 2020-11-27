@@ -80,6 +80,7 @@ export function EditCalculationTestData() {
         sourceCode: "return 42",
         sourceCodeName: "source code 1",
         specificationId: testSpec.id,
+        dataType: CalculationDataType.Decimal,
         valueType: ValueType.Currency,
         wasTemplateCalculation: false
     }
@@ -163,6 +164,7 @@ export function EditCalculationTestData() {
             sourceCodeName: "",
             specificationId: "",
             valueType: ValueType.Boolean,
+            dataType: CalculationDataType.Decimal,
             wasTemplateCalculation: false,
             calculationType: CalculationType.Template
         }
@@ -202,6 +204,7 @@ export function EditCalculationTestData() {
         sourceCodeName: "",
         specificationId: "",
         valueType: ValueType.Boolean,
+        dataType: CalculationDataType.Boolean,
         wasTemplateCalculation: false,
         calculationType: CalculationType.Template
     }
