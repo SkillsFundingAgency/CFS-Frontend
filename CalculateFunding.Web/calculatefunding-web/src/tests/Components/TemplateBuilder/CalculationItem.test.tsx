@@ -428,11 +428,10 @@ describe('<CalculationItem />', () => {
         wrapper.find('#calculation-type').simulate("change", {target: {value: "Rate"}});
 
         expect(wrapper.find('#calculation-value-format').props().value).toBeUndefined();
-        expect(wrapper.find('#calculation-value-format').children().length).toBe(4);
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(3);
         expect(wrapper.find('#calculation-value-format').childAt(0).text()).toBe("Please select");
-        expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Number");
-        expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Percentage");
-        expect(wrapper.find('#calculation-value-format').childAt(3).text()).toBe("Currency");
+        expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Percentage");
+        expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Currency");
     });
 
     it('restricts valueFormats when type Number selected', () => {
@@ -451,11 +450,26 @@ describe('<CalculationItem />', () => {
         wrapper.find('#calculation-type').simulate("change", {target: {value: "Number"}});
 
         expect(wrapper.find('#calculation-value-format').props().value).toBe("Number");
-        expect(wrapper.find('#calculation-value-format').children().length).toBe(4);
-        expect(wrapper.find('#calculation-value-format').childAt(0).text()).toBe("Please select");
-        expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Number");
-        expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Percentage");
-        expect(wrapper.find('#calculation-value-format').childAt(3).text()).toBe("Currency");
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(1);
+    });
+
+    it('restricts valueFormats when type PupilNumber selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "PupilNumber"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBe("Number");
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(1);
     });
 
     it('restricts valueFormats when type Weighting selected', () => {
@@ -474,10 +488,9 @@ describe('<CalculationItem />', () => {
         wrapper.find('#calculation-type').simulate("change", {target: {value: "Weighting"}});
 
         expect(wrapper.find('#calculation-value-format').props().value).toBeUndefined();
-        expect(wrapper.find('#calculation-value-format').children().length).toBe(4);
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(3);
         expect(wrapper.find('#calculation-value-format').childAt(0).text()).toBe("Please select");
         expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Number");
         expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Percentage");
-        expect(wrapper.find('#calculation-value-format').childAt(3).text()).toBe("Currency");
     });
 });

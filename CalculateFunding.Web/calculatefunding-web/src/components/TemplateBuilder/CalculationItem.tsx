@@ -104,6 +104,12 @@ export function CalculationItem({
             case CalculationType.Cash:
                 setValueFormat(ValueFormatType.Currency);
                 break;
+            case CalculationType.Number:
+                setValueFormat(ValueFormatType.Number);
+                break;
+            case CalculationType.PupilNumber:
+                setValueFormat(ValueFormatType.Number);
+                break;
             default:
                 setValueFormat(ValueFormatType[e.target.value as keyof typeof ValueFormatType]);
                 break;
@@ -292,6 +298,23 @@ export function CalculationItem({
         }
         if (type === CalculationType.Cash) {
             return <option value={ValueFormatType.Currency}>Currency</option>
+        }
+        if (type === CalculationType.Rate) {
+            return <>
+                <option value="">Please select</option>
+                <option value={ValueFormatType.Percentage}>Percentage</option>
+                <option value={ValueFormatType.Currency}>Currency</option>
+            </>
+        }
+        if (type === CalculationType.Weighting) {
+            return <>
+                <option value="">Please select</option>
+                <option value={ValueFormatType.Number}>Number</option>
+                <option value={ValueFormatType.Percentage}>Percentage</option>
+            </>
+        }
+        if (type === CalculationType.Number || type === CalculationType.PupilNumber) {
+            return <option value={ValueFormatType.Number}>Number</option>
         }
 
         return (
