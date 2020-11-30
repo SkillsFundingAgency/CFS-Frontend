@@ -373,4 +373,111 @@ describe('<CalculationItem />', () => {
 
         expect(wrapper.find('[data-testid="delete-button"]')).toHaveLength(0);
     });
+
+    it('renders valueFormat of String when type Enum selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "Enum"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBe("String");
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(1);
+    });
+
+    it('renders valueFormat of Currency when type Cash selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "Cash"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBe("Currency");
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(1);
+    });
+
+    it('restricts valueFormats when type Rate selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "Rate"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBeUndefined();
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(4);
+        expect(wrapper.find('#calculation-value-format').childAt(0).text()).toBe("Please select");
+        expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Number");
+        expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Percentage");
+        expect(wrapper.find('#calculation-value-format').childAt(3).text()).toBe("Currency");
+    });
+
+    it('restricts valueFormats when type Number selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "Number"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBe("Number");
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(4);
+        expect(wrapper.find('#calculation-value-format').childAt(0).text()).toBe("Please select");
+        expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Number");
+        expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Percentage");
+        expect(wrapper.find('#calculation-value-format').childAt(3).text()).toBe("Currency");
+    });
+
+    it('restricts valueFormats when type Weighting selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={calc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "Weighting"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBeUndefined();
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(4);
+        expect(wrapper.find('#calculation-value-format').childAt(0).text()).toBe("Please select");
+        expect(wrapper.find('#calculation-value-format').childAt(1).text()).toBe("Number");
+        expect(wrapper.find('#calculation-value-format').childAt(2).text()).toBe("Percentage");
+        expect(wrapper.find('#calculation-value-format').childAt(3).text()).toBe("Currency");
+    });
 });
