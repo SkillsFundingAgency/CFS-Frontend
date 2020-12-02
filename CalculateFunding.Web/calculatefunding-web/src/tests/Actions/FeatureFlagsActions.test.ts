@@ -38,28 +38,6 @@ const storeWithData: IStoreState = {
     hasConfirmedSkills: true,
     fundingStreamPermissions: []
   },
-  fundingLineStructureState: {
-    specificationResult: {
-      name: '',
-      id: '',
-      templateIds: {},
-      publishedResultsRefreshedAt: null,
-      providerVersionId: '',
-      lastCalculationUpdatedAt: '',
-      fundingStreams: [],
-      fundingPeriod: {
-        id: '',
-        name: ''
-      },
-      isSelectedForFunding: false,
-      description: '',
-      approvalStatus: '',
-      lastEditedDate: new Date(),
-      dataDefinitionRelationshipIds: []
-    },
-    fundingLineStructureResult: [],
-    fundingLineStatusResult: ''
-  },
   viewSpecificationResults: {
     additionalCalculations: {
       lastPage: 0,
@@ -114,21 +92,6 @@ const storeWithData: IStoreState = {
       dataDefinitionRelationshipIds: [],
       templateIds: {},
     }
-  },
-  selectSpecification: {
-    fundingStreams: [],
-    fundingPeriods: [],
-    specifications: []
-  },
-  datasets: {
-    dataSchemas: [
-      {
-        name: '',
-        id: '',
-        description: '',
-        tableDefinitions: []
-      }
-    ]
   },
   featureFlags: {
     templateBuilderVisible: false,

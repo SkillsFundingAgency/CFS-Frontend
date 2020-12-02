@@ -1,9 +1,9 @@
 import * as React from "react";
 import {
-    FundingStructureType, IFundingStructureItem
+    FundingStructureType, FundingStructureItem
 } from "../../types/FundingStructureItem";
 import {CollapsibleSteps} from "../CollapsibleSteps";
-export function FundingLineStepProviderResults(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean, callback: any}) {
+export function FundingLineStepProviderResults(props: { fundingStructureItem: FundingStructureItem, expanded: boolean, callback: any}) {
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
     let fundingType = "";
@@ -32,10 +32,9 @@ export function FundingLineStepProviderResults(props: { fundingStructureItem: IF
                             calculationType={innerFundingLineItem.calculationType != null ? innerFundingLineItem.calculationType : ""}
                             value={innerFundingLineItem.value != null? innerFundingLineItem.value : ""}
                             description={innerFundingLineItem.name}
-                            status={(innerFundingLineItem.calculationPublishStatus != null && innerFundingLineItem.calculationPublishStatus !== '') ?
-                                innerFundingLineItem.calculationPublishStatus: ""}
+                            status={innerFundingLineItem.calculationPublishStatus}
                             step={displayFundingType?innerFundingLineItem.level.toString(): ""}
-                            expanded={expanded || innerFundingLineItem.expanded}
+                            expanded={expanded || innerFundingLineItem.expanded === true}
                             link={linkValue}
                             hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}
                             callback={collapsibleStepsChanged}>

@@ -106,7 +106,7 @@ const matchMock: match<ProviderFundingOverviewRoute> = {
     params: {
         providerId: testProvider.providerId,
         specificationId: testSpec.id,
-        providerVersionId: "provider-version-id-123",
+        specCoreProviderVersionId: "provider-version-id-123",
         fundingStreamId: fundingStream.id,
         fundingPeriodId: fundingPeriod.id
     },

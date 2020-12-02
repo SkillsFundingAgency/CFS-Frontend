@@ -527,7 +527,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new OkObjectResult(createJobResponse.Content);
         }
         
-        [HttpGet("/api/publishedproviders/{fundingStreamId}/{fundingPeriodId}/lastupdated")]
+        [HttpGet("/api/publishedProviders/{fundingStreamId}/{fundingPeriodId}/lastupdated")]
         public async Task<IActionResult> GetLatestPublishedDate([FromRoute] string fundingStreamId,
             [FromRoute] string fundingPeriodId)
         {
@@ -545,6 +545,29 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new OkObjectResult(latestPublishedDateResponse.Content);
+        }
+        
+        [HttpGet("api/specifications/{specificationId}/publishedproviders/{providerId}/fundingStreams/{fundingStreamId}/errors")]
+        public async Task<IActionResult> GetPublishedProviderErrors(
+            [FromRoute] string fundingStreamId,
+            [FromRoute] string specificationId,
+            [FromRoute] string providerId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            ApiResponse<PublishedProviderVersion> response = 
+                await _publishingApiClient.GetCurrentPublishedProviderVersion(specificationId, fundingStreamId, providerId);
+            
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return new OkObjectResult(response.Content.Errors);
         }
 
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)

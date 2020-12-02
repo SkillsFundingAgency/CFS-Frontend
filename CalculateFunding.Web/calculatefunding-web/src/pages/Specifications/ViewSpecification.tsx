@@ -67,7 +67,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
     const specificationId = match.params.specificationId;
 
-    const {errors, addErrorMessage, clearErrorMessages, addError} = useErrors();
+    const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isApprovingAllCalculations, setIsApprovingAllCalculations] = useState(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
@@ -152,8 +152,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 }
             } catch (err) {
                 addErrorMessage("A problem occurred while approving all calculations: " + err);
-            }
-            finally {
+            } finally {
                 setIsApprovingAllCalculations(false);
             }
         }
@@ -236,22 +235,22 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     return <div>
-        <Header location={Section.Specifications} />
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"} />
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-                <Breadcrumb name={specification.name} />
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={specification.name}/>
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={isApprovingAllCalculations} />
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={isApprovingAllCalculations}/>
 
-            <MultipleErrorSummary errors={errors} />
+            <MultipleErrorSummary errors={errors}/>
 
             <LoadingStatus title={"Checking calculations"}
-                hidden={!isApprovingAllCalculations}
-                subTitle={"Please wait, this could take several minutes"}
-                description={"Please do not refresh the page, you will be redirected automatically"} />
+                           hidden={!isApprovingAllCalculations}
+                           subTitle={"Please wait, this could take several minutes"}
+                           description={"Please do not refresh the page, you will be redirected automatically"}/>
 
             {(isCheckingForJob || hasJob) &&
             <div className="govuk-form-group">
@@ -264,11 +263,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
                     <span className="govuk-caption-l">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
                     {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
-                        <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                    <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
                     }
                 </div>
                 <div className="govuk-grid-column-two-thirds">
-                    <Details title={`What is ${specification.name}`} body={specification.description} />
+                    <Details title={`What is ${specification.name}`} body={specification.description}/>
                 </div>
                 <div className="govuk-grid-column-one-third">
                     <ul className="govuk-list">
@@ -286,19 +285,19 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
                         {isLoadingSelectedForFunding &&
-                            <LoadingFieldStatus title={"checking funding status..."} />
+                        <LoadingFieldStatus title={"checking funding status..."}/>
                         }
                         {!isLoadingSelectedForFunding &&
-                            <li>
-                                {specification.isSelectedForFunding || selectedForFundingSpecId ?
-                                    <Link className="govuk-link govuk-link--no-visited-state"
-                                        to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
-                                        View funding
+                        <li>
+                            {specification.isSelectedForFunding || selectedForFundingSpecId ?
+                                <Link className="govuk-link govuk-link--no-visited-state"
+                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
+                                    View funding
                                 </Link>
-                                    :
-                                    <button type="button" className="govuk-link" onClick={chooseForFunding}>Choose for funding</button>
-                                }
-                            </li>
+                                :
+                                <button type="button" className="govuk-link" onClick={chooseForFunding}>Choose for funding</button>
+                            }
+                        </li>
                         }
                     </ul>
                 </div>
@@ -314,37 +313,38 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variation-management-tab"} label="variation-management">Variation Management</Tabs.Tab>
                         </ul>
                         <Tabs.Panel label="fundingline-structure">
-                            <FundingLineResults specificationId={specification.id}
+                            <FundingLineResults
+                                specificationId={specification.id}
                                 fundingStreamId={specification.fundingStreams[0].id}
                                 fundingPeriodId={specification.fundingPeriod.id}
-                                approvalStatus={specification.approvalStatus as PublishStatus}
-                                addErrorMessage={addErrorMessage}
+                                status={specification.approvalStatus as PublishStatus}
+                                addError={addError}
                                 clearErrorMessages={clearErrorMessages}
-                                setApprovalStatusToApproved={setApprovalStatusToApproved} />
+                                setStatusToApproved={setApprovalStatusToApproved}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <AdditionalCalculations specificationId={specificationId}
-                                addError={addErrorMessage} />
+                                                    addError={addErrorMessage}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="datasets">
-                            <Datasets specificationId={specificationId} />
+                            <Datasets specificationId={specificationId}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="release-timetable">
                             <section className="govuk-tabs__panel">
                                 <ReleaseTimetable specificationId={specificationId}
-                                    addErrorMessage={addErrorMessage}
-                                    clearErrorMessages={clearErrorMessages}
-                                    errors={errors} />
+                                                  addErrorMessage={addErrorMessage}
+                                                  clearErrorMessages={clearErrorMessages}
+                                                  errors={errors}/>
                             </section>
                         </Tabs.Panel>
                         <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>
-                            <VariationManagement specificationId={specificationId} />
+                            <VariationManagement specificationId={specificationId}/>
                         </Tabs.Panel>
                     </Tabs>
                 </div>
             </div>}
         </div>
         &nbsp;
-        <Footer />
+        <Footer/>
     </div>
 }

@@ -59,7 +59,7 @@ export const ProviderFundingProfilingSummary = (props: ProviderFundingProfilingS
         <h3 className="govuk-heading-m">Previous profiles</h3>
         {props.specification && props.specification.fundingStreams && props.specification.fundingStreams.length > 0 &&
         <p className="govuk-body">History of previous <Link
-            to={`/Approvals/ProfilingHistory/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.providerVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}`}
+            to={`/Approvals/ProfilingHistory/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}`}
             className="govuk-button"
             data-module="govuk-button">profiles</Link>
         </p>

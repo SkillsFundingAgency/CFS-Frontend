@@ -4,7 +4,7 @@ import {AutoComplete} from "../AutoComplete";
 import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../CollapsibleSteps";
 import {
     FundingStructureType,
-    IFundingStructureItem
+    FundingStructureItem
 } from "../../types/FundingStructureItem";
 import {FundingLineStep} from "./FundingLineStep";
 import {BackToTop} from "../BackToTop";
@@ -16,68 +16,73 @@ import {
     checkIfShouldOpenAllSteps,
     expandCalculationsByName,
     getDistinctOrderedFundingLineCalculations,
-    mapPublishedProviderFundingStructureItemsToFundingStructureItems,
     setExpandStatusByFundingLineName,
     setInitialExpandedStatus,
     updateFundingLineExpandStatus
-} from "./FundingLineStructure";
-import {
-    getFundingLineStructureByProviderService,
-    getFundingLineStructureService
-} from "../../services/fundingStructuresService";
-import {getPublishedProviderFundingStructureService} from "../../services/publishedProviderFundingLineService";
+} from "./FundingLineStructureHelper";
+import {getFundingLineStructureService} from "../../services/fundingStructuresService";
+import {getCurrentPublishedProviderFundingStructureService} from "../../services/publishedProviderFundingLineService";
+import { AxiosError } from "axios";
+import {useQuery} from "react-query";
+import {getProviderFundingLineErrors} from "../../services/providerService";
+import {PublishedProviderError} from "../../types/PublishedProviderError";
 
 export interface FundingLineResultsProps {
     specificationId: string,
     fundingPeriodId: string,
     fundingStreamId: string,
-    approvalStatus: PublishStatus,
+    status: PublishStatus,
     providerId?: string,
-    providerVersionId?: string,
-    addErrorMessage: (errorMessage: any, description?: string, fieldName?: string) => void,
+    addError: (errorMessage: AxiosError | Error | string, description?: string, fieldName?: string) => void,
     clearErrorMessages: (fieldNames?: string[]) => void,
-    setApprovalStatusToApproved?: () => void,
+    setStatusToApproved?: () => void,
 }
 
 export function FundingLineResults({
     specificationId,
     fundingPeriodId,
     fundingStreamId,
-    approvalStatus,
+    status,
     providerId,
-    providerVersionId,
-    addErrorMessage,
+    addError,
     clearErrorMessages,
-    setApprovalStatusToApproved
+    setStatusToApproved
 }: FundingLineResultsProps) {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
-    const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
-    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
+    const [fundingLines, setFundingLines] = useState<FundingStructureItem[]>([]);
+    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<FundingStructureItem[]>([]);
     const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
 
+    const {data: fundingLineErrors, isLoading: isLoadingFundingLineErrors} =
+        useQuery<PublishedProviderError[], AxiosError>(`funding-line-errors-for-spec-${specificationId}-stream-${fundingStreamId}-provider-${providerId}`,
+            async () => (await getProviderFundingLineErrors(specificationId, fundingStreamId, providerId as string)).data,
+            {
+                enabled: providerId && providerId.length > 0,
+                onError: err => addError(err, "Error while loading funding line errors")
+            });
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
         const response = await approveFundingLineStructureService(specificationId);
         if (response.status === 200) {
             setFundingLinePublishStatus(PublishStatus.Approved);
-            if (setApprovalStatusToApproved) {
-                setApprovalStatusToApproved();
+            if (setStatusToApproved) {
+                setStatusToApproved();
             }
         } else {
-            addErrorMessage(`Error whilst approving funding line structure: ${response.statusText} ${response.data}`, undefined, "funding-line-results");
-            setFundingLinePublishStatus(approvalStatus);
+            addError(`${response.statusText} ${response.data}`, "Error whilst approving funding line structure", "funding-line-results");
+            setFundingLinePublishStatus(status);
         }
     };
 
     function searchFundingLines(calculationName: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
+        const fundingLinesCopy: FundingStructureItem[] = fundingLinesOriginalData as FundingStructureItem[];
         expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
         setFundingLines(fundingLinesCopy);
         setRerenderFundingLineSteps(true);
@@ -92,7 +97,7 @@ export function FundingLineResults({
     }
 
     function collapsibleStepsChanged(expanded: boolean, name: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
+        const fundingLinesCopy: FundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
         setFundingLines(fundingLinesCopy);
 
         const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
@@ -108,7 +113,7 @@ export function FundingLineResults({
         setFundingLineRenderInternalState(true);
         if (fundingLines.length !== 0) {
             if (fundingLinesOriginalData.length === 0) {
-                setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
+                setFundingLineSearchSuggestions([... getDistinctOrderedFundingLineCalculations(fundingLines)]);
                 setFundingLinesOriginalData(fundingLines);
             }
             setIsLoadingFundingLineStructure(false);
@@ -143,26 +148,21 @@ export function FundingLineResults({
         setIsLoadingFundingLineStructure(true);
         try {
             if (specificationId !== "" && fundingPeriodId !== "" && fundingStreamId !== "") {
-                let fundingStructureItems: IFundingStructureItem[];
-                if (providerVersionId != null) {
-                    const publishedProviderFundingStructure = (await getPublishedProviderFundingStructureService(providerVersionId)).data;
-                    fundingStructureItems = mapPublishedProviderFundingStructureItemsToFundingStructureItems(publishedProviderFundingStructure.items);
-                }
-                else if (providerId != null) {
-                    fundingStructureItems = (await getFundingLineStructureByProviderService(specificationId, fundingPeriodId, fundingStreamId, providerId)).data;
-                }
-                else {
+                let fundingStructureItems: FundingStructureItem[];
+                if (providerId) {
+                    fundingStructureItems = (await getCurrentPublishedProviderFundingStructureService(specificationId, fundingStreamId, providerId)).data.items;
+                } else {
                     fundingStructureItems = (await getFundingLineStructureService(specificationId, fundingPeriodId, fundingStreamId)).data;
                 }
 
                 setInitialExpandedStatus(fundingStructureItems, false);
                 setFundingLines(fundingStructureItems);
-                setFundingLinePublishStatus(approvalStatus);
+                setFundingLinePublishStatus(status);
                 clearErrorMessages(["funding-line-results"]);
             }
         } catch (err) {
             setFundingLineStructureError(true);
-            addErrorMessage(`A problem occurred while loading funding line structure: ${err.message}`, undefined, "funding-line-results");
+            addError(err, `A problem occurred while loading funding line structure`, "funding-line-results");
         } finally {
             setIsLoadingFundingLineStructure(false);
         }
@@ -219,18 +219,20 @@ export function FundingLineResults({
                             customRef={f.customRef}
                             key={"collapsible-steps" + index}
                             uniqueKey={index.toString()}
-                            title={FundingStructureType[f.type]}
+                            title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
                             description={f.name}
-                            status={(f.calculationPublishStatus && f.calculationPublishStatus !== '') ? f.calculationPublishStatus : ""}
+                            status={f.calculationPublishStatus}
                             step={f.level.toString()}
-                            expanded={fundingLinesExpandedStatus || f.expanded}
+                            expanded={fundingLinesExpandedStatus || f.expanded === true}
                             link={linkValue}
                             hasChildren={f.fundingStructureItems != null}
                             callback={collapsibleStepsChanged}>
-                            <FundingLineStep key={f.name.replace(" ", "") + index}
+                            <FundingLineStep 
+                                key={f.name.replace(" ", "") + index}
                                 showResults={false}
                                 expanded={fundingLinesExpandedStatus}
                                 fundingStructureItem={f}
+                                fundingLineErrors={fundingLineErrors}
                                 callback={collapsibleStepsChanged} />
                         </CollapsibleSteps>
                     </li>

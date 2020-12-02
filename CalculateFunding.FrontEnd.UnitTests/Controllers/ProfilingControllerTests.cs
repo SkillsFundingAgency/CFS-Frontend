@@ -135,11 +135,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             List<ProfilingInstallment> expectedFutureInstallments = new List<ProfilingInstallment>
             {
                 new ProfilingInstallment(
-                    profilePeriodPatternInTheCurrentTime.PeriodYear,
-                    profilePeriodPatternInTheCurrentTime.Period,
-                    profilePeriodPatternInTheCurrentTime.Occurrence,
-                    0),
-                new ProfilingInstallment(
                     profilePeriodPatternInTheFuture.PeriodYear,
                     profilePeriodPatternInTheFuture.Period,
                     profilePeriodPatternInTheFuture.Occurrence,

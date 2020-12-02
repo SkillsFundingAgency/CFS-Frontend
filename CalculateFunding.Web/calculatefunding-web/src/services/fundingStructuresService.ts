@@ -1,10 +1,13 @@
 import axios, {AxiosResponse} from "axios"
-import {IFundingStructureItem} from "../types/FundingStructureItem";
+import {FundingStructureItem} from "../types/FundingStructureItem";
 
-const baseURL = "/api/fundingstructures";
+const baseURL = "/api/fundingStructures";
 
-export async function getFundingLineStructureService(specificationId: string, fundingPeriodId: string, fundingStreamId: string): Promise<AxiosResponse<IFundingStructureItem[]>> {
-    return axios(`${baseURL}/specifications/${specificationId}/fundingperiods/${fundingPeriodId}/fundingstreams/${fundingStreamId}`, {
+export async function getFundingLineStructureService(
+    specificationId: string, 
+    fundingPeriodId: string, 
+    fundingStreamId: string): Promise<AxiosResponse<FundingStructureItem[]>> {
+    return axios(`${baseURL}/specifications/${specificationId}/fundingPeriods/${fundingPeriodId}/fundingStreams/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -12,8 +15,12 @@ export async function getFundingLineStructureService(specificationId: string, fu
     });
 }
 
-export async function getFundingLineStructureByProviderService(specificationId: string, fundingPeriodId: string, fundingStreamId: string, providerId: string) {
-    return axios(`${baseURL}/specifications/${specificationId}/fundingperiods/${fundingPeriodId}/fundingstreams/${fundingStreamId}/provider/${providerId}`, {
+export async function getFundingLineStructureByProviderService(
+    specificationId: string, 
+    fundingPeriodId: string, 
+    fundingStreamId: string, 
+    providerId: string): Promise<AxiosResponse<FundingStructureItem[]>> {
+    return axios(`${baseURL}/specifications/${specificationId}/fundingPeriods/${fundingPeriodId}/fundingStreams/${fundingStreamId}/provider/${providerId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -21,8 +28,11 @@ export async function getFundingLineStructureByProviderService(specificationId: 
     });
 }
 
-export async function getFundingStructuresWithCalculationResultService(specificationId: string, fundingPeriodId: string, fundingStreamId: string) {
-    return axios(`${baseURL}/results/specifications/${specificationId}/fundingperiods/${fundingPeriodId}/fundingstreams/${fundingStreamId}`, {
+export async function getFundingStructuresWithCalculationResultService(
+    specificationId: string, 
+    fundingPeriodId: string, 
+    fundingStreamId: string): Promise<AxiosResponse<FundingStructureItem[]>> {
+    return axios(`${baseURL}/results/specifications/${specificationId}/fundingPeriods/${fundingPeriodId}/fundingStreams/${fundingStreamId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

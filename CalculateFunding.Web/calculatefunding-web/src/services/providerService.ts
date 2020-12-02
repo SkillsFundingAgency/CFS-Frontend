@@ -2,12 +2,18 @@ import axios, {AxiosResponse} from "axios"
 import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
 import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
+import {PublishedProviderError} from "../types/PublishedProviderError";
 
 const baseURL = "/api/provider";
 
 export async function getProviderByIdAndVersionService(providerId:string, providerVersionId:string): 
     Promise<AxiosResponse<ProviderSummary>> {
-    return axios.get<ProviderSummary>(`${baseURL}/getproviderbyversionandid/${providerVersionId}/${providerId}`);
+    return axios.get<ProviderSummary>(`${baseURL}/getProviderByVersionAndId/${providerVersionId}/${providerId}`);
+}
+
+export async function getProviderFundingLineErrors(specificationId: string, fundingStreamId: string, providerId: string): 
+    Promise<AxiosResponse<PublishedProviderError[]>> {
+    return axios.get<PublishedProviderError[]>(`/api/specifications/${specificationId}/publishedProviders/${providerId}/fundingStreams/${fundingStreamId}/errors`);
 }
 
 export async function getProviderTransactionsService(specificationId:string, providerId:string): 

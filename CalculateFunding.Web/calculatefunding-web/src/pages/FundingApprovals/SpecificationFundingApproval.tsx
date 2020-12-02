@@ -30,7 +30,6 @@ import {preValidateForRefreshFundingService, refreshSpecificationFundingService}
 import {ConfirmationModal} from "../../components/ConfirmationModal";
 import {RunningStatus} from "../../types/RunningStatus";
 import {AxiosError} from "axios";
-import {ValidationErrors} from "../../types/ErrorMessage";
 
 export interface SpecificationFundingApprovalRouteProps {
     fundingStreamId: string;
@@ -213,7 +212,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             specificationId={specificationId}
                             fundingStreamId={fundingStreamId}
                             fundingPeriodId={fundingPeriodId}
-                            versionId={specification.providerVersionId}
+                            specCoreProviderVersionId={specification.providerVersionId}
                             enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
                             providerSearchResults={publishedProviderSearchResults}
                             canRefreshFunding={canRefreshFunding}

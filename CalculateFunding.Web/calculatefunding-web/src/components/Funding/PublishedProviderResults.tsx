@@ -14,7 +14,7 @@ export interface IPublishedProviderResultsProps {
     specificationId: string,
     fundingStreamId: string,
     fundingPeriodId: string,
-    versionId: string,
+    specCoreProviderVersionId: string,
     enableBatchSelection: boolean,
     providerSearchResults: PublishedProviderSearchResults | undefined,
     canRefreshFunding: boolean | undefined,
@@ -101,7 +101,7 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                 <PublishedProviderRow
                     key={`provider-${i}`}
                     publishedProvider={provider}
-                    specProviderVersionId={props.versionId}
+                    specCoreProviderVersionId={props.specCoreProviderVersionId}
                     enableSelection={props.enableBatchSelection}
                     isSelected={state.providerVersionIds.includes(provider.publishedProviderVersionId)}
                     handleItemSelectionToggle={handleItemSelectionToggle}

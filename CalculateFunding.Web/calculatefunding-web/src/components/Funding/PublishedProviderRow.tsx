@@ -5,9 +5,9 @@ import {PublishedProviderNameColumn} from "./PublishedProviderNameColumn";
 
 export interface IPublishedProviderRowProps {
     publishedProvider: PublishedProviderResult;
+    specCoreProviderVersionId: string;
     enableSelection: boolean;
     isSelected: boolean;
-    specProviderVersionId: string;
     handleItemSelectionToggle: any
 }
 
@@ -18,7 +18,7 @@ export const PublishedProviderRow = (props: IPublishedProviderRowProps) => {
         <tr key={provider.publishedProviderVersionId}>
             <PublishedProviderNameColumn
                         id={`provider-approval-${provider.publishedProviderVersionId}`}
-                        fundingOverviewUrl={`/Approvals/ProviderFundingOverview/${provider.specificationId}/${provider.ukprn}/${props.specProviderVersionId}/${provider.fundingStreamId}/${provider.fundingPeriodId}`}
+                        fundingOverviewUrl={`/Approvals/ProviderFundingOverview/${provider.specificationId}/${provider.ukprn}/${props.specCoreProviderVersionId}/${provider.fundingStreamId}/${provider.fundingPeriodId}`}
                         enableSelection={props.enableSelection}
                         handleItemSelectionToggle={props.handleItemSelectionToggle}
                         isSelected={props.isSelected}

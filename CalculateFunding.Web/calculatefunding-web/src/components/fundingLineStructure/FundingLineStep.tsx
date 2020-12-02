@@ -1,62 +1,65 @@
 import * as React from "react";
-import {
-    FundingStructureType, IFundingStructureItem
-} from "../../types/FundingStructureItem";
+import {FundingStructureType, FundingStructureItem} from "../../types/FundingStructureItem";
 import {CollapsibleSteps} from "../CollapsibleSteps";
+import {PublishedProviderError} from "../../types/PublishedProviderError";
 
-export function FundingLineStep(props: { fundingStructureItem: IFundingStructureItem, expanded: boolean, showResults: boolean, callback: any}) {
+export interface FundingLineStepProps {
+    key: string,
+    showResults: boolean,
+    expanded: boolean,
+    fundingStructureItem: FundingStructureItem,
+    fundingLineErrors?: PublishedProviderError[] | undefined,
+    callback: any
+}
+
+export function FundingLineStep(props: FundingLineStepProps) {
     const fundingStructureItems = props.fundingStructureItem.fundingStructureItems;
     const expanded = props.expanded;
-    let fundingType = "";
+
     function collapsibleStepsChanged(expanded: boolean, name: string) {
         props.callback(expanded, name);
     }
-    const parentFundingLineName :string = fundingStructureItems && fundingStructureItems.length > 0 ? fundingStructureItems[0].name : "";
+
+    if (!fundingStructureItems || fundingStructureItems.length === 0) return null;
+
     return <div>
         {
-            (fundingStructureItems && fundingStructureItems.length > 0) ? fundingStructureItems.map((innerFundingLineItem, index) => {
-                    let displayFundingType = false;
-                    if (fundingType !== FundingStructureType[innerFundingLineItem.type])
-                    {
-                        displayFundingType = true;
-                        fundingType = FundingStructureType[innerFundingLineItem.type];
-                    }
-                    let linkValue = "";
-                    if (innerFundingLineItem.calculationId != null && innerFundingLineItem.calculationId !== '') {
-                        linkValue = props.showResults ?
-                            `/ViewCalculationResults/${innerFundingLineItem.calculationId}` :
-                            `/Specifications/EditCalculation/${innerFundingLineItem.calculationId}`;
-                    }
-                    return (
-                        <CollapsibleSteps
-                            customRef={innerFundingLineItem.customRef}
-                            key={index}
-                            uniqueKey={index.toString()}
-                            title={displayFundingType?fundingType: ""}
-                            calculationType={innerFundingLineItem.calculationType != null ? innerFundingLineItem.calculationType : ""}
-                            value={innerFundingLineItem.value != null? innerFundingLineItem.value : ""}
-                            description={innerFundingLineItem.name}
-                            status={(innerFundingLineItem.calculationPublishStatus != null && innerFundingLineItem.calculationPublishStatus !== '') ?
-                                innerFundingLineItem.calculationPublishStatus: ""}
-                            step={displayFundingType?innerFundingLineItem.level.toString(): ""}
-                            expanded={expanded || innerFundingLineItem.expanded}
-                            link={linkValue}
-                            hasChildren={innerFundingLineItem.fundingStructureItems != null && innerFundingLineItem.fundingStructureItems.length > 0}
-                            lastUpdatedDate={innerFundingLineItem.lastUpdatedDate}
-                            callback={collapsibleStepsChanged}>
-                            {
-                                innerFundingLineItem.fundingStructureItems ?
-                                    (<FundingLineStep fundingStructureItem={innerFundingLineItem}
-                                                      expanded={expanded}
-                                                      showResults={props.showResults}
-                                                      callback={collapsibleStepsChanged}/>)
-                                    : null
-                            }
-                        </CollapsibleSteps>
-                    )
+            fundingStructureItems.map((item, index) => {
+                let linkValue = "";
+                if (item.type === FundingStructureType.Calculation) {
+                    linkValue = props.showResults ?
+                        `/ViewCalculationResults/${item.calculationId}` :
+                        `/Specifications/EditCalculation/${item.calculationId}`;
                 }
+                return (
+                    <CollapsibleSteps
+                        customRef={item.customRef}
+                        key={index}
+                        uniqueKey={index.toString()}
+                        title={item.type === FundingStructureType.FundingLine ? "Funding Line" : item.type}
+                        calculationType={item.calculationType != null ? item.calculationType : ""}
+                        value={item.value != null ? item.value : ""}
+                        description={item.name}
+                        status={item.calculationPublishStatus}
+                        step={item.level.toString()}
+                        expanded={expanded || item.expanded === true}
+                        link={linkValue}
+                        hasChildren={item.fundingStructureItems != null && item.fundingStructureItems.length > 0}
+                        lastUpdatedDate={item.lastUpdatedDate}
+                        callback={collapsibleStepsChanged}>
+                        {
+                            item.fundingStructureItems &&
+                                <FundingLineStep
+                                    key={item.name.replace(" ", "") + index}
+                                    fundingStructureItem={item}
+                                    expanded={expanded}
+                                    showResults={props.showResults}
+                                    fundingLineErrors={props.fundingLineErrors}
+                                    callback={collapsibleStepsChanged}/>
+                        }
+                    </CollapsibleSteps>
                 )
-                : null
+            })
         }
     </div>
 }

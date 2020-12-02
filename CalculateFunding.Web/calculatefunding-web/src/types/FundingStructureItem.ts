@@ -1,38 +1,28 @@
 import React from "react";
-
-export interface IFundingStructureItem {
-    level : number;
-    name : string;
-    calculationId : string;
-    calculationPublishStatus : string;
-    type : FundingStructureType;
-    value?: string;
-    calculationType?: string;
-    fundingStructureItems: IFundingStructureItem[];
-    parentName: string;
-    expanded: boolean;
-    customRef?: React.MutableRefObject<null>;
-    lastUpdatedDate?: Date
-}
+import {PublishStatus} from "./PublishStatusModel";
 
 export enum FundingStructureType{
-    FundingLine = "Funding Line",
+    FundingLine = "FundingLine",
     Calculation = "Calculation",
-    "Funding Line" = FundingLine,
 }
 
-
 export interface PublishedProviderFundingStructure {
-    items : PublishedProviderFundingStructureItem[];
+    items : FundingStructureItem[];
     PublishedProviderVersion: number;
 }
 
-export interface PublishedProviderFundingStructureItem {
-    level : number;
-    name : string;
-    calculationId : string;
-    type : FundingStructureType;
-    value: string;
-    calculationType: string;
-    fundingStructureItems: PublishedProviderFundingStructureItem[];
+export interface FundingStructureItem {
+    level : number,
+    name : string,
+    fundingLineCode : string,
+    calculationId : string,
+    type : FundingStructureType,
+    value: string,
+    calculationType: string,
+    calculationPublishStatus?: PublishStatus | undefined,
+    parentName?: string,
+    expanded?: boolean,
+    customRef?: React.MutableRefObject<null>,
+    lastUpdatedDate?: Date,
+    fundingStructureItems: FundingStructureItem[]
 }

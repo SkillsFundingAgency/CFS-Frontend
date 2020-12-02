@@ -20,8 +20,9 @@ export async function applyCustomProfile(profile: ApplyCustomProfileRequest) {
     });
 }
 
-export async function getPublishedProviderFundingStructureService(publishedProviderVersionId: string): Promise<AxiosResponse<PublishedProviderFundingStructure>> {
-    return axios(`/api/publishedproviderfundingstructure/${publishedProviderVersionId}`, {
+export async function getCurrentPublishedProviderFundingStructureService(specificationId: string, fundingStreamId: string, providerId: string): 
+    Promise<AxiosResponse<PublishedProviderFundingStructure>> {
+    return axios(`/api/specifications/${specificationId}/publishedProviders/${providerId}/fundingStreams/${fundingStreamId}/fundingStructure`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

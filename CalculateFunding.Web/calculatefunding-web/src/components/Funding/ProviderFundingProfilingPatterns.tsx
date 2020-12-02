@@ -31,7 +31,7 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                                 </dd>
                                 <dd className="govuk-summary-list__actions">
                                     <Link
-                                        to={`/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.providerVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${p.fundingLineCode}`}>
+                                        to={`/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${p.fundingLineCode}`}>
                                         Change
                                     </Link>
                                 </dd>

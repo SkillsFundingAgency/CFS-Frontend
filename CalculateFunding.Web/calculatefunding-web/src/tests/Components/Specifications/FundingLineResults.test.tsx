@@ -3,69 +3,124 @@ import {MemoryRouter, Route, Switch} from "react-router";
 import {act, fireEvent, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {PublishStatus} from "../../../types/PublishStatusModel";
-import {FundingStructureType, IFundingStructureItem} from "../../../types/FundingStructureItem";
+import {FundingStructureItem, FundingStructureType} from "../../../types/FundingStructureItem";
+import {getCurrentPublishedProviderFundingStructureService} from "../../../services/publishedProviderFundingLineService";
 
-const renderFundingLineResults = () => {
+const renderViewSpecificationFundingLineResults = () => {
     const {FundingLineResults} = require('../../../components/fundingLineStructure/FundingLineResults');
     return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
         <Switch>
-            <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus"  >
+            <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
                 <FundingLineResults
-                    approvalStatus={PublishStatus.Approved}
+                    status={PublishStatus.Approved}
                     fundingPeriodId={"test fundingPeriodId"}
                     fundingStreamId={"test fundingStreamId"}
                     specificationId={"test spec id"}
-                    addErrorMessage={jest.fn()}
-                    clearErrorMessages={jest.fn()} />
+                    addError={jest.fn()}
+                    clearErrorMessages={jest.fn()}/>
             </Route>
         </Switch>
     </MemoryRouter>)
 }
 
-const renderFundingLineResultsWithProviderId = () => {
+const renderProviderFundingLineResults = () => {
     const {FundingLineResults} = require('../../../components/fundingLineStructure/FundingLineResults');
     return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
         <Switch>
-            <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus"  >
+            <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
                 <FundingLineResults
-                    approvalStatus={PublishStatus.Approved}
+                    status={undefined}
                     fundingPeriodId={"test fundingPeriodId"}
                     fundingStreamId={"test fundingStreamId"}
                     specificationId={"test spec id"}
                     providerId={"test provider id"}
-                    addErrorMessage={jest.fn()}
-                    clearErrorMessages={jest.fn()} />
+                    addError={jest.fn()}
+                    clearErrorMessages={jest.fn()}/>
             </Route>
         </Switch>
     </MemoryRouter>)
 }
 
-const renderFundingLineResultsWithProviderVersionId = () => {
-    const {FundingLineResults} = require('../../../components/fundingLineStructure/FundingLineResults');
-    return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
-        <Switch>
-            <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus"  >
-                <FundingLineResults
-                    approvalStatus={PublishStatus.Approved}
-                    fundingPeriodId={"test fundingPeriodId"}
-                    fundingStreamId={"test fundingStreamId"}
-                    specificationId={"test spec id"}
-                    providerVersionId={"test provider version id"}
-                    addErrorMessage={jest.fn()}
-                    clearErrorMessages={jest.fn()} />
-            </Route>
-        </Switch>
-    </MemoryRouter>)
-}
+describe("<FundingLineResults/> tests", () => {
+    describe("<FundingLineResults service checks />  ", () => {
+        beforeEach(() => {
+            jest.mock('../../../services/fundingStructuresService', () => mockFundingLineStructureService());
+            jest.mock('../../../services/publishedProviderFundingLineService', () => mockCurrentPublishedProviderFundingStructureService());
+        });
+
+        afterEach(() => jest.clearAllMocks());
+
+        it("calls getFundingLineStructureService from the fundingStructuresService", async () => {
+            const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
+            const {getFundingLineStructureByProviderService} = require('../../../services/fundingStructuresService');
+
+            renderViewSpecificationFundingLineResults();
+
+            await waitFor(() => expect(getFundingLineStructureService).toBeCalledTimes(1))
+            await waitFor(() => expect(getFundingLineStructureByProviderService).toBeCalledTimes(0))
+        });
+
+        it("calls getFundingLineStructureByProviderService from the fundingStructuresService", async () => {
+            const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
+            const {getCurrentPublishedProviderFundingStructureService} = require('../../../services/publishedProviderFundingLineService');
+
+            renderProviderFundingLineResults();
+
+            await waitFor(() => expect(getFundingLineStructureService).toBeCalledTimes(0))
+            await waitFor(() => expect(getCurrentPublishedProviderFundingStructureService).toBeCalledTimes(1))
+        });
+    });
+
+    describe('<FundingLineResults /> page render checks ', () => {
+        beforeEach(() => {
+            jest.mock('../../../services/fundingStructuresService', () => mockFundingLineStructureService());
+            jest.mock('../../../services/publishedProviderFundingLineService', () => mockCurrentPublishedProviderFundingStructureService());
+        });
+
+        afterEach(() => jest.clearAllMocks());
+
+        it('shows approve status in funding line structure tab', async () => {
+            const {queryAllByText} = renderViewSpecificationFundingLineResults();
+            await waitFor(() => expect(queryAllByText('Draft')[0]).toHaveClass("govuk-tag"));
+        });
+
+        it('renders collapsible steps', async () => {
+            const {container} = renderViewSpecificationFundingLineResults();
+            await waitFor(() => expect(container.querySelectorAll('.collapsible-steps')).toHaveLength(1))
+        });
+
+        it('shows search box with an autocomplete input in funding line structure tab', async () => {
+            const {container} = renderViewSpecificationFundingLineResults();
+            await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .search-container')).toHaveLength(1))
+            await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .search-container #input-auto-complete')).toHaveLength(1))
+        });
+
+        it('shows open-close all buttons correctly', async () => {
+            const {container} = renderViewSpecificationFundingLineResults();
+            await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0]).toBeVisible());
+            await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[1]).not.toBeVisible());
+
+            act(() => {
+                fireEvent.click(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0])
+            });
+
+            await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0]).not.toBeVisible());
+            await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[1]).toBeVisible());
+        });
+    });
+});
 
 
 const mockFundingLineStructureService = () => {
     const fundingLineStructureService = jest.requireActual('../../../services/fundingStructuresService');
-    const mockedFundingStructureItems: IFundingStructureItem[] = [{
+    const mockedFundingStructureItems: FundingStructureItem[] = [{
         level: 1,
         name: "",
         calculationId: "",
-        calculationPublishStatus: "",
+        fundingLineCode: "XXX-1",
+        value: "",
+        calculationType: "",
+        calculationPublishStatus: PublishStatus.Draft,
         type: FundingStructureType.Calculation,
         fundingStructureItems: [],
         parentName: "",
@@ -82,11 +137,11 @@ const mockFundingLineStructureService = () => {
     }
 }
 
-const mockPublishedProviderFundingLineService = () => {
+const mockCurrentPublishedProviderFundingStructureService = () => {
     const publishedProviderFundingLineService = jest.requireActual('../../../services/publishedProviderFundingLineService');
     return {
         ...publishedProviderFundingLineService,
-        getPublishedProviderFundingStructureService: jest.fn(() => Promise.resolve({
+        getCurrentPublishedProviderFundingStructureService: jest.fn(() => Promise.resolve({
             data: {
                 items: [{
                     level: 1,
@@ -102,86 +157,3 @@ const mockPublishedProviderFundingLineService = () => {
         }))
     }
 }
-
-describe("<FundingLineResults service checks />  ", () => {
-    beforeEach(() => {
-        jest.mock('../../../services/fundingStructuresService', () => mockFundingLineStructureService());
-        jest.mock('../../../services/publishedProviderFundingLineService', () => mockPublishedProviderFundingLineService());
-    });
-
-    afterEach(() => jest.clearAllMocks());
-
-    it("calls getFundingLineStructureService from the fundingStructuresService", async () => {
-        const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
-        const {getFundingLineStructureByProviderService} = require('../../../services/fundingStructuresService');
-        const {getPublishedProviderFundingStructureService} = require('../../../services/publishedProviderFundingLineService');
-
-        renderFundingLineResults();
-
-        await waitFor(() => expect(getFundingLineStructureService).toBeCalledTimes(1))
-        await waitFor(() => expect(getFundingLineStructureByProviderService).toBeCalledTimes(0))
-        await waitFor(() => expect(getPublishedProviderFundingStructureService).toBeCalledTimes(0))
-    });
-
-    it("calls getFundingLineStructureByProviderService from the fundingStructuresService", async () => {
-        const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
-        const {getFundingLineStructureByProviderService} = require('../../../services/fundingStructuresService');
-        const {getPublishedProviderFundingStructureService} = require('../../../services/publishedProviderFundingLineService');
-
-        renderFundingLineResultsWithProviderId();
-
-        await waitFor(() => expect(getFundingLineStructureService).toBeCalledTimes(0))
-        await waitFor(() => expect(getFundingLineStructureByProviderService).toBeCalledTimes(1))
-        await waitFor(() => expect(getPublishedProviderFundingStructureService).toBeCalledTimes(0))
-    });
-
-    it("calls getPublishedProviderFundingStructureService from the fundingStructuresService", async () => {
-        const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
-        const {getFundingLineStructureByProviderService} = require('../../../services/fundingStructuresService');
-        const {getPublishedProviderFundingStructureService} = require('../../../services/publishedProviderFundingLineService');
-
-        renderFundingLineResultsWithProviderVersionId();
-
-        await waitFor(() => expect(getFundingLineStructureService).toBeCalledTimes(0))
-        await waitFor(() => expect(getFundingLineStructureByProviderService).toBeCalledTimes(0))
-        await waitFor(() => expect(getPublishedProviderFundingStructureService).toBeCalledTimes(1))
-    });
-});
-
-describe('<FundingLineResults /> page render checks ', () => {
-    beforeEach(() => {
-        jest.mock('../../../services/fundingStructuresService', () => mockFundingLineStructureService());
-        jest.mock('../../../services/publishedProviderFundingLineService', () => mockPublishedProviderFundingLineService());
-    });
-
-    afterEach(() => jest.clearAllMocks());
-
-    it('shows approve status in funding line structure tab', async () => {
-        const {queryAllByText} = renderFundingLineResults();
-        await waitFor(() => expect(queryAllByText('Draft')[0]).toHaveClass("govuk-tag"));
-    });
-
-    it('renders collapsible steps', async () => {
-        const {container} = renderFundingLineResults();
-        await waitFor(() => expect(container.querySelectorAll('.collapsible-steps')).toHaveLength(1))
-    });
-
-    it('shows search box with an autocomplete input in funding line structure tab', async () => {
-        const {container} = renderFundingLineResults();
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .search-container')).toHaveLength(1))
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .search-container #input-auto-complete')).toHaveLength(1))
-    });
-
-    it('shows open-close all buttons correctly', async () => {
-        const {container} = renderFundingLineResults();
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0]).toBeVisible());
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[1]).not.toBeVisible());
-
-        act(() => {
-            fireEvent.click(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0])
-        });
-
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[0]).not.toBeVisible());
-        await waitFor(() => expect(container.querySelectorAll('#fundingline-structure .govuk-accordion__open-all')[1]).toBeVisible());
-    });
-});

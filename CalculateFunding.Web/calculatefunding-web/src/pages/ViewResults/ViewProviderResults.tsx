@@ -15,7 +15,7 @@ import {searchForCalculationsByProviderService} from "../../services/calculation
 import {Link} from "react-router-dom";
 import Pagination from "../../components/Pagination";
 import {getFundingLineStructureByProviderService} from "../../services/fundingStructuresService";
-import {FundingStructureType, IFundingStructureItem} from "../../types/FundingStructureItem";
+import {FundingStructureType, FundingStructureItem} from "../../types/FundingStructureItem";
 import {AutoComplete} from "../../components/AutoComplete";
 import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../../components/CollapsibleSteps";
 import {BackToTop} from "../../components/BackToTop";
@@ -25,7 +25,7 @@ import {
     expandCalculationsByName,
     getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName,
     updateFundingLineExpandStatus
-} from "../../components/fundingLineStructure/FundingLineStructure";
+} from "../../components/fundingLineStructure/FundingLineStructureHelper";
 import {NoData} from "../../components/NoData";
 import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
 import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
@@ -99,9 +99,9 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     });
     const [selectedSpecificationId, setSelectedSpecificationId] = useState<string>("");
     const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
-    const [fundingLines, setFundingLines] = useState<IFundingStructureItem[]>([]);
+    const [fundingLines, setFundingLines] = useState<FundingStructureItem[]>([]);
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
-    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<IFundingStructureItem[]>([]);
+    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<FundingStructureItem[]>([]);
     const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
@@ -222,7 +222,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
 
     useEffect(() => {
         if (fundingLines.length !== 0) {
-                setFundingLineSearchSuggestions(getDistinctOrderedFundingLineCalculations(fundingLines));
+                setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
                 setFundingLinesOriginalData(fundingLines);
         }
     }, [fundingLines]);
@@ -288,7 +288,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     }
 
     function searchFundingLines(calculationName: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = fundingLinesOriginalData as IFundingStructureItem[];
+        const fundingLinesCopy: FundingStructureItem[] = fundingLinesOriginalData as FundingStructureItem[];
         expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
         setFundingLines(fundingLinesCopy);
         setRerenderFundingLineSteps(true);
@@ -298,7 +298,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     }
 
     function collapsibleStepsChanged(expanded: boolean, name: string) {
-        const fundingLinesCopy: IFundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
+        const fundingLinesCopy: FundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
         setFundingLines(fundingLinesCopy);
 
         const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
@@ -335,7 +335,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
 
                 getFundingLineStructureByProviderService(result.id, result.fundingPeriod.id, result.fundingStreams[0].id, match.params.providerId).then((response) => {
                     if (response.status === 200) {
-                        const result = response.data as IFundingStructureItem[];
+                        const result = response.data as FundingStructureItem[];
                         setFundingLines(result);
                     }
                     setIsLoading(prevState => {
@@ -473,14 +473,13 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                         customRef={f.customRef}
                                                         key={"collapsible-steps" + index}
                                                         uniqueKey={index.toString()}
-                                                        title={FundingStructureType[f.type]}
+                                                        title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
                                                         calculationType={f.calculationType != null ? f.calculationType : ""}
                                                         value={f.value != null ? f.value : ""}
                                                         description={f.name}
-                                                        status={(f.calculationPublishStatus != null && f.calculationPublishStatus !== '') ?
-                                                            f.calculationPublishStatus : ""}
+                                                        status={f.calculationPublishStatus}
                                                         step={f.level.toString()}
-                                                        expanded={fundingLinesExpandedStatus || f.expanded}
+                                                        expanded={fundingLinesExpandedStatus || f.expanded === true}
                                                         link={linkValue}
                                                         hasChildren={f.fundingStructureItems != null}
                                                         callback={collapsibleStepsChanged}>
