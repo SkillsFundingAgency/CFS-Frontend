@@ -14,9 +14,18 @@ export interface ITemplateButtonsProps {
     templateVersion: number,
     isCurrentVersion: boolean,
     isSaving: boolean,
+    isFullScreen: boolean,
     handleSave: () => void,
     handleRestore: (templateVersion: number) => void,
-    handlePublish: () => void,
+    handlePublish: () => void
+}
+
+const saveButtonFullScreenStyle: React.CSSProperties = {
+    zIndex: 10,
+    width: "68px",
+    bottom: 10,
+    left: 10,
+    position: "fixed",
 }
 
 export const TemplateButtons: React.FC<ITemplateButtonsProps> =
@@ -32,9 +41,10 @@ export const TemplateButtons: React.FC<ITemplateButtonsProps> =
          unsavedChanges,
          isCurrentVersion,
          isSaving,
+         isFullScreen,
          handleSave,
          handleRestore,
-         handlePublish
+         handlePublish,
      }) => {
         const [confirmRestore, setConfirmRestore] = useState<boolean>(false);
 
@@ -59,7 +69,7 @@ export const TemplateButtons: React.FC<ITemplateButtonsProps> =
                 <div className="govuk-grid-column-full">
                     {isEditMode && canEditTemplate && !confirmRestore &&
                     <button className="govuk-button govuk-!-margin-right-1" data-testid='save-button'
-                            disabled={!unsavedChanges || isSaving} onClick={handleSave}>Save
+                            disabled={!unsavedChanges || isSaving} onClick={handleSave} style={isFullScreen ? saveButtonFullScreenStyle : {}}>Save
                     </button>}
                     {isEditMode && canApproveTemplate && templateStatus !== TemplateStatus.Published && !confirmRestore &&
                     <button className="govuk-button govuk-button--warning govuk-!-margin-right-1" data-testid='publish-button'

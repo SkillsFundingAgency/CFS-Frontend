@@ -95,6 +95,7 @@ export function EditTemplate() {
     const [targetScale, setTargetScale] = useState<number>(1);
     const [undos, setUndos] = useState<number>(0);
     const [redos, setRedos] = useState<number>(0);
+    const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
     const {canEditTemplate, canApproveTemplate, canCreateTemplate, missingPermissions} =
         useTemplatePermissions(["edit"], template ? [template.fundingStreamId] : []);
     const {
@@ -520,6 +521,31 @@ export function EditTemplate() {
         return !isClonedNode(id) || isCloneRoot(fundingLines, id);
     };
 
+    const fullScreenStyle: React.CSSProperties = {
+        zIndex: 1,
+        width: "100%",
+        height: "100%",
+        top: 0,
+        left: 0,
+        position: "fixed"
+    }
+
+    const toolBarFullScreenStyle: React.CSSProperties = {
+        zIndex: 10,
+        width: "100%",
+        top: 10,
+        left: 0,
+        position: "fixed"
+    }
+
+    const saveMessageFullScreenStyle: React.CSSProperties = {
+        zIndex: 10,
+        width: "90%",
+        bottom: 33,
+        left: 100,
+        position: "fixed"
+    }
+
     return (
         <div>
             <Header location={Section.Templates} />
@@ -641,7 +667,7 @@ export function EditTemplate() {
                         </>}
                     {mode === Mode.Edit && canEditTemplate &&
                         <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full">
+                            <div className="govuk-grid-column-full" style={isFullScreen ? toolBarFullScreenStyle : {}}>
                                 <div className="govuk-grid-column-one-third govuk-!-padding-left-0 search-container">
                                     <AutoComplete suggestions={allFundingLinesAndCalculations}
                                         callback={search} includePager={true} mode={AutoCompleteMode.PrefixedId} />
@@ -677,7 +703,7 @@ export function EditTemplate() {
                                 </div>
                             </div>
                         </div>}
-                    <div className="govuk-!-margin-bottom-0 gov-org-chart-container">
+                    <div className="govuk-!-margin-bottom-0 gov-org-chart-container" style={isFullScreen ? fullScreenStyle : {}}>
                         <div id="template"
                             className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
                             {errors.map((error, i) => error.fieldName === "template" &&
@@ -711,12 +737,13 @@ export function EditTemplate() {
                                     targetScale={targetScale}
                                 />
                                 <TemplateBuilderToolBar
-                                    containerClassName="template-builder-container"
                                     orgChart={orgchart}
                                     setChartScale={setChartScale}
                                     chartScale={chartScale}
                                     setTargetScale={setTargetScale}
                                     targetScale={targetScale}
+                                    isFullScreen={isFullScreen}
+                                    setIsFullScreen={setIsFullScreen}
                                 />
                             </div>
                         </div>
@@ -733,6 +760,7 @@ export function EditTemplate() {
                         unsavedChanges={isDirty}
                         isSaving={isSaving}
                         isCurrentVersion={template.isCurrentVersion}
+                        isFullScreen={isFullScreen}
                         handleSave={handleSaveContentClick}
                         handleRestore={handleRestoreTemplateClick}
                         handlePublish={handlePublishClick}
@@ -741,7 +769,7 @@ export function EditTemplate() {
                         Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false} />
                         {` by ${template && template.authorName}`}
                     </p>
-                    {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                    {saveMessage.length > 0 ? <span className="govuk-error-message" style={isFullScreen ? saveMessageFullScreenStyle : {}}>{saveMessage}</span> : null}
                     <Link to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"}
                         id="back-button"
                         className="govuk-link govuk-back-link govuk-link--no-visited-state">

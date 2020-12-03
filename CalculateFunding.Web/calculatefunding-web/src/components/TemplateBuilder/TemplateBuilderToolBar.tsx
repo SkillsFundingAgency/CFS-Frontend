@@ -2,24 +2,24 @@ import React, {useState} from "react";
 import "../../styles/TemplateBuilderToolBar.scss";
 
 export interface TemplateBuilderToolBarProps {
-    containerClassName: string,
     setChartScale: React.Dispatch<React.SetStateAction<number>>,
     chartScale: number,
     orgChart: React.RefObject<HTMLDivElement>,
     setTargetScale: React.Dispatch<React.SetStateAction<number>>,
     targetScale: number,
+    isFullScreen: boolean,
+    setIsFullScreen: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
 export function TemplateBuilderToolBar({
-    containerClassName,
     setChartScale,
     chartScale,
     orgChart,
     setTargetScale,
     targetScale,
+    isFullScreen,
+    setIsFullScreen
 }: TemplateBuilderToolBarProps) {
-    const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
-
     const handleZoomIn = () => {
         setChartScale(chartScale < 0 ? chartScale * -1.1 : chartScale * 1.1);
     }
@@ -29,17 +29,7 @@ export function TemplateBuilderToolBar({
     }
 
     const handleFullScreen = () => {
-        const elem = document.getElementById(containerClassName);
-        if (elem && elem.requestFullscreen) {
-            if (!isFullScreen) {
-                elem.requestFullscreen().then(() => {
-                    setIsFullScreen(true);
-                });
-            } else {
-                document.exitFullscreen();
-                setIsFullScreen(false);
-            }
-        }
+        setIsFullScreen(!isFullScreen);
     }
 
     const handleFitToScreen = () => {

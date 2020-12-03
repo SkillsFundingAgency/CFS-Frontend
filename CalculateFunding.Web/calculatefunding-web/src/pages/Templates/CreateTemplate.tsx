@@ -164,6 +164,7 @@ export const CreateTemplate = () => {
                             <LoadingStatus title={"Loading options..."} description={"Please wait whilst the options are loading"} />
                         </div>
                         {!isLoading &&
+                        <>
                             <FundingStreamAndPeriodSelection
                                 hideFundingStreamSelection={false}
                                 fundingStreams={fundingStreams}
@@ -171,31 +172,32 @@ export const CreateTemplate = () => {
                                 errors={errors}
                                 onFundingStreamChange={handleFundingStreamChange}
                                 onFundingPeriodChange={handleFundingPeriodChange}
-                            />}
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full govuk-form-group">
-                                <label className="govuk-label" htmlFor="description">
-                                    Description
-                            </label>
-                                <textarea className="govuk-textarea" id="description" rows={8}
-                                    aria-describedby="description-hint"
-                                    maxLength={1000}
-                                    onChange={handleDescriptionChange} />
+                            />
+                            <div className="govuk-grid-row">
+                                <div className="govuk-grid-column-full govuk-form-group">
+                                    <label className="govuk-label" htmlFor="description">
+                                        Description
+                                </label>
+                                    <textarea className="govuk-textarea" id="description" rows={8}
+                                        aria-describedby="description-hint"
+                                        maxLength={1000}
+                                        onChange={handleDescriptionChange} />
+                                </div>
                             </div>
-                        </div>
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-full">
-                                {selectedFundingPeriodId && selectedFundingStreamId &&
-                                    <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
-                                Template</button>}
-                            &nbsp;
-                            <Link id="cancel-create-template" to="/Templates/List" className="govuk-button govuk-button--secondary"
-                                    data-module="govuk-button">
-                                    Back
-                            </Link>
-                                {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                            <div className="govuk-grid-row">
+                                <div className="govuk-grid-column-full">
+                                    {selectedFundingPeriodId && selectedFundingStreamId &&
+                                        <button className="govuk-button" data-testid='save' onClick={handleSaveClick} disabled={!enableSaveButton}>Create
+                                    Template</button>}
+                                &nbsp;
+                                <Link id="cancel-create-template" to="/Templates/List" className="govuk-button govuk-button--secondary"
+                                        data-module="govuk-button">
+                                        Back
+                                </Link>
+                                    {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+                                </div>
                             </div>
-                        </div>
+                        </>}
                     </form>
                 }
             </div>

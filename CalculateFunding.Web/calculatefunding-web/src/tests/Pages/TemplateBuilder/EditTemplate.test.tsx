@@ -52,7 +52,9 @@ const noPermissionsState: FundingStreamPermissions[] = [{
     canAssignProfilePattern: false,
     canDeleteProfilePattern: false,
     canEditProfilePattern: false,
-    canCreateProfilePattern: false
+    canCreateProfilePattern: false,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false
 }];
 
 const permissionsState: FundingStreamPermissions[] = [{
@@ -81,7 +83,9 @@ const permissionsState: FundingStreamPermissions[] = [{
     canAssignProfilePattern: false,
     canDeleteProfilePattern: false,
     canEditProfilePattern: false,
-    canCreateProfilePattern: false
+    canCreateProfilePattern: false,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false
 }];
 
 const mockTemplate: TemplateResponse = {
