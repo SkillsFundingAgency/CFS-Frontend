@@ -17,6 +17,7 @@ using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 
@@ -540,6 +541,72 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Value
                 .Should()
                 .BeSameAs(expectedLatestDate);
+        }
+
+        [TestMethod]
+        public async Task UploadBatchDelegatesToPublishingEndPoint()
+        {
+            byte[] batchStream = new byte[0];
+            
+            BatchUploadResponse expectedResponse = new BatchUploadResponse();
+
+            _publishingApiClient.UploadBatch(Arg.Is<BatchUploadRequest>(request =>
+                    ReferenceEquals(request.Stream, batchStream)))
+                .Returns(new ApiResponse<BatchUploadResponse>(HttpStatusCode.OK, expectedResponse));
+
+            OkObjectResult result = await _publishController.UploadBatch(new BatchUploadRequestViewModel
+            {
+                Stream = batchStream
+            }) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
+        public async Task QueueBatchUploadValidationDelegatesToPublishingEndPoint()
+        {
+            BatchUploadValidationRequestViewModel request = new BatchUploadValidationRequestViewModel
+            {
+                BatchId = NewRandomString(),
+                FundingPeriodId = NewRandomString(),
+                FundingStreamId = NewRandomString()
+            };     
+            
+            JobCreationResponse expectedResponse = new JobCreationResponse();
+
+            _publishingApiClient.QueueBatchUploadValidation(Arg.Is<BatchUploadValidationRequest>(req =>
+                    req.BatchId == request.BatchId &&
+                    req.FundingStreamId == request.FundingStreamId &&
+                    req.FundingPeriodId == request.FundingPeriodId))
+                .Returns(new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.OK, expectedResponse));
+            
+            OkObjectResult result = await _publishController.QueueBatchUploadValidation(request) as OkObjectResult;
+            
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
+        public async Task GetBatchPublishedProviderIdsDelegatesToPublishingEndPoint()
+        {
+            string batchId = NewRandomString();
+            
+            IEnumerable<string> expectedResponse = ArraySegment<string>.Empty;
+
+            _publishingApiClient.GetBatchPublishedProviderIds(batchId)
+                .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, expectedResponse));
+            
+            OkObjectResult result = await _publishController.GetBatchPublishedProviderIds(batchId) as OkObjectResult;
+            
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
         }
 
         private static string NewRandomString() => Guid.NewGuid().ToString();

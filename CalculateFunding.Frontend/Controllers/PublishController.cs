@@ -570,6 +570,70 @@ namespace CalculateFunding.Frontend.Controllers
             return new OkObjectResult(response.Content.Errors);
         }
 
+        [HttpPost("api/publishedproviderbatch")]
+        public async Task<IActionResult> UploadBatch(BatchUploadRequestViewModel request)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+
+            ApiResponse<BatchUploadResponse> response = await _publishingApiClient.UploadBatch(new BatchUploadRequest
+            {
+                Stream = request.Stream
+            });
+            
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+            
+            return new OkObjectResult(response.Content);
+        }
+
+        [HttpPost("api/publishedproviderbatch/validate")]
+        public async Task<IActionResult> QueueBatchUploadValidation(BatchUploadValidationRequestViewModel request)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+
+            ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueBatchUploadValidation(new BatchUploadValidationRequest
+            {
+                BatchId = request.BatchId,
+                FundingPeriodId = request.FundingPeriodId,
+                FundingStreamId = request.FundingStreamId
+            });
+
+            if (response.IsBadRequest(out BadRequestObjectResult badRequestObject))
+            {
+                return badRequestObject;
+            }
+            
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+            
+            return new OkObjectResult(response.Content);
+        }
+
+        [HttpGet("publishedproviderbatch/{batchId}/publishedProviders")]
+        public async Task<IActionResult> GetBatchPublishedProviderIds([FromRoute] string batchId)
+        {
+            Guard.IsNullOrWhiteSpace(batchId, nameof(batchId));
+
+            ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetBatchPublishedProviderIds(batchId);
+            
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+            
+            return new OkObjectResult(response.Content);
+        }
+
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
         {
             if (!await _authorizationHelper.DoesUserHavePermission(

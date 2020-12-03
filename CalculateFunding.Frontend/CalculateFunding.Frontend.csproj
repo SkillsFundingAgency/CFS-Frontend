@@ -33,7 +33,7 @@
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Policies" Version="4.0.1" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Graph" Version="2.4.1" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Jobs" Version="3.0.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.19.6" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.20.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.1.4" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Providers" Version="4.2.1" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Results" Version="4.1.3" />
