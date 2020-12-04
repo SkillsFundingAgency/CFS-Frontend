@@ -3,7 +3,7 @@ import {EditCalculationRouteProps} from "../../../pages/Calculations/EditCalcula
 import {createLocation, createMemoryHistory} from 'history';
 import {match} from 'react-router';
 import {MemoryRouter} from 'react-router-dom';
-import {act, cleanup, render, screen, within} from '@testing-library/react';
+import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
@@ -27,9 +27,9 @@ import {CalculationType} from "../../../types/CalculationSearchResponse";
 
 const history = createMemoryHistory();
 export function EditCalculationTestData() {
-    function renderEditCalculation() {
+    const renderEditCalculation = async() => {
         const {EditCalculation} = require("../../../pages/Calculations/EditCalculation");
-        return render(
+        const component = render(
             <MemoryRouter>
                 <EditCalculation
                     excludeMonacoEditor={true}
@@ -37,6 +37,12 @@ export function EditCalculationTestData() {
                     location={location}
                     match={matchMock}/>
             </MemoryRouter>);
+        
+        await waitFor(() => {
+            expect(screen.queryByText(/Loading.../)).not.toBeInTheDocument();
+        });
+
+        return component;
     }
 
     const fundingStream: FundingStream = {
@@ -291,6 +297,10 @@ export function EditCalculationTestData() {
                 compileCalculationPreviewService: jest.fn(() => Promise.resolve({
                     data: mockFailedBuildResponse,
                     status: 400
+                })),
+                getCalculationProvidersService: jest.fn(() => Promise.resolve({
+                    data: {},
+                    status: 200
                 }))
             }
         });
@@ -304,6 +314,10 @@ export function EditCalculationTestData() {
                 compileCalculationPreviewService: jest.fn(() => Promise.resolve({
                     data: mockSuccessfulBuildResponse,
                     status: 200
+                })),
+                getCalculationProvidersService: jest.fn(() => Promise.resolve({
+                    data: {},
+                    status: 200
                 }))
             }
         });
@@ -316,6 +330,10 @@ export function EditCalculationTestData() {
                 ...service,
                 compileCalculationPreviewService: jest.fn(() => Promise.resolve({
                     data: mockSuccessfulBuildResponseWithNoProvider,
+                    status: 200
+                })),
+                getCalculationProvidersService: jest.fn(() => Promise.resolve({
+                    data: {},
                     status: 200
                 }))
             }

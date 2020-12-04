@@ -1,5 +1,4 @@
-import React from "react";
-import {act, cleanup, screen, waitFor, within} from '@testing-library/react';
+import {cleanup, screen, waitFor, within} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {EditCalculationTestData} from "./EditCalculationTestData";
@@ -27,11 +26,13 @@ describe("<EditCalculation> tests ", () => {
         it("renders the error message", async () => {
             const buildButton = screen.getByRole("button", {name: /Build calculation/});
 
-            act(() => userEvent.click(buildButton));
+            userEvent.click(buildButton);
 
-            expect(await screen.findByText(/There was a compilation error/)).toBeInTheDocument();
-            expect(await screen.findByText(/Typo error/)).toBeInTheDocument();
-            expect(screen.queryByText(/Build successful/)).not.toBeInTheDocument();
+            await waitFor(async () => {
+                expect(await screen.findByText(/There was a compilation error/)).toBeInTheDocument();
+                expect(await screen.findByText(/Typo error/)).toBeInTheDocument();
+                expect(screen.queryByText(/Build successful/)).not.toBeInTheDocument();
+            });
         });
     });
 
@@ -48,7 +49,7 @@ describe("<EditCalculation> tests ", () => {
         afterEach(() => jest.clearAllMocks());
 
         it("does not render any errors", async () => {
-            expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+            expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
         });
 
         it("renders the specification name", async () => {

@@ -1,5 +1,4 @@
-import React from "react";
-import {act, screen} from '@testing-library/react';
+import {act, fireEvent, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {EditCalculationTestData} from "./EditCalculationTestData";
@@ -25,22 +24,19 @@ describe("<EditCalculation> tests with successful build source code", () => {
 
     it("renders code compiled successfully message", async () => {
         const buildButton = screen.getByRole("button", {name: /Build calculation/});
-        if (buildButton != undefined) {
-            act(() => userEvent.click(buildButton));
-
-            expect(await screen.findByText(/Code compiled successfully/)).toBeInTheDocument();
-        }
+        userEvent.click(buildButton);
+        expect(await screen.findByText(/Code compiled successfully/)).toBeInTheDocument();
     });
 
     it("does not render no provider found message when a provider is returned for the given provider Id", async () => {
-
         const buildButton = screen.getByRole("button", {name: /Build calculation/});
-        const textbox = screen.getByTestId('providerId') as HTMLInputElement;
+        const textbox = screen.getByTestId('providerId');
+        fireEvent.change(textbox, {target: {value: '123456'}});
 
-        await userEvent.type(textbox, "123456");
         act(() => userEvent.click(buildButton));
+        
+        await waitFor(() => expect(screen.queryByText(/Build output/)).toBeInTheDocument());
 
-        expect(await screen.queryByText(/No provider found. Try a different UKPRN./)).not.toBeInTheDocument();
-
+        expect(screen.queryByText(/No provider found. Try a different UKPRN./)).not.toBeInTheDocument();
     });
 });

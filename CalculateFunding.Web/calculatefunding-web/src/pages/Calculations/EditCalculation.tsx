@@ -187,11 +187,12 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                                 <dd className="govuk-summary-list__value">
                                     {!isLoadingCalculation && calculation ?
                                         <>
-                                            <select className="govuk-select" onChange={(e) => setCalculationType(e.target.value as ValueType)} hidden={calculation.calculationType === CalculationType.Template}>
-                                        <option selected={calculationType === ValueType.Percentage}>Percentage</option>
-                                        <option selected={calculationType === ValueType.Currency}>Currency</option>
-                                        <option selected={calculationType === ValueType.Number}>Number</option>
-                                    </select>
+                                            <select className="govuk-select" onChange={(e) => setCalculationType(e.target.value as ValueType)}
+                                            hidden={calculation.calculationType === CalculationType.Template} value={calculationType}>
+                                                <option value={ValueType.Percentage}>Percentage</option>
+                                                <option value={ValueType.Currency}>Currency</option>
+                                                <option value={ValueType.Number}>Number</option>
+                                            </select>
                                             <span hidden={calculation.calculationType === CalculationType.Additional}>{calculation.valueType}</span>
                                         </> : <LoadingFieldStatus title="Loading..."/>}
                                 </dd>
