@@ -4,7 +4,11 @@ import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {Tabs} from "../../components/Tabs";
 import {RouteComponentProps} from "react-router";
-import {getAdditionalCalculations, getSpecificationSummary, getTemplateCalculations} from "../../actions/ViewSpecificationResultsActions";
+import {
+    getAdditionalCalculations,
+    getSpecificationSummary,
+    getTemplateCalculations
+} from "../../actions/ViewSpecificationResultsActions";
 import {useDispatch, useSelector} from "react-redux";
 import {AppState} from "../../states/AppState";
 import {ViewSpecificationResultsState} from "../../states/ViewSpecificationResultsState";
@@ -18,13 +22,25 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {AutoComplete} from "../../components/AutoComplete";
 import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../../components/CollapsibleSteps";
-import {FundingStructureType, FundingStructureItem} from "../../types/FundingStructureItem";
+import {FundingStructureItem, FundingStructureType} from "../../types/FundingStructureItem";
 import {FundingLineStep} from "../../components/fundingLineStructure/FundingLineStep";
 import {BackToTop} from "../../components/BackToTop";
-import {checkIfShouldOpenAllSteps, expandCalculationsByName, getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName, updateFundingLineExpandStatus} from "../../components/fundingLineStructure/FundingLineStructureHelper";
+import {
+    checkIfShouldOpenAllSteps,
+    expandCalculationsByName,
+    getDistinctOrderedFundingLineCalculations,
+    setExpandStatusByFundingLineName,
+    updateFundingLineExpandStatus
+} from "../../components/fundingLineStructure/FundingLineStructureHelper";
 import {getFundingStructuresWithCalculationResultService} from "../../services/fundingStructuresService";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {ErrorMessage} from "../../types/ErrorMessage";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {JobType} from "../../types/jobType";
+import {runGenerateCalculationCsvResultsJob} from "../../services/calculationService";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import {RunningStatus} from "../../types/RunningStatus";
+import {useErrors} from "../../hooks/useErrors";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
@@ -45,8 +61,67 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<FundingStructureItem[]>([]);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
+    const {errors: liveReportErrors, addErrorMessage: addLiveReportErrors,
+        clearErrorMessages: clearLiveReportErrorMessages} = useErrors();
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
+    const [liveReportStatusMessage, setLiveReportStatusMessage] = useState<string>("");
+
+
+    const {hasJob: hasCalculationJob, latestJob: latestCalculationJob, isCheckingForJob: isCheckingForCalculationJob} =
+        useLatestSpecificationJobWithMonitoring(match.params.specificationId,
+            [JobType.CreateInstructAllocationJob,
+                JobType.GenerateGraphAndInstructAllocationJob,
+                JobType.CreateInstructGenerateAggregationsAllocationJob,
+                JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob],
+            err => addLiveReportErrors(`Error checking for calculation job ${err}`)
+    );
+    const {hasJob: hasReportJob, latestJob: latestReportJob, isCheckingForJob: isCheckingForReportJob} =
+        useLatestSpecificationJobWithMonitoring(match.params.specificationId,
+            [JobType.GenerateCalcCsvResultsJob],
+            err => addLiveReportErrors(`Error checking for CSV results job ${err}`)
+        );
+    const [isRefreshingReports, setIsRefreshingReports] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (!latestCalculationJob && !latestReportJob) return;
+
+        //CASE: Calc running
+        //      Report never run
+        if ((latestCalculationJob?.isActive &&
+            latestCalculationJob?.runningStatus !== RunningStatus.Completed || latestCalculationJob?.parentJobId !== undefined)
+        && latestReportJob?.created === undefined)
+        {
+            setLiveReportStatusMessage("Initial calculations in progress, live data reports will be available soon.");
+        }
+
+        //CASE: Calc running
+        //      Report run with latest calc results (no new version)
+        //      Existing successfully run report: Y
+        else if ((latestCalculationJob?.isActive &&
+            latestCalculationJob?.runningStatus !== RunningStatus.Completed || latestCalculationJob?.parentJobId !== undefined)
+            && latestReportJob?.runningStatus === RunningStatus.Completed
+            && latestReportJob?.isSuccessful && latestReportJob?.parentJobId === undefined
+        )
+        {
+            setLiveReportStatusMessage("Calculation run in progress. Please wait.");
+        }
+
+        //CASE: Calc run completed
+        //      Report running
+        else if ((latestCalculationJob?.runningStatus === RunningStatus.Completed && latestCalculationJob?.parentJobId === undefined)
+            && (latestReportJob?.isActive
+            && latestReportJob?.runningStatus !== RunningStatus.Completed ||
+                latestReportJob?.parentJobId !== undefined))
+        {
+            setLiveReportStatusMessage("Live report refresh in progress, please wait.");
+        }
+
+        else
+        {
+            setLiveReportStatusMessage("");
+        }
+    }, [hasCalculationJob, hasReportJob]);
 
     const specificationResults: ViewSpecificationResultsState = useSelector((state: AppState) => state.viewSpecificationResults);
 
@@ -145,6 +220,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     }, [fundingLines]);
 
     const fetchData = async () => {
+        clearErrorMessages();
         if (specificationResults.specification &&
             specificationResults.specification.fundingPeriod &&
             specificationResults.specification.fundingStreams[0]) {
@@ -173,6 +249,24 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
 
     function clearErrorMessages() {
         setErrors([]);
+    }
+
+    function submitRefresh() {
+        clearLiveReportErrorMessages();
+        runCalculationRefresh();
+    }
+    const runCalculationRefresh = async () => {
+        setIsRefreshingReports(true);
+        try {
+            const result = await runGenerateCalculationCsvResultsJob(specificationId);
+            if (result.data !== null)
+            {
+                setIsRefreshingReports(false);
+            }
+        } catch (err) {
+            addErrorMessage(`Live reports couldn't refresh, please try again. ${err}`)
+            setIsRefreshingReports(false);
+        }
     }
 
     return <div>
@@ -336,52 +430,129 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                             <Tabs.Panel label="downloadable-reports">
                                 <section className="govuk-tabs__panel" id="downloadable-reports">
                                     <h2 className="govuk-heading-l">Downloadable reports</h2>
+                                    <MultipleErrorSummary errors={liveReportErrors} />
                                     <div className="govuk-grid-row">
                                         <div className="govuk-grid-column-full">
                                             <div className="govuk-body-l" hidden={downloadableReports.length > 0}>
                                                 There are no reports available for this Specification
                                             </div>
-                                            <div hidden={downloadableReports.filter(dr => dr.category === "Live").length === 0}>
+
+                                            <div hidden={!downloadableReports.some(dr => dr.category === "Live")}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
-                                                {downloadableReports.filter(dr => dr.category === "Live").map(dlr => <div>
-                                                        <div className="attachment__thumbnail">
-                                                            <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
-                                                               aria-hidden="true">
-                                                                <svg
-                                                                    className="attachment__thumbnail-image thumbnail-image-small "
-                                                                    version="1.1" viewBox="0 0 99 140" width="99"
-                                                                    height="140"
-                                                                    aria-hidden="true">
-                                                                    <path
-                                                                        d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
-                                                                        stroke-width="0"></path>
-                                                                    <path
-                                                                        d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
-                                                                        stroke-width="0"></path>
-                                                                    <path
-                                                                        d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
-                                                                        fill="none" stroke-miterlimit="10"
-                                                                        stroke-width="2"></path>
-                                                                </svg>
-                                                            </a>
+                                                <div className={`govuk-form-group ${liveReportErrors.length> 0? "govuk-form-group--error": ""}`}>
+                                                    { liveReportErrors.length> 0? <span className="govuk-error-message">
+                                                        <span className="govuk-visually-hidden">Error:</span> Live reports couldn't refresh, please try again.
+                                                        </span>
+                                                        : null
+                                                    }
+                                                    {downloadableReports.filter(dr => dr.category === "Live").map(dlr => <div>
+                                                            <div className="attachment__thumbnail">
+                                                                <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"
+                                                                   aria-hidden="true">
+                                                                    <svg
+                                                                        className="attachment__thumbnail-image thumbnail-image-small "
+                                                                        version="1.1" viewBox="0 0 99 140" width="99"
+                                                                        height="140"
+                                                                        aria-hidden="true">
+                                                                        <path
+                                                                            d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
+                                                                            stroke-width="0"></path>
+                                                                        <path
+                                                                            d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
+                                                                            stroke-width="0"></path>
+                                                                        <path
+                                                                            d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
+                                                                            fill="none" stroke-miterlimit="10"
+                                                                            stroke-width="2"></path>
+                                                                    </svg>
+                                                                </a>
+                                                            </div>
+                                                            <div className="attachment__details">
+                                                                <h4 className="govuk-heading-s">
+                                                                    <a className="govuk-link" target="_self"
+                                                                       href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
+                                                                    {
+                                                                        downloadableReports.some(dr => dr.specificationReportIdentifier == dlr.specificationReportIdentifier
+                                                                            && dr.lastModified > dlr.lastModified) ? <strong
+                                                                                className="govuk-tag govuk-!-margin-left-2 govuk-tag--green ">
+                                                                                New version available
+                                                                            </strong>
+                                                                            : null
+                                                                    }
+                                                                </h4>
+                                                                <p className="govuk-body-s">
+                                                                    <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
+                                                                    utc={false} date={dlr.lastModified}/></span>
+                                                                </p>
+                                                            </div>
+                                                            <div className="govuk-clearfix"></div>
                                                         </div>
-                                                        <div className="attachment__details">
-                                                            <h4 className="govuk-heading-s">
-                                                                <a className="govuk-link" target="_self"
-                                                                   href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
-                                                            </h4>
-                                                            <p className="govuk-body-s">
-                                                                <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
-                                                                utc={false} date={dlr.lastModified}/></span>
-                                                            </p>
-                                                        </div>
-                                                        <div className="govuk-clearfix"></div>
+                                                    )}
+                                                    <div className="attachment__thumbnail">
+                                                        <a className="govuk-link" target="_self"
+                                                           aria-hidden="true" href="">
+                                                            <svg
+                                                                className="attachment__thumbnail-image thumbnail-image-small "
+                                                                version="1.1" viewBox="0 0 99 140" width="99"
+                                                                height="140" aria-hidden="true">
+                                                                <path
+                                                                    d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
+                                                                    stroke-width="0"></path>
+                                                                <path
+                                                                    d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
+                                                                    stroke-width="0"></path>
+                                                                <path
+                                                                    d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
+                                                                    fill="none" stroke-miterlimit="10"
+                                                                    stroke-width="2"></path>
+                                                            </svg>
+                                                        </a>
                                                     </div>
-                                                )}
+                                                    <div className="attachment__details">
+                                                        <h4 className="govuk-heading-s">
+
+                                                            <p hidden={downloadableReports.some(dr => dr.category === "Live"
+                                                                && latestReportJob?.runningStatus === RunningStatus.InProgress
+                                                                && latestCalculationJob?.runningStatus === RunningStatus.InProgress)}
+                                                                className="govuk-body-m"><strong>Refresh live reports to
+                                                                view the latest results</strong></p>
+
+                                                            <p hidden={latestReportJob?.runningStatus !== RunningStatus.InProgress
+                                                                && latestCalculationJob?.runningStatus !== RunningStatus.InProgress}
+                                                               className="govuk-body-m"><strong>Generating new report</strong></p>
+
+
+                                                            {(isCheckingForReportJob || isCheckingForCalculationJob ||
+                                                                hasReportJob || hasCalculationJob || isRefreshingReports) &&
+                                                            <div className="govuk-form-group">
+                                                                <LoadingFieldStatus title={"Checking for running jobs..."}
+                                                                                    hidden={!isCheckingForReportJob
+                                                                                    && !isCheckingForCalculationJob && !isRefreshingReports}/>
+
+
+                                                                <LoadingFieldStatus title={liveReportStatusMessage}
+                                                                                    hidden={liveReportStatusMessage === ""}/>
+                                                            </div>
+                                                            }
+                                                        </h4>
+                                                    </div>
+                                                    <div className="govuk-grid-row govuk-!-margin-top-3">
+                                                        <div className="govuk-grid-column-full">
+                                                            <button className="govuk-button"
+                                                                    type="button"
+                                                                    aria-label="Refresh"
+                                                                    disabled={isRefreshingReports}
+                                                                    onClick={submitRefresh}>
+                                                                Refresh
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div hidden={downloadableReports.filter(dr => dr.category === "History").length === 0}>
+
+                                            <div hidden={!downloadableReports.some(dr => dr.category === "History")}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Published reports</h3>
-                                                {downloadableReports.filter(dr => dr.category === "History").map(dlr =>
+                                                {downloadableReports.filter(dr => dr.category !== "History").map(dlr =>
                                                     <div>
                                                         <div className="attachment__thumbnail">
                                                             <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"

@@ -159,3 +159,12 @@ export async function approveAllCalculationsService(specificationId: string) {
         }
     })
 }
+
+export async function runGenerateCalculationCsvResultsJob(specificationId: string) {
+    return axios(`/api/calcs/specifications/${specificationId}/generate-calculation-csv-results`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    });
+}
