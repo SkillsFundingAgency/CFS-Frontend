@@ -60,6 +60,6 @@ export interface ProviderVersionSearchModel {
     facetCount: number,
     countOnly: boolean,
     searchMode: SearchMode,
-    searchFields: [],
+    searchFields: string[],
     overrideFacetFields: []
 }

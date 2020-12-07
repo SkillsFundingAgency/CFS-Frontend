@@ -6,7 +6,7 @@ import {Link, RouteComponentProps} from "react-router-dom";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {SearchMode} from "../../types/SearchMode";
-import {GetProvidersByFundingStreamService} from "../../services/providerService";
+import {getProvidersByFundingStreamService} from "../../services/providerService";
 import {
     PagedProviderVersionSearchResults,
     ProviderVersionSearchModel,
@@ -19,6 +19,10 @@ import {NoData} from "../../components/NoData";
 import {getFundingStreamByIdService} from "../../services/policyService";
 import {FundingStream} from "../../types/viewFundingTypes";
 import {Footer} from "../../components/Footer";
+import {RadioSearch} from "./RadioSearch";
+import {useErrors} from "../../hooks/useErrors";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+
 export interface ViewProvidersByFundingStreamRouteProps {
     fundingStreamId: string;
 }
@@ -30,7 +34,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
         searchTerm: "",
         errorToggle: false,
         orderBy: [],
-        filters: {"": [""]},
+        filters: {},
         includeFacets: true,
         facetCount: 100,
         countOnly: false,
@@ -63,30 +67,30 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     const [resultsProviderSubType, setResultsProviderSubType] = useState<FacetValue[]>([]);
     const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([]);
     const [resultsLocalAuthority, setResultsLocalAuthority] = useState<FacetValue[]>([]);
+    const [searchType, setSearchType] = useState<string>();
+    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
 
-    useEffect(()=>{
-        GetProvidersByFundingStream(searchRequest);
+    useEffect(() => {
+        getProvidersByFundingStream(searchRequest);
     }, [searchRequest]);
 
-    function GetProvidersByFundingStream(searchModel: ProviderVersionSearchModel)
-    {
+    function getProvidersByFundingStream(searchModel: ProviderVersionSearchModel) {
+        clearErrorMessages();
         setIsLoading(true);
         getFundingStreamByIdService(match.params.fundingStreamId).then((fundingStreamResponse) => {
             if (fundingStreamResponse.status === 200 || fundingStreamResponse.status === 201) {
                 const fundingStream = fundingStreamResponse.data as FundingStream;
-                if (fundingStream != null)
-                {
+                if (fundingStream != null) {
                     setFundingStreamName(fundingStream.name)
                 }
             }
         });
-        GetProvidersByFundingStreamService(match.params.fundingStreamId, searchModel).then( (response)=>{
+        getProvidersByFundingStreamService(match.params.fundingStreamId, searchModel).then((response) => {
             if (response.status === 200 || response.status === 201) {
                 const result = response.data as PagedProviderVersionSearchResults;
                 setProviderVersionSearchResults(result);
 
-                if (result.facets.length >= 3 && resultsProviderType.length === 0)
-                {
+                if (result.facets.length >= 3 && resultsProviderType.length === 0) {
                     setResultsProviderType(result.facets[0].facetValues);
                     setFilterProviderType(result.facets[0].facetValues);
 
@@ -99,7 +103,9 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
 
                 setIsLoading(false);
             }
-        }).catch((er) => {
+        }).catch((err) => {
+            addErrorMessage(`A problem occurred while loading funding line structure: ${err}`);
+
             setIsLoading(false);
         });
     }
@@ -113,17 +119,17 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
         setSearchRequest(initialSearchRequest);
     }
 
-    function searchText(e: React.ChangeEvent<HTMLInputElement>) {
-        const term = e.target.value;
-        if (term.length > 3) {
+    function searchText(searchType: string, searchText?: string) {
+        const term = searchText;
+        setSearchType(searchType);
+        if (term !== null && term !== undefined && term.length > 3) {
             setSearchRequest(prevState => {
-                return {...prevState, searchTerm: term}
+                return {...prevState, searchTerm: term, searchFields: [searchType]}
             });
         }
-        if (term.length === 0)
-        {
+        if (term !== null && term !== undefined && term.length === 0) {
             setSearchRequest(prevState => {
-                return {...prevState, searchTerm: ""}
+                return {...prevState, searchTerm: "", searchFields: []}
             });
         }
     }
@@ -137,6 +143,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     function filterByProviderType(e: React.ChangeEvent<HTMLInputElement>) {
         filterResults("providerType", e.target.value, e.target.checked);
     }
+
     function searchProviderTypeFilters(e: React.ChangeEvent<HTMLInputElement>) {
         setFilterProviderType(filterSearch(e.target.value, resultsProviderType, filterProviderType));
     }
@@ -144,6 +151,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     function filterByProviderSubType(e: React.ChangeEvent<HTMLInputElement>) {
         filterResults("providerSubType", e.target.value, e.target.checked);
     }
+
     function searchProviderSubTypeFilters(e: React.ChangeEvent<HTMLInputElement>) {
         setFilterProviderSubType(filterSearch(e.target.value, resultsProviderSubType, filterProviderSubType));
     }
@@ -151,12 +159,13 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
     function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
         filterResults("authority", e.target.value, e.target.checked);
     }
+
     function searchLocalAuthorityFilters(e: React.ChangeEvent<HTMLInputElement>) {
         setFilterLocalAuthority(filterSearch(e.target.value, resultsLocalAuthority, filterLocalAuthority));
     }
 
     function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-        const filters: string [] = (searchRequest.filters[filterKey] != undefined) ? searchRequest.filters[filterKey] : [];
+        const filters: string [] = (searchRequest.filters[filterKey] !== undefined) ? searchRequest.filters[filterKey] : [];
         if (enableFilter) {
             if (filters.indexOf(filterValue) === -1) {
                 filters.push(filterValue);
@@ -174,14 +183,12 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
         });
     }
 
-    function filterSearch(keywords: string, originalFilters: FacetValue[], currentFilters: FacetValue[])
-    {
+    function filterSearch(keywords: string, originalFilters: FacetValue[], currentFilters: FacetValue[]) {
         if (keywords.length >= 3) {
             const copyOfFilters: FacetValue[] = originalFilters as FacetValue[];
             return copyOfFilters.filter(x => x.name.toLowerCase().includes(keywords.toLowerCase()));
         }
-        if (keywords.length === 0)
-        {
+        if (keywords.length === 0) {
             return resultsProviderType;
         }
         return currentFilters;
@@ -193,10 +200,10 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
             <div className={"govuk-grid-row  govuk-!-margin-bottom-9"}>
                 <div className={"govuk-grid-column-full"}>
                     <Breadcrumbs>
-                        <Breadcrumb name={"Calculate funding"} url={"/"} />
-                        <Breadcrumb name={"View results"} url={"/results"} />
-                        <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
-                        <Breadcrumb name={"View provider results"} />
+                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                        <Breadcrumb name={"View results"} url={"/results"}/>
+                        <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"}/>
+                        <Breadcrumb name={"View provider results"}/>
                     </Breadcrumbs>
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">View provider results</h1>
                     {
@@ -207,16 +214,36 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                     <h3 className="govuk-heading-m">{fundingStreamName}</h3>
                 </div>
             </div>
+            <div className="grid-row">
+                <div className="govuk-grid-column-full">
+                    <MultipleErrorSummary errors={errors}/>
+                </div>
+            </div>
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-one-third">
                     <form id="searchProviders">
                         <CollapsiblePanel title={"Search"} expanded={true}>
                             <fieldset className="govuk-fieldset">
                                 <div className="govuk-form-group">
-                                    <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                                        Search
-                                    </label>
-                                    <input className="govuk-input filterSearchInput govuk-!-margin-bottom-2" id="mainContentSearch" autoComplete="off" name="search" type="text" onChange={(e) => searchText(e)}/>
+                                    <span className="govuk-caption-m govuk-!-margin-bottom-4">Select one option</span>
+                                    <div className="radios">
+                                        <RadioSearch text="Provider name" timeout={900} radioId={"provider-name"}
+                                                     radioName={"search-providers-radios"} searchType={"name"}
+                                                     minimumChars={3} callback={searchText}
+                                                     selectedSearchType={searchType}/>
+                                        <RadioSearch text="UKPRN" timeout={900} radioId={"ukprn"}
+                                                     radioName={"search-providers-radios"} searchType={"ukprn"}
+                                                     minimumChars={3} callback={searchText}
+                                                     selectedSearchType={searchType}/>
+                                        <RadioSearch text="UPIN" timeout={900} radioId={"upin"}
+                                                     radioName={"search-providers-radios"} searchType={"upin"}
+                                                     minimumChars={3} callback={searchText}
+                                                     selectedSearchType={searchType}/>
+                                        <RadioSearch text="URN" timeout={900} radioId={"urn"}
+                                                     radioName={"search-providers-radios"} searchType={"urn"}
+                                                     minimumChars={3} callback={searchText}
+                                                     selectedSearchType={searchType}/>
+                                    </div>
                                 </div>
                             </fieldset>
                         </CollapsiblePanel>
@@ -301,13 +328,12 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                     </form>
                 </div>
                 <div className="govuk-grid-column-two-thirds">
-                    <LoadingStatus title={"Loading providers"} hidden={!isLoading}/>
-                    <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading} />
-                    {
+                    {(!isLoading) ?
                         providerVersionSearchResults.items.map(providerVersionSearchResult =>
                             <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
                                 <h3 className="govuk-heading-m">
-                                    <Link to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}/${match.params.fundingStreamId}`}>{providerVersionSearchResult.name}</Link>
+                                    <Link
+                                        to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}/${match.params.fundingStreamId}`}>{providerVersionSearchResult.name}</Link>
                                 </h3>
                                 <p className="govuk-body-s govuk-!-margin-bottom-3">
                                 <span>UKPRN: <strong>
@@ -339,32 +365,39 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                                     }
                                 </strong></span>
                                 </p>
-                                <p className="govuk-body-s govuk-!-margin-bottom-3">Provider type: <strong>{providerVersionSearchResult.providerType}</strong>
+                                <p className="govuk-body-s govuk-!-margin-bottom-3">Provider
+                                    type: <strong>{providerVersionSearchResult.providerType}</strong>
                                 </p>
-                                <p className="govuk-body-s govuk-!-margin-bottom-3">Provider subtype: <strong>{providerVersionSearchResult.providerSubType}</strong></p>
+                                <p className="govuk-body-s govuk-!-margin-bottom-3">Provider
+                                    subtype: <strong>{providerVersionSearchResult.providerSubType}</strong></p>
 
                                 <p className="govuk-body-s govuk-!-margin-bottom-3">
                                     <span>Local authority: <strong>{providerVersionSearchResult.authority}</strong></span>
                                     <span>Date opened:
                                     <strong>
                                         {
-                                            ((providerVersionSearchResult.dateOpened == null)?
+                                            ((providerVersionSearchResult.dateOpened == null) ?
                                                     " Unknown"
-                                                    : <DateFormatter date={providerVersionSearchResult.dateOpened} utc={true}/>
+                                                    : <DateFormatter date={providerVersionSearchResult.dateOpened}
+                                                                     utc={true}/>
                                             )}
                                     </strong>
                                 </span>
                                 </p>
-                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
                             </div>
-                        )
+                        ) : <LoadingStatus title={"Loading providers"}/>
                     }
-                    <BackToTop id="top" />
+                    <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading}/>
+                    <BackToTop id="top"/>
                     {!isLoading && providerVersionSearchResults.totalCount > 0 &&
                     <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation"
                          aria-label="Pagination">
-                        <div className="pagination__summary">Showing {providerVersionSearchResults.startItemNumber} - {providerVersionSearchResults.endItemNumber} of {providerVersionSearchResults.totalCount} results</div>
-                        <Pagination currentPage={providerVersionSearchResults.pagerState.currentPage} lastPage={providerVersionSearchResults.pagerState.lastPage} callback={pageChange}/>
+                        <div
+                            className="pagination__summary">Showing {providerVersionSearchResults.startItemNumber} - {providerVersionSearchResults.endItemNumber} of {providerVersionSearchResults.totalCount} results
+                        </div>
+                        <Pagination currentPage={providerVersionSearchResults.pagerState.currentPage}
+                                    lastPage={providerVersionSearchResults.pagerState.lastPage} callback={pageChange}/>
                     </nav>}
                 </div>
             </div>

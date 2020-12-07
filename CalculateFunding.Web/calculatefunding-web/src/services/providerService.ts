@@ -34,7 +34,7 @@ export async function getLocalAuthoritiesService(fundingStreamId: string, fundin
     });
 }
 
-export async function GetProvidersByFundingStreamService(fundingStreamId: string, search: ProviderVersionSearchModel) {
+export async function getProvidersByFundingStreamService(fundingStreamId: string, search: ProviderVersionSearchModel) {
     return axios(`${baseURL}/fundingstreams/${fundingStreamId}/current/search`, {
         method: 'POST',
         headers: {
