@@ -1,11 +1,12 @@
 import React from "react";
 import * as redux from "react-redux";
-import {render, waitFor, screen, fireEvent, cleanup, waitForElementToBeRemoved} from "@testing-library/react";
+import {render, waitFor, fireEvent, cleanup} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {ChangeProfileTypeProps} from "../../../pages/FundingApprovals/ChangeProfileType";
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
+import userEvent from "@testing-library/user-event";
 
 describe("<ChangeProfileType /> ", () => {
     afterEach(async () => {
@@ -204,7 +205,7 @@ describe("<ChangeProfileType /> ", () => {
                     expect(getByText(/Apply/).closest("button")).not.toBeDisabled();
                 });
 
-                fireEvent.click(getAllByText(/Preview profile/i)[0]);
+                userEvent.click(getAllByText(/Preview profile/i)[0]);
 
                 await waitFor(() => {
                     expect(queryByRole("dialog")).not.toBeInTheDocument();

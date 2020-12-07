@@ -4,10 +4,9 @@ import {act, fireEvent, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import {FundingStructureItem, FundingStructureType} from "../../../types/FundingStructureItem";
-import {getCurrentPublishedProviderFundingStructureService} from "../../../services/publishedProviderFundingLineService";
 
 const renderViewSpecificationFundingLineResults = () => {
-    const {FundingLineResults} = require('../../../components/fundingLineStructure/FundingLineResults');
+    const {FundingLineResults} = require('../../../components/FundingLineStructure/FundingLineResults');
     return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
         <Switch>
             <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
@@ -24,7 +23,7 @@ const renderViewSpecificationFundingLineResults = () => {
 }
 
 const renderProviderFundingLineResults = () => {
-    const {FundingLineResults} = require('../../../components/fundingLineStructure/FundingLineResults');
+    const {FundingLineResults} = require('../../../components/FundingLineStructure/FundingLineResults');
     return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
         <Switch>
             <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
@@ -42,6 +41,10 @@ const renderProviderFundingLineResults = () => {
 }
 
 describe("<FundingLineResults/> tests", () => {
+    beforeAll(() => {
+        jest.mock('../../../services/providerService', () => mockProviderService());
+    });
+
     describe("<FundingLineResults service checks />  ", () => {
         beforeEach(() => {
             jest.mock('../../../services/fundingStructuresService', () => mockFundingLineStructureService());
@@ -157,3 +160,13 @@ const mockCurrentPublishedProviderFundingStructureService = () => {
         }))
     }
 }
+
+const mockProviderService = () => {
+    const providerService = jest.requireActual('../../../services/providerService');
+    return {
+        ...providerService,
+        getProviderFundingLineErrors: jest.fn(() => Promise.resolve({
+            data: []
+        }))
+    }
+};

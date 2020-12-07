@@ -10,38 +10,38 @@ import {PublishStatus} from "../../../types/PublishStatusModel";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 
-const renderComponent = () => {
+const renderComponent = async () => {
     const {AdditionalCalculations} = require('../../../components/Calculations/AdditionalCalculations');
-    return render(<MemoryRouter initialEntries={['/AdditionalCalculations/SPEC123']}>
+    const component = render(<MemoryRouter initialEntries={['/AdditionalCalculations/SPEC123']}>
         <Switch>
-            <Route path="/AdditionalCalculations/:specificationId" component={AdditionalCalculations}/>
+            <Route path="/AdditionalCalculations/:specificationId" component={AdditionalCalculations} />
         </Switch>
-    </MemoryRouter>)
+    </MemoryRouter>);
+    await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+    });
+    return component;
 }
-
 
 describe('<AdditionalCalculations /> tests', () => {
 
-    describe("<AdditionalCalculations /> service call checks ", () => {
-        afterEach(() => jest.clearAllMocks());
+    afterEach(() => jest.clearAllMocks());
 
+    describe("<AdditionalCalculations /> service call checks ", () => {
         it("it calls the services correct number of times", async () => {
             jest.mock('../../../services/calculationService', () => mockCalculationService());
             const {searchForCalculationsService} = require('../../../services/calculationService');
-            renderComponent();
+            await renderComponent();
             await waitFor(() => expect(searchForCalculationsService).toBeCalledTimes(1))
         });
     });
-    
-    
+
     describe('<AdditionalCalculations /> without circular ref error', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             jest.mock('../../../services/calculationService', () => mockCalculationService());
             mockNoCircularRefErrors();
-            renderComponent();
+            await renderComponent();
         });
-
-        afterEach(() => jest.clearAllMocks());
 
         it('additional calculations are displayed', async () => {
             expect(await screen.findByText(testCalc1.name)).toBeInTheDocument();
@@ -60,13 +60,11 @@ describe('<AdditionalCalculations /> tests', () => {
     });
 
     describe('<AdditionalCalculations /> with circular ref error', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             jest.mock('../../../services/calculationService', () => mockCalculationService());
             mockCircularRefErrors();
-            renderComponent();
+            await renderComponent();
         });
-
-        afterEach(() => jest.clearAllMocks());
 
         it('additional calculations are displayed', async () => {
             expect(await screen.findByText(testCalc1.name)).toBeInTheDocument();
@@ -81,8 +79,7 @@ describe('<AdditionalCalculations /> tests', () => {
             expect(await screen.queryByText(testCalc2.status)).not.toBeInTheDocument();
             expect(await screen.findByText(testCalc1.status)).toBeInTheDocument();
         });
-    })
-
+    });
 });
 
 const fundingStream: FundingStream = {

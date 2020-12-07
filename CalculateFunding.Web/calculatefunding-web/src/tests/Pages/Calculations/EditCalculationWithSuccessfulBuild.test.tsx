@@ -6,7 +6,7 @@ import {EditCalculationTestData} from "./EditCalculationTestData";
 const testData = EditCalculationTestData();
 
 describe("<EditCalculation> tests with successful build source code", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         testData.mockOutMonacoEditor();
         testData.mockWithFullPermissions();
         testData.mockSpecification();
@@ -14,7 +14,7 @@ describe("<EditCalculation> tests with successful build source code", () => {
         testData.mockNoCircularRefErrors();
         testData.mockSuccessfulBuild();
 
-        testData.renderEditCalculation();
+        await testData.renderEditCalculation();
     });
     afterEach(() => jest.clearAllMocks());
 

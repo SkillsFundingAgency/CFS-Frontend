@@ -27,7 +27,7 @@ export function MultipleErrorSummary(props: { errors: ErrorMessage[] }) {
                                             :
                                             <li key={`${i}-${index}`}>
                                                 {error.validationErrors && error.validationErrors[errKey]
-                                                    .map(err => <><span>{err}</span><br/></>)}
+                                                    .map((err, j) => <span key ={`validation-error-${j}`}><span>{err}</span><br/></span>)}
                                             </li>
                                     )}
                                 </ul>

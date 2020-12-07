@@ -46,6 +46,9 @@ import {ValidationErrors} from "../../../types/ErrorMessage";
 import {createMockAxiosError} from "../../fakes/fakeAxios";
 import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
 
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
@@ -380,7 +383,6 @@ describe("<SpecificationFundingApproval />", () => {
 
                 const errorSummary = await screen.findByTestId("error-summary");
                 expect(errorSummary).toBeInTheDocument();
-                screen.debug(errorSummary);
                 expect(within(errorSummary).getByText("There is a problem")).toBeInTheDocument();
                 expect(within(errorSummary).getByText(/stack overflow/)).toBeInTheDocument();
                 expect(within(errorSummary).getByText(/divide by zero/)).toBeInTheDocument();

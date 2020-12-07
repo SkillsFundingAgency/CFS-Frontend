@@ -23,7 +23,10 @@ jest.mock('../../../services/fundingLineDetailsService', () => ({
 
 jest.mock('../../../services/providerService', () => ({
     getProviderTransactionsService: jest.fn(),
-    getReleasedProfileTotalsService: jest.fn()
+    getReleasedProfileTotalsService: jest.fn(() => Promise.resolve({
+        data: {},
+        status: 200
+    }))
 }));
 
 const history = createBrowserHistory();

@@ -42,12 +42,12 @@ export function PreviewProfileModal({
                         fundingLineId, previewProfilePatternKey)
                 ).data;
                 setProfileTotals(data);
+                setIsLoading(false);
             } catch (error) {
+                setIsLoading(false);
                 addErrorMessage("Could not retrieve preview data. Please try again.", undefined, "preview-profile");
                 toggleModal(false);
                 setPreviewProfilePatternKey(undefined);
-            } finally {
-                setIsLoading(false);
             }
         }
         getPreviewProfile();

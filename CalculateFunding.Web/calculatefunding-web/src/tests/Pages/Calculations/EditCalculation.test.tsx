@@ -7,7 +7,7 @@ const testData = EditCalculationTestData();
 
 describe("<EditCalculation> tests ", () => {
     describe("<EditCalculation> when user builds invalid source code", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockWithFullPermissions();
             testData.mockSpecification();
@@ -15,7 +15,7 @@ describe("<EditCalculation> tests ", () => {
             testData.mockNoCircularRefErrors();
             testData.mockFailedBuild();
 
-            testData.renderEditCalculation();
+            await testData.renderEditCalculation();
 
         });
         afterEach(() => {
@@ -37,14 +37,14 @@ describe("<EditCalculation> tests ", () => {
     });
 
     describe("<EditCalculation> with no circular ref errors", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockWithFullPermissions();
             testData.mockSpecification();
             testData.mockCalculation();
             testData.mockNoCircularRefErrors();
 
-            testData.renderEditCalculation();
+            await testData.renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
 
@@ -86,14 +86,14 @@ describe("<EditCalculation> tests ", () => {
         });
     });
     describe("<EditCalculation> with no permissions", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockWithNoPermissions();
             testData.mockSpecification();
             testData.mockCalculation();
             testData.mockNoCircularRefErrors();
 
-            testData.renderEditCalculation();
+            await testData.renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
 
@@ -113,13 +113,13 @@ describe("<EditCalculation> tests ", () => {
     });
 
     describe("<EditCalculation> when loading circular ref errors", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockSpecification();
             testData.mockCalculation();
             testData.mockCircularRefErrorsLoading();
 
-            testData.renderEditCalculation();
+            await testData.renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
 
@@ -138,13 +138,13 @@ describe("<EditCalculation> tests ", () => {
     });
 
     describe("<EditCalculation> with a circular ref error", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockSpecification();
             testData.mockCalculation();
             testData.mockCircularRefErrors();
 
-            testData.renderEditCalculation();
+            await testData.renderEditCalculation();
         });
         afterEach(() => jest.clearAllMocks());
 

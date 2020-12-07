@@ -117,7 +117,6 @@ describe("<ConfirmFunding />", () => {
         it('renders funding summary section', async () => {
             await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
             const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
-            screen.debug(fundingSummaryTable);
             expect(fundingSummaryTable).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();

@@ -8,6 +8,8 @@ import {ViewSpecificationResults} from "../../../pages/Specifications/ViewSpecif
 import {createStore, Store} from "redux";
 import {createBrowserHistory, createLocation} from "history";
 
+jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
+
 describe("Provider Funding Overview ", () => {
     const specificationId = "056fcfcd-fb12-45ed-8a1b-079a0e2fc8c5";
     const match: match<ViewSpecificationRoute> = {
