@@ -1,5 +1,6 @@
 ﻿import React, {useEffect, useState} from "react";
 import {
+    CalculationCompilePreviewResponse,
     CalculationDataType,
     CompilerOutputViewModel,
     PreviewCompileRequestViewModel
@@ -18,7 +19,7 @@ export interface CalculationSourceCodeProps {
     dataType: CalculationDataType,
     fundingStreams: FundingStream[],
     originalSourceCode: string,
-    onChange: (state: CalculationSourceCodeState) => void,
+    onChange: (state: CalculationSourceCodeState) => void
 }
 
 export interface CalculationSourceCodeState {
@@ -41,7 +42,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             hasCodeBuiltSuccessfully: undefined,
             previewResponse: undefined,
             isProviderValid: undefined,
-            providerRuntimeException: ""
+            providerRuntimeException: "",
+            providerName: "",
+            providerResult: undefined,
         },
         providerId: "",
         dataType: CalculationDataType.Decimal
@@ -60,7 +63,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                         hasCodeBuiltSuccessfully: undefined,
                         previewResponse: undefined,
                         isProviderValid: undefined,
-                        providerRuntimeException: ""
+                        providerRuntimeException: "",
+                        providerName: "",
+                        providerResult: undefined,
                     }
                 }
             });
@@ -80,7 +85,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             }
             compileCalculationPreviewService(props.specificationId, 'temp-calc-id', previewCompileRequestViewModel)
                 .then((result) => {
-                    setState(prevState => {
+                    setState((prevState: CalculationSourceCodeState) => {
                         return {
                             ...prevState,
                             calculationBuild: {
@@ -88,7 +93,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                                 previewResponse: result.data,
                                 isProviderValid: state.providerId !== "" &&
                                     (result.data?.previewProviderCalculation?.providerName !== undefined && result.data?.previewProviderCalculation?.providerName !== ""),
-                                providerRuntimeException: result.data?.previewProviderCalculation?.calculationResult?.exceptionMessage
+                                providerRuntimeException: result.data?.previewProviderCalculation?.calculationResult?.exceptionMessage,
+                                providerName: result.data?.previewProviderCalculation?.providerName,
+                                providerResult: result.data?.previewProviderCalculation?.calculationResult,
                             },
                             errorMessage: result.status !== 200 && result.status !== 400 ?
                                 "Unexpected response with status " + result.statusText : "",
@@ -104,7 +111,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                                 hasCodeBuiltSuccessfully: false,
                                 previewResponse: undefined,
                                 isProviderValid: undefined,
-                                providerRuntimeException: ""
+                                providerRuntimeException: "",
+                                providerName: "",
+                                providerResult: undefined,
                             },
                             errorMessage: err.toString(),
                             isBuilding: false
@@ -124,7 +133,9 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                         hasCodeBuiltSuccessfully: undefined,
                         previewResponse: undefined,
                         isProviderValid: undefined,
-                        providerRuntimeException: ""
+                        providerRuntimeException: "",
+                        providerName: "",
+                        providerResult: undefined,
                     },
                     isDirty: props.originalSourceCode !== newSourceCode
                 }
@@ -206,6 +217,12 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                 }
                 {state.calculationBuild.isProviderValid && state.calculationBuild.providerRuntimeException !== "" &&
                     <p className="govuk-body"><strong>{state.calculationBuild.providerRuntimeException}</strong></p>
+                }
+                {state.calculationBuild.providerName !== "" &&
+                <p className="govuk-body"><strong>Provider: {state.calculationBuild.providerName}</strong></p>
+                }
+                {state.calculationBuild.providerResult !== undefined &&
+                <p className="govuk-body"><strong>Provider result: {state.calculationBuild.providerResult.value}</strong></p>
                 }
             </div>
             }

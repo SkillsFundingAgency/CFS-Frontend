@@ -24,6 +24,7 @@ import {
 } from "../../../types/Calculations/CalculationCompilePreviewResponse";
 import {CalculationDetails} from "../../../types/CalculationDetails";
 import {CalculationType} from "../../../types/CalculationSearchResponse";
+import {Reference} from "../../../types/Reference";
 
 const history = createMemoryHistory();
 export function EditCalculationTestData() {
@@ -196,7 +197,7 @@ export function EditCalculationTestData() {
             exceptionType: "",
             value: undefined
         },
-        providerName: "123"
+        providerName: "test provider name",
     }
     const mockSuccessfulCalculation: CalculationDetails = {
         id: "",

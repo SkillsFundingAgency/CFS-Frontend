@@ -63,6 +63,8 @@ export interface CompilerOutputViewModel {
     previewResponse: CalculationCompilePreviewResponse | undefined
     isProviderValid: boolean | undefined;
     providerRuntimeException: string;
+    providerName: string;
+    providerResult: CalculationResult | undefined;
 }
 
 export interface SourceFile {

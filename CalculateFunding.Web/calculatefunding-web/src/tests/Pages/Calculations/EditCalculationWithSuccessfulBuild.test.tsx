@@ -28,6 +28,12 @@ describe("<EditCalculation> tests with successful build source code", () => {
         expect(await screen.findByText(/Code compiled successfully/)).toBeInTheDocument();
     });
 
+    it("renders provider name for given provider id", async () => {
+        const buildButton = screen.getByRole("button", {name: /Build calculation/});
+        userEvent.click(buildButton);
+        expect(await screen.findByText(/test provider name/)).toBeInTheDocument();
+    });
+
     it("does not render no provider found message when a provider is returned for the given provider Id", async () => {
         const buildButton = screen.getByRole("button", {name: /Build calculation/});
         const textbox = screen.getByTestId('providerId');
