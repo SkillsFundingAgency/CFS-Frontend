@@ -118,6 +118,9 @@ export function EditTemplate() {
         if (e.keyCode === 89 && e.ctrlKey) {
             redo();
         }
+        if (e.keyCode === 27) {
+            setIsFullScreen(false);
+        }
     };
 
     useEventListener('keydown', keyPressHandler);
@@ -797,7 +800,8 @@ export function EditTemplate() {
                                 background: "white",
                                 position: "fixed",
                                 padding: "20px 20px",
-                                width: "500px"
+                                width: "500px",
+                                zIndex: "10"
                             }, root: {position: "undefined"}, content: {
                                 position: "undefined",
                                 top: "undefined",
