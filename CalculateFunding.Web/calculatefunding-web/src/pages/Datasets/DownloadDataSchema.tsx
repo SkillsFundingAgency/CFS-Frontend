@@ -124,7 +124,7 @@ export function DownloadDataSchema() {
 
     function searchText(e: React.ChangeEvent<HTMLInputElement>) {
         const term = e.target.value;
-        if (term.length > 3) {
+        if (term.length >= 3) {
             setSearchRequest(prevState => {
                 return {...prevState, searchTerm: term}
             });
