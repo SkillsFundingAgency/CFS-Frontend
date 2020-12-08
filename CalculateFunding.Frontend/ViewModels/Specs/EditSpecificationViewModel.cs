@@ -31,6 +31,8 @@
 
         public int? ProviderSnapshotId { get; set; }
 
+        public CoreProviderVersionUpdates CoreProviderVersionUpdates { get; set; }
+
         public string GetSpecificationId()
         {
             return Id;

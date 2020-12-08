@@ -24,5 +24,7 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
         public string FundingPeriodId { get; set; }
 
         public IDictionary<string, string> AssignedTemplateIds { get; set; }
+
+        public CoreProviderVersionUpdates CoreProviderVersionUpdates { get; set; }
     }
 }

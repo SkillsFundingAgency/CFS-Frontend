@@ -146,7 +146,8 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.TemplateIds, opt => opt.Ignore())
                 .ForMember(m => m.DataDefinitionRelationshipIds, opt => opt.Ignore())
                 .ForMember(m => m.LastEditedDate, opt => opt.Ignore())
-                .ForMember(m => m.ProviderSource, opt => opt.Ignore());
+                .ForMember(m => m.ProviderSource, opt => opt.Ignore())
+                .ForMember(m => m.CoreProviderVersionUpdates, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationModel, CreateSpecificationViewModel>()
                 .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
@@ -191,7 +192,7 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
             CreateMap<SpecificationSummary, SpecificationSummary>();
-
+            
             CreateMap<SpecificationSummary, SpecificationViewModel>()
                   .ForMember(m => m.PublishStatus, opt => opt.MapFrom(c => c.ApprovalStatus));
 
