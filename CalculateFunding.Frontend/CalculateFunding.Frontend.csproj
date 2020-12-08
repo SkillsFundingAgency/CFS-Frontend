@@ -26,8 +26,6 @@
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.CalcEngine" Version="1.0.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="4.5.6" />
 
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Calcs" Version="3.5.5" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Datasets" Version="5.5.2" />
@@ -36,7 +34,6 @@
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Graph" Version="2.4.1" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Jobs" Version="3.1.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.20.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.1.4" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Providers" Version="4.2.1" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Results" Version="4.1.3" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Specifications" Version="3.13.1" />
