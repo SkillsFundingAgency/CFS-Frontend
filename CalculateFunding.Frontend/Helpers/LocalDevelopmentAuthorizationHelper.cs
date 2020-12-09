@@ -152,6 +152,36 @@ namespace CalculateFunding.Frontend.Helpers
                     CanUploadDataSourceFiles = true,
                     UserId = user.GetUserProfile()?.Id,
                     FundingStreamId = "DSG-AT"
+                },
+                new FundingStreamPermission
+                {
+                    CanAdministerFundingStream = true,
+                    CanApproveFunding = true,
+                    CanApproveSpecification = true,
+                    CanChooseFunding = true,
+                    CanCreateQaTests = true,
+                    CanCreateSpecification = true,
+                    CanEditCalculations = true,
+                    CanEditQaTests = true,
+                    CanEditSpecification = true,
+                    CanMapDatasets = true,
+                    CanReleaseFunding = true,
+                    CanRefreshFunding = true,
+                    CanCreateTemplates = true,
+                    CanEditTemplates = true,
+                    CanDeleteTemplates = true,
+                    CanApproveTemplates = true,
+                    CanApproveCalculations = true,
+                    CanApproveAllCalculations = true,
+                    CanDeleteCalculations = true,
+                    CanDeleteQaTests = true,
+                    CanAssignProfilePattern = true,
+                    CanApplyCustomProfilePattern = true,
+                    CanDeleteSpecification = true,
+                    CanRefreshPublishedQa = true,
+                    CanUploadDataSourceFiles = true,
+                    UserId = user.GetUserProfile()?.Id,
+                    FundingStreamId = "GAG"
                 }
             } as IEnumerable<FundingStreamPermission>);
         }
@@ -192,6 +222,7 @@ namespace CalculateFunding.Frontend.Helpers
                 CanReleaseFunding = true,
                 CanRefreshFunding = true,
                 CanApproveCalculations = true,
+                CanApproveAnyCalculations = true,
                 CanApproveAllCalculations = true,
                 CanDeleteCalculations = true,
                 CanDeleteQaTests = true,
