@@ -1,36 +1,78 @@
 import React from 'react';
 import Pagination from "../../components/Pagination";
+import {fireEvent, render, screen} from "@testing-library/react";
+import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+const callBackSpy = jest.fn();
 
 describe('<Pagination />', () => {
-    it('shows the list', () => {
-        const wrapper = shallow(<Pagination callback={() => {
-        }} currentPage={1} lastPage={1}/>);
+    beforeEach(() => {
+        callBackSpy.mockReset();
+    });
 
-        const actual = wrapper.find('ul');
+    it('renders correctly when only one page', () => {
+        render(<Pagination callback={callBackSpy} currentPage={1} lastPage={1}/>);
 
-        expect(actual).toBeTruthy();
+        expect(screen.queryByText(/Next Page/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/Previous Page/i)).not.toBeInTheDocument();
+        expect(callBackSpy).toBeCalledTimes(0);
+    });
+
+    it('renders correctly when multiple pages', () => {
+        render(<Pagination callback={callBackSpy} currentPage={1} lastPage={10}/>);
+
+        expect(screen.getByText(/Next Page/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Previous Page/i)).not.toBeInTheDocument();
+        expect(screen.getByText("1")).toBeInTheDocument();
+        expect(screen.getByText("2")).toBeInTheDocument();
+        expect(screen.getByText("3")).toBeInTheDocument();
+        expect(callBackSpy).toBeCalledTimes(0);
+    });
+
+    it('renders correctly when multiple pages and not on first page', () => {
+        render(<Pagination callback={callBackSpy} currentPage={2} lastPage={10}/>);
+
+        expect(screen.getByText(/Next Page/i)).toBeInTheDocument();
+        expect(screen.getByText(/Previous Page/i)).toBeInTheDocument();
+        expect(screen.getByText("1")).toBeInTheDocument();
+        expect(screen.getByText("2")).toBeInTheDocument();
+        expect(screen.getByText("3")).toBeInTheDocument();
+        expect(callBackSpy).toBeCalledTimes(0);
     });
 
     it('next page button is enabled', () => {
-        const wrapper = shallow(<Pagination callback={() => {
-        }} currentPage={1} lastPage={1}/>);
+        render(<Pagination callback={callBackSpy} currentPage={1} lastPage={2}/>);
 
-        const actual = wrapper.find('ul').find('li');
-
-        expect(actual.hasOwnProperty("disabled")).toBeFalsy();
+        expect(screen.getByText(/Next Page/i).closest("button")).toBeEnabled();
+        expect(callBackSpy).toBeCalledTimes(0);
     });
 
-    it('contains a list for buttons', () => {
-        const wrapper = shallow(<Pagination callback={() => {
-        }} currentPage={1} lastPage={10}/>);
+    it('previous button but not next page button is shown when on last page', () => {
+        render(<Pagination callback={callBackSpy} currentPage={2} lastPage={2}/>);
 
-        const actual = wrapper.find('ul');
+        expect(screen.getByText(/Previous Page/i)).toBeInTheDocument();
+        expect(screen.queryByText(/Next Page/i)).not.toBeInTheDocument();
+        expect(callBackSpy).toBeCalledTimes(0);
+    });
 
-        expect(actual.children()).toHaveLength(4);
+    it('calls callback when next button clicked', () => {
+        render(<Pagination callback={callBackSpy} currentPage={1} lastPage={2}/>);
+        fireEvent.click(screen.getByText(/Next Page/i));
+        expect(callBackSpy).toBeCalledTimes(1);
+        expect(callBackSpy).toBeCalledWith(2);
+    });
+
+    it('calls callback when previous button clicked', () => {
+        render(<Pagination callback={callBackSpy} currentPage={2} lastPage={2}/>);
+        fireEvent.click(screen.getByText(/Previous Page/i));
+        expect(callBackSpy).toBeCalledTimes(1);
+        expect(callBackSpy).toBeCalledWith(1);
+    });
+
+    it('calls callback when page link is clicked', () => {
+        render(<Pagination callback={callBackSpy} currentPage={2} lastPage={10}/>);
+        fireEvent.click(screen.getByText("1").closest("button") as Element);
+        expect(callBackSpy).toBeCalledTimes(1);
     });
 });

@@ -14,6 +14,19 @@ export interface CalculationSearchResponse {
     facets: any[];
 }
 
+export interface CalculationSearchResultResponse {
+    totalCount: number;
+    calculations: CalculationSearchResult[];
+    totalResults: number;
+    totalErrorResults: number;
+    currentPage: number;
+    lastPage: number;
+    startItemNumber: number;
+    endItemNumber: number;
+    pagerState: PagerState;
+    facets: any[];
+}
+
 export interface CalculationSearchResult {
     id: string;
     name: string;

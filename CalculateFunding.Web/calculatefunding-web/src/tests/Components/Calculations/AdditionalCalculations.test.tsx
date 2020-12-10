@@ -1,6 +1,6 @@
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
-import {render, screen, waitFor, waitForElementToBeRemoved} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
@@ -30,9 +30,9 @@ describe('<AdditionalCalculations /> tests', () => {
     describe("<AdditionalCalculations /> service call checks ", () => {
         it("it calls the services correct number of times", async () => {
             jest.mock('../../../services/calculationService', () => mockCalculationService());
-            const {searchForCalculationsService} = require('../../../services/calculationService');
+            const {searchCalculationsForSpecification} = require('../../../services/calculationService');
             await renderComponent();
-            await waitFor(() => expect(searchForCalculationsService).toBeCalledTimes(1))
+            await waitFor(() => expect(searchCalculationsForSpecification).toBeCalledTimes(1));
         });
     });
 
@@ -157,7 +157,7 @@ const mockCalculationService = () => {
     const calculationService = jest.requireActual('../../../services/calculationService');
     return {
         ...calculationService,
-        searchForCalculationsService: jest.fn(() => Promise.resolve({
+        searchCalculationsForSpecification: jest.fn(() => Promise.resolve({
             status: 200,
             data: {
                 totalCount: 2,
@@ -176,7 +176,7 @@ const mockCalculationService = () => {
                     currentPage: 0
                 },
                 facets: [],
-                results: [testCalc1, testCalc2]
+                calculations: [testCalc1, testCalc2]
             }
         }))
     }

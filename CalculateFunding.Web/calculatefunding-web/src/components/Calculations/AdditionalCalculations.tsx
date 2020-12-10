@@ -3,8 +3,8 @@ import {Link} from "react-router-dom";
 import {DateFormatter} from "../DateFormatter";
 import Pagination from "../Pagination";
 import * as React from "react";
-import {searchForCalculationsService} from "../../services/calculationService";
-import {CalculationSearchResponse, CalculationType} from "../../types/CalculationSearchResponse";
+import {searchCalculationsForSpecification} from "../../services/calculationService";
+import {CalculationSearchResultResponse, CalculationType} from "../../types/CalculationSearchResponse";
 import {useEffect, useState} from "react";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
@@ -16,8 +16,8 @@ export interface AdditionalCalculationsProps {
 }
 
 export function AdditionalCalculations(props: AdditionalCalculationsProps) {
-    const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSearchResponse>({
-        results: [],
+    const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSearchResultResponse>({
+        calculations: [],
         currentPage: 0,
         endItemNumber: 0,
         facets: [],
@@ -52,7 +52,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
         if (!isLoadingAdditionalCalculations) {
             setIsLoadingAdditionalCalculations(true);
         }
-        searchForCalculationsService({
+        searchCalculationsForSpecification({
             specificationId: specificationId,
             status: status,
             pageNumber: pageNumber,
@@ -68,11 +68,10 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
         findAdditionalCalculations(props.specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm);
     }
 
-
     return <section className="govuk-tabs__panel" id="additional-calculations">
         {isLoadingAdditionalCalculations &&
-        <LoadingStatus title="Loading additional calculations"
-                       description="Please wait"/>
+            <LoadingStatus title="Loading additional calculations"
+                description="Please wait" />
         }
         <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
             <div className="govuk-grid-column-two-thirds">
@@ -80,10 +79,9 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
             </div>
             <div className="govuk-grid-column-one-third ">
                 <p className="govuk-body right-align"
-                   hidden={additionalCalculations.totalResults === 0}>
-                    Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
-                    of {additionalCalculations.totalResults}
-                    calculations
+                    hidden={additionalCalculations.totalResults === 0}>
+                    {`Showing ${additionalCalculations.startItemNumber} - ${additionalCalculations.endItemNumber} of 
+                        ${additionalCalculations.totalResults} calculations`}
                 </p>
             </div>
         </div>
@@ -95,7 +93,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                         id="event-name"
                         name="event-name"
                         type="text"
-                        onChange={(e) => setAdditionalCalculationSearchTerm(e.target.value)}/>
+                        onChange={(e) => setAdditionalCalculationSearchTerm(e.target.value)} />
                 </div>
             </div>
             <div className="govuk-grid-column-one-third">
@@ -108,80 +106,79 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
             </div>
         </div>
 
-        {!isLoadingAdditionalCalculations && 
-        <table className="govuk-table">
-            <thead className="govuk-table__head">
-            <tr className="govuk-table__row">
-                <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                <th scope="col" className="govuk-table__header">Status</th>
-                <th scope="col" className="govuk-table__header">Value type</th>
-                <th scope="col" className="govuk-table__header">Last edited date</th>
-            </tr>
-            </thead>
-            <tbody className="govuk-table__body">
-            {additionalCalculations.results.map((ac, index) => {
-                const hasError = circularReferenceErrors && circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
-                
-                return <tr className="govuk-table__row" key={index}>
-                        <td className="govuk-table__cell text-overflow">
-                            <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
-                            <br/>
-                            {hasError ? <span className="govuk-error-message">circular reference detected in calculation script</span> : ""}
-                        </td>
-                        <td className="govuk-table__cell">
-                            {isLoadingCircularDependencies ? <LoadingFieldStatus title="Checking..."/> : hasError ? "Error" : ac.status}
-                        </td>
-                        <td className="govuk-table__cell">{ac.valueType}</td>
-                        <td className="govuk-table__cell">
-                            <DateFormatter date={ac.lastUpdatedDate} utc={false}/>
-                        </td>
+        {!isLoadingAdditionalCalculations &&
+            <table className="govuk-table">
+                <thead className="govuk-table__head">
+                    <tr className="govuk-table__row">
+                        <th scope="col" className="govuk-table__header">Additional calculation name</th>
+                        <th scope="col" className="govuk-table__header">Status</th>
+                        <th scope="col" className="govuk-table__header">Value type</th>
+                        <th scope="col" className="govuk-table__header">Last edited date</th>
                     </tr>
-                }
-            )}
-            </tbody>
-        </table>
+                </thead>
+                <tbody className="govuk-table__body">
+                    {additionalCalculations.calculations.map((ac, index) => {
+                        const hasError = circularReferenceErrors && circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
+
+                        return <tr className="govuk-table__row" key={index}>
+                            <td className="govuk-table__cell text-overflow">
+                                <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
+                                <br />
+                                {hasError ? <span className="govuk-error-message">circular reference detected in calculation script</span> : ""}
+                            </td>
+                            <td className="govuk-table__cell">
+                                {isLoadingCircularDependencies ? <LoadingFieldStatus title="Checking..." /> : hasError ? "Error" : ac.status}
+                            </td>
+                            <td className="govuk-table__cell">{ac.valueType}</td>
+                            <td className="govuk-table__cell">
+                                <DateFormatter date={ac.lastUpdatedDate} utc={false} />
+                            </td>
+                        </tr>
+                    }
+                    )}
+                </tbody>
+            </table>
         }
 
         {!isLoadingAdditionalCalculations && additionalCalculations &&
-        <>
-            {additionalCalculations.results.length === 0 &&
-            <div className="govuk-warning-text">
-                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong className="govuk-warning-text__text">
-                    <span className="govuk-warning-text__assistive">Warning</span>
+            <>
+                {additionalCalculations.calculations.length === 0 &&
+                    <div className="govuk-warning-text">
+                        <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong className="govuk-warning-text__text">
+                            <span className="govuk-warning-text__assistive">Warning</span>
                     No additional calculations available. &nbsp;
                     {canCreateAdditionalCalculation &&
-                    <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}>
-                        Create a calculation
+                                <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}>
+                                    Create a calculation
                     </Link>
-                    }
-                </strong>
-            </div>
-            }
-            {additionalCalculations.results.length > 0 && canCreateAdditionalCalculation &&
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full">
-                    <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}
-                          className="govuk-link govuk-button">
-                        Create a calculation
+                            }
+                        </strong>
+                    </div>
+                }
+                {additionalCalculations.calculations.length > 0 && canCreateAdditionalCalculation &&
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-full">
+                            <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}
+                                className="govuk-link govuk-button">
+                                Create a calculation
                     </Link>
-                </div>
-            </div>
-            }
-        </>
+                        </div>
+                    </div>
+                }
+            </>
         }
         {additionalCalculations.totalResults > 0 &&
-        <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-            <div className="pagination__summary">
-                <p className="govuk-body right-align">
-                    Showing
-                    {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
-                    of {additionalCalculations.totalResults} calculations
-                </p>
-            </div>
-            <Pagination currentPage={additionalCalculations.currentPage}
-                        lastPage={additionalCalculations.lastPage}
-                        callback={movePage}/>
-        </nav>}
+            <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
+                <div className="pagination__summary">
+                    <p className="govuk-body right-align">
+                        {`Showing ${additionalCalculations.startItemNumber} - ${additionalCalculations.endItemNumber} of 
+                        ${additionalCalculations.totalResults} calculations`}
+                    </p>
+                </div>
+                <Pagination currentPage={additionalCalculations.currentPage}
+                    lastPage={additionalCalculations.lastPage}
+                    callback={movePage} />
+            </nav>}
     </section>
 }

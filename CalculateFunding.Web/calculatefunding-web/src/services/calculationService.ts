@@ -1,13 +1,12 @@
 import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import { CreateAdditionalCalculationViewModel, UpdateCalculationViewModel } from "../types/Calculations/CreateAdditonalCalculationViewModel";
-import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
-import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
+import {PublishStatus} from "../types/PublishStatusModel";
+import {CalculationSearchResponse, CalculationSearchResultResponse} from "../types/CalculationSearchResponse";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";
 import {CircularReferenceError} from "../types/Calculations/CircularReferenceError";
 import {
     CalculationCompilePreviewResponse,
-    CalculationDataType,
     PreviewCompileRequestViewModel
 } from "../types/Calculations/CalculationCompilePreviewResponse";
 import {CalculationDetails, CalculationSummary} from "../types/CalculationDetails";
@@ -29,6 +28,23 @@ export async function searchForCalculationsService(calculationSearchRequestViewM
                 }
         }
     );
+}
+
+export async function searchCalculationsForSpecification(calculationSearchRequestViewModel: CalculationSearchRequestViewModel):
+Promise<AxiosResponse<CalculationSearchResultResponse>> {
+    return axios(`/api/specifications/${calculationSearchRequestViewModel.specificationId}/calculations/calculationType/${calculationSearchRequestViewModel.calculationType}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        params:
+            {
+                status: calculationSearchRequestViewModel.status,
+                searchTerm: calculationSearchRequestViewModel.searchTerm,
+                page: calculationSearchRequestViewModel.pageNumber
+            }
+    }
+);
 }
 
 export async function searchForCalculationsByProviderService(
