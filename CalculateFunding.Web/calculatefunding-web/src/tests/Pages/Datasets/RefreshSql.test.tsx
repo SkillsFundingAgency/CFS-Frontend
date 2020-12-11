@@ -242,7 +242,7 @@ describe("<ChangeProfileType /> ", () => {
                         invokerUserDisplayName: "test",
                         parentJobId: "",
                         lastUpdated: new Date("2020-11-19T14:36:34.324284+00:00"),
-                        created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                        created: new Date("2020-11-24T14:36:16.3435836+00:00")
                     }],
                     isCheckingForJobs: false,
                     errorCheckingForJobs: "",
@@ -383,6 +383,89 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/Data push queued/i)).toBeInTheDocument();
             });
             expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
+        });
+
+        it("push button is enabled when previous sql job failed", async () => {
+            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+                return {
+                    allJobs: [{
+                        jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                        jobType: "RunSqlImportJob",
+                        specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                        statusDescription: "",
+                        jobDescription: "",
+                        outcome: "",
+                        runningStatus: RunningStatus.Completed,
+                        completionStatus: CompletionStatus.Failed,
+                        isSuccessful: false,
+                        isFailed: true,
+                        isActive: true,
+                        isComplete: true,
+                        invokerUserId: "testid",
+                        invokerUserDisplayName: "test",
+                        parentJobId: "",
+                        lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                        created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                    }],
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
+                    isFetching: false,
+                    isFetched: true
+                }
+            });
+
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
+            await waitFor(() => {
+                expect(screen.getByText(/24 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText(/Failed/i)).toBeInTheDocument();
+            });
+
+            expect(screen.getByText(/Push data/).closest("button")).not.toBeDisabled();
+        });
+
+        it("push button is enabled when previous sql job timed out", async () => {
+            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+                return {
+                    allJobs: [{
+                        jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                        jobType: "RunSqlImportJob",
+                        specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                        statusDescription: "",
+                        jobDescription: "",
+                        outcome: "",
+                        runningStatus: RunningStatus.Completed,
+                        completionStatus: CompletionStatus.TimedOut,
+                        isSuccessful: false,
+                        isFailed: true,
+                        isActive: true,
+                        isComplete: false,
+                        invokerUserId: "testid",
+                        invokerUserDisplayName: "test",
+                        parentJobId: "",
+                        lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                        created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                    }],
+                    isCheckingForJobs: false,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
+                    isFetching: false,
+                    isFetched: true
+                }
+            });
+
+            await renderPage();
+            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
+            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
+            await waitFor(() => {
+                expect(screen.getByText(/24 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
+                expect(screen.getByText(/Failed/i)).toBeInTheDocument();
+            });
+            expect(screen.getByText(/Push data/).closest("button")).not.toBeDisabled();
         });
     });
 });

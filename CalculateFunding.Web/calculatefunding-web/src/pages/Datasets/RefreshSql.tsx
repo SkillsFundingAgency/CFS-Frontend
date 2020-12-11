@@ -24,6 +24,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {useHistory} from "react-router";
 import {RunningStatus} from "../../types/RunningStatus";
 import {JobDetails} from "../../helpers/jobDetailsHelper";
+import {CompletionStatus} from "../../types/CompletionStatus";
 
 export function RefreshSql() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
@@ -233,10 +234,15 @@ export function RefreshSql() {
         if (!lastSqlJob || !lastSqlJob.lastUpdated) {
             return <span className="govuk-body">N/A</span>
         }
+        const previousJobFailed = lastSqlJob.completionStatus !== CompletionStatus.Succeeded;
+
         return (
-            <DateFormatter
-                date={lastSqlJob.lastUpdated}
-                utc={true} />
+            <>
+                <DateFormatter
+                    date={lastSqlJob.lastUpdated}
+                    utc={true} />
+                <span className="govuk-body">{previousJobFailed ? " (Failed)" : ""}</span>
+            </>
         );
     }
 
@@ -347,11 +353,15 @@ export function RefreshSql() {
     }
 
     function RefreshButton() {
-        const isDisabled = !((lastSqlJob === undefined || !lastSqlJob.lastUpdated || latestPublishedDate === undefined ||
-            latestPublishedDate.value === null || latestPublishedDate.value > lastSqlJob.lastUpdated)
+        const isDisabled = !(
+            (lastSqlJob === undefined || !lastSqlJob.lastUpdated || latestPublishedDate === undefined ||
+                latestPublishedDate.value === null || latestPublishedDate.value > lastSqlJob.lastUpdated ||
+                lastSqlJob.completionStatus === CompletionStatus.Failed ||
+                lastSqlJob.completionStatus === CompletionStatus.TimedOut)
             && missingPermissions.length === 0 && !isLoadingOptions
             && !isCheckingForJobs && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob
-            && !hasRunningFundingJobs);
+            && !hasRunningFundingJobs
+        );
 
         return (
             <button className="govuk-button" onClick={handlePushData} disabled={isDisabled}>
