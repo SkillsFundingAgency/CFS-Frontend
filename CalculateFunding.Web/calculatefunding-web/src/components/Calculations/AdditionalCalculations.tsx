@@ -170,14 +170,14 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
         }
         {additionalCalculations.totalResults > 0 &&
             <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                <div className="pagination__summary">
+                <div className="pagination__summary" hidden={additionalCalculations.currentPage === 1 && additionalCalculations.pagerState.lastPage <= 1}>
                     <p className="govuk-body right-align">
                         {`Showing ${additionalCalculations.startItemNumber} - ${additionalCalculations.endItemNumber} of 
                         ${additionalCalculations.totalResults} calculations`}
                     </p>
                 </div>
                 <Pagination currentPage={additionalCalculations.currentPage}
-                    lastPage={additionalCalculations.lastPage}
+                    lastPage={additionalCalculations.pagerState.lastPage}
                     callback={movePage} />
             </nav>}
     </section>

@@ -16,6 +16,7 @@ describe('<Pagination />', () => {
 
         expect(screen.queryByText(/Next Page/i)).not.toBeInTheDocument();
         expect(screen.queryByText(/Previous Page/i)).not.toBeInTheDocument();
+        expect(screen.queryByText("1")).not.toBeInTheDocument();
         expect(callBackSpy).toBeCalledTimes(0);
     });
 

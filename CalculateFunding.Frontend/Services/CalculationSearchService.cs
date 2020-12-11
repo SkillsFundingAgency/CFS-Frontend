@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -107,13 +108,7 @@ namespace CalculateFunding.Frontend.Services
 		        result.EndItemNumber = result.TotalResults;
 	        }
 
-	        int totalPages = 0;
-	        if (result.TotalResults > 0)
-	        {
-		        totalPages = pageSize % result.TotalResults;
-	        }
-
-	        result.PagerState = new PagerState(page, totalPages, 4);
+            result.PagerState = new PagerState(page, (int)Math.Ceiling(result.TotalResults / (double)pageSize), 2);
 
 	        return result;
         }
