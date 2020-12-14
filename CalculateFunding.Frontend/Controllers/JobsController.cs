@@ -51,5 +51,24 @@ namespace CalculateFunding.Frontend.Controllers
 
             return Ok(jobs);
         }
+
+        [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [Route("api/jobs/latest-success/{specificationId}/{jobDefinitionId}")]
+        public async Task<IActionResult> GetSpecificationLatstSucessfulJob([FromRoute] string specificationId, [FromRoute] string jobDefinitionId)
+        {
+            ApiResponse<JobSummary> response = await _jobsApiClient.GetLatestSuccessfulJobForSpecification(specificationId, jobDefinitionId);
+
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary");
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            JobSummaryViewModel jobs = _mapper.Map<JobSummaryViewModel>(response.Content);
+
+            return Ok(jobs);
+        }
     }
 }
