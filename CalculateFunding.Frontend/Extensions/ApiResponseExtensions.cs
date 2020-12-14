@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
@@ -8,6 +9,40 @@ namespace CalculateFunding.Common.ApiClient.Models
 {
     public static class ApiResponseExtensions
     {
+        public static IActionResult Handle<T>(
+            this ValidatedApiResponse<T> apiResponse, 
+            string entityName, 
+            Func<ApiResponse<T>, IActionResult> onSuccess,
+            bool treatNoContentAsSuccess = false)
+        {
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
+            return errorResult ?? onSuccess(apiResponse);
+        }
+        
+        
+        public static IActionResult Handle<T>(
+            this ApiResponse<T> apiResponse, 
+            string entityName, 
+            Func<ApiResponse<T>, IActionResult> onSuccess,
+            bool treatNoContentAsSuccess = false)
+        {
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
+            return errorResult ?? onSuccess(apiResponse);
+        }
+        
+        public static IActionResult IsSuccessOrReturnFailureResult<T>(
+            this ValidatedApiResponse<T> apiResponse, 
+            string entityName, 
+            bool treatNoContentAsSuccess = false)
+        {
+            if (apiResponse != null && apiResponse.IsBadRequest(out BadRequestObjectResult badRequestObject))
+            {
+                return badRequestObject;
+            }
+
+            return (apiResponse as ApiResponse<T>).IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
+        }
+        
         public static IActionResult IsSuccessOrReturnFailureResult<T>(this ApiResponse<T> apiResponse, string entityName, bool treatNoContentAsSuccess = false)
         {
             Guard.IsNullOrWhiteSpace(entityName, nameof(entityName));
@@ -22,9 +57,14 @@ namespace CalculateFunding.Common.ApiClient.Models
                 return new NotFoundObjectResult($"{entityName} not found.");
             }
 
-            if(treatNoContentAsSuccess && apiResponse.StatusCode == HttpStatusCode.NoContent)
+            if (treatNoContentAsSuccess && apiResponse.StatusCode == HttpStatusCode.NoContent)
             {
                 return null;
+            }
+
+            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return new BadRequestResult();
             }
 
             if (apiResponse.StatusCode != HttpStatusCode.OK)

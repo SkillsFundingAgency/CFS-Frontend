@@ -27,7 +27,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/publishedprovider/search/ids")]
+        [Route("api/publishedProviders/search/ids")]
         public async Task<IActionResult> GetProviderIds([FromBody] SearchPublishedProvidersRequest request)
         {
             PublishedProviderIdSearchModel searchModel = new PublishedProviderIdSearchModel
@@ -49,7 +49,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/publishedprovider/search")]
+        [Route("api/publishedProviders/search")]
         public async Task<IActionResult> GetProviders([FromBody] SearchPublishedProvidersRequest request)
         {
             Guard.ArgumentNotNull(request, nameof(request));

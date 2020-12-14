@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Specs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -111,18 +113,10 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<IEnumerable<string>> response =
                 await _publishingApiClient.ValidateSpecificationForRefresh(specificationId);
 
-            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
-            {
-                return badRequest;
-            }
-
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(ValidateSpecificationForRefresh), treatNoContentAsSuccess: true);
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok();
+            
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(), 
+                treatNoContentAsSuccess: true);
         }
 
         [Route("api/specs/{specificationId}/approve")]
@@ -137,28 +131,16 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<JobCreationResponse> result =
+            ValidatedApiResponse<JobCreationResponse> response =
                 await _publishingApiClient.ApproveFundingForSpecification(specificationId);
 
-            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
-            {
-                return badRequest;
-            }
-
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                if (result.Content?.JobId != null)
-                {
-                    return new OkObjectResult(new {jobId = result.Content.JobId});
-                }
-            }
-
-            if (result.StatusCode == HttpStatusCode.PreconditionFailed)
+            if (response.StatusCode == HttpStatusCode.PreconditionFailed)
             {
                 return new PreconditionFailedResult("Preconditions for this approval have not been met.");
             }
-
-            return new InternalServerErrorResult("There was an error approving funding for this specification.");
+            
+            return response.Handle("Release Funding", 
+                onSuccess: x => x.Content.JobId != null ? (IActionResult) Ok(new {jobId = x.Content.JobId}) : BadRequest());
         }
 
         [Route("api/specs/{specificationId}/release")]
@@ -173,27 +155,11 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<JobCreationResponse> result =
+            ValidatedApiResponse<JobCreationResponse> response =
                 await _publishingApiClient.PublishFundingForSpecification(specificationId);
 
-            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
-            {
-                return badRequest;
-            }
-
-            IActionResult errorResult = result.IsSuccessOrReturnFailureResult("Approve Funding");
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            if (result.Content.JobId != null)
-            {
-                return Ok(new {result.Content.JobId});
-            }
-
-            return BadRequest();
+            return response.Handle("Release Funding", 
+                onSuccess: x => x.Content.JobId != null ? (IActionResult) Ok(x.Content.JobId) : BadRequest());
         }
 
         [Route("api/specs/{specificationId}/fundingSummary")]
@@ -249,24 +215,12 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> GetLocalAuthorities(string fundingStreamId, string fundingPeriodId,
             [FromQuery] string searchText = "")
         {
-            var result =
+            ApiResponse<IEnumerable<string>> response =
                 await _publishingApiClient.SearchPublishedProviderLocalAuthorities(searchText, fundingStreamId,
                     fundingPeriodId);
 
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(result.Content);
-            }
-
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return new BadRequestResult();
-            }
-
-            return new NotFoundObjectResult(Content("Error. Not found."))
-            {
-                StatusCode = 404
-            };
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpGet]
@@ -280,21 +234,14 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
             Guard.ArgumentNotNull(providerId, nameof(providerId));
 
-            ApiResponse<IDictionary<int, ProfilingVersion>> apiResponse =
+            ApiResponse<IDictionary<int, ProfilingVersion>> response =
                 await _publishingApiClient.GetAllReleasedProfileTotals(
                     fundingStreamId,
                     fundingPeriodId,
                     providerId);
 
-            IActionResult errorResult =
-                apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok(MapToProfilingViewModel(apiResponse.Content));
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(MapToProfilingViewModel(x.Content)));
         }
 
         [HttpGet]
@@ -306,13 +253,9 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
             ApiResponse<IEnumerable<ProfileTotal>> response = await _publishingApiClient.GetProfileHistory(fundingStreamId, fundingPeriodId, providerId);
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(response.Content);
-            }
-
-            return new BadRequestResult();
+            
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpGet]
@@ -326,21 +269,14 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
             Guard.ArgumentNotNull(providerId, nameof(providerId));
 
-            ApiResponse<IDictionary<int, ProfilingVersion>> apiResponse =
+            ApiResponse<IDictionary<int, ProfilingVersion>> response =
                 await _publishingApiClient.GetAllReleasedProfileTotals(
                     fundingStreamId,
                     fundingPeriodId,
                     providerId);
 
-            IActionResult errorResult =
-                apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok(MapToArchiveViewModel(apiResponse.Content));
+            return response.Handle(nameof(PublishedProviderVersion), 
+                onSuccess: x => Ok(MapToArchiveViewModel(x.Content)));
         }
 
         [HttpPost("api/specs/{specificationId}/funding-summary-for-release")]
@@ -350,6 +286,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
             }
+
             if (providers.PublishedProviderIds.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(providers.PublishedProviderIds), "Missing " + nameof(providers.PublishedProviderIds));
@@ -360,19 +297,10 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ApiResponse<PublishedProviderFundingCount> apiResponse = await _publishingApiClient.GetProviderBatchForReleaseCount(providers, specificationId);
+            ApiResponse<PublishedProviderFundingCount> response = await _publishingApiClient.GetProviderBatchForReleaseCount(providers, specificationId);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(apiResponse.Content);
-            }
-
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(apiResponse.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error retrieving provider funding counts for release.");
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpPost("api/specs/{specificationId}/funding-summary-for-approval")]
@@ -382,6 +310,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
             }
+
             if (providers.PublishedProviderIds.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(providers.PublishedProviderIds), "Missing " + nameof(providers.PublishedProviderIds));
@@ -392,19 +321,10 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ApiResponse<PublishedProviderFundingCount> apiResponse = await _publishingApiClient.GetProviderBatchForApprovalCount(providers, specificationId);
+            ApiResponse<PublishedProviderFundingCount> response = await _publishingApiClient.GetProviderBatchForApprovalCount(providers, specificationId);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(apiResponse.Content);
-            }
-
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(apiResponse.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error retrieving provider funding counts for approval.");
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpPost("api/specs/{specificationId}/funding-approval/providers")]
@@ -414,6 +334,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
             }
+
             if (providers.PublishedProviderIds.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(providers.PublishedProviderIds), "Missing " + nameof(providers.PublishedProviderIds));
@@ -424,19 +345,10 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<JobCreationResponse> apiResponse = await _publishingApiClient.ApproveFundingForBatchProviders(specificationId, providers);
+            ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.ApproveFundingForBatchProviders(specificationId, providers);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(apiResponse.Content);
-            }
-
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(apiResponse.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error approving provider funding.");
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpPost("api/specs/{specificationId}/funding-release/providers")]
@@ -446,6 +358,7 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
             }
+
             if (providers.PublishedProviderIds.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(providers.PublishedProviderIds), "Missing " + nameof(providers.PublishedProviderIds));
@@ -456,19 +369,10 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<JobCreationResponse> apiResponse = await _publishingApiClient.PublishFundingForBatchProviders(specificationId, providers);
+            ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.PublishFundingForBatchProviders(specificationId, providers);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(apiResponse.Content);
-            }
-
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(apiResponse.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error releasing provider funding.");
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpGet]
@@ -483,29 +387,22 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState); 
+                return BadRequest(ModelState);
             }
 
-            ApiResponse<IEnumerable<string>> apiResponse = await _publishingApiClient.GetPublishedProviderErrors(specificationId);
+            ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetPublishedProviderErrors(specificationId);
 
-            IActionResult errorResult =
-                apiResponse.IsSuccessOrReturnFailureResult(nameof(Specification));
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(apiResponse.Content?.Where(x => x != null).ToList());
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content?.Where(err => err != null).ToList()));
         }
-        
+
         [HttpGet("/api/sqlqa/specifications/{specificationId}/funding-streams/{fundingStreamId}/import/queue")]
         public async Task<IActionResult> RunSqlImportJob([FromRoute] string specificationId,
             [FromRoute] string fundingStreamId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
-            
+
             if (!await _authorizationHelper.DoesUserHavePermission(
                 User,
                 specificationId,
@@ -514,39 +411,26 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ApiResponse<JobCreationResponse> createJobResponse = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
-            
-            IActionResult errorResult =
-                createJobResponse.IsSuccessOrReturnFailureResult(nameof(Specification));
+            ApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
 
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(createJobResponse.Content);
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
-        
+
         [HttpGet("/api/publishedProviders/{fundingStreamId}/{fundingPeriodId}/lastupdated")]
-        public async Task<IActionResult> GetLatestPublishedDate([FromRoute] string fundingStreamId,
+        public async Task<IActionResult> GetLatestPublishedDate(
+            [FromRoute] string fundingStreamId,
             [FromRoute] string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<LatestPublishedDate> latestPublishedDateResponse = await _publishingApiClient.GetLatestPublishedDate(fundingStreamId, fundingPeriodId);
-            
-            IActionResult errorResult =
-                latestPublishedDateResponse.IsSuccessOrReturnFailureResult(nameof(Specification));
+            ApiResponse<LatestPublishedDate> response = await _publishingApiClient.GetLatestPublishedDate(fundingStreamId, fundingPeriodId);
 
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(latestPublishedDateResponse.Content);
+            return response.Handle(nameof(Specification), 
+                onSuccess: x => Ok(x.Content));
         }
-        
+
         [HttpGet("api/specifications/{specificationId}/publishedproviders/{providerId}/fundingStreams/{fundingStreamId}/errors")]
         public async Task<IActionResult> GetPublishedProviderErrors(
             [FromRoute] string fundingStreamId,
@@ -557,81 +441,61 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            ApiResponse<PublishedProviderVersion> response = 
+            ApiResponse<PublishedProviderVersion> response =
                 await _publishingApiClient.GetCurrentPublishedProviderVersion(specificationId, fundingStreamId, providerId);
-            
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
 
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(response.Content.Errors);
+            return response.Handle(nameof(PublishedProviderVersion), 
+                onSuccess: x => Ok(x.Content));
         }
 
-        [HttpPost("api/publishedproviderbatch")]
-        public async Task<IActionResult> UploadBatch(BatchUploadRequestViewModel request)
+        [HttpPost("api/publishedProviders/batch")]
+        public async Task<IActionResult> UploadBatch(IFormFile file)
         {
-            Guard.ArgumentNotNull(request, nameof(request));
-
-            ApiResponse<BatchUploadResponse> response = await _publishingApiClient.UploadBatch(new BatchUploadRequest
+            if (file == null || file.Length == 0)
             {
-                Stream = request.Stream
-            });
-            
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-
-            if (errorResult != null)
-            {
-                return errorResult;
+                return BadRequest("Missing or empty file");
             }
-            
-            return new OkObjectResult(response.Content);
+
+            await using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+
+                ApiResponse<BatchUploadResponse> response = await _publishingApiClient.UploadBatch(new BatchUploadRequest
+                {
+                    Stream = stream.ToArray()
+                });
+                
+                return response.Handle(nameof(PublishedProviderVersion), 
+                    onSuccess: x => Ok(x.Content));
+            }
         }
 
-        [HttpPost("api/publishedproviderbatch/validate")]
-        public async Task<IActionResult> QueueBatchUploadValidation(BatchUploadValidationRequestViewModel request)
+        [HttpPost("api/publishedProviders/batch/validate")]
+        public async Task<IActionResult> QueueBatchUploadValidation([FromBody] BatchUploadValidationRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
             ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueBatchUploadValidation(new BatchUploadValidationRequest
             {
                 BatchId = request.BatchId,
+                SpecificationId = request.SpecificationId,
                 FundingPeriodId = request.FundingPeriodId,
                 FundingStreamId = request.FundingStreamId
             });
 
-            if (response.IsBadRequest(out BadRequestObjectResult badRequestObject))
-            {
-                return badRequestObject;
-            }
-            
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-            
-            return new OkObjectResult(response.Content);
+            return response.Handle(nameof(PublishedProviderVersion), 
+                onSuccess: x => Ok(x.Content));
         }
 
-        [HttpGet("publishedproviderbatch/{batchId}/publishedProviders")]
+        [HttpGet("api/publishedProviders/batch/{batchId}")]
         public async Task<IActionResult> GetBatchPublishedProviderIds([FromRoute] string batchId)
         {
             Guard.IsNullOrWhiteSpace(batchId, nameof(batchId));
 
             ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetBatchPublishedProviderIds(batchId);
-            
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
 
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-            
-            return new OkObjectResult(response.Content);
+            return response.Handle(nameof(PublishedProviderVersion), 
+                onSuccess: x => Ok(x.Content));
         }
 
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
@@ -644,27 +508,11 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ValidatedApiResponse<JobCreationResponse> result =
+            ValidatedApiResponse<JobCreationResponse> response =
                 await _publishingApiClient.RefreshFundingForSpecification(specificationId);
 
-            if (result.IsBadRequest(out BadRequestObjectResult badRequest))
-            {
-                return badRequest;
-            }
-
-            IActionResult errorResult = result.IsSuccessOrReturnFailureResult("Refresh Funding");
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            if (result.Content.JobId != null)
-            {
-                return Ok(new {result.Content.JobId});
-            }
-
-            return BadRequest();
+            return response.Handle("Refresh Funding", 
+                onSuccess: x => x.Content.JobId != null ? (IActionResult) Ok(x.Content.JobId) : BadRequest());
         }
 
         private static ProfilingViewModel MapToProfilingViewModel(IDictionary<int, ProfilingVersion> profilingVersions)

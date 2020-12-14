@@ -39,5 +39,6 @@
     SearchIndexWriterJob = "SearchIndexWriterJob",
     ApproveAllCalculationsJob = "ApproveAllCalculationsJob",
     RunSqlImportJob = "RunSqlImportJob",
-    GenerateCalcCsvResultsJob = "GenerateCalcCsvResultsJob"
+    GenerateCalcCsvResultsJob = "GenerateCalcCsvResultsJob",
+    BatchPublishedProviderValidationJob = "BatchPublishedProviderValidationJob"
 }

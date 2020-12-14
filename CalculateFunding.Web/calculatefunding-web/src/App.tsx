@@ -59,6 +59,7 @@ import {ProfileHistory} from './pages/FundingApprovals/ProfileHistory';
 import {EditCalculation} from "./pages/Calculations/EditCalculation";
 import {ConfirmFunding} from "./pages/FundingApprovals/ConfirmFunding";
 import {RefreshSql} from "./pages/Datasets/RefreshSql";
+import {UploadBatch} from "./pages/FundingApprovals/UploadBatch";
 
 const queryCache = new QueryCache();
 
@@ -98,6 +99,7 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
                         <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId" component={SpecificationFundingApproval}/>
                         <Route path="/Approvals/ConfirmFunding/:fundingStreamId/:fundingPeriodId/:specificationId/:mode" component={ConfirmFunding}/>
+                        <Route path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId" component={UploadBatch}/>
                         <Route path="/Results/" component={ViewResults}/>
                         <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
                         <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -16,9 +18,11 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using NSubstitute;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
@@ -302,7 +306,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 aValidId,
                 aValidId);
 
-            result.Should().BeAssignableTo<InternalServerErrorResult>();
+            result.Should().BeAssignableTo<BadRequestResult>();
         }
 
         [TestMethod]
@@ -546,19 +550,26 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task UploadBatchDelegatesToPublishingEndPoint()
         {
-            byte[] batchStream = new byte[0];
-            
-            BatchUploadResponse expectedResponse = new BatchUploadResponse();
+            Mock<IFormFile> file = new Mock<IFormFile>();
+            byte[] contents = {3, 63, 8, 100};
+            MemoryStream ms = new MemoryStream();
+            StreamWriter writer = new StreamWriter(ms);
+            writer.Write(File.Create("blah blah"));
+            await writer.FlushAsync();
+            ms.Position = 0;
+            file.Setup(_ => _.CopyToAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
+                .Returns((Stream stream, CancellationToken token) => ms.CopyToAsync(stream))
+                .Verifiable();
+            file.SetupGet(x => x.Length).Returns(contents.Length);
+            BatchUploadResponse expectedResponse = new BatchUploadResponse { BatchId = Guid.NewGuid().ToString(), Url = "http:whatever"};
 
-            _publishingApiClient.UploadBatch(Arg.Is<BatchUploadRequest>(request =>
-                    ReferenceEquals(request.Stream, batchStream)))
+            _publishingApiClient
+                .UploadBatch(Arg.Any<BatchUploadRequest>())
                 .Returns(new ApiResponse<BatchUploadResponse>(HttpStatusCode.OK, expectedResponse));
 
-            OkObjectResult result = await _publishController.UploadBatch(new BatchUploadRequestViewModel
-            {
-                Stream = batchStream
-            }) as OkObjectResult;
+            OkObjectResult result = await _publishController.UploadBatch(file.Object) as OkObjectResult;
 
+            result.Should().NotBeNull();
             result?
                 .Value
                 .Should()

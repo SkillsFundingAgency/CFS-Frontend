@@ -216,6 +216,10 @@ function getJobProgressMessage(jobTypeString: string) {
             return "Approving all calculations";
         case JobType.RunSqlImportJob:
             return "Running SQL import";
+        case JobType.GenerateCalcCsvResultsJob:
+            return "Generating calculation results file";
+        case JobType.BatchPublishedProviderValidationJob:
+            return "Validating batch file";
         case undefined:
             return "";
         default:

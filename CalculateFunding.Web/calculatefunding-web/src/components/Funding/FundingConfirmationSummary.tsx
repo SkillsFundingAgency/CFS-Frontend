@@ -66,6 +66,9 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
 
     } else {
 
+        if (fundingSummary.count === 0) {
+            props.addError("There are no providers to " + props.actionType.toLowerCase())
+        }
         return (
             <>
                 <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
@@ -91,7 +94,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                                 <td className="govuk-table__cell">
                                 </td>
                                 <td className="govuk-table__cell govuk-table__cell--numeric">
-                                    <p className="govuk-body">{selectedProviderIds.length}</p>
+                                    <p className="govuk-body">{fundingSummary.count}</p>
                                 </td>
                             </tr>
                             <tr className="govuk-table__row">

@@ -6,7 +6,11 @@ export const useErrors = () => {
     const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
     const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) => {
-        const isDuplicateError = errors && errors.some(err => err.description === description && err.fieldName === fieldName && err.message === errorMessage);
+        const isDuplicateError = errors && errors.some(err => 
+            (err.description === description || (!description && !err.description)) && 
+            (err.fieldName === fieldName || (!fieldName && !err.fieldName)) && 
+            (err.message === errorMessage || (!errorMessage && !err.message)) && 
+            (err.suggestion === suggestion || (!suggestion && !err.suggestion)));
         if (isDuplicateError) {
             return;
         }

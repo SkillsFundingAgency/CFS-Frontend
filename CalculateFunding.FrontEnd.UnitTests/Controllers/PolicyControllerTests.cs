@@ -42,7 +42,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             //Assert
             result
                 .Should()
-                .BeAssignableTo<InternalServerErrorResult>();
+                .BeAssignableTo<BadRequestResult>();
         }
 
         [TestMethod]
@@ -66,7 +66,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             //Assert
             result
                 .Should()
-                .BeAssignableTo<InternalServerErrorResult>();
+                .BeAssignableTo<BadRequestResult>();
         }
 
         [TestMethod]

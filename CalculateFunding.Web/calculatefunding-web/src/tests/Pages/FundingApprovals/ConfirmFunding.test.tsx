@@ -2,13 +2,13 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
-import {act, render, screen, waitFor, waitForElementToBeRemoved, within} from "@testing-library/react";
+import {render, screen, waitFor, waitForElementToBeRemoved, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import * as redux from "react-redux";
 import {Provider} from "react-redux";
-import {createStore, Reducer, Store} from "redux";
-import {Actions, IStoreState, rootReducer} from "../../../reducers/rootReducer";
+import {createStore, Store} from "redux";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {QueryCache, ReactQueryCacheProvider} from "react-query";
 import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
@@ -122,7 +122,6 @@ describe("<ConfirmFunding />", () => {
             expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText(fundingPeriod.name)).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText(testSpec.name)).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText("2")).toBeInTheDocument();
         });
 
         it('renders approve button as enabled', async () => {
@@ -167,7 +166,6 @@ describe("<ConfirmFunding />", () => {
             expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText(fundingPeriod.name)).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText(testSpec.name)).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText("2")).toBeInTheDocument();
         });
 
         it('renders approve button as enabled', async () => {

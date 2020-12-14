@@ -9,7 +9,8 @@ export type OptionsForSpecificationsSelectedForFundingResult = {
     errorCheckingForOptions: string,
     isErrorCheckingForOptions: boolean
 }
-export const useOptionsForSpecificationsSelectedForFunding = (queryConfig: QueryConfig<FundingStreamWithSpecificationSelectedForFunding[], AxiosError> = {}) 
+export const useOptionsForSpecificationsSelectedForFunding = (
+    queryConfig: QueryConfig<FundingStreamWithSpecificationSelectedForFunding[], AxiosError> = {}) 
     : OptionsForSpecificationsSelectedForFundingResult => {
         const {data, isLoading, isError, error} = useQuery<FundingStreamWithSpecificationSelectedForFunding[], AxiosError>(
             `options-for-specifications-selected-for-funding`,

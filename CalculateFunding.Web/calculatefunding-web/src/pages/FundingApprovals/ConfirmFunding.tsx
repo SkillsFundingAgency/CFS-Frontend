@@ -22,8 +22,8 @@ import {Footer} from "../../components/Footer";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
-import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {RunningStatus} from "../../types/RunningStatus";
+import {HistoryPage} from "../../types/HistoryPage";
 
 
 export interface ConfirmFundingRouteProps {
@@ -38,7 +38,16 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
     const mode = match.params.mode;
-
+    const history = useHistory();
+    const previousPage: HistoryPage =
+        (history.location.state as any) &&
+        (history.location.state as any).previousPage as HistoryPage ?
+            (history.location.state as any).previousPage :
+            {
+                title: "Funding approval results",
+                path: `/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
+            };
+    const isBatchSelection = previousPage.title === "Upload batch file";
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
     const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(
@@ -59,7 +68,6 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const {errors, addErrorMessage, addError} = useErrors();
     const [jobId, setJobId] = useState<string>("");
     const [isConfirming, setIsConfirming] = useState<boolean>(false);
-    const history = useHistory();
 
     useEffect(() => {
             const handleActionJobComplete = () => {
@@ -100,6 +108,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         }
     }
 
+
     return (
         <div>
             <Header location={Section.Approvals}/>
@@ -108,7 +117,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                     <Breadcrumb name={"Calculate funding"} url={"/"}/>
                     <Breadcrumb name={"Approvals"}/>
                     <Breadcrumb name={"Select specification"} url={"/Approvals/Select"}/>
-                    <Breadcrumb name={"Funding approval results"}
+                    <Breadcrumb name="Funding approval results"
                                 url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}/>
                     <Breadcrumb name={mode + " funding"}/>
                 </Breadcrumbs>
@@ -180,7 +189,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                         <div className="govuk-grid-column-full">
                             <Link className="govuk-button govuk-button--secondary"
                                   data-module="govuk-button"
-                                  to={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}>
+                                  to={previousPage.path}>
                                 Back
                             </Link>
                         </div>
@@ -191,15 +200,16 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                             <button data-prevent-double-click="true"
                                     className="govuk-button govuk-!-margin-right-1"
                                     data-module="govuk-button"
-                                    disabled={isLoadingFundingConfiguration || isCheckingForJob || isConfirming || latestJob && latestJob.runningStatus !== RunningStatus.Completed}
+                                    disabled={isLoadingFundingConfiguration || isCheckingForJob || isConfirming || !specification || !fundingConfiguration ||
+                                    latestJob && latestJob.runningStatus !== RunningStatus.Completed}
                                     onClick={handleConfirm}>
                                 Confirm {mode === FundingActionType.Approve ? "approval" : "release"}
                             </button>
-                            <Link className="govuk-button govuk-button--secondary"
+                            <a className="govuk-button govuk-button--secondary"
                                   data-module="govuk-button"
-                                  to={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}>
+                                  onClick={() => history.goBack()}>
                                 Cancel
-                            </Link>
+                            </a>
                         </div>
                     </div>
                 }
