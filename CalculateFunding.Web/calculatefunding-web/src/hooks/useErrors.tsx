@@ -5,7 +5,7 @@ import {ErrorMessage, ValidationErrors} from "../types/ErrorMessage";
 export const useErrors = () => {
     const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
-    const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string) => {
+    const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) => {
         const isDuplicateError = errors && errors.some(err => err.description === description && err.fieldName === fieldName && err.message === errorMessage);
         if (isDuplicateError) {
             return;
@@ -15,6 +15,7 @@ export const useErrors = () => {
             id: errorCount + 1,
             fieldName: fieldName,
             description: description,
+            suggestion: suggestion,
             message: errorMessage.toString(),
             validationErrors: undefined
         };

@@ -32,6 +32,9 @@ export function MultipleErrorSummary(props: { errors: ErrorMessage[] }) {
                                     )}
                                 </ul>
                                 }
+                                {error.suggestion &&
+                                    error.suggestion
+                                }
                             </li>
                         )}
                     </ul>

@@ -2,7 +2,7 @@
     id: number,
     fieldName?: string,
     description?: string,
-    suggestion?: string,
+    suggestion?: any,
     message: string,
     validationErrors?: ValidationErrors | undefined
 }

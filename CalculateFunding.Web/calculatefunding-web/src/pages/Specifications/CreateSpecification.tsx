@@ -22,10 +22,11 @@ import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {HubConnectionBuilder} from "@microsoft/signalr";
 import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
-import {ErrorMessage} from "../../types/ErrorMessage";
 import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
 import {CompletionStatus} from "../../types/CompletionStatus";
 import {RunningStatus} from "../../types/RunningStatus";
+import {useErrors} from "../../hooks/useErrors";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export function CreateSpecification() {
     const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
@@ -47,9 +48,10 @@ export function CreateSpecification() {
     const [isLoading, setIsLoading] = useState(false);
     const [fundingPeriodIsLoading, setFundingPeriodIsLoading] = useState<boolean>(false);
     const [newSpecificationId, setNewSpecificationId] = useState<string>('');
-    const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [providerSource, setProviderSource] = useState<ProviderSource>();
     const history = useHistory();
+    const {errors, addError, addErrorMessage, clearErrorMessages} = useErrors();
+    const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
 
     useEffect(() => {
         const getStreams = async () => {
@@ -57,7 +59,7 @@ export function CreateSpecification() {
                 const streamResult = await getFundingStreamsService(true);
                 setFundingStreamData(streamResult.data as FundingStream[]);
             } catch {
-                addErrorMessage("There was a problem loading the funding streams. Please try refreshing the page.");
+                addErrorMessage("There was a problem loading the funding streams. Please try refreshing the page.", "", "", errorSuggestion);
             }
         };
 
@@ -73,9 +75,9 @@ export function CreateSpecification() {
                 setFundingPeriodData(periodResult.data);
             } catch (err) {
                 if (err.response.status === 404) {
-                    addErrorMessage("No funding periods exist for your selection.");
+                    addErrorMessage("No funding periods exist for your selection.", "", "", errorSuggestion);
                 } else {
-                    addErrorMessage("There was a problem loading the funding periods. Please try again.");
+                    addErrorMessage("There was a problem loading the funding periods. Please try again.", "", "", errorSuggestion);
                 }
             } finally {
                 setFundingPeriodIsLoading(false);
@@ -94,10 +96,10 @@ export function CreateSpecification() {
                 const publishedFundingTemplates = (await getPublishedTemplatesByStreamAndPeriod(fundingStreamId, fundingPeriodId)).data;
                 setTemplateVersionData(publishedFundingTemplates);
             } catch (err) {
-                if (err.response.status == 404) {
-                    addErrorMessage("No published template exists for your selections.")
+                if (err.response.status === 404) {
+                    addErrorMessage("No published template exists for your selections.", "", "", errorSuggestion)
                 } else {
-                    addErrorMessage("There was a problem loading the template versions. Please try again.");
+                    addErrorMessage("There was a problem loading the template versions. Please try again.", "", "", errorSuggestion);
                 }
             }
         };
@@ -113,14 +115,14 @@ export function CreateSpecification() {
                     const providerSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
                     setProviderSnapshots(providerSnapshots);
                 } else {
-                    throw new Error("Unable to resolve provider source to either 'CFS' or 'FDZ'.");
+                    addErrorMessage("Unable to resolve provider source to either 'CFS' or 'FDZ'.", "", "", errorSuggestion);
                 }
             } catch (error) {
                 if (error.response != null) {
                     if (error.response.status === 404) {
-                        addErrorMessage("No provider data exists for your selections.");
+                        addErrorMessage("No provider data exists for your selections.", "", "", errorSuggestion);
                     } else {
-                        addErrorMessage(`There was a problem loading the core providers for the following reason: ${error.message}. Please try again.`);
+                        addErrorMessage(`There was a problem loading the core providers for the following reason: ${error.message}. Please try again.`, "", "", errorSuggestion);
                     }
                 }
             }
@@ -136,14 +138,14 @@ export function CreateSpecification() {
                 })
                 .catch((err) => {
                     if (err.response != null && err.response.status !== 404) {
-                        addErrorMessage("There was a problem fetching the data. Please try again.");
+                        addErrorMessage("There was a problem fetching the data. Please try again.", "", "", errorSuggestion);
                     }
                 });
         }
     }, [selectedFundingPeriod]);
 
     useEffect(() => {
-        if (newSpecificationId.length === 0) return;
+        if (newSpecificationId?.length === 0) return;
 
         const createHubConnection = async () => {
             const hubConnect = new HubConnectionBuilder()
@@ -164,7 +166,7 @@ export function CreateSpecification() {
                             hubConnect.stop();
                         });
                         if (message.completionStatus !== CompletionStatus.Succeeded) {
-                            addErrorMessage(message.outcome);
+                            addErrorMessage(message.outcome, "", "", errorSuggestion);
                         } else {
                             history.push(`/ViewSpecification/${newSpecificationId}`);
                         }
@@ -181,16 +183,6 @@ export function CreateSpecification() {
 
         createHubConnection();
     }, [newSpecificationId]);
-
-    function addErrorMessage(errorMessage: string, fieldName?: string) {
-        const errorCount: number = errors.length;
-        const error: ErrorMessage = {id: errorCount + 1, fieldName: fieldName, message: errorMessage};
-        setErrors(errors => [...errors, error]);
-    }
-
-    function clearErrorMessages() {
-        setErrors([]);
-    }
 
     function saveSpecificationName(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
@@ -269,9 +261,15 @@ export function CreateSpecification() {
                 const createSpecificationResult = await createSpecificationService(createSpecificationViewModel);
                 const specificationSummary = createSpecificationResult.data as SpecificationSummary;
                 setNewSpecificationId(specificationSummary.id);
-            } catch {
+            } catch (error) {
                 setIsLoading(false);
-                addErrorMessage("Specification failed to create. Please try again.");
+                if (error.response && error.response.data["Name"] !== undefined)
+                {
+                    addErrorMessage(error.response.data["Name"], "", "", errorSuggestion);
+                }
+                else {
+                    addError(`Specification failed to create. Please try again. ${error}`);
+                }
             }
         } else {
             setFormValid({formSubmitted: true, formValid: false})
@@ -291,26 +289,9 @@ export function CreateSpecification() {
                     subTitle={"Please wait whilst we create the specification"}
                     description={"This can take a few minutes"} id={"create-specification"}
                     hidden={!isLoading} />
-                <div hidden={errors.length === 0}
-                    className="govuk-error-summary"
-                    aria-labelledby="error-summary-title" role="alert"
-                    data-module="govuk-error-summary">
-                    <h2 className="govuk-error-summary__title">
-                        There is a problem
-                    </h2>
-                    <div className="govuk-error-summary__body">
-                        <ul className="govuk-list govuk-error-summary__list">
-                            {errors.map((error, i) =>
-                                <li key={i}>
-                                    <p className="govuk-body">
-                                        {!error.fieldName && <span className="govuk-error-message">{error.message}</span>}
-                                    </p>
-                                </li>
-                            )}
-                            <li>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></li>
-                        </ul>
-                    </div>
-                </div>
+
+                <MultipleErrorSummary errors={errors} />
+
                 <fieldset className="govuk-fieldset" id="create-specification-fieldset" hidden={isLoading}>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
@@ -325,15 +306,16 @@ export function CreateSpecification() {
                         <label className="govuk-label" htmlFor="specification-name">
                             Specification name
                         </label>
-                        <input className="govuk-input" id="aspecification-name" name="specification-name" type="text"
-                            onChange={saveSpecificationName} />
+                        <input className="govuk-input" id="specification-name" name="specification-name" type="text"
+                            onChange={saveSpecificationName} data-testid={"specification-name-input"} />
                     </div>
 
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="funding-stream">
                             Funding streams
                         </label>
-                        <select className="govuk-select" id="funding-stream" name="funding-stream" onChange={selectFundingStream}>
+                        <select className="govuk-select" id="funding-stream" name="funding-stream" onChange={selectFundingStream}
+                                data-testid={"funding-stream-dropdown"}>
                             <option value="">Select funding Stream</option>
                             {fundingStreamData.map((fs, index) => <option key={index} value={fs.id}>{fs.name}</option>)}
                         </select>
@@ -344,7 +326,8 @@ export function CreateSpecification() {
                             Funding period
                         </label>
                         <select className="govuk-select" id="funding-period" name="funding-period"
-                            disabled={fundingPeriodData.length === 0 || fundingPeriodIsLoading} onChange={selectFundingPeriod}>
+                            disabled={fundingPeriodData.length === 0 || fundingPeriodIsLoading} onChange={selectFundingPeriod}
+                                data-testid={"funding-period-dropdown"}>
                             <option value="">Select funding period</option>
                             {fundingPeriodData.map((fp, index) => <option key={index} value={fp.id}>{fp.name}</option>)}
                         </select>
@@ -356,7 +339,8 @@ export function CreateSpecification() {
                             Core provider data
                         </label>
                         <select className="govuk-select" id="core-provider-data" name="core-provider-data"
-                            disabled={coreProviderData.length === 0 && providerSnapshots.length === 0} onChange={selectCoreProvider}>
+                            disabled={coreProviderData.length === 0 && providerSnapshots.length === 0} onChange={selectCoreProvider}
+                                data-testid={"core-provider-dropdown"}>
                             <option value="">Select core provider</option>
                             {
                                 coreProviderData.length > 0 ?
@@ -378,7 +362,7 @@ export function CreateSpecification() {
                             Template version
                         </label>
                         <select className="govuk-select" id="template-version" name="template-version" disabled={templateVersionData.length === 0}
-                            onChange={selectTemplateVersion} value={selectedTemplateVersion || ""}>
+                            onChange={selectTemplateVersion} value={selectedTemplateVersion || ""} data-testid={"template-version-dropdown"}>
                             <option value="">Select template version</option>
                             {templateVersionData.map((publishedFundingTemplate, index) =>
                                 <option key={index} value={publishedFundingTemplate.templateVersion}>
@@ -393,7 +377,8 @@ export function CreateSpecification() {
                         </label>
                         <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8}
                             aria-describedby="more-detail-hint"
-                            onChange={(e) => saveDescriptionName(e)}></textarea>
+                            onChange={(e) => saveDescriptionName(e)}
+                                  data-testid={"more-detail-textarea"}></textarea>
                     </div>
                     <div className="govuk-form-group">
                         <button id="submit-specification-button" className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"

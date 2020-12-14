@@ -32,7 +32,8 @@ export async function getFundingStreamByIdService(fundingStreamId: string) {
     });
 }
 
-export async function getFundingConfiguration(fundingStreamId: string, fundingPeriodId: string): Promise<AxiosResponse<FundingConfiguration>> {
+export async function getFundingConfiguration(fundingStreamId: string, fundingPeriodId: string):
+    Promise<AxiosResponse<FundingConfiguration>> {
     return axios(`${baseURL}/configuration/${fundingStreamId}/${fundingPeriodId}`, {
         method: 'GET',
         headers: {
