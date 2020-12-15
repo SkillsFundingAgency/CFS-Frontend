@@ -18,9 +18,9 @@ const store: Store<IStoreState> = createStore(rootReducer);
 const testData = FundingApprovalTestSetup();
 const mockRoute: match<UploadBatchRouteProps> = {
     params: {
-        specificationId: testData.testSpec.id,
-        fundingStreamId: testData.fundingStream.id,
-        fundingPeriodId: testData.fundingPeriod.id
+        specificationId: testData.testSpec2.id,
+        fundingStreamId: testData.fundingStream2.id,
+        fundingPeriodId: testData.fundingPeriod2.id
     },
     url: "",
     path: "",

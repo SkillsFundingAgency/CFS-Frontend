@@ -18,9 +18,9 @@ const store: Store<IStoreState> = createStore(rootReducer);
 const testData = FundingApprovalTestSetup();
 const mockRoute: match<UploadBatchRouteProps> = {
     params: {
-        specificationId: testData.testSpec.id,
-        fundingStreamId: testData.fundingStream.id,
-        fundingPeriodId: testData.fundingPeriod.id
+        specificationId: testData.testSpec2.id,
+        fundingStreamId: testData.fundingStream2.id,
+        fundingPeriodId: testData.fundingPeriod2.id
     },
     url: "",
     path: "",
@@ -86,9 +86,9 @@ describe("<UploadBatch />", () => {
             await waitFor(() => expect(testData.mockCreateValidationJobService)
                 .toHaveBeenCalledWith({
                     batchId: "asdgasfgwer",
-                    fundingPeriodId: testData.fundingPeriod.id,
-                    fundingStreamId: testData.fundingStream.id,
-                    specificationId: testData.testSpec.id
+                    fundingPeriodId: testData.fundingPeriod2.id,
+                    fundingStreamId: testData.fundingStream2.id,
+                    specificationId: testData.testSpec2.id
                 }));
         });
     });

@@ -12,23 +12,64 @@ import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
+import {FundingConfiguration} from "../../../types/FundingConfiguration";
+import {FundingStreamWithSpecificationSelectedForFunding} from "../../../types/SpecificationSelectedForFunding";
 
 export const FundingApprovalTestSetup = () => {
-    const fundingStream: FundingStream = {
-        name: "FS123",
+    const fundingStream1: FundingStream = {
+        name: "WIZZ1",
         id: "Wizard Training Scheme"
     };
-    const fundingPeriod: FundingPeriod = {
+    const fundingStream2: FundingStream = {
+        name: "DRK1",
+        id: "Dark Arts Programme"
+    };
+    const fundingPeriod1: FundingPeriod = {
         id: "FP123",
         name: "2019-20"
     };
-    const testSpec: SpecificationSummary = {
+    const fundingPeriod2: FundingPeriod = {
+        id: "FP124",
+        name: "2020-21"
+    };
+    const mockFundingConfigData: FundingConfiguration[] = [
+
+    ]
+    const mockSelectionData: FundingStreamWithSpecificationSelectedForFunding[] = [
+        {
+            id: fundingStream1.id,
+            name: "Wizard Funding Stream",
+            periods: [
+                {id: fundingPeriod1.id, name: fundingPeriod1.name, specifications: [{id: "ABC123", name: "Wizard Training"}]}
+            ]
+        },
+        {
+            id: "DRK",
+            name: fundingStream2.name,
+            periods: [
+                {id: fundingPeriod2.id, name: fundingPeriod2.name, specifications: [{id: "ABC123", name: "Dark Arts"}]}
+            ]
+        }
+    ];
+    const testSpec1: SpecificationSummary = {
         name: "Wizard Training",
         approvalStatus: "",
         description: "",
-        fundingPeriod: fundingPeriod,
-        fundingStreams: [fundingStream],
+        fundingPeriod: fundingPeriod1,
+        fundingStreams: [fundingStream1],
         id: "ABC123",
+        isSelectedForFunding: true,
+        providerVersionId: "",
+        dataDefinitionRelationshipIds: [],
+        templateIds: {}
+    };
+    const testSpec2: SpecificationSummary = {
+        name: "Dark Arts",
+        approvalStatus: "",
+        description: "",
+        fundingPeriod: fundingPeriod2,
+        fundingStreams: [fundingStream2],
+        id: "XYZ123",
         isSelectedForFunding: true,
         providerVersionId: "",
         dataDefinitionRelationshipIds: [],
@@ -39,8 +80,20 @@ export const FundingApprovalTestSetup = () => {
             approvalMode: ApprovalMode.Batches,
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
-            fundingPeriodId: fundingPeriod.id,
-            fundingStreamId: fundingStream.id
+            fundingPeriodId: fundingPeriod2.id,
+            fundingStreamId: fundingStream2.id
+        },
+        isLoadingFundingConfiguration: false,
+        isErrorLoadingFundingConfiguration: false,
+        errorLoadingFundingConfiguration: "",
+    };
+    const mockFundingConfigWithApprovalAllMode: FundingConfigurationQueryResult = {
+        fundingConfiguration: {
+            approvalMode: ApprovalMode.All,
+            providerSource: ProviderSource.CFS,
+            defaultTemplateVersion: "1.1",
+            fundingPeriodId: fundingPeriod1.id,
+            fundingStreamId: fundingStream1.id
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -143,6 +196,7 @@ export const FundingApprovalTestSetup = () => {
     const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
     const hasLatestJob = (job: LatestSpecificationJobWithMonitoringResult) => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (job));
     const hasFundingConfigWithApproveBatchMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalBatchMode));
+    const hasFundingConfigWithApproveAllMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalAllMode));
 
     
     return {
@@ -150,16 +204,22 @@ export const FundingApprovalTestSetup = () => {
         mockCreateValidationJobService,
         mockUploadFileService,
         mockFundingConfigWithApprovalBatchMode,
+        mockFundingConfigWithApprovalAllMode,
+        mockSelectionData,
         hasNoActiveJobsRunning,
         hasLatestJob,
         hasFundingConfigWithApproveBatchMode,
+        hasFundingConfigWithApproveAllMode,
         failedValidationJob,
         successfulValidationJob,
         activeApprovalJob,
         activeValidationJob,
-        testSpec,
+        testSpec1,
+        testSpec2,
         noJob,
-        fundingStream,
-        fundingPeriod,
+        fundingStream1,
+        fundingPeriod1,
+        fundingStream2,
+        fundingPeriod2
     }
 }
