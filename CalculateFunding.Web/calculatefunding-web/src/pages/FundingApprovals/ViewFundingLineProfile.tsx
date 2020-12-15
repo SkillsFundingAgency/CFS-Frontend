@@ -28,7 +28,7 @@ export interface ViewFundingLineProfileProps {
     fundingPeriodId: string;
     specificationId: string;
     fundingLineId: string;
-    providerVersionId: string;
+    specCoreProviderVersionId: string;
 }
 
 export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingLineProfileProps>) {
@@ -38,12 +38,38 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
     const specificationId = match.params.specificationId;
     const fundingLineId = match.params.fundingLineId;
     const providerId = match.params.providerId;
-    const providerVersionId = match.params.providerVersionId;
+    const providerVersionId = match.params.specCoreProviderVersionId;
 
     const history = useHistory();
 
-    const [fundingLineProfile, setFundingLineProfile] = useState<FundingLineProfile>();
-    const [editedFundingLineProfile, setEditedFundingLineProfile] = useState<FundingLineProfile>();
+    const [fundingLineProfile, setFundingLineProfile] = useState<FundingLineProfile>({
+        fundingLineCode: '',
+        fundingLineName: '',
+        ukprn: '',
+        amountAlreadyPaid: 0,
+        carryOverAmount: null,
+        providerName: '',
+        profilePatternKey: '',
+        profilePatternName: '',
+        profilePatternDescription: '',
+        lastUpdatedUser: {id: '', name: '', },
+        profileTotalAmount: 0,
+        profileTotals: []
+    });
+    const [editedFundingLineProfile, setEditedFundingLineProfile] = useState<FundingLineProfile>({
+        fundingLineCode: '',
+        fundingLineName: '',
+        ukprn: '',
+        amountAlreadyPaid: 0,
+        carryOverAmount: null,
+        providerName: '',
+        profilePatternKey: '',
+        profilePatternName: '',
+        profilePatternDescription: '',
+        lastUpdatedUser: {id: '', name: '', },
+        profileTotalAmount: 0,
+        profileTotals: []
+    });
     const [errors, setErrors] = useState<ErrorMessage[]>([]);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -222,7 +248,7 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
         <div>
             <Header location={Section.Approvals} />
             <div className="govuk-width-container">
-                {!editedFundingLineProfile || !fundingLineProfile || isLoading || isSaving ?
+                {isLoading || isSaving ?
                     <LoadingStatus title={`${isLoading ? "Loading" : "Saving"} funding line profile`} /> :
                     <>
                         <Breadcrumbs>

@@ -109,11 +109,11 @@ const App: React.FunctionComponent = () => {
                         <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
                         <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
                         <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
                                component={ChangeProfileType}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
                                component={ViewFundingLineProfile}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId"
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
                                component={ProviderFundingOverview}/>
                         <Route path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode" component={ProfileHistory}/>
                         <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
