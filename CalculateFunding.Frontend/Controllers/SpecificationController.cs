@@ -459,13 +459,13 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
 
-        [Route("api/specs/{specificationId}/get-report-metadata/")]
+        [Route("api/specs/{specificationId}/get-report-metadata/{fundingPeriodId}")]
         [HttpGet]
-        public async Task<IActionResult> GetReportMetadata(string specificationId)
+        public async Task<IActionResult> GetReportMetadata(string specificationId, string fundingPeriodId = null)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<IEnumerable<SpecificationReport>> response = await _specificationsApiClient.GetReportMetadataForSpecifications(specificationId);
+            ApiResponse<IEnumerable<SpecificationReport>> response = await _specificationsApiClient.GetReportMetadataForSpecifications(specificationId, fundingPeriodId);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

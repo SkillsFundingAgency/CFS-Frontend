@@ -132,12 +132,6 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         dispatch(getSpecificationSummary(specificationId));
         dispatch(getTemplateCalculations(specificationId, "All", 1, templateCalculationsSearchTerm));
         dispatch(getAdditionalCalculations(specificationId, "All", 1, additionalCalculationsSearchTerm));
-
-        getDownloadableReportsService(specificationId)
-            .then((result) => {
-                    const response = result.data as ReportMetadataViewModel[];
-                setDownloadableReports(response);
-            });
     }, [specificationId]);
 
     useEffect(() => {
@@ -145,6 +139,12 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
             specificationResults.specification.fundingPeriod &&
             specificationResults.specification.fundingStreams[0]) {
             fetchData();
+
+            getDownloadableReportsService(specificationId, specificationResults.specification.fundingPeriod.id)
+            .then((result) => {
+                    const response = result.data as ReportMetadataViewModel[];
+                setDownloadableReports(response);
+            });
         }
     }, [specificationResults.specification]);
 
@@ -552,7 +552,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
 
                                             <div hidden={!downloadableReports.some(dr => dr.category === "History")}>
                                                 <h3 className="govuk-heading-m govuk-!-margin-top-5">Published reports</h3>
-                                                {downloadableReports.filter(dr => dr.category !== "History").map(dlr =>
+                                                {downloadableReports.filter(dr => dr.category === "History").map(dlr =>
                                                     <div>
                                                         <div className="attachment__thumbnail">
                                                             <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`} className="govuk-link" target="_self"

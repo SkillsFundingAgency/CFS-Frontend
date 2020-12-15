@@ -117,8 +117,8 @@ export async function updateSpecificationService(updateSpecificationViewModel: U
     });
 }
 
-export async function getDownloadableReportsService(specificationId: string) {
-    return axios(`${baseURL}/${specificationId}/get-report-metadata/`, {
+export async function getDownloadableReportsService(specificationId: string, fundingPeriodId: string = "") {
+    return axios(`${baseURL}/${specificationId}/get-report-metadata/${fundingPeriodId}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
