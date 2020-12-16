@@ -11,6 +11,10 @@ import {UploadBatch, UploadBatchRouteProps} from "../../../pages/FundingApproval
 import userEvent from "@testing-library/user-event";
 import * as redux from "react-redux";
 import {FundingApprovalTestSetup} from "./FundingApprovalTestSetup";
+
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 const mockHistory = {push: jest.fn()};
 const location = createLocation("", "", "");

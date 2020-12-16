@@ -3,6 +3,7 @@ import 'regenerator-runtime/runtime'
 import Adapter from "enzyme-adapter-react-16";
 import 'jest-canvas-mock';
 import MutationObserver from '@sheerun/mutationobserver-shim';
+import { format } from 'util';
 require('jest-localstorage-mock');
 
 window.scrollTo = jest.fn();
@@ -24,3 +25,10 @@ jest.mock('./services/templateBuilderService', () => {
         getSelectedNodeInfo: jest.fn(() => subject2.asObservable())
     }
 });
+
+const error = global.console.error;
+
+global.console.error = function(...args) {
+  error(...args);
+  throw new Error(format(...args));
+};
