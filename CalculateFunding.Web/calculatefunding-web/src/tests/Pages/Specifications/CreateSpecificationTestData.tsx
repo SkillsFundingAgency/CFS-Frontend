@@ -1,11 +1,10 @@
 import React from 'react';
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {act, render, screen, waitFor} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import '@testing-library/jest-dom/extend-expect';
 import {ProviderSource} from "../../../types/CoreProviderSummary";
-import userEvent from "@testing-library/user-event";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -14,13 +13,19 @@ const store: Store<IStoreState> = createStore(
 store.dispatch = jest.fn();
 
 export function CreateSpecificationTestData() {
+
     const renderCreateSpecificationPage = async () => {
         const {CreateSpecification} = require('../../../pages/Specifications/CreateSpecification');
-        return render(<MemoryRouter initialEntries={['/Specifications/CreateSpecification']}>
+        const component =  render(<MemoryRouter initialEntries={['/Specifications/CreateSpecification']}>
             <Switch>
                 <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
             </Switch>
         </MemoryRouter>);
+
+        await waitFor(() => {
+            expect(screen.queryByText(/Loading.../)).not.toBeInTheDocument();
+        });
+        return component;
     };
 
     const mockPolicyService = () => {
@@ -162,54 +167,12 @@ export function CreateSpecificationTestData() {
         });
     }
 
-    const setupSpecificationNameEntered = async () => {
-        const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
-        await act(() => userEvent.type(specificationField, "test specification name"));
-    }
-
-    const setupFundingStreamSelected = async () => {
-        const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-        act(() => userEvent.selectOptions(fundingStreamSelect, "test funding stream id"));
-    }
-
-    const setupFundingPeriodSelected = async () => {
-        const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-        act(() => userEvent.selectOptions(fundingPeriodSelect, "test funding period id"));
-    }
-
-    const setupCoreProviderSelected = async () => {
-        const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-        act(() => userEvent.selectOptions(coreProviderSelect, "test core provider id"));
-    }
-
-    const setupTemplateVersionIdSelected = async () => {
-        const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
-        act(() => userEvent.selectOptions(templateVersionSelect, "test template version id"));
-    }
-
-    const setupMoreDetailEntered = async () => {
-        const moreDetailField = await screen.findByTestId(`more-detail-textarea`);
-        await act(() => userEvent.type(moreDetailField, "test value"));
-    }
-
-    const setupSaveButtonAct = async () => {
-        const buildButton = screen.getByRole("button", {name: /Save and continue/});
-        act(() => userEvent.click(buildButton));
-    }
-
     return {
         renderCreateSpecificationPage,
         mockPolicyService,
         mockSpecificationService,
         mockSpecificationServiceWithDuplicateNameResponse,
         mockProviderVersionService,
-        mockProviderService,
-        setupSpecificationNameEntered,
-        setupFundingStreamSelected,
-        setupFundingPeriodSelected,
-        setupCoreProviderSelected,
-        setupTemplateVersionIdSelected,
-        setupMoreDetailEntered,
-        setupSaveButtonAct
+        mockProviderService
     }
 }
