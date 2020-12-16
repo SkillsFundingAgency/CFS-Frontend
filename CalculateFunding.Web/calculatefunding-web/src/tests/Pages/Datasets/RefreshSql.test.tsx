@@ -9,7 +9,10 @@ import * as fetchLatestSpecificationJobs from "../../../hooks/Jobs/useFetchAllLa
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as publishService from "../../../services/publishService";
+import * as jobService from "../../../services/jobService";
 import {createMockAxiosError} from "../../fakes/fakeAxios";
+
+const latestPublishedDate = "2020-11-23T17:35:01.1080915+00:00";
 
 describe("<ChangeProfileType /> ", () => {
     beforeAll(() => {
@@ -41,6 +44,13 @@ describe("<ChangeProfileType /> ", () => {
                     isFetched: true
                 }
             });
+            jobServiceSpy.mockResolvedValue({
+                data: undefined,
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
         });
 
         afterEach(() => {
@@ -49,6 +59,7 @@ describe("<ChangeProfileType /> ", () => {
 
         afterAll(() => {
             useFetchLatestSpecificationJobSpy.mockReset();
+            jobServiceSpy.mockReset();
         });
 
         it("does not show summary until funding stream and funding period selected", async () => {
@@ -220,9 +231,29 @@ describe("<ChangeProfileType /> ", () => {
     describe("when a previous sql job exists", () => {
         afterEach(() => {
             useFetchLatestSpecificationJobSpy.mockReset();
+            jobServiceSpy.mockReset();
         });
 
         it("shows previous job run date and enables push data button if new data exists", async () => {
+            jobServiceSpy.mockResolvedValue({
+                data: {
+                    jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                    jobType: "RunSqlImportJob",
+                    specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                    outcome: "",
+                    runningStatus: RunningStatus.Completed,
+                    completionStatus: CompletionStatus.Succeeded,
+                    invokerUserId: "testid",
+                    invokerUserDisplayName: "test",
+                    parentJobId: "",
+                    lastUpdated: new Date("2020-11-19T14:36:34.324284+00:00"),
+                    created: new Date("2020-11-24T14:36:16.3435836+00:00")
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
                     allJobs: [{
@@ -265,6 +296,25 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("shows previous job run date and shows warning message if job already run", async () => {
+            jobServiceSpy.mockResolvedValue({
+                data: {
+                    jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                    jobType: "RunSqlImportJob",
+                    specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                    outcome: "",
+                    runningStatus: RunningStatus.Completed,
+                    completionStatus: CompletionStatus.Succeeded,
+                    invokerUserId: "testid",
+                    invokerUserDisplayName: "test",
+                    parentJobId: "",
+                    lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                    created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
                     allJobs: [{
@@ -347,6 +397,25 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("push button is disabled when sql job in progress", async () => {
+            jobServiceSpy.mockResolvedValue({
+                data: {
+                    jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                    jobType: "RunSqlImportJob",
+                    specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                    outcome: "",
+                    runningStatus: RunningStatus.InProgress,
+                    completionStatus: undefined,
+                    invokerUserId: "testid",
+                    invokerUserDisplayName: "test",
+                    parentJobId: "",
+                    lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                    created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
                     allJobs: [{
@@ -386,6 +455,25 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("push button is enabled when previous sql job failed", async () => {
+            jobServiceSpy.mockResolvedValue({
+                data: {
+                    jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                    jobType: "RunSqlImportJob",
+                    specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                    outcome: "",
+                    runningStatus: RunningStatus.Completed,
+                    completionStatus: CompletionStatus.Failed,
+                    invokerUserId: "testid",
+                    invokerUserDisplayName: "test",
+                    parentJobId: "",
+                    lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                    created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
                     allJobs: [{
@@ -428,6 +516,25 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("push button is enabled when previous sql job timed out", async () => {
+            jobServiceSpy.mockResolvedValue({
+                data: {
+                    jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                    jobType: "RunSqlImportJob",
+                    specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                    outcome: "",
+                    runningStatus: RunningStatus.Completed,
+                    completionStatus: CompletionStatus.TimedOut,
+                    invokerUserId: "testid",
+                    invokerUserDisplayName: "test",
+                    parentJobId: "",
+                    lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
+                    created: new Date("2020-11-23T14:36:16.3435836+00:00")
+                },
+                status: 200,
+                statusText: "",
+                headers: {},
+                config: {}
+            });
             useFetchLatestSpecificationJobSpy.mockImplementation(() => {
                 return {
                     allJobs: [{
@@ -521,20 +628,21 @@ jest.mock('../../../services/specificationService', () => ({
 }));
 
 // Setup spies
+const jobServiceSpy = jest.spyOn(jobService, 'getLatestSuccessfulJob');
+const runSqlImportJobSpy = jest.spyOn(publishService, 'runSqlImportJob');
+const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+const useFetchLatestSpecificationJobSpy = jest.spyOn(fetchLatestSpecificationJobs, 'useFetchAllLatestSpecificationJobs');
+
 const getLatestPublishedDateSpy = jest.spyOn(publishService, 'getLatestPublishedDate');
 getLatestPublishedDateSpy.mockResolvedValue({
     data: {
-        value: new Date("2020-11-23T17:35:01.1080915+00:00")
+        value: new Date(latestPublishedDate)
     },
     status: 200,
     statusText: "",
     headers: {},
     config: {}
 });
-
-const runSqlImportJobSpy = jest.spyOn(publishService, 'runSqlImportJob');
-
-const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 const jobMonitorSpy = jest.spyOn(monitor, 'useMonitorForNewSpecificationJob');
 jobMonitorSpy.mockImplementation(() => {
@@ -543,8 +651,6 @@ jobMonitorSpy.mockImplementation(() => {
         newJob: undefined
     }
 });
-
-const useFetchLatestSpecificationJobSpy = jest.spyOn(fetchLatestSpecificationJobs, 'useFetchAllLatestSpecificationJobs');
 
 // Setup router mocks
 const mockHistoryPush = jest.fn();

@@ -25,6 +25,8 @@ import {useHistory} from "react-router";
 import {RunningStatus} from "../../types/RunningStatus";
 import {JobDetails} from "../../helpers/jobDetailsHelper";
 import {CompletionStatus} from "../../types/CompletionStatus";
+import {getLatestSuccessfulJob} from "../../services/jobService";
+import {JobSummary} from "../../types/jobSummary";
 
 export function RefreshSql() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
@@ -60,7 +62,16 @@ export function RefreshSql() {
     );
     const fundingStreamId = selectedFundingStream ? selectedFundingStream.id : "";
     const fundingPeriodId = selectedFundingPeriod ? selectedFundingPeriod.id : "";
-    const lastSqlJob = allJobs?.filter(job => job.jobType !== undefined && job.jobType === JobType.RunSqlImportJob)[0];
+
+    const {data: lastSqlJob, isLoading: isCheckingForLatestSqlJob} = useQuery<JobSummary | undefined, AxiosError>(`last-successful-sql-job-${specificationId}-runsqljob`,
+        async () => (await getLatestSuccessfulJob(specificationId, JobType.RunSqlImportJob)).data,
+        {
+            cacheTime: 0,
+            refetchOnWindowFocus: false,
+            enabled: specificationId && specificationId.length > 0,
+            onError: err => addErrorMessage(err.message, "Error while loading last successful sql job")
+        });
+
     const hasRunningFundingJobs: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
         && job.jobType !== JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed
         && job.specificationId === specificationId).length > 0 || false;
@@ -218,7 +229,7 @@ export function RefreshSql() {
     }
 
     function LastSqlUpdate() {
-        if (isCheckingForJobs) {
+        if (isCheckingForJobs || isCheckingForLatestSqlJob) {
             return <LoadingFieldStatus title="Loading..." />
         }
         if (isAnotherUserRunningSqlJob) {
@@ -360,7 +371,7 @@ export function RefreshSql() {
                 lastSqlJob.completionStatus === CompletionStatus.TimedOut)
             && missingPermissions.length === 0 && !isLoadingOptions
             && !isCheckingForJobs && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob
-            && !hasRunningFundingJobs
+            && !hasRunningFundingJobs && !isCheckingForLatestSqlJob
         );
 
         return (

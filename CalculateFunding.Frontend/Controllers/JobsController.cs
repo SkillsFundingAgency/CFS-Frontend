@@ -36,7 +36,7 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<IEnumerable<JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypesArray);
 
             IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary", treatNoContentAsSuccess: true);
-            
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -55,9 +55,14 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("api/jobs/latest-success/{specificationId}/{jobDefinitionId}")]
-        public async Task<IActionResult> GetSpecificationLatstSucessfulJob([FromRoute] string specificationId, [FromRoute] string jobDefinitionId)
+        public async Task<IActionResult> GetSpecificationLatestSucessfulJob([FromRoute] string specificationId, [FromRoute] string jobDefinitionId)
         {
             ApiResponse<JobSummary> response = await _jobsApiClient.GetLatestSuccessfulJobForSpecification(specificationId, jobDefinitionId);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return Ok();
+            }
 
             IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary");
 

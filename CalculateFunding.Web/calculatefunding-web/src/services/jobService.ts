@@ -11,3 +11,12 @@ export async function getJobStatusUpdatesForSpecification(specificationId: strin
         },
     });
 }
+
+export async function getLatestSuccessfulJob(specificationId: string, jobType: string): Promise<AxiosResponse<JobSummary | undefined>> {
+    return axios(`${baseURL}/latest-success/${specificationId}/${jobType}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+}

@@ -28,7 +28,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task When_GetSpecificationLatstSucessfulJob_has_Valid_SuccessfulJob_Returns_Job()
+        public async Task When_GetSpecificationLatestSucessfulJob_has_Valid_SuccessfulJob_Returns_Job()
         {
             JobSummary expected = new JobSummary {JobId = "ABC123", RunningStatus = RunningStatus.Completed, CompletionStatus = CompletionStatus.Succeeded};
             _mockJobsApiClient
@@ -38,7 +38,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             _sut = new JobsController(_mockJobsApiClient.Object, mapper);
 
-            IActionResult result = await _sut.GetSpecificationLatstSucessfulJob("ABC123", "Published");
+            IActionResult result = await _sut.GetSpecificationLatestSucessfulJob("ABC123", "Published");
 
             result.Should().NotBeNull();
             result.Should().BeAssignableTo<OkObjectResult>();
@@ -48,20 +48,21 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task When_GetSpecificationLatstSucessfulJob_has_no_jobs_Returns_ErrorMessage()
+        public async Task When_GetSpecificationLatestSucessfulJob_has_no_jobs_Returns_Empty_Response()
         {
             _mockJobsApiClient
                 .Setup(x => x.GetLatestSuccessfulJobForSpecification("ABC123", "SomeJobDefinitionId"))
                 .ReturnsAsync(new ApiResponse<JobSummary>(HttpStatusCode.NotFound, null));
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
-            IActionResult result = await _sut.GetSpecificationLatstSucessfulJob("ABC123", "SomeJobDefinitionId");
+            IActionResult result = await _sut.GetSpecificationLatestSucessfulJob("ABC123", "SomeJobDefinitionId");
 
             _mockJobsApiClient.VerifyAll();
             result.Should().NotBeNull();
-            result.Should().BeAssignableTo<NotFoundObjectResult>();
-            var content = (result as NotFoundObjectResult).Value;
-            content.Should().Be("JobSummary not found.");
+            result.Should().BeAssignableTo<OkResult>();
+            var content = (result as OkResult);
+            content.Should().NotBeNull();
+            content.Should().BeOfType<OkResult>();
         }
     }
 }
