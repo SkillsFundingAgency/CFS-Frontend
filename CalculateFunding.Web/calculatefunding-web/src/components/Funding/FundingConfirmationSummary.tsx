@@ -22,6 +22,7 @@ export interface FundingConfirmationSummaryProps {
     specification: SpecificationSummary,
     canReleaseFunding: boolean,
     canApproveFunding: boolean,
+    isLoading: boolean,
     addError: (errorMessage: string, description?: string, fieldName?: string) => void,
 }
 
@@ -124,7 +125,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                     </div>
                 </div>
 
-                {state.providerVersionIds.length > 0 &&
+                {state.providerVersionIds.length > 0 && !props.isLoading &&
                 <div className="govuk-grid-row govuk-!-margin-bottom-9">
                     <div className="govuk-grid-column-three-quarters">
                         <Link to={`/Approvals/SpecificationFundingApproval/${props.fundingStreamId}/${props.fundingPeriodId}/${props.specification.id}`}

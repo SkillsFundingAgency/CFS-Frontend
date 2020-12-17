@@ -36,6 +36,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
     const [theFile, setTheFile] = useState<File>();
     const [jobId, setJobId] = useState<string | undefined>();
     const [batchId, setBatchId] = useState<string | undefined>();
+    const [isUpdating, setIsUpdating] = useState<boolean>();
     const [isWaitingForJob, setIsWaitingForJob] = useState<boolean>();
     const [actionType, setActionType] = useState<FundingActionType | undefined>();
     const history = useHistory();
@@ -105,12 +106,14 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
     }
 
     const uploadForApprove = async () => {
+        setIsUpdating(true);
         clearErrorMessages();
         setActionType(FundingActionType.Approve);
         await uploadBatchFile(theFile);
     }
 
     const uploadForRelease = async () => {
+        setIsUpdating(true);
         clearErrorMessages();
         setActionType(FundingActionType.Release);
         await uploadBatchFile(theFile);
@@ -125,6 +128,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
 
         if (latestJob.isFailed) {
             addError(latestJob.outcome, "Validation failed");
+            setIsUpdating(false);
         } else if (latestJob.isSuccessful && publishedProviderIds) {
             dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
             dispatch(addProvidersToFundingSelection(publishedProviderIds));
@@ -135,11 +139,11 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         }
     }, [latestJob, publishedProviderIds]);
 
-    const isBlocked = (isWaitingForJob || isUploadingBatchFile || isCreatingValidationJob || isCheckingForJob || isExtractingProviderIds ||
+    const isBlocked = (isUpdating || isWaitingForJob || isUploadingBatchFile || isCreatingValidationJob || isCheckingForJob || isExtractingProviderIds ||
         (latestJob && latestJob.jobId === jobId && latestJob.isActive));
     const hasActiveJob = latestJob && latestJob.isActive;
     const hasUsersValidationJobActive = latestJob && latestJob.isActive && latestJob.jobId === jobId;
-    const isValidatingOrUploading = isUploadingBatchFile || isCreatingValidationJob || isWaitingForJob || hasUsersValidationJobActive;
+    const isValidatingOrUploading = isUpdating || isUploadingBatchFile || isCreatingValidationJob || isWaitingForJob || hasUsersValidationJobActive;
 
 
     return <div>

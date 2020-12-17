@@ -12,7 +12,6 @@ import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
-import {FundingConfiguration} from "../../../types/FundingConfiguration";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../../types/SpecificationSelectedForFunding";
 
 export const FundingApprovalTestSetup = () => {
@@ -32,9 +31,6 @@ export const FundingApprovalTestSetup = () => {
         id: "FP124",
         name: "2020-21"
     };
-    const mockFundingConfigData: FundingConfiguration[] = [
-
-    ]
     const mockSelectionData: FundingStreamWithSpecificationSelectedForFunding[] = [
         {
             id: fundingStream1.id,
@@ -101,6 +97,7 @@ export const FundingApprovalTestSetup = () => {
     };
     const batchUploadResponse: BatchUploadResponse = {batchId: "asdgasfgwer", url: ""};
     const jobCreatedResponse: JobCreatedResponse = {jobId: "rtyg453645724"};
+    const getPublishedProvidersByBatchResponse: string[] = ["provider123"];
 
     const mockUploadFileService = jest.fn(() => Promise.resolve({
         data: batchUploadResponse,
@@ -108,6 +105,10 @@ export const FundingApprovalTestSetup = () => {
     }));
     const mockCreateValidationJobService = jest.fn(() => Promise.resolve({
         data: jobCreatedResponse,
+        status: 200
+    }));
+    const mockGetPublishedProvidersByBatchService = jest.fn(() => Promise.resolve({
+        data: getPublishedProvidersByBatchResponse,
         status: 200
     }));
     const noJob: LatestSpecificationJobWithMonitoringResult = {
@@ -188,7 +189,8 @@ export const FundingApprovalTestSetup = () => {
             return {
                 ...mockService,
                 uploadBatchOfPublishedProviders: mockUploadFileService,
-                validatePublishedProvidersByBatch: mockCreateValidationJobService
+                validatePublishedProvidersByBatch: mockCreateValidationJobService,
+                getPublishedProvidersByBatch: mockGetPublishedProvidersByBatchService
             }
         });
     }
@@ -206,6 +208,7 @@ export const FundingApprovalTestSetup = () => {
         mockFundingConfigWithApprovalBatchMode,
         mockFundingConfigWithApprovalAllMode,
         mockSelectionData,
+        mockGetPublishedProvidersByBatchService,
         hasNoActiveJobsRunning,
         hasLatestJob,
         hasFundingConfigWithApproveBatchMode,

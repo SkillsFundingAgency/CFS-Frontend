@@ -47,7 +47,6 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 title: "Funding approval results",
                 path: `/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
             };
-    const isBatchSelection = previousPage.title === "Upload batch file";
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
     const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(
@@ -180,6 +179,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                         canApproveFunding={canApproveFunding}
                         canReleaseFunding={canReleaseFunding}
                         addError={addErrorMessage}
+                        isLoading={(isLoadingFundingConfiguration || isCheckingForJob || isConfirming || !specification || !fundingConfiguration ||
+                        latestJob && latestJob.runningStatus !== RunningStatus.Completed) === true}
                     />
                 </>
                 }
