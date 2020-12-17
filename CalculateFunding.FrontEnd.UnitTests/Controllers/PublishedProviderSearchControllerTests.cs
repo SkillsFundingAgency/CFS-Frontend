@@ -10,16 +10,16 @@ using CalculateFunding.Frontend.ViewModels.Results;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NSubstitute;
+using Moq;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
     [TestClass]
     public class PublishedProviderSearchControllerTests
     {
-        private IPublishingApiClient _publishingApiClient;
+        private Mock<IPublishingApiClient> _publishingApiClient;
 
-        private IPublishedProviderSearchService _publishedProviderSearchService;
+        private Mock<IPublishedProviderSearchService> _publishedProviderSearchService;
 
         private PublishedProviderSearchController _publishedProviderSearchController;
 
@@ -32,22 +32,22 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestInitialize]
         public void Setup()
         {
-            _publishingApiClient = Substitute.For<IPublishingApiClient>();
-            _publishedProviderSearchService = Substitute.For<IPublishedProviderSearchService>();
-
-            _publishedProviderSearchController =
-                new PublishedProviderSearchController(_publishedProviderSearchService, _publishingApiClient);
+            _publishingApiClient = new Mock<IPublishingApiClient>();
+            _publishedProviderSearchService = new Mock<IPublishedProviderSearchService>();
         }
 
         [TestMethod]
         public async Task GetProviderIds_Returns_OK()
         {
-            _publishingApiClient
-                .SearchPublishedProviderIds(Arg.Is<PublishedProviderIdSearchModel>(_ => _.Filters.Count == 3 &&
-                    _.Filters["fundingStreamId"][0] == _fundingStreamId &&
-                    _.Filters["fundingPeriodId"][0] == _fundingPeriodId &&
-                    _.Filters["specificationId"][0] == _specificationId))
-                .Returns(new ApiResponse<IEnumerable<string>>(System.Net.HttpStatusCode.OK, new string[] { "provider1" }));
+            _publishingApiClient.Setup(x =>
+                    x.SearchPublishedProviderIds(It.Is<PublishedProviderIdSearchModel>(_ =>
+                        _.Filters.Count == 3 &&
+                        _.Filters["fundingStreamId"][0] == _fundingStreamId &&
+                        _.Filters["fundingPeriodId"][0] == _fundingPeriodId &&
+                        _.Filters["specificationId"][0] == _specificationId)))
+                .ReturnsAsync(new ApiResponse<IEnumerable<string>>(System.Net.HttpStatusCode.OK, new[] {"provider1"}));
+            _publishedProviderSearchController =
+                new PublishedProviderSearchController(_publishedProviderSearchService.Object, _publishingApiClient.Object);
 
             IActionResult result = await _publishedProviderSearchController.GetProviderIds(GetSearchRequest());
 
@@ -57,13 +57,23 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetProviders_Returns_OK()
         {
-            _publishedProviderSearchService
-                .PerformSearch(Arg.Is<SearchRequestViewModel>(_ => _.Filters.Count == 3 &&
-                    _.Filters["fundingStreamId"][0] == _fundingStreamId &&
-                    _.Filters["fundingPeriodId"][0] == _fundingPeriodId &&
-                    _.Filters["specificationId"][0] == _specificationId))
-                .Returns(new PublishProviderSearchResultViewModel());
-            
+            _publishingApiClient.Setup(x =>
+                    x.SearchPublishedProviderIds(It.Is<PublishedProviderIdSearchModel>(_ =>
+                        _.Filters.Count == 3 &&
+                        _.Filters["fundingStreamId"][0] == _fundingStreamId &&
+                        _.Filters["fundingPeriodId"][0] == _fundingPeriodId &&
+                        _.Filters["specificationId"][0] == _specificationId)))
+                .ReturnsAsync(new ApiResponse<IEnumerable<string>>(System.Net.HttpStatusCode.OK, new[] {"provider1"}));
+            _publishedProviderSearchService.Setup(x =>
+                    x.PerformSearch(It.Is<SearchRequestViewModel>(
+                        _ => _.Filters.Count == 3 &&
+                             _.Filters["fundingStreamId"][0] == _fundingStreamId &&
+                             _.Filters["fundingPeriodId"][0] == _fundingPeriodId &&
+                             _.Filters["specificationId"][0] == _specificationId)))
+                .ReturnsAsync(new PublishProviderSearchResultViewModel());
+            _publishedProviderSearchController =
+                new PublishedProviderSearchController(_publishedProviderSearchService.Object, _publishingApiClient.Object);
+
             IActionResult result = await _publishedProviderSearchController.GetProviders(GetSearchRequest());
 
             result.Should().BeOfType<OkObjectResult>();
@@ -71,7 +81,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
         private ViewModels.Common.SearchPublishedProvidersRequest GetSearchRequest()
         {
-            return new SearchPublishedProvidersRequest {
+            return new SearchPublishedProvidersRequest
+            {
                 SearchTerm = "",
                 Status = new string[] { },
                 ProviderType = new string[] { },
@@ -85,10 +96,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 IncludeFacets = true,
                 FacetCount = 0,
                 FundingPeriodId = _fundingPeriodId,
-                ErrorToggle =  "",
+                ErrorToggle = "",
                 SearchFields = new string[] { }
             };
         }
-
     }
 }

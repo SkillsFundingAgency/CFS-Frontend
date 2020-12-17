@@ -64,7 +64,9 @@ namespace CalculateFunding.Frontend.Controllers
                 FacetCount = request.FacetCount,
                 IncludeFacets = request.IncludeFacets,
                 PageSize = request.PageSize ?? 50,
-                SearchFields = request.SearchFields
+                SearchFields = request.SearchFields,
+                FundingStreamId = request.FundingStreamId,
+                FundingPeriodId = request.FundingPeriodId
             };
 
             PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(searchModel);
