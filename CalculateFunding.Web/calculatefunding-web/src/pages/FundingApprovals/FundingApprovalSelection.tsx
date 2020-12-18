@@ -114,6 +114,7 @@ export function FundingApprovalSelection() {
                                            id="yesUpload"
                                            name="yesUpload"
                                            aria-label="Approve using an upload of selected providers"
+                                           checked={batchUpload === true}
                                            onChange={() => setBatchUpload(true)}
                                            type="radio"/>
                                     <label className="govuk-label govuk-radios__label" htmlFor="yesUpload">
@@ -125,7 +126,8 @@ export function FundingApprovalSelection() {
                                            id="noUpload"
                                            name="noUpload"
                                            aria-label="Approve without an upload"
-                                           onClick={() => setBatchUpload(false)}
+                                           checked={batchUpload === false}
+                                           onChange={() => setBatchUpload(false)}
                                            type="radio"/>
                                     <label className="govuk-label govuk-radios__label" htmlFor="noUpload">
                                         No
