@@ -17,10 +17,25 @@ import {IVariable} from "../types/GdsMonacoEditor/IVariable";
 import {ILocalFunction} from "../types/GdsMonacoEditor/ILocalFunction";
 import {IDefaultType} from "../types/GdsMonacoEditor/IDefaultType";
 import {IKeyword} from "../types/GdsMonacoEditor/IKeyword";
-import {checkAggregableFunctionDeclared, convertClassToVariables, createCompletionItem, findDeclaredVariables, getDefaultDataTypesCompletionItems, getHoverDescriptionForDefaultType, getHoverDescriptionForLocalFunction, getHoverDescriptionForVariable, getKeywordsCompletionItems, getVariableForAggregatePath, getVariablesForPath, processSourceToRemoveComments} from "../services/IntellisenseProvider";
+import {
+    checkAggregableFunctionDeclared,
+    convertClassToVariables,
+    createCompletionItem,
+    findDeclaredVariables,
+    findEnum, findEnumItems,
+    getDefaultDataTypesCompletionItems,
+    getHoverDescriptionForDefaultType,
+    getHoverDescriptionForLocalFunction,
+    getHoverDescriptionForVariable,
+    getKeywordsCompletionItems, getOptionsForPath,
+    getVariableForAggregatePath,
+    getVariablesForPath,
+    processSourceToRemoveComments
+} from "../services/IntellisenseProvider";
 import {FundingStream} from "../types/viewFundingTypes";
 
 export function GdsMonacoEditor(props: {
+    calculationId?: string;
     value: string,
     change: any,
     language: string,
@@ -142,9 +157,46 @@ export function GdsMonacoEditor(props: {
                     return item.type === "Keyword";
                 });
 
+                const optionsList = result.filter(item => {
+                    return item.type.endsWith("Options");
+                })
+
                 const root = result.find(item => item.name === "CalculationContext");
 
                 variables = convertClassToVariables(root, result);
+
+                if (props.calculationId) {
+                    const enumVariable = findEnum(result, props.calculationId);
+
+
+                    if (enumVariable !== undefined && enumVariable.name !== "") {
+                        const enumItems = findEnumItems(enumVariable.name, result);
+
+                        if (enumItems !== undefined) {
+                            if (enumVariable.items === undefined) {
+                                enumVariable.items = {};
+                            }
+
+                            if (enumItems.enumValues !== null) {
+                                enumItems.enumValues.forEach(x => {
+                                    // @ts-ignore
+                                    enumVariable.items[x.toLowerCase()] = {
+                                        description: x,
+                                        friendlyName: x,
+                                        isAggregable: false,
+                                        items: {},
+                                        name: x,
+                                        type: x,
+                                        variableType: monaco.languages.CompletionItemKind.EnumMember
+                                    }
+                                })
+                            }
+                        }
+                        if (enumVariable.name !== undefined) {
+                            variables[enumVariable.name.toLowerCase()] = enumVariable;
+                        }
+                    }
+                }
 
                 const defaultTypes: IDefaultTypeContainer = {};
 
@@ -172,13 +224,46 @@ export function GdsMonacoEditor(props: {
                     }
                 }
 
+                const options: IVariableContainer = {}
+
+                if (optionsList) {
+                    for (const ol in optionsList) {
+                        const optionItem = optionsList[ol];
+
+                        const tempContainer: IVariableContainer = {};
+
+                        optionItem.enumValues.forEach(x => tempContainer[x.toLowerCase()] = {
+                            name: x,
+                            description: x,
+                            friendlyName: x,
+                            isAggregable: false,
+                            type: x,
+                            variableType: monaco.languages.CompletionItemKind.EnumMember,
+                        })
+
+                        const option: IVariable = {
+                            name: optionItem.name,
+                            description: optionItem.description,
+                            friendlyName: optionItem.name,
+                            isAggregable: false,
+                            type: optionItem.type,
+                            variableType: monaco.languages.CompletionItemKind.Enum,
+                            items: tempContainer
+                        }
+
+                        options[optionsList[ol].name.toLowerCase()] = option;
+                    }
+                }
+
+
                 const contextVariables = variables;
                 const contextFunctions = functions;
                 const contextDefaultTypes = defaultTypes;
                 const contextKeywords = keywords;
+                const contextOptions = options;
 
                 monaco.languages.registerCompletionItemProvider('vb', {
-                    triggerCharacters: [".", " ", "("],
+                    triggerCharacters: [".", " ", "(", "="],
                     provideCompletionItems: function (model: monaco.editor.ITextModel, position: IPosition,) {
 
                         const results = {
@@ -220,6 +305,8 @@ export function GdsMonacoEditor(props: {
 
                                 if (path) {
                                     const pathItems = getVariablesForPath(path, contextVariables);
+                                    const optionItems = getVariablesForPath(path, contextOptions);
+
                                     if (pathItems && pathItems.length > 0) {
 
                                         for (const variableResultKey in pathItems) {
@@ -262,6 +349,103 @@ export function GdsMonacoEditor(props: {
                                                 // @ts-ignore
                                                 results.suggestions.push(pathVariable);
                                             }
+                                        }
+                                    }
+
+                                    if (optionItems && optionItems.length > 0) {
+
+                                        for (const variableResultKey in optionItems) {
+                                            const variable: IVariable = optionItems[variableResultKey];
+                                            const pathVariable = {
+                                                label: variable.name,
+                                                kind: variable.variableType,
+                                                detail: variable.type,
+                                                insertText: variable.name,
+                                                range: editorRange
+                                            };
+
+                                            if (contextVariables[pathVariable.label.toString().toLowerCase()] === undefined) {
+                                                let description = "";
+                                                let friendlyName = "";
+
+                                                if (typeof variable.description !== "undefined") {
+                                                    description = variable.description;
+                                                }
+
+                                                if (typeof variable.friendlyName !== "undefined") {
+                                                    friendlyName = variable.friendlyName;
+                                                }
+
+                                                if (description || friendlyName) {
+                                                    let documentationValue = "";
+
+                                                    if (friendlyName) {
+                                                        documentationValue = "**" + friendlyName + "**";
+                                                    }
+
+                                                    if (description) {
+                                                        if (documentationValue) {
+                                                            documentationValue = documentationValue + "\r\n\r\n";
+                                                        }
+                                                        documentationValue = documentationValue + description;
+                                                    }
+                                                }
+
+                                                // @ts-ignore
+                                                results.suggestions.push(pathVariable);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                         } else if (lastCharacterTyped === " " && lineContentsSoFar.trimEnd().charAt(lineContentsSoFar.trimEnd().length - 1) === "=") {
+                            let pathString = lineContentsSoFar.replace('=', '').replace('()', '').trimEnd();
+
+                            const path = pathString.split(' ').splice(-1).toString().toLowerCase() + "options";
+
+                            if (path) {
+                                const pathItems = getOptionsForPath(path, contextOptions);
+                                if (pathItems && pathItems.length > 0) {
+
+                                    for (const variableResultKey in pathItems) {
+                                        const variable: IVariable = pathItems[variableResultKey];
+                                        const pathVariable = {
+                                            label: variable.name,
+                                            kind: variable.variableType,
+                                            detail: variable.type,
+                                            insertText: variable.name,
+                                            range: editorRange
+                                        };
+
+                                        if (contextVariables[pathVariable.label.toString().toLowerCase()] === undefined) {
+                                            let description = "";
+                                            let friendlyName = "";
+
+                                            if (typeof variable.description !== "undefined") {
+                                                description = variable.description;
+                                            }
+
+                                            if (typeof variable.friendlyName !== "undefined") {
+                                                friendlyName = variable.friendlyName;
+                                            }
+
+                                            if (description || friendlyName) {
+                                                let documentationValue = "";
+
+                                                if (friendlyName) {
+                                                    documentationValue = "**" + friendlyName + "**";
+                                                }
+
+                                                if (description) {
+                                                    if (documentationValue) {
+                                                        documentationValue = documentationValue + "\r\n\r\n";
+                                                    }
+                                                    documentationValue = documentationValue + description;
+                                                }
+                                            }
+
+                                            // @ts-ignore
+                                            results.suggestions.push(pathVariable);
                                         }
                                     }
                                 }

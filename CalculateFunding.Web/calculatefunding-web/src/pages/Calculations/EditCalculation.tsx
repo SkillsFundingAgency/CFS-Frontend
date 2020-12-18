@@ -219,6 +219,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     fundingStreams={specification.fundingStreams}
                     onChange={onCalculationChange}
                     originalSourceCode={calculation.sourceCode}
+                    calculationId={calculationId}
                 />
                 }
 

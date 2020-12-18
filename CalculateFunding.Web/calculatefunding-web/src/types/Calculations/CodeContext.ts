@@ -37,6 +37,7 @@ export interface ITypeInformationResponse {
     type: string;
     methods: Array<IMethodInformationResponse>;
     properties: Array<IPropertyInformationResponse>;
+    enumValues: Array<string>;
 }
 
 export interface IMethodInformationResponse {
@@ -44,6 +45,8 @@ export interface IMethodInformationResponse {
     friendlyName: string;
     description: string;
     returnType: string;
+    returnTypeClass:string;
+    returnTypeIsNullable:boolean;
     entityId: string;
     isCustom: boolean;
     parameters: Array<IParameterInformationResponse>;

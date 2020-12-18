@@ -14,6 +14,7 @@ import {compileCalculationPreviewService} from "../../services/calculationServic
 export interface CalculationSourceCodeProps {
     excludeMonacoEditor: boolean,
     specificationId: string,
+    calculationId?: string,
     calculationName: string,
     calculationType: string,
     dataType: CalculationDataType,
@@ -49,7 +50,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         providerId: "",
         dataType: CalculationDataType.Decimal
     });
-    
+
     useEffect(() => {
         if (props.originalSourceCode && props.originalSourceCode.length > 0) {
             setState(prevState => {
@@ -71,11 +72,11 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             });
         }
     }, [props.originalSourceCode]);
-    
+
     useEffect(() => {
         props.onChange(state);
     }, [state]);
-    
+
     useEffect(() => {
         if (state.isBuilding) {
             const previewCompileRequestViewModel: PreviewCompileRequestViewModel = {
@@ -176,6 +177,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             calculationType={props.calculationType + "Calculation"}
             calculationName={props.calculationName ? props.calculationName : ""}
             fundingStreams={props.fundingStreams}
+            calculationId={props.calculationId}
         />}
 
         <h4 className="govuk-heading-s">
@@ -188,8 +190,8 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         <div className="govuk-form-group govuk-!-margin-bottom-5">
             <input className="govuk-input govuk-input--width-10" type="text" aria-label="enter UKPRN"
                    data-testid="providerId"
-            onChange={onUpdateUKPRN}
-                   value={state.providerId} />
+                   onChange={onUpdateUKPRN}
+                   value={state.providerId}/>
         </div>
 
         <button data-prevent-double-click="true"
@@ -203,7 +205,8 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
         <LoadingFieldStatus title={"Building source code"} hidden={!state.isBuilding}/>
 
         {state.calculationBuild.hasCodeBuiltSuccessfully !== undefined &&
-        <div className={"govuk-inset-text" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
+        <div
+            className={"govuk-inset-text" + (!state.calculationBuild.hasCodeBuiltSuccessfully ? " govuk-form-group--error" : "")}>
             <label className="govuk-label">
                 <h4 className="govuk-heading-s">
                     Build output
@@ -213,10 +216,10 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             <div>
                 <p className="govuk-body">Code compiled successfully </p>
                 {!state.calculationBuild.isProviderValid &&
-                    <p className="govuk-body"><strong>No provider found. Try a different UKPRN.</strong></p>
+                <p className="govuk-body"><strong>No provider found. Try a different UKPRN.</strong></p>
                 }
                 {state.calculationBuild.isProviderValid && state.calculationBuild.providerRuntimeException !== "" &&
-                    <p className="govuk-body"><strong>{state.calculationBuild.providerRuntimeException}</strong></p>
+                <p className="govuk-body"><strong>{state.calculationBuild.providerRuntimeException}</strong></p>
                 }
                 {state.calculationBuild.providerName !== "" &&
                 <p className="govuk-body"><strong>Provider: {state.calculationBuild.providerName}</strong></p>
@@ -227,7 +230,8 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
             </div>
             }
             {!state.calculationBuild.hasCodeBuiltSuccessfully && state.calculationBuild.previewResponse &&
-            <CompilationErrorMessageList compilerMessages={state.calculationBuild.previewResponse.compilerOutput.compilerMessages}/>
+            <CompilationErrorMessageList
+                compilerMessages={state.calculationBuild.previewResponse.compilerOutput.compilerMessages}/>
             }
         </div>
         }

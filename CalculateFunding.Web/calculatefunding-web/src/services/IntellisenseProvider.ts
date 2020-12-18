@@ -1,5 +1,6 @@
 import {IVariable} from "../types/GdsMonacoEditor/IVariable";
 import * as monaco from "monaco-editor";
+import {languages} from "monaco-editor";
 import {IDefaultTypeContainer} from "../types/GdsMonacoEditor/IDefaultTypeContainer";
 import {IDefaultType} from "../types/GdsMonacoEditor/IDefaultType";
 import {IKeywordsContainer} from "../types/GdsMonacoEditor/IKeywordsContainer";
@@ -9,7 +10,6 @@ import {ILocalFunctionContainer} from "../types/GdsMonacoEditor/ILocalFunctionCo
 import {ILocalFunction} from "../types/GdsMonacoEditor/ILocalFunction";
 import {IMethodInformationResponse, ITypeInformationResponse} from "../types/Calculations/CodeContext";
 import {ILocalMethod} from "../types/GdsMonacoEditor/IMethodContainer";
-import {languages} from "monaco-editor";
 
 export function convertMethodInformationResponseToVariable(method: IMethodInformationResponse, types: Array<ITypeInformationResponse>, level?: number) {
     const methodItem: ILocalMethod = {
@@ -17,7 +17,7 @@ export function convertMethodInformationResponseToVariable(method: IMethodInform
         friendlyName: "",
         isCustom: false,
         label: "",
-        parameters:[],
+        parameters: [],
         returnType: "",
         getFunctionAndParameterDescription(): string {
             return "";
@@ -158,7 +158,7 @@ export function getVariablesForPath(path: string, variables: IVariableContainer)
         return [];
     }
 
-    path = path.toLowerCase();
+    path = path.replace('=','').toLowerCase();
 
     const pathArray: Array<string> = path.split(".");
     let currentVariableContainer: IVariableContainer = variables;
@@ -192,6 +192,33 @@ export function getVariablesForPath(path: string, variables: IVariableContainer)
     }
 
     return [];
+}
+
+export function getOptionsForPath(path: string, variables: IVariableContainer) {
+    if (!path) {
+        return [];
+    }
+    const result: Array<IVariable> = [];
+
+    path = path.toLowerCase();
+
+    const pathArray: Array<string> = path.split(".");
+    let currentVariableContainer: IVariableContainer = variables;
+
+    for (const variableKey in pathArray) {
+        if (currentVariableContainer === null) {
+            break;
+        }
+
+        const variableContainerKey = pathArray[variableKey];
+        const currentVariable: IVariable = currentVariableContainer[variableContainerKey];
+
+        if (currentVariable !== undefined && typeof currentVariable.items !== "undefined") {
+            result.push(currentVariable);
+        }
+    }
+
+    return result;
 }
 
 export function getVariableByPath(path: string, variables: IVariableContainer) {
@@ -273,8 +300,7 @@ export function getVariableForAggregatePath(path: string, variables: IVariableCo
 
             variablesArray.push(calcVariable);
 
-            if(clonedVariable.items !== undefined)
-            {
+            if (clonedVariable.items !== undefined) {
                 clonedVariable.items[calcVariable.name] = calcVariable
             }
         }
@@ -566,10 +592,10 @@ export function convertClassToVariables(root: ITypeInformationResponse | undefin
     if (!root || !root.properties) {
         return variables;
     }
-    
+
     root.properties.forEach(property => {
         const propLowerCaseName = property.name.toLowerCase();
-        
+
         variables[propLowerCaseName] = {
             description: property.description,
             friendlyName: property.friendlyName,
@@ -582,18 +608,17 @@ export function convertClassToVariables(root: ITypeInformationResponse | undefin
 
         const subItem = result.find(p => p.name === property.type);
 
-        if (subItem)
-        {
+        if (subItem) {
             variables[propLowerCaseName].items = convertClassToVariables(subItem, result);
         }
     });
 
     root.methods.forEach(method => {
-        variables[method.name.toLowerCase()] ={
-            description:method.description,
+        variables[method.name.toLowerCase()] = {
+            description: method.description,
             friendlyName: method.friendlyName,
             isAggregable: false,
-            items:{},
+            items: {},
             name: method.name,
             type: method.returnType,
             variableType: languages.CompletionItemKind.Method
@@ -601,4 +626,42 @@ export function convertClassToVariables(root: ITypeInformationResponse | undefin
     });
 
     return variables;
+}
+
+export function findEnum(root: ITypeInformationResponse[] | undefined, entityId: string) {
+    let enumItem: IVariable = {
+        friendlyName: "",
+        isAggregable: false,
+        name: "",
+        type: "",
+        variableType: languages.CompletionItemKind.Enum
+    };
+
+    if (!root) {
+        return enumItem;
+    }
+
+    root.forEach(information => {
+        const method = information.methods?.find(m => m.entityId == entityId);
+        if (method !== undefined)
+            enumItem = {
+                description: method.description,
+                friendlyName: method.friendlyName,
+                isAggregable: false,
+                items: {},
+                name: method.returnTypeClass,
+                type: method.returnTypeClass,
+                variableType: languages.CompletionItemKind.Enum
+            }
+    })
+
+    return enumItem;
+}
+
+export function findEnumItems(name: string, result: Array<ITypeInformationResponse>) {
+    let response = result.find(x => x.name === name);
+
+    if (response !== null) {
+        return response;
+    }
 }
