@@ -15,8 +15,10 @@ export interface ProfileHistoryPanelProps {
 export function ProfileHistoryPanel({specificationId, providerId, providerVersionId, fundingStreamId,
     fundingPeriodId, fundingLineCode}: ProfileHistoryPanelProps) {
     const {isLoading, isError, data} = useQuery<boolean>(`profile-history-exists-${specificationId}--${providerId}-${fundingStreamId}-${fundingLineCode}`,
-        async () => (
-            await getPreviousProfileExistsForSpecificationForProviderForFundingLine(specificationId, providerId, fundingStreamId, fundingLineCode)).data
+        async () => (await getPreviousProfileExistsForSpecificationForProviderForFundingLine(specificationId, providerId, fundingStreamId, fundingLineCode)).data,
+        {
+            refetchOnWindowFocus: false
+        }
     );
 
     return (

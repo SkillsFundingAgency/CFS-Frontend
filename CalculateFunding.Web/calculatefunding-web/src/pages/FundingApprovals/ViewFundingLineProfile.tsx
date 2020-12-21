@@ -8,7 +8,7 @@ import {Footer} from "../../components/Footer";
 import {ErrorMessage} from "../../types/ErrorMessage";
 import {getFundingLinePublishedProviderDetails, applyCustomProfile} from "../../services/publishedProviderFundingLineService";
 import {Link} from "react-router-dom";
-import {FundingLineProfile} from "../../types/PublishedProvider/FundingLineProfile";
+import {FundingLineProfile, FundingLineProfileViewModel} from "../../types/PublishedProvider/FundingLineProfile";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {useSelector} from "react-redux";
@@ -74,8 +74,10 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [canEditProfile, setCanEditProfile] = useState<boolean>(false);
+    const [hasPermission, setHasPermission] = useState<boolean>(false);
     const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [canEditCustomProfile, setCanEditCustomProfile] = useState<boolean>(false);
+    const [canChangeToRuleBasedProfile, setCanChangeToRuleBasedProfile] = useState<boolean>(false);
 
     useEffect(() => {
         getFundingLineProfile();
@@ -87,7 +89,7 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
         if (!fundingStreamPermission || !fundingStreamPermission.canApplyCustomProfilePattern) {
             setMissingPermissions(["apply custom profile pattern"]);
         } else {
-            setCanEditProfile(true);
+            setHasPermission(true);
         }
     }, [permissions]);
 
@@ -107,10 +109,12 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
     const getFundingLineProfile = async () => {
         try {
             setIsLoading(true);
-            const response = await getFundingLinePublishedProviderDetails(specificationId, providerId, fundingStreamId, fundingLineId);
-            const profile = response.data as FundingLineProfile;
-            setEditedFundingLineProfile(profile);
-            setFundingLineProfile(profile);
+            const response = await getFundingLinePublishedProviderDetails(specificationId, providerId, fundingStreamId, fundingLineId, fundingPeriodId);
+            const profile = response.data as FundingLineProfileViewModel;
+            setEditedFundingLineProfile(profile.fundingLineProfile);
+            setFundingLineProfile(profile.fundingLineProfile);
+            setCanEditCustomProfile(profile.enableUserEditableCustomProfiles);
+            setCanChangeToRuleBasedProfile(profile.enableUserEditableRuleBasedProfiles);
         }
         catch (err) {
             addErrorMessage(err.message);
@@ -390,14 +394,15 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
                             </div>
                             <div className="govuk-grid-row">
                                 <div className="govuk-grid-column-two-thirds">
-                                    <button className="govuk-button govuk-!-margin-right-1" disabled={!canEditProfile}
+                                    {canEditCustomProfile && <button className="govuk-button govuk-!-margin-right-1" disabled={!hasPermission}
                                         onClick={handleEditProfileClick} data-testid="edit-profile-btn">
                                         {isEditMode ? "Apply profile" : "Edit profile"}
-                                    </button>
+                                    </button>}
                                     {isEditMode && <button className="govuk-button govuk-button--secondary govuk-!-margin-right-1" onClick={handleCancelClick} data-testid="cancel-btn">
                                         Cancel
                                     </button>}
-                                    <button className="govuk-button" onClick={handleChangeToRuleBasedProfileClick}>Change to rule based profile</button>
+                                    {canChangeToRuleBasedProfile &&
+                                        <button className="govuk-button" onClick={handleChangeToRuleBasedProfileClick}>Change to rule based profile</button>}
                                 </div>
                             </div>
                         </div>

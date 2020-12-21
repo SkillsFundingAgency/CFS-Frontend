@@ -15,6 +15,8 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.ViewModels.Profiles;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -23,25 +25,30 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IPublishingApiClient _publishingApiClient;
         private readonly IProvidersApiClient _providersApiClient;
         private readonly ISpecificationsApiClient _specificationsApiClient;
+        private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
 
         public FundingLineDetailsController(IPublishingApiClient publishingApiClient, IProvidersApiClient providersApiClient,
-            ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
+            ISpecificationsApiClient specificationsApiClient, IPoliciesApiClient policiesApiClient, IAuthorizationHelper authorizationHelper)
         {
             _publishingApiClient = publishingApiClient;
             _providersApiClient = providersApiClient;
             _specificationsApiClient = specificationsApiClient;
+            _policiesApiClient = policiesApiClient;
             _authorizationHelper = authorizationHelper;
         }
 
         [HttpGet]
-        [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}/{fundingLineCode}")]
+        [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}/{fundingPeriodId}/{fundingLineCode}")]
         public async Task<IActionResult> GetFundingLinePublishedProviderDetails(
             string specificationId,
             string providerId,
             string fundingStreamId,
-            string fundingLineCode)
+            string fundingLineCode,
+            string fundingPeriodId)
         {
+            ApiResponse<FundingConfiguration> fundingConfig = await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
+
             ApiResponse<FundingLineProfile> fundingLineApiResponse = await _publishingApiClient
                 .GetFundingLinePublishedProviderDetails(
                     specificationId,
@@ -56,7 +63,14 @@ namespace CalculateFunding.Frontend.Controllers
                 return errorResult;
             }
 
-            return Ok(fundingLineApiResponse.Content);
+            FundingLineProfileViewModel fundingLineProfileViewModel = new FundingLineProfileViewModel()
+            {
+                FundingLineProfile = fundingLineApiResponse.Content,
+                EnableUserEditableCustomProfiles = fundingConfig.Content.EnableUserEditableCustomProfiles,
+                EnableUserEditableRuleBasedProfiles = fundingConfig.Content.EnableUserEditableRuleBasedProfiles
+            };
+
+            return Ok(fundingLineProfileViewModel);
         }
 
         [HttpGet]
@@ -130,10 +144,10 @@ namespace CalculateFunding.Frontend.Controllers
 
             return Ok(new FundingLineChangesViewModel
             {
-                    ProviderName = providerResponse.Content.Name,
-                    SpecificationName = specification.Name,
-                    FundingPeriodName = specification.FundingPeriod.Name,
-                    FundingLineChanges = fundingLineApiResponse.Content
+                ProviderName = providerResponse.Content.Name,
+                SpecificationName = specification.Name,
+                FundingPeriodName = specification.FundingPeriod.Name,
+                FundingLineChanges = fundingLineApiResponse.Content
             });
         }
 
@@ -187,9 +201,9 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         [Route("api/specifications/{specificationId}/publishedproviders/{providerId}/fundingStreams/{fundingStreamId}/fundingStructure")]
         public async Task<IActionResult> GetPublishedProviderFundingStructure(
-            [FromRoute]string specificationId,
-            [FromRoute]string fundingStreamId,
-            [FromRoute]string providerId)
+            [FromRoute] string specificationId,
+            [FromRoute] string fundingStreamId,
+            [FromRoute] string providerId)
         {
             string etag = Request.ReadETagHeaderValue();
             ApiResponse<PublishedProviderFundingStructure> fundingLineApiResponse = await _publishingApiClient

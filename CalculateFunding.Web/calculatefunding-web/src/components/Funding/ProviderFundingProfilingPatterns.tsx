@@ -32,7 +32,7 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                                 <dd className="govuk-summary-list__actions">
                                     <Link
                                         to={`/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${p.fundingLineCode}`}>
-                                        Change
+                                        View
                                     </Link>
                                 </dd>
                             </div>

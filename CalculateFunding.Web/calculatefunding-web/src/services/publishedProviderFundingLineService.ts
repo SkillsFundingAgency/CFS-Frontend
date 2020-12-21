@@ -1,13 +1,13 @@
 import axios, {AxiosResponse} from "axios"
-import {FundingLineProfile} from "../types/PublishedProvider/FundingLineProfile";
+import {FundingLineProfileViewModel} from "../types/PublishedProvider/FundingLineProfile";
 import {ApplyCustomProfileRequest} from "../types/PublishedProvider/ApplyCustomProfileRequest";
 import {PublishedProviderFundingStructure} from "../types/FundingStructureItem";
 
 const baseUrl = "/api/publishedproviderfundinglinedetails";
 
 export async function getFundingLinePublishedProviderDetails(specificationId: string, providerId: string,
-    fundingStreamId: string, fundingLineCode: string): Promise<AxiosResponse<FundingLineProfile>> {
-    return axios.get<FundingLineProfile>(`${baseUrl}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}`);
+    fundingStreamId: string, fundingLineCode: string, fundingPeriodId: string): Promise<AxiosResponse<FundingLineProfileViewModel>> {
+    return axios.get<FundingLineProfileViewModel>(`${baseUrl}/${specificationId}/${providerId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`);
 }
 
 export async function applyCustomProfile(profile: ApplyCustomProfileRequest) {

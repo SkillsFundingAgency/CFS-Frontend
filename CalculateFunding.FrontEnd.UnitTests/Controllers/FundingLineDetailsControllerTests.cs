@@ -18,6 +18,8 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Profiles;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
@@ -27,6 +29,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private Mock<IPublishingApiClient> _publishingApiClient;
         private Mock<ISpecificationsApiClient> _specificationsApiClient;
         private Mock<IProvidersApiClient> _providersApiClient;
+        private Mock<IPoliciesApiClient> _policiesApiClient;
         private Mock<IAuthorizationHelper> _mockAuthorizationHelper;
         private FundingLineDetailsController _fundingLineDetailsController;
 
@@ -34,6 +37,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private string _providerId;
         private string _fundingStreamId;
         private string _fundingLineCode;
+        private string _fundingPeriodId;
 
 
         [TestInitialize]
@@ -43,13 +47,15 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _providersApiClient = new Mock<IProvidersApiClient>();
             _specificationsApiClient = new Mock<ISpecificationsApiClient>();
             _mockAuthorizationHelper = new Mock<IAuthorizationHelper>();
-            _fundingLineDetailsController = new FundingLineDetailsController(_publishingApiClient.Object, _providersApiClient.Object,
-                _specificationsApiClient.Object, _mockAuthorizationHelper.Object);
+            _policiesApiClient = new Mock<IPoliciesApiClient>();
+                        _fundingLineDetailsController = new FundingLineDetailsController(_publishingApiClient.Object, _providersApiClient.Object,
+                _specificationsApiClient.Object, _policiesApiClient.Object, _mockAuthorizationHelper.Object);
 
             _specificationId = "specificationId";
             _providerId = "providerId";
             _fundingStreamId = "fundingStreamId";
             _fundingLineCode = "fundingLineCode";
+            _fundingPeriodId = "fundingPeriodId";
         }
 
         [TestMethod]
@@ -57,8 +63,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             GivenGetFundingLinePublishedProviderDetailsForFundingLine(
                 HttpStatusCode.InternalServerError);
+            GivenFundingConfiguration(HttpStatusCode.OK);
 
-            IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
+                        IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
 
             actualResult.Should().BeOfType<InternalServerErrorResult>();
         }
@@ -68,6 +75,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             GivenGetFundingLinePublishedProviderDetailsForFundingLine(
                 HttpStatusCode.OK, new FundingLineProfile());
+            GivenFundingConfiguration(
+                HttpStatusCode.OK, new FundingConfiguration());
 
             IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
 
@@ -164,6 +173,17 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _fundingStreamId,
                     _fundingLineCode))
                 .ReturnsAsync(new ApiResponse<FundingLineProfile>(httpStatusCode, result));
+        }
+
+        public void GivenFundingConfiguration(
+            HttpStatusCode httpStatusCode,
+            FundingConfiguration fundingConfiguration = null) 
+        {
+            _policiesApiClient
+                .Setup(_ => _.GetFundingConfiguration(
+                    _fundingStreamId,
+                    _fundingPeriodId))
+                .ReturnsAsync(new ApiResponse<FundingConfiguration>(httpStatusCode, fundingConfiguration));
         }
 
         [TestMethod]
@@ -267,7 +287,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _specificationId,
                     _providerId,
                     _fundingStreamId,
-                    _fundingLineCode);
+                    _fundingLineCode,
+                    _fundingPeriodId);
         }
         private void GivenGetPreviousProfilesForSpecificationForProviderForFundingLine(
                 HttpStatusCode httpStatusCode,

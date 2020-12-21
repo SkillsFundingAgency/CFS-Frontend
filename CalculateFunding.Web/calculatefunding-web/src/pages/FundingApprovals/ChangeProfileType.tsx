@@ -16,9 +16,9 @@ import {useQuery} from "react-query";
 import {assignProfilePatternKeyToPublishedProvider, getAllProfilePatterns} from "../../services/profilingService";
 import {FundingStreamPeriodProfilePattern} from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import {AxiosError} from "axios";
-import {FundingLineProfile} from "../../types/FundingLineProfile";
-import {getFundingLinePublishedProviderDetails} from "../../services/fundingLineDetailsService";
+import {getFundingLinePublishedProviderDetails} from "../../services/publishedProviderFundingLineService";
 import {useProviderVersion} from "../../hooks/Providers/useProviderVersion";
+import {FundingLineProfileViewModel} from "../../types/PublishedProvider/FundingLineProfile";
 
 export interface ChangeProfileTypeProps {
     providerId: string;
@@ -49,15 +49,24 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
     const {data: profilePatterns, isFetching: isFetchingProfilePatterns} =
         useQuery<FundingStreamPeriodProfilePattern[], AxiosError>(`profile-patterns-${fundingStreamId}-${fundingPeriodId}`,
             async () => (await getAllProfilePatterns(fundingStreamId, fundingPeriodId)).data,
-            {onError: err => addErrorMessage(err.message, "Error while loading profile patterns")});
+            {
+                onError: err => addErrorMessage(err.message, "Error while loading profile patterns"),
+                refetchOnWindowFocus: false
+            });
 
     const {providerVersion, isFetchingProviderVersion} = useProviderVersion(providerId, providerVersionId,
         (err: AxiosError) => addErrorMessage(err.message, "Error while loading provider"));
 
-    const {data: fundingLineProfile, isFetching: isFetchingFundingLineProfile} =
-        useQuery<FundingLineProfile, AxiosError>(`provider-profiling-pattern-for-spec-${specificationId}-provider-${providerId}-stream-${fundingStreamId}`,
-            async () => (await getFundingLinePublishedProviderDetails(specificationId, providerId, fundingStreamId, fundingLineId)).data,
-            {onError: err => addErrorMessage(err.message, "Error while loading funding line profile")});
+    const {data: fundingLineProfileViewModel, isFetching: isFetchingFundingLineProfile} =
+        useQuery<FundingLineProfileViewModel, AxiosError>(`provider-profiling-pattern-for-spec-${specificationId}-provider-${providerId}-stream-${fundingStreamId}-period-${fundingPeriodId}`,
+            async () => (await getFundingLinePublishedProviderDetails(specificationId, providerId, fundingStreamId, fundingLineId, fundingPeriodId)).data,
+            {
+                onError: err => addErrorMessage(err.message, "Error while loading funding line profile"),
+                refetchOnWindowFocus: false
+            });
+    
+    const fundingLineProfile = fundingLineProfileViewModel ?
+        fundingLineProfileViewModel.fundingLineProfile : undefined;
 
     const [canChangeProfileType, setCanChangeProfileType] = useState<boolean>(false);
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);

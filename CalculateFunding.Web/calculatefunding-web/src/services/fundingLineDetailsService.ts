@@ -11,10 +11,6 @@ export async function getCurrentProfileConfigService(
     return axios.get<FundingLineProfile[]>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}`);
 }
 
-export async function getFundingLinePublishedProviderDetails(specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string) {
-    return axios.get<FundingLineProfile>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}`);
-}
-
 export async function getPreviousProfilesForSpecificationForProviderForFundingLine(specificationId: string, providerId: string, fundingStreamId: string, fundingLineCode: string) {
     return axios.get<FundingLineChangeViewModel>(`${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/changes`);
 }

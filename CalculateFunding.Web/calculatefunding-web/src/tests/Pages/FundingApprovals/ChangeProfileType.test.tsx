@@ -11,7 +11,6 @@ import userEvent from "@testing-library/user-event";
 describe("<ChangeProfileType /> ", () => {
     afterEach(async () => {
         jest.clearAllMocks();
-        await cleanup();
     });
 
     describe("when user has canApplyCustomProfilePattern permission", () => {
@@ -26,8 +25,12 @@ describe("<ChangeProfileType /> ", () => {
             beforeEach(() => {
                 mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
                     data: {
-                        fundingLineCode: "DSG-004",
-                        fundingLineName: "Pupil Led Factors"
+                        fundingLineProfile: {
+                            fundingLineCode: "DSG-004",
+                            fundingLineName: "Pupil Led Factors"
+                        },
+                        enableUserEditableCustomProfiles: true,
+                        enableUserEditableRuleBasedProfiles: true
                     }
                 });
             });
@@ -67,25 +70,29 @@ describe("<ChangeProfileType /> ", () => {
             beforeEach(() => {
                 mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
                     data: {
-                        fundingLineCode: "DSG-004",
-                        fundingLineName: "Pupil Led Factors",
-                        totalAllocation: null,
-                        amountAlreadyPaid: 0.0,
-                        remainingAmount: null,
-                        carryOverAmount: 0.0,
-                        providerId: "10005143",
-                        providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
-                        ukprn: "10005143",
-                        profilePatternKey: "pattern key 2",
-                        profilePatternName: "pattern key 2",
-                        profilePatternDescription: null,
-                        lastUpdatedUser: {
-                            id: "testid",
-                            name: "testuser"
+                        fundingLineProfile: {
+                            fundingLineCode: "DSG-004",
+                            fundingLineName: "Pupil Led Factors",
+                            totalAllocation: null,
+                            amountAlreadyPaid: 0.0,
+                            remainingAmount: null,
+                            carryOverAmount: 0.0,
+                            providerId: "10005143",
+                            providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
+                            ukprn: "10005143",
+                            profilePatternKey: "pattern key 2",
+                            profilePatternName: "pattern key 2",
+                            profilePatternDescription: null,
+                            lastUpdatedUser: {
+                                id: "testid",
+                                name: "testuser"
+                            },
+                            lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
+                            profileTotalAmount: 0.0,
+                            profileTotals: []
                         },
-                        lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
-                        profileTotalAmount: 0.0,
-                        profileTotals: []
+                        enableUserEditableCustomProfiles: true,
+                        enableUserEditableRuleBasedProfiles: true
                     }
                 });
             });
@@ -225,25 +232,28 @@ describe("<ChangeProfileType /> ", () => {
             }]);
             mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
                 data: {
-                    fundingLineCode: "DSG-004",
-                    fundingLineName: "Pupil Led Factors",
-                    totalAllocation: null,
-                    amountAlreadyPaid: 0.0,
-                    remainingAmount: null,
-                    carryOverAmount: 0.0,
-                    providerId: "10005143",
-                    providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
-                    ukprn: "10005143",
-                    profilePatternKey: "pattern key 2",
-                    profilePatternName: "pattern key 2",
-                    profilePatternDescription: null,
-                    lastUpdatedUser: {
-                        id: "testid",
-                        name: "testuser"
-                    },
-                    lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
-                    profileTotalAmount: 0.0,
-                    profileTotals: []
+                    fundingLineProfile: {
+                        fundingLineCode: "DSG-004",
+                        fundingLineName: "Pupil Led Factors",
+                        totalAllocation: null,
+                        amountAlreadyPaid: 0.0,
+                        remainingAmount: null,
+                        carryOverAmount: 0.0,
+                        providerId: "10005143",
+                        providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
+                        ukprn: "10005143",
+                        profilePatternKey: "pattern key 2",
+                        profilePatternName: "pattern key 2",
+                        profilePatternDescription: null,
+                        lastUpdatedUser: {
+                            id: "testid",
+                            name: "testuser"
+                        },
+                        lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
+                        profileTotalAmount: 0.0,
+                        profileTotals: []
+                    }, enableUserEditableCustomProfiles: true,
+                    enableUserEditableRuleBasedProfiles: true
                 }
             });
         });
@@ -375,7 +385,7 @@ jest.mock('../../../services/providerService', () => ({
     })),
 }));
 
-jest.mock('../../../services/fundingLineDetailsService', () => ({
+jest.mock('../../../services/publishedProviderFundingLineService', () => ({
     getFundingLinePublishedProviderDetails: mockGetFundingLinePublishedProviderDetails
 }));
 

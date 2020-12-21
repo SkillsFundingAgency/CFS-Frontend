@@ -16,6 +16,12 @@ export interface FundingLineProfile {
   profileTotals: ProfileTotal[]
 }
 
+export interface FundingLineProfileViewModel {
+  fundingLineProfile: FundingLineProfile,
+  enableUserEditableCustomProfiles: boolean,
+  enableUserEditableRuleBasedProfiles: boolean
+}
+
 export interface ProfileTotal {
   year: number,
   typeValue: string,
