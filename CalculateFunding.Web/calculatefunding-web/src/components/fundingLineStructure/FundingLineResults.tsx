@@ -36,6 +36,7 @@ export interface FundingLineResultsProps {
     addError: (errorMessage: AxiosError | Error | string, description?: string, fieldName?: string) => void,
     clearErrorMessages: (fieldNames?: string[]) => void,
     setStatusToApproved?: () => void,
+    refreshFundingLines: boolean | undefined,
 }
 
 export function FundingLineResults({
@@ -46,7 +47,8 @@ export function FundingLineResults({
     providerId,
     addError,
     clearErrorMessages,
-    setStatusToApproved
+    setStatusToApproved,
+    refreshFundingLines
 }: FundingLineResultsProps) {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
@@ -80,6 +82,13 @@ export function FundingLineResults({
             setFundingLinePublishStatus(status);
         }
     };
+
+    const refreshFundingLinesRef = React.useRef(false);
+    useEffect(() => {
+        if (!refreshFundingLinesRef.current && refreshFundingLines) {
+            fetchData();
+        }
+    }, [refreshFundingLines]);
 
     function searchFundingLines(calculationName: string) {
         const fundingLinesCopy: FundingStructureItem[] = fundingLinesOriginalData as FundingStructureItem[];

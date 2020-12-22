@@ -75,11 +75,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const {canApproveAllCalculations, canChooseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId,
             [SpecificationPermissions.ApproveAllCalculations, SpecificationPermissions.ChooseFunding]);
-
     const history = useHistory();
     const location = useLocation();
 
-    const {hasJob, latestJob, isCheckingForJob} =
+    const {hasJob, latestJob: approveAllCalculationsJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.ApproveAllCalculationsJob],
             err => addError(err, "Error while checking for approve all calculation job"));
@@ -255,7 +254,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             {(isCheckingForJob || hasJob) &&
             <div className="govuk-form-group">
                 <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
-                {hasJob && <MappingStatus job={latestJob} />}
+                {hasJob && !isApprovingAllCalculations && <MappingStatus job={approveAllCalculationsJob} />}
             </div>}
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>
@@ -320,7 +319,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 status={specification.approvalStatus as PublishStatus}
                                 addError={addError}
                                 clearErrorMessages={clearErrorMessages}
-                                setStatusToApproved={setApprovalStatusToApproved}/>
+                                setStatusToApproved={setApprovalStatusToApproved}
+                                refreshFundingLines={approveAllCalculationsJob?.isSuccessful}/>
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <AdditionalCalculations specificationId={specificationId}
