@@ -20,13 +20,13 @@ import {useHistory} from "react-router";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {HubConnectionBuilder} from "@microsoft/signalr";
-import {JobMessage} from "../../types/jobMessage";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
 import {CompletionStatus} from "../../types/CompletionStatus";
 import {RunningStatus} from "../../types/RunningStatus";
 import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {JobResponse} from "../../types/jobDetails";
 
 export function CreateSpecification() {
     const [fundingStreamData, setFundingStreamData] = useState<FundingStream[]>([]);
@@ -157,7 +157,7 @@ export function CreateSpecification() {
             try {
                 await hubConnect.start();
 
-                hubConnect.on('NotificationEvent', (message: JobMessage) => {
+                hubConnect.on('NotificationEvent', (message: JobResponse) => {
                     if (message.jobType === "AssignTemplateCalculationsJob" &&
                         message.runningStatus === RunningStatus.Completed &&
                         message.specificationId === newSpecificationId) {

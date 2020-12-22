@@ -29,8 +29,8 @@ import {FundingSearchSelectionState} from "../../../states/FundingSearchSelectio
 import {ConfirmFundingRouteProps} from "../../../pages/FundingApprovals/ConfirmFunding";
 import {FundingActionType, PublishedProviderFundingCount} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import {createPublishedProviderIdsQueryResult} from "../../fakes/testFactories";
-import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
 import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
+import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
@@ -89,7 +89,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobSummary({
+    latestJob: getJobDetailsFromJobResponse({
         jobId: "dfgwer",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.InProgress,

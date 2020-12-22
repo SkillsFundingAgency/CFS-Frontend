@@ -4,18 +4,23 @@ import {render, screen} from '@testing-library/react';
 import {JobNotificationBanner, JobNotificationBannerProps} from "../../components/Calculations/JobNotificationBanner";
 import {JobType} from "../../types/jobType";
 import {RunningStatus} from "../../types/RunningStatus";
-import {getJobDetailsFromJobSummary, JobDetails} from "../../helpers/jobDetailsHelper";
+import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
+import {JobDetails} from "../../types/jobDetails";
 
-const mockQueuedJobResult: JobDetails = getJobDetailsFromJobSummary({
+const mockQueuedJobResult: JobDetails = getJobDetailsFromJobResponse({
     jobId: "sdfg",
     jobType: JobType.RefreshFundingJob,
     specificationId: "abc123",
     runningStatus: RunningStatus.Queued,
     completionStatus: undefined,
+    outcomes: [],
+    outcome: "",
+    trigger: {entityId: "", entityType: "", message: ""},
     lastUpdated: new Date(),
     created: new Date(),
-    invokerUserDisplayName: "Bob"
-});
+    invokerUserDisplayName: "Bob",
+    invokerUserId: "xxx"
+}) as JobDetails;
 
 const renderComponent = (params: JobNotificationBannerProps) => {
     return render(<JobNotificationBanner

@@ -4,11 +4,11 @@ import MockAdapter from "axios-mock-adapter";
 import {useFetchLatestSpecificationJob} from "../../hooks/Jobs/useFetchLatestSpecificationJob";
 import {JobType} from "../../types/jobType";
 import {act} from 'react-test-renderer';
-import {JobSummary} from "../../types/jobSummary";
 import {RunningStatus} from "../../types/RunningStatus";
+import {JobResponse} from "../../types/jobDetails";
 
 const specificationId = "abc123";
-const mockQueuedJobResult1: JobSummary = {
+const mockQueuedJobResult1: JobResponse = {
     jobId: "sdfg",
     jobType: JobType.RefreshFundingJob,
     specificationId: specificationId,
@@ -17,7 +17,7 @@ const mockQueuedJobResult1: JobSummary = {
     lastUpdated: new Date("2020-11-20T10:29:03.2643188+00:00"),
     created: new Date("2020-11-20T10:28:03.2643188+00:00"),
 };
-const mockQueuedJobResult2: JobSummary = {
+const mockQueuedJobResult2: JobResponse = {
     jobId: "tyije5",
     jobType: JobType.RefreshFundingJob,
     specificationId: specificationId,

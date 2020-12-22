@@ -1,8 +1,9 @@
 ﻿import {JobType} from "../../types/jobType";
 import {useQuery} from "react-query";
 import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
-import {getJobDetailsFromJobSummary, JobDetails} from "../../helpers/jobDetailsHelper";
 import {AxiosError} from "axios";
+import {JobDetails} from "../../types/jobDetails";
+import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 
 export type FetchLatestSpecificationJobResult = {
     lastJob: JobDetails | undefined,
@@ -33,7 +34,7 @@ export const useFetchLatestSpecificationJob = (
         const results = response.data
             .filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated)
             .sort((a, b) => Number(new Date(b.lastUpdated)) - Number(new Date(a.lastUpdated)));
-        return results && results.length > 0 ? getJobDetailsFromJobSummary(results[0]) : undefined;
+        return results && results.length > 0 ? getJobDetailsFromJobResponse(results[0]) : undefined;
     };
 
     if (isError) {

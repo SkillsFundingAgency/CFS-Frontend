@@ -23,10 +23,10 @@ import {useFetchAllLatestSpecificationJobs} from "../../hooks/Jobs/useFetchAllLa
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useHistory} from "react-router";
 import {RunningStatus} from "../../types/RunningStatus";
-import {JobDetails} from "../../helpers/jobDetailsHelper";
 import {CompletionStatus} from "../../types/CompletionStatus";
 import {getLatestSuccessfulJob} from "../../services/jobService";
-import {JobSummary} from "../../types/jobSummary";
+import {JobDetails} from "../../types/jobDetails";
+import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 
 export function RefreshSql() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
@@ -63,8 +63,8 @@ export function RefreshSql() {
     const fundingStreamId = selectedFundingStream ? selectedFundingStream.id : "";
     const fundingPeriodId = selectedFundingPeriod ? selectedFundingPeriod.id : "";
 
-    const {data: lastSqlJob, isLoading: isCheckingForLatestSqlJob} = useQuery<JobSummary | undefined, AxiosError>(`last-successful-sql-job-${specificationId}-runsqljob`,
-        async () => (await getLatestSuccessfulJob(specificationId, JobType.RunSqlImportJob)).data,
+    const {data: lastSqlJob, isLoading: isCheckingForLatestSqlJob} = useQuery<JobDetails | undefined, AxiosError>(`last-successful-sql-job-${specificationId}-runsqljob`,
+        async () => getJobDetailsFromJobResponse((await getLatestSuccessfulJob(specificationId, JobType.RunSqlImportJob)).data),
         {
             cacheTime: 0,
             refetchOnWindowFocus: false,

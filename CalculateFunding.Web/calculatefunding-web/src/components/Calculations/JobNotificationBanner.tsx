@@ -2,7 +2,7 @@ import React from "react";
 import {DateFormatter} from "../DateFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
-import {JobDetails} from "../../helpers/jobDetailsHelper";
+import {JobDetails} from "../../types/jobDetails";
 
 export interface JobNotificationBannerProps {
     job: JobDetails | undefined,
@@ -28,9 +28,20 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
                  role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
-            Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
+            Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
             {props.job.isActive &&
             <div className="loader loader-small" role="alert" aria-live="assertive" aria-label="Monitoring job"/>
+            }
+            {props.job.isFailed && props.job.failures.length > 0 &&
+            <ul className="govuk-list govuk-error-summary__list">
+                {props.job.failures.map(f =>
+                    <li>
+                        <p className="govuk-body">
+                            {f.jobDescription}: {f.description} 
+                        </p>
+                    </li>
+                )}
+            </ul>
             }
         </h2>
         <div className="govuk-error-summary__body">

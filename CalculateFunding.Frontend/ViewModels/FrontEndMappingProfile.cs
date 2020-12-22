@@ -67,18 +67,18 @@ namespace CalculateFunding.Frontend.ViewModels
         private void MapResults()
         {
             CreateMap<ProviderVersionSearchResult, ProviderSearchResultItemViewModel>()
-                        .ForMember(m => m.ConvertDate, opt => opt.Ignore())
-                        .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
-                        .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
-                        .ForMember(m => m.DateClosed, opt => opt.Ignore())
-                        .ForMember(m => m.DateOpened, opt => opt.MapFrom(src => src.DateOpened != null ? src.DateOpened.Value.DateTime : DateTime.MinValue))
-                        .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(s => s.Authority));
+                .ForMember(m => m.ConvertDate, opt => opt.Ignore())
+                .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
+                .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
+                .ForMember(m => m.DateClosed, opt => opt.Ignore())
+                .ForMember(m => m.DateOpened, opt => opt.MapFrom(src => src.DateOpened != null ? src.DateOpened.Value.DateTime : DateTime.MinValue))
+                .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(s => s.Authority));
 
             CreateMap<ProviderTestSearchResultItem, ProviderTestSearchResultItemViewModel>()
-               .ForMember(m => m.ConvertDate, opt => opt.Ignore())
-               .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
-               .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
-               .ForMember(m => m.DateClosed, opt => opt.Ignore());
+                .ForMember(m => m.ConvertDate, opt => opt.Ignore())
+                .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
+                .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
+                .ForMember(m => m.DateClosed, opt => opt.Ignore());
 
             CreateMap<TestScenarioResultCounts, TestScenarioResultCountsViewModel>();
 
@@ -93,7 +93,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
             CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
-	            .ForMember(d => d.CalculationResultDisplay, opt => opt.Ignore());
+                .ForMember(d => d.CalculationResultDisplay, opt => opt.Ignore());
         }
 
         private void MapCalcs()
@@ -116,8 +116,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(d => d.SpecificationId, opt => opt.Ignore())
                 .ForMember(d => d.CalculationId, opt => opt.Ignore())
                 .ForMember(d => d.Name, opt => opt.Ignore())
-                .ForMember(d => d.ProviderId, opt => opt.Ignore())
-                ;
+                .ForMember(d => d.ProviderId, opt => opt.Ignore());
 
             CreateMap<CalculationUpdateViewModel, CalculationEditModel>()
                 .ForMember(d => d.Description, opt => opt.Ignore())
@@ -125,11 +124,10 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(d => d.CalculationId, opt => opt.Ignore())
                 .ForMember(d => d.Name, opt => opt.Ignore())
                 .ForMember(d => d.ValueType, opt => opt.Ignore())
-                .ForMember(d => d.DataType, opt => opt.Ignore())
-                ;
+                .ForMember(d => d.DataType, opt => opt.Ignore());
 
             CreateMap<CalculationVersion, CalculationVersionsCompareModel>()
-                .ForMember(m => m.Versions, opt => opt.MapFrom(f => new[] { f.Version }))
+                .ForMember(m => m.Versions, opt => opt.MapFrom(f => new[] {f.Version}))
                 ;
 
             CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>();
@@ -151,20 +149,14 @@ namespace CalculateFunding.Frontend.ViewModels
 
             CreateMap<CreateSpecificationModel, CreateSpecificationViewModel>()
                 .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
-                .AfterMap((CreateSpecificationModel source, CreateSpecificationViewModel destination) =>
-                {
-                    destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault();
-                });
+                .AfterMap((CreateSpecificationModel source, CreateSpecificationViewModel destination) => { destination.FundingStreamId = source.FundingStreamIds.FirstOrDefault(); });
 
             CreateMap<CreateSpecificationViewModel, CreateSpecificationModel>()
                 .ForMember(m => m.FundingStreamIds, opt => opt.Ignore())
-                .AfterMap((CreateSpecificationViewModel source, CreateSpecificationModel destination) =>
-                {
-                    destination.FundingStreamIds = new List<string> { source.FundingStreamId };
-                });
+                .AfterMap((CreateSpecificationViewModel source, CreateSpecificationModel destination) => { destination.FundingStreamIds = new List<string> {source.FundingStreamId}; });
 
             CreateMap<EditSpecificationViewModel, EditSpecificationModel>()
-	            .ForMember(m => m.AssignedTemplateIds, opt => opt.Ignore());
+                .ForMember(m => m.AssignedTemplateIds, opt => opt.Ignore());
 
             CreateMap<EditSpecificationModel, EditSpecificationViewModel>()
                 .ForMember(m => m.Id, opt => opt.Ignore())
@@ -192,18 +184,18 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<SpecificationSummary, SpecificationSummaryViewModel>();
 
             CreateMap<SpecificationSummary, SpecificationSummary>();
-            
+
             CreateMap<SpecificationSummary, SpecificationViewModel>()
-                  .ForMember(m => m.PublishStatus, opt => opt.MapFrom(c => c.ApprovalStatus));
+                .ForMember(m => m.PublishStatus, opt => opt.MapFrom(c => c.ApprovalStatus));
 
             CreateMap<CalculationVersion, CalculationViewModel>()
-	            .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.LastUpdated))
-	            .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author != null ? s.Author.Name : "Unknown"))
-	            .ForMember(d => d.PublishStatus, opt => opt.MapFrom(s => s.PublishStatus.AsMatchingEnum<PublishStatusViewModel>()))
-	            .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
-	            .ForMember(d => d.ValueType, opt => opt.Ignore())
-	            .ForMember(d => d.SpecificationId, opt => opt.Ignore())
-	            .ForMember(d => d.LastModified, opt => opt.Ignore())
+                .ForMember(d => d.LastModified, opt => opt.MapFrom(s => s.LastUpdated))
+                .ForMember(d => d.LastModifiedByName, opt => opt.MapFrom(s => s.Author != null ? s.Author.Name : "Unknown"))
+                .ForMember(d => d.PublishStatus, opt => opt.MapFrom(s => s.PublishStatus.AsMatchingEnum<PublishStatusViewModel>()))
+                .ForMember(d => d.Id, opt => opt.MapFrom(s => s.CalculationId))
+                .ForMember(d => d.ValueType, opt => opt.Ignore())
+                .ForMember(d => d.SpecificationId, opt => opt.Ignore())
+                .ForMember(d => d.LastModified, opt => opt.Ignore())
                 .ForMember(d => d.Description, opt => opt.Ignore());
 
             CreateMap<SpecificationSummary, EditSpecificationViewModel>()
@@ -226,15 +218,12 @@ namespace CalculateFunding.Frontend.ViewModels
         private void MapDatasets()
         {
             CreateMap<DatasetIndex, DatasetSearchResultItemViewModel>()
-               .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
-               .ForMember(m => m.LastUpdated, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
-               .AfterMap((DatasetIndex source, DatasetSearchResultItemViewModel destination) =>
-               {
-                   destination.LastUpdatedDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
-               });
+                .ForMember(m => m.LastUpdatedDisplay, opt => opt.Ignore())
+                .ForMember(m => m.LastUpdated, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
+                .AfterMap((DatasetIndex source, DatasetSearchResultItemViewModel destination) => { destination.LastUpdatedDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString); });
 
             CreateMap<DatasetDefinitionIndex, DatasetDefinitionSearchResultItemViewModel>()
-               .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore());
+                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore());
             CreateMap<DatasetVersionIndex, DatasetVersionSearchResultModel>();
 
             CreateMap<AssignDatasetSchemaViewModel, CreateDefinitionSpecificationRelationshipModel>()
@@ -242,26 +231,19 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
 
             CreateMap<ProviderVersionSearchResult, ProviderViewModel>()
-              .ForMember(m => m.DateOpenedDisplay, opt => opt.Ignore())
-              .ForMember(m => m.DateOpened, opt => opt.MapFrom(c => c.DateOpened != null ? c.DateOpened.Value.DateTime : DateTime.MinValue))
-              .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(c => c.Authority))
-              .ForMember(m => m.Upin, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UPIN) ? 0 : Convert.ToInt32(c.UPIN)))
-              .ForMember(m => m.Ukprn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UKPRN) ? 0 : Convert.ToInt32(c.UKPRN)))
-              .ForMember(m => m.Urn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.URN) ? 0 : Convert.ToInt32(c.URN)))
-
-             .AfterMap((ProviderVersionSearchResult source, ProviderViewModel destination) =>
-             {
-                 destination.DateOpenedDisplay = source.DateOpened.HasValue ? source.DateOpened.Value.ToString("dd/MM/yyyy") : "Unknown";
-             });
+                .ForMember(m => m.DateOpenedDisplay, opt => opt.Ignore())
+                .ForMember(m => m.DateOpened, opt => opt.MapFrom(c => c.DateOpened != null ? c.DateOpened.Value.DateTime : DateTime.MinValue))
+                .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(c => c.Authority))
+                .ForMember(m => m.Upin, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UPIN) ? 0 : Convert.ToInt32(c.UPIN)))
+                .ForMember(m => m.Ukprn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.UKPRN) ? 0 : Convert.ToInt32(c.UKPRN)))
+                .ForMember(m => m.Urn, opt => opt.MapFrom(c => string.IsNullOrWhiteSpace(c.URN) ? 0 : Convert.ToInt32(c.URN)))
+                .AfterMap((ProviderVersionSearchResult source, ProviderViewModel destination) => { destination.DateOpenedDisplay = source.DateOpened.HasValue ? source.DateOpened.Value.ToString("dd/MM/yyyy") : "Unknown"; });
 
             CreateMap<DatasetVersionResponseViewModel, DatasetVersionFullViewModel>()
-               .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
-               .ForMember(dest => dest.LastUpdatedDate, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
-               .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.PublishStatus))
-               .AfterMap((DatasetVersionResponseViewModel source, DatasetVersionFullViewModel destination) =>
-               {
-                   destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
-               });
+                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
+                .ForMember(dest => dest.LastUpdatedDate, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.PublishStatus))
+                .AfterMap((DatasetVersionResponseViewModel source, DatasetVersionFullViewModel destination) => { destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString); });
 
             CreateMap<DatasetValidationStatusModel, DatasetValidationStatusViewModel>();
             CreateMap<DatasetValidationStatus, DatasetValidationStatusOperationViewModel>();
@@ -274,14 +256,14 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<TestScenarioSearchResultItem, TestScenarioSearchResultItemViewModel>()
-           .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
-            .AfterMap((TestScenarioSearchResultItem source, TestScenarioSearchResultItemViewModel destination) =>
-            {
-                if (source.LastUpdatedDate.HasValue)
+                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
+                .AfterMap((TestScenarioSearchResultItem source, TestScenarioSearchResultItemViewModel destination) =>
                 {
-                    destination.LastUpdatedDateDisplay = source.LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
-                }
-            });
+                    if (source.LastUpdatedDate.HasValue)
+                    {
+                        destination.LastUpdatedDateDisplay = source.LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
+                    }
+                });
 
             CreateMap<ResultCounts, ResultCountsViewModel>();
         }
@@ -289,19 +271,16 @@ namespace CalculateFunding.Frontend.ViewModels
         private void MapScenario()
         {
             CreateMap<ScenarioSearchResultItem, ScenarioSearchResultItemViewModel>()
-                 .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
-                 .AfterMap((ScenarioSearchResultItem source, ScenarioSearchResultItemViewModel destination) =>
-                 {
-                     destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
-                 });
+                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
+                .AfterMap((ScenarioSearchResultItem source, ScenarioSearchResultItemViewModel destination) => { destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString); });
 
             CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
-                    .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
 
             CreateMap<ScenarioEditViewModel, TestScenarioUpdateModel>()
-              .ForMember(m => m.SpecificationId, opt => opt.Ignore())
-              .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
-              .ForMember(m => m.Id, opt => opt.Ignore());
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+                .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
+                .ForMember(m => m.Id, opt => opt.Ignore());
         }
 
         private void MapCommon()
@@ -312,7 +291,11 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<SearchFacetValue, SearchFacetValueViewModel>();
             CreateMap<Reference, ReferenceViewModel>();
             CreateMap<PublishStatus, PublishStatusViewModel>();
+            CreateMap<Outcome, JobOutcomeViewModel>()
+                .ForMember(m => m.JobType,
+                    opt => opt.MapFrom(src => src.JobDefinitionId));
             CreateMap<JobSummary, JobSummaryViewModel>();
+            CreateMap<Trigger, TriggerViewModel>();
             CreateMap<PublishedProviderSearchItem, PublishedProviderSearchResultItemViewModel>();
         }
     }

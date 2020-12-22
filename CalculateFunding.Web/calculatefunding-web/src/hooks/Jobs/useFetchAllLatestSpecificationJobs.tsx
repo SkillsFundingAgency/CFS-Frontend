@@ -1,8 +1,9 @@
 import {JobType} from "../../types/jobType";
 import {useQuery} from "react-query";
 import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
-import {getJobDetailsFromJobSummary, JobDetails} from "../../helpers/jobDetailsHelper";
 import {AxiosError} from "axios";
+import {JobDetails} from "../../types/jobDetails";
+import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 
 export type FetchAllLatestSpecificationJobResult = {
     allJobs: JobDetails[] | undefined,
@@ -31,7 +32,7 @@ export const useFetchAllLatestSpecificationJobs = (
     const checkForJobs = async (specId: string, listOfJobTypes: string): Promise<JobDetails[] | undefined> => {
         const response = await getJobStatusUpdatesForSpecification(specId, listOfJobTypes);
         const results = response.data.filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated);
-        return results && results.length > 0 ? results.map(r => getJobDetailsFromJobSummary(r)) : undefined;
+        return results && results.length > 0 ? results.map(r => getJobDetailsFromJobResponse(r) as JobDetails) : undefined;
     };
 
     if (isError) {

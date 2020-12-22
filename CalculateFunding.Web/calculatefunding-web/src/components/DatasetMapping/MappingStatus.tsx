@@ -1,6 +1,6 @@
 import React from "react";
 import {DateFormatter} from "../DateFormatter";
-import {JobDetails} from "../../helpers/jobDetailsHelper";
+import {JobDetails} from "../../types/jobDetails";
 
 export interface MappingStatusProps {
     job: JobDetails | undefined,
@@ -24,10 +24,21 @@ export function MappingStatus(props: MappingStatusProps) {
         data-testid="job-notification">
         <h2 className="govuk-error-summary__title" id="error-summary-title">
             <span data-testid="job-notification-title">
-                Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
+                Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
                 </span>
             {props.job.isActive &&
             <div className="loader loader-small" role="alert" aria-live="assertive" aria-label="Monitoring job"/>
+            }
+            {props.job.isFailed && props.job.failures.length > 0 &&
+            <ul className="govuk-list govuk-error-summary__list">
+                {props.job.failures.map(f =>
+                    <li>
+                        <p className="govuk-body">
+                            {f.jobDescription}: {f.description}
+                        </p>
+                    </li>
+                )}
+            </ul>
             }
         </h2>
         <div className="govuk-error-summary__body">

@@ -1,62 +1,18 @@
-﻿import {JobSummary} from "../types/jobSummary";
-import {JobType} from "../types/jobType";
+﻿import {JobType} from "../types/jobType";
 import {RunningStatus} from "../types/RunningStatus";
 import {CompletionStatus} from "../types/CompletionStatus";
-import {JobMessage} from "../types/jobMessage";
+import {JobDetails, JobFailure, JobOutcomeType, JobResponse} from "../types/jobDetails";
 
 
-export type JobDetails = {
-    jobId: string,
-    jobType?: string,
-    specificationId?: string,
-    statusDescription: string,
-    jobDescription: string,
-    outcome: string,
-    runningStatus: RunningStatus,
-    completionStatus?: CompletionStatus | undefined,
-    isSuccessful: boolean,
-    isFailed: boolean,
-    isActive: boolean,
-    isComplete: boolean,
-    parentJobId?: string,
-    invokerUserId?: string,
-    invokerUserDisplayName?: string,
-    lastUpdated?: Date,
-    created?: Date
-}
-
-export function getJobDetailsFromJobMessage(job: JobMessage): JobDetails {
+export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobDetails | undefined {
+    if (!job) return undefined;
+    
     const result: JobDetails = {
         jobId: job.jobId,
-        jobDescription: buildDescription(job.jobType, job.trigger.message),
+        jobDescription: buildDescription(job.jobType, job.trigger?.message),
         statusDescription: "",
         outcome: job.outcome ? job.outcome : "",
-        isSuccessful: false,
-        isActive: false,
-        isComplete: false,
-        isFailed: false,
-        completionStatus: job.completionStatus,
-        runningStatus: job.runningStatus,
-        created: job.jobCreatedDateTime,
-        lastUpdated: job.statusDateTime,
-        invokerUserDisplayName: job.invokerUserDisplayName,
-        invokerUserId: job.invokerUserId,
-        jobType: job.jobType,
-        parentJobId: job.parentJobId,
-        specificationId: job.specificationId
-    };
-
-    setStatusFields(result);
-
-    return result;
-}
-
-export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
-        const result: JobDetails = {
-        jobId: job.jobId,
-        statusDescription: "",
-        jobDescription: buildDescription(job.jobType, job.message),
-        outcome: job.outcome ? job.outcome : "",
+        failures: [],
         isSuccessful: false,
         isActive: false,
         isComplete: false,
@@ -71,8 +27,25 @@ export function getJobDetailsFromJobSummary(job: JobSummary): JobDetails {
         parentJobId: job.parentJobId,
         specificationId: job.specificationId
     };
+    
+    if (job.outcomes && job.outcomes.length > 0) {
+        result.failures = job.outcomes
+            .filter(j => !j.isSuccessful)
+            .map<JobFailure>(x => {
+                return {
+                    description: x.description, 
+                    type: x.type, 
+                    jobType: x.jobType, 
+                    jobDescription: x.jobType};
+            });
+        const hasValidationError = result.failures.some(e => e.type === JobOutcomeType.ValidationError);
+        result.outcome = result.failures.length === 1 ? "One of the job steps failed" : "Some of the job steps failed";
+        if (hasValidationError) {
+            result.outcome += " due to validation"
+        }
+    }
 
-        setStatusFields(result);
+    setStatusFields(result);
 
     return result;
 }
@@ -84,13 +57,13 @@ function getJobType(jobTypeString: string): JobType | undefined {
 function buildDescription(jobType: string, message: string | undefined) {
     const descFromJobType = getJobProgressMessage(jobType).trim();
     const haveDescFromJobType = descFromJobType && descFromJobType.length > 0;
-    const descFromServer = (message && message.length > 0) ? message.trim().replace(/[\W_]+/g," ") : "";
+    const descFromServer = (message && message.length > 0) ? message.trim().replace(/[\W_]+/g, " ") : "";
     const haveDescFromServer = descFromServer && descFromServer.length > 0;
-    const same = (descFromJobType && descFromServer && 
-        (descFromJobType.toLowerCase() == descFromServer.toLowerCase() || descFromServer.includes(descFromJobType))) 
-    return  haveDescFromJobType && haveDescFromServer ? 
+    const same = (descFromJobType && descFromServer &&
+        (descFromJobType.toLowerCase() == descFromServer.toLowerCase() || descFromServer.includes(descFromJobType)))
+    return haveDescFromJobType && haveDescFromServer ?
         same ? descFromServer : `${descFromJobType}: ${descFromServer}` :
-        (haveDescFromJobType && !haveDescFromServer) ? descFromJobType : 
+        (haveDescFromJobType && !haveDescFromServer) ? descFromJobType :
             (!haveDescFromJobType && haveDescFromServer) ? descFromServer : "";
 }
 
@@ -109,8 +82,8 @@ function setStatusFields(job: JobDetails) {
             job.isComplete = true;
             switch (job.completionStatus) {
                 case CompletionStatus.Succeeded:
-                    job.statusDescription = "completed successfully";
-                    job.isSuccessful = true;
+                    job.statusDescription = job.failures.length > 0 ? "completed with error(s)" : "completed successfully";
+                    job.isSuccessful = job.failures.length === 0;
                     break;
                 case CompletionStatus.Cancelled:
                     job.statusDescription = "cancelled";
@@ -131,6 +104,7 @@ function setStatusFields(job: JobDetails) {
             }
             break;
     }
+    
     return job;
 }
 

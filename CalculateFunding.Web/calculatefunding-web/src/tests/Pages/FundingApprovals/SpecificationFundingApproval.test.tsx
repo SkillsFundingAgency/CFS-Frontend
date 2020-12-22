@@ -44,7 +44,7 @@ import {PublishStatus} from "../../../types/PublishStatusModel";
 import userEvent from "@testing-library/user-event";
 import {ValidationErrors} from "../../../types/ErrorMessage";
 import {createMockAxiosError} from "../../fakes/fakeAxios";
-import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
+import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 
 // ToDo: These tests need sorting properly so no errors occur
 jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
@@ -488,7 +488,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobSummary({
+    latestJob: getJobDetailsFromJobResponse({
         jobId: "rt56w",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.InProgress,
@@ -503,7 +503,7 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
 const failedJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobSummary({
+    latestJob: getJobDetailsFromJobResponse({
         jobId: "sd64",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.Completed,
@@ -519,7 +519,7 @@ const failedJob: LatestSpecificationJobWithMonitoringResult = {
 const successfulCompletedJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobSummary({
+    latestJob: getJobDetailsFromJobResponse({
         jobId: "rfgd",
         jobType: JobType.RefreshFundingJob,
         runningStatus: RunningStatus.Completed,

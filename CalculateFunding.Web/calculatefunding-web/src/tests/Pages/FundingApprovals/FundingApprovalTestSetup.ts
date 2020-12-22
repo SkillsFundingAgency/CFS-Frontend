@@ -1,18 +1,19 @@
 ﻿import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {BatchUploadResponse} from "../../../types/PublishedProvider/BatchUploadResponse";
 import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
+import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
-import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../../types/SpecificationSelectedForFunding";
+import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
+import {JobOutcomeType} from "../../../types/jobDetails";
 
 export const FundingApprovalTestSetup = () => {
     const fundingStream1: FundingStream = {
@@ -122,7 +123,7 @@ export const FundingApprovalTestSetup = () => {
     const activeApprovalJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
         isCheckingForJob: false,
-        latestJob: getJobDetailsFromJobSummary({
+        latestJob: getJobDetailsFromJobResponse({
             jobId: "dfgwer",
             jobType: JobType.ApproveAllProviderFundingJob,
             runningStatus: RunningStatus.InProgress,
@@ -137,10 +138,11 @@ export const FundingApprovalTestSetup = () => {
     const activeValidationJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
         isCheckingForJob: false,
-        latestJob: getJobDetailsFromJobSummary({
+        latestJob: getJobDetailsFromJobResponse({
             jobId: jobCreatedResponse.jobId,
             jobType: JobType.BatchPublishedProviderValidationJob,
             runningStatus: RunningStatus.InProgress,
+            outcome: "xxx",
             invokerUserDisplayName: "testUser",
             created: new Date(),
             lastUpdated: new Date()
@@ -152,9 +154,11 @@ export const FundingApprovalTestSetup = () => {
     const successfulValidationJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
         isCheckingForJob: false,
-        latestJob: getJobDetailsFromJobSummary({
+        latestJob: getJobDetailsFromJobResponse({
             jobId: jobCreatedResponse.jobId,
             jobType: JobType.BatchPublishedProviderValidationJob,
+            outcome: "Succeeded successfully",
+            outcomes: [],
             runningStatus: RunningStatus.Completed,
             completionStatus: CompletionStatus.Succeeded,
             invokerUserDisplayName: "testUser",
@@ -168,12 +172,13 @@ export const FundingApprovalTestSetup = () => {
     const failedValidationJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
         isCheckingForJob: false,
-        latestJob: getJobDetailsFromJobSummary({
+        latestJob: getJobDetailsFromJobResponse({
             jobId: jobCreatedResponse.jobId,
             jobType: JobType.BatchPublishedProviderValidationJob,
             runningStatus: RunningStatus.Completed,
             completionStatus: CompletionStatus.Failed,
-            outcome: "Validation failed for some reason",
+            outcome: "xxx",
+            outcomes: [{description: "Missing name field", isSuccessful: false, jobType: JobType.CreateInstructAllocationJob, type: JobOutcomeType.Failed}],
             invokerUserDisplayName: "testUser",
             created: new Date(),
             lastUpdated: new Date()

@@ -1,9 +1,9 @@
 ﻿import {JobType} from "../../types/jobType";
 import {useEffect, useRef, useState} from "react";
 import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
-import {JobMessage} from "../../types/jobMessage";
-import {getJobDetailsFromJobMessage, JobDetails} from "../../helpers/jobDetailsHelper";
+import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {AxiosError} from "axios";
+import {JobDetails, JobResponse} from "../../types/jobDetails";
 
 export type MonitorForNewSpecificationJobResult = {
     newJob: JobDetails | undefined,
@@ -43,10 +43,10 @@ export const useMonitorForNewSpecificationJob = (
         try {
             if (hubConnect.connectionId === null) {
                 await hubConnect.start();
-                hubConnect.on('NotificationEvent', (job: JobMessage) => {
+                hubConnect.on('NotificationEvent', (job: JobResponse) => {
                     const jobType: JobType | undefined = JobType[job.jobType as keyof typeof JobType];
                     if (isThisJobValid(job) && amInterestedInJobType(jobType)) {
-                        setNewJob(getJobDetailsFromJobMessage(job));
+                        setNewJob(getJobDetailsFromJobResponse(job));
                     }
                 });
             }
@@ -62,7 +62,7 @@ export const useMonitorForNewSpecificationJob = (
         }
     }
 
-    function isThisJobValid(job: JobMessage) {
+    function isThisJobValid(job: JobResponse) {
         return job && job.jobId && job.jobId.length > 0;
     }
 

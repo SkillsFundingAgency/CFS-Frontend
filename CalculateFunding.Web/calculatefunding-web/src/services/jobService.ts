@@ -1,9 +1,9 @@
 import axios, {AxiosResponse} from "axios"
-import {JobSummary} from "../types/jobSummary";
+import {JobResponse} from "../types/jobDetails";
 
 const baseURL = "/api/jobs";
 
-export async function getJobStatusUpdatesForSpecification(specificationId: string, jobTypes: string): Promise<AxiosResponse<JobSummary[]>> {
+export async function getJobStatusUpdatesForSpecification(specificationId: string, jobTypes: string): Promise<AxiosResponse<JobResponse[]>> {
     return axios(`${baseURL}/${specificationId}/${jobTypes}`, {
         method: 'GET',
         headers: {
@@ -12,7 +12,7 @@ export async function getJobStatusUpdatesForSpecification(specificationId: strin
     });
 }
 
-export async function getLatestSuccessfulJob(specificationId: string, jobType: string): Promise<AxiosResponse<JobSummary | undefined>> {
+export async function getLatestSuccessfulJob(specificationId: string, jobType: string): Promise<AxiosResponse<JobResponse | undefined>> {
     return axios(`${baseURL}/latest-success/${specificationId}/${jobType}`, {
         method: 'GET',
         headers: {

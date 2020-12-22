@@ -1,4 +1,4 @@
-﻿import { AxiosError } from "axios";
+﻿import {AxiosError} from "axios";
 import * as React from "react";
 import {ErrorMessage, ValidationErrors} from "../types/ErrorMessage";
 
@@ -6,10 +6,11 @@ export const useErrors = () => {
     const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
     const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) => {
-        const isDuplicateError = errors && errors.some(err => 
-            (err.description === description || (!description && !err.description)) && 
-            (err.fieldName === fieldName || (!fieldName && !err.fieldName)) && 
-            (err.message === errorMessage || (!errorMessage && !err.message)) && 
+        const isDuplicateError = errors && errors.some(err =>
+            !err.validationErrors &&
+            (err.description === description || (!description && !err.description)) &&
+            (err.fieldName === fieldName || (!fieldName && !err.fieldName)) &&
+            (err.message === errorMessage || (!errorMessage && !err.message)) &&
             (err.suggestion === suggestion || (!suggestion && !err.suggestion)));
         if (isDuplicateError) {
             return;
@@ -25,7 +26,7 @@ export const useErrors = () => {
         };
         setErrors(errors => [...errors, error]);
     };
-    
+
     const addError = (error: AxiosError | Error | string, description?: string, fieldName?: string) => {
         let errorMessage = "";
         const axiosError = (error as AxiosError);
@@ -38,7 +39,7 @@ export const useErrors = () => {
         }
         addErrorMessage(errorMessage.length > 0 ? errorMessage : error.toString(), description, fieldName);
     };
-    
+
     const addValidationErrors = (validationErrors: ValidationErrors, message: string, description?: string, fieldName?: string) => {
         const errorCount: number = errors.length;
         const errorMessage: ErrorMessage = {

@@ -1,8 +1,8 @@
 ﻿import {JobType} from "../../types/jobType";
 import {useFetchLatestSpecificationJob} from "./useFetchLatestSpecificationJob";
 import {useMonitorForNewSpecificationJob} from "./useMonitorForNewSpecificationJob";
-import {JobDetails} from "../../helpers/jobDetailsHelper";
 import {AxiosError} from "axios";
+import {JobDetails} from "../../types/jobDetails";
 
 export type LatestSpecificationJobWithMonitoringResult = {
     latestJob: JobDetails | undefined,

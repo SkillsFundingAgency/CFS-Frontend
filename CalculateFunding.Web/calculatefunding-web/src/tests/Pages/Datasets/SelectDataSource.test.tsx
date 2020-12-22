@@ -17,7 +17,7 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {RelationshipDataQueryResult} from "../../../hooks/useRelationshipData";
-import {getJobDetailsFromJobSummary} from "../../../helpers/jobDetailsHelper";
+import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
@@ -71,7 +71,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
     isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobSummary({
+    latestJob: getJobDetailsFromJobResponse({
         jobId: "kdfghjboer",
         jobType: JobType.MapDatasetJob,
         invokerUserDisplayName: "test user",
