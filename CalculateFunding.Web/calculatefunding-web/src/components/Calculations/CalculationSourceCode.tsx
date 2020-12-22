@@ -84,7 +84,7 @@ export function CalculationSourceCode(props: CalculationSourceCodeProps) {
                 providerId: state.providerId,
                 dataType: state.dataType
             }
-            compileCalculationPreviewService(props.specificationId, 'temp-calc-id', previewCompileRequestViewModel)
+            compileCalculationPreviewService(props.specificationId, props.calculationId?? 'temp-calc-id', previewCompileRequestViewModel)
                 .then((result) => {
                     setState((prevState: CalculationSourceCodeState) => {
                         return {
