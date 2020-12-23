@@ -1,49 +1,60 @@
 import React from "react";
-import {match, MemoryRouter} from "react-router";
-import {Provider} from "react-redux";
-import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {mount} from "enzyme";
-import {ViewSpecificationRoute} from "../../../pages/Specifications/ViewSpecification";
+import {MemoryRouter} from "react-router";
 import {ViewSpecificationResults} from "../../../pages/Specifications/ViewSpecificationResults";
-import {createStore, Store} from "redux";
-import {createBrowserHistory, createLocation} from "history";
+import {render} from "@testing-library/react";
+import {Route, Switch} from "react-router-dom";
+import {waitFor} from "@testing-library/dom";
+import * as specHook from "../../../hooks/useSpecificationSummary";
+import {testSpec} from "../../Hooks/useSpecificationSummary.test";
 
-jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
-describe("Provider Funding Overview ", () => {
-    const specificationId = "056fcfcd-fb12-45ed-8a1b-079a0e2fc8c5";
-    const match: match<ViewSpecificationRoute> = {
-        params: {
-            specificationId: specificationId,
-        },
-        isExact: true,
-        path: "",
-        url: ""
-    };
+function renderViewSpecificationResults() {
+    const {ViewSpecificationResults} = require('../../../pages/Specifications/ViewSpecificationResults');
+    return render(<MemoryRouter initialEntries={[`/Specifications/ViewSpecificationResults/ABC123`]}>
+        <Switch>
+            <Route path="" component={ViewSpecificationResults}/>
+        </Switch>
+    </MemoryRouter>)
+}
 
-    const store: Store<IStoreState> = createStore(
-        rootReducer
-    );
+const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
+    .mockImplementation(() => ({
+        specification: testSpec,
+        isLoadingSpecification: false,
+        errorCheckingForSpecification: null,
+        haveErrorCheckingForSpecification: false,
+        isFetchingSpecification: false,
+        isSpecificationFetched: true
+    }));
 
-    store.dispatch = jest.fn();
-    const fakeHistory = createBrowserHistory();
 
-    const fakeLocation = createLocation("", "", "", {search:"", pathname:"", hash:"", key:"", state: ""});
-
-    it("renders the page with 3 tabs", async () => {
-        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
-
-        expect(wrapper.find('.govuk-tabs__list').children().length).toBe(3);
-    });
-
-    it("dispatches to Redux the correct number of times", () => {
-        mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
-        expect(store.dispatch).toHaveBeenCalledTimes(6);
-    });
-
-    it("has a downloadable reports tab", () => {
-        const wrapper = mount(<MemoryRouter><Provider store={store} ><ViewSpecificationResults history={fakeHistory} location={fakeLocation} match={match} /></Provider></MemoryRouter>);
-
-        expect(wrapper.find("#downloadable-reports")).toBeTruthy();
+describe("<ViewSpecificationResults />  ", () => {
+    beforeEach(() => {
+        mockSpecification();
     })
+
+    afterEach(jest.clearAllMocks);
+
+    it("renders the page with the correct breadcrumbs", async () => {
+        const {container} = renderViewSpecificationResults();
+
+        await waitFor(() => expect(container.querySelectorAll(".govuk-breadcrumbs__list-item").length).toBe(4));
+    });
+
+    it("shows the header with text from the service call", async () => {
+        const {container} = renderViewSpecificationResults();
+        await waitFor(() => expect(container.querySelector("h1")?.textContent).toContain("Wizard Training"));
+    });
+
+    it("shows the sub-heading with text from the service call", async () => {
+        const {container} = renderViewSpecificationResults();
+        await waitFor(() => expect(container.querySelector("h2.govuk-caption-xl")?.textContent).toContain("2019-20"));
+    });
+
+    it("shows the tabs with the correct text", async () => {
+        const {getByTestId} = renderViewSpecificationResults();
+        await waitFor(() => expect(getByTestId("tab-fundingline-structure").textContent).toContain("Funding line structure"));
+        await waitFor(() => expect(getByTestId("tab-additional-calculations").textContent).toContain("Additional Calculations"));
+        await waitFor(() => expect(getByTestId("tab-downloadable-reports").textContent).toContain("Downloadable Reports"));
+    });
 });
