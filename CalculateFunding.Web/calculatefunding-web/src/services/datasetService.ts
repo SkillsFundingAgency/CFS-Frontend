@@ -1,11 +1,13 @@
-import {AssignDatasetSchemaUpdateViewModel} from "../types/Datasets/AssignDatasetSchemaUpdateViewModel";
 import {DatasetDefinitionRequestViewModel} from "../types/Datasets/DatasetDefinitionRequestViewModel";
 import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequestViewModel";
 import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
-import axios, { AxiosResponse } from "axios"
+import axios, {AxiosResponse} from "axios"
 import {DatasourceVersionSearchModel} from "../types/Datasets/DatasourceVersionSearchModel";
 import {RelationshipData} from "../types/Datasets/RelationshipData";
 import {UpdateNewDatasetVersionResponseViewModel} from "../types/Datasets/UpdateDatasetRequestViewModel";
+import {DataschemaDetailsViewModel} from "../types/Datasets/DataschemaDetailsViewModel";
+import {AssignDatasetSchemaRequest} from "../types/Datasets/AssignDatasetSchemaRequest";
+import {DatasetDefinition} from "../types/Datasets/DatasetDefinitionResponseViewModel";
 
 const baseUrl = "/api/datasets";
 
@@ -18,7 +20,8 @@ export async function getDatasetBySpecificationIdService(specificationId: string
     });
 }
 
-export async function getDatasetDefinitionsService() {
+export async function getDatasetDefinitionsService():
+    Promise<AxiosResponse<DatasetDefinition[]>>{
     return axios(`${baseUrl}/get-dataset-definitions/`, {
         method: 'GET',
         headers: {
@@ -27,19 +30,14 @@ export async function getDatasetDefinitionsService() {
     });
 }
 
-export async function assignDatasetSchemaUpdateService(name: string, description: string, dataSchemaId: string, specificationId: string, isSetAsProviderData: boolean) {
-    const data: AssignDatasetSchemaUpdateViewModel = {
-        datasetDefinitionId: dataSchemaId,
-        description: description,
-        name: name,
-        isSetAsProviderData: isSetAsProviderData
-    };
-    return axios(`${baseUrl}/assignDatasetSchema/${specificationId}`, {
+export async function assignDatasetSchemaService(request: AssignDatasetSchemaRequest):
+    Promise<AxiosResponse<boolean>> {
+    return axios(`${baseUrl}/assignDatasetSchema/${request.specificationId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
         },
-        data: data
+        data: request
     });
 }
 
@@ -112,7 +110,7 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
     })
 }
 
-export async function uploadDatasetVersionService(request:UpdateNewDatasetVersionResponseViewModel, file: File) {
+export async function uploadDatasetVersionService(request: UpdateNewDatasetVersionResponseViewModel, file: File) {
     return axios(`${request.blobUrl}`, {
         method: 'PUT',
         headers: {
@@ -130,7 +128,7 @@ export async function uploadDatasetVersionService(request:UpdateNewDatasetVersio
     })
 }
 
-export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, mergeExisting:boolean, description: string, changeNote: string) {
+export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, mergeExisting: boolean, description: string, changeNote: string) {
     return axios(`${baseUrl}/validate-dataset`, {
         method: 'POST',
         headers: {
@@ -174,12 +172,11 @@ export async function searchDatasetService(request: DatasetSearchRequestViewMode
     })
 }
 
-export async function getDatasetsForFundingStreamService(fundingStreamId: string) {
+export async function getDatasetsForFundingStreamService(fundingStreamId: string):
+    Promise<AxiosResponse<DataschemaDetailsViewModel[]>> {
     return axios(`${baseUrl}/get-datasets-for-fundingstream/${fundingStreamId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }
 
@@ -221,11 +218,10 @@ export async function getExpandedDataSources(relationshipId: string, datasetId: 
     })
 }
 
-export async function getCurrentDatasetVersionByDatasetId(datasetId:string)
-{
+export async function getCurrentDatasetVersionByDatasetId(datasetId: string) {
     return axios(`${baseUrl}/get-current-dataset-version-by-dataset-id/${datasetId}`, {
         method: "GET",
-        headers:{
+        headers: {
             'Content-Type': 'application/json'
         }
     })

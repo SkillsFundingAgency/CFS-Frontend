@@ -240,7 +240,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/datasets/get-dataset-definitions/")]
         public async Task<IActionResult> GetDatasetDefinitions()
         {
-            var result = await _datasetApiClient.GetDatasetDefinitions();
+            ApiResponse<IEnumerable<DatasetDefinition>> result = await _datasetApiClient.GetDatasetDefinitions();
 
             if (result.StatusCode == HttpStatusCode.OK)
             {

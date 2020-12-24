@@ -19,10 +19,11 @@ export interface TableDefinition {
     fieldDefinitions: FieldDefinition[];
 }
 
-export interface DatasetDefinitions {
+export interface DatasetDefinition {
     description: string;
     tableDefinitions: TableDefinition[];
     id: string;
     name: string;
 }
+
 

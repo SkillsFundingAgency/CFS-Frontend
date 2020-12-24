@@ -28,11 +28,12 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
+import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 
 export function LoadNewDataSource() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
-    const [dataSchemaSuggestions, setDataSchemaSuggestions] = useState<DatasetDefinition[]>([]);
+    const [dataSchemaSuggestions, setDataSchemaSuggestions] = useState<DataschemaDetailsViewModel[]>([]);
     const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream | undefined>();
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
     const [validationFailures, setValidationFailures] = useState<{[key: string]: string[]}>();
@@ -124,11 +125,11 @@ export function LoadNewDataSource() {
         setDataSchemaIsLoading(true);
         if (fundingStreamId) {
             getDatasetsForFundingStreamService(fundingStreamId)
-                .then((datasetsResponse) => setDataSchemaSuggestions(datasetsResponse.data as DatasetDefinition[]))
+                .then((datasetsResponse) => setDataSchemaSuggestions(datasetsResponse.data))
                 .finally(() => setDataSchemaIsLoading(false));
         } else {
             getDatasetDefinitionsService()
-                .then((result) => setDataSchemaSuggestions(result.data as DatasetDefinition[]))
+                .then((result) => setDataSchemaSuggestions(result.data))
                 .finally(() => setDataSchemaIsLoading(false));
         }
     }
