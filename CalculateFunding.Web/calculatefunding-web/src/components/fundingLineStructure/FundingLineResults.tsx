@@ -36,7 +36,7 @@ export interface FundingLineResultsProps {
     addError: (errorMessage: AxiosError | Error | string, description?: string, fieldName?: string) => void,
     clearErrorMessages: (fieldNames?: string[]) => void,
     setStatusToApproved?: () => void,
-    refreshFundingLines: boolean | undefined,
+    refreshFundingLines?: boolean | undefined,
 }
 
 export function FundingLineResults({
@@ -229,6 +229,7 @@ export function FundingLineResults({
                             key={"collapsible-steps" + index}
                             uniqueKey={index.toString()}
                             title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
+                            value={f.value != null ? f.value : ""}
                             description={f.name}
                             status={f.calculationPublishStatus}
                             step={f.level.toString()}
