@@ -6,7 +6,7 @@ import {JobDetails, JobFailure, JobOutcomeType, JobResponse} from "../types/jobD
 
 export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobDetails | undefined {
     if (!job) return undefined;
-    
+
     const result: JobDetails = {
         jobId: job.jobId,
         jobDescription: buildDescription(job.jobType, job.trigger?.message),
@@ -27,15 +27,15 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
         parentJobId: job.parentJobId,
         specificationId: job.specificationId
     };
-    
+
     if (job.outcomes && job.outcomes.length > 0) {
         result.failures = job.outcomes
             .filter(j => !j.isSuccessful)
             .map<JobFailure>(x => {
                 return {
-                    description: x.description, 
-                    type: x.type, 
-                    jobType: x.jobType, 
+                    description: x.description,
+                    type: x.type,
+                    jobType: x.jobType,
                     jobDescription: x.jobType};
             });
         const hasValidationError = result.failures.some(e => e.type === JobOutcomeType.ValidationError);
@@ -104,7 +104,7 @@ function setStatusFields(job: JobDetails) {
             }
             break;
     }
-    
+
     return job;
 }
 

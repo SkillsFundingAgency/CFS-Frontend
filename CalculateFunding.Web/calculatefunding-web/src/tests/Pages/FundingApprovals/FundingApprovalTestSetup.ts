@@ -129,7 +129,13 @@ export const FundingApprovalTestSetup = () => {
             runningStatus: RunningStatus.InProgress,
             invokerUserDisplayName: "testUser",
             created: new Date(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
+            trigger: {
+                message: "",
+                entityId: "",
+                entityType: ""
+            },
+            outcomes: []
         }),
         isFetched: true,
         isFetching: false,
@@ -145,7 +151,13 @@ export const FundingApprovalTestSetup = () => {
             outcome: "xxx",
             invokerUserDisplayName: "testUser",
             created: new Date(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
+            trigger: {
+                message: "",
+                entityId: "",
+                entityType: ""
+            },
+            outcomes: []
         }),
         isFetched: true,
         isFetching: false,
@@ -163,7 +175,12 @@ export const FundingApprovalTestSetup = () => {
             completionStatus: CompletionStatus.Succeeded,
             invokerUserDisplayName: "testUser",
             created: new Date(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
+            trigger: {
+                message: "",
+                entityId: "",
+                entityType: ""
+            }
         }),
         isFetched: true,
         isFetching: false,
@@ -181,7 +198,12 @@ export const FundingApprovalTestSetup = () => {
             outcomes: [{description: "Missing name field", isSuccessful: false, jobType: JobType.CreateInstructAllocationJob, type: JobOutcomeType.Failed}],
             invokerUserDisplayName: "testUser",
             created: new Date(),
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
+            trigger: {
+                message: "",
+                entityId: "",
+                entityType: ""
+            }
         }),
         isFetched: true,
         isFetching: false,

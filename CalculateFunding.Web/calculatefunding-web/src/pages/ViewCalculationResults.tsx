@@ -48,11 +48,12 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
     const calculationId = match.params.calculationId;
     const [specificationId, setSpecificationId] = useState<string>("");
     const {errors, addErrorMessage, addError} = useErrors();
-    const {calculation, isLoadingCalculation} =
+    const {calculation} =
         useCalculation(calculationId,
             err => addErrorMessage(err.message, "Error while loading calculation"));
-    const {specification, isLoadingSpecification} =
+    const {specification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
+
     const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.CreateInstructAllocationJob,
@@ -60,6 +61,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 JobType.CreateInstructGenerateAggregationsAllocationJob,
                 JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob],
             err => addError(err, "Error checking for job"));
+
     const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
         calculationValueType: "",
         errorToggle: "",
@@ -257,17 +259,19 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 }
             </Breadcrumbs>
             <MultipleErrorSummary errors={errors}/>
+            {specificationId.length > 0 &&
+            <JobNotificationBanner
+                job={latestJob}
+                isCheckingForJob={isCheckingForJob}
+                jobCompletedOutcomeFailedMessage="Calculation run completed with one or more exceptions detected in the calculation code"
+                jobFailedMessage={"Calculation run failed due to a problem with the service"}/>
+            }
             <div className="govuk-main-wrapper">
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
                         <h2 className="govuk-caption-xl">{specification ? specification.fundingPeriod.name : <LoadingFieldStatus title="Loading..."/>}</h2>
                         <h1 className="govuk-heading-xl">{calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}</h1>
                         <h3 className="govuk-heading-m">{fundingStream.name}</h3>
-                        {specificationId.length > 0 &&
-                        <JobNotificationBanner
-                            job={latestJob}
-                            isCheckingForJob={isCheckingForJob}/>
-                        }
                         {calculation &&
                         <Link id={"view-calculation-button"}
                               to={`/Specifications/EditCalculation/${calculation.id}`}

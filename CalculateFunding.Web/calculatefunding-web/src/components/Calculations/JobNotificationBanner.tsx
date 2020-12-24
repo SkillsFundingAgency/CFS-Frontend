@@ -7,6 +7,8 @@ import {JobDetails} from "../../types/jobDetails";
 export interface JobNotificationBannerProps {
     job: JobDetails | undefined,
     isCheckingForJob: boolean,
+    jobCompletedOutcomeFailedMessage?: string
+    jobFailedMessage?: string
 }
 
 export function JobNotificationBanner(props: JobNotificationBannerProps) {
@@ -20,7 +22,7 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
         return null;
     }
 
-    return (<div className={props.job.isFailed ? "govuk-error-summary" :
+    return (<div className={props.job.isFailed || (props.job.isComplete && props.job.failures.length > 0) ? "govuk-error-summary" :
         props.job.isActive ? "govuk-error-summary-orange" :
             "govuk-error-summary-green"}
                  aria-labelledby="error-summary-title"
@@ -28,7 +30,12 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
                  role="alert"
                  data-module="govuk-error-summary">
         <h2 className="govuk-error-summary__title">
-            Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
+
+            {(props.job.isComplete && props.job.failures.length > 0) ?
+                <div>There is a problem</div>
+                :
+                <div>Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome != null && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}</div>
+            }
             {props.job.isActive &&
             <div className="loader loader-small" role="alert" aria-live="assertive" aria-label="Monitoring job"/>
             }
@@ -46,13 +53,28 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
         </h2>
         <div className="govuk-error-summary__body">
             <ul className="govuk-list govuk-error-summary__list">
+                {!props.job.isFailed && props.job.failures.length > 0 && props.jobCompletedOutcomeFailedMessage != null &&
                 <li>
+                    <p className="govuk-body">
+                        {props.jobCompletedOutcomeFailedMessage}
+                    </p>
+                </li>
+                }
+                {props.job.isFailed && props.jobFailedMessage != null &&
+                <li>
+                    <p className="govuk-body">
+                        {props.jobFailedMessage}
+                    </p>
+                    Try again later.
+                </li>
+                }
+                <li hidden={props.job.isFailed && props.jobFailedMessage != null}>
                     <p className="govuk-body">
                         Job initiated by {props.job.invokerUserDisplayName} on <DateFormatter
                         date={props.job.created as Date} utc={true}/>
                     </p>
                 </li>
-                <li hidden={props.job.completionStatus == null || props.job.runningStatus === RunningStatus.InProgress}>
+                <li hidden={props.job.completionStatus == null || props.job.runningStatus === RunningStatus.InProgress || (props.job.isFailed && props.jobFailedMessage != null)}>
                     <p className="govuk-body-s">
                         <strong>Results updated: </strong>
                         <DateFormatter date={props.job.lastUpdated as Date} utc={true}/>
