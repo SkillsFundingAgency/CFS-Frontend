@@ -20,10 +20,11 @@ import {approveProvidersFundingService, approveSpecificationFundingService, rele
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {Footer} from "../../components/Footer";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {RunningStatus} from "../../types/RunningStatus";
 import {HistoryPage} from "../../types/HistoryPage";
+import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
 
 
 export interface ConfirmFundingRouteProps {
@@ -39,6 +40,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const specificationId = match.params.specificationId;
     const mode = match.params.mode;
     const history = useHistory();
+    const dispatch = useDispatch();
+
     const previousPage: HistoryPage =
         (history.location.state as any) &&
         (history.location.state as any).previousPage as HistoryPage ?
@@ -68,19 +71,21 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const [jobId, setJobId] = useState<string>("");
     const [isConfirming, setIsConfirming] = useState<boolean>(false);
 
-    useEffect(() => {
-            const handleActionJobComplete = () => {
-                if (jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
-                    setIsConfirming(false);
-                    if (latestJob.isComplete && latestJob.isSuccessful) {
-                        history.push(`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`);
-                    }
-                }
-            };
+    useEffect(() => handleActionJobComplete(), [latestJob]);
 
-            handleActionJobComplete();
-        }, [latestJob]
-    )
+    const handleActionJobComplete = () => {
+        if (jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
+            setIsConfirming(false);
+            if (latestJob.isComplete && latestJob.isSuccessful) {
+                clearFundingSearchSelection();
+                history.push(`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`);
+            }
+        }
+    };
+
+    const clearFundingSearchSelection = () => {
+        dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+    }
 
     const handleConfirm = async () => {
         if (!fundingConfiguration) {
@@ -180,7 +185,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                         canReleaseFunding={canReleaseFunding}
                         addError={addErrorMessage}
                         isLoading={(isLoadingFundingConfiguration || isCheckingForJob || isConfirming || !specification || !fundingConfiguration ||
-                        latestJob && latestJob.runningStatus !== RunningStatus.Completed) === true}
+                            latestJob && latestJob.runningStatus !== RunningStatus.Completed) === true}
                     />
                 </>
                 }
@@ -207,8 +212,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                                 Confirm {mode === FundingActionType.Approve ? "approval" : "release"}
                             </button>
                             <a className="govuk-button govuk-button--secondary"
-                                  data-module="govuk-button"
-                                  onClick={() => history.goBack()}>
+                               data-module="govuk-button"
+                               onClick={() => history.goBack()}>
                                 Cancel
                             </a>
                         </div>

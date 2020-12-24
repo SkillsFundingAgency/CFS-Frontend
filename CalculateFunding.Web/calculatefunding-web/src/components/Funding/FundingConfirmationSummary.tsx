@@ -33,13 +33,16 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
         usePublishedProviderIds(props.fundingStreamId, props.fundingPeriodId, props.specification.id,
             props.approvalMode !== ApprovalMode.Batches,
             err => props.addError(err.message, "Error while loading provider ids"));
-    const selectedProviderIds = state.providerVersionIds.length > 0 ? state.providerVersionIds : publishedProviderIds ? publishedProviderIds : [];
+    const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.providerVersionIds.length > 0 ? 
+        state.providerVersionIds : publishedProviderIds ? publishedProviderIds : [];
 
     const {data: batchApprovalSummary, isLoading: isLoadingBatchApprovalSummary} =
         useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-approval`,
             async () => (await getFundingSummaryForApprovingService(props.specification.id, selectedProviderIds)).data,
             {
                 enabled: props.actionType === FundingActionType.Approve && selectedProviderIds.length > 0,
+                cacheTime: 0,
+                staleTime: 0,
                 onError: err => props.addError(err.message, "Error while loading funding summary")
             });
     const {data: batchReleaseSummary, isLoading: isLoadingBatchReleaseSummary} =
@@ -47,6 +50,8 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
             async () => (await getFundingSummaryForReleasingService(props.specification.id, selectedProviderIds)).data,
             {
                 enabled: props.actionType === FundingActionType.Release && selectedProviderIds.length > 0,
+                cacheTime: 0,
+                staleTime: 0,
                 onError: err => props.addError(err.message, "Error while loading funding summary")
             });
 
