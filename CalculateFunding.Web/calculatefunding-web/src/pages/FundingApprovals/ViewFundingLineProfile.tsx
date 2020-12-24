@@ -162,7 +162,17 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
                 await getFundingLineProfile();
                 setIsEditMode(false);
             } catch (err) {
-                addErrorMessage(err.message);
+                const errStatus = err.response.status;
+                if (errStatus === 400) {
+                    const errResponse = err.response.data;
+                    for (let key of Object.keys(errResponse)) {
+                        errResponse[key].forEach((error: string) => {
+                            addErrorMessage(error);
+                        });
+                    }
+                } else {
+                    addErrorMessage(err.message);
+                }
             } finally {
                 setIsSaving(false);
             }

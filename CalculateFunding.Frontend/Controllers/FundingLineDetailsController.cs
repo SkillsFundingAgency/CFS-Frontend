@@ -241,20 +241,19 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            // TODO: Change Backend to return a ValidatedApiResponse instead of just a status code
-            HttpStatusCode result = await _publishingApiClient.ApplyCustomProfilePattern(request);
+            NoValidatedContentApiResponse result = await _publishingApiClient.ApplyCustomProfilePattern(request);
 
-            if (result == HttpStatusCode.BadRequest)
+            if (result.StatusCode == HttpStatusCode.BadRequest)
             {
-                return new BadRequestObjectResult("One or more validation errors occurred.");
+                return BadRequest(result.ModelState);
             }
 
-            if (result == HttpStatusCode.NoContent)
+            if (result.StatusCode == HttpStatusCode.InternalServerError)
             {
-                return new NoContentResult();
+                return new InternalServerErrorResult($"Unable to apply custom profile. An error has occurred.'");
             }
 
-            return new InternalServerErrorResult($"Unable to apply custom profile - result '{result}'");
+            return StatusCode((int)result.StatusCode);
         }
     }
 }

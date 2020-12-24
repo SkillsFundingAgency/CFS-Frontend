@@ -38,7 +38,7 @@
 
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Jobs" Version="4.1.1" />
 
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.21.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.22.0" />
 
 
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Providers" Version="4.3.0" />
