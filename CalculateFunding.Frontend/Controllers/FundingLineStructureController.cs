@@ -1,8 +1,8 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Results;
-using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -11,46 +11,14 @@ namespace CalculateFunding.Frontend.Controllers
 {
     public class FundingLineStructureController : Controller
     {
-        private readonly IResultsApiClient _resultsApiClient;
+        private readonly ISpecificationsApiClient _specificationsApiClient;
 
         public FundingLineStructureController(
-            IResultsApiClient resultsApiClient)
+            ISpecificationsApiClient specificationsApiClient)
         {
-            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
 
-            _resultsApiClient = resultsApiClient;
-        }
-
-        [HttpGet("api/fundingstructures/specifications/{specificationId}/fundingperiods/{fundingPeriodId}/fundingstreams/{fundingStreamId}/provider/{providerId}")]
-        public async Task<IActionResult> GetFundingStructuresByProviderId(
-	        [FromRoute] string fundingStreamId,
-	        [FromRoute] string fundingPeriodId,
-	        [FromRoute] string specificationId,
-	        [FromRoute] string providerId)
-        {
-            string etag = Request.ReadETagHeaderValue();
-
-            ApiResponse<FundingStructure> fundingStructureApiResponse = await _resultsApiClient.GetFundingStructureResults(fundingStreamId,
-                fundingPeriodId,
-                specificationId,
-                providerId,
-                etag);
-            
-            if (fundingStructureApiResponse.StatusCode == HttpStatusCode.NotModified)
-            {
-                return new StatusCodeResult(304);
-            }
-
-            Response.CopyCacheControlHeaders(fundingStructureApiResponse.Headers);
-            
-            IActionResult fundingStructureErrorResult =
-                fundingStructureApiResponse.IsSuccessOrReturnFailureResult("GetFundingStructuresByProviderId");
-            if (fundingStructureErrorResult != null)
-            {
-                return fundingStructureErrorResult;
-            }
-
-            return Ok(fundingStructureApiResponse.Content.Items);
+            _specificationsApiClient = specificationsApiClient;
         }
 
         [HttpGet("api/fundingstructures/results/specifications/{specificationId}/fundingperiods/{fundingPeriodId}/fundingstreams/{fundingStreamId}")]
@@ -61,7 +29,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             string etag = Request.ReadETagHeaderValue();
 
-            ApiResponse<FundingStructure> fundingStructureApiResponse = await _resultsApiClient.GetFundingStructureResults(fundingStreamId,
+            ApiResponse<FundingStructure> fundingStructureApiResponse = await _specificationsApiClient.GetFundingStructure(fundingStreamId,
                 fundingPeriodId,
                 specificationId,
                 etag:etag);
@@ -91,7 +59,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             string etag = Request.ReadETagHeaderValue();
 
-            ApiResponse<FundingStructure> fundingStructureApiResponse = await _resultsApiClient.GetFundingStructure(fundingStreamId,
+            ApiResponse<FundingStructure> fundingStructureApiResponse = await _specificationsApiClient.GetFundingStructure(fundingStreamId,
                 fundingPeriodId,
                 specificationId,
                 etag);
