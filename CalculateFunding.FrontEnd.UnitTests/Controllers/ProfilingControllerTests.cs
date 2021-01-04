@@ -117,8 +117,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 DistributionPeriod = $"FY-{DateTime.Now.Year}",
                 Occurrence = 1,
                 Period = DateTime.Now.ToString("MMMM"),
-                PeriodStartDate = DateTime.Now.AddMonths(1),
-                PeriodEndDate = DateTime.Now.AddMonths(2),
+                PeriodStartDate = DateTime.Now,
+                PeriodEndDate = DateTime.Now.AddMonths(1),
                 PeriodType = PeriodType.CalendarMonth,
                 PeriodYear = DateTime.Now.Year
             };

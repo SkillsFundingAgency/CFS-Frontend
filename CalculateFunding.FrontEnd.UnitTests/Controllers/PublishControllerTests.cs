@@ -323,7 +323,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             {
                 Occurrence = 2,
                 TypeValue = DateTime.Now.AddMonths(-1).ToString("MMMM"),
-                Year = DateTime.Now.Year,
+                Year = DateTime.Now.AddMonths(-1).Year,
                 Value = 112.0m
             };
             ProfileTotal aProfileTotalOneYearInTheFuture = new ProfileTotal
@@ -397,19 +397,22 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 profileTotal => profileTotal.Value));
             profilingViewModelResult.PreviousAllocation.Should().Be(previousProfilingVersion.ProfileTotals.Sum(
                 profileTotal => profileTotal.Value));
-            profilingViewModelResult.ProfilingInstallments.ToList()[0].InstallmentMonth.Should()
+
+            List<ProfilingInstallment> profilingInstallments = profilingViewModelResult.ProfilingInstallments.ToList();
+
+            profilingInstallments[0].InstallmentMonth.Should()
                 .Be(aProfileTotalOneYearInThePast.TypeValue);
-            profilingViewModelResult.ProfilingInstallments.ToList()[0].InstallmentYear.Should()
+            profilingInstallments[0].InstallmentYear.Should()
                 .Be(aProfileTotalOneYearInThePast.Year);
-            profilingViewModelResult.ProfilingInstallments.ToList()[0].InstallmentNumber.Should()
+            profilingInstallments[0].InstallmentNumber.Should()
                 .Be(aProfileTotalOneYearInThePast.Occurrence);
-            profilingViewModelResult.ProfilingInstallments.ToList()[0].InstallmentValue.Should()
+            profilingInstallments[0].InstallmentValue.Should()
                 .Be(aProfileTotalOneYearInThePast.Value);
-            profilingViewModelResult.ProfilingInstallments.ToList()[0].IsPaid.Should()
+            profilingInstallments[0].IsPaid.Should()
                 .Be(true);
-            profilingViewModelResult.ProfilingInstallments.ToList()[1].IsPaid.Should()
+            profilingInstallments[1].IsPaid.Should()
                 .Be(true);
-            profilingViewModelResult.ProfilingInstallments.ToList()[2].IsPaid.Should()
+            profilingInstallments[2].IsPaid.Should()
                 .Be(false);
         }
 
