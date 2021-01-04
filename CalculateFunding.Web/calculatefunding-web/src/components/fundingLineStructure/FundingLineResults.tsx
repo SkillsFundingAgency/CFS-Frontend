@@ -26,6 +26,7 @@ import { AxiosError } from "axios";
 import {useQuery} from "react-query";
 import {getProviderFundingLineErrors} from "../../services/providerService";
 import {PublishedProviderError} from "../../types/PublishedProviderError";
+import {InputSearch} from "../InputSearch";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -200,7 +201,7 @@ export function FundingLineResults({
                     <label className="govuk-label">
                         Search by calculation
                     </label>
-                    <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
+                    <InputSearch id={"input-auto-complete"} suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
                 </div>
             </div>
         </div>
