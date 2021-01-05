@@ -111,7 +111,7 @@ namespace CalculateFunding.Frontend.Helpers
                             CanRefreshPublishedQa = true,
                             CanUploadDataSourceFiles = true,
                             UserId = user.GetUserProfile()?.Id
-                        }); ;
+                        });
                     }
 
                     return permissions;

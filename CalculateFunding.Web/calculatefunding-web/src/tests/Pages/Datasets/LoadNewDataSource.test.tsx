@@ -1,11 +1,11 @@
 import React from "react";
 import * as redux from "react-redux";
-import {render, waitFor, screen, fireEvent, waitForElementToBeRemoved, act} from "@testing-library/react";
+import {render, waitFor, screen, fireEvent} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {MemoryRouter} from "react-router";
 
-describe("<DatasetHistory />", () => {
+describe("<LoadNewDataSource />", () => {
     beforeAll(() => {
         useSelectorSpy.mockReturnValue([
             {
@@ -52,44 +52,11 @@ describe("<DatasetHistory />", () => {
         expect(screen.getByTestId("create-button")).not.toBeDisabled();
     });
 
-    it("shows a permissions message for funding stream where user does not have canUploadDataSourceFiles permission", async () => {
+    it("filters out funding stream where user does not have canUploadDataSourceFiles permission", async () => {
         await renderPage();
 
         fireEvent.change(screen.getAllByTestId("input-auto-complete")[0], {target: {value: "1619"}});
-        fireEvent.click(screen.getByTestId("1619"), {target: {innerText: '1619'}});
-
-        await waitFor(() => {
-            expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-        });
-
-        expect(screen.getByText(/you do not have permissions/i)).toBeInTheDocument();
-        expect(screen.getByTestId("create-button")).toBeDisabled();
-    });
-
-    it("removes permissions message when funding stream changed to one where user has canUploadDataSourceFiles permission", async () => {
-        await renderPage();
-
-        fireEvent.change(screen.getAllByTestId("input-auto-complete")[0], {target: {value: "1619"}});
-        fireEvent.click(screen.getByTestId("1619"), {target: {innerText: '1619'}});
-
-        await waitFor(() => {
-            expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-        });
-
-        expect(screen.getByText(/you do not have permissions/i)).toBeInTheDocument();
-
-        fireEvent.change(screen.getAllByTestId("input-auto-complete")[0], {target: {value: "GAG"}});
-        fireEvent.click(screen.getByTestId("GAG"), {target: {innerText: 'GAG'}});
-
-        await waitFor(() => {
-            expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-        });
-
-        await waitFor(() => {
-            expect(screen.queryByText(/you do not have permissions/i)).not.toBeInTheDocument();
-        });
-
-        expect(screen.getByTestId("create-button")).not.toBeDisabled();
+        expect(screen.queryByTestId("1619")).not.toBeInTheDocument();
     });
 });
 
