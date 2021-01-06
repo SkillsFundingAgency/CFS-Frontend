@@ -237,13 +237,64 @@
             "metadata": {
                 "description": "Specifies the permissions to secrets in the vault. Valid values are: all, get, list, set, delete, backup, restore, recover, and purge."
             }
+        },
+        "Http5xxTH": {
+            "type": "string",
+            "defaultValue": "0",
+            "metadata": {
+                "description": "No of HTTP 5xx error(s) threshold"
+            }
+        },
+        "Http401TH": {
+            "type": "string",
+            "defaultValue": "0",
+            "metadata": {
+                "description": "No of HTTP 4xx error(s) threshold"
+            }
+        },
+        "HttpResponseTimeTH": {
+            "type": "string",
+            "defaultValue": "2",
+            "metadata": {
+                "description": "HTTP Response time threshold"
+            }
         }
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/funding-platform-building-blocks/resourceTags/templates/",
         "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
         "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfsapi-', parameters('productVersion'))]",
-        "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]"
+        "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]",
+        "actionGroupName": "cfs-alerting",
+        "alertRules": [
+            {
+                "MetricName": "Http5xx",
+                "Operator": "GreaterThan",
+                "Threshold": "[parameters('Http5xxTH')]",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/sites",
+                "ResourceName": "[variables('webSiteName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "Http401",
+                "Operator": "GreaterThan",
+                "Threshold": "[parameters('Http401TH')]",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/sites",
+                "ResourceName": "[variables('webSiteName')]",
+                "WindowSize": "PT5M"
+            },
+            {
+                "MetricName": "HttpResponseTime",
+                "Operator": "GreaterThan",
+                "Threshold": "[parameters('HttpResponseTimeTH')]",
+                "Aggregation": "Average",
+                "ResourceType": "Microsoft.Web/sites",
+                "ResourceName": "[variables('webSiteName')]",
+                "WindowSize": "PT5M"
+            }
+        ]
     },
     "resources": [
         {
@@ -648,6 +699,66 @@
             "dependsOn": [
                 "Deploy_Frontend_App"
             ]
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "name": "[concat(variables('alertRules')[copyIndex()].ResourceName, '-', replace(variables('alertRules')[copyIndex()].MetricName, '/', '-'))]",
+            "dependsOn": [
+                "Deploy_Frontend_App"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'alert-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "alertName": {
+                        "value": "[concat(variables('alertRules')[copyIndex()].ResourceName, '-metric-', replace(variables('alertRules')[copyIndex()].MetricName, '/', '-'))]"
+                    },
+                    "metricName": {
+                        "value": "[variables('alertRules')[copyIndex()].MetricName]"
+                    },
+                    "operator": {
+                        "value": "[variables('alertRules')[copyIndex()].Operator]"
+                    },
+                    "threshold": {
+                        "value": "[variables('alertRules')[copyIndex()].Threshold]"
+                    },
+                    "aggregation": {
+                        "value": "[variables('alertRules')[copyIndex()].Aggregation]"
+                    },
+                    "actionGroupName": {
+                        "value": "[variables('actionGroupName')]"
+                    },
+                    "windowSize": {
+                        "value": "[variables('alertRules')[copyIndex()].WindowSize]"
+                    },
+                    "resourceId": {
+                        "value": "[resourceId(variables('alertRules')[copyIndex()].ResourceType, variables('alertRules')[copyIndex()].ResourceName)]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "AlertRulesCopy",
+                "count": "[length(variables('alertRules'))]"
+            }
         }
     ],
     "outputs": {
