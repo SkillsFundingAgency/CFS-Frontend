@@ -487,6 +487,62 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/generate-csv-for-approval/batch")]
+        public async Task<IActionResult> GenerateCsvForBatchPublishedProvidersForApproval(
+            [FromBody] PublishedProviderIdsRequest request,
+            [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            ApiResponse<PublishedProviderDataDownload> response = 
+                await _publishingApiClient.GenerateCsvForBatchPublishedProvidersForApproval(request, specificationId);
+
+            return response.Handle(nameof(PublishedProviderDataDownload),
+                onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/generate-csv-for-approval/all")]
+        public async Task<IActionResult> GenerateCsvForAllPublishedProvidersForApproval(
+            [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            ApiResponse<PublishedProviderDataDownload> response =
+                await _publishingApiClient.GenerateCsvForAllPublishedProvidersForApproval(specificationId);
+
+            return response.Handle(nameof(PublishedProviderDataDownload),
+                onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/generate-csv-for-release/batch")]
+        public async Task<IActionResult> GenerateCsvForBatchPublishedProvidersForRelease(
+            [FromBody] PublishedProviderIdsRequest request,
+            [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            ApiResponse<PublishedProviderDataDownload> response =
+                await _publishingApiClient.GenerateCsvForBatchPublishedProvidersForRelease(request, specificationId);
+
+            return response.Handle(nameof(PublishedProviderDataDownload),
+                onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/generate-csv-for-release/all")]
+        public async Task<IActionResult> GenerateCsvForAllPublishedProvidersForRelease(
+            [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+
+            ApiResponse<PublishedProviderDataDownload> response =
+                await _publishingApiClient.GenerateCsvForAllPublishedProvidersForRelease(specificationId);
+
+            return response.Handle(nameof(PublishedProviderDataDownload),
+                onSuccess: x => Ok(x.Content));
+        }
+
         [HttpGet("api/publishedProviders/batch/{batchId}")]
         public async Task<IActionResult> GetBatchPublishedProviderIds([FromRoute] string batchId)
         {

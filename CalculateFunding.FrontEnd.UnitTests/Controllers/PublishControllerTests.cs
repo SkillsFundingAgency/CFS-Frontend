@@ -606,6 +606,94 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task GenerateCsvForBatchPublishedProvidersForApprovalDelegatesToPublishingEndPoint()
+        {
+            string specificationId = NewRandomString();
+
+            PublishedProviderIdsRequest request = new PublishedProviderIdsRequest
+            {
+                PublishedProviderIds = new List<string>
+                {
+                    NewRandomString()
+                }
+            };
+
+            PublishedProviderDataDownload expectedResponse = new PublishedProviderDataDownload();
+
+            _publishingApiClient.GenerateCsvForBatchPublishedProvidersForApproval(Arg.Is(request), Arg.Is(specificationId))
+                .Returns(new ApiResponse<PublishedProviderDataDownload>(HttpStatusCode.OK, expectedResponse));
+
+            OkObjectResult result = await _publishController.GenerateCsvForBatchPublishedProvidersForApproval(request, specificationId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
+        public async Task GenerateCsvForAllPublishedProvidersForApprovalDelegatesToPublishingEndPoint()
+        {
+            string specificationId = NewRandomString();
+
+            PublishedProviderDataDownload expectedResponse = new PublishedProviderDataDownload();
+
+            _publishingApiClient.GenerateCsvForAllPublishedProvidersForApproval(Arg.Is(specificationId))
+                .Returns(new ApiResponse<PublishedProviderDataDownload>(HttpStatusCode.OK, expectedResponse));
+
+            OkObjectResult result = await _publishController.GenerateCsvForAllPublishedProvidersForApproval(specificationId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
+        public async Task GenerateCsvForBatchPublishedProvidersForReleaseDelegatesToPublishingEndPoint()
+        {
+            string specificationId = NewRandomString();
+
+            PublishedProviderIdsRequest request = new PublishedProviderIdsRequest
+            {
+                PublishedProviderIds = new List<string>
+                {
+                    NewRandomString()
+                }
+            };
+
+            PublishedProviderDataDownload expectedResponse = new PublishedProviderDataDownload();
+
+            _publishingApiClient.GenerateCsvForBatchPublishedProvidersForRelease(Arg.Is(request), Arg.Is(specificationId))
+                .Returns(new ApiResponse<PublishedProviderDataDownload>(HttpStatusCode.OK, expectedResponse));
+
+            OkObjectResult result = await _publishController.GenerateCsvForBatchPublishedProvidersForRelease(request, specificationId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
+        public async Task GenerateCsvForAllPublishedProvidersForReleaseDelegatesToPublishingEndPoint()
+        {
+            string specificationId = NewRandomString();
+
+            PublishedProviderDataDownload expectedResponse = new PublishedProviderDataDownload();
+
+            _publishingApiClient.GenerateCsvForAllPublishedProvidersForRelease(Arg.Is(specificationId))
+                .Returns(new ApiResponse<PublishedProviderDataDownload>(HttpStatusCode.OK, expectedResponse));
+
+            OkObjectResult result = await _publishController.GenerateCsvForAllPublishedProvidersForRelease(specificationId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
         public async Task GetBatchPublishedProviderIdsDelegatesToPublishingEndPoint()
         {
             string batchId = NewRandomString();
