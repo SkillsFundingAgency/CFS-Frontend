@@ -15,7 +15,6 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
-using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Services

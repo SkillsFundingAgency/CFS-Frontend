@@ -147,7 +147,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     {
                         new FundingStreamPeriodProfilePattern
                         {
-                            CalculateBalancingPayment = false,
                             FundingPeriodId = ValidFundingPeriodId,
                             FundingStreamId = ValidFundingStreamId,
                             FundingStreamPeriodEndDate = new DateTime(2021, 3, 31),
@@ -158,8 +157,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                                 profilePeriodPatternInTheCurrentTime,
                                 profilePeriodPatternInTheFuture
                             },
-                            ProfilePatternKey = null,
-                            ReProfilePastPeriods = false
+                            ProfilePatternKey = null
                         }
                     }));
 
@@ -217,7 +215,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     {
                         new FundingStreamPeriodProfilePattern
                         {
-                            CalculateBalancingPayment = false,
                             FundingPeriodId = ValidFundingPeriodId,
                             FundingStreamId = ValidFundingStreamId,
                             FundingStreamPeriodEndDate = DateTime.Now,
@@ -226,8 +223,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                             {
                                 profilePeriodPatternInThePast
                             },
-                            ProfilePatternKey = null,
-                            ReProfilePastPeriods = false
+                            ProfilePatternKey = null
                         }
                     }));
 

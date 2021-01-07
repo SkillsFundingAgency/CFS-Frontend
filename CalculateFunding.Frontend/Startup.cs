@@ -222,6 +222,7 @@ namespace CalculateFunding.Frontend
                 app.UseAuthentication();
                 app.UseAuthorization();
                 app.UseMiddleware<SkillsCheckMiddleware>();
+                app.UseMiddleware<LoggedInMiddleware>();
             }
 
             app.UseEndpoints(endpoints =>

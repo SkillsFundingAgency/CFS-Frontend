@@ -42,8 +42,6 @@ namespace CalculateFunding.Frontend.Modules
             int numberOfExceptionsBeforeCircuitBreaker = 100;
             TimeSpan circuitBreakerFailurePeriod = HostingEnvironment.IsDevelopment() ? TimeSpan.FromMinutes(10) : TimeSpan.FromMinutes(1);
 
-            IServiceProvider serviceProvider = services.BuildServiceProvider();
-
             services.AddCalculationsInterServiceClient(Configuration);
             services.AddResultsInterServiceClient(Configuration);
             services.AddProvidersInterServiceClient(Configuration);
@@ -125,7 +123,6 @@ namespace CalculateFunding.Frontend.Modules
             Configuration.Bind("redisSettings", redisSettings);
 
             services.AddSingleton(redisSettings);
-
         }
 
         private static void SetDefaultApiClientConfigurationOptions(HttpClient httpClient, ApiClientConfigurationOptions options, IServiceCollection services)
@@ -158,13 +155,11 @@ namespace CalculateFunding.Frontend.Modules
             {
 	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.Username, "testuser");
 	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.UserId, "testid");
-
             }
             else
             {
 	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.Username, userProfile.Fullname);
 	            httpClient.DefaultRequestHeaders?.Add(ApiClientHeaders.UserId, userProfile.Id);
-
             }
 
             httpClient.DefaultRequestHeaders?.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

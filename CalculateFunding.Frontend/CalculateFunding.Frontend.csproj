@@ -32,7 +32,7 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.3.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="4.1.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.2.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.9.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="3.9.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.3.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="5.3.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="4.22.0" />
@@ -141,7 +141,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Core\Middleware" />
     <Folder Include="wwwroot" />
   </ItemGroup>
   <ItemGroup>
