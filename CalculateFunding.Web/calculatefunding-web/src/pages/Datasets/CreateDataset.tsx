@@ -262,7 +262,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                                 </div>
                             </div>
 
-                            {fundingConfiguration && fundingConfiguration.providerSource !== ProviderSource.CFS &&
+                            {fundingConfiguration && fundingConfiguration.providerSource === ProviderSource.CFS &&
                             <div className="govuk-form-group">
                                 <fieldset className="govuk-fieldset">
                                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">

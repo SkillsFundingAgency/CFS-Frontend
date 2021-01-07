@@ -15,10 +15,10 @@ import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfigur
 
 describe("<CreateDataset />", () => {
 
-    describe("when page loads for CFS provider source", () => {
+    describe("when page loads for FDZ provider source", () => {
         beforeEach(() => {
             testing.mockSpecificationHook();
-            testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockCfsFundingConfiguration));
+            testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockFdzFundingConfiguration));
 
             function mockDatasetService() {
                 const service = jest.requireActual('../../../services/datasetService');
@@ -47,7 +47,7 @@ describe("<CreateDataset />", () => {
             expect(await screen.findByRole("heading", {name: testing.testSpec.name})).toBeInTheDocument();
         });
         
-        it('does not render Set as provider data for CFS', async () => {
+        it('does not render Set as provider data for FDZ', async () => {
             expect(await screen.queryByRole("heading", {name: /Set as provider data/})).not.toBeInTheDocument();
         });
         
@@ -64,10 +64,10 @@ describe("<CreateDataset />", () => {
         });
     });
 
-    describe("when page loads for FDZ provider source", () => {
+    describe("when page loads for CFS provider source", () => {
         beforeEach(() => {
             testing.mockSpecificationHook();
-            testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockFdzFundingConfiguration));
+            testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockCfsFundingConfiguration));
 
             function mockDatasetService() {
                 const service = jest.requireActual('../../../services/datasetService');
