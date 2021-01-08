@@ -4,13 +4,16 @@ import {DownloadableReports} from "../../../components/Reports/DownloadableRepor
 import {act, fireEvent, render} from "@testing-library/react";
 import {Route, Switch} from "react-router-dom";
 import {waitFor} from "@testing-library/dom";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 function renderDownloadableReports() {
     const {DownloadableReports} = require('../../../components/Reports/DownloadableReports');
     return render(<MemoryRouter initialEntries={[`/DownloadableReports/ABC123`]}>
-        <Switch>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
             <Route path="/DownloadableReports/:specificationId" component={DownloadableReports}/>
         </Switch>
+        </QueryClientProvider>
     </MemoryRouter>)
 }
 

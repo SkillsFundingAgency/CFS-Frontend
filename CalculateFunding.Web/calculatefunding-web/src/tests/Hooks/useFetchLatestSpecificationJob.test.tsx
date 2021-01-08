@@ -6,6 +6,9 @@ import {JobType} from "../../types/jobType";
 import {act} from 'react-test-renderer';
 import {RunningStatus} from "../../types/RunningStatus";
 import {JobResponse} from "../../types/jobDetails";
+import {QueryClient, QueryClientProvider} from "react-query";
+import React from "react";
+import {QueryClientProviderTestWrapper} from "./QueryClientProviderTestWrapper";
 
 const specificationId = "abc123";
 const mockQueuedJobResult1: JobResponse = {
@@ -32,8 +35,8 @@ describe("useFetchLatestSpecificationJob tests", () => {
     describe("Handles invalid inputs correctly", () => {
         it("when specification id is null", async () => {
             const {result} =
-                renderHook(() =>
-                    useFetchLatestSpecificationJob("", [JobType.RefreshFundingJob]));
+                renderHook(() =>  useFetchLatestSpecificationJob("", [JobType.RefreshFundingJob]),
+                    {wrapper: QueryClientProviderTestWrapper});
             expect(result.current.lastJob).toBe(undefined);
             expect(result.current.isCheckingForJob).toBe(false);
             expect(result.current.haveErrorCheckingForJob).toBe(false);
@@ -45,7 +48,8 @@ describe("useFetchLatestSpecificationJob tests", () => {
         it("when no job types supplied", async () => {
             const {result} =
                 renderHook(() =>
-                    useFetchLatestSpecificationJob(specificationId, []));
+                    useFetchLatestSpecificationJob(specificationId, []),
+                    {wrapper: QueryClientProviderTestWrapper});
             expect(result.current.lastJob).toBe(undefined);
             expect(result.current.isCheckingForJob).toBe(false);
             expect(result.current.haveErrorCheckingForJob).toBe(false);
@@ -71,7 +75,8 @@ describe("useFetchLatestSpecificationJob tests", () => {
         it("returns correct latest job", async () => {
             const {result, waitForNextUpdate} =
                 renderHook(() =>
-                    useFetchLatestSpecificationJob(specificationId, [JobType.RefreshFundingJob]));
+                    useFetchLatestSpecificationJob(specificationId, [JobType.RefreshFundingJob]),
+                    {wrapper: QueryClientProviderTestWrapper});
 
             await act(async () => {
                 await waitForNextUpdate();

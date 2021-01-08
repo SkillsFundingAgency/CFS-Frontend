@@ -1,9 +1,8 @@
 ﻿import {AxiosError} from "axios";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery} from "react-query";
 import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
 import {searchForPublishedProviderResults} from "../../services/publishedProviderService";
 import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import {PublishedProviderFundingCount} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 
 export type PublishedProviderSearchQueryResult = {
     publishedProviderSearchResults: PublishedProviderSearchResults | undefined,
@@ -22,7 +21,7 @@ export const usePublishedProviderSearch = (searchRequest: PublishedProviderSearc
             async () => (await searchForPublishedProviderResults(searchRequest as PublishedProviderSearchRequest)).data,
             {
                 onError,
-                enabled: searchRequest && searchRequest.fundingStreamId && searchRequest.fundingPeriodId && isEnabled
+                enabled: (searchRequest && searchRequest.fundingStreamId && searchRequest.fundingPeriodId && isEnabled) === true
             });
     return {
         publishedProviderSearchResults: data,

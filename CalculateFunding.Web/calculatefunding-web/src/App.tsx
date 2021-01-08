@@ -51,17 +51,17 @@ import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculatio
 import {ViewFundingLineProfile} from "./pages/FundingApprovals/ViewFundingLineProfile";
 import {ChangeProfileType} from "./pages/FundingApprovals/ChangeProfileType";
 import {
-    QueryCache,
-    ReactQueryCacheProvider,
+    QueryClient,
+    QueryClientProvider,
 } from "react-query";
-import {ReactQueryDevtools} from "react-query-devtools";
+import {ReactQueryDevtools} from 'react-query/devtools';
 import {ProfileHistory} from './pages/FundingApprovals/ProfileHistory';
 import {EditCalculation} from "./pages/Calculations/EditCalculation";
 import {ConfirmFunding} from "./pages/FundingApprovals/ConfirmFunding";
 import {RefreshSql} from "./pages/Datasets/RefreshSql";
 import {UploadBatch} from "./pages/FundingApprovals/UploadBatch";
 
-const queryCache = new QueryCache();
+const queryClient = new QueryClient();
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
@@ -92,7 +92,7 @@ const App: React.FunctionComponent = () => {
         return (
             <BrowserRouter basename="/app"
                            getUserConfirmation={(message, callback) => ConfirmationModal(message, callback, 'Leave this page', 'Stay on this page')}>
-                <ReactQueryCacheProvider queryCache={queryCache}>
+                <QueryClientProvider client={queryClient}>
                     <Switch>
                         <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
                         <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
@@ -150,7 +150,7 @@ const App: React.FunctionComponent = () => {
                     {process.env.NODE_ENV === 'development' && featureFlagsState.enableReactQueryDevTool &&
                     <ReactQueryDevtools initialIsOpen={false}/>
                     }
-                </ReactQueryCacheProvider>
+                </QueryClientProvider>
             </BrowserRouter>
         );
     } else {

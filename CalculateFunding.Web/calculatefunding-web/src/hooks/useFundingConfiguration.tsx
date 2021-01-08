@@ -21,7 +21,7 @@ export const useFundingConfiguration = (fundingStreamId: string | undefined | nu
             cacheTime: milliseconds.OneDay,
             staleTime: milliseconds.OneDay,
             refetchOnWindowFocus: false,
-            enabled: fundingStreamId && fundingPeriodId && fundingPeriodId.length > 0 && fundingStreamId.length > 0
+            enabled: (fundingStreamId && fundingPeriodId && fundingPeriodId.length > 0 && fundingStreamId.length > 0) === true
         });
     
     return {

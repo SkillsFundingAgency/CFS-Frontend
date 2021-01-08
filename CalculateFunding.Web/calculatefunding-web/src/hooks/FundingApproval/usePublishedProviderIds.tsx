@@ -23,10 +23,10 @@ export const usePublishedProviderIds = (fundingStreamId: string,
             },
             {
                 onError,
-                enabled: specificationId && specificationId.length > 0
+                enabled: (specificationId && specificationId.length > 0
                     && fundingStreamId && fundingStreamId.length > 0
                     && fundingPeriodId && fundingPeriodId.length > 0
-                    && isEnabled
+                    && isEnabled) === true
             });
     return {
         publishedProviderIds: data,

@@ -9,7 +9,7 @@ import * as redux from "react-redux";
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {QueryCache, ReactQueryCacheProvider} from "react-query";
+import {QueryCache, QueryClient, QueryClientProvider} from "react-query";
 import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -40,11 +40,11 @@ const renderConfirmApprovalPage = () => {
     const {ConfirmFunding} = require('../../../pages/FundingApprovals/ConfirmFunding');
     store.dispatch = jest.fn();
     return render(<MemoryRouter>
-        <ReactQueryCacheProvider queryCache={new QueryCache()}>
+        <QueryClientProvider client={new QueryClient()}>
             <Provider store={store}>
                 <ConfirmFunding location={location} history={history} match={mockConfirmApprovalRoute}/>
             </Provider>
-        </ReactQueryCacheProvider>
+        </QueryClientProvider>
     </MemoryRouter>);
 };
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
@@ -236,7 +236,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render job progress spinner', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
+            expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument();
         });
 
         it('renders warning message', async () => {
@@ -244,7 +244,6 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders funding summary section', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
             const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
             expect(fundingSummaryTable).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();
@@ -284,7 +283,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render job progress spinner', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
+            expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument();
         });
 
         it('renders warning message', async () => {
@@ -292,7 +291,6 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders funding summary section', async () => {
-            await waitForElementToBeRemoved(screen.getByTestId("loader-inline"));
             const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
             expect(fundingSummaryTable).toBeInTheDocument();
             expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();

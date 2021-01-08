@@ -1,6 +1,6 @@
 ﻿import {useMemo} from "react";
 import {getUserPermissionsService} from "../services/userService";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery, UseQueryOptions} from "react-query";
 import { AxiosError } from "axios";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 import {milliseconds} from "../helpers/TimeInMs";
@@ -40,10 +40,10 @@ export interface SpecificationPermissionsResult {
 export const useSpecificationPermissions = (
     specificationId: string, 
     requiredPermissions: SpecificationPermissions[],
-    queryOptions: QueryConfig<EffectiveSpecificationPermission, AxiosError> = {
+    queryOptions: UseQueryOptions<EffectiveSpecificationPermission, AxiosError> = {
         cacheTime: milliseconds.OneHour, 
         staleTime: milliseconds.OneHour, 
-        enabled: specificationId && specificationId.length > 0, 
+        enabled: (specificationId && specificationId.length > 0) === true, 
         refetchOnWindowFocus: false
     }): SpecificationPermissionsResult => {
 

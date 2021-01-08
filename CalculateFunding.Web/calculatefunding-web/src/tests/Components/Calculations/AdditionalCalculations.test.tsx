@@ -9,13 +9,16 @@ import {ValueType} from "../../../types/ValueType";
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 const renderComponent = async () => {
     const {AdditionalCalculations} = require('../../../components/Calculations/AdditionalCalculations');
     const component = render(<MemoryRouter initialEntries={['/AdditionalCalculations/SPEC123']}>
-        <Switch>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
             <Route path="/AdditionalCalculations/:specificationId" component={AdditionalCalculations} />
         </Switch>
+        </QueryClientProvider>
     </MemoryRouter>);
     await waitFor(() => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();

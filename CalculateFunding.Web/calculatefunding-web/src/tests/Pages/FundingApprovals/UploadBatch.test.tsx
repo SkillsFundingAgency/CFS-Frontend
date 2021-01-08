@@ -1,12 +1,12 @@
 ﻿import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {createLocation} from "history";
-import {render, screen, waitFor, waitForElementToBeRemoved, within} from "@testing-library/react";
+import {render, screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {QueryCache, ReactQueryCacheProvider} from "react-query";
+import {QueryCache, QueryClient, QueryClientProvider} from "react-query";
 import {UploadBatch, UploadBatchRouteProps} from "../../../pages/FundingApprovals/UploadBatch";
 import userEvent from "@testing-library/user-event";
 import * as redux from "react-redux";
@@ -30,11 +30,11 @@ const renderPage = () => {
     const {UploadBatch} = require('../../../pages/FundingApprovals/UploadBatch');
     store.dispatch = jest.fn();
     return render(<MemoryRouter>
-        <ReactQueryCacheProvider queryCache={new QueryCache()}>
+        <QueryClientProvider client={new QueryClient()}>
             <Provider store={store}>
                 <UploadBatch location={location} history={mockHistory} match={mockRoute}/>
             </Provider>
-        </ReactQueryCacheProvider>
+        </QueryClientProvider>
     </MemoryRouter>);
 };
 

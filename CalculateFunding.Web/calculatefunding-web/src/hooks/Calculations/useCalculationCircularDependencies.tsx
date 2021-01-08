@@ -18,7 +18,7 @@ export const useCalculationCircularDependencies = (specificationId: string,
         {
             onError: onError,
             refetchOnWindowFocus: false,
-            enabled: specificationId && specificationId.length > 0
+            enabled: (specificationId && specificationId.length > 0) === true
         });
 
     return {

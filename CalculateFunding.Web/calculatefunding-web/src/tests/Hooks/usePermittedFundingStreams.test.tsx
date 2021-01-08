@@ -33,6 +33,9 @@ const noPermissionsFundingStream: FundingStreamPermissions = {
     canApproveAllCalculations: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
+    canEditProfilePattern: false,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false
 }
 const withChooseForFundingPermissionsFundingStream: FundingStreamPermissions = {
     fundingStreamId: "GAG",
@@ -61,6 +64,9 @@ const withChooseForFundingPermissionsFundingStream: FundingStreamPermissions = {
     canApproveAllCalculations: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
+    canEditProfilePattern: false,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false
 }
 
 describe("usePermittedFundingStreams tests", () => {

@@ -25,7 +25,7 @@ export const useFetchAllLatestSpecificationJobs = (
         useQuery<JobDetails[] | undefined, AxiosError>(`specification-${specificationId}-all-jobs-` + jobTypeList,
             async () => await checkForJobs(specificationId, jobTypeList),
             {
-                enabled: specificationId && specificationId.length > 0 && jobTypes.length > 0,
+                enabled: (specificationId && specificationId.length > 0 && jobTypes.length > 0) === true,
                 onError: onError
             });
 

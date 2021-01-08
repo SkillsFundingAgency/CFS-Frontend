@@ -10,7 +10,7 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {QueryCache, ReactQueryCacheProvider} from "react-query";
+import {QueryCache, QueryClient, QueryClientProvider} from "react-query";
 import * as publishService from "../../../services/publishService"
 import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -59,11 +59,11 @@ const renderPage = () => {
     const {SpecificationFundingApproval} = require('../../../pages/FundingApprovals/SpecificationFundingApproval');
     store.dispatch = jest.fn();
     return render(<MemoryRouter>
-        <ReactQueryCacheProvider queryCache={new QueryCache()}>
+        <QueryClientProvider client={new QueryClient()}>
             <Provider store={store}>
                 <SpecificationFundingApproval location={location} history={history} match={matchMock}/>
             </Provider>
-        </ReactQueryCacheProvider>
+        </QueryClientProvider>
     </MemoryRouter>);
 };
 const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));

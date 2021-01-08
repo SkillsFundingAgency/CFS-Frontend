@@ -12,13 +12,18 @@ export interface ProfileHistoryPanelProps {
     fundingPeriodId: string;
 }
 
-export function ProfileHistoryPanel({specificationId, providerId, providerVersionId, fundingStreamId,
-    fundingPeriodId, fundingLineCode}: ProfileHistoryPanelProps) {
-    const {isLoading, isError, data} = useQuery<boolean>(`profile-history-exists-${specificationId}--${providerId}-${fundingStreamId}-${fundingLineCode}`,
-        async () => (await getPreviousProfileExistsForSpecificationForProviderForFundingLine(specificationId, providerId, fundingStreamId, fundingLineCode)).data,
-        {
-            refetchOnWindowFocus: false
-        }
+export function ProfileHistoryPanel(
+    {
+        specificationId,
+        providerId,
+        providerVersionId,
+        fundingStreamId,
+        fundingPeriodId,
+        fundingLineCode
+    }: ProfileHistoryPanelProps) {
+    const {isLoading, isError, data} = useQuery<boolean>(
+        `profile-history-exists-${specificationId}--${providerId}-${fundingStreamId}-${fundingLineCode}`,
+        async () => (await getPreviousProfileExistsForSpecificationForProviderForFundingLine(specificationId, providerId, fundingStreamId, fundingLineCode)).data
     );
 
     return (
@@ -33,7 +38,7 @@ export function ProfileHistoryPanel({specificationId, providerId, providerVersio
                         to={`/Approvals/ProfilingHistory/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}
                         className="govuk-link">
                         History of previous profiles
-        </Link>
+                    </Link>
                 </div>
                 : null}
         </>

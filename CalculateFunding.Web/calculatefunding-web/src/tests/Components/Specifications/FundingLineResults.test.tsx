@@ -4,11 +4,13 @@ import {act, fireEvent, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import {FundingStructureItem, FundingStructureType} from "../../../types/FundingStructureItem";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 const renderViewSpecificationFundingLineResults = () => {
     const {FundingLineResults} = require('../../../components/FundingLineStructure/FundingLineResults');
     return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
-        <Switch>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
             <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
                 <FundingLineResults
                     status={PublishStatus.Approved}
@@ -19,13 +21,15 @@ const renderViewSpecificationFundingLineResults = () => {
                     clearErrorMessages={jest.fn()}/>
             </Route>
         </Switch>
+        </QueryClientProvider>
     </MemoryRouter>)
 }
 
 const renderProviderFundingLineResults = () => {
     const {FundingLineResults} = require('../../../components/FundingLineStructure/FundingLineResults');
     return render(<MemoryRouter initialEntries={['/FundingLineResults/SPEC123/FS1/FP1/Completed']}>
-        <Switch>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
             <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
                 <FundingLineResults
                     status={undefined}
@@ -37,6 +41,7 @@ const renderProviderFundingLineResults = () => {
                     clearErrorMessages={jest.fn()}/>
             </Route>
         </Switch>
+        </QueryClientProvider>
     </MemoryRouter>)
 }
 

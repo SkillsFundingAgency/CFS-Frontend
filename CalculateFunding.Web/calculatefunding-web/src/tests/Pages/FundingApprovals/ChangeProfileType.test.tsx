@@ -7,6 +7,7 @@ import {ChangeProfileTypeProps} from "../../../pages/FundingApprovals/ChangeProf
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
 import userEvent from "@testing-library/user-event";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 describe("<ChangeProfileType /> ", () => {
     afterEach(async () => {
@@ -421,7 +422,9 @@ const renderPage = () => {
     const {ChangeProfileType} = require("../../../pages/FundingApprovals/ChangeProfileType");
     return render(
         <MemoryRouter>
-            <ChangeProfileType match={matchMock} location={location} history={history} />
+            <QueryClientProvider client={new QueryClient()}>
+                <ChangeProfileType match={matchMock} location={location} history={history} />
+            </QueryClientProvider>
         </MemoryRouter>
     );
 }

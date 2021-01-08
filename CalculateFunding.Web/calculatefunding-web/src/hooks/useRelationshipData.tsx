@@ -1,5 +1,5 @@
 ﻿import {AxiosError} from "axios";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery, UseQueryOptions} from "react-query";
 import {getRelationshipData} from "../services/datasetService";
 import {RelationshipData} from "../types/Datasets/RelationshipData";
 
@@ -10,9 +10,9 @@ export type RelationshipDataQueryResult = {
     errorLoadingRelationshipData: string
 }
 export const useRelationshipData = (relationshipId: string,
-                                    queryConfig: QueryConfig<RelationshipData, AxiosError> =
+                                    queryConfig: UseQueryOptions<RelationshipData, AxiosError> =
                                         {
-                                            enabled: relationshipId && relationshipId.length > 0
+                                            enabled: (relationshipId && relationshipId.length > 0) === true
                                         })
     : RelationshipDataQueryResult => {
     const {data, isLoading, isError, error} = useQuery<RelationshipData, AxiosError>(

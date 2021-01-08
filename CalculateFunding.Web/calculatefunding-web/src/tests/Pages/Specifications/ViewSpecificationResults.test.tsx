@@ -6,14 +6,17 @@ import {Route, Switch} from "react-router-dom";
 import {waitFor} from "@testing-library/dom";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {testSpec} from "../../Hooks/useSpecificationSummary.test";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 
 function renderViewSpecificationResults() {
     const {ViewSpecificationResults} = require('../../../pages/Specifications/ViewSpecificationResults');
     return render(<MemoryRouter initialEntries={[`/Specifications/ViewSpecificationResults/ABC123`]}>
-        <Switch>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
             <Route path="" component={ViewSpecificationResults}/>
         </Switch>
+        </QueryClientProvider>
     </MemoryRouter>)
 }
 

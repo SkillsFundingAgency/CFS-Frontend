@@ -38,61 +38,6 @@ const storeWithData: IStoreState = {
     hasConfirmedSkills: true,
     fundingStreamPermissions: []
   },
-  viewSpecificationResults: {
-    additionalCalculations: {
-      lastPage: 0,
-      totalCount: 0,
-      results: [],
-      currentPage: 0,
-      endItemNumber: 0,
-      facets: [],
-      pagerState: {
-        currentPage: 0,
-        displayNumberOfPages: 0,
-        lastPage: 0,
-        nextPage: 0,
-        pages: [],
-        previousPage: 0
-      },
-      startItemNumber: 0,
-      totalErrorResults: 0,
-      totalResults: 0
-    },
-    templateCalculations: {
-      totalCount: 0,
-      lastPage: 0,
-      results: [],
-      currentPage: 0,
-      endItemNumber: 0,
-      facets: [],
-      pagerState: {
-        currentPage: 0,
-        displayNumberOfPages: 0,
-        lastPage: 0,
-        nextPage: 0,
-        pages: [],
-        previousPage: 0
-      },
-      startItemNumber: 0,
-      totalErrorResults: 0,
-      totalResults: 0
-    },
-    specification: {
-      name: '',
-      approvalStatus: '',
-      description: '',
-      fundingPeriod: {
-        id: '',
-        name: ''
-      },
-      fundingStreams: [],
-      id: '',
-      isSelectedForFunding: false,
-      providerVersionId: '',
-      dataDefinitionRelationshipIds: [],
-      templateIds: {},
-    }
-  },
   featureFlags: {
     templateBuilderVisible: false,
     enableReactQueryDevTool: false,

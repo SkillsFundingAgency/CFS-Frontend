@@ -16,7 +16,7 @@ export const usePublishedProviderErrorSearch = (specificationId: string,
         async () => (await getPublishedProviderErrors(specificationId)).data,
         {
             onError,
-            enabled: specificationId && specificationId.length > 0 && isEnabled
+            enabled: (specificationId && specificationId.length > 0 && isEnabled) === true
         });
     return {
         publishedProvidersWithErrors: data,

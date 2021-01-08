@@ -16,6 +16,7 @@ import {ProviderVersionQueryResult, useProviderVersion} from "../../../hooks/Pro
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {createStore, Store} from "redux";
 import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 jest.mock('../../../services/fundingLineDetailsService', () => ({
     getCurrentProfileConfigService: jest.fn()
@@ -122,9 +123,11 @@ const renderPage = () => {
     store.dispatch = jest.fn();
     return render(
         <MemoryRouter>
-            <Provider store={store}>
+            <QueryClientProvider client={new QueryClient()}>
+                <Provider store={store}>
                 <ProviderFundingOverview location={location} history={history} match={matchMock}/>
             </Provider>
+            </QueryClientProvider>
         </MemoryRouter>
     );
 };

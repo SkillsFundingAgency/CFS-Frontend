@@ -25,7 +25,7 @@ export const useProviderVersion = (providerId: string,
             cacheTime: milliseconds.OneDay,
             staleTime: milliseconds.OneDay,
             refetchOnWindowFocus: false,
-            enabled: providerId && providerVersionId && providerId.length > 0 && providerVersionId.length > 0
+            enabled: (providerId && providerVersionId && providerId.length > 0 && providerVersionId.length > 0) === true
         });
 
     return {

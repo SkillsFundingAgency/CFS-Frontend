@@ -11,6 +11,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useHistory} from "react-router";
 import {ApprovalMode} from "../../types/ApprovalMode";
+import {useQuery} from "react-query";
 
 export function FundingApprovalSelection() {
     const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStreamWithSpecificationSelectedForFunding>();

@@ -1,4 +1,4 @@
-import {render, screen, waitFor, waitForElementToBeRemoved} from "@testing-library/react";
+import {render, screen} from "@testing-library/react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import '@testing-library/jest-dom/extend-expect';
 import React from "react";
@@ -11,6 +11,7 @@ import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {DataschemaDetailsViewModel} from "../../../types/Datasets/DataschemaDetailsViewModel";
 import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 
 describe("<CreateDataset />", () => {
@@ -197,9 +198,11 @@ const createDatasetTestSetup = () => {
     function renderCreateDatasetPage() {
         const {CreateDataset} = require('../../../pages/Datasets/CreateDataset');
         return render(<MemoryRouter initialEntries={['/Datasets/CreateDataset/' + testSpec.id]}>
-            <Switch>
+            <QueryClientProvider client={new QueryClient()}>
+                <Switch>
                 <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
             </Switch>
+            </QueryClientProvider>
         </MemoryRouter>)
     }
 

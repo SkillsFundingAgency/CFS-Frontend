@@ -11,6 +11,7 @@ import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as publishService from "../../../services/publishService";
 import * as jobService from "../../../services/jobService";
 import {createMockAxiosError} from "../../fakes/fakeAxios";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 const latestPublishedDate = "2020-11-23T17:35:01.1080915+00:00";
 
@@ -666,7 +667,9 @@ const renderPage = async () => {
     const {RefreshSql} = require("../../../pages/Datasets/RefreshSql");
     const component = render(
         <MemoryRouter>
-            <RefreshSql />
+            <QueryClientProvider client={new QueryClient()}>
+                <RefreshSql />
+            </QueryClientProvider>
         </MemoryRouter>
     );
     await waitFor(() => {

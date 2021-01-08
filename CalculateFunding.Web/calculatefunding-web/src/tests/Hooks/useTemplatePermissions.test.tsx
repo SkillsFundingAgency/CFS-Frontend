@@ -29,9 +29,12 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: true,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
     canEditProfilePattern: false,
-    canCreateProfilePattern: false
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false,
+    canApproveCalculations: false,
+    canApproveAnyCalculations: false,
+    canApproveAllCalculations: false
 },
 {
     fundingStreamId: "GAG",
@@ -57,9 +60,12 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
-    canApproveAllCalculations: false,
+    canEditProfilePattern: false,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
+    canApproveAllCalculations: false
 },
 {
     fundingStreamId: "1619",
@@ -85,9 +91,12 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canApproveTemplates: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
-    canApproveAllCalculations: false,
+    canEditProfilePattern: false,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
+    canApproveAllCalculations: false
 }];
 
 beforeEach(() => {

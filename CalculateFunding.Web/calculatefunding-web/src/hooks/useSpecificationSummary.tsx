@@ -1,5 +1,5 @@
 ﻿import {AxiosError} from "axios";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery, UseQueryOptions} from "react-query";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {getSpecificationSummaryService} from "../services/specificationService";
 import {milliseconds} from "../helpers/TimeInMs";
@@ -18,11 +18,11 @@ export const useSpecificationSummary = (specificationId: string,
                                         staleTime: number = milliseconds.OneHour)
     : SpecificationSummaryQueryResult => {
 
-    const config: QueryConfig<SpecificationSummary, AxiosError> = {
+    const config: UseQueryOptions<SpecificationSummary, AxiosError> = {
         cacheTime: milliseconds.OneHour,
         staleTime: staleTime,
         refetchOnWindowFocus: false,
-        enabled: specificationId && specificationId.length > 0,
+        enabled: (specificationId && specificationId.length > 0) === true,
         onError: onError
     };
     

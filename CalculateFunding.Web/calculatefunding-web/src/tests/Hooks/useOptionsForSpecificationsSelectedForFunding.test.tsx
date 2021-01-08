@@ -4,6 +4,10 @@ import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../types/SpecificationSelectedForFunding";
 import {useOptionsForSpecificationsSelectedForFunding} from "../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
+import {QueryClient, QueryClientProvider} from "react-query";
+import React from "react";
+import {render} from "@testing-library/react";
+import {QueryClientProviderTestWrapper} from "./QueryClientProviderTestWrapper";
 
 const mockData: FundingStreamWithSpecificationSelectedForFunding[] = [
     {
@@ -34,9 +38,10 @@ describe("useOptionsForSpecificationsSelectedForFunding loads data correctly", (
     });
 
     it("returns data correctly", async () => {
-        const {result, waitForValueToChange} =
-            renderHook(() => useOptionsForSpecificationsSelectedForFunding());
-        await act(async () => { await waitForValueToChange(() => result.current.isLoadingOptions);
+        const {result, waitForValueToChange} = renderHook(() => useOptionsForSpecificationsSelectedForFunding({}),
+            {wrapper: QueryClientProviderTestWrapper});
+        await act(async () => {
+            await waitForValueToChange(() => result.current.isLoadingOptions);
         });
         expect(result.current.fundingStreams).toEqual(mockData);
         expect(result.current.isLoadingOptions).toBe(false);

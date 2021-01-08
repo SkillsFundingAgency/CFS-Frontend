@@ -68,7 +68,7 @@ export function RefreshSql() {
         {
             cacheTime: 0,
             refetchOnWindowFocus: false,
-            enabled: specificationId && specificationId.length > 0,
+            enabled: specificationId !== undefined && specificationId.length > 0,
             onError: err => addErrorMessage(err.message, "Error while loading last successful sql job")
         });
 

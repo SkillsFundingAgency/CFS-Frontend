@@ -67,7 +67,7 @@ export function FundingLineResults({
         useQuery<PublishedProviderError[], AxiosError>(`funding-line-errors-for-spec-${specificationId}-stream-${fundingStreamId}-provider-${providerId}`,
             async () => (await getProviderFundingLineErrors(specificationId, fundingStreamId, providerId as string)).data,
             {
-                enabled: providerId && providerId.length > 0,
+                enabled: providerId !== undefined && providerId.length > 0,
                 onError: err => addError(err, "Error while loading funding line errors")
             });
 

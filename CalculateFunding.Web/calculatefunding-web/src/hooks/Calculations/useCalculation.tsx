@@ -18,7 +18,7 @@ export const useCalculation = (calculationId: string,
         {
             onError: onError,
             refetchOnWindowFocus: false,
-            enabled: calculationId && calculationId.length > 0
+            enabled: calculationId !== undefined && calculationId.length > 0
         });
 
     return {

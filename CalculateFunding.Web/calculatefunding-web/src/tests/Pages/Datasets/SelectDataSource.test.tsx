@@ -18,6 +18,7 @@ import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {RelationshipDataQueryResult} from "../../../hooks/useRelationshipData";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
@@ -122,7 +123,9 @@ const renderPage = () => {
     const {SelectDataSource} = require("../../../pages/Datasets/SelectDataSource");
     return render(
         <MemoryRouter>
-            <SelectDataSource match={matchMock} location={location} history={history}/>
+            <QueryClientProvider client={new QueryClient()}>
+                <SelectDataSource match={matchMock} location={location} history={history}/>
+            </QueryClientProvider>
         </MemoryRouter>);
 };
 

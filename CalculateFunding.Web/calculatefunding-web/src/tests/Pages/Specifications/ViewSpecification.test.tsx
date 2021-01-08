@@ -9,6 +9,7 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import userEvent from "@testing-library/user-event";
 import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import {QueryClient, QueryClientProvider} from "react-query";
 
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
@@ -30,9 +31,11 @@ jest.mock("react-redux", () => ({
 const renderViewSpecificationPage = async () => {
     const {ViewSpecification} = require('../../../pages/Specifications/ViewSpecification');
     const component = render(<MemoryRouter initialEntries={['/ViewSpecification/SPEC123']}>
-        <Switch>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
             <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
         </Switch>
+        </QueryClientProvider>
     </MemoryRouter>);
     await waitFor(() => {
         expect(screen.getByText(/View funding/i)).toBeInTheDocument();

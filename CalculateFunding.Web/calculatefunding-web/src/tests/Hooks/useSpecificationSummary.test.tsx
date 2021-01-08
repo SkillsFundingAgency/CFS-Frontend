@@ -5,6 +5,7 @@ import {SpecificationSummary} from "../../types/SpecificationSummary";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
 import {waitFor} from "@testing-library/dom";
+import {QueryClientProviderTestWrapper} from "./QueryClientProviderTestWrapper";
 
 export const testSpec: SpecificationSummary = {
     name: "Wizard Training",
@@ -40,7 +41,8 @@ describe("useSpecificationSummary loads specification", () => {
 
     it("returns specification correctly", async () => {
         const {result, waitForValueToChange} =
-            renderHook(() => useSpecificationSummary(specificationId, err => {}));
+            renderHook(() => useSpecificationSummary(specificationId, err => {}),
+                {wrapper: QueryClientProviderTestWrapper});
         await act(async () => {
             await waitForValueToChange(() => result.current.isLoadingSpecification);
         });

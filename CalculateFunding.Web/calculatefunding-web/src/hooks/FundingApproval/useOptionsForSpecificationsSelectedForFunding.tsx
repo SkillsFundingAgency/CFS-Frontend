@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import {QueryConfig, useQuery} from "react-query";
+import {useQuery, UseQueryOptions} from "react-query";
 import {getSpecificationsSelectedForFundingService} from "../../services/specificationService";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../types/SpecificationSelectedForFunding";
 
@@ -10,7 +10,7 @@ export type OptionsForSpecificationsSelectedForFundingResult = {
     isErrorCheckingForOptions: boolean
 }
 export const useOptionsForSpecificationsSelectedForFunding = (
-    queryConfig: QueryConfig<FundingStreamWithSpecificationSelectedForFunding[], AxiosError> = {}) 
+    queryConfig: UseQueryOptions<FundingStreamWithSpecificationSelectedForFunding[], AxiosError> = {}) 
     : OptionsForSpecificationsSelectedForFundingResult => {
         const {data, isLoading, isError, error} = useQuery<FundingStreamWithSpecificationSelectedForFunding[], AxiosError>(
             `options-for-specifications-selected-for-funding`,

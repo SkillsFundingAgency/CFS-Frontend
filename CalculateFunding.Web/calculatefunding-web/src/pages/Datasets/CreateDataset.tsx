@@ -7,7 +7,6 @@ import {ConfirmationPanel} from "../../components/ConfirmationPanel";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 import {Footer} from "../../components/Footer";
 import {ProviderSource} from "../../types/CoreProviderSummary";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
@@ -35,13 +34,15 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
             err => addError(err, "Error while loading funding configuration"));
     const {data: dataSchemas, isLoading: isLoadingDataSchemas} =
-        useQuery<DataschemaDetailsViewModel[], AxiosError>(`data-schemas-for-stream-${fundingStreamId}`,
-            async () => (await getDatasetsForFundingStreamService(fundingStreamId as string)).data,
+        useQuery(
+            `data-schemas-for-stream-${fundingStreamId}`,
+            () => getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")
+                .then((response) => response.data),
             {
                 enabled: fundingStreamId !== undefined,
-                onError: err => addError(err, "Error while loading available data schemas")
+                onError: err => addError(err as AxiosError, "Error while loading available data schemas")
             });
-    const [assignDatasetSchema, {isLoading: isUpdating, isSuccess}] =
+    const {mutate: assignDatasetSchema, isLoading: isUpdating, isSuccess} =
         useMutation<boolean, AxiosError, AssignDatasetSchemaRequest>(
             async (request) => (await assignDatasetSchemaService(request)).data,
             {
@@ -158,7 +159,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
         // @ts-ignore
         document.getElementById('save-dataset-form').reset();
     }
-    
+
     useEffect(() => {
         if (updateRequest) {
             assignDatasetSchema(updateRequest);
@@ -175,10 +176,10 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                 <Breadcrumb name={"Create dataset"}/>
             </Breadcrumbs>
 
-            <ConfirmationPanel title={"Dataset created"} 
-                               body={`Dataset ${updateRequest?.name} has been created.`} 
+            <ConfirmationPanel title={"Dataset created"}
+                               body={`Dataset ${updateRequest?.name} has been created.`}
                                hidden={!isSuccess}/>
-            
+
             <MultipleErrorSummary errors={errors}/>
 
             {(isLoadingSpecification || isLoadingFundingConfiguration || isUpdating) &&

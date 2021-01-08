@@ -57,7 +57,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob],
             err => addError(err, "Error checking for background jobs running"));
-    const [uploadBatchFile, {isLoading: isUploadingBatchFile}] =
+    const {mutate: uploadBatchFile, isLoading: isUploadingBatchFile} =
         useMutation<BatchUploadResponse, AxiosError, File>(
             async (theFile) => {
                 return (await uploadBatchOfPublishedProviders(theFile)).data;
@@ -79,11 +79,11 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         `batch-${batchId}-publishedProviderIds`,
         async () => (await getPublishedProvidersByBatch(batchId as string)).data,
         {
-            enabled: batchId !== undefined && jobId && latestJob && latestJob.jobId === jobId && latestJob.isSuccessful,
+            enabled: (batchId !== undefined && jobId && latestJob && latestJob.jobId === jobId && latestJob.isSuccessful) === true,
             cacheTime: 0,
             staleTime: 0
         });
-    const [createValidationJob, {isLoading: isCreatingValidationJob}] =
+    const {mutate: createValidationJob, isLoading: isCreatingValidationJob} =
         useMutation<JobCreatedResponse, AxiosError, BatchValidationRequest>(
             async (request) => {
                 return (await validatePublishedProvidersByBatch(request)).data;
@@ -109,14 +109,14 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         setIsUpdating(true);
         clearErrorMessages();
         setActionType(FundingActionType.Approve);
-        await uploadBatchFile(theFile);
+        await uploadBatchFile(theFile as File);
     }
 
     const uploadForRelease = async () => {
         setIsUpdating(true);
         clearErrorMessages();
         setActionType(FundingActionType.Release);
-        await uploadBatchFile(theFile);
+        await uploadBatchFile(theFile as File);
     }
 
     useEffect(() => {
@@ -127,7 +127,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         }
 
         if (latestJob.isFailed) {
-            addError(latestJob.outcome, "Validation failed");
+            addError(latestJob.outcome ? latestJob.outcome : "", "Validation failed");
             setIsUpdating(false);
         } else if (latestJob.isSuccessful && publishedProviderIds) {
             dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));

@@ -6,6 +6,7 @@ import {ViewFundingLineProfileProps} from "../../../pages/FundingApprovals/ViewF
 import {waitFor, fireEvent, render, screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
+import {QueryClient, QueryClientProvider} from "react-query";
 
 describe("<ViewFundingLineProfile />", () => {
     afterEach(async () => {
@@ -281,7 +282,9 @@ const mockApplyCustomProfile = jest.fn();
 const mockGetFundingLinePublishedProviderDetails = jest.fn();
 
 jest.mock('../../../services/fundingLineDetailsService', () => ({
-    getPreviousProfileExistsForSpecificationForProviderForFundingLine: jest.fn()
+    getPreviousProfileExistsForSpecificationForProviderForFundingLine: jest.fn(() => Promise.resolve({
+        data: {}
+    })),
 }));
 
 jest.mock('react-router', () => ({
@@ -295,7 +298,9 @@ const renderPage = async () => {
     const {ViewFundingLineProfile} = require("../../../pages/FundingApprovals/ViewFundingLineProfile");
     const component = render(
         <MemoryRouter>
-            <ViewFundingLineProfile match={matchMock} location={location} history={history} />
+            <QueryClientProvider client={new QueryClient()}>
+                <ViewFundingLineProfile match={matchMock} location={location} history={history} />
+            </QueryClientProvider>
         </MemoryRouter>
     );
     await waitFor(() => expect(screen.queryByText(/loading/i)).not.toBeInTheDocument());

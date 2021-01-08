@@ -13,7 +13,7 @@ import {PublishStatus} from "../../../types/PublishStatusModel";
 import * as calcHook from "../../../hooks/Calculations/useCalculation";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {CalculationVersionHistorySummary} from "../../../types/Calculations/CalculationVersionHistorySummary";
-import {QueryCache, ReactQueryCacheProvider} from "react-query";
+import {QueryClient, QueryClientProvider} from "react-query";
 import {CalculationDataType} from "../../../types/Calculations/CalculationCompilePreviewResponse";
 
 const history = createBrowserHistory();
@@ -23,9 +23,9 @@ function renderPage() {
     const {CalculationVersionHistory} = require("../../../pages/Calculations/CalculationVersionHistory");
     return render(
         <MemoryRouter>
-            <ReactQueryCacheProvider queryCache={new QueryCache()}>
+            <QueryClientProvider client={new QueryClient()}>
             <CalculationVersionHistory match={mockRoute} history={history} location={location}/>
-            </ReactQueryCacheProvider>
+            </QueryClientProvider>
         </MemoryRouter>);
 }
 

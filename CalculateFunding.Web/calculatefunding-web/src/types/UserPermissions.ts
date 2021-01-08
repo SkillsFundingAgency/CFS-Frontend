@@ -24,4 +24,7 @@
     canEditTemplates: boolean;
     canDeleteTemplates: boolean;
     canApproveTemplates: boolean;
+    canEditProfilePattern: boolean;
+    canRefreshPublishedQa: boolean;
+    canUploadDataSourceFiles: boolean;
 }
