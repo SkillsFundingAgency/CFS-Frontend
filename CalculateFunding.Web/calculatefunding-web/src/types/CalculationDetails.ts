@@ -5,22 +5,22 @@ import {CalculationType} from "./CalculationSearchResponse";
 import { CalculationDataType } from "./Calculations/CalculationCompilePreviewResponse";
 
 export interface CalculationDetails {
-    id: string;
-    name: string;
-    specificationId: string;
-    fundingStreamId: string;
-    sourceCode: string;
+    author: Author | null;
     calculationType: CalculationType;
-    sourceCodeName: string;
+    dataType: CalculationDataType;
+    description?: string | undefined;
+    fundingStreamId: string;
+    id: string;
+    lastUpdated: Date;
+    name: string;
     namespace: string;
+    publishStatus: PublishStatus;
+    sourceCode: string;
+    sourceCodeName: string;
+    specificationId: string;
     wasTemplateCalculation: boolean;
     valueType: ValueType;
-    dataType: CalculationDataType;
-    lastUpdated: Date;
-    author: Author | null;
     version?: number | undefined;
-    publishStatus: PublishStatus;
-    description?: string | undefined;
 }
 
 export interface CalculationSummary {

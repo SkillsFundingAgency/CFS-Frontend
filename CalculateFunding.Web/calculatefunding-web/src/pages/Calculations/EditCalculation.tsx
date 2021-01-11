@@ -2,7 +2,7 @@
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
 import {UpdateCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
-import {updateCalculationService, updateCalculationStatusService,} from "../../services/calculationService";
+import {UpdateCalculationRequest, updateCalculationService, updateCalculationStatusService,} from "../../services/calculationService";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -10,7 +10,7 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
 import {DateFormatter} from "../../components/DateFormatter";
@@ -24,6 +24,10 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
 import {ValueType} from "../../types/ValueType";
 import {CalculationType} from "../../types/CalculationSearchResponse";
+import {ConfirmationPanel} from "../../components/ConfirmationPanel";
+import {QueryClient, useMutation} from "react-query";
+import {AxiosError} from "axios";
+import {CalculationDetails} from "../../types/CalculationDetails";
 
 export interface EditorProps {
     excludeMonacoEditor?: boolean
@@ -37,22 +41,34 @@ export interface EditCalculationRouteProps {
 export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProps<EditCalculationRouteProps> & EditorProps) {
     const calculationId = match.params.calculationId;
     const [specificationId, setSpecificationId] = useState<string>("");
-    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const [calculation, setCalculation] = useState<CalculationDetails | undefined>();
+    const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
     const {canEditCalculation, canApproveCalculation, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.EditCalculations, SpecificationPermissions.ApproveCalculations]);
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {calculation, isLoadingCalculation} =
-        useCalculation(calculationId, err => addErrorMessage(err.message, "Error while loading calculation"));
+    const queryClient = new QueryClient();
+    const updateCalculation =
+        useMutation((request: UpdateCalculationRequest) =>
+                updateCalculationService(request),
+            {
+                onError: err => addError(err as AxiosError, "Error while trying to update calculation"),
+                onSuccess: async response => {
+                    const calc = await response.data;
+                    setCalculation(calc);
+                    queryClient.setQueryData(`calculation-${calc.id}`, calc);
+                }
+            });
+    const {} = useCalculation(calculationId, 
+                err => addErrorMessage(err.message, "Error while loading calculation"),
+            data => setCalculation(data));
     const {circularReferenceErrors, isLoadingCircularDependencies} =
         useCalculationCircularDependencies(specificationId, err => addErrorMessage(err.message, "Error while checking for circular reference errors"));
-    const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [calculationStatus, setCalculationStatus] = useState<PublishStatus | undefined>();
     const [isApproving, setIsApproving] = useState(false);
     const [calculationState, setCalculationState] = useState<CalculationSourceCodeState | undefined>();
-    const [calculationType, setCalculationType] = useState<ValueType | undefined>();
-    const history = useHistory();
-    document.title = `Edit ${calculation?.calculationType} Calculation - Calculate Funding`;
+    const [calculationPublishStatus, setCalculationPublishStatus] = useState<PublishStatus | undefined>();
+    const [calculationValueType, setCalculationValueType] = useState<ValueType | undefined>();
+    document.title = `Edit ${calculation ? calculation.calculationType : ""} Calculation - Calculate Funding`;
 
     const onCalculationChange = async (state: CalculationSourceCodeState) => {
         setCalculationState(state);
@@ -69,28 +85,16 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
             return;
         }
 
-        setIsSaving(true);
+        clearErrorMessages();
 
-        const updateAdditionalCalculationViewModel: UpdateCalculationViewModel = {
+        const updateCalculationViewModel: UpdateCalculationViewModel = {
             calculationName: calculation.name,
-            valueType: calculationType ?? calculation.valueType,
+            valueType: calculationValueType ?? calculation.valueType,
             sourceCode: calculationState.sourceCode,
             dataType: calculation.dataType
         };
 
-        updateCalculationService(updateAdditionalCalculationViewModel, specificationId, calculationId)
-            .then((result) => {
-                if (result.status === 200) {
-                    history.go(0);
-                } else {
-                    addErrorMessage(result.data, "Failed to save calculation");
-                    setIsSaving(false);
-                }
-            })
-            .catch((err) => {
-                addErrorMessage(err, "Failed to save calculation");
-                setIsSaving(false);
-            });
+        await updateCalculation.mutate({updateCalculationViewModel, specificationId, calculationId});
     }
 
     const onApproveCalculation = async () => {
@@ -101,7 +105,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
             if (canApproveCalculation) {
                 const response = await updateCalculationStatusService(PublishStatus.Approved, specificationId, calculationId);
                 if (response.status === 200) {
-                    setCalculationStatus((response.data as PublishStatusModel).publishStatus);
+                    setCalculationPublishStatus((response.data as PublishStatusModel).publishStatus);
                 } else {
                     addErrorMessage(response.data, "Calculation approval was rejected");
                 }
@@ -115,22 +119,19 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         }
     }
 
-    const initCalculationData = () => {
-        if (!calculation || specificationId.length > 0) {
-            return;
+    useEffect(() => {
+        if (calculation) {
+            setSpecificationId(calculation.specificationId);
+            setCalculationPublishStatus(calculation.publishStatus);
+            setCalculationValueType(calculation.valueType);
         }
-        setSpecificationId(calculation.specificationId);
-        setCalculationStatus(calculation.publishStatus);
-        setCalculationType(calculation.valueType)
-    }
+    }, [calculation])
 
     if (circularReferenceErrors && circularReferenceErrors.length > 0) {
         window.scrollTo(0, 0);
     }
 
-    initCalculationData();
-    
-    useConfirmLeavePage(!isSaving && calculationState !== undefined && calculationState.isDirty);
+    useConfirmLeavePage(!updateCalculation.isLoading && calculationState !== undefined && calculationState.isDirty);
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -143,22 +144,24 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 }
                 <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`}/>
             </Breadcrumbs>
-            
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingCalculation || isLoadingSpecification}/>
 
-            {(isApproving || isSaving) && calculation &&
-            <LoadingStatus title={isSaving ? `Saving ${calculation.calculationType} calculation` : `Approving ${calculation.calculationType} calculation`} 
-                           subTitle="Please wait whilst the calculation is updated" />
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={!calculation || !specification}/>
+
+            {(isApproving || updateCalculation.isLoading) && calculation &&
+            <LoadingStatus title={updateCalculation.isLoading ? `Saving ${calculation.calculationType} calculation` : `Approving ${calculation.calculationType} calculation`}
+                           subTitle="Please wait whilst the calculation is updated"/>
             }
-            
-            <MultipleErrorSummary errors={errors}/>
 
-            <fieldset className="govuk-fieldset" hidden={isSaving || isApproving}>
+            <MultipleErrorSummary errors={errors}/>
+            <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"}
+                               hidden={!updateCalculation.isSuccess || isApproving}/>
+
+            <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>
 
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <span className="govuk-caption-l">Calculation name</span>
                     <h2 id="calculation-name-title" className={"govuk-heading-l"}>
-                        {!isLoadingCalculation && calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
+                        {calculation ? calculation.name : <LoadingFieldStatus title="Loading..."/>}
                     </h2>
                 </legend>
 
@@ -175,7 +178,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                                 </dt>
                                 <dd className="govuk-summary-list__value">
                                     <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2 calc-status">
-                                        {!isLoadingCalculation && calculationStatus ? calculationStatus : <LoadingFieldStatus title="Loading..."/>}
+                                        {calculationPublishStatus ? calculationPublishStatus : <LoadingFieldStatus title="Loading..."/>}
                                     </strong>
                                 </dd>
                             </div>
@@ -185,10 +188,10 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                                     Value type
                                 </dt>
                                 <dd className="govuk-summary-list__value">
-                                    {!isLoadingCalculation && calculation ?
+                                    {calculation ?
                                         <>
-                                            <select className="govuk-select" onChange={(e) => setCalculationType(e.target.value as ValueType)}
-                                            hidden={calculation.calculationType === CalculationType.Template} value={calculationType}>
+                                            <select className="govuk-select" onChange={(e) => setCalculationValueType(e.target.value as ValueType)}
+                                                    hidden={calculation.calculationType === CalculationType.Template} value={calculationValueType}>
                                                 <option value={ValueType.Percentage}>Percentage</option>
                                                 <option value={ValueType.Currency}>Currency</option>
                                                 <option value={ValueType.Number}>Number</option>
@@ -203,12 +206,12 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 </div>
 
                 {isLoadingCircularDependencies &&
-                <LoadingFieldStatus title="Checking for circular reference errors" />
+                <LoadingFieldStatus title="Checking for circular reference errors"/>
                 }
                 {!isLoadingCircularDependencies && circularReferenceErrors &&
                 <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3}/>
                 }
-                
+
                 {calculation && specification &&
                 <CalculationSourceCode
                     excludeMonacoEditor={excludeMonacoEditor === true}
@@ -241,13 +244,13 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     <div className="govuk-grid-column-two-thirds">
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onSaveCalculation}
-                                disabled={!calculationState || !calculationState.calculationBuild.hasCodeBuiltSuccessfully || isSaving || !canEditCalculation}>
+                                disabled={!calculationState || !calculationState.calculationBuild.hasCodeBuiltSuccessfully || updateCalculation.isLoading || !canEditCalculation}>
                             Save and continue
                         </button>
 
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onApproveCalculation}
-                                disabled={(calculationState && calculationState.isDirty) || !calculation || calculationStatus === PublishStatus.Approved || !canApproveCalculation}>
+                                disabled={(calculationState && calculationState.isDirty) || !calculation || calculationPublishStatus === PublishStatus.Approved || !canApproveCalculation}>
                             Approve
                         </button>
 

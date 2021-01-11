@@ -3,7 +3,7 @@ import {EditCalculationRouteProps} from "../../../pages/Calculations/EditCalcula
 import {createLocation, createMemoryHistory} from 'history';
 import {match} from 'react-router';
 import {MemoryRouter} from 'react-router-dom';
-import {act, cleanup, render, screen, waitFor, within} from '@testing-library/react';
+import {render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
@@ -24,23 +24,35 @@ import {
 } from "../../../types/Calculations/CalculationCompilePreviewResponse";
 import {CalculationDetails} from "../../../types/CalculationDetails";
 import {CalculationType} from "../../../types/CalculationSearchResponse";
-import {Reference} from "../../../types/Reference";
+import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
+import {getCalculationByIdService} from "../../../services/calculationService";
 
 const history = createMemoryHistory();
+
 export function EditCalculationTestData() {
-    const renderEditCalculation = async() => {
+    const renderEditCalculation = async () => {
         const {EditCalculation} = require("../../../pages/Calculations/EditCalculation");
         const component = render(
             <MemoryRouter>
-                <EditCalculation
-                    excludeMonacoEditor={true}
-                    history={history}
-                    location={location}
-                    match={matchMock}/>
+                <QueryClientProviderTestWrapper>
+                    <EditCalculation
+                        excludeMonacoEditor={true}
+                        history={history}
+                        location={location}
+                        match={matchMock}/>
+                </QueryClientProviderTestWrapper>
             </MemoryRouter>);
-        
+
+        // await waitForElementToBeRemoved(screen.queryAllByText(/Loading.../))
+        /*await waitFor(() => {
+            expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
+            expect(screen.queryAllByText(/Loading.../)).toHaveLength(0);
+        });*/
+        /*await waitFor(() => {
+            expect(screen.queryAllByText(/Loading.../)).toHaveLength(0);
+        });*/
         await waitFor(() => {
-            expect(screen.queryByText(/Loading.../)).not.toBeInTheDocument();
+            expect(screen.queryAllByText(/Loading/)).toHaveLength(0);
         });
 
         return component;
@@ -54,7 +66,7 @@ export function EditCalculationTestData() {
         id: "FP123",
         name: "2019-20"
     };
-    const testSpec: SpecificationSummary = {
+    const mockSpecData: SpecificationSummary = {
         name: "Wizard Training",
         approvalStatus: "",
         description: "",
@@ -67,14 +79,14 @@ export function EditCalculationTestData() {
         templateIds: {}
     };
     const specResult: SpecificationSummaryQueryResult = {
-        specification: testSpec,
+        specification: mockSpecData,
         isLoadingSpecification: false,
         errorCheckingForSpecification: null,
         haveErrorCheckingForSpecification: false,
         isFetchingSpecification: false,
         isSpecificationFetched: true
     };
-    const testCalc: CalculationDetails = {
+    const mockCalcData: CalculationDetails = {
         author: {id: "testUserId", name: "Mr Test"},
         calculationType: CalculationType.Template,
         description: undefined,
@@ -86,14 +98,10 @@ export function EditCalculationTestData() {
         publishStatus: PublishStatus.Draft,
         sourceCode: "return 42",
         sourceCodeName: "source code 1",
-        specificationId: testSpec.id,
+        specificationId: mockSpecData.id,
         dataType: CalculationDataType.Decimal,
         valueType: ValueType.Currency,
         wasTemplateCalculation: false
-    }
-    const calcResult: CalculationQueryResult = {
-        calculation: testCalc,
-        isLoadingCalculation: false
     }
 
     const matchMock: match<EditCalculationRouteProps> = {
@@ -101,17 +109,17 @@ export function EditCalculationTestData() {
         path: "",
         url: "",
         params: {
-            calculationId: testCalc.id,
+            calculationId: mockCalcData.id,
         }
     };
     const withCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
         circularReferenceErrors: [{
             node: {
-                calculationid: testCalc.id,
-                calculationName: testCalc.name,
-                calculationType: testCalc.calculationType,
+                calculationid: mockCalcData.id,
+                calculationName: mockCalcData.name,
+                calculationType: mockCalcData.calculationType,
                 fundingStream: fundingStream.id,
-                specificationId: testSpec.id
+                specificationId: mockSpecData.id
             },
             relationships: []
         }],
@@ -184,7 +192,7 @@ export function EditCalculationTestData() {
         }],
         compilerMessages: [],
     }
-    const mockSuccessfulPreviewProviderCalculation: PreviewProviderCalculationResponseModel = {
+    const mockSuccessfulPreviewProviderCalculationResult: PreviewProviderCalculationResponseModel = {
         calculationResult: {
             calculation: {
                 id: "123",
@@ -199,28 +207,44 @@ export function EditCalculationTestData() {
         },
         providerName: "test provider name",
     }
-    const mockSuccessfulCalculation: CalculationDetails = {
+    const mockSuccessfulCalcData: CalculationDetails = {
         id: "",
         author: null,
         fundingStreamId: "",
         lastUpdated: new Date(),
-        name: "",
+        name: "Test 890234",
         namespace: "",
-        sourceCode: "",
+        sourceCode: "return 0",
         publishStatus: PublishStatus.Approved,
         sourceCodeName: "",
-        specificationId: "",
+        specificationId: mockSpecData.id,
         valueType: ValueType.Boolean,
         dataType: CalculationDataType.Boolean,
         wasTemplateCalculation: false,
         calculationType: CalculationType.Template
     }
+    const mockSavedCalcData: CalculationDetails = {
+        id: "",
+        author: null,
+        fundingStreamId: "",
+        lastUpdated: new Date(),
+        name: "Test 543672357",
+        namespace: "",
+        sourceCode: "return 1010101",
+        publishStatus: PublishStatus.Draft,
+        sourceCodeName: "",
+        specificationId: mockSpecData.id,
+        valueType: ValueType.Number,
+        dataType: CalculationDataType.Decimal,
+        wasTemplateCalculation: false,
+        calculationType: CalculationType.Template
+    }
     const mockSuccessfulBuildResponse: CalculationCompilePreviewResponse = {
         compilerOutput: mockSuccessfulCompilerOutput,
-        previewProviderCalculation: mockSuccessfulPreviewProviderCalculation,
-        calculation: mockSuccessfulCalculation
+        previewProviderCalculation: mockSuccessfulPreviewProviderCalculationResult,
+        calculation: mockSuccessfulCalcData
     };
-    const mockSuccessfulBuildResponseWithNoProvider: CalculationCompilePreviewResponse = {
+    const mockSuccessfulBuildResponseWithNoProviderResponse: CalculationCompilePreviewResponse = {
         compilerOutput: mockSuccessfulCompilerOutput,
         previewProviderCalculation: {
             calculationResult: {
@@ -237,7 +261,7 @@ export function EditCalculationTestData() {
             },
             providerName: ""
         },
-        calculation: mockSuccessfulCalculation
+        calculation: mockSuccessfulCalcData
     };
     const specFullPermsResult: SpecificationPermissionsResult = {
         canApproveFunding: false,
@@ -281,8 +305,6 @@ export function EditCalculationTestData() {
         .mockImplementation(() => (specNoPermsResult));
     const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
         .mockImplementation(() => (specResult));
-    const mockCalculation = () => jest.spyOn(calcHook, 'useCalculation')
-        .mockImplementation(() => (calcResult));
     const mockCircularRefErrors = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
         .mockImplementation(() => (withCircularRefErrorsResult));
     const mockCircularRefErrorsLoading = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
@@ -302,6 +324,10 @@ export function EditCalculationTestData() {
                 getCalculationProvidersService: jest.fn(() => Promise.resolve({
                     data: {},
                     status: 200
+                })),
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalcData,
+                    status: 200
                 }))
             }
         });
@@ -316,8 +342,50 @@ export function EditCalculationTestData() {
                     data: mockSuccessfulBuildResponse,
                     status: 200
                 })),
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalcData,
+                    status: 200
+                })),
                 getCalculationProvidersService: jest.fn(() => Promise.resolve({
                     data: {},
+                    status: 200
+                }))
+            }
+        });
+    }
+    const mockCalculationOnly = () => {
+        jest.mock("../../../services/calculationService", () => {
+            const mockService = jest.requireActual("../../../services/calculationService");
+
+            return {
+                ...mockService,
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalcData,
+                    status: 200
+                })),
+            }
+        });
+    }
+    const mockSuccessfulBuildAndSave = () => {
+        jest.mock("../../../services/calculationService", () => {
+            const mockService = jest.requireActual("../../../services/calculationService");
+
+            return {
+                ...mockService,
+                compileCalculationPreviewService: jest.fn(() => Promise.resolve({
+                    data: mockSuccessfulBuildResponse,
+                    status: 200
+                })),
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalcData,
+                    status: 200
+                })),
+                getCalculationProvidersService: jest.fn(() => Promise.resolve({
+                    data: {},
+                    status: 200
+                })),
+                updateCalculationService: jest.fn(() => Promise.resolve({
+                    data: mockSavedCalcData,
                     status: 200
                 }))
             }
@@ -330,7 +398,11 @@ export function EditCalculationTestData() {
             return {
                 ...service,
                 compileCalculationPreviewService: jest.fn(() => Promise.resolve({
-                    data: mockSuccessfulBuildResponseWithNoProvider,
+                    data: mockSuccessfulBuildResponseWithNoProviderResponse,
+                    status: 200
+                })),
+                getCalculationByIdService: jest.fn(() => Promise.resolve({
+                    data: mockCalcData,
                     status: 200
                 })),
                 getCalculationProvidersService: jest.fn(() => Promise.resolve({
@@ -343,19 +415,21 @@ export function EditCalculationTestData() {
 
     return {
         matchMock,
-        testCalc,
-        testSpec,
+        calcData: mockCalcData,
+        specData: mockSpecData,
+        savedCalcData: mockSavedCalcData,
         renderEditCalculation,
+        mockCalculationOnly,
         mockSuccessfulBuild,
         mockFailedBuild,
         mockOutMonacoEditor,
         mockWithFullPermissions,
         mockSpecification,
-        mockCalculation,
         mockNoCircularRefErrors,
         mockCircularRefErrors,
         mockWithNoPermissions,
         mockCircularRefErrorsLoading,
-        mockSuccessfulBuildWithNoProvider
+        mockSuccessfulBuildWithNoProvider,
+        mockSuccessfulBuildAndSave
     }
 }

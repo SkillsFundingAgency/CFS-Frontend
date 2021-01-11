@@ -1,4 +1,4 @@
-import {act, fireEvent, screen, waitFor} from '@testing-library/react';
+import {fireEvent, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {EditCalculationTestData} from "./EditCalculationTestData";
@@ -10,7 +10,6 @@ describe("<EditCalculation> tests with successful build source code but no provi
         testData.mockOutMonacoEditor();
         testData.mockWithFullPermissions();
         testData.mockSpecification();
-        testData.mockCalculation();
         testData.mockNoCircularRefErrors();
         testData.mockSuccessfulBuildWithNoProvider();
 

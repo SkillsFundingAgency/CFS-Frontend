@@ -10,7 +10,6 @@ describe("<EditCalculation> tests with successful build source code", () => {
         testData.mockOutMonacoEditor();
         testData.mockWithFullPermissions();
         testData.mockSpecification();
-        testData.mockCalculation();
         testData.mockNoCircularRefErrors();
         testData.mockSuccessfulBuild();
 
@@ -20,6 +19,11 @@ describe("<EditCalculation> tests with successful build source code", () => {
 
     it("renders the UKPRN optional field", async () => {
         expect(screen.getByText("Optional: Enter a UKPRN to view calculation results for this provider")).toBeInTheDocument();
+    });
+    
+    it("renders the save button disabled before successful compilation", async () => {
+        const saveButton = screen.getByRole("button", {name: /Save and continue/});
+        expect(saveButton).toBeDisabled();
     });
 
     it("renders code compiled successfully message", async () => {
@@ -41,7 +45,7 @@ describe("<EditCalculation> tests with successful build source code", () => {
 
         act(() => userEvent.click(buildButton));
         
-        await waitFor(() => expect(screen.queryByText(/Build output/)).toBeInTheDocument());
+        expect(await screen.findByText(/Build output/)).toBeInTheDocument();
 
         expect(screen.queryByText(/No provider found. Try a different UKPRN./)).not.toBeInTheDocument();
     });

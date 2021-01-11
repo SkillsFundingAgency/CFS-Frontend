@@ -11,7 +11,6 @@ describe("<EditCalculation> tests ", () => {
             testData.mockOutMonacoEditor();
             testData.mockWithFullPermissions();
             testData.mockSpecification();
-            testData.mockCalculation();
             testData.mockNoCircularRefErrors();
             testData.mockFailedBuild();
 
@@ -33,6 +32,9 @@ describe("<EditCalculation> tests ", () => {
                 expect(await screen.findByText(/Typo error/)).toBeInTheDocument();
                 expect(screen.queryByText(/Build successful/)).not.toBeInTheDocument();
             });
+
+            const saveButton = screen.getByRole("button", {name: /Save and continue/});
+            expect(saveButton).toBeDisabled();
         });
     });
 
@@ -41,7 +43,6 @@ describe("<EditCalculation> tests ", () => {
             testData.mockOutMonacoEditor();
             testData.mockWithFullPermissions();
             testData.mockSpecification();
-            testData.mockCalculation();
             testData.mockNoCircularRefErrors();
 
             await testData.renderEditCalculation();
@@ -53,22 +54,22 @@ describe("<EditCalculation> tests ", () => {
         });
 
         it("renders the specification name", async () => {
-            expect(screen.getByText(testData.testSpec.name)).toBeInTheDocument();
+            expect(screen.getByText(testData.specData.name)).toBeInTheDocument();
         });
 
         it("renders the calculation name", async () => {
             expect(screen.getByText("Calculation name")).toBeInTheDocument();
-            expect(screen.getByText(testData.testCalc.name)).toBeInTheDocument();
+            expect(screen.getByText(testData.calcData.name)).toBeInTheDocument();
         });
 
         it("renders the calculation status", async () => {
             expect(screen.getByText("Calculation status")).toBeInTheDocument();
-            expect(screen.getByText(testData.testCalc.publishStatus)).toBeInTheDocument();
+            expect(screen.getByText(testData.calcData.publishStatus)).toBeInTheDocument();
         });
 
         it("renders the calculation type", async () => {
             expect(screen.getByText("Value type")).toBeInTheDocument();
-            expect(screen.getAllByText(testData.testCalc.valueType)[0]).toBeInTheDocument();
+            expect(screen.getAllByText(testData.calcData.valueType)[0]).toBeInTheDocument();
         });
 
         it("does not render CircularReferenceErrors when there are no circular reference errors", async () => {
@@ -90,7 +91,6 @@ describe("<EditCalculation> tests ", () => {
             testData.mockOutMonacoEditor();
             testData.mockWithNoPermissions();
             testData.mockSpecification();
-            testData.mockCalculation();
             testData.mockNoCircularRefErrors();
 
             await testData.renderEditCalculation();
@@ -103,7 +103,7 @@ describe("<EditCalculation> tests ", () => {
             expect(within(permissionsWarning).getByText(/Approve Calculations/)).toBeInTheDocument();
             expect(within(permissionsWarning).getByText(/Edit Calculations/)).toBeInTheDocument();
 
-            expect(screen.getByText(testData.testSpec.name)).toBeInTheDocument();
+            expect(screen.getByText(testData.specData.name)).toBeInTheDocument();
         });
 
         it('disables approve button given user is not allowed to approve calculation', async () => {
@@ -116,7 +116,6 @@ describe("<EditCalculation> tests ", () => {
         beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockSpecification();
-            testData.mockCalculation();
             testData.mockCircularRefErrorsLoading();
 
             await testData.renderEditCalculation();
@@ -124,12 +123,12 @@ describe("<EditCalculation> tests ", () => {
         afterEach(() => jest.clearAllMocks());
 
         it("renders the specification", async () => {
-            expect(screen.getByText(testData.testSpec.name)).toBeInTheDocument();
+            expect(screen.getByText(testData.specData.name)).toBeInTheDocument();
         });
 
         it("renders the calculation", async () => {
             expect(screen.getByText("Calculation name")).toBeInTheDocument();
-            expect(screen.getByText(testData.testCalc.publishStatus)).toBeInTheDocument();
+            expect(screen.getByText(testData.calcData.publishStatus)).toBeInTheDocument();
         });
 
         it("renders CircularReferenceErrors loading", async () => {
@@ -141,7 +140,6 @@ describe("<EditCalculation> tests ", () => {
         beforeEach(async () => {
             testData.mockOutMonacoEditor();
             testData.mockSpecification();
-            testData.mockCalculation();
             testData.mockCircularRefErrors();
 
             await testData.renderEditCalculation();
@@ -149,12 +147,12 @@ describe("<EditCalculation> tests ", () => {
         afterEach(() => jest.clearAllMocks());
 
         it("renders the specification", async () => {
-            expect(screen.getByText(testData.testSpec.name)).toBeInTheDocument();
+            expect(screen.getByText(testData.specData.name)).toBeInTheDocument();
         });
 
         it("renders the calculation", async () => {
             expect(screen.getByText("Calculation name")).toBeInTheDocument();
-            expect(screen.getByText(testData.testCalc.publishStatus)).toBeInTheDocument();
+            expect(screen.getByText(testData.calcData.publishStatus)).toBeInTheDocument();
         });
 
         it("renders CircularReferenceErrors when there are circular reference errors", async () => {
