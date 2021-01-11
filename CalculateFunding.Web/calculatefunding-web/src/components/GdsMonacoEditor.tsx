@@ -49,7 +49,7 @@ export function GdsMonacoEditor(props: {
     const element = useRef<HTMLElement>();
     const editor = useRef<monaco.editor.IStandaloneCodeEditor>();
     const specificationId = props.specificationId;
-
+    let provider: monaco.IDisposable | null = null;
     let isLoading = false;
 
     const variableAllowedNowPrefixes: Array<string> = [
@@ -133,7 +133,10 @@ export function GdsMonacoEditor(props: {
 
         loadIntellisenseContext();
 
-        return () => editor.current && editor.current.dispose()
+        return () => {
+            editor?.current?.dispose();
+            provider?.dispose();
+        }
     });
 
     useEffect(() => {
@@ -262,7 +265,7 @@ export function GdsMonacoEditor(props: {
                 const contextKeywords = keywords;
                 const contextOptions = options;
 
-                monaco.languages.registerCompletionItemProvider('vb', {
+                provider = monaco.languages.registerCompletionItemProvider('vb', {
                     triggerCharacters: [".", " ", "(", "="],
                     provideCompletionItems: function (model: monaco.editor.ITextModel, position: IPosition,) {
 
