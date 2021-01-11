@@ -504,7 +504,28 @@ namespace CalculateFunding.Frontend.Controllers
             
             return new InternalServerErrorResult(result.StatusCode.ToString());
         }
-        
+
+        [HttpGet]
+        [Route("api/datasets/download-validate-dataset-error-url/{schemaId}")]
+        public async Task<IActionResult> DownloadValidateDatasetValidationErrorSasUrl([FromRoute] string jobId)
+        {
+            Guard.IsNullOrWhiteSpace(jobId, nameof(jobId));
+
+            DatasetValidationErrorRequestModel requestModel = new DatasetValidationErrorRequestModel
+            {
+                JobId = jobId
+            };
+
+            ApiResponse<DatasetValidationErrorSasUrlResponseModel> apiResponse = await _datasetApiClient.GetValidateDatasetValidationErrorSasUrl(requestModel);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.ValidationErrorFileUrl))
+            {
+                return Redirect(apiResponse.Content.ValidationErrorFileUrl);
+            }
+
+            return new NotFoundResult();
+        }
+
         private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)
         {
             SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel
