@@ -6,23 +6,18 @@ export enum FundingStructureType{
     Calculation = "Calculation",
 }
 
-export interface PublishedProviderFundingStructure {
-    items : FundingStructureItem[];
-    PublishedProviderVersion: number;
-}
-
-export interface FundingStructureItem {
+export interface FundingStructureItemViewModel {
     level : number,
     name : string,
     fundingLineCode : string,
     calculationId : string,
+    templateId: number,
     type : FundingStructureType,
     value: string,
     calculationType: string,
     calculationPublishStatus?: PublishStatus | undefined,
-    parentName?: string,
     expanded?: boolean,
     customRef?: React.MutableRefObject<null>,
     lastUpdatedDate?: Date,
-    fundingStructureItems: FundingStructureItem[]
+    fundingStructureItems: FundingStructureItemViewModel[]
 }

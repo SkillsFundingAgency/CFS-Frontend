@@ -1,11 +1,11 @@
 import {
-    FundingStructureType, FundingStructureItem
+    FundingStructureType, FundingStructureItemViewModel
 } from "../../types/FundingStructureItem";
 
-export function getDistinctOrderedFundingLineCalculations(fundingLinesToFilter: FundingStructureItem[])
+export function getDistinctOrderedFundingLineCalculations(fundingLinesToFilter: FundingStructureItemViewModel[])
 {
     const calculationNames: string[] = [];
-    fundingLinesToFilter.map(function searchFundingLines(fundingStructureItem: FundingStructureItem) : any {
+    fundingLinesToFilter.map(function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) : any {
         if (fundingStructureItem.type === FundingStructureType.Calculation)
         {
             calculationNames.push(fundingStructureItem.name);
@@ -18,10 +18,10 @@ export function getDistinctOrderedFundingLineCalculations(fundingLinesToFilter: 
     return new Set(calculationNames.sort((a, b) => a.localeCompare(b)));
 }
 
-export function expandCalculationsByName(fundingLinesToFilter: FundingStructureItem[], keyword: string, customRef: React.MutableRefObject<null>, nullRef: React.MutableRefObject<null>)
+export function expandCalculationsByName(fundingLinesToFilter: FundingStructureItemViewModel[], keyword: string, customRef: React.MutableRefObject<null>, nullRef: React.MutableRefObject<null>)
 {
     fundingLinesToFilter.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
 
             fundingStructureItem.customRef = nullRef;
             fundingStructureItem.expanded = false;
@@ -33,7 +33,7 @@ export function expandCalculationsByName(fundingLinesToFilter: FundingStructureI
 
     let isRefAlreadyAssigned = false;
     fundingLinesToFilter.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
             if (fundingStructureItem.name.toLowerCase() === keyword.toLowerCase()
                 && fundingStructureItem.type === FundingStructureType.Calculation) {
                 fundingStructureItem.expanded = true;
@@ -53,11 +53,11 @@ export function expandCalculationsByName(fundingLinesToFilter: FundingStructureI
     );
 }
 
-export function setExpandStatusByFundingLineName(fundingLines: FundingStructureItem[], expanded: boolean, name: string)
+export function setExpandStatusByFundingLineName(fundingLines: FundingStructureItemViewModel[], expanded: boolean, name: string)
 {
-    const fundingLinesCopy: FundingStructureItem[] = fundingLines as FundingStructureItem[];
+    const fundingLinesCopy: FundingStructureItemViewModel[] = fundingLines as FundingStructureItemViewModel[];
     fundingLinesCopy.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
             if (fundingStructureItem.name === name) {
                 fundingStructureItem.expanded = expanded;
             }
@@ -68,10 +68,10 @@ export function setExpandStatusByFundingLineName(fundingLines: FundingStructureI
     return fundingLinesCopy;
 }
 
-export function checkIfShouldOpenAllSteps(fundingStructureItems: FundingStructureItem[]) {
+export function checkIfShouldOpenAllSteps(fundingStructureItems: FundingStructureItemViewModel[]) {
     let openAllSteps = true;
     fundingStructureItems.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
             if (!fundingStructureItem.expanded && fundingStructureItem.fundingStructureItems != null) {
                 openAllSteps = false;
                 return;
@@ -85,9 +85,9 @@ export function checkIfShouldOpenAllSteps(fundingStructureItems: FundingStructur
     return openAllSteps;
 }
 
-export function setInitialExpandedStatus(fundingStructureItems: FundingStructureItem[], expanded: boolean) {
+export function setInitialExpandedStatus(fundingStructureItems: FundingStructureItemViewModel[], expanded: boolean) {
     fundingStructureItems.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
             fundingStructureItem.expanded = expanded;
             if (fundingStructureItem.fundingStructureItems) {
                 fundingStructureItem.fundingStructureItems.map(searchFundingLines);
@@ -96,10 +96,10 @@ export function setInitialExpandedStatus(fundingStructureItems: FundingStructure
     );
 }
 
-export function updateFundingLineExpandStatus(fundingStructureItems: FundingStructureItem[], expandedStatus: boolean)
+export function updateFundingLineExpandStatus(fundingStructureItems: FundingStructureItemViewModel[], expandedStatus: boolean)
 {
     fundingStructureItems.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
             fundingStructureItem.expanded = expandedStatus;
             if (fundingStructureItem.fundingStructureItems) {
                 fundingStructureItem.fundingStructureItems.map(searchFundingLines);

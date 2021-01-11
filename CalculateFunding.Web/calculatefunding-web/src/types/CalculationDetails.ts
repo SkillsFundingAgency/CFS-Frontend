@@ -27,7 +27,9 @@ export interface CalculationSummary {
     calculationType: CalculationType,
     status: PublishStatus,
     version: number,
-    calculationValueType: CalculationValueType
+    calculationValueType: CalculationValueType,
+    id: string,
+    name: string
 }
 
 export enum CalculationValueType {

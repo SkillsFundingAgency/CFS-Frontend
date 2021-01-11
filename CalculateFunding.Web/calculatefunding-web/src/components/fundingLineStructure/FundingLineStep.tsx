@@ -1,14 +1,12 @@
 import * as React from "react";
-import {FundingStructureType, FundingStructureItem} from "../../types/FundingStructureItem";
+import {FundingStructureType, FundingStructureItemViewModel} from "../../types/FundingStructureItem";
 import {CollapsibleSteps} from "../CollapsibleSteps";
-import {PublishedProviderError} from "../../types/PublishedProviderError";
 
 export interface FundingLineStepProps {
     key: string,
     showResults: boolean,
     expanded: boolean,
-    fundingStructureItem: FundingStructureItem,
-    fundingLineErrors?: PublishedProviderError[] | undefined,
+    fundingStructureItem: FundingStructureItemViewModel,
     callback: any
 }
 
@@ -21,10 +19,16 @@ export function FundingLineStep(props: FundingLineStepProps) {
     }
 
     if (!fundingStructureItems || fundingStructureItems.length === 0) return null;
+    let fundingType = "";
 
     return <div>
         {
             fundingStructureItems.map((item, index) => {
+                let displayFundingType = false;
+                if (fundingType !== FundingStructureType[item.type]) {
+                    displayFundingType = true;
+                    fundingType = FundingStructureType[item.type];
+                }
                 let linkValue = "";
                 if (item.type === FundingStructureType.Calculation) {
                     linkValue = props.showResults ?
@@ -41,7 +45,7 @@ export function FundingLineStep(props: FundingLineStepProps) {
                         value={item.value != null ? item.value : ""}
                         description={item.name}
                         status={item.calculationPublishStatus}
-                        step={item.level.toString()}
+                        step={displayFundingType ? item.level.toString() : ""}
                         expanded={expanded || item.expanded === true}
                         link={linkValue}
                         hasChildren={item.fundingStructureItems != null && item.fundingStructureItems.length > 0}
@@ -54,7 +58,6 @@ export function FundingLineStep(props: FundingLineStepProps) {
                                     fundingStructureItem={item}
                                     expanded={expanded}
                                     showResults={props.showResults}
-                                    fundingLineErrors={props.fundingLineErrors}
                                     callback={collapsibleStepsChanged}/>
                         }
                     </CollapsibleSteps>

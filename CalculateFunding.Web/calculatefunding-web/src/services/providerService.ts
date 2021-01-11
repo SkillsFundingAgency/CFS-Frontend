@@ -3,6 +3,7 @@ import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearc
 import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
 import {PublishedProviderError} from "../types/PublishedProviderError";
+import {ProviderResultForSpecification} from "../types/Provider/ProviderResultForSpecification";
 
 const baseURL = "/api/provider";
 
@@ -55,6 +56,16 @@ export async function getProviderResultsService(providerId: string): Promise<Axi
 
 export async function getProviderSnapshotsForFundingStreamService(fundingStreamId:string) {
     return axios(`/api/providers/fundingStreams/${fundingStreamId}/snapshots`, {
+        method: 'GET',
+        headers: {
+            'Content-Type':'application/json'
+        }
+    })
+}
+
+export async function getFundingStructureResultsForProviderAndSpecification(specificationId: string, providerId: string)
+: Promise<AxiosResponse<ProviderResultForSpecification>> {
+    return axios(`/api/results/specifications/${specificationId}/providers/${providerId}/template-results`, {
         method: 'GET',
         headers: {
             'Content-Type':'application/json'

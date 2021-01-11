@@ -1,33 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
 import {getProviderResultsService} from "../../services/providerService";
 import {RouteComponentProps, useLocation} from "react-router";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {SpecificationInformation} from "../../types/Provider/SpecificationInformation";
-import {approveFundingLineStructureService, getSpecificationSummaryService} from "../../services/specificationService";
+import {getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Tabs} from "../../components/Tabs";
 import {DateFormatter} from "../../components/DateFormatter";
 import {searchForCalculationsByProviderService} from "../../services/calculationService";
 import {Link} from "react-router-dom";
 import Pagination from "../../components/Pagination";
-import {getFundingLineStructureByProviderService} from "../../services/fundingStructuresService";
-import {FundingStructureType, FundingStructureItem} from "../../types/FundingStructureItem";
-import {AutoComplete} from "../../components/AutoComplete";
-import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../../components/CollapsibleSteps";
-import {BackToTop} from "../../components/BackToTop";
 import {PublishStatus} from "../../types/PublishStatusModel";
-import {
-    checkIfShouldOpenAllSteps,
-    expandCalculationsByName,
-    getDistinctOrderedFundingLineCalculations, setExpandStatusByFundingLineName,
-    updateFundingLineExpandStatus
-} from "../../components/fundingLineStructure/FundingLineStructureHelper";
 import {NoData} from "../../components/NoData";
-import {FundingLineStepProviderResults} from "../../components/fundingLineStructure/FundingLineStepProviderResults";
 import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
 import {Footer} from "../../components/Footer";
 import * as QueryString from "query-string";
@@ -37,6 +24,8 @@ import {WarningText} from "../../components/WarningText";
 import {useProviderVersion} from "../../hooks/Providers/useProviderVersion";
 import {AxiosError} from "axios";
 import {useErrors} from "../../hooks/useErrors";
+import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -44,100 +33,42 @@ export interface ViewProviderResultsRouteProps {
 }
 
 export function ViewProviderResults({match}: RouteComponentProps<ViewProviderResultsRouteProps>) {
-    const [providerResults, setProviderResults] = useState<SpecificationInformation[]>([{
-        fundingPeriod: "",
-        fundingPeriodEnd: new Date(),
-        id: "",
-        lastEditDate: new Date(),
-        name: "",
-        fundingStreamIds: []
-    }]);
-    const [additionalCalculations, setAdditionalCalculations] = useState<AdditionalCalculationSearchResultViewModel>({
-        currentPage: 0,
-        endItemNumber: 0,
-        facets: [],
-        lastPage: 0,
-        pagerState: {
-            currentPage: 0,
-            lastPage: 0,
-            pages: [],
-            displayNumberOfPages: 0,
-            nextPage: 0,
-            previousPage: 0
-        },
-        results: [],
-        startItemNumber: 0,
-        totalCount: 0,
-        totalErrorResults: 0,
-        totalResults: 0
-    });
+    const [providerResults, setProviderResults] = useState<SpecificationInformation[]>();
+    const [additionalCalculations, setAdditionalCalculations] = useState<AdditionalCalculationSearchResultViewModel>();
     const [additionalCalculationsSearchTerm, setAdditionalCalculationsSearchTerm] = useState("");
-    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
-        approvalStatus: "",
-        description: "",
-        fundingPeriod: {
-            id: "",
-            name: ""
-        },
-        fundingStreams: [{
-            name: "",
-            id: ""
-        }],
-        id: "",
-        isSelectedForFunding: false,
-        name: "",
-        providerVersionId: "",
-        templateIds: {},
-        dataDefinitionRelationshipIds: [],
-    })
-
-    const [isLoading, setIsLoading] = useState({
-        fundingLineStructure: true,
-        additionalCalculations: true,
-        providerData: true,
-        providerResults: true,
-    });
+    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
+    const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState<boolean>(false);
+    const [isLoadingProviderData, setIsLoadingProviderData] = useState<boolean>(true);
     const [selectedSpecificationId, setSelectedSpecificationId] = useState<string>("");
     const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
-    const [fundingLines, setFundingLines] = useState<FundingStructureItem[]>([]);
-    const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
-    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<FundingStructureItem[]>([]);
-    const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
-    const fundingLineStepReactRef = useRef(null);
-    const nullReactRef = useRef(null);
-    const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
-    const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<PublishStatus>(PublishStatus.Draft);
-    const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const location = useLocation();
+    const {errors, addError, clearErrorMessages} = useErrors();
 
-    const {errors, addErrorMessage} = useErrors();
+    const providerId = match.params.providerId;
 
     const {providerVersion: providerDetails, isLoadingProviderVersion} = useProviderVersion(
-        match.params.providerId,
+        providerId,
         specificationSummary ? specificationSummary.providerVersionId : "",
-        (err: AxiosError) => addErrorMessage(err.message, "Error while loading provider"));
-    
-    useEffectOnce(() => {
-        const providerId = match.params.providerId;
+        (err: AxiosError) => addError(err.message, "Error while loading provider"));
+
+    useEffect(() => {
         const querystringParams = QueryString.parse(location.search);
 
-        getProviderResultsService(providerId)
-            .then((response) => {
+        const fetchData = async () => {
+            try {
+                const response = await getProviderResultsService(providerId);
                 const specificationInformation = response.data;
                 if (specificationInformation && specificationInformation.length > 0) {
-
                     const specificationIdQuerystring = querystringParams.specificationId as string;
-                    const selectedSpecification = specificationInformation
-                        .find((s) => 
-                            s.id === specificationIdQuerystring) ?? specificationInformation[0];
+                    const selectedSpecification = specificationInformation.find((s) =>
+                        s.id === specificationIdQuerystring) ?? specificationInformation[0];
 
                     let specificationId = selectedSpecification.id;
 
-                    if (querystringParams.specificationId != null) {
+                    if (querystringParams.specificationId) {
                         setSelectedSpecificationId(specificationIdQuerystring);
                         specificationId = specificationIdQuerystring;
-                    }
-                    else {
+                    } else {
                         if (specificationInformation.some((specInformation) =>
                             specInformation.fundingStreamIds != null)) {
                             let selectSpecificationByFundingStream = false;
@@ -153,164 +84,56 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                             });
 
                             if (!selectSpecificationByFundingStream) {
-                                getFundingStreamByIdService(match.params.fundingStreamId)
-                                    .then((fundingStreamResponse) => {
-                                        const fundingStream = fundingStreamResponse.data as FundingStream;
-                                        setDefaultFundingStreamName(fundingStream.name);
-                                    })
+                                const fundingStreamResponse = await getFundingStreamByIdService(match.params.fundingStreamId);
+                                const fundingStream = fundingStreamResponse.data as FundingStream;
+                                setDefaultFundingStreamName(fundingStream.name);
                             }
                         }
                     }
                     populateSpecification(specificationId);
-
                     setProviderResults(specificationInformation);
-                    setIsLoading(prevState => {
-                        return {
-                            ...prevState,
-                            providerResults: false
-                        }
-                    });
                 }
-            })
-            .catch((e) => {
-                setIsLoading(prevState => {
-                    return {
-                        ...prevState,
-                        providerDetails: false,
-                        providerResults: false,
-                        providerData: false,
-                        additionalCalculations: false,
-                        fundingLineStructure: false
-                    }
-                })
-            });
-    });
-
-    useEffect(() => {
-        if (!fundingLineRenderInternalState) {
-            return
+            } catch (err) {
+                addError(err);
+            } finally {
+                setIsLoadingProviderData(false);
+            }
         }
-        if (fundingLineStepReactRef !== null && fundingLineStepReactRef.current !== null) {
-            // @ts-ignore
-            fundingLineStepReactRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
-        }
-        setFundingLineRenderInternalState(false);
-    }, [fundingLineRenderInternalState]);
+        fetchData();
+    }, []);
 
     useEffect(() => {
-        if (!rerenderFundingLineSteps) {
-            return
-        }
-        setFundingLineRenderInternalState(true);
-        setRerenderFundingLineSteps(false);
-    }, [rerenderFundingLineSteps]);
-
-    useEffect(() => {
-        setFundingLineRenderInternalState(true);
-    }, [fundingLines]);
-
-    useEffect(() => {
+        if (!additionalCalculations) return;
         if (additionalCalculations.currentPage !== 0) {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    additionalCalculations: false
-                }
-            });
+            setIsLoadingAdditionalCalculations(false);
         }
-    }, [additionalCalculations.results]);
-
-    useEffect(() => {
-        if (fundingLines.length !== 0) {
-                setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
-                setFundingLinesOriginalData(fundingLines);
-        }
-    }, [fundingLines]);
-
-    useEffect(() => {
-        if (fundingLines.length !== 0) {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    fundingLineStructure: false
-                }
-            });
-        }
-    }, [fundingLines]);
+    }, [additionalCalculations]);
 
     function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
+        setIsLoadingAdditionalCalculations(true);
         searchForCalculationsByProviderService({
             specificationId: specificationId,
             status: status,
             pageNumber: pageNumber,
             searchTerm: searchTerm,
             calculationType: "Additional"
-        }, match.params.providerId)
+        }, providerId)
             .then((response) => {
-                if (response.status === 200) {
-                    setAdditionalCalculations(response.data);
-                    setIsLoading(prevState => {
-                        return {
-                            ...prevState,
-                            additionalCalculations: false
-                        }
-                    })
-                }
-            }).catch((e) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    additionalCalculations: false,
-                }
+                setAdditionalCalculations(response.data);
+            }).catch((err) => {
+                addError(err);
+            }).finally(() => {
+                setIsLoadingAdditionalCalculations(false);
             });
-        })
     }
 
     function movePage(pageNumber: number) {
+        if (!specificationSummary) return;
         populateAdditionalCalculations(specificationSummary.id, "", pageNumber, additionalCalculationsSearchTerm);
     }
 
-    function updateFundingLineState(specificationId: string) {
-        approveFundingLineStructureService(specificationId).then((response) => {
-            if (response.status === 200) {
-                setFundingLinePublishStatus(response.data as PublishStatus)
-            }
-        });
-    }
-
-    let fundingLineStatus = specificationSummary.approvalStatus as PublishStatus;
-    if (fundingLines != null)
-        fundingLineStatus = fundingLinePublishStatus;
-
-    function openCloseAllFundingLines(isOpen: boolean) {
-        setFundingLinesExpandedStatus(isOpen);
-        updateFundingLineExpandStatus(fundingLines, isOpen);
-    }
-
-    function searchFundingLines(calculationName: string) {
-        const fundingLinesCopy: FundingStructureItem[] = fundingLinesOriginalData as FundingStructureItem[];
-        expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
-        setFundingLines(fundingLinesCopy);
-        setRerenderFundingLineSteps(true);
-        if (checkIfShouldOpenAllSteps(fundingLinesCopy)) {
-            openCloseAllFundingLines(true);
-        }
-    }
-
-    function collapsibleStepsChanged(expanded: boolean, name: string) {
-        const fundingLinesCopy: FundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
-        setFundingLines(fundingLinesCopy);
-
-        const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
-        if (collapsibleStepsAllStepsStatus.openAllSteps){
-            openCloseAllFundingLines(true);
-        }
-        if (collapsibleStepsAllStepsStatus.closeAllSteps){
-            openCloseAllFundingLines(false);
-        }
-    }
-
     function searchAdditionalCalculations() {
+        if (!specificationSummary) return;
         populateAdditionalCalculations(specificationSummary.id, "", 1, additionalCalculationsSearchTerm);
     }
 
@@ -321,533 +144,435 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
 
     function populateSpecification(specificationId: string) {
         getSpecificationSummaryService(specificationId).then((response) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    fundingLineStructure: true
-                }
-            });
-            if (response.status === 200) {
-                const result = response.data as SpecificationSummary;
-                setSelectedSpecificationId(result.id);
-
-                setSpecificationSummary(response.data);
-
-                getFundingLineStructureByProviderService(result.id, result.fundingPeriod.id, result.fundingStreams[0].id, match.params.providerId).then((response) => {
-                    if (response.status === 200) {
-                        const result = response.data as FundingStructureItem[];
-                        setFundingLines(result);
-                    }
-                    setIsLoading(prevState => {
-                        return {
-                            ...prevState,
-                            fundingLineStructure: false
-                        }
-                    });
-                }).catch((e) => {
-                    setIsLoading(prevState => {
-                        return {
-                            ...prevState,
-                            fundingLineStructure: false
-                        }
-                    });
-                });
-
-                populateAdditionalCalculations(result.id, "", 1, additionalCalculationsSearchTerm);
-            }
+            const result = response.data as SpecificationSummary;
+            setSelectedSpecificationId(result.id);
+            setSpecificationSummary(response.data);
+            populateAdditionalCalculations(result.id, "", 1, additionalCalculationsSearchTerm);
         }).catch((e) => {
-            setIsLoading(prevState => {
-                return {
-                    ...prevState,
-                    fundingLineStructure: false,
-                    additionalCalculations: false,
-                    providerData: false
-                }
-            });
+            addError(e.message);
         });
     }
 
-    return <div>
-        <Header location={Section.Results}/>
-        <div className="govuk-width-container">
-            <div className="govuk-grid-row">
+    return (
+        <div>
+            <Header location={Section.Results} />
+            <div className="govuk-width-container">
+                <Breadcrumbs>
+                    <Breadcrumb name={"Calculate funding"} url={"/"} />
+                    <Breadcrumb name={"View results"} url={"/Results"} />
+                    <Breadcrumb name={"Select funding stream"} url={"/ViewResults/ViewProvidersFundingStreamSelection"} />
+                    <Breadcrumb name={"View provider results"} goBack={true} />
+                    <Breadcrumb name={providerDetails ? providerDetails.name : "Loading..."} />
+                </Breadcrumbs>
+
+                <MultipleErrorSummary errors={errors} />
+                <LoadingStatus title={"Loading provider details"} hidden={!isLoadingProviderVersion && !isLoadingProviderData} />
+
                 {providerDetails &&
-                <div className="govuk-grid-column-full">
-                    <Breadcrumbs>
-                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                        <Breadcrumb name={"View results"} url={"/Results"}/>
-                        <Breadcrumb name={"Select funding stream"} url={"/ViewResults/ViewProvidersFundingStreamSelection"}/>
-                        <Breadcrumb name={"View provider results"} goBack={true}/>
-                        <Breadcrumb name={providerDetails.name}/>
-                    </Breadcrumbs>
-                </div>
-                }
-            </div>
-            {isLoadingProviderVersion &&
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full">
-                    <LoadingStatus title={"Loading provider details"}/>
-                </div>
-            </div>
-            }
-            {!isLoadingProviderVersion && providerDetails &&
-            <div className="govuk-grid-row" hidden={isLoadingProviderVersion}>
-                <div className="govuk-grid-column-full">
-                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">{providerDetails.name}</h1>
-                    <span className="govuk-caption-m govuk-!-margin-bottom-4">UKPRN: <strong>{providerDetails.ukprn}</strong></span>
-                </div>
-            </div>
-            }
-            <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === "" || isLoadingProviderVersion} />
-            <NoData hidden={isLoading.providerResults || specificationSummary.id !== "" || isLoadingProviderVersion}/>
-            <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={specificationSummary.id === "" || isLoadingProviderVersion}>
-                <div className="govuk-grid-column-two-thirds">
-                    <div className="govuk-form-group">
-                        <h3 className="govuk-heading-m govuk-!-margin-bottom-1">Specification</h3>
-                        <span className="govuk-caption-m govuk-!-margin-bottom-2">Available specifications for all funding streams will be displayed here.</span>
-                        <select className="govuk-select" id="sort" name="sort" 
-                                onChange={setSelectedSpecification} 
-                                value={selectedSpecificationId !== "" ?  selectedSpecificationId : specificationSummary.id}>
-                            {providerResults.map(p =>
-                                <option key={p.id} value={p.id}>{p.name}
-                                </option>
-                            )}
-                        </select>
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-full">
+                            <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">{providerDetails.name}</h1>
+                            <span className="govuk-caption-m govuk-!-margin-bottom-4">UKPRN: <strong>{providerDetails.ukprn}</strong></span>
+                        </div>
                     </div>
-                    <p className="govuk-body">Funding stream:<span className="govuk-!-margin-left-2 govuk-!-font-weight-bold">{specificationSummary.fundingStreams[0].name}</span>
-                    </p>
-                    <p className="govuk-body">Funding period:<span className="govuk-!-margin-left-2 govuk-!-font-weight-bold">{specificationSummary.fundingPeriod.name}</span>
-                    </p>
+                }
+
+                <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === "" || isLoadingProviderVersion} />
+                <NoData hidden={specificationSummary && specificationSummary.id !== "" || true} />
+
+                <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={isLoadingProviderVersion}>
+                    {specificationSummary && providerResults && <div className="govuk-grid-column-two-thirds">
+                        <div className="govuk-form-group">
+                            <h3 className="govuk-heading-m govuk-!-margin-bottom-1">Specification</h3>
+                            <span className="govuk-caption-m govuk-!-margin-bottom-2">Available specifications for all funding streams will be displayed here.</span>
+                            <select className="govuk-select" id="sort" name="sort"
+                                onChange={setSelectedSpecification}
+                                value={selectedSpecificationId !== "" ? selectedSpecificationId : specificationSummary.id}>
+                                {providerResults.map(p =>
+                                    <option key={p.id} value={p.id}>{p.name}
+                                    </option>
+                                )}
+                            </select>
+                        </div>
+                        <p className="govuk-body">Funding stream:<span className="govuk-!-margin-left-2 govuk-!-font-weight-bold">{specificationSummary.fundingStreams[0].name}</span>
+                        </p>
+                        <p className="govuk-body">Funding period:<span className="govuk-!-margin-left-2 govuk-!-font-weight-bold">{specificationSummary.fundingPeriod.name}</span>
+                        </p>
+                    </div>}
                 </div>
-            </div>
-            <div className="govuk-grid-row" hidden={specificationSummary.id === "" || isLoadingProviderVersion}>
-                <div className="govuk-grid-column-full">
-                    <Tabs initialTab={"funding-line-structure"}>
-                        <ul className="govuk-tabs__list">
-                            <Tabs.Tab label="funding-line-structure">Funding line structure</Tabs.Tab>
-                            <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
-                            <Tabs.Tab label="provider-data">Provider data</Tabs.Tab>
-                        </ul>
-                        <Tabs.Panel label={"funding-line-structure"}>
-                            <section className="govuk-tabs__panel" id="fundingline-structure">
-                                <LoadingStatus title={"Loading funding line structure"}
-                                               hidden={!isLoading.fundingLineStructure}
-                                               description={"Please wait whilst funding line structure is loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure}>
-                                    <div className="govuk-grid-column-full">
-                                        <h2 className="govuk-heading-l">Funding line structure</h2>
-                                    </div>
-                                </div>
-                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure}>
-                                    <div className="govuk-grid-column-full">
-                                        <div className="govuk-form-group search-container">
-                                            <label className="govuk-label">
-                                                Search by calculation
-                                            </label>
-                                            <AutoComplete suggestions={fundingLineSearchSuggestions} callback={searchFundingLines}/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="govuk-grid-row" hidden={isLoading.fundingLineStructure}>
-                                    <div className="govuk-grid-column-full">
-                                        <div className="govuk-accordion__controls" hidden={isLoading.fundingLineStructure}>
-                                            <button type="button" className="govuk-accordion__open-all"
-                                                    aria-expanded="false"
-                                                    onClick={(e)=>openCloseAllFundingLines(true)}
-                                                    hidden={fundingLinesExpandedStatus}>Open all<span
-                                                className="govuk-visually-hidden"> sections</span></button>
-                                            <button type="button" className="govuk-accordion__open-all"
-                                                    aria-expanded="true"
-                                                    onClick={(e)=>openCloseAllFundingLines(false)}
-                                                    hidden={!fundingLinesExpandedStatus}>Close all<span
-                                                className="govuk-visually-hidden"> sections</span></button>
-                                        </div>
-                                        <ul className="collapsible-steps">
-                                            {
-                                                fundingLines.map((f, index) => {
-                                                    let linkValue = '';
-                                                    if (f.calculationId != null && f.calculationId !== '') {
-                                                        linkValue = `/app/viewcalculationresults/${f.calculationId}`;
-                                                    }
-                                                    return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown"><CollapsibleSteps
-                                                        customRef={f.customRef}
-                                                        key={"collapsible-steps" + index}
-                                                        uniqueKey={index.toString()}
-                                                        title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
-                                                        calculationType={f.calculationType != null ? f.calculationType : ""}
-                                                        value={f.value != null ? f.value : ""}
-                                                        description={f.name}
-                                                        status={f.calculationPublishStatus}
-                                                        step={f.level.toString()}
-                                                        expanded={fundingLinesExpandedStatus || f.expanded === true}
-                                                        link={linkValue}
-                                                        hasChildren={f.fundingStructureItems != null}
-                                                        callback={collapsibleStepsChanged}>
-                                                        <FundingLineStepProviderResults key={f.name.replace(" ", "") + index}
-                                                                                        expanded={fundingLinesExpandedStatus}
-                                                                                        fundingStructureItem={f}
-                                                                                        callback={collapsibleStepsChanged}/>
-                                                    </CollapsibleSteps>
-                                                    </li>
-                                                })}
-                                        </ul>
-                                        <BackToTop id={"fundingline-structure"} hidden={fundingLines == null ||
-                                        fundingLines.length === 0}/>
-                                    </div>
-                                </div>
-                            </section>
-                        </Tabs.Panel>
-                        <Tabs.Panel label="additional-calculations">
-                            <section className="govuk-tabs__panel" id="additional-calculations">
-                                <LoadingStatus title={"Loading additional calculations"}
-                                               hidden={!isLoading.additionalCalculations}
-                                               description={"Please wait whilst additional calculations are loading"}/>
-                                <div className="govuk-grid-row" hidden={isLoading.additionalCalculations}>
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <h2 className="govuk-heading-l">Additional calculations</h2>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third ">
-                                        <p className="govuk-body right-align"
-                                           hidden={additionalCalculations.totalResults === 0}>
-                                            Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
+                <div className="govuk-grid-row" hidden={isLoadingProviderVersion || isLoadingProviderData}>
+                    <div className="govuk-grid-column-full">
+                        <Tabs initialTab={"funding-line-structure"}>
+                            <ul className="govuk-tabs__list">
+                                <Tabs.Tab label="funding-line-structure">Funding line structure</Tabs.Tab>
+                                <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
+                                <Tabs.Tab label="provider-data">Provider data</Tabs.Tab>
+                            </ul>
+                            <Tabs.Panel label={"funding-line-structure"}>
+                                {specificationSummary &&
+                                    <FundingLineResults specificationId={specificationSummary.id}
+                                        fundingStreamId={specificationSummary.fundingStreams[0].id}
+                                        fundingPeriodId={specificationSummary.fundingPeriod.id}
+                                        status={specificationSummary.approvalStatus as PublishStatus}
+                                        providerId={providerId}
+                                        addError={addError}
+                                        clearErrorMessages={clearErrorMessages} />
+                                }
+                            </Tabs.Panel>
+                            <Tabs.Panel label="additional-calculations">
+                                {additionalCalculations &&
+                                    <section className="govuk-tabs__panel" id="additional-calculations">
+                                        <LoadingStatus title={"Loading additional calculations"}
+                                            hidden={!isLoadingAdditionalCalculations}
+                                            description={"Please wait whilst additional calculations are loading"} />
+                                        <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
+                                            <div className="govuk-grid-column-two-thirds">
+                                                <h2 className="govuk-heading-l">Additional calculations</h2>
+                                            </div>
+                                            <div className="govuk-grid-column-one-third ">
+                                                <p className="govuk-body right-align"
+                                                    hidden={additionalCalculations.totalResults === 0}>
+                                                    Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults}
                                             calculations
                                         </p>
-                                    </div>
-                                </div>
-                                <div className="govuk-grid-row">
-                                    <div className="govuk-grid-column-two-thirds">
-                                        <div className="govuk-form-group search-container">
-                                            <input className="govuk-input input-search" id="event-name"
-                                                   name="event-name" type="text" onChange={(e) => setAdditionalCalculationsSearchTerm(e.target.value)}/>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="govuk-grid-column-one-third">
-                                        <button className="govuk-button" type="submit" onClick={() => searchAdditionalCalculations()}>Search</button>
-                                    </div>
-                                </div>
-                                <table className="govuk-table">
-                                    <thead className="govuk-table__head">
-                                    <tr className="govuk-table__row">
-                                        <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                                        <th scope="col" className="govuk-table__header">Type</th>
-                                        <th scope="col" className="govuk-table__header">Value</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody className="govuk-table__body">
-                                    {additionalCalculations.results.map((ac, index) =>
-                                        <tr className="govuk-table__row" key={index}>
-                                            <td className="govuk-table__cell text-overflow">
-                                                <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
-                                            </td>
-                                            <td className="govuk-table__cell">{ac.valueType != null && ac.value != null ? ac.valueType : ""}</td>
-                                            <td className="govuk-table__cell">{ac.value}</td>
-                                        </tr>
-                                    )}
-                                    </tbody>
-                                </table>
+                                        <div className="govuk-grid-row">
+                                            <div className="govuk-grid-column-two-thirds">
+                                                <div className="govuk-form-group search-container">
+                                                    <input className="govuk-input input-search" id="event-name"
+                                                        name="event-name" type="text" onChange={(e) => setAdditionalCalculationsSearchTerm(e.target.value)} />
+                                                </div>
+                                            </div>
+                                            <div className="govuk-grid-column-one-third">
+                                                <button className="govuk-button" type="submit" onClick={() => searchAdditionalCalculations()}>Search</button>
+                                            </div>
+                                        </div>
+                                        <table className="govuk-table">
+                                            <thead className="govuk-table__head">
+                                                <tr className="govuk-table__row">
+                                                    <th scope="col" className="govuk-table__header">Additional calculation name</th>
+                                                    <th scope="col" className="govuk-table__header">Type</th>
+                                                    <th scope="col" className="govuk-table__header">Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="govuk-table__body">
+                                                {additionalCalculations.results.map((ac, index) =>
+                                                    <tr className="govuk-table__row" key={index}>
+                                                        <td className="govuk-table__cell text-overflow">
+                                                            <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
+                                                        </td>
+                                                        <td className="govuk-table__cell">{ac.valueType != null && ac.value != null ? ac.valueType : ""}</td>
+                                                        <td className="govuk-table__cell">{ac.value}</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
 
-                                <div className="govuk-warning-text" hidden={additionalCalculations.totalCount > 0}>
-                                    <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                    <strong className="govuk-warning-text__text">
-                                        <span className="govuk-warning-text__assistive">Warning</span>
+                                        <div className="govuk-warning-text" hidden={additionalCalculations.totalCount > 0}>
+                                            <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                            <strong className="govuk-warning-text__text">
+                                                <span className="govuk-warning-text__assistive">Warning</span>
                                         No additional calculations available.&nbsp;
-                                        <Link to={`/Specifications/CreateAdditionalCalculation/${specificationSummary.id}`}>
-                                            Create a calculation
+                                        <Link to={`/Specifications/CreateAdditionalCalculation/${specificationSummary?.id}`}>
+                                                    Create a calculation
                                         </Link>
-                                    </strong>
-                                </div>
-                                {additionalCalculations.totalResults > 0 &&
-                                <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                                    <div className="pagination__summary">
-                                        <p className="govuk-body right-align">
-                                            Showing
+                                            </strong>
+                                        </div>
+                                        {additionalCalculations.totalResults > 0 &&
+                                            <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
+                                                <div className="pagination__summary">
+                                                    <p className="govuk-body right-align">
+                                                        Showing
                                             {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
                                             of {additionalCalculations.totalResults} calculations
                                         </p>
-                                    </div>
-                                    <Pagination currentPage={additionalCalculations.currentPage}
-                                                lastPage={additionalCalculations.lastPage}
-                                                callback={movePage}/>
-                                </nav>}
-                            </section>
-                        </Tabs.Panel>
-                        <Tabs.Panel label={"provider-data"}>
-                            {providerDetails &&
-                            <section className="govuk-tabs__panel" id="provider-data">
-                                <h2 className="govuk-heading-l">Provider data</h2>
-                                <div className="govuk-warning-text">
-                                    <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                    <strong className="govuk-warning-text__text">
-                                        <span className="govuk-warning-text__assistive">Warning</span>
-                                        You are using {providerDetails.name} from the master version.
-                                    </strong>
-                                </div>
-                                <h4 className="govuk-heading-m">Establishment details</h4>
-                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Name
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.name}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Number
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.establishmentNumber}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            UKPRN
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.ukprn}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            UPIN
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.upin}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            URN
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.urn}
-                                        </dd>
-                                    </div>
-                                </dl>
-                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
-                                <h4 className="govuk-heading-m">Provider details</h4>
-                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Type
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.providerType}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Sub type
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.providerSubType}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Phase of education
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.phaseOfEducation}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Provider profile type
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.providerType}
-                                        </dd>
-                                    </div>
-                                </dl>
-                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
-                                <h4 className="govuk-heading-m">Location details</h4>
-                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Local authority
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.authority}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Local authority code
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.laCode}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Town
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.town}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Postcode
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.postcode}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Region
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.rscRegionName}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Region code
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.rscRegionCode}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Local government group type
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.localGovernmentGroupTypeName}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Local government group type code
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.localGovernmentGroupTypeCode}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Country
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.countryName}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Country code
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.localGovernmentGroupTypeCode}
-                                        </dd>
-                                    </div>
-                                </dl>
-                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
-                                <h4 className="govuk-heading-m">Status details</h4>
-                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Status
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.status}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Date opened
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {(providerDetails !== undefined) ?
-                                                <DateFormatter date={providerDetails.dateOpened} utc={false}/> : "Unknown"}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Date closed
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {(providerDetails !== undefined) ?
-                                                <DateFormatter date={providerDetails.dateClosed} utc={false}/> : "Unknown"}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Reason establishment opened
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.reasonEstablishmentOpened}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Reason establishment closed
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.reasonEstablishmentClosed}
-                                        </dd>
-                                    </div>
-                                </dl>
-                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
-                                <h4 className="govuk-heading-m">Trust details</h4>
-                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Status
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.trustStatus}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Name
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.trustName}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Code
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.trustCode}
-                                        </dd>
-                                    </div>
-                                </dl>
-                                <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
-                                <h4 className="govuk-heading-m">Payment organisation details</h4>
-                                <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Name
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.paymentOrganisationName}
-                                        </dd>
-                                    </div>
-                                    <div className="govuk-summary-list__row">
-                                        <dt className="govuk-summary-list__key">
-                                            Identifier
-                                        </dt>
-                                        <dd className="govuk-summary-list__value">
-                                            {providerDetails.paymentOrganisationIdentifier}
-                                        </dd>
-                                    </div>
-                                </dl>
-                            </section>
-                            }
-                        </Tabs.Panel>
-                    </Tabs>
+                                                </div>
+                                                <Pagination currentPage={additionalCalculations.currentPage}
+                                                    lastPage={additionalCalculations.lastPage}
+                                                    callback={movePage} />
+                                            </nav>}
+                                    </section>
+                                }
+                            </Tabs.Panel>
+                            <Tabs.Panel label={"provider-data"}>
+                                {providerDetails &&
+                                    <section className="govuk-tabs__panel" id="provider-data">
+                                        <h2 className="govuk-heading-l">Provider data</h2>
+                                        <div className="govuk-warning-text">
+                                            <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                            <strong className="govuk-warning-text__text">
+                                                <span className="govuk-warning-text__assistive">Warning</span>
+                                                You are using {providerDetails.name} from the master version.
+                                            </strong>
+                                        </div>
+                                        <h4 className="govuk-heading-m">Establishment details</h4>
+                                        <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Name
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.name}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Number
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.establishmentNumber}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    UKPRN
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.ukprn}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    UPIN
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.upin}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    URN
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.urn}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                        <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                                        <h4 className="govuk-heading-m">Provider details</h4>
+                                        <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Type
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.providerType}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Sub type
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.providerSubType}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Phase of education
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.phaseOfEducation}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Provider profile type
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.providerType}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                        <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                                        <h4 className="govuk-heading-m">Location details</h4>
+                                        <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Local authority
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.authority}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Local authority code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.laCode}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Town
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.town}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Postcode
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.postcode}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Region
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.rscRegionName}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Region code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.rscRegionCode}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Local government group type
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.localGovernmentGroupTypeName}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Local government group type code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.localGovernmentGroupTypeCode}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Country
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.countryName}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Country code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.localGovernmentGroupTypeCode}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                        <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                                        <h4 className="govuk-heading-m">Status details</h4>
+                                        <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Status
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.status}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Date opened
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {(providerDetails !== undefined) ?
+                                                        <DateFormatter date={providerDetails.dateOpened} utc={false} /> : "Unknown"}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Date closed
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {(providerDetails !== undefined) ?
+                                                        <DateFormatter date={providerDetails.dateClosed} utc={false} /> : "Unknown"}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Reason establishment opened
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.reasonEstablishmentOpened}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Reason establishment closed
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.reasonEstablishmentClosed}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                        <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                                        <h4 className="govuk-heading-m">Trust details</h4>
+                                        <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Status
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.trustStatus}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Name
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.trustName}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.trustCode}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                        <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+                                        <h4 className="govuk-heading-m">Payment organisation details</h4>
+                                        <dl className="govuk-summary-list govuk-!-margin-bottom-6 govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Name
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.paymentOrganisationName}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Identifier
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.paymentOrganisationIdentifier}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </section>
+                                }
+                            </Tabs.Panel>
+                        </Tabs>
+                    </div>
                 </div>
             </div>
+            &nbsp;
+            <Footer />
         </div>
-        &nbsp;
-        <Footer/>
-    </div>
+    );
 }

@@ -320,7 +320,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 addError={addError}
                                 clearErrorMessages={clearErrorMessages}
                                 setStatusToApproved={setApprovalStatusToApproved}
-                                refreshFundingLines={approveAllCalculationsJob?.isSuccessful}/>
+                                refreshFundingLines={approveAllCalculationsJob?.isSuccessful}
+                                showApproveButton={true} />
                         </Tabs.Panel>
                         <Tabs.Panel label="additional-calculations">
                             <AdditionalCalculations specificationId={specificationId}

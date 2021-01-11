@@ -2,7 +2,7 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {DateFormatter} from "./DateFormatter";
-import {FundingStructureItem} from "../types/FundingStructureItem";
+import {FundingStructureItemViewModel} from "../types/FundingStructureItem";
 import {PublishStatus} from "../types/PublishStatusModel";
 import {PublishedProviderError} from "../types/PublishedProviderError";
 
@@ -85,13 +85,13 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                         <span className="collapsible-step-header-value-container">
                             {props.value != null && props.value !== "" ?
                                 <span>
-                                        <span className="collapsible-step-header-value-type">
-                                            {props.calculationType}
-                                        </span>
-                                        <span className="collapsible-step-header-value">
-                                            {props.value}
-                                        </span>
+                                    <span className="collapsible-step-header-value-type">
+                                        {props.calculationType ? props.calculationType.replace(/([A-Z])/g, ' $1').trim() : ""}
                                     </span>
+                                    <span className="collapsible-step-header-value">
+                                        {props.value}
+                                    </span>
+                                </span>
                                 : null
                             }
                         </span>
@@ -111,13 +111,13 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
     );
 }
 
-export function setCollapsibleStepsAllStepsStatus(fundingLines: FundingStructureItem[]) {
+export function setCollapsibleStepsAllStepsStatus(fundingLines: FundingStructureItemViewModel[]) {
     const collapsibleStepsAllStepsStatus: ICollapsibleStepsAllStepsStatus = {
         openAllSteps: true,
         closeAllSteps: true
     }
     fundingLines.map(
-        function searchFundingLines(fundingStructureItem: FundingStructureItem) {
+        function searchFundingLines(fundingStructureItem: FundingStructureItemViewModel) {
             if (!fundingStructureItem.expanded && fundingStructureItem.fundingStructureItems != null) {
                 collapsibleStepsAllStepsStatus.openAllSteps = false;
             }

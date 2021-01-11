@@ -23,8 +23,15 @@ jest.mock('../../../services/fundingLineDetailsService', () => ({
 }));
 
 jest.mock('../../../services/providerService', () => ({
-    getProviderTransactionsService: jest.fn(),
+    getProviderTransactionsService: jest.fn(() => Promise.resolve({
+        data: {},
+        status: 200
+    })),
     getReleasedProfileTotalsService: jest.fn(() => Promise.resolve({
+        data: {},
+        status: 200
+    })),
+    getFundingStructureResultsForProviderAndSpecification: jest.fn(() => Promise.resolve({
         data: {},
         status: 200
     }))

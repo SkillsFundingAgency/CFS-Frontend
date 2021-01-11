@@ -13,6 +13,8 @@ import {DataschemaDetailsViewModel} from "../../../types/Datasets/DataschemaDeta
 import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
 import {QueryClient, QueryClientProvider} from "react-query";
 
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
 
 describe("<CreateDataset />", () => {
 

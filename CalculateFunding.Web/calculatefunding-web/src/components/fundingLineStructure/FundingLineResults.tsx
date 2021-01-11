@@ -1,10 +1,9 @@
 import {LoadingStatus} from "../LoadingStatus";
 import {ApproveStatusButton} from "../ApproveStatusButton";
-import {AutoComplete} from "../AutoComplete";
 import {CollapsibleSteps, setCollapsibleStepsAllStepsStatus} from "../CollapsibleSteps";
 import {
     FundingStructureType,
-    FundingStructureItem
+    FundingStructureItemViewModel
 } from "../../types/FundingStructureItem";
 import {FundingLineStep} from "./FundingLineStep";
 import {BackToTop} from "../BackToTop";
@@ -21,12 +20,14 @@ import {
     updateFundingLineExpandStatus
 } from "./FundingLineStructureHelper";
 import {getFundingLineStructureService} from "../../services/fundingStructuresService";
-import {getCurrentPublishedProviderFundingStructureService} from "../../services/publishedProviderFundingLineService";
-import { AxiosError } from "axios";
-import {useQuery} from "react-query";
-import {getProviderFundingLineErrors} from "../../services/providerService";
-import {PublishedProviderError} from "../../types/PublishedProviderError";
+import {AxiosError} from "axios";
+import {getFundingStructureResultsForProviderAndSpecification} from "../../services/providerService";
 import {InputSearch} from "../InputSearch";
+import {getCalculationSummaryBySpecificationId} from "../../services/calculationService";
+import {CalculationSummary} from "../../types/CalculationDetails";
+import {ProviderResultForSpecification} from "../../types/Provider/ProviderResultForSpecification";
+import {ValueFormatType} from "../../types/TemplateBuilderDefinitions";
+import {formatNumber, NumberType} from "../FormattedNumber";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -38,6 +39,7 @@ export interface FundingLineResultsProps {
     clearErrorMessages: (fieldNames?: string[]) => void,
     setStatusToApproved?: () => void,
     refreshFundingLines?: boolean | undefined,
+    showApproveButton: boolean,
 }
 
 export function FundingLineResults({
@@ -49,27 +51,20 @@ export function FundingLineResults({
     addError,
     clearErrorMessages,
     setStatusToApproved,
-    refreshFundingLines
+    refreshFundingLines,
+    showApproveButton = false
 }: FundingLineResultsProps) {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
     const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
     const [fundingLinePublishStatus, setFundingLinePublishStatus] = useState<string>(PublishStatus.Draft.toString());
     const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
-    const [fundingLines, setFundingLines] = useState<FundingStructureItem[]>([]);
-    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<FundingStructureItem[]>([]);
+    const [fundingLines, setFundingLines] = useState<FundingStructureItemViewModel[]>([]);
+    const [fundingLinesOriginalData, setFundingLinesOriginalData] = useState<FundingStructureItemViewModel[]>([]);
     const [rerenderFundingLineSteps, setRerenderFundingLineSteps] = useState<boolean>();
     const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
     const fundingLineStepReactRef = useRef(null);
     const nullReactRef = useRef(null);
-
-    const {data: fundingLineErrors, isLoading: isLoadingFundingLineErrors} =
-        useQuery<PublishedProviderError[], AxiosError>(`funding-line-errors-for-spec-${specificationId}-stream-${fundingStreamId}-provider-${providerId}`,
-            async () => (await getProviderFundingLineErrors(specificationId, fundingStreamId, providerId as string)).data,
-            {
-                enabled: providerId !== undefined && providerId.length > 0,
-                onError: err => addError(err, "Error while loading funding line errors")
-            });
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
         const response = await approveFundingLineStructureService(specificationId);
@@ -92,7 +87,7 @@ export function FundingLineResults({
     }, [refreshFundingLines]);
 
     function searchFundingLines(calculationName: string) {
-        const fundingLinesCopy: FundingStructureItem[] = fundingLinesOriginalData as FundingStructureItem[];
+        const fundingLinesCopy: FundingStructureItemViewModel[] = fundingLinesOriginalData as FundingStructureItemViewModel[];
         expandCalculationsByName(fundingLinesCopy, calculationName, fundingLineStepReactRef, nullReactRef);
         setFundingLines(fundingLinesCopy);
         setRerenderFundingLineSteps(true);
@@ -107,7 +102,7 @@ export function FundingLineResults({
     }
 
     function collapsibleStepsChanged(expanded: boolean, name: string) {
-        const fundingLinesCopy: FundingStructureItem[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
+        const fundingLinesCopy: FundingStructureItemViewModel[] = setExpandStatusByFundingLineName(fundingLines, expanded, name);
         setFundingLines(fundingLinesCopy);
 
         const collapsibleStepsAllStepsStatus = setCollapsibleStepsAllStepsStatus(fundingLinesCopy);
@@ -123,7 +118,7 @@ export function FundingLineResults({
         setFundingLineRenderInternalState(true);
         if (fundingLines.length !== 0) {
             if (fundingLinesOriginalData.length === 0) {
-                setFundingLineSearchSuggestions([... getDistinctOrderedFundingLineCalculations(fundingLines)]);
+                setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
                 setFundingLinesOriginalData(fundingLines);
             }
             setIsLoadingFundingLineStructure(false);
@@ -154,16 +149,82 @@ export function FundingLineResults({
         fetchData();
     }, [specificationId])
 
+    async function appendData(fundingStructureItems: FundingStructureItemViewModel[],
+        calculationSummaries: CalculationSummary[], providerResults: ProviderResultForSpecification | undefined) {
+        for (let item = 0; item < fundingStructureItems.length; item++) {
+            const stack: FundingStructureItemViewModel[] = [];
+            const hashMap: any = {};
+
+            stack.push(fundingStructureItems[item]);
+
+            while (stack.length !== 0) {
+                const node = stack.pop();
+                if (node && (node.fundingStructureItems === null || node.fundingStructureItems.length === 0)) {
+                    visitNode(node, hashMap, calculationSummaries, providerResults);
+                } else {
+                    if (node && node.fundingStructureItems && node.fundingStructureItems.length > 0) {
+                        for (let i: number = node.fundingStructureItems.length - 1; i >= 0; i--) {
+                            stack.push(node.fundingStructureItems[i]);
+                        }
+                    }
+                }
+
+                node && visitNode(node, hashMap, calculationSummaries, providerResults);
+            }
+        }
+    }
+
+    function renderValue(value: number, calculationType: ValueFormatType): string {
+        switch(calculationType) {
+            case ValueFormatType.Currency:
+                return formatNumber(value, NumberType.FormattedMoney, 0);
+            case ValueFormatType.Percentage:
+                return formatNumber(value, NumberType.FormattedPercentage, 0);
+        }
+        return `${value}`;
+    }
+
+    function visitNode(node: FundingStructureItemViewModel, hashMap: any,
+        calculationSummaries: CalculationSummary[], providerResults: ProviderResultForSpecification | undefined) {
+        if (node.calculationId && !hashMap[`calc-${node.calculationId}`]) {
+            hashMap[`calc-${node.calculationId}`] = true;
+            const calculationSummary = calculationSummaries.find(c => c.id === node.calculationId);
+            node.calculationPublishStatus = calculationSummary?.status;
+            if (providerResults) {
+                const templateCalculationResult = providerResults.calculationResults[node.templateId];
+                if (templateCalculationResult) {
+                    node.value = templateCalculationResult.value !== null ?
+                        renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat) : "";
+                }
+            }
+        }
+        if (providerResults && node.fundingLineCode && !hashMap[`fun-${node.fundingLineCode}`]) {
+            hashMap[`fun-${node.fundingLineCode}`] = true;
+            const fundingLineResult = providerResults.fundingLineResults[node.templateId];
+            if (fundingLineResult) {
+                node.value = fundingLineResult.value !== null ?
+                    renderValue(fundingLineResult.value, ValueFormatType.Currency) : "";
+            }
+        }
+    }
+
     const fetchData = async () => {
         setIsLoadingFundingLineStructure(true);
         try {
             if (specificationId !== "" && fundingPeriodId !== "" && fundingStreamId !== "") {
-                let fundingStructureItems: FundingStructureItem[];
+                const fundingLineStructureResponse = await getFundingLineStructureService(specificationId, fundingPeriodId, fundingStreamId);
+                const fundingStructureItems: FundingStructureItemViewModel[] = fundingLineStructureResponse.data;
+                const calculationSummariesResponse = await getCalculationSummaryBySpecificationId(specificationId);
+                const calculationSummaries: CalculationSummary[] = calculationSummariesResponse.data;
+
+                let providerResults: ProviderResultForSpecification | undefined = undefined;
+
                 if (providerId) {
-                    fundingStructureItems = (await getCurrentPublishedProviderFundingStructureService(specificationId, fundingStreamId, providerId)).data.items;
-                } else {
-                    fundingStructureItems = (await getFundingLineStructureService(specificationId, fundingPeriodId, fundingStreamId)).data;
+                    const providerResultsResponse = await getFundingStructureResultsForProviderAndSpecification(specificationId, providerId);
+                    providerResults = providerResultsResponse.data;
                 }
+
+                appendData(fundingStructureItems, calculationSummaries, providerResults);
 
                 setInitialExpandedStatus(fundingStructureItems, false);
                 setFundingLines(fundingStructureItems);
@@ -192,9 +253,9 @@ export function FundingLineResults({
                 <h2 className="govuk-heading-l">Funding line structure</h2>
             </div>
             <div className="govuk-grid-column-one-third">
-                <ApproveStatusButton id={specificationId}
+                {showApproveButton && <ApproveStatusButton id={specificationId}
                     status={fundingLinePublishStatus}
-                    callback={handleApproveFundingLineStructure} />
+                    callback={handleApproveFundingLineStructure} />}
             </div>
             <div className="govuk-grid-column-two-thirds">
                 <div className="govuk-form-group search-container">
@@ -238,12 +299,11 @@ export function FundingLineResults({
                             link={linkValue}
                             hasChildren={f.fundingStructureItems != null}
                             callback={collapsibleStepsChanged}>
-                            <FundingLineStep 
+                            <FundingLineStep
                                 key={f.name.replace(" ", "") + index}
                                 showResults={false}
                                 expanded={fundingLinesExpandedStatus}
                                 fundingStructureItem={f}
-                                fundingLineErrors={fundingLineErrors}
                                 callback={collapsibleStepsChanged} />
                         </CollapsibleSteps>
                     </li>

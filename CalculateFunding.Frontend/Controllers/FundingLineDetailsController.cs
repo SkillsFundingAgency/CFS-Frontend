@@ -174,56 +174,6 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(fundingLineApiResponse.Content);
         }
 
-        [HttpGet]
-        [Route("api/publishedproviderfundingstructure/{publishedProviderVersionId}")]
-        public async Task<IActionResult> GetPublishedProviderFundingStructure(
-            [FromRoute] string publishedProviderVersionId)
-        {
-            string etag = Request.ReadETagHeaderValue();
-            ApiResponse<PublishedProviderFundingStructure> fundingLineApiResponse = await _publishingApiClient
-                .GetPublishedProviderFundingStructure(publishedProviderVersionId, etag);
-
-            if (fundingLineApiResponse.StatusCode == HttpStatusCode.NotModified)
-            {
-                return new StatusCodeResult(304);
-            }
-
-            IActionResult errorResult =
-                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetPublishedProviderFundingStructure));
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok(fundingLineApiResponse.Content);
-        }
-
-        [HttpGet]
-        [Route("api/specifications/{specificationId}/publishedproviders/{providerId}/fundingStreams/{fundingStreamId}/fundingStructure")]
-        public async Task<IActionResult> GetPublishedProviderFundingStructure(
-            [FromRoute] string specificationId,
-            [FromRoute] string fundingStreamId,
-            [FromRoute] string providerId)
-        {
-            string etag = Request.ReadETagHeaderValue();
-            ApiResponse<PublishedProviderFundingStructure> fundingLineApiResponse = await _publishingApiClient
-                .GetCurrentPublishedProviderFundingStructure(specificationId, fundingStreamId, providerId, etag);
-
-            if (fundingLineApiResponse.StatusCode == HttpStatusCode.NotModified)
-            {
-                return new StatusCodeResult(304);
-            }
-
-            IActionResult errorResult =
-                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(GetPublishedProviderFundingStructure));
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return Ok(fundingLineApiResponse.Content);
-        }
-
         [HttpPost]
         [Route("api/publishedproviderfundinglinedetails/customprofiles")]
         public async Task<IActionResult> ApplyCustomProfile([FromBody] ApplyCustomProfileRequest request)
