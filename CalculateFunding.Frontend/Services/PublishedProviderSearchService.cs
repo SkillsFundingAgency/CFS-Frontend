@@ -95,12 +95,15 @@ namespace CalculateFunding.Frontend.Services
 
             if (result.Providers != null && result.Providers.Any())
             {
+                string[] providerTypes = request.Filters.GetValueOrDefault("providerType") ?? new string[0];
+                string[] localAuthorities = request.Filters.GetValueOrDefault("localAuthority") ?? new string[0];
+                string[] fundingStatuses = request.Filters.GetValueOrDefault("fundingStatus") ?? new string[0];
                 ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts =
                     await _publishingApiClient.GetProviderStatusCounts(
                         result.Providers.First().SpecificationId,
-                        request.Filters.GetValueOrDefault("providerType")?.FirstOrDefault(),
-                        request.Filters.GetValueOrDefault("localAuthority")?.FirstOrDefault(),
-                        request.Filters.GetValueOrDefault("fundingStatus")?.FirstOrDefault()
+                        providerTypes.FirstOrDefault(),
+                        localAuthorities.FirstOrDefault(),
+                        fundingStatuses.FirstOrDefault()
                     );
 
                 foreach (var providerStats in providerStatusCounts.Content)

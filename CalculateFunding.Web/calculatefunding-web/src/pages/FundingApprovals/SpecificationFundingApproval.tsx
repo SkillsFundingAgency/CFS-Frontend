@@ -64,7 +64,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         usePublishedProviderIds(fundingStreamId, fundingPeriodId, specificationId,
             !isCheckingForJob && !(latestJob && latestJob.isActive) && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches,
             err => addErrorMessage(err.message, "", "Error while loading provider ids"));
-    const {publishedProvidersWithErrors} =
+    const {publishedProvidersWithErrors, isLoadingPublishedProviderErrors} =
         usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !(latestJob && latestJob.isActive),
             err => addErrorMessage(err.message, "Error while loading provider funding errors"));
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
@@ -86,13 +86,29 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
     async function handleApprove() {
         if (publishedProviderSearchResults && canApproveFunding && publishedProviderSearchResults.canApprove) {
-            history.push(`/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${FundingActionType.Approve}`);
+            if (fundingConfiguration?.approvalMode === ApprovalMode.All && publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0) {
+                addErrorMessage("Funding cannot be approved as there are providers in error",
+                    undefined,
+                    undefined,
+                    "Please filter by error status to identify affected providers"
+                );
+            } else {
+                history.push(`/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${FundingActionType.Approve}`);
+            }
         }
     }
 
     async function handleRelease() {
         if (publishedProviderSearchResults && publishedProviderSearchResults.canPublish && canReleaseFunding) {
-            history.push(`/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${FundingActionType.Release}`);
+            if (fundingConfiguration?.approvalMode === ApprovalMode.All && publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0) {
+                addErrorMessage("Funding cannot be released as there are providers in error",
+                    undefined,
+                    undefined,
+                    "Please filter by error status to identify affected providers"
+                );
+            } else {
+                history.push(`/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${FundingActionType.Release}`);
+            }
         }
     }
 
@@ -227,6 +243,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         }
                     </div>
                 </div>
+                
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full right-align">
                         <div className="right-align">
@@ -235,11 +252,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                     onClick={handleRefresh}>Refresh funding
                             </button>
                             <button className="govuk-button"
-                                    disabled={(latestJob && latestJob.isActive) || !publishedProviderSearchResults?.canApprove || !canApproveFunding || isLoadingRefresh}
+                                    disabled={(latestJob && latestJob.isActive) || !publishedProviderSearchResults?.canApprove || !canApproveFunding || isLoadingRefresh || isLoadingPublishedProviderErrors}
                                     onClick={handleApprove}>Approve funding
                             </button>
                             <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                                    disabled={(latestJob && latestJob.isActive) || !publishedProviderSearchResults?.canPublish || !canReleaseFunding || isLoadingRefresh}
+                                    disabled={(latestJob && latestJob.isActive) || !publishedProviderSearchResults?.canPublish || !canReleaseFunding || isLoadingRefresh || isLoadingPublishedProviderErrors}
                                     onClick={handleRelease}>Release funding
                             </button>
                         </div>

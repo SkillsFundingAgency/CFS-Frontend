@@ -42,15 +42,7 @@ export function EditCalculationTestData() {
                         match={matchMock}/>
                 </QueryClientProviderTestWrapper>
             </MemoryRouter>);
-
-        // await waitForElementToBeRemoved(screen.queryAllByText(/Loading.../))
-        /*await waitFor(() => {
-            expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-            expect(screen.queryAllByText(/Loading.../)).toHaveLength(0);
-        });*/
-        /*await waitFor(() => {
-            expect(screen.queryAllByText(/Loading.../)).toHaveLength(0);
-        });*/
+        
         await waitFor(() => {
             expect(screen.queryAllByText(/Loading/)).toHaveLength(0);
         });
