@@ -29,7 +29,7 @@ export function GdsMonacoDiffEditor(props: {
             removeActionBarOverlay();
         }
         return () => editor.current && editor.current.dispose();
-    }, [isInline]);
+    });
 
     const removeActionBarOverlay = () => {
         const didUpdateDiffDisposable = editor?.current?.onDidUpdateDiff(() => {
