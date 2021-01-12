@@ -283,7 +283,7 @@ export function FundingLineResults({
                 fundingLines.map((f, index) => {
                     let linkValue = '';
                     if (f.calculationId != null && f.calculationId !== '') {
-                        linkValue = `/app/Specifications/EditCalculation/${f.calculationId}`;
+                        linkValue = showApproveButton ? `/app/Specifications/EditCalculation/${f.calculationId}` : `/app/ViewCalculationResults/${f.calculationId}`;
                     }
                     return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
                         <CollapsibleSteps
