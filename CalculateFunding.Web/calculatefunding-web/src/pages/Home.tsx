@@ -7,17 +7,6 @@ import { Link } from "react-router-dom";
 
 export function Home(props: { featureFlags: FeatureFlagsState }){
     useEffect(() => {
-        fetch("/api/account/IsAuthenticated", {
-            method: 'GET'
-        }).then(function (response) {
-            const username = document.getElementById("username");
-
-            if (username != null) {
-                username.innerText = "";
-            }
-
-        });
-
         document.title = "Calculate funding";
     }, []);
 

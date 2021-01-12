@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useSelector, useDispatch} from "react-redux";
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {IStoreState} from './reducers/rootReducer';
 import {FeatureFlagsState} from './states/FeatureFlagsState';
-import {getHasUserConfirmedSkills, getUserFundingStreamPermissions} from "./actions/userAction";
+import {getHasUserConfirmedSkills, getUserFundingStreamPermissions, userActionGetUser} from "./actions/userAction";
 import './App.scss'
 import {Footer} from "./components/Footer";
 import {Section} from "./types/Sections";
@@ -60,17 +60,32 @@ import {EditCalculation} from "./pages/Calculations/EditCalculation";
 import {ConfirmFunding} from "./pages/FundingApprovals/ConfirmFunding";
 import {RefreshSql} from "./pages/Datasets/RefreshSql";
 import {UploadBatch} from "./pages/FundingApprovals/UploadBatch";
+import {initialiseAppInsights, setAppInsightsAuthenticatedUser} from "./services/appInsightsService";
 
 const queryClient = new QueryClient();
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const hasConfirmedSkills: boolean | undefined = useSelector((state: IStoreState) => state.userState && state.userState.hasConfirmedSkills);
+    const username: string = useSelector((state: IStoreState) => state.userState && state.userState.userName);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(getHasUserConfirmedSkills());
+        dispatch(userActionGetUser());
     }, []);
+
+    useEffect(() => {
+        if (username.length> 0)
+        {
+            setAppInsightsAuthenticatedUser(username);
+        }
+        else
+        {
+            initialiseAppInsights();
+        }
+    }, [username]);
 
     useEffect(() => {
         if (hasConfirmedSkills) {

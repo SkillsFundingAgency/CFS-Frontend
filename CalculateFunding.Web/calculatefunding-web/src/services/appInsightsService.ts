@@ -4,7 +4,7 @@ import {Config} from '../types/Config';
 export async function initialiseAppInsights() {
     const configuration: Config = await (window as any)['configuration'];
 
-    if ((window as any).appInsights || configuration.appInsightsKey.trim().length === 0) return;
+    if ((window as any).appInsights || configuration == null || configuration.appInsightsKey.trim().length === 0) return;
 
     const ai = new ApplicationInsights({
         config: {
@@ -25,5 +25,20 @@ export async function initialiseAppInsights() {
     });
     ai.trackPageView();
 
+    (window as any).appInsights = ai;
+}
+
+export async function setAppInsightsAuthenticatedUser(user: string) {
+    if (!(window as any).appInsights)
+    {
+        await initialiseAppInsights();
+    }
+    await setAppInsightsAuthenticatedUserContext(user);
+}
+
+async function setAppInsightsAuthenticatedUserContext(user: string)
+{
+    const ai = (window as any).appInsights;
+    ai.setAuthenticatedUserContext(user.replace(/[,;=| ]+/g, "_"), null, true);
     (window as any).appInsights = ai;
 }

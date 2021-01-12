@@ -12,6 +12,8 @@ const initialState: IUserState = {
 export const reduceUserState: Reducer<IUserState, IUserActions> =
     (state: IUserState = initialState, action: IUserActions): IUserState => {
         switch (action.type) {
+            case UserActionEvent.GET_USER:
+                return {...state, userName: action.payload};
             case UserActionEvent.CREATE_ACCOUNT:
                 return {...state, isLoggedIn: true, userName: action.userName};
             case UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS:

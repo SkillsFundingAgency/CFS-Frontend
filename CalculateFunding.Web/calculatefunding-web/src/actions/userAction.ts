@@ -3,10 +3,12 @@ import {ActionCreator} from "redux";
 import {ThunkAction} from "redux-thunk";
 import axios from "axios";
 import {IUserState} from "../states/IUserState";
+import {Identity} from "../types/Identity";
 
 export const hasConfirmedSkillsStateKey = "hasConfirmedSkillsState";
 
 export enum UserActionEvent {
+    GET_USER = 'userActionGetUser',
     CREATE_ACCOUNT = 'userActionCreateAccount',
     GET_FUNDING_STREAM_PERMISSIONS = 'getFundingStreamPermissions',
     GET_HAS_USER_CONFIRMED_SKILLS = 'getHasUserConfirmedSkills',
@@ -17,7 +19,13 @@ export type IUserActions =
     ICreateAccountAction |
     IFundingStreamPermissionsAction |
     IHasUserConfirmedSkillsAction |
-    IUpdateUserConfirmedSkillsAction;
+    IUpdateUserConfirmedSkillsAction |
+    IGetUserAction;
+
+export interface IGetUserAction {
+    type: UserActionEvent.GET_USER;
+    payload: string
+}
 
 export interface ICreateAccountAction {
     type: UserActionEvent.CREATE_ACCOUNT;
@@ -38,6 +46,32 @@ export interface IUpdateUserConfirmedSkillsAction {
     type: UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS;
     payload: boolean
 }
+
+export const userActionGetUser: ActionCreator<ThunkAction<Promise<any>, IUserState, null, IUserActions>> = () => {
+    return async (dispatch, getState) => {
+        if (getState().userName != null && getState().userName !== "") {
+            return;
+        }
+        try {
+            const response = await axios(`/api/account/IsAuthenticated`, {
+                method: 'GET',
+                headers: {'Content-Type': 'application/json'},
+            });
+            const result =  response.data as Identity;
+            dispatch({
+                type: UserActionEvent.GET_USER,
+                payload: result.name?? ""
+            });
+        }
+        catch (ex)
+        {
+            dispatch({
+                type: UserActionEvent.GET_USER,
+                payload: ""
+            });
+        }
+    }
+};
 
 export const getUserFundingStreamPermissions: ActionCreator<ThunkAction<Promise<any>, IUserState, null, IUserActions>> = () => {
     return async (dispatch, getState) => {

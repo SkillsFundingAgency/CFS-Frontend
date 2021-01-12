@@ -3,7 +3,7 @@ import thunk from "redux-thunk";
 import axios from "axios"
 import MockAdapter from "axios-mock-adapter";
 import {IStoreState} from "../../reducers/rootReducer";
-import {getUserFundingStreamPermissions, UserActionEvent} from '../../actions/userAction';
+import {getUserFundingStreamPermissions, UserActionEvent, userActionGetUser} from '../../actions/userAction';
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
@@ -48,6 +48,36 @@ describe("user-permissions-actions", () => {
         const store = mockStore(storeWithData);
 
         await getUserFundingStreamPermissions()(store.dispatch, () => storeWithData.userState, null);
+
+        expect(store.getActions()).toEqual(expectedActions);
+    });
+
+    it("returns username given name is not empty", async () => {
+        const payload = {
+            name: "test user",
+            AuthenticationType: "",
+            isAuthenticated: true
+        };
+        fetchMock.onGet("/api/account/IsAuthenticated").reply(200, payload);
+        const expectedActions = [{type: UserActionEvent.GET_USER, payload: payload.name}];
+        const store = mockStore(storeWithData);
+
+        await userActionGetUser()(store.dispatch, () => storeWithData.userState, null);
+
+        expect(store.getActions()).toEqual(expectedActions);
+    });
+
+    it("returns empty given name is null", async () => {
+        const payload = {
+            name: null ,
+            AuthenticationType: "",
+            isAuthenticated: true
+        };
+        fetchMock.onGet("/api/account/IsAuthenticated").reply(200, payload);
+        const expectedActions = [{type: UserActionEvent.GET_USER, payload: ""}];
+        const store = mockStore(storeWithData);
+
+        await userActionGetUser()(store.dispatch, () => storeWithData.userState, null);
 
         expect(store.getActions()).toEqual(expectedActions);
     });
