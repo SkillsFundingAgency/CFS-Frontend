@@ -30,6 +30,8 @@ const payload: [FundingStreamPermissions] = [{
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false,
+    canDeleteProfilePattern: false,
+    canCreateProfilePattern: false,
     fundingStreamId: "DSG",
     userId: ""
 }];
@@ -61,6 +63,8 @@ export const fundingStreamPermissionsDsgState: FundingStreamPermissions = {
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false,
+    canCreateProfilePattern: false,
+    canDeleteProfilePattern: false,
     fundingStreamId: "DSG",
     userId: ""
 };

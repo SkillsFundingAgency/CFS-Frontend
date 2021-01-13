@@ -33,6 +33,8 @@ const noPermissionsFundingStream: FundingStreamPermissions = {
     canApproveAllCalculations: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
+    canCreateProfilePattern: false,
+    canDeleteProfilePattern: false,
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false
@@ -66,6 +68,8 @@ const withChooseForFundingPermissionsFundingStream: FundingStreamPermissions = {
     canApproveAnyCalculations: false,
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
+    canDeleteProfilePattern: false,
+    canCreateProfilePattern: false,
     canUploadDataSourceFiles: false
 }
 

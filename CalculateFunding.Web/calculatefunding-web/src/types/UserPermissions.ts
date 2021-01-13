@@ -1,5 +1,5 @@
 ﻿export interface UserPermissions {
-    canCreateQaTests: boolean;
+    userId: string;
     canReleaseFunding: boolean;
     canApproveFunding: boolean;
     canRefreshFunding: boolean;
@@ -10,21 +10,23 @@
     canApproveCalculations: boolean;
     canApplyCustomProfilePattern: boolean;
     canAssignProfilePattern: boolean;
-    canApproveAnyCalculations: boolean;
-    canApproveAllCalculations: boolean;
+    canCreateProfilePattern: boolean;
+    canEditProfilePattern: boolean;
+    canDeleteProfilePattern: boolean;
     canDeleteSpecification: boolean;
     canApproveSpecification: boolean;
     canEditSpecification: boolean;
     canCreateSpecification: boolean;
     canAdministerFundingStream: boolean;
-    userId: string;
+    canCreateQaTests: boolean;
     canEditQaTests: boolean;
     canDeleteQaTests: boolean;
     canCreateTemplates: boolean;
     canEditTemplates: boolean;
     canDeleteTemplates: boolean;
     canApproveTemplates: boolean;
-    canEditProfilePattern: boolean;
+    canApproveAnyCalculations: boolean;
+    canApproveAllCalculations: boolean;
     canRefreshPublishedQa: boolean;
     canUploadDataSourceFiles: boolean;
 }

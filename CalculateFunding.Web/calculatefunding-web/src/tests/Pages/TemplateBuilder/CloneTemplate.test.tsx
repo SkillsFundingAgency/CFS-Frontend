@@ -1,4 +1,4 @@
-﻿﻿import React from 'react';
+﻿import React from 'react';
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import * as redux from "react-redux";
 import {waitFor, screen, render} from "@testing-library/react";
@@ -34,6 +34,11 @@ export const noPermissionsState: FundingStreamPermissions[] = [{
     canEditTemplates: false,
     canDeleteTemplates: false,
     canApproveTemplates: false,
+    canApproveAllCalculations: false,
+    canApproveAnyCalculations: false,
+    canApproveCalculations: false,
+    canUploadDataSourceFiles: false,
+    canRefreshPublishedQa: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
     canDeleteProfilePattern: false,
@@ -63,6 +68,11 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canEditTemplates: true,
     canDeleteTemplates: true,
     canApproveTemplates: true,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false,
+    canApproveCalculations: false,
+    canApproveAnyCalculations: false,
+    canApproveAllCalculations: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
     canDeleteProfilePattern: false,

@@ -1,12 +1,12 @@
 ﻿import React from "react";
 import '@testing-library/jest-dom/extend-expect';
 import {render, screen, waitFor} from '@testing-library/react';
-import {JobNotificationBanner, JobNotificationBannerProps} from "../../components/Calculations/JobNotificationBanner";
-import {JobType} from "../../types/jobType";
-import {RunningStatus} from "../../types/RunningStatus";
-import {CompletionStatus} from "../../types/CompletionStatus";
-import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
-import {JobDetails, JobTrigger} from "../../types/jobDetails";
+import {JobNotificationBanner, JobNotificationBannerProps} from "../../../components/Jobs/JobNotificationBanner";
+import {JobType} from "../../../types/jobType";
+import {RunningStatus} from "../../../types/RunningStatus";
+import {CompletionStatus} from "../../../types/CompletionStatus";
+import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
+import {JobDetails, JobTrigger} from "../../../types/jobDetails";
 
 const renderComponent = (params: JobNotificationBannerProps) => {
     return render(<JobNotificationBanner
@@ -18,23 +18,19 @@ const renderComponent = (params: JobNotificationBannerProps) => {
 describe('<JobNotificationBanner />', () => {
     beforeAll(() => jest.clearAllMocks());
 
-    describe('with no job running', () => {
-        it('renders null', async () => {
+    describe('when no job running and not checking for job', () => {
+        it('does not render banner', async () => {
             const props: JobNotificationBannerProps = {
                 job: undefined,
                 isCheckingForJob: false,
             };
             await renderComponent(props);
 
-            expect(screen.queryByText("Checking for running jobs")).toBeFalsy();
-            expect(screen.queryByText("Error while checking for latest job")).toBeFalsy();
-            expect(screen.queryByText("Calculation job ")).toBeFalsy();
-            expect(screen.queryByText("Calculation initiated by Bob on ")).toBeFalsy();
-            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
+            expect(screen.queryByTestId("job-notification-banner")).not.toBeInTheDocument();
         });
     });
 
-    describe('when still loading latest spec job', () => {
+    describe('when still checking for job', () => {
         it('renders loading message correctly', async () => {
             const props: JobNotificationBannerProps = {
                 job: undefined,
@@ -43,12 +39,13 @@ describe('<JobNotificationBanner />', () => {
             await renderComponent(props);
 
             expect(screen.getByText("Checking for running jobs")).toBeInTheDocument();
-            expect(screen.queryByText((content) => content.startsWith('Job initiated by'))).not.toBeInTheDocument();
+            expect(screen.queryByText(/Job initiated by/)).not.toBeInTheDocument();
+            expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
         });
     });
 
     describe('when job is queued', () => {
-        it('renders error message correctly', async () => {
+        it('renders message correctly', async () => {
             const props: JobNotificationBannerProps = {
                 job: mockQueuedJobResult,
                 isCheckingForJob: false,
@@ -56,29 +53,35 @@ describe('<JobNotificationBanner />', () => {
 
             renderComponent(props);
 
-            expect(await screen.getByText("Job in queue: Refreshing funding")).toBeInTheDocument();
-            expect(screen.getByText((content) => content.startsWith('Job initiated by')));
+            expect(screen.getByText("Job in queue: Refreshing funding")).toBeInTheDocument();
+            expect(screen.getByText(/Job initiated by/));
+            expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
         });
     });
 
-    describe('with completed job ', () => {
-        describe('without any failed outcome ', () => {
-            it('does not render any error messages', async () => {
-                const props: JobNotificationBannerProps = {
-                    job: mockCompletedJobWithNoOutcomeTypeResult,
-                    isCheckingForJob: false,
-                    jobCompletedOutcomeFailedMessage: "a test jobCompletedOutcomeFailedMessage"
-                };
+    describe('when job successfully completed', () => {
+        it('renders correctly', async () => {
+            const props: JobNotificationBannerProps = {
+                job: mockCompletedJobWithNoOutcomeTypeResult,
+                isCheckingForJob: false,
+                jobCompletedOutcomeFailedMessage: "a test jobCompletedOutcomeFailedMessage"
+            };
 
-                renderComponent(props);
+            renderComponent(props);
 
-                waitFor(() => {
-                    expect(screen.queryByText(/There is a problem/)).not.toBeInTheDocument();
-                    expect(screen.queryByText(/a test jobCompletedOutcomeFailedMessage/)).not.toBeInTheDocument();
-                });
+            waitFor(() => {
+                expect(screen.getByText(/Job completed successfully/)).toBeInTheDocument();
+                expect(screen.queryByText(/There is a problem/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/a test jobCompletedOutcomeFailedMessage/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
             });
         });
-        describe('with a failed outcome ', () => {
+    });
+
+    describe('when job failed', () => {
+        
+        describe('with a provided jobCompletedOutcomeFailedMessage ', () => {
+            
             it('renders error messages correctly ', async () => {
                 const props: JobNotificationBannerProps = {
                     job: mockCompletedJobWithFailedOutcomeResult,
@@ -91,13 +94,14 @@ describe('<JobNotificationBanner />', () => {
                 waitFor(() => {
                     expect(screen.getByText(/There is a problem/)).toBeInTheDocument();
                     expect(screen.getByText(/a test jobCompletedOutcomeFailedMessage/)).toBeInTheDocument();
+                    expect(screen.getByText(/Job ID/)).toBeInTheDocument();
+                    expect(screen.getByText(mockCompletedJobWithFailedOutcomeResult.jobId)).toBeInTheDocument();
                 });
             });
         });
-    });
-
-    describe('with failed job ', () => {
+        
         describe('with a provided jobFailedMessage ', () => {
+
             it('renders jobFailedMessage error messages correctly ', async () => {
                 const props: JobNotificationBannerProps = {
                     job: mockFailedJobResult,
@@ -112,11 +116,13 @@ describe('<JobNotificationBanner />', () => {
                     expect(screen.getByText(/a test jobFailedMessage/)).toBeInTheDocument();
                     expect(screen.getByText(/Job initiated/)).not.toBeInTheDocument();
                     expect(screen.getByText(/Results updated/)).not.toBeInTheDocument();
+                    expect(screen.getByText(/Job ID/)).toBeInTheDocument();
+                    expect(screen.getByText(mockCompletedJobWithFailedOutcomeResult.jobId)).toBeInTheDocument();
                 });
             });
         });
 
-        describe('without a jobFailedMessage provided ', () => {
+        describe('with a jobFailedMessage provided ', () => {
             it('renders error summary messages correctly ', async () => {
                 const props: JobNotificationBannerProps = {
                     job: mockFailedJobResult,
@@ -128,9 +134,10 @@ describe('<JobNotificationBanner />', () => {
 
                 waitFor(() => {
                     expect(screen.getByText(/There is a problem/)).not.toBeInTheDocument();
-                    expect(screen.getByText(/a test jobFailedMessage/)).not.toBeInTheDocument();
+                    expect(screen.getByText(/a test jobFailedMessage/)).toBeInTheDocument();
                     expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
                     expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+                    expect(screen.getByText(/Job ID/)).toBeInTheDocument();
                 });
             });
         });
@@ -144,7 +151,7 @@ const emptyTrigger: JobTrigger = {
 }
 
 const mockQueuedJobResult: JobDetails = getJobDetailsFromJobResponse({
-    jobId: "a valid job id",
+    jobId: "34570303245",
     jobType: JobType.RefreshFundingJob,
     specificationId: "a valid specification id",
     runningStatus: RunningStatus.Queued,
@@ -158,7 +165,7 @@ const mockQueuedJobResult: JobDetails = getJobDetailsFromJobResponse({
 }) as JobDetails;
 
 const mockCompletedJobWithFailedOutcomeResult: JobDetails = getJobDetailsFromJobResponse({
-    jobId: "a valid job id",
+    jobId: "345768293546",
     jobType: JobType.RefreshFundingJob,
     specificationId: "a valid specification id",
     runningStatus: RunningStatus.Completed,
@@ -171,7 +178,7 @@ const mockCompletedJobWithFailedOutcomeResult: JobDetails = getJobDetailsFromJob
 }) as JobDetails;
 
 const mockCompletedJobWithNoOutcomeTypeResult: JobDetails = getJobDetailsFromJobResponse({
-    jobId: "a valid job id",
+    jobId: "732457230405",
     jobType: JobType.RefreshFundingJob,
     specificationId: "a valid specification id",
     runningStatus: RunningStatus.Completed,
@@ -184,7 +191,7 @@ const mockCompletedJobWithNoOutcomeTypeResult: JobDetails = getJobDetailsFromJob
 }) as JobDetails;
 
 const mockFailedJobResult: JobDetails = getJobDetailsFromJobResponse({
-    jobId: "a valid job id",
+    jobId: "8765434444",
     jobType: JobType.RefreshFundingJob,
     specificationId: "a valid specification id",
     runningStatus: RunningStatus.Completed,

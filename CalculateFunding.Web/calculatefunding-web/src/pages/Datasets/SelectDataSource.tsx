@@ -9,7 +9,7 @@ import {Link} from "react-router-dom";
 import {assignDataSourceService} from "../../services/datasetService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
-import {MappingStatus} from "../../components/DatasetMapping/MappingStatus";
+import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {JobType} from "../../types/jobType";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -159,7 +159,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         {(isCheckingForJob || hasJob) &&
                         <div className="govuk-form-group">
                             <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
-                            {hasJob && <MappingStatus job={latestJob} />}
+                            {hasJob && <JobProgressNotificationBanner job={latestJob} />}
                         </div>}
                         {!isCheckingForPermissions && !hasMissingPermissions &&
                         <div className="govuk-form-group">

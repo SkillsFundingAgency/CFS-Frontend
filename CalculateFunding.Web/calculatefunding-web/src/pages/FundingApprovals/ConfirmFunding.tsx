@@ -14,7 +14,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {FundingConfirmationSummary} from "../../components/Funding/FundingConfirmationSummary";
 import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {JobNotificationBanner} from "../../components/Calculations/JobNotificationBanner";
+import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {Link} from "react-router-dom";
 import {approveProvidersFundingService, approveSpecificationFundingService, releaseProvidersFundingService, releaseSpecificationFundingService} from "../../services/publishService";
 import {ApprovalMode} from "../../types/ApprovalMode";

@@ -4,16 +4,16 @@ import {RunningStatus} from "../../../types/RunningStatus";
 import {JobType} from "../../../types/jobType";
 import {render, screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import {MappingStatus} from "../../../components/DatasetMapping/MappingStatus";
+import {JobProgressNotificationBanner} from "../../../components/Jobs/JobProgressNotificationBanner";
 import {JobDetails} from "../../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 
 const renderComponent = (job: JobDetails) => {
-  const {MappingStatus} = require("../../../components/DatasetMapping/MappingStatus");
-  return render(<MappingStatus job={job} hasActiveJob={job.runningStatus !== RunningStatus.Completed} />);
+  const {JobProgressNotificationBanner} = require("../../../components/Jobs/JobProgressNotificationBanner");
+  return render(<JobProgressNotificationBanner job={job} hasActiveJob={job.runningStatus !== RunningStatus.Completed} />);
 };
 
-describe('<MappingStatus />', () => {
+describe('<JobProgressNotificationBanner />', () => {
 
   it("renders status based on Queued job", () => {
     const job = createTestJob(undefined, RunningStatus.Queued);
@@ -25,10 +25,12 @@ describe('<MappingStatus />', () => {
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-orange");
 
-    expect(screen.getByText((content) => content.startsWith('Mapping initiated by Harry Potter on'))).toBeInTheDocument();
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
     expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
     expect(screen.queryByText("Completed:")).not.toBeInTheDocument();
     expect(screen.queryByTestId('formatted-completed-date')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
+    expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
   });
   
   it("renders status based on InProgress job", () => {
@@ -41,10 +43,12 @@ describe('<MappingStatus />', () => {
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-orange");
 
-    expect(screen.getByText((content) => content.startsWith('Mapping initiated by Harry Potter on'))).toBeInTheDocument();
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
     expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
     expect(screen.queryByText("Completed:")).not.toBeInTheDocument();
     expect(screen.queryByTestId('formatted-completed-date')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
+    expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
   });
 
   it("renders status based on successfully completed job", () => {
@@ -57,10 +61,12 @@ describe('<MappingStatus />', () => {
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-green");
 
-    expect(screen.getByText((content) => content.startsWith('Mapping initiated by Harry Potter on'))).toBeInTheDocument();
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
     expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
     expect(screen.getByText("Completed:"));
     expect(screen.queryByTestId('formatted-completed-date')).toBeInTheDocument();
+    expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
+    expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
   });
 
   it("renders status based on failed completed job", () => {
@@ -73,10 +79,12 @@ describe('<MappingStatus />', () => {
     const outerDiv = screen.getByTestId('job-notification');
     expect(outerDiv.className).toContain("govuk-error-summary-red");
 
-    expect(screen.getByText((content) => content.startsWith('Mapping initiated by Harry Potter on'))).toBeInTheDocument();
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
     expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
     expect(screen.getByText("Completed:"));
     expect(screen.queryByTestId('formatted-completed-date')).toBeInTheDocument();
+    expect(screen.getByText(/Job ID/)).toBeInTheDocument();
+    expect(screen.getByText(/job-id-5472345/)).toBeInTheDocument();
   });
 
 });
@@ -86,7 +94,7 @@ function createTestJob(completionStatus: CompletionStatus | undefined, runningSt
     completionStatus: completionStatus,
     invokerUserDisplayName: "Harry Potter",
     invokerUserId: "",
-    jobId: "",
+    jobId: `job-id-5472345`,
     jobType: JobType.MapDatasetJob,
     runningStatus: runningStatus,
     specificationId: "",

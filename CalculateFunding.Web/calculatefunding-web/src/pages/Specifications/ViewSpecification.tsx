@@ -37,7 +37,7 @@ import {approveAllCalculationsService, getCalculationSummaryBySpecificationId} f
 import {cloneDeep} from "lodash";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
-import {MappingStatus} from "../../components/DatasetMapping/MappingStatus";
+import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -254,7 +254,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             {(isCheckingForJob || hasJob) &&
             <div className="govuk-form-group">
                 <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
-                {hasJob && !isApprovingAllCalculations && <MappingStatus job={approveAllCalculationsJob} />}
+                {hasJob && !isApprovingAllCalculations && <JobProgressNotificationBanner job={approveAllCalculationsJob} />}
             </div>}
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>

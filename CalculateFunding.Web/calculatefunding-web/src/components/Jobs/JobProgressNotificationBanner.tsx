@@ -2,11 +2,11 @@ import React from "react";
 import {DateFormatter} from "../DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
 
-export interface MappingStatusProps {
-    job: JobDetails | undefined,
+export interface JobProgressNotificationBannerProps {
+    job: JobDetails | undefined
 }
 
-export function MappingStatus(props: MappingStatusProps) {
+export function JobProgressNotificationBanner(props: JobProgressNotificationBannerProps) {
     if (!props.job) {
         return null;
     }
@@ -45,9 +45,13 @@ export function MappingStatus(props: MappingStatusProps) {
             <ul className="govuk-list govuk-error-summary__list">
                 <li>
                     <p className="govuk-body">
-                        {`Mapping initiated by ${props.job.invokerUserDisplayName} on `}
-                        <span data-testid="formatted-created-date"><DateFormatter date={props.job.created as Date}
-                                                                                  utc={false}/></span>
+                        {`Initiated by ${props.job.invokerUserDisplayName} on `}
+                        <span data-testid="formatted-created-date">
+                            <DateFormatter date={props.job.created as Date} utc={false}/>
+                        </span>
+                        {props.job.isFailed &&
+                        <span>Job ID: {props.job.jobId}</span>
+                        }
                     </p>
                 </li>
                 {props.job.isComplete &&

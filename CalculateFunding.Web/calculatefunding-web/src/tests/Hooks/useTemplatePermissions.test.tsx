@@ -32,6 +32,8 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false,
+    canCreateProfilePattern: false,
+    canDeleteProfilePattern: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
     canApproveAllCalculations: false
@@ -63,6 +65,8 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false,
+    canDeleteProfilePattern: false,
+    canCreateProfilePattern: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
     canApproveAllCalculations: false
@@ -94,6 +98,8 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canEditProfilePattern: false,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false,
+    canCreateProfilePattern: false,
+    canDeleteProfilePattern: false,
     canApproveCalculations: false,
     canApproveAnyCalculations: false,
     canApproveAllCalculations: false

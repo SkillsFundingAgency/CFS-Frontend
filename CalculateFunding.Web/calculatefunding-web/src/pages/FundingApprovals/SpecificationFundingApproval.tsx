@@ -23,7 +23,7 @@ import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {useErrors} from "../../hooks/useErrors";
-import {JobNotificationBanner} from "../../components/Calculations/JobNotificationBanner";
+import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
 import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {preValidateForRefreshFundingService, refreshSpecificationFundingService} from "../../services/publishService";

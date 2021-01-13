@@ -14,7 +14,8 @@ const matchMock : match<DatasetHistoryRouteProps> = {
     params: {
         datasetId: "123"
     },
-    path:"",
+    path: "",
+    url: "",
     isExact: true,
 };
 

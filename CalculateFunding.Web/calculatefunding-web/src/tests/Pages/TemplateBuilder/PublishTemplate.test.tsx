@@ -1,4 +1,4 @@
-﻿﻿import React from 'react';
+﻿import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
@@ -30,6 +30,11 @@ export const noPermissionsState: FundingStreamPermissions[] = [{
     canDeleteTemplates: true,
     canApproveTemplates: false,
     canApplyCustomProfilePattern: false,
+    canApproveAllCalculations: false,
+    canApproveAnyCalculations: false,
+    canApproveCalculations: false,
+    canUploadDataSourceFiles: false,
+    canRefreshPublishedQa: false,
     canAssignProfilePattern: false,
     canDeleteProfilePattern: false,
     canEditProfilePattern: false,
@@ -58,6 +63,11 @@ export const permissionsState: FundingStreamPermissions[] = [{
     canEditTemplates: false,
     canDeleteTemplates: false,
     canApproveTemplates: true,
+    canRefreshPublishedQa: false,
+    canUploadDataSourceFiles: false,
+    canApproveCalculations: false,
+    canApproveAnyCalculations: false,
+    canApproveAllCalculations: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
     canDeleteProfilePattern: false,

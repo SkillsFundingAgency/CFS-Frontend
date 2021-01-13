@@ -125,6 +125,7 @@ const mockFundingLineStructureService = () => {
         fundingLineCode: "XXX-1",
         value: "",
         calculationType: "",
+        templateId: 1,
         calculationPublishStatus: PublishStatus.Draft,
         type: FundingStructureType.Calculation,
         fundingStructureItems: [],

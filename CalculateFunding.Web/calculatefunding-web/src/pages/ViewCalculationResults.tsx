@@ -10,7 +10,7 @@ import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
 import {SearchMode} from "../types/SearchMode";
-import {JobNotificationBanner} from "../components/Calculations/JobNotificationBanner";
+import {JobNotificationBanner} from "../components/Jobs/JobNotificationBanner";
 import {FacetValue} from "../types/Facet";
 import {Link} from "react-router-dom";
 import {CalculationProviderSearchRequestViewModel} from "../types/calculationProviderSearchRequestViewModel";

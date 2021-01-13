@@ -8,11 +8,14 @@ import '@testing-library/jest-dom/extend-expect';
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
-import {CalculationCompilePreviewResponse, CompileErrorSeverity} from "../../../types/Calculations/CalculationCompilePreviewResponse";
+import {CalculationCompilePreviewResponse, CalculationDataType, CompileErrorSeverity} from "../../../types/Calculations/CalculationCompilePreviewResponse";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import {createLocation} from "history";
 import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
 import * as specHook from "../../../hooks/useSpecificationSummary";
+import {CalculationType} from "../../../types/CalculationSearchResponse";
+import {PublishStatus} from "../../../types/PublishStatusModel";
+import {ValueType} from "../../../types/ValueType";
 
 function renderPage() {
     const {CreateAdditionalCalculation} = require("../../../pages/Calculations/CreateAdditionalCalculation");
@@ -171,8 +174,40 @@ const mockSuccessfulBuildResponse: CalculationCompilePreviewResponse = {
             fileName: "",
             sourceCode: ""
         }],
-        compilerMessages: [],
+        compilerMessages: []
+    },
+    previewProviderCalculation: {
+        calculationResult: {
+            calculation: {
+                id: "",
+                name: ""
+            },
+            calculationDataType: CalculationDataType.Boolean,
+            calculationType: CalculationType.Template,
+            exceptionMessage: "",
+            exceptionStackTrace: "",
+            exceptionType: "",
+            value: undefined
+        },
+        providerName: ""
+    },
+    calculation: {
+        id: "",
+        author: null,
+        fundingStreamId: "",
+        lastUpdated: new Date(),
+        name: "",
+        namespace: "",
+        sourceCode: "",
+        publishStatus: PublishStatus.Approved,
+        sourceCodeName: "",
+        specificationId: "",
+        valueType: ValueType.Boolean,
+        dataType: CalculationDataType.Decimal,
+        wasTemplateCalculation: false,
+        calculationType: CalculationType.Template
     }
+
 };
 const specFullPermsResult: SpecificationPermissionsResult = {
     canApproveFunding: false,
@@ -187,6 +222,8 @@ const specFullPermsResult: SpecificationPermissionsResult = {
     isCheckingForPermissions: false,
     isPermissionsFetched: true,
     missingPermissions: [],
+    canApproveAllCalculations: false,
+    canChooseFunding: false,
     canCreateAdditionalCalculation: true
 }
 const specNoPermsResult: SpecificationPermissionsResult = {
@@ -198,6 +235,8 @@ const specNoPermsResult: SpecificationPermissionsResult = {
     canRefreshFunding: false,
     canReleaseFunding: false,
     canApproveCalculation: false,
+    canChooseFunding: false,
+    canApproveAllCalculations: false,
     hasMissingPermissions: false,
     isCheckingForPermissions: false,
     isPermissionsFetched: true,

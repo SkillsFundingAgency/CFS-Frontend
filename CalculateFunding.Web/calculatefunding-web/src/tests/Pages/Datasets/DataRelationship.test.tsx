@@ -14,7 +14,8 @@ const matchMock : match<DataRelationshipsRouteProps> = {
     params: {
         specificationId: "123"
     },
-    path:"",
+    path: "",
+    url: "",
     isExact: true,
 };
 
