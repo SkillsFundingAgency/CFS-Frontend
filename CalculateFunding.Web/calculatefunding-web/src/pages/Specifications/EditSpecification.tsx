@@ -4,7 +4,6 @@ import {Header} from "../../components/Header";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getSpecificationSummaryService, updateSpecificationService} from "../../services/specificationService";
 import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
-import {ErrorSummary} from "../../components/ErrorSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
@@ -16,6 +15,8 @@ import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import {getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} from "../../services/policyService";
 import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
+import {useErrors} from "../../hooks/useErrors";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -63,12 +64,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         formSubmitted: false,
         formValid: false
     });
-    const [errorSummary, setErrorSummary] = useState({
-        title: "",
-        error: ""
-    });
     const [isLoading, setIsLoading] = useState(false);
     const history = useHistory();
+    const {errors, addError, addErrorMessage, clearErrorMessages} = useErrors();
+    const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
 
     useEffectOnce(() => {
         const getSpecification = async () => {
@@ -87,10 +86,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 setSelectedDescription(editSpecificationViewModel.description ? editSpecificationViewModel.description : "");
             }
             catch (error) {
-                setErrorSummary({
-                    title: "There is a problem",
-                    error: `Specification failed to load for the following reason: ${error.message}. Please try again.`
-                });
+                addErrorMessage(`Specification failed to load for the following reason: ${error.message}. Please try again.`, "", "", errorSuggestion);
+            
                 setIsLoading(false);
             }
         };
@@ -142,7 +139,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 selectedVersion && setSelectedTemplateVersion(selectedVersion.value);
             }
             catch (error) {
-                setErrorSummary({title: "There is a problem", error: `Specification failed to load for the following reason: ${error.message}. Please try again.`});
+                addErrorMessage(`Specification failed to load for the following reason: ${error.message}. Please try again.`, "", "", errorSuggestion);
             }
             finally {
                 setIsLoading(false);
@@ -176,11 +173,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     }
 
     async function submitUpdateSpecification() {
-        setErrorSummary({title: "", error: ""});
         if (selectedName !== "" && selectedProviderVersionId !== "" && selectedDescription !== "" && selectedTemplateVersion !== "") {
             setFormValid({formValid: true, formSubmitted: true});
             setLoadingMessage({title: "Updating Specification", subTitle: "Please wait whilst we update the specification"});
             setIsLoading(true);
+            clearErrorMessages();
             const assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[specificationSummary.fundingStreams[0].id] = selectedTemplateVersion;
 
@@ -207,9 +204,15 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 setIsLoading(false);
                 history.push(`/ViewSpecification/${specificationId}`);
             }
-            catch {
+            catch(error)  {
                 setFormValid({formValid: true, formSubmitted: false});
-                setErrorSummary({title: "There is a problem", error: "Specification failed to update, please try again."});
+                if (error.response && error.response.data["Name"] !== undefined)
+                {
+                    addErrorMessage(error.response.data["Name"], "", "", errorSuggestion);
+                }
+                else {
+                    addError(`Specification failed to update, please try again. ${error}`);
+                }
                 setIsLoading(false);
             }
         } else {
@@ -230,17 +233,13 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     subTitle={loadingMessage.subTitle}
                     description={"This can take a few minutes"} id={"update-specification"}
                     hidden={!isLoading} />
+                <MultipleErrorSummary errors={errors} />
                 <fieldset className="govuk-fieldset" id="update-specification-fieldset" hidden={isLoading}>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
                             Edit specification
                         </h1>
                     </legend>
-                    <div className="govuk-form-group"
-                        hidden={(!formValid.formValid && !formValid.formSubmitted) || (formValid.formValid && formValid.formSubmitted)}>
-                        <ErrorSummary title={errorSummary.title === "" ? "Form not valid" : errorSummary.title}
-                            error={errorSummary.error === "" ? "Please complete all fields" : errorSummary.error} suggestion="" />
-                    </div>
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="address-line-1">
                             Specification name
