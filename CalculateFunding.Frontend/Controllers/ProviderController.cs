@@ -119,8 +119,13 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return BadRequest(result.Content);
             }
-            
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+
+            if (result.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+            }
+
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpGet]

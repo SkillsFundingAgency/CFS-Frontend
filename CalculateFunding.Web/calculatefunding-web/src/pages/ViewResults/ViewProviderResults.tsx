@@ -94,7 +94,14 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                     setProviderResults(specificationInformation);
                 }
             } catch (err) {
-                addError(err);
+                    if (err.response?.status === 404)
+                    {
+                        addError("No results found for this provider.");
+                    }
+                    else
+                    {
+                        addError(err);
+                    }
             } finally {
                 setIsLoadingProviderData(false);
             }
