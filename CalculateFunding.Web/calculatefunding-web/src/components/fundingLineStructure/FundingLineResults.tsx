@@ -301,7 +301,7 @@ export function FundingLineResults({
                             callback={collapsibleStepsChanged}>
                             <FundingLineStep
                                 key={f.name.replace(" ", "") + index}
-                                showResults={false}
+                                showResults={!showApproveButton}
                                 expanded={fundingLinesExpandedStatus}
                                 fundingStructureItem={f}
                                 callback={collapsibleStepsChanged} />
