@@ -131,10 +131,12 @@ export function LoadNewDataSource() {
 
     async function populateFundingStreamSuggestions() {
         setFundingStreamIsLoading(true);
-        const response = await getFundingStreamsService(true);
-        const permittedStreams = response.data.filter(fs => permittedFundingStreams.some(permitted => permitted === fs.id));
-        setFundingStreamSuggestions(permittedStreams);
-        setFundingStreamIsLoading(false);
+        getFundingStreamsService(false)
+            .then((response) => {
+                const permittedStreams = response.data.filter(fs => permittedFundingStreams.some(permitted => permitted === fs.id));
+                setFundingStreamSuggestions(permittedStreams);
+            })
+            .finally(() => setFundingStreamIsLoading(false));
     }
 
     async function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
