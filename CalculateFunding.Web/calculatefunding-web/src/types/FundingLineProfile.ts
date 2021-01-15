@@ -15,7 +15,7 @@ export interface FundingLineProfile {
     profilePatternDescription: string,
     lastUpdatedUser: Reference,
     lastUpdatedDate?: Date,
-    profileTotalAmount: number,
+    profileTotalAmount?: number,
     profileTotals: ProfileTotal[]
 }
 

@@ -30,6 +30,7 @@ import * as providerSearchHook from "../../../hooks/FundingApproval/usePublished
 import React from "react";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
+import {FundingLineProfile, ProfileTotal} from "../../../types/FundingLineProfile";
 
 export function FundingApprovalTestData() {
 
@@ -174,6 +175,46 @@ export function FundingApprovalTestData() {
         upin: "785220",
         urn: "82096"
     };
+    const profileTotal: ProfileTotal = {
+        distributionPeriodId: "", 
+        installmentNumber: 0, 
+        isPaid: false, 
+        occurrence: 0, 
+        periodType: "", 
+        typeValue: "", 
+        value: 0, 
+        year: 0
+    }
+    const fundingLineProfile1: FundingLineProfile = {
+        amountAlreadyPaid: 53450,
+        fundingLineCode: "KNIT", 
+        fundingLineName: "Knitting", 
+        lastUpdatedUser: {name: "Bob", id: "1"}, 
+        profilePatternDescription: "A nice smooth lined knitting pattern", 
+        profilePatternKey: "pattern-key", 
+        profilePatternName: "Stockinette Stitch Pattern", 
+        profileTotalAmount: 5794330, 
+        profileTotals: [profileTotal], 
+        providerId: provider1.publishedProviderVersionId, 
+        providerName: provider1.providerName, 
+        totalAllocation: 895436.74,
+        ukprn: provider1.ukprn
+    }
+    const fundingLineProfileWithMissingTotalAllocation: FundingLineProfile = {
+        amountAlreadyPaid: 53450,
+        fundingLineCode: "KNIT", 
+        fundingLineName: "Knitting", 
+        lastUpdatedUser: {name: "Bob", id: "1"}, 
+        profilePatternDescription: "A nice smooth lined knitting pattern", 
+        profilePatternKey: "pattern-key", 
+        profilePatternName: "Stockinette Stitch Pattern", 
+        profileTotalAmount: undefined, 
+        profileTotals: [profileTotal], 
+        providerId: provider1.publishedProviderVersionId, 
+        providerName: provider1.providerName, 
+        totalAllocation: undefined,
+        ukprn: provider1.ukprn
+    }
     const fullPermissions: SpecificationPermissionsResult = {
         canApproveAllCalculations: false,
         canChooseFunding: false,
@@ -207,7 +248,7 @@ export function FundingApprovalTestData() {
         path: "",
         isExact: true,
     };
-    
+
     const store: Store<IStoreState> = createStore(rootReducer);
 
     const renderPage = () => {
@@ -247,6 +288,8 @@ export function FundingApprovalTestData() {
         testSpec,
         provider1,
         providerWithError1,
+        fundingLineProfile1,
+        fundingLineProfileWithMissingTotalAllocation,
         fundingSearchSelectionState,
         activeJob,
         failedJob,

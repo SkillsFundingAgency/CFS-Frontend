@@ -174,6 +174,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                                 status={PublishStatus.Approved}
                                                 providerId={providerId}
                                                 addError={addError}
+                                                showApproveButton={false}
                                                 clearErrorMessages={clearErrorMessages} />
                         </Tabs.Panel>
                     </Tabs>
