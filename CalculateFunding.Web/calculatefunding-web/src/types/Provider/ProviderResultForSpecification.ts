@@ -14,7 +14,8 @@ export interface FundingLineResult {
     templateLineId: number,
     name: string,
     value: number | null,
-    exceptionMessage: string
+    exceptionMessage: string | null,
+    fundingLineCode: string | null
 }
 
 export interface TemplateCalculationResult {
@@ -25,7 +26,7 @@ export interface TemplateCalculationResult {
     valueFormat: ValueFormatType,
     templateCalculationType: LegacyCalculationType,
     value: number | null,
-    exceptionMessage: string
+    exceptionMessage: string | null
 }
 
 export enum LegacyCalculationType {

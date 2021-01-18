@@ -103,12 +103,12 @@ describe("<FundingLineResults/> tests", () => {
 
         it('shows calculation errors when providerId provided', async () => {
             renderProviderFundingLineResults();
-            await waitFor(() => expect(screen.getByText('exception')).toBeInTheDocument());
+            await waitFor(() => expect(screen.queryByText('exception')).toBeInTheDocument());
         });
 
         it('shows circular reference errors when providerId provided', async () => {
             renderProviderFundingLineResults();
-            await waitFor(() => expect(screen.getByText(/Circular reference detected in calculation script. oops/i)).toBeInTheDocument());
+            await waitFor(() => expect(screen.queryByText(/Circular reference detected in calculation script. oops/i)).toBeInTheDocument());
         });
     });
 });
@@ -161,7 +161,7 @@ const mockFundingLineStructureService = () => {
         level: 1,
         name: "fundingline1",
         calculationId: '',
-        fundingLineCode: "FL1",
+        fundingLineCode: null,
         value: "",
         calculationType: "",
         templateId: 1,
@@ -214,9 +214,10 @@ const mockProviderService = () => {
                 fundingLineResults: {
                     1: {
                         templateLineId: 1,
+                        fundingLineCode: null,
                         name: "fundingline1",
-                        value: null,
-                        exceptionMessage: ''
+                        value: 0,
+                        exceptionMessage: null
                     }
                 },
                 calculationResults: {

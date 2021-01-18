@@ -198,18 +198,19 @@ export function FundingLineResults({
         return `${value}`;
     }
 
-    function getCalculationErrorMessage(calculationId: string | null | undefined, exceptionMessage: string): string {
+    function getCalculationErrorMessage(calculationId: string | null | undefined, exceptionMessage: string | null): string {
         if (calculationId && circularReferenceErrors) {
             const circularReferenceErrorMessage = 'Circular reference detected in calculation script';
             const hasCircularReferenceErrors: boolean = circularReferenceErrors.some((error) =>
                 error.node.calculationid === calculationId
             );
             if (hasCircularReferenceErrors) {
-                return exceptionMessage.length > 0 ? `${circularReferenceErrorMessage}. ${exceptionMessage}`
+                return exceptionMessage !== null && exceptionMessage.length > 0
+                    ? `${circularReferenceErrorMessage}. ${exceptionMessage}`
                     : circularReferenceErrorMessage;
             }
         }
-        return exceptionMessage;
+        return exceptionMessage !== null ? exceptionMessage : "";
     }
 
     function visitNode(node: FundingStructureItemViewModel, hashMap: any,
@@ -229,12 +230,12 @@ export function FundingLineResults({
                 node.errorMessage = getCalculationErrorMessage(node.calculationId, '');
             }
         }
-        if (providerResults && node.fundingLineCode && !hashMap[`fun-${node.fundingLineCode}`]) {
-            hashMap[`fun-${node.fundingLineCode}`] = true;
+        if (providerResults && node.type === FundingStructureType.FundingLine && !hashMap[`fun-${node.templateId}`]) {
+            hashMap[`fun-${node.templateId}`] = true;
             node.errorMessage = '';
             const fundingLineResult = providerResults.fundingLineResults[node.templateId];
             if (fundingLineResult) {
-                node.errorMessage = fundingLineResult.exceptionMessage;
+                node.errorMessage = fundingLineResult.exceptionMessage !== null ? fundingLineResult.exceptionMessage : undefined;
                 node.value = fundingLineResult.value !== null ?
                     renderValue(fundingLineResult.value, ValueFormatType.Currency) : "";
             }
