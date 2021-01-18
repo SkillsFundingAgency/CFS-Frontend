@@ -9,8 +9,7 @@ export type CalculationCircularDependenciesQueryResult = {
     isLoadingCircularDependencies: boolean
 }
 
-export const useCalculationCircularDependencies = (specificationId: string,
-                               onError: (err: AxiosError) => void)
+export const useCalculationCircularDependencies = (specificationId: string, onError: (err: AxiosError) => void)
     : CalculationCircularDependenciesQueryResult => {
     const {data, isLoading} = useQuery<CircularReferenceError[], AxiosError>(
         `calculation-circular-ref-check-${specificationId}`,

@@ -50,7 +50,8 @@ export function FundingLineStep(props: FundingLineStepProps) {
                         link={linkValue}
                         hasChildren={item.fundingStructureItems != null && item.fundingStructureItems.length > 0}
                         lastUpdatedDate={item.lastUpdatedDate}
-                        callback={collapsibleStepsChanged}>
+                        callback={collapsibleStepsChanged}
+                        calculationErrorMessage={item.errorMessage}>
                         {
                             item.fundingStructureItems &&
                                 <FundingLineStep

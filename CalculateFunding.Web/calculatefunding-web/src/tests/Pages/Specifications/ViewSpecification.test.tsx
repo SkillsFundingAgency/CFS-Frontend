@@ -10,6 +10,7 @@ import userEvent from "@testing-library/user-event";
 import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import {QueryClient, QueryClientProvider} from "react-query";
+import {PublishStatus} from "../../../types/PublishStatusModel";
 
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
@@ -45,11 +46,11 @@ const renderViewSpecificationPage = async () => {
 const testSpec: SpecificationSummary = {
     name: "A Test Spec Name",
     id: "SPEC123",
-    approvalStatus: "Draft",
+    approvalStatus: PublishStatus.Draft,
     isSelectedForFunding: true,
     description: "Test Description",
     providerVersionId: "PROVID123",
-    fundingStreams: [{id: "", name: "PSG"}],
+    fundingStreams: [{id: "fundingStreamId", name: "PSG"}],
     fundingPeriod: {
         id: "fp123",
         name: "fp 123"
@@ -60,7 +61,7 @@ const testSpec: SpecificationSummary = {
 
 describe('<ViewSpecification /> ', () => {
 
-    beforeEach(() => {
+    beforeAll(() => {
         mockSpecificationPermissions();
         jest.mock('../../../services/specificationService', () => mockSpecificationService());
         jest.mock('../../../services/fundingStructuresService', () => mockFundingLineStructureService());
@@ -74,7 +75,7 @@ describe('<ViewSpecification /> ', () => {
         it("it calls the specificationService", async () => {
             const {getSpecificationSummaryService} = require('../../../services/specificationService');
             await renderViewSpecificationPage();
-            await waitFor(() => expect(getSpecificationSummaryService).toBeCalled())
+            await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1));
         });
     });
 
@@ -153,7 +154,7 @@ describe('<ViewSpecification /> ', () => {
             const approveAllCalcsButton = queryAllByText('Approve all calculations')[0] as HTMLButtonElement;
             userEvent.click(approveAllCalcsButton);
 
-            await waitFor(() => expect(getCalculationSummaryBySpecificationId).toBeCalled())
+            await waitFor(() => expect(getCalculationSummaryBySpecificationId).toBeCalled());
         });
     });
 
@@ -179,14 +180,12 @@ describe('<ViewSpecification /> ', () => {
             mockSpecificationPermissions(permission);
         });
 
-        it("it does not getCalculationSummary service given approve all calculations button is clicked", async () => {
-            const {getCalculationSummaryBySpecificationId} = require("../../../services/calculationService");
-
+        it("shows permission message when approve all calculations button is clicked", async () => {
             const {queryAllByText} = await renderViewSpecificationPage();
             const approveAllCalcsButton = queryAllByText('Approve all calculations')[0] as HTMLButtonElement;
             userEvent.click(approveAllCalcsButton);
 
-            await waitFor(() => expect(getCalculationSummaryBySpecificationId).not.toBeCalled());
+            await waitFor(() => expect(screen.getByText("You don't have permission to approve calculations")).toBeInTheDocument());
         });
     });
 
@@ -282,6 +281,9 @@ function mockCalculationService() {
     return {
         ...calculationService,
         getCalculationSummaryBySpecificationId: jest.fn(() => Promise.resolve({
+            data: []
+        })),
+        getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
             data: []
         }))
     }

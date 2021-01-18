@@ -60,7 +60,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         fundingPeriodId={specification.fundingPeriod.id}
                                         status={specification.approvalStatus as PublishStatus}
                                         addError={addError}
-                                        clearErrorMessages={clearErrorMessages} /> : ""}
+                                        clearErrorMessages={clearErrorMessages}
+                                        showApproveButton={false} /> : ""}
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
                                 <AdditionalCalculations specificationId={specificationId} addError={addErrorMessage}/>

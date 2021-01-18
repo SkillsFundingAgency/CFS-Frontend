@@ -1,10 +1,10 @@
+import '../styles/CollapsibleSteps.scss';
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {DateFormatter} from "./DateFormatter";
 import {FundingStructureItemViewModel} from "../types/FundingStructureItem";
 import {PublishStatus} from "../types/PublishStatusModel";
-import {PublishedProviderError} from "../types/PublishedProviderError";
 
 interface ICollapsibleStepsProps {
     uniqueKey: string;
@@ -16,12 +16,12 @@ interface ICollapsibleStepsProps {
     value?: string;
     fundingLineCode?: string;
     calculationType?: string;
-    errors?: PublishedProviderError[];
     expanded: boolean;
     hasChildren: boolean;
     customRef?: React.MutableRefObject<null>;
     lastUpdatedDate?: Date;
     callback: any;
+    calculationErrorMessage?: string;
 }
 
 export interface ICollapsibleStepsAllStepsStatus {
@@ -45,42 +45,42 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
         props.callback(!expanded, props.description);
     }
 
+    const hasError: boolean = props.calculationErrorMessage === undefined ||
+        props.calculationErrorMessage === null ? false : props.calculationErrorMessage.length > 0;
+
     return (
         <ul>
-            <li ref={props.customRef} 
-                key={"step" + listKey} 
+            <li ref={props.customRef}
+                key={"step" + listKey}
                 className="collapsible-step step-is-shown">
                 <div key={listKey + "header"}
-                     className={`collapsible-step-header-container 
+                    className={`collapsible-step-header-container 
                      ${props.value != null && props.value !== "" ? " collapsible-step-header-with-calculation-value" : ""}
                      ${props.lastUpdatedDate != null ? " collapsible-step-header-with-updated-date" : ""}`}>
                     <h2 className={props.step === "1" ? "govuk-heading-s first-step-title" : "govuk-heading-s"}>
                         <span className="collapsible-step-circle collapsible-step-circle-number" hidden={props.step === ""}>
                             <span className="collapsible-step-circle-inner">
                                 <span className="collapsible-step-circle-background">
-                                  <span className="collapsible-step-circle-step-label visuallyhidden">Step</span>
+                                    <span className="collapsible-step-circle-step-label visuallyhidden">Step</span>
                                     {props.step}
                                     <span className="collapsible-step-circle-step-colon visuallyhidden"
-                                          aria-hidden="true">:</span>
+                                        aria-hidden="true">:</span>
                                 </span>
                             </span>
                         </span>
-                        {props.fundingLineCode && props.errors &&
-                        props.errors.filter(e => e.fundingLineCode === props.fundingLineCode)
-                            .map((err, index) =>
-                                <span key={`${props.uniqueKey}-error-${index}`} className="govuk-error-message govuk-!-margin-top-2">
-                                    <span className="govuk-visually-hidden">Error:</span>
-                                    {err}
-                                </span>
-                            )}
                         <span className="collapsible-step-header-title">
                             {props.title}
                         </span>
-                        <span className="collapsible-step-header-description">
+                        <span className={`collapsible-step-header-description 
+                            ${hasError ? "govuk-form-group--error" : ""}`}>
                             {props.link !== "" ? <Link to={props.link} className="govuk-link">{props.description}</Link> : <span>{props.description}</span>}
+                            {hasError ?
+                                <span className="govuk-error-container govuk-error-message">
+                                    <span className="govuk-visually-hidden">Error:</span>{props.calculationErrorMessage}
+                                </span> : null}
                         </span>
                         <span className="collapsible-step-header-status">
-                            {props.status}
+                            {hasError ? <span className="govuk-error-message">Error</span> : props.status}
                         </span>
                         <span className="collapsible-step-header-value-container">
                             {props.value != null && props.value !== "" ?
@@ -96,10 +96,10 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                             }
                         </span>
                         <span className="collapsible-step-header-updated-date">
-                            <DateFormatter date={props.lastUpdatedDate} utc={true}/>
+                            <DateFormatter date={props.lastUpdatedDate} utc={true} />
                         </span>
                         <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={updateExpandedStatus}>
-                            <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"}/>
+                            <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"} />
                         </span>
                     </h2>
                 </div>

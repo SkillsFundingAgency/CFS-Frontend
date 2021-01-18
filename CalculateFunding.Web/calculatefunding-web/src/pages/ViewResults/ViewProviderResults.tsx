@@ -26,6 +26,7 @@ import {AxiosError} from "axios";
 import {useErrors} from "../../hooks/useErrors";
 import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {AdditionalCalculations} from "../../components/Calculations/AdditionalCalculations";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -223,84 +224,14 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                         status={specificationSummary.approvalStatus as PublishStatus}
                                         providerId={providerId}
                                         addError={addError}
-                                        clearErrorMessages={clearErrorMessages} />
+                                        clearErrorMessages={clearErrorMessages} 
+                                        showApproveButton={false} />
                                 }
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
-                                {additionalCalculations &&
-                                    <section className="govuk-tabs__panel" id="additional-calculations">
-                                        <LoadingStatus title={"Loading additional calculations"}
-                                            hidden={!isLoadingAdditionalCalculations}
-                                            description={"Please wait whilst additional calculations are loading"} />
-                                        <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
-                                            <div className="govuk-grid-column-two-thirds">
-                                                <h2 className="govuk-heading-l">Additional calculations</h2>
-                                            </div>
-                                            <div className="govuk-grid-column-one-third ">
-                                                <p className="govuk-body right-align"
-                                                    hidden={additionalCalculations.totalResults === 0}>
-                                                    Showing {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
-                                            of {additionalCalculations.totalResults}
-                                            calculations
-                                        </p>
-                                            </div>
-                                        </div>
-                                        <div className="govuk-grid-row">
-                                            <div className="govuk-grid-column-two-thirds">
-                                                <div className="govuk-form-group search-container">
-                                                    <input className="govuk-input input-search" id="event-name"
-                                                        name="event-name" type="text" onChange={(e) => setAdditionalCalculationsSearchTerm(e.target.value)} />
-                                                </div>
-                                            </div>
-                                            <div className="govuk-grid-column-one-third">
-                                                <button className="govuk-button" type="submit" onClick={() => searchAdditionalCalculations()}>Search</button>
-                                            </div>
-                                        </div>
-                                        <table className="govuk-table">
-                                            <thead className="govuk-table__head">
-                                                <tr className="govuk-table__row">
-                                                    <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                                                    <th scope="col" className="govuk-table__header">Type</th>
-                                                    <th scope="col" className="govuk-table__header">Value</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="govuk-table__body">
-                                                {additionalCalculations.results.map((ac, index) =>
-                                                    <tr className="govuk-table__row" key={index}>
-                                                        <td className="govuk-table__cell text-overflow">
-                                                            <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
-                                                        </td>
-                                                        <td className="govuk-table__cell">{ac.valueType != null && ac.value != null ? ac.valueType : ""}</td>
-                                                        <td className="govuk-table__cell">{ac.value}</td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-
-                                        <div className="govuk-warning-text" hidden={additionalCalculations.totalCount > 0}>
-                                            <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                            <strong className="govuk-warning-text__text">
-                                                <span className="govuk-warning-text__assistive">Warning</span>
-                                        No additional calculations available.&nbsp;
-                                        <Link to={`/Specifications/CreateAdditionalCalculation/${specificationSummary?.id}`}>
-                                                    Create a calculation
-                                        </Link>
-                                            </strong>
-                                        </div>
-                                        {additionalCalculations.totalResults > 0 &&
-                                            <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-                                                <div className="pagination__summary">
-                                                    <p className="govuk-body right-align">
-                                                        Showing
-                                            {additionalCalculations.startItemNumber} - {additionalCalculations.endItemNumber}
-                                            of {additionalCalculations.totalResults} calculations
-                                        </p>
-                                                </div>
-                                                <Pagination currentPage={additionalCalculations.currentPage}
-                                                    lastPage={additionalCalculations.lastPage}
-                                                    callback={movePage} />
-                                            </nav>}
-                                    </section>
+                                {specificationSummary && <AdditionalCalculations
+                                        specificationId={specificationSummary.id}
+                                        addError={addError} />
                                 }
                             </Tabs.Panel>
                             <Tabs.Panel label={"provider-data"}>
