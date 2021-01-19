@@ -22,6 +22,7 @@ import {Footer} from "../../components/Footer";
 import {RadioSearch} from "./RadioSearch";
 import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {CharacterRestrictions} from "../../types/CharacterRestrictions";
 
 export interface ViewProvidersByFundingStreamRouteProps {
     fundingStreamId: string;
@@ -227,19 +228,19 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                                 <div className="govuk-form-group">
                                     <span className="govuk-caption-m govuk-!-margin-bottom-4">Select one option</span>
                                     <div className="radios">
-                                        <RadioSearch text="Provider name" timeout={900} radioId={"provider-name"}
+                                        <RadioSearch text="Provider name" timeout={900} radioId={"provider-name"} characterRestrictions={CharacterRestrictions.AlphaNumeric}
                                                      radioName={"search-providers-radios"} searchType={"name"}
                                                      minimumChars={3} callback={searchText}
                                                      selectedSearchType={searchType}/>
-                                        <RadioSearch text="UKPRN" timeout={900} radioId={"ukprn"}
+                                        <RadioSearch text="UKPRN" timeout={900} radioId={"ukprn"} characterRestrictions={CharacterRestrictions.NumericOnly}
                                                      radioName={"search-providers-radios"} searchType={"ukprn"}
                                                      minimumChars={3} callback={searchText}
                                                      selectedSearchType={searchType}/>
-                                        <RadioSearch text="UPIN" timeout={900} radioId={"upin"}
+                                        <RadioSearch text="UPIN" timeout={900} radioId={"upin"} characterRestrictions={CharacterRestrictions.NumericOnly}
                                                      radioName={"search-providers-radios"} searchType={"upin"}
                                                      minimumChars={3} callback={searchText}
                                                      selectedSearchType={searchType}/>
-                                        <RadioSearch text="URN" timeout={900} radioId={"urn"}
+                                        <RadioSearch text="URN" timeout={900} radioId={"urn"} characterRestrictions={CharacterRestrictions.NumericOnly}
                                                      radioName={"search-providers-radios"} searchType={"urn"}
                                                      minimumChars={3} callback={searchText}
                                                      selectedSearchType={searchType}/>
