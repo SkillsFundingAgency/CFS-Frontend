@@ -1,19 +1,18 @@
 ﻿import React from "react";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {LoadingStatus} from "../LoadingStatus";
 import {FundingActionType, PublishedProviderFundingCount} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {Link} from "react-router-dom";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {useQuery} from "react-query";
-import {AxiosError} from "axios";
-import {getFundingSummaryForApprovingService, getFundingSummaryForReleasingService} from "../../services/publishService";
+import * as publishService from "../../services/publishService";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {ErrorProps} from "../../hooks/useErrors";
+import {AxiosError} from "axios";
 
 export interface FundingConfirmationSummaryProps {
     fundingStreamId: string,
@@ -32,14 +31,16 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
 
     const {publishedProviderIds, isLoadingPublishedProviderIds} =
         usePublishedProviderIds(props.fundingStreamId, props.fundingPeriodId, props.specification.id,
-            props.approvalMode !== ApprovalMode.Batches,
-            err => props.addError({error: err, description: "Error while loading provider ids"}));
-    const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.providerVersionIds.length > 0 ? 
+            {
+                enabled: props.approvalMode !== ApprovalMode.Batches,
+                onError: err => props.addError({error: err, description: "Error while loading provider ids"})
+            });
+    const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.providerVersionIds.length > 0 ?
         state.providerVersionIds : publishedProviderIds ? publishedProviderIds : [];
 
     const {data: batchApprovalSummary, isLoading: isLoadingBatchApprovalSummary} =
         useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-approval`,
-            async () => (await getFundingSummaryForApprovingService(props.specification.id, selectedProviderIds)).data,
+            async () => (await publishService.getFundingSummaryForApprovingService(props.specification.id, selectedProviderIds)).data,
             {
                 enabled: props.actionType === FundingActionType.Approve && selectedProviderIds.length > 0,
                 cacheTime: 0,
@@ -48,7 +49,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
             });
     const {data: batchReleaseSummary, isLoading: isLoadingBatchReleaseSummary} =
         useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-release`,
-            async () => (await getFundingSummaryForReleasingService(props.specification.id, selectedProviderIds)).data,
+            async () => (await publishService.getFundingSummaryForReleasingService(props.specification.id, selectedProviderIds)).data,
             {
                 enabled: props.actionType === FundingActionType.Release && selectedProviderIds.length > 0,
                 cacheTime: 0,
@@ -74,7 +75,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
     } else {
 
         if (fundingSummary.count === 0) {
-            props.addError({error: "There are no providers to " +props.actionType.toLowerCase()})
+            props.addError({error: "There are no providers to " + props.actionType.toLowerCase()})
         }
         return (
             <>

@@ -16,7 +16,7 @@ import {FundingActionType} from "../../types/PublishedProvider/PublishedProvider
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {Link} from "react-router-dom";
-import {approveProvidersFundingService, approveSpecificationFundingService, releaseProvidersFundingService, releaseSpecificationFundingService} from "../../services/publishService";
+import * as publishService from "../../services/publishService";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {Footer} from "../../components/Footer";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
@@ -95,15 +95,15 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         try {
             if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
                 if (mode === FundingActionType.Approve) {
-                    setJobId((await approveProvidersFundingService(specificationId, state.providerVersionIds)).data.jobId);
+                    setJobId((await publishService.approveProvidersFundingService(specificationId, state.providerVersionIds)).data.jobId);
                 } else if (mode === FundingActionType.Release) {
-                    setJobId((await releaseProvidersFundingService(specificationId, state.providerVersionIds)).data.jobId);
+                    setJobId((await publishService.releaseProvidersFundingService(specificationId, state.providerVersionIds)).data.jobId);
                 }
             } else {
                 if (mode === FundingActionType.Approve) {
-                    setJobId((await approveSpecificationFundingService(specificationId)).data.jobId);
+                    setJobId((await publishService.approveSpecificationFundingService(specificationId)).data.jobId);
                 } else if (mode === FundingActionType.Release) {
-                    setJobId((await releaseSpecificationFundingService(specificationId)).data.jobId);
+                    setJobId((await publishService.releaseSpecificationFundingService(specificationId)).data.jobId);
                 }
             }
         } catch (e) {

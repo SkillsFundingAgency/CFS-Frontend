@@ -26,7 +26,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
 import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import {preValidateForRefreshFundingService, refreshSpecificationFundingService} from "../../services/publishService";
+import * as publishService from "../../services/publishService";
 import {ConfirmationModal} from "../../components/ConfirmationModal";
 import {RunningStatus} from "../../types/RunningStatus";
 import {AxiosError} from "axios";
@@ -54,16 +54,26 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             err => addError({error: err, description: "Error while checking for job"}));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {publishedProviderSearchResults, isLoadingSearchResults} =
-        usePublishedProviderSearch(state.searchCriteria, true,
-            err => addErrorMessage(err.message, "", "Error while searching for providers"));
+    const {publishedProviderSearchResults, isLoadingSearchResults, refetchSearchResults} =
+        usePublishedProviderSearch(state.searchCriteria,
+            {
+                onError: err => addError({error: err, description: "Error while searching for providers"}),
+                enabled: state.searchCriteria !== undefined && state.searchCriteria.fundingStreamId !== undefined && state.searchCriteria.fundingPeriodId !== undefined
+            });
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
             err => addErrorMessage(err.message, "", "Error while loading funding configuration"));
-    const {publishedProviderIds, isLoadingPublishedProviderIds} =
+    const {publishedProviderIds, isLoadingPublishedProviderIds, refetchPublishedProviderIds} =
         usePublishedProviderIds(fundingStreamId, fundingPeriodId, specificationId,
-            !isCheckingForJob && !(latestJob && latestJob.isActive) && fundingConfiguration !== undefined && fundingConfiguration.approvalMode === ApprovalMode.Batches,
-            err => addErrorMessage(err.message, "", "Error while loading provider ids"));
+            {
+                onError: err => addError({error: err, description: "Error while loading provider ids"}),
+                enabled: specificationId !== undefined && specificationId.length > 0 &&
+                    fundingStreamId !== undefined && fundingStreamId.length > 0 &&
+                    fundingPeriodId !== undefined && fundingPeriodId.length > 0 &&
+                    !isCheckingForJob && !(latestJob && latestJob.isActive) &&
+                    fundingConfiguration !== undefined &&
+                    fundingConfiguration.approvalMode === ApprovalMode.Batches
+            });
     const {publishedProvidersWithErrors, isLoadingPublishedProviderErrors} =
         usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !(latestJob && latestJob.isActive),
             err => addErrorMessage(err.message, "Error while loading provider funding errors"));
@@ -117,27 +127,25 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
         try {
             setIsLoadingRefresh(true);
-            await preValidateForRefreshFundingService(specificationId);
+            await publishService.preValidateForRefreshFundingService(specificationId);
             setIsLoadingRefresh(false);
 
             ConfirmationModal(<ConfirmRefreshModelBody/>, refreshFunding, "Confirm", "Cancel");
-        } catch (e) {
-            if (e.isAxiosError) {
-                const axiosError = e as AxiosError;
-                if (axiosError.response) {
-                    addValidationErrors(axiosError.response.data, "Error trying to refresh funding");
-                }
+        } catch (error) {
+            const axiosError = error as AxiosError;
+            if (axiosError && axiosError.response && axiosError.response.status === 400) {
+                addValidationErrors(axiosError.response.data, "Error trying to refresh funding");
             } else {
-                addErrorMessage(e, "Error trying to refresh funding");
+                addError({error: error, description: `Error trying to refresh funding`});
             }
-            setIsLoadingRefresh(false);
         }
+        setIsLoadingRefresh(false);
     }
 
     async function refreshFunding() {
         setIsLoadingRefresh(true);
         try {
-            setJobId((await refreshSpecificationFundingService(specificationId)).data.jobId);
+            setJobId((await publishService.refreshSpecificationFundingService(specificationId)).data.jobId);
         } catch (e) {
             setIsLoadingRefresh(false);
             addErrorMessage(e, "Error trying to refresh funding");
@@ -166,6 +174,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     if (latestJob && latestJob.jobId === jobId && latestJob.runningStatus === RunningStatus.Completed) {
         setIsLoadingRefresh(false);
         setJobId("");
+        refetchSearchResults();
+        refetchPublishedProviderIds();
     }
 
     const isLoading = errors.length === 0 && (isLoadingSpecification || isLoadingFundingConfiguration || isCheckingForJob || (latestJob && latestJob.isActive) || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);
@@ -243,7 +253,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         }
                     </div>
                 </div>
-                
+
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full right-align">
                         <div className="right-align">
