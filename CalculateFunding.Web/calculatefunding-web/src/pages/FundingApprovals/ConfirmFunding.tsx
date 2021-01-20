@@ -129,7 +129,9 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingSpecification}/>
 
                 <div>
-                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Confirm funding approval</h1>
+                    <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">
+                        Confirm funding {mode === FundingActionType.Approve ? "approval" : "release"}
+                    </h1>
                     <span className="govuk-caption-xl govuk-!-margin-bottom-8">
                         Check the information below carefully before {mode === FundingActionType.Approve ? "approving" : "releasing"} the funding
                     </span>
