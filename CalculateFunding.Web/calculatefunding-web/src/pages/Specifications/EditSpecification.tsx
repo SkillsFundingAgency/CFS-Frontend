@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {getSpecificationSummaryService, updateSpecificationService} from "../../services/specificationService";
-import {getProviderByFundingStreamIdService} from "../../services/providerVersionService";
+import * as specificationService from "../../services/specificationService";
+import * as providerVersionService from "../../services/providerVersionService";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
@@ -12,308 +11,372 @@ import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpe
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
-import {getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} from "../../services/policyService";
-import {getProviderSnapshotsForFundingStreamService} from "../../services/providerService";
-import {SpecificationSummary} from "../../types/SpecificationSummary";
+import * as policyService from "../../services/policyService";
 import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
+import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
+import {useQuery} from "react-query";
+import {AxiosError} from "axios";
+import * as providerService from "../../services/providerService";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
 }
 
-interface EditSpecificationCoreProvider {
-    name: string,
-    value: string
-}
-
-interface EditSpecificationTemplateVersion {
+interface NameValuePair {
     name: string,
     value: string
 }
 
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
     const specificationId = match.params.specificationId;
-    const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>({
-        id: "",
-        name: "",
-        description: "",
-        fundingPeriod: {
-            name: "",
-            id: ""
-        },
-        providerVersionId: "",
-        approvalStatus: "",
-        isSelectedForFunding: false,
-        fundingStreams: [],
-        dataDefinitionRelationshipIds: [],
-        templateIds: {}
-    });
-    const [coreProviderData, setCoreProviderData] = useState<EditSpecificationCoreProvider[]>([]);
-    const [templateVersionData, setTemplateVersionData] = useState<EditSpecificationTemplateVersion[]>([]);
-    const [selectedName, setSelectedName] = useState<string>("");
-    const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
+
+    const {specification, isLoadingSpecification} =
+        useSpecificationSummary(specificationId,
+            err => addError({error: err, description: "Error while loading specification"}),
+            result => {
+                setSelectedName(result.name);
+            });
+
+    const fundingStreamId = specification && specification.fundingStreams[0].id
+    const fundingPeriodId = specification && specification.fundingPeriod.id;
+
+    const {isLoadingFundingConfiguration} =
+        useFundingConfiguration(fundingStreamId, fundingPeriodId,
+            err => addError({error: err, description: "Error while loading funding configuration"}),
+            result => setProviderSource(result.providerSource));
+
     const [providerSource, setProviderSource] = useState<ProviderSource>();
-    const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
-    const [selectedDescription, setSelectedDescription] = useState<string>("");
-    const [loadingMessage, setLoadingMessage] = useState({
-        title: "",
-        subTitle: ""
-    });
-    const [formValid, setFormValid] = useState({
-        formSubmitted: false,
-        formValid: false
-    });
-    const [isLoading, setIsLoading] = useState(false);
-    const history = useHistory();
-    const {errors, addError, addErrorMessage, clearErrorMessages} = useErrors();
-    const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
+    const [coreProviderData, setCoreProviderData] = useState<NameValuePair[]>([]);
 
-    useEffectOnce(() => {
-        const getSpecification = async () => {
-            try {
-                setLoadingMessage({title: "Loading Specification", subTitle: "Please wait whilst we load the specification"});
-                setIsLoading(true);
-                const specificationResult = await getSpecificationSummaryService(specificationId);
-                const editSpecificationViewModel = specificationResult.data as SpecificationSummary;
-                if (editSpecificationViewModel.fundingStreams.length === 0) {
-                    throw new Error("Specification has no funding streams.");
-                }
-                if (editSpecificationViewModel.fundingPeriod.id.length === 0) {
-                    throw new Error("Specification has no funding period.");
-                }
-                setSpecificationSummary(editSpecificationViewModel);
-                setSelectedDescription(editSpecificationViewModel.description ? editSpecificationViewModel.description : "");
-            }
-            catch (error) {
-                addErrorMessage(`Specification failed to load for the following reason: ${error.message}. Please try again.`, "", "", errorSuggestion);
-            
-                setIsLoading(false);
-            }
-        };
-
-        getSpecification();
-    });
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const fundingStreamId = specificationSummary.fundingStreams[0].id;
-
-                const fundingConfiguration = (await getFundingConfiguration(specificationSummary.fundingStreams[0].id, specificationSummary.fundingPeriod.id)).data;
-                const providerSource = fundingConfiguration.providerSource;
-                setProviderSource(providerSource);
-
+    const {data: coreProviders, isLoading: isLoadingCoreProviders} = useQuery<CoreProviderSummary[], AxiosError>(
+        `coreProviderSummary-for-${fundingStreamId}`,
+        async () => (await providerVersionService.getProviderByFundingStreamIdService(fundingStreamId as string)).data,
+        {
+            enabled: providerSource === ProviderSource.CFS,
+            retry: false,
+            onError: err => err.response?.status !== 404 && addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
+            onSuccess: results => {
                 if (providerSource === ProviderSource.CFS) {
-                    const coreProviderResult = await getProviderByFundingStreamIdService(fundingStreamId);
-                    const coreProviderSummaries = coreProviderResult.data as CoreProviderSummary[];
-                    const providerData = coreProviderSummaries.map(coreProviderItem => ({
+                    clearErrorMessages(["selectCoreProvider"]);
+                    const providerData = results.map(coreProviderItem => ({
                         name: coreProviderItem.name,
                         value: coreProviderItem.providerVersionId
                     }));
                     setCoreProviderData(providerData);
-                    const selectedProviderVersion = providerData.find(p => p.value === specificationSummary.providerVersionId);
+                    const selectedProviderVersion = providerData.find(p => specification && p.value === specification.providerVersionId);
                     selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
-                } else if (providerSource === ProviderSource.FDZ) {
-                    const coreProviderSnapshotsResult = await getProviderSnapshotsForFundingStreamService(specificationSummary.fundingStreams[0].id);
-                    const coreProviderSnapshots = coreProviderSnapshotsResult.data as ProviderSnapshot[];
-                    const providerData = coreProviderSnapshots.map(coreProviderItem => ({
+                }
+            }
+        }
+    );
+    const {data: providerSnapshots, isLoading: isLoadingProviderSnapshots} = useQuery<ProviderSnapshot[], AxiosError>(
+        `coreProviderSummary-for-${fundingStreamId}`,
+        async () => (await providerService.getProviderSnapshotsForFundingStreamService(fundingStreamId as string)).data,
+        {
+            enabled: providerSource === ProviderSource.FDZ,
+            retry: false,
+            onError: err => err.response?.status !== 404 && addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
+            onSuccess: results => {
+                if (providerSource === ProviderSource.FDZ) {
+                    clearErrorMessages(["selectCoreProvider"]);
+                    const providerData = results.map(coreProviderItem => ({
                         name: coreProviderItem.name,
                         value: coreProviderItem.providerSnapshotId?.toString()
                     }));
                     setCoreProviderData(providerData);
-                    const selectedProviderSnapshot = providerData.find(p => p.value === specificationSummary.providerSnapshotId?.toString());
+                    const selectedProviderSnapshot = providerData.find(p => specification && p.value === specification.providerSnapshotId?.toString());
                     selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value);
-                } else {
-                    throw new Error("Unable to resolve provider source to either 'CFS' or 'FDZ'.");
                 }
-
-                const templatesResult = await getPublishedTemplatesByStreamAndPeriod(fundingStreamId, specificationSummary.fundingPeriod.id);
-                const publishedFundingTemplates = templatesResult.data as PublishedFundingTemplate[];
-                const templateVersionData = publishedFundingTemplates.map(publishedFundingTemplate => ({
-                    name: publishedFundingTemplate.templateVersion,
-                    value: publishedFundingTemplate.templateVersion
-                }));
-                setTemplateVersionData(templateVersionData);
-                const selectedVersion = templateVersionData.find(t => t.value === specificationSummary.templateIds[fundingStreamId]);
-                selectedVersion && setSelectedTemplateVersion(selectedVersion.value);
             }
-            catch (error) {
-                addErrorMessage(`Specification failed to load for the following reason: ${error.message}. Please try again.`, "", "", errorSuggestion);
-            }
-            finally {
-                setIsLoading(false);
-            }
-        };
-
-        if (specificationSummary.id !== "") {
-            setSelectedName(specificationSummary.name);
-            fetchData();
         }
-    }, [specificationSummary]);
+    );
+
+    const [templateVersionData, setTemplateVersionData] = useState<NameValuePair[]>([]);
+    const {data: publishedFundingTemplates, isLoading: isLoadingPublishedFundingTemplates} = useQuery<PublishedFundingTemplate[], AxiosError>(
+        `published-funding-templates-for-${fundingStreamId}-${fundingPeriodId}`,
+        async () => (await policyService.getPublishedTemplatesByStreamAndPeriod(fundingStreamId as string, fundingPeriodId as string)).data,
+        {
+            enabled: (fundingStreamId && fundingStreamId.length > 0 && fundingPeriodId && fundingPeriodId.length > 0) === true,
+            retry: false,
+            onError: err => err.response?.status !== 404 && addError({error: err, description: "Could not find any published funding templates", fieldName: "selectTemplateVersion"}),
+            onSuccess: results => {
+                clearErrorMessages(["selectTemplateVersion"]);
+                if (specification && fundingStreamId) {
+                    const templateVersionData = results.map(publishedFundingTemplate => ({
+                        name: publishedFundingTemplate.templateVersion,
+                        value: publishedFundingTemplate.templateVersion
+                    }));
+                    setTemplateVersionData(templateVersionData);
+                    const selectedVersion = templateVersionData.find(t => t.value === specification.templateIds[fundingStreamId]);
+                    selectedVersion && setSelectedTemplateVersion(selectedVersion.value);
+                }
+            }
+        }
+    );
+
+    const [selectedName, setSelectedName] = useState<string>("");
+    const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
+    const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
+    const [selectedDescription, setSelectedDescription] = useState<string>("");
+    const [isUpdating, setIsUpdating] = useState(false);
+    const history = useHistory();
+    const {errors, addError, clearErrorMessages} = useErrors();
+    const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
 
     function saveSpecificationName(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
         setSelectedName(specificationName);
+        clearErrorMessages(["name"]);
     }
 
     function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
         setSelectedProviderVersionId(coreProviderId);
+        clearErrorMessages(["selectCoreProvider"]);
     }
 
     function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
         const templateVersionId = e.target.value;
         setSelectedTemplateVersion(templateVersionId);
+        clearErrorMessages(["selectedTemplateVersion"]);
     }
 
     function saveDescriptionName(e: React.ChangeEvent<HTMLTextAreaElement>) {
         const specificationDescription = e.target.value;
         setSelectedDescription(specificationDescription);
+        clearErrorMessages(["description"]);
+    }
+
+    function validateForm() {
+        clearErrorMessages();
+        let isValid: boolean = true;
+
+        if (!selectedName || selectedName.length == 0) {
+            addError({error: "Invalid specification name", fieldName: "name"})
+            isValid = false;
+        }
+        if (!selectedDescription || selectedDescription.length == 0) {
+            addError({error: "Missing description", fieldName: "description"})
+            isValid = false;
+        }
+        if (!selectedProviderVersionId || selectedProviderVersionId.length == 0) {
+            addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
+            isValid = false;
+        }
+        if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
+            addError({error: "Missing template version", fieldName: "selectTemplateVersion"})
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     async function submitUpdateSpecification() {
-        if (selectedName !== "" && selectedProviderVersionId !== "" && selectedDescription !== "" && selectedTemplateVersion !== "") {
-            setFormValid({formValid: true, formSubmitted: true});
-            setLoadingMessage({title: "Updating Specification", subTitle: "Please wait whilst we update the specification"});
-            setIsLoading(true);
-            clearErrorMessages();
+
+        if (validateForm() && specification && fundingStreamId && fundingPeriodId) {
+            setIsUpdating(true);
             const assignedTemplateIdsValue: any = {};
-            assignedTemplateIdsValue[specificationSummary.fundingStreams[0].id] = selectedTemplateVersion;
+            assignedTemplateIdsValue[fundingStreamId] = selectedTemplateVersion;
 
             const updateSpecificationViewModel: UpdateSpecificationViewModel = {
                 description: selectedDescription,
-                fundingPeriodId: specificationSummary.fundingPeriod.id,
-                fundingStreamId: specificationSummary.fundingStreams[0].id,
+                fundingPeriodId: fundingPeriodId,
+                fundingStreamId: fundingStreamId,
                 name: selectedName,
-                providerVersionId: specificationSummary.providerVersionId,
+                providerVersionId: specification.providerVersionId,
                 assignedTemplateIds: assignedTemplateIdsValue,
             };
 
-            if (providerSource?.toString() === ProviderSource[ProviderSource.CFS])
-            {
+            if (providerSource === ProviderSource.CFS) {
                 updateSpecificationViewModel.providerVersionId = selectedProviderVersionId;
-            }
-            else if (providerSource?.toString() === ProviderSource[ProviderSource.FDZ])
-            {
+            } else if (providerSource === ProviderSource.FDZ) {
                 updateSpecificationViewModel.providerSnapshotId = parseInt(selectedProviderVersionId);
             }
 
             try {
-                await updateSpecificationService(updateSpecificationViewModel, specificationId);
-                setIsLoading(false);
+                await specificationService.updateSpecificationService(updateSpecificationViewModel, specificationId);
+                setIsUpdating(false);
                 history.push(`/ViewSpecification/${specificationId}`);
-            }
-            catch(error)  {
-                setFormValid({formValid: true, formSubmitted: false});
-                if (error.response && error.response.data["Name"] !== undefined)
-                {
-                    addErrorMessage(error.response.data["Name"], "", "", errorSuggestion);
+            } catch (error) {
+                if (error.response && error.response.data["Name"] !== undefined) {
+                    addError({error: error.response.data["Name"], description: `Failed to save`, suggestion: errorSuggestion});
+                } else {
+                    addError({error: error, description: `Specification failed to update, please try again`});
                 }
-                else {
-                    addError(`Specification failed to update, please try again. ${error}`);
-                }
-                setIsLoading(false);
+                setIsUpdating(false);
             }
-        } else {
-            setFormValid({formSubmitted: true, formValid: false})
         }
     }
 
+    const isLoading = isLoadingPublishedFundingTemplates || isLoadingFundingConfiguration || isLoadingCoreProviders || isLoadingProviderSnapshots || isLoadingSpecification;
+
     return <div>
-        <Header location={Section.Specifications} />
+        <Header location={Section.Specifications}/>
         <div className="govuk-width-container">
             <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"} />
-                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-                <Breadcrumb name={"Edit specification"} />
+                <Breadcrumb name={"Calculate funding"} url={"/"}/>
+                <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
+                <Breadcrumb name={"Edit specification"}/>
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
-                <LoadingStatus title={loadingMessage.title}
-                    subTitle={loadingMessage.subTitle}
-                    description={"This can take a few minutes"} id={"update-specification"}
-                    hidden={!isLoading} />
-                <MultipleErrorSummary errors={errors} />
-                <fieldset className="govuk-fieldset" id="update-specification-fieldset" hidden={isLoading}>
+                <LoadingStatus title={isUpdating ? "Updating Specification" : "Loading"}
+                               subTitle="Please wait"
+                               description={isUpdating ? "This can take a few minutes" : ""}
+                               hidden={!isUpdating && !isLoading}/>
+
+                <MultipleErrorSummary errors={errors}/>
+
+                {!isLoading && !isUpdating &&
+                <fieldset className="govuk-fieldset" id="update-specification-fieldset">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
                             Edit specification
                         </h1>
                     </legend>
-                    <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="address-line-1">
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "name").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <label className="govuk-label" htmlFor="name">
                             Specification name
                         </label>
-                        <input className="govuk-input" id="address-line-1" name="address-line-1" type="text"
-                            value={selectedName}
-                            onChange={saveSpecificationName} />
+                        <input className="govuk-input"
+                               id="name"
+                               name="name"
+                               type="text"
+                               value={selectedName}
+                               onChange={saveSpecificationName}/>
                     </div>
 
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
-                            Funding streams
+                        <label className="govuk-label" htmlFor="funding-stream">
+                            Funding stream
                         </label>
-                        <h3 className="govuk-heading-m">{specificationSummary.fundingStreams.length > 0 && specificationSummary.fundingStreams[0].id}</h3>
+                        <h3 className="govuk-heading-m" id="funding-stream">{fundingStreamId}</h3>
                     </div>
 
                     <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                        <label className="govuk-label" htmlFor="funding-period">
                             Funding period
                         </label>
-                        <h3 className="govuk-heading-m">{specificationSummary.fundingStreams.length > 0 && specificationSummary.fundingPeriod.name}</h3>
+                        <h3 className="govuk-heading-m" id="funding-period">{specification && specification.fundingPeriod.name}</h3>
                     </div>
 
-                    <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "enableTracking").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <label className="govuk-label" htmlFor="enableTracking">
+                            Track latest core provider data?
+                        </label>
+                        <div id="enableTracking-hint" className="govuk-hint govuk-!-margin-bottom-4">
+                            Select yes if you wish to use the latest available provider data.
+                        </div>
+                        <div className="govuk-radios">
+                            <div className="govuk-radios__item">
+                                <input className="govuk-radios__input" 
+                                       id="sign-in" 
+                                       name="sign-in" 
+                                       type="radio" 
+                                       value="government-gateway" 
+                                       aria-describedby="sign-in-item-hint" >
+                                    <label className="govuk-label govuk-radios__label" htmlFor="sign-in">
+                                        Yes
+                                    </label>
+                                    <div id="sign-in-item-hint" className="govuk-hint govuk-radios__hint">
+                                        This specification will use the latest available provider data
+                                    </div>
+                                </input>
+                            </div>
+                            <div className="govuk-radios__item">
+                                <input className="govuk-radios__input" 
+                                       id="sign-in-2" 
+                                       name="sign-in" 
+                                       type="radio" 
+                                       value="govuk-verify" 
+                                       aria-describedby="sign-in-2-item-hint">
+                                    <label className="govuk-label govuk-radios__label" htmlFor="sign-in-2">
+                                        No
+                                    </label>
+                                    <div id="sign-in-2-item-hint" className="govuk-hint govuk-radios__hint">
+                                        I will select which provider data to use
+                                    </div>
+                                </input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={coreProviderData.length === 0}
-                            value={selectedProviderVersionId}
-                            onChange={selectCoreProvider}>
+                        <select className="govuk-select"
+                                id="selectCoreProvider"
+                                name="selectCoreProvider"
+                                disabled={coreProviderData.length === 0}
+                                value={selectedProviderVersionId}
+                                onChange={selectCoreProvider}>
                             <option value="">Select core provider</option>
-                            {coreProviderData.map((cp, index) => <option key={`provider-${index}`}
-                                value={cp.value}>{cp.name}
-                            </option>)}
+                            {coreProviderData.map((cp, index) =>
+                                <option key={`provider-${index}`}
+                                        value={cp.value}>
+                                    {cp.name}
+                                </option>)}
                         </select>
                     </div>
 
-                    <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="sort">
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectTemplateVersion").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <label className="govuk-label" htmlFor="selectTemplateVersion">
                             Template version
                         </label>
-                        <select className="govuk-select" id="sort" name="sort" disabled={templateVersionData.length === 0}
-                            value={selectedTemplateVersion}
-                            onChange={selectTemplateVersion}>
+                        <select className="govuk-select"
+                                id="selectTemplateVersion"
+                                name="selectTemplateVersion"
+                                disabled={templateVersionData.length === 0}
+                                value={selectedTemplateVersion}
+                                onChange={selectTemplateVersion}>
                             <option value="">Select template version</option>
-                            {templateVersionData.map((cp, index) => <option key={`template-version-${index}`}
-                                value={cp.value}>{cp.name}
-                            </option>)}
+                            {templateVersionData.map((cp, index) =>
+                                <option key={`template-version-${index}`}
+                                        value={cp.value}>
+                                    {cp.name}
+                                </option>)}
                         </select>
                     </div>
 
-                    <div className="govuk-form-group">
-                        <label className="govuk-label" htmlFor="more-detail">
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <label className="govuk-label" htmlFor="description">
                             Can you provide more detail?
                         </label>
-                        <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8}
-                            aria-describedby="more-detail-hint"
-                            onChange={(e) => saveDescriptionName(e)} value={selectedDescription} />
+                        <textarea className="govuk-textarea" 
+                                  id="description" 
+                                  name="description" 
+                                  rows={8}
+                                  aria-describedby="description-hint"
+                                  onChange={saveDescriptionName}
+                                  value={selectedDescription}/>
                     </div>
                     <div className="govuk-form-group">
                         <button id="submit-specification-button" className="govuk-button govuk-!-margin-right-1"
-                            data-module="govuk-button"
-                            onClick={submitUpdateSpecification}>
+                                data-module="govuk-button"
+                                onClick={submitUpdateSpecification}>
                             Save and continue
                         </button>
-                        <Link id="cancel-update-specification" to={`/ViewSpecification/${specificationSummary.id}`}
-                            className="govuk-button govuk-button--secondary"
-                            data-module="govuk-button">
+                        <Link id="cancel-update-specification" to={`/ViewSpecification/${specificationId}`}
+                              className="govuk-button govuk-button--secondary"
+                              data-module="govuk-button">
                             Cancel
                         </Link>
                     </div>
                 </fieldset>
+                }
+                {isUpdating &&
+                <div className="govuk-form-group">
+                    <Link id="cancel-update-specification" to={`/ViewSpecification/${specificationId}`}
+                          className="govuk-button govuk-button--secondary"
+                          data-module="govuk-button">
+                        Back
+                    </Link>
+                </div>
+                }
             </div>
         </div>
-        <Footer />
+        <Footer/>
     </div>
 }

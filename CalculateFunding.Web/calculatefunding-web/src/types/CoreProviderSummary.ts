@@ -21,6 +21,6 @@ export interface ProviderSnapshot {
 }
 
 export enum ProviderSource{
-    CFS= "CFS",
+    CFS = "CFS",
     FDZ = "FDZ"
 }

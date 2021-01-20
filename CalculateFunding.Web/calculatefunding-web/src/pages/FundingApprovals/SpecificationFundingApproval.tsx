@@ -51,7 +51,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob],
-            err => addError(err, "Error while checking for job"));
+            err => addError({error: err, description: "Error while checking for job"}));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
     const {publishedProviderSearchResults, isLoadingSearchResults} =

@@ -27,12 +27,12 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
     const history = useHistory();
     const {errors, addError, clearErrorMessages} = useErrors();
     const {specification, isLoadingSpecification} =
-        useSpecificationSummary(specificationId, err => addError(err, "Error while loading specification"));
+        useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
     const fundingPeriodId = specification && specification.fundingPeriod.id;
     const fundingStreamId = specification && specification.fundingStreams[0].id;
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
-            err => addError(err, "Error while loading funding configuration"));
+            err => addError({error: err, description: "Error while loading funding configuration"}));
     const {data: dataSchemas, isLoading: isLoadingDataSchemas} =
         useQuery(
             `data-schemas-for-stream-${fundingStreamId}`,
@@ -40,13 +40,13 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                 .then((response) => response.data),
             {
                 enabled: fundingStreamId !== undefined,
-                onError: err => addError(err as AxiosError, "Error while loading available data schemas")
+                onError: err => addError({error: err as AxiosError, description: "Error while loading available data schemas"})
             });
     const {mutate: assignDatasetSchema, isLoading: isUpdating, isSuccess} =
         useMutation<boolean, AxiosError, AssignDatasetSchemaRequest>(
             async (request) => (await assignDatasetSchemaService(request)).data,
             {
-                onError: err => addError(err, "Error while trying to assign dataset schema"),
+                onError: err => addError({error: err, description: "Error while trying to assign dataset schema"}),
                 onSuccess: data => {
                     if (updateRequest && updateRequest.addAnotherAfter) {
                         clearFormData();

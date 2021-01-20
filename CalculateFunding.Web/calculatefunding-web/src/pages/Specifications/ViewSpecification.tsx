@@ -81,7 +81,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const {hasJob, latestJob: approveAllCalculationsJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.ApproveAllCalculationsJob],
-            err => addError(err, "Error while checking for approve all calculation job"));
+            err => addError({error: err, description: "Error while checking for approve all calculation job"}));
 
     useEffect(() => {
         const params = QueryString.parse(location.search);

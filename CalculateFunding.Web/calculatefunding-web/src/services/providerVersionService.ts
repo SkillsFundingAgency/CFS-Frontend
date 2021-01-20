@@ -1,12 +1,12 @@
-import axios from "axios"
+import axios, {AxiosResponse} from "axios"
+import {CoreProviderSummary} from "../types/CoreProviderSummary";
 
-const baseURL = "/api/providerversions";
+const baseURL = "/api/providerVersions";
 
-export async function getProviderByFundingStreamIdService(fundingStreamId:string) {
-    return axios(`${baseURL}/getbyfundingstream/${fundingStreamId}`, {
+export async function getProviderByFundingStreamIdService(fundingStreamId: string):
+    Promise<AxiosResponse<CoreProviderSummary[]>> {
+    return axios(`${baseURL}/getByFundingStream/${fundingStreamId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type':'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }

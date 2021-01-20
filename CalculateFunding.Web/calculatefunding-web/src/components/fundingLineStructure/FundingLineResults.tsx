@@ -29,6 +29,7 @@ import {ProviderResultForSpecification} from "../../types/Provider/ProviderResul
 import {ValueFormatType} from "../../types/TemplateBuilderDefinitions";
 import {formatNumber, NumberType} from "../FormattedNumber";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
+import {ErrorProps} from "../../hooks/useErrors";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -36,7 +37,7 @@ export interface FundingLineResultsProps {
     fundingStreamId: string,
     status: PublishStatus,
     providerId?: string,
-    addError: (errorMessage: AxiosError | Error | string, description?: string, fieldName?: string) => void,
+    addError: (props: ErrorProps) => void,
     clearErrorMessages: (fieldNames?: string[]) => void,
     setStatusToApproved?: () => void,
     refreshFundingLines?: boolean | undefined,
@@ -81,7 +82,7 @@ export function FundingLineResults({
                 setStatusToApproved();
             }
         } else {
-            addError(`${response.statusText} ${response.data}`, "Error whilst approving funding line structure", "funding-line-results");
+            addError({error: `${response.statusText} ${response.data}`, description: "Error whilst approving funding line structure", fieldName: "funding-line-results"});
             setFundingLinePublishStatus(status);
         }
     };
@@ -263,7 +264,7 @@ export function FundingLineResults({
         } catch (err) {
             setIsLoadingFundingLineStructure(false);
             setFundingLineStructureError(true);
-            addError(err, `A problem occurred while loading funding line structure`, "funding-line-results");
+            addError({error: err, description: `A problem occurred while loading funding line structure`, fieldName: "funding-line-results"});
         }
     };
 

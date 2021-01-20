@@ -9,10 +9,11 @@ import {useEffect, useState} from "react";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
+import {ErrorProps} from "../../hooks/useErrors";
 
 export interface AdditionalCalculationsProps {
     specificationId: string,
-    addError: (errorMessage: string, description?: string, fieldName?: string) => void,
+    addError: (props: ErrorProps) => void,
 }
 
 export function AdditionalCalculations(props: AdditionalCalculationsProps) {
@@ -42,7 +43,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
         useSpecificationPermissions(props.specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
     const {circularReferenceErrors, isLoadingCircularDependencies} =
         useCalculationCircularDependencies(props.specificationId,
-            err => props.addError(err.message, "Error while checking for circular reference errors"));
+            err => props.addError({error: err, description: "Error while checking for circular reference errors"}));
 
     useEffect(() => {
         findAdditionalCalculations(props.specificationId, statusFilter, 1, additionalCalculationsSearchTerm);
@@ -61,7 +62,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
         }).then((response) => {
             setAdditionalCalculations(response.data);
             setIsLoadingAdditionalCalculations(false);
-        }).catch((err) => props.addError(err.toString(), "Error while fetching additional calculations", "additional-calculations"));
+        }).catch((err) => props.addError({error: err, description: "Error while fetching additional calculations", fieldName: "additional-calculations"}));
     }
 
     function movePage(pageNumber: number) {

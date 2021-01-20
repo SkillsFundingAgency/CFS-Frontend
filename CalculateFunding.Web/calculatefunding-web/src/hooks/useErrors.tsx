@@ -2,6 +2,13 @@
 import * as React from "react";
 import {ErrorMessage, ValidationErrors} from "../types/ErrorMessage";
 
+export interface ErrorProps {
+    error: AxiosError | Error | string, 
+    description ? : string, 
+    fieldName ? : string, 
+    suggestion?: any
+}
+
 export const useErrors = () => {
     const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
@@ -27,7 +34,7 @@ export const useErrors = () => {
         setErrors(errors => [...errors, error]);
     };
 
-    const addError = (error: AxiosError | Error | string, description?: string, fieldName?: string) => {
+    const addError = ({error, description, fieldName, suggestion}: ErrorProps) => {
         let errorMessage = "";
         const axiosError = (error as AxiosError);
         if (axiosError && axiosError.isAxiosError) {
@@ -37,7 +44,7 @@ export const useErrors = () => {
         if (err && err.message) {
             errorMessage = err.message;
         }
-        addErrorMessage(errorMessage.length > 0 ? errorMessage : error.toString(), description, fieldName);
+        addErrorMessage(errorMessage.length > 0 ? errorMessage : error.toString(), description, fieldName, suggestion);
     };
 
     const addValidationErrors = (validationErrors: ValidationErrors, message: string, description?: string, fieldName?: string) => {

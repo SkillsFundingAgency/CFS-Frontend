@@ -97,7 +97,8 @@ export async function approveFundingLineStructureService(specificationId: string
     });
 }
 
-export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel) {
+export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel): 
+    Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/create`, {
         method: 'POST',
         headers: {

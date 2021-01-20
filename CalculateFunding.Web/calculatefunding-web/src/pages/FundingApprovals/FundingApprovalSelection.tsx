@@ -20,12 +20,12 @@ export function FundingApprovalSelection() {
     const history = useHistory();
     const {fundingStreams, isLoadingOptions, isErrorCheckingForOptions, errorCheckingForOptions} =
         useOptionsForSpecificationsSelectedForFunding({
-            onError: err => addError(err, "Error while loading selections")
+            onError: err => addError({error: err, description: "Error while loading selections"})
         });
     const {errors, addError, clearErrorMessages} = useErrors();
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(selectedFundingStream?.id, selectedFundingPeriod?.id,
-            err => addError(err, "Error while loading funding configuration"));
+            err => addError({error: err, description: "Error while loading funding configuration"}));
 
     const changeFundingStream = (e: React.ChangeEvent<HTMLSelectElement>) => {
         clearErrorMessages();

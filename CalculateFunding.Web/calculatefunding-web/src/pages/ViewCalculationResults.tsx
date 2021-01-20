@@ -60,7 +60,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                 JobType.GenerateGraphAndInstructAllocationJob,
                 JobType.CreateInstructGenerateAggregationsAllocationJob,
                 JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob],
-            err => addError(err, "Error checking for job"));
+            err => addError({error: err, description: "Error checking for job"}));
 
     const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
         calculationValueType: "",

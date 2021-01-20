@@ -52,7 +52,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
         useMutation((request: UpdateCalculationRequest) =>
                 updateCalculationService(request),
             {
-                onError: err => addError(err as AxiosError, "Error while trying to update calculation"),
+                onError: err => addError({error: err as AxiosError, description: "Error while trying to update calculation"}),
                 onSuccess: async response => {
                     const calc = await response.data;
                     setCalculation(calc);

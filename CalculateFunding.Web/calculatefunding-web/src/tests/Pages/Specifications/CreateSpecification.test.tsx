@@ -3,18 +3,19 @@ import {screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {CreateSpecificationTestData} from "./CreateSpecificationTestData";
 import userEvent from "@testing-library/user-event";
+import * as policyService from "../../../services/policyService";
 
-const testData = CreateSpecificationTestData();
+const test = CreateSpecificationTestData();
 
 describe("<CreateSpecification />", () => {
     describe("<CreateSpecification /> with successful scenario", () => {
         beforeEach(async () => {
-            testData.mockPolicyService();
-            testData.mockSpecificationService();
-            testData.mockProviderService();
-            testData.mockProviderVersionService();
+            test.mockPolicyService();
+            test.mockSpecificationService();
+            test.mockProviderService();
+            test.mockProviderVersionService();
 
-            await testData.renderCreateSpecificationPage();
+            await test.renderCreateSpecificationPage();
         });
 
         afterEach(() => jest.clearAllMocks());
@@ -28,149 +29,257 @@ describe("<CreateSpecification />", () => {
 
        describe("page render checks ", () => {
             it('the breadcrumbs are correct', async () => {
-                expect(await screen.queryAllByText(/Create specification/)[0]).toHaveClass("govuk-breadcrumbs__list-item");
+                expect((await screen.findAllByText(/Create specification/))[0]).toHaveClass("govuk-breadcrumbs__list-item");
             });
 
             it('will have the correct breadcrumbs', async () => {
-                expect(await screen.queryAllByTestId("breadcrumb").length).toBe(3);
+                expect(await screen.findAllByTestId("breadcrumb")).toHaveLength(3);
             });
 
             it('will have the correct <H1 /> title', async () => {
-                expect(await screen.queryAllByText(/Create specification/)[1]).toHaveClass("govuk-fieldset__heading");
+                expect((await screen.findAllByText(/Create specification/))[1]).toHaveClass("govuk-fieldset__heading");
             });
         });
         describe("form submission checks ", () => {
-            it("it does not displays error given all required fields are completed", async () => {
+
+            it("it displays correct errors given nothing entered before submitting", async () => {
+                const button = screen.getByRole("button", {name: /Save and continue/});
+                userEvent.click(button);
+
+                expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+                expect(screen.getByText(/Invalid specification name/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing funding stream/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing funding period/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing core provider version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing description/)).toBeInTheDocument();
+            });
+
+            it("it displays correct errors given funding stream is not selected", async () => {
                 const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
                 userEvent.type(specificationField, "test specification name");
+
+                const button = screen.getByRole("button", {name: /Save and continue/});
+                userEvent.click(button);
+
+                expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+                expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
+                expect(screen.getByText(/Missing funding stream/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing funding period/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing core provider version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing description/)).toBeInTheDocument();
+            });
+
+            it("it displays correct errors given funding period is not selected", async () => {
+                const {getFundingStreamsService} = require('../../../services/policyService');
+                await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
+                
+                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
+                userEvent.type(specificationField, "test specification name");
+                
                 const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-                userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
+                userEvent.selectOptions(fundingStreamSelect, test.fundingStream.name);
+                
+                const {getFundingPeriodsByFundingStreamIdService} = require('../../../services/specificationService');
+                await waitFor(() => expect(getFundingPeriodsByFundingStreamIdService).toBeCalledTimes(1));
+                
                 const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-                userEvent.selectOptions(fundingPeriodSelect, "test funding period id");
+                expect(fundingPeriodSelect).toHaveLength(2);
+
+                const button = screen.getByRole("button", {name: /Save and continue/});
+                userEvent.click(button);
+
+                expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+                expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
+                expect(screen.getByText(/Missing funding period/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing core provider version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing description/)).toBeInTheDocument();
+            });
+
+            it("it displays correct errors given provider is not selected", async () => {
+                const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
+                const {getProviderByFundingStreamIdService} = require('../../../services/providerVersionService');
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+
+                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
+                userEvent.type(specificationField, "test specification name");
+
+                await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
+                const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
+                expect(fundingStreamSelect).toHaveLength(2);
+                userEvent.selectOptions(fundingStreamSelect, test.fundingStream.name);
+
+                const {getFundingPeriodsByFundingStreamIdService} = require('../../../services/specificationService');
+                await waitFor(() => expect(getFundingPeriodsByFundingStreamIdService).toBeCalledTimes(1));
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+
+                const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
+                expect(fundingPeriodSelect).toHaveLength(2);
+                userEvent.selectOptions(fundingPeriodSelect, test.fundingPeriod.name);
+                
+                await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
+                await waitFor(() => expect(getProviderByFundingStreamIdService).toBeCalledTimes(1));
                 const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-                userEvent.selectOptions(coreProviderSelect, "test core provider id");
+                expect(coreProviderSelect).toHaveLength(2);
+                
+                await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
                 const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
-                userEvent.selectOptions(templateVersionSelect, "test template version id");
-                const moreDetailField = await screen.findByTestId(`more-detail-textarea`);
-                userEvent.type(moreDetailField, "test value");
+                expect(templateVersionSelect).toHaveLength(2);
+                
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
+                const button = screen.getByRole("button", {name: /Save and continue/});
+                userEvent.click(button);
 
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).not.toBeVisible();
-                });
+                expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+                expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding period/)).not.toBeInTheDocument();
+                expect(screen.getByText(/Missing core provider version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing description/)).toBeInTheDocument();
             });
 
-            it("it displays error given no specification", async () => {
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
+            it("it displays correct errors given template version is not selected", async () => {
+                const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
+                const {getProviderByFundingStreamIdService} = require('../../../services/providerVersionService');
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).toBeVisible();
-                });
-            });
-
-            it("it displays error given funding stream is not selected", async () => {
                 const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
                 userEvent.type(specificationField, "test specification name");
 
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
-
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).toBeVisible();
-                });
-            });
-
-            it("it displays error given funding period is not selected", async () => {
-                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
-                userEvent.type(specificationField, "test specification name");
+                await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
                 const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-                userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
+                expect(fundingStreamSelect).toHaveLength(2);
+                userEvent.selectOptions(fundingStreamSelect, test.fundingStream.name);
 
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
+                const {getFundingPeriodsByFundingStreamIdService} = require('../../../services/specificationService');
+                await waitFor(() => expect(getFundingPeriodsByFundingStreamIdService).toBeCalledTimes(1));
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).toBeVisible();
-                });
-            });
-
-            it("it displays error given provider is not selected", async () => {
-                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
-                userEvent.type(specificationField, "test specification name");
-                const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-                userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
                 const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-                userEvent.selectOptions(fundingPeriodSelect, "test funding period id");
+                expect(fundingPeriodSelect).toHaveLength(2);
+                userEvent.selectOptions(fundingPeriodSelect, test.fundingPeriod.name);
 
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
+                await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
 
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).toBeVisible();
-                });
-            });
-
-            it("it displays error given template version is not selected", async () => {
-                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
-                userEvent.type(specificationField, "test specification name");
-                const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-                userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
-                const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-                userEvent.selectOptions(fundingPeriodSelect, "test funding period id");
-                const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-                userEvent.selectOptions(coreProviderSelect, "test core provider id");
-
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
-
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).toBeVisible();
-                });
-            });
-
-            it("it displays error given more details field is not completed", async () => {
-                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
-                userEvent.type(specificationField, "test specification name");
-                const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-                userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
-                const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-                userEvent.selectOptions(fundingPeriodSelect, "test funding period id");
-                const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-                userEvent.selectOptions(coreProviderSelect, "test core provider id");
+                await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
                 const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
-                userEvent.selectOptions(templateVersionSelect, "test template version id");
+                expect(templateVersionSelect).toHaveLength(2);
+                
+                await waitFor(() => expect(getProviderByFundingStreamIdService).toBeCalledTimes(1));
+                const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
+                expect(coreProviderSelect).toHaveLength(2);
+                
+                userEvent.selectOptions(coreProviderSelect, test.providerVersion.name);
 
-                const buildButton = screen.getByRole("button", {name: /Save and continue/});
-                userEvent.click(buildButton);
+                const button = screen.getByRole("button", {name: /Save and continue/});
+                userEvent.click(button);
 
-                waitFor(() => {
-                    expect(screen.queryByText(/Form not valid/)).toBeVisible();
-                });
+                expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+                expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding period/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing core provider version/)).not.toBeInTheDocument();
+                expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
+                expect(screen.getByText(/Missing description/)).toBeInTheDocument();
+            });
+
+            it("it displays error given description missing", async () => {
+                const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
+                const {getProviderByFundingStreamIdService} = require('../../../services/providerVersionService');
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+
+                const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
+                userEvent.type(specificationField, "test specification name");
+
+                await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
+                const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
+                expect(fundingStreamSelect).toHaveLength(2);
+                userEvent.selectOptions(fundingStreamSelect, test.fundingStream.name);
+
+                const {getFundingPeriodsByFundingStreamIdService} = require('../../../services/specificationService');
+                await waitFor(() => expect(getFundingPeriodsByFundingStreamIdService).toBeCalledTimes(1));
+                expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+
+                const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
+                expect(fundingPeriodSelect).toHaveLength(2);
+                userEvent.selectOptions(fundingPeriodSelect, test.fundingPeriod.name);
+
+                await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
+
+                await waitFor(() => expect(getProviderByFundingStreamIdService).toBeCalledTimes(1));
+                const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
+                expect(coreProviderSelect).toHaveLength(2);
+
+                userEvent.selectOptions(coreProviderSelect, test.providerVersion.name);
+
+                await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
+                const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
+                expect(templateVersionSelect).toHaveLength(2);
+                userEvent.selectOptions(templateVersionSelect, test.template.templateVersion);
+
+                const button = screen.getByRole("button", {name: /Save and continue/});
+                userEvent.click(button);
+
+                expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
+                expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing funding period/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing core provider version/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing template version/)).not.toBeInTheDocument();
+                expect(screen.getByText(/Missing description/)).toBeInTheDocument();
             });
         });
 
         it("it submits create specification given all fields are provided", async () => {
             const {createSpecificationService} = require('../../../services/specificationService');
+
+            const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
+            const {getProviderByFundingStreamIdService} = require('../../../services/providerVersionService');
+            expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+
             const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
             userEvent.type(specificationField, "test specification name");
-            const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-            userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
-            const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-            userEvent.selectOptions(fundingPeriodSelect, "test funding period id");
-            const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-            userEvent.selectOptions(coreProviderSelect, "test core provider id");
-            const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
-            userEvent.selectOptions(templateVersionSelect, "test template version id");
-            const moreDetailField = await screen.findByTestId(`more-detail-textarea`);
-            userEvent.type(moreDetailField, "test value");
 
-            const buildButton = screen.getByRole("button", {name: /Save and continue/});
-            userEvent.click(buildButton);
+            await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
+            const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
+            expect(fundingStreamSelect).toHaveLength(2);
+            userEvent.selectOptions(fundingStreamSelect, test.fundingStream.name);
+
+            const {getFundingPeriodsByFundingStreamIdService} = require('../../../services/specificationService');
+            await waitFor(() => expect(getFundingPeriodsByFundingStreamIdService).toBeCalledTimes(1));
+            expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+
+            const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
+            expect(fundingPeriodSelect).toHaveLength(2);
+            userEvent.selectOptions(fundingPeriodSelect, test.fundingPeriod.name);
+
+            await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
+
+            await waitFor(() => expect(getProviderByFundingStreamIdService).toBeCalledTimes(1));
+            const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
+            expect(coreProviderSelect).toHaveLength(2);
+
+            userEvent.selectOptions(coreProviderSelect, test.providerVersion.name);
+
+            await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
+            const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
+            expect(templateVersionSelect).toHaveLength(2);
+            userEvent.selectOptions(templateVersionSelect, test.template.templateVersion);
+            
+            const moreDetailField = await screen.findByTestId(`description-textarea`);
+            userEvent.type(moreDetailField, "test description");
+            expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
+
+            const button = screen.getByRole("button", {name: /Save and continue/});
+            userEvent.click(button);
 
             await waitFor(() => expect(createSpecificationService).toBeCalledTimes(1));
+            expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
         });
     });
 });

@@ -50,7 +50,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
     const {providerVersion: providerDetails, isLoadingProviderVersion} = useProviderVersion(
         providerId,
         specificationSummary ? specificationSummary.providerVersionId : "",
-        (err: AxiosError) => addError(err.message, "Error while loading provider"));
+        (err: AxiosError) => addError({error: err.message, description: "Error while loading provider"}));
 
     useEffect(() => {
         const querystringParams = QueryString.parse(location.search);
@@ -97,11 +97,11 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             } catch (err) {
                     if (err.response?.status === 404)
                     {
-                        addError("No results found for this provider.");
+                        addError({error: "No results found for this provider."});
                     }
                     else
                     {
-                        addError(err);
+                        addError({error: err});
                     }
             } finally {
                 setIsLoadingProviderData(false);
@@ -129,7 +129,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             .then((response) => {
                 setAdditionalCalculations(response.data);
             }).catch((err) => {
-                addError(err);
+                addError({error: err});
             }).finally(() => {
                 setIsLoadingAdditionalCalculations(false);
             });
@@ -157,7 +157,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             setSpecificationSummary(response.data);
             populateAdditionalCalculations(result.id, "", 1, additionalCalculationsSearchTerm);
         }).catch((e) => {
-            addError(e.message);
+            addError({error: e});
         });
     }
 

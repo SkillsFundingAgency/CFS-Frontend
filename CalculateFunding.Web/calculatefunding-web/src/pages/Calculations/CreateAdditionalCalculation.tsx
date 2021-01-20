@@ -28,12 +28,11 @@ export interface CreateAdditionalCalculationRouteProps {
 
 export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteComponentProps<CreateAdditionalCalculationRouteProps> & CreateAdditionalCalculationProps) {
     const specificationId = match.params.specificationId;
-    const {errors, addErrorMessage, clearErrorMessages} = useErrors();
+    const {errors, addError, addErrorMessage, clearErrorMessages} = useErrors();
     const {canCreateAdditionalCalculation, missingPermissions} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
     const {specification, isLoadingSpecification} =
-        useSpecificationSummary(specificationId,
-            err => addErrorMessage(err.message, "Error while loading specification"));
+        useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
     const [additionalCalculationType, setAdditionalCalculationType] = useState<ValueType>(ValueType.Percentage);
     const [calculationState, setCalculationState] = useState<CalculationSourceCodeState | undefined>();

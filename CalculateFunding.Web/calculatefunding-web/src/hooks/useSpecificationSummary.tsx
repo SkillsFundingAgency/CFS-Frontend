@@ -15,6 +15,7 @@ export type SpecificationSummaryQueryResult = {
 
 export const useSpecificationSummary = (specificationId: string,
                                         onError: (err: AxiosError) => void,
+                                        onSuccess?: (data: SpecificationSummary) => void,
                                         staleTime: number = milliseconds.OneHour)
     : SpecificationSummaryQueryResult => {
 
@@ -23,7 +24,8 @@ export const useSpecificationSummary = (specificationId: string,
         staleTime: staleTime,
         refetchOnWindowFocus: false,
         enabled: (specificationId && specificationId.length > 0) === true,
-        onError: onError
+        onError: onError,
+        onSuccess: onSuccess
     };
     
     const {data, error, isFetching, isLoading, isError, isFetched} =

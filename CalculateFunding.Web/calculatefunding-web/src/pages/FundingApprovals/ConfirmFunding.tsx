@@ -59,7 +59,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob],
-            err => addError(err, "Error checking for job"));
+            err => addError({error: err, description: "Error checking for job"}));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
     const {canApproveFunding, canReleaseFunding, missingPermissions} =

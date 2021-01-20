@@ -46,7 +46,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const {hasJob, latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId, 
             [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation],
-            err => addError(err, "Error while checking for job"));
+            err => addError({error: err, description: "Error while checking for job"}));
     
     function getCurrentDataset() {
         return newDataset ? newDataset :

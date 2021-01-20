@@ -53,15 +53,15 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
     const history = useHistory();
 
     const {specification, isLoadingSpecification} =
-        useSpecificationSummary(specificationId, err => addError(err, "Error while loading specification"));
+        useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
 
     const {providerVersion, isLoadingProviderVersion} = useProviderVersion(providerId, specCoreProviderVersionId,
-        (err: AxiosError) => addError(err, "Error while loading provider"));
+        (err: AxiosError) => addError({error: err, description: "Error while loading provider"}));
     
     const {data: transactions, isLoading: isLoadingTransactions} =
         useQuery<ProviderTransactionSummary, AxiosError>(`provider-transactions-for-spec-${specificationId}-provider-${providerId}`,
             async () => (await getProviderTransactionsService(specificationId, providerId)).data,
-            {onError: err => addError(err, "Error while loading provider transactions")});
+            {onError: err => addError({error: err, description: "Error while loading provider transactions"})});
 
     const {data: profilingPatterns, isLoading: isLoadingProfilingPatterns} =
         useQuery<FundingLineProfile[], AxiosError>(`provider-profiling-pattern-for-spec-${specificationId}-provider-${providerId}-stream-${fundingStreamId}`,
@@ -69,8 +69,8 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
             {
                 enabled: featureFlagsState.profilingPatternVisible,
                 onError: err => err.response?.status === 404 ?
-                    addError("No profile patterns found for this provider", "Error while loading profile patterns") :
-                    addError(err.message, "Error while loading profile patterns")
+                    addError({error: "No profile patterns found for this provider", description: "Error while loading profile patterns"}) :
+                    addError({error: err, description: "Error while loading profile patterns"})
             });
 
     const {data: profileTotals, isLoading: isLoadingProfileTotals} =
@@ -80,8 +80,8 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 enabled: featureFlagsState.profilingPatternVisible !== undefined && !featureFlagsState.profilingPatternVisible,
                 retry: 1,
                 onError: err => err.response?.status === 404 ?
-                    addError("No profile totals found for this provider", "Error while loading profile totals") :
-                    addError(err, "Error while loading profile totals")
+                    addError({error: "No profile totals found for this provider", description: "Error while loading profile totals"}) :
+                    addError({error: err, description: "Error while loading profile totals"})
             });
 
     useEffect(() => {

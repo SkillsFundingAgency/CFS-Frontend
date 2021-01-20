@@ -56,14 +56,14 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
                 JobType.ApproveBatchProviderFundingJob,
                 JobType.PublishBatchProviderFundingJob,
                 JobType.PublishAllProviderFundingJob],
-            err => addError(err, "Error checking for background jobs running"));
+            err => addError({error: err, description: "Error checking for background jobs running"}));
     const {mutate: uploadBatchFile, isLoading: isUploadingBatchFile} =
         useMutation<BatchUploadResponse, AxiosError, File>(
             async (theFile) => {
                 return (await uploadBatchOfPublishedProviders(theFile)).data;
             },
             {
-                onError: err => addError(err, "Error while trying to queue job to validate your batch file"),
+                onError: err => addError({error: err, description: "Error while trying to queue job to validate your batch file"}),
                 onSuccess: data => {
                     setBatchId(data.batchId);
                     createValidationJob({
@@ -89,7 +89,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
                 return (await validatePublishedProvidersByBatch(request)).data;
             },
             {
-                onError: err => addError(err, "Error while trying to create job to validate your batch file"),
+                onError: err => addError({error: err, description: "Error while trying to create job to validate your batch file"}),
                 onSuccess: data => {
                     setJobId(data.jobId);
                     setIsWaitingForJob(true);
@@ -127,7 +127,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         }
 
         if (latestJob.isFailed) {
-            addError(latestJob.outcome ? latestJob.outcome : "", "Validation failed");
+            addError({error: latestJob.outcome ? latestJob.outcome : "", description: "Validation failed"});
             setIsUpdating(false);
         } else if (latestJob.isSuccessful && publishedProviderIds) {
             dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
