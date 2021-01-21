@@ -2,7 +2,7 @@
 import React from 'react';
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
-import {render, screen, waitFor, waitForElementToBeRemoved, within} from "@testing-library/react";
+import {render, screen, waitFor, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import * as redux from "react-redux";
@@ -31,6 +31,7 @@ import {FundingActionType, PublishedProviderFundingCount} from "../../../types/P
 import {createPublishedProviderIdsQueryResult} from "../../fakes/testFactories";
 import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
+
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
@@ -202,6 +203,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render warning message', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
             expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
         });
 
@@ -210,6 +212,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders approve button as disabled', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
             const button = screen.queryByRole("button", {name: /Confirm approval/});
             expect(button).toBeInTheDocument();
             expect(button).toBeDisabled();
@@ -236,10 +239,14 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render job progress spinner', async () => {
-            expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument();
+            await waitFor(() => expect(mockFundingSummaryForApprovingService)
+                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
+            expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
         });
 
         it('renders warning message', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService)
+                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
             expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
         });
 
@@ -253,10 +260,14 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render change selection link', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService)
+                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
             expect(screen.queryByRole("link", {name: /Change selection/})).not.toBeInTheDocument();
         });
 
         it('renders approve button as enabled', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService)
+                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
             const button = screen.queryByRole("button", {name: /Confirm approval/});
             expect(button).toBeInTheDocument();
             expect(button).toBeEnabled();
@@ -283,10 +294,12 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('does not render job progress spinner', async () => {
-            expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument();
+            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+            expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
         });
 
         it('renders warning message', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
             expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
         });
 
@@ -307,6 +320,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         it('renders approve button as enabled', async () => {
+            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
             const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
             expect(button).toBeInTheDocument();
             expect(button).toBeEnabled();
@@ -379,6 +393,30 @@ const hasFundingApprovalSummary = () => {
             ...mockService,
             getFundingSummaryForApprovingService: mockFundingSummaryForApprovingService,
             approveSpecificationFundingService: mockApproveSpecService,
+            generateCsvForApprovalAll: jest.fn(() => Promise.resolve({
+                data: {
+                    url: "http://testing-link"
+                },
+                status: 200
+            })),
+            generateCsvForApprovalBatch: jest.fn(() => Promise.resolve({
+                data: {
+                    url: "http://testing-link"
+                },
+                status: 200
+            })),
+            generateCsvForReleaseBatch: jest.fn(() => Promise.resolve({
+                data: {
+                    url: "http://testing-link"
+                },
+                status: 200
+            })),
+            generateCsvForReleaseAll: jest.fn(() => Promise.resolve({
+                data: {
+                    url: "http://testing-link"
+                },
+                status: 200
+            })),
         }
     });
 };

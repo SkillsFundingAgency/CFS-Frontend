@@ -1,16 +1,23 @@
 ﻿import React from "react";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {FundingActionType, PublishedProviderFundingCount} from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import {
+    FundingActionType,
+    PublishedProviderFundingCount
+} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {Link} from "react-router-dom";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {useQuery} from "react-query";
-import * as publishService from "../../services/publishService";
+import {
+    getFundingSummaryForApprovingService,
+    getFundingSummaryForReleasingService
+} from "../../services/publishService";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
+import {CsvDownloadPublishedProviders} from "./CsvDownloadPublishedProviders";
 import {ErrorProps} from "../../hooks/useErrors";
 import {AxiosError} from "axios";
 
@@ -40,7 +47,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
 
     const {data: batchApprovalSummary, isLoading: isLoadingBatchApprovalSummary} =
         useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-approval`,
-            async () => (await publishService.getFundingSummaryForApprovingService(props.specification.id, selectedProviderIds)).data,
+            async () => (await getFundingSummaryForApprovingService(props.specification.id, selectedProviderIds)).data,
             {
                 enabled: props.actionType === FundingActionType.Approve && selectedProviderIds.length > 0,
                 cacheTime: 0,
@@ -49,7 +56,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
             });
     const {data: batchReleaseSummary, isLoading: isLoadingBatchReleaseSummary} =
         useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-release`,
-            async () => (await publishService.getFundingSummaryForReleasingService(props.specification.id, selectedProviderIds)).data,
+            async () => (await getFundingSummaryForReleasingService(props.specification.id, selectedProviderIds)).data,
             {
                 enabled: props.actionType === FundingActionType.Release && selectedProviderIds.length > 0,
                 cacheTime: 0,
@@ -100,6 +107,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                             <tr className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header">Providers selected</th>
                                 <td className="govuk-table__cell">
+                                    <CsvDownloadPublishedProviders actionType={props.actionType} specificationId={props.specification.id} error={(errorMessage, description, fieldName) => props.addError} />
                                 </td>
                                 <td className="govuk-table__cell govuk-table__cell--numeric">
                                     <p className="govuk-body">{fundingSummary.count}</p>

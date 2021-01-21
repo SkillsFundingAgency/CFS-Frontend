@@ -4,6 +4,7 @@ import {ReleaseTimetableSummary} from "../types/ReleaseTimetableSummary";
 import {PublishedProviderFundingCount} from "../types/PublishedProvider/PublishedProviderFundingCount";
 import {JobCreatedResponse} from "../types/JobCreatedResponse";
 import {LatestPublishedDate} from "../types/PublishedProvider/LatestPublishedDate";
+import {PublishProviderDataDownload} from "../types/PublishedProvider/PublishProviderDataDownload";
 
 export async function getFundingSummaryForApprovingService(specificationId: string, publishedProviderIds: string[]): 
     Promise<AxiosResponse<PublishedProviderFundingCount>> {
@@ -102,6 +103,48 @@ export async function getLatestPublishedDate(fundingStreamId: string, fundingPer
     return axios(`/api/publishedproviders/${fundingStreamId}/${fundingPeriodId}/lastupdated`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
+    });
+}
+
+export async function generateCsvForReleaseBatch(specificationId: string, publishedProviderIds: string[]):
+    Promise<AxiosResponse<PublishProviderDataDownload>> {
+    return axios(`/api/specifications/${specificationId}/publishedproviders/generate-csv-for-release/batch`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data:{
+            request: publishedProviderIds
+        }
+    });
+}
+
+
+export async function generateCsvForReleaseAll(specificationId: string):
+    Promise<AxiosResponse<PublishProviderDataDownload>> {
+    return axios(`/api/specifications/${specificationId}/publishedproviders/generate-csv-for-release/all`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: {}
+    });
+}
+
+export async function generateCsvForApprovalBatch(specificationId: string, publishedProviderIds: string[]):
+    Promise<AxiosResponse<PublishProviderDataDownload>> {
+    return axios(`/api/specifications/${specificationId}/publishedproviders/generate-csv-for-approval/batch`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data:{
+            request: publishedProviderIds
+        }
+    });
+}
+
+
+export async function generateCsvForApprovalAll(specificationId: string):
+    Promise<AxiosResponse<PublishProviderDataDownload>> {
+    return axios(`/api/specifications/${specificationId}/publishedproviders/generate-csv-for-approval/all`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: {}
     });
 }
 
