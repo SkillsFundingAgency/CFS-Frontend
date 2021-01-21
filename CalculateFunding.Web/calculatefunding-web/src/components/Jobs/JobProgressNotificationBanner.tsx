@@ -49,11 +49,15 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
                         <span data-testid="formatted-created-date">
                             <DateFormatter date={props.job.created as Date} utc={false}/>
                         </span>
-                        {props.job.isFailed &&
-                        <span>Job ID: {props.job.jobId}</span>
-                        }
                     </p>
                 </li>
+                {props.job.isFailed &&
+                <li>
+                    <p className="govuk-body-s">
+                        <span>Job ID: {props.job.jobId}</span>
+                    </p>
+                </li>
+                }
                 {props.job.isComplete &&
                 <li>
                     <p className="govuk-body-s">
