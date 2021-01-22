@@ -16,7 +16,9 @@ import {CalculationDetails} from "../../types/CalculationDetails";
 import {CalculationType} from "../../types/CalculationSearchResponse";
 import {ValueType} from "../../types/ValueType";
 import {PublishStatus} from "../../types/PublishStatusModel";
-import { CalculationDataType } from "../../types/Calculations/CalculationCompilePreviewResponse";
+import {CalculationDataType} from "../../types/Calculations/CalculationCompilePreviewResponse";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useErrors} from "../../hooks/useErrors";
 
 export interface CompareCalculationVersionsRouteProps {
     calculationId: string;
@@ -30,6 +32,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         calculations: true,
         calculationVersions: true
     });
+    const {errors, addError} = useErrors();
     const calculationId = match.params.calculationId;
     const firstCalculationVersionId = parseInt(match.params.firstCalculationVersionId);
     const secondCalculationVersionId = parseInt(match.params.secondCalculationVersionId);
@@ -106,9 +109,12 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         getCalculationByIdService(calculationId).then((result) => {
             const response = result.data as CalculationDetails;
             setCalculation(response);
+        }).catch(err => {
+            addError({error: err, description: `Error while getting calculation`});
+        }).finally(() => {
             setIsLoading(prevState => {
                 return {...prevState, calculations: false}
-            })
+            });
         })
     }
 
@@ -116,20 +122,26 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         getSpecificationSummaryService(specificationId).then((result) => {
             const response = result.data as SpecificationSummary;
             setSpecification(response);
+        }).catch(err => {
+            addError({error: err, description: `Error while getting specification summary`});
+        }).finally(() => {
             setIsLoading(prevState => {
                 return {...prevState, specifications: false}
             })
-        })
+        });
     }
 
     function populateCalculationVersions(calculationId: string, versions: number[]) {
         getMultipleVersionsByCalculationIdService(calculationId, versions).then((result) => {
             const response = result.data as CalculationVersionHistorySummary[];
             setCalculationVersions(response);
+        }).catch(err => {
+            addError({error: err, description: `Error while getting calculation versions`});
+        }).finally(() => {
             setIsLoading(prevState => {
                 return {...prevState, calculationVersions: false}
-            })
-        })
+            });
+        });
     }
 
     useEffectOnce(() => {
@@ -149,18 +161,23 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         setInlineCodeView(viewInline);
     }
 
-    return <div><Header location={Section.Specifications}/>
+    return <div><Header location={Section.Specifications} />
         <LoadingStatus title={"Loading calculation version history"}
-                       description={"Please wait whilst calculation versions are loaded"} hidden={!isLoading.calculations && !isLoading.specifications && !isLoading.calculationVersions}/>
+            description={"Please wait whilst calculation versions are loaded"} hidden={!isLoading.calculations && !isLoading.specifications && !isLoading.calculationVersions} />
         <div className="govuk-width-container" hidden={isLoading.calculations || isLoading.specifications || isLoading.calculationVersions}>
             <div className="govuk-grid-row" >
                 <div className="govuk-grid-column-full">
                     <Breadcrumbs>
-                        <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
-                        <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`}/>
-                        <Breadcrumb name={"Calculation version history"}/>
+                        <Breadcrumb name={"Calculate funding"} url={"/"} />
+                        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
+                        <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
+                        <Breadcrumb name={"Calculation version history"} />
                     </Breadcrumbs>
+                </div>
+            </div>
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                    <MultipleErrorSummary errors={errors} />
                 </div>
             </div>
             <div className="govuk-grid-row" >
@@ -184,7 +201,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                 </div>
                 <div className="govuk-grid-column-full">
                     <div className="govuk-form-group">
-                        <GdsMonacoDiffEditor firstCalculationVersion={calculationVersions[0].sourceCode} secondCalculationVersion={calculationVersions[1].sourceCode} inlineCodeViewer={inlineCodeView}/>
+                        <GdsMonacoDiffEditor firstCalculationVersion={calculationVersions[0].sourceCode} secondCalculationVersion={calculationVersions[1].sourceCode} inlineCodeViewer={inlineCodeView} />
                     </div>
                 </div>
             </div>
@@ -195,7 +212,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                             <div className="govuk-checkboxes govuk-checkboxes--small">
                                 <div className="govuk-checkboxes__item">
                                     <input className="govuk-checkboxes__input" id="organisation" name="organisation"
-                                           type="checkbox" onChange={(e) => changeInlineCodeView(e)}/>
+                                        type="checkbox" onChange={(e) => changeInlineCodeView(e)} />
                                     <label className="govuk-label govuk-checkboxes__label" htmlFor="organisation">
                                         Inline code viewer
                                     </label>

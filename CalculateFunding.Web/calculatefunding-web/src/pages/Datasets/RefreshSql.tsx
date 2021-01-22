@@ -30,7 +30,7 @@ import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 
 export function RefreshSql() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
-    const {errors, addErrorMessage} = useErrors()
+    const {errors, addErrorMessage} = useErrors();
     const history = useHistory();
     const [sqlJobStatusMessage, setSqlJobStatusMessage] = useState<string>('Data push queued');
     const [fundingStatusMessage, setFundingStatusMessage] = useState<string>('Funding job running');
