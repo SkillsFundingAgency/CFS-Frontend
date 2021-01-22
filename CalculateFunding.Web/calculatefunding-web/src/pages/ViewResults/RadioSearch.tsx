@@ -38,7 +38,7 @@ export function RadioSearch(props: {
         if (props.characterRestrictions === CharacterRestrictions.NumericOnly) {
             let regEx = new RegExp("[^0-9]");
             if (regEx.test(value)) {
-                addError("Numeric characters only", "Only numbers allowed");
+                addError({error: "Numeric characters only", description: "Only numbers allowed"});
                 searchValid = false;
             }else{
                 clearErrorMessages();
@@ -46,7 +46,7 @@ export function RadioSearch(props: {
         }else if(props.characterRestrictions === CharacterRestrictions.AlphaOnly) {
             let regEx = new RegExp("[^0-9]");
             if (!regEx.test(value)) {
-                addError("Alpha characters only", "Only letters allowed");
+                addError({error: "Alpha characters only", description: "Only letters allowed"});
                 searchValid = false;
             }else{
                 clearErrorMessages();

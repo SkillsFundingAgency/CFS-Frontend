@@ -72,7 +72,7 @@ export function FundingLineResults({
 
     const {circularReferenceErrors, isLoadingCircularDependencies} =
         useCalculationCircularDependencies(specificationId,
-            err => addError(err.message, "Error while checking for circular reference errors"));
+            err => addError({error: err, description: "Error while checking for circular reference errors"}));
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
         const response = await approveFundingLineStructureService(specificationId);
