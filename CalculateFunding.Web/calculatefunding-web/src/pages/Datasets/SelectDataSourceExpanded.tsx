@@ -16,11 +16,13 @@ import Pagination from "../../components/Pagination";
 import {SearchMode} from "../../types/SearchMode";
 import {DatasourceVersionSearchModel} from "../../types/Datasets/DatasourceVersionSearchModel";
 import {Footer} from "../../components/Footer";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useErrors} from "../../hooks/useErrors";
 
 export interface SelectDataSourceExpandedRouteProps {
     specificationId: string;
     datasetId: string;
-    relationshipId:string
+    relationshipId: string
 }
 
 export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectDataSourceExpandedRouteProps>) {
@@ -84,9 +86,9 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
             currentPage: 0,
             lastPage: 0
         },
-        description:"",
-        id:"",
-        name:"",
+        description: "",
+        id: "",
+        name: "",
         startItemNumber: 0,
         totalCount: 0
     });
@@ -96,15 +98,17 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
     const [saveErrorState, setSaveErrorState] = useState<boolean>(false);
 
     const history = useHistory();
+    const {errors, addError} = useErrors();
 
     useEffectOnce(() => {
         getSpecificationSummaryService(match.params.specificationId).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as SpecificationSummary;
-                setSpecificationSummary(result);
+            const result = response.data as SpecificationSummary;
+            setSpecificationSummary(result);
 
             populateExpandedDatasources(match.params.datasetId, searchRequest);
-            }
+        }).catch(err => {
+            addError({error: err, description: `Error while getting specification summary`});
+        }).finally(() => {
             setDatasourceIsLoading(false);
         });
     });
@@ -115,10 +119,10 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
 
     function populateExpandedDatasources(relationshipId: string, searchRequest: DatasourceVersionSearchModel) {
         getExpandedDataSources(match.params.relationshipId, match.params.datasetId, searchRequest).then((response) => {
-            if (response.status === 200) {
-                const result = response.data as DatasetRelationshipPagedResponseViewModel;
-                setDatasourceVersions(result);
-            }
+            const result = response.data as DatasetRelationshipPagedResponseViewModel;
+            setDatasourceVersions(result);
+        }).catch(err => {
+            addError({error: err, description: `Error while getting data sources`});
         });
     }
 
@@ -139,7 +143,8 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                 } else {
                     setErrorState(true);
                 }
-            }).catch((e) => {
+            }).catch(err => {
+                addError({error: err, description: `Error while assigning data source`});
                 setSaveErrorState(true);
             });
         }
@@ -153,102 +158,107 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
     }
 
     return (<div>
-            <Header location={Section.Datasets}/>
-            <div className="govuk-width-container">
-                <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-full" hidden={specificationSummary.name === ""}>
-                        <Breadcrumbs>
-                            <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                            <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"}/>
-                            <Breadcrumb name={"Map data source files to datasets for a specification"} url={"/Datasets/MapDataSourceFiles"}/>
-                            <Breadcrumb name={specificationSummary.name} url={`/Datasets/DataRelationships/${specificationSummary.id}`}/>
-                            <Breadcrumb name={`Change ${specificationSummary.name}`}/>
-                        </Breadcrumbs>
-                    </div>
+        <Header location={Section.Datasets} />
+        <div className="govuk-width-container">
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full" hidden={specificationSummary.name === ""}>
+                    <Breadcrumbs>
+                        <Breadcrumb name={"Calculate funding"} url={"/"} />
+                        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+                        <Breadcrumb name={"Map data source files to datasets for a specification"} url={"/Datasets/MapDataSourceFiles"} />
+                        <Breadcrumb name={specificationSummary.name} url={`/Datasets/DataRelationships/${specificationSummary.id}`} />
+                        <Breadcrumb name={`Change ${specificationSummary.name}`} />
+                    </Breadcrumbs>
                 </div>
-                <div className="govuk-grid-row" hidden={!datasourceIsLoading}>
-                    <div className="govuk-grid-column-full">
-                        <LoadingStatus title={"Loading datasources"}/>
-                    </div>
+            </div>
+            <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                    <MultipleErrorSummary errors={errors} />
                 </div>
-                <div className="govuk-grid-row" hidden={datasourceIsLoading}>
-                    <div className="govuk-grid-column-full">
-                        <h1 className="govuk-heading-xl">
-                            {specificationSummary.name}
-                            <span className="govuk-caption-xl">{specificationSummary.fundingPeriod.name}</span>
-                        </h1>
-                        <h3 className="govuk-heading-m">
-                            {selectedDataset.name}
-                            <span className="govuk-hint">
-                                <strong>Description:</strong> {specificationSummary.description}
-                            </span>
-                        </h3>
-                        <div className="govuk-form-group">
-                            <div hidden={!errorState}>
-                                <ErrorSummary title={"Please select a version"} error={"No selection has been made"} suggestion={"No version is selected. Please select a version to apply."}/>
-                            </div>
-                            <div hidden={!saveErrorState}>
-                                <ErrorSummary title={"Error"} error={"An error was encountered whilst trying to save changes"} suggestion={"Please check and try again."}/>
-                            </div>
+            </div>
+            <div className="govuk-grid-row" hidden={!datasourceIsLoading}>
+                <div className="govuk-grid-column-full">
+                    <LoadingStatus title={"Loading datasources"} />
+                </div>
+            </div>
+            <div className="govuk-grid-row" hidden={datasourceIsLoading}>
+                <div className="govuk-grid-column-full">
+                    <h1 className="govuk-heading-xl">
+                        {specificationSummary.name}
+                        <span className="govuk-caption-xl">{specificationSummary.fundingPeriod.name}</span>
+                    </h1>
+                    <h3 className="govuk-heading-m">
+                        {selectedDataset.name}
+                        <span className="govuk-hint">
+                            <strong>Description:</strong> {specificationSummary.description}
+                        </span>
+                    </h3>
+                    <div className="govuk-form-group">
+                        <div hidden={!errorState}>
+                            <ErrorSummary title={"Please select a version"} error={"No selection has been made"} suggestion={"No version is selected. Please select a version to apply."} />
                         </div>
-                        <div className="govuk-form-group">
-                            <fieldset className="govuk-fieldset">
-                                <div className="govuk-radios">
-                                    <div className="govuk-form-group">
-                                        <fieldset className="govuk-fieldset">
-                                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                                                <h4 className="govuk-heading-s">Select data source version</h4>
-                                                <span id="select-one-option" className="govuk-hint">
-                                                  Select one option.
+                        <div hidden={!saveErrorState}>
+                            <ErrorSummary title={"Error"} error={"An error was encountered whilst trying to save changes"} suggestion={"Please check and try again."} />
+                        </div>
+                    </div>
+                    <div className="govuk-form-group">
+                        <fieldset className="govuk-fieldset">
+                            <div className="govuk-radios">
+                                <div className="govuk-form-group">
+                                    <fieldset className="govuk-fieldset">
+                                        <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                            <h4 className="govuk-heading-s">Select data source version</h4>
+                                            <span id="select-one-option" className="govuk-hint">
+                                                Select one option.
                                                 </span>
-                                            </legend>
+                                        </legend>
 
-                                            <div className="govuk-radios govuk-radios--small">
-                                                {datasourceVersions.items
-                                                    .sort((datasourceVersions1, datasourceVersions2) =>
-                                                        datasourceVersions2.version - datasourceVersions1.version)
-                                                    .map(v =>
-                                                        <div className="govuk-radios__item">
-                                                            <input className="govuk-radios__input" id={`datasource-${v.version}`} name={`datasource-${v.version}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)}/>
-                                                            <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.version}`}>
-                                                                {datasourceVersions.name} (Version {v.version})
+                                        <div className="govuk-radios govuk-radios--small">
+                                            {datasourceVersions.items
+                                                .sort((datasourceVersions1, datasourceVersions2) =>
+                                                    datasourceVersions2.version - datasourceVersions1.version)
+                                                .map(v =>
+                                                    <div className="govuk-radios__item">
+                                                        <input className="govuk-radios__input" id={`datasource-${v.version}`} name={`datasource-${v.version}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)} />
+                                                        <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.version}`}>
+                                                            {datasourceVersions.name} (Version {v.version})
                                                                 <div className="govuk-!-margin-top-1">
-                                                                    <details className="govuk-details summary-margin-removal" data-module="govuk-details">
-                                                                        <summary className="govuk-details__summary">
-                      <span className="govuk-details__summary-text">
-                        Version details
+                                                                <details className="govuk-details summary-margin-removal" data-module="govuk-details">
+                                                                    <summary className="govuk-details__summary">
+                                                                        <span className="govuk-details__summary-text">
+                                                                            Version details
                       </span>
-                                                                        </summary>
-                                                                        <div className="govuk-details__text">
-                                                                            <p className="govuk-body-s">
-                                                                                <strong>Last updated:</strong>
-                                                                                <DateFormatter date={v.date} utc={false}/>
-                                                                            </p>
-                                                                            <p className="govuk-body-s">
-                                                                                <strong>Last updated by:</strong> {v.author.name}
-                                                                            </p>
-                                                                        </div>
-                                                                    </details>
-                                                                </div>
-                                                            </label>
-                                                        </div>
+                                                                    </summary>
+                                                                    <div className="govuk-details__text">
+                                                                        <p className="govuk-body-s">
+                                                                            <strong>Last updated:</strong>
+                                                                            <DateFormatter date={v.date} utc={false} />
+                                                                        </p>
+                                                                        <p className="govuk-body-s">
+                                                                            <strong>Last updated by:</strong> {v.author.name}
+                                                                        </p>
+                                                                    </div>
+                                                                </details>
+                                                            </div>
+                                                        </label>
+                                                    </div>
                                                 )}
-                                            </div>
-                                        </fieldset>
-                                    </div>
+                                        </div>
+                                    </fieldset>
                                 </div>
-                            </fieldset>
-                        </div>
-                        <div className="govuk-form-group">
-                            <div className="pagination__summary">Showing {datasourceVersions.startItemNumber} - {datasourceVersions.endItemNumber} of {datasourceVersions.totalCount} results</div>
-                            <Pagination currentPage={datasourceVersions.pagerState.currentPage} lastPage={datasourceVersions.pagerState.lastPage} callback={setPagination}/>
-                            <button className="govuk-button govuk-!-margin-right-1" disabled={selectedVersion === ""} onClick={saveVersion}>Save</button>
-                            <button className="govuk-button govuk-button--secondary" onClick={changeSelection}>Cancel</button>
-                        </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div className="govuk-form-group">
+                        <div className="pagination__summary">Showing {datasourceVersions.startItemNumber} - {datasourceVersions.endItemNumber} of {datasourceVersions.totalCount} results</div>
+                        <Pagination currentPage={datasourceVersions.pagerState.currentPage} lastPage={datasourceVersions.pagerState.lastPage} callback={setPagination} />
+                        <button className="govuk-button govuk-!-margin-right-1" disabled={selectedVersion === ""} onClick={saveVersion}>Save</button>
+                        <button className="govuk-button govuk-button--secondary" onClick={changeSelection}>Cancel</button>
                     </div>
                 </div>
             </div>
-            <Footer/>
         </div>
+        <Footer />
+    </div>
     )
 }

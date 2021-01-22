@@ -14,6 +14,8 @@ import {SearchMode} from "../../types/SearchMode";
 import {NoData} from "../../components/NoData";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {SearchFacetValue} from "../../types/TemplateBuilderDefinitions";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useErrors} from "../../hooks/useErrors";
 
 export function DownloadDataSchema() {
     const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -48,6 +50,7 @@ export function DownloadDataSchema() {
     const initialFacets: SearchFacetValue[] = [];
     const [filterFundingStreams, setFilterFundingStreams] = useState<SearchFacetValue[]>(initialFacets);
     const [filterFundingStreamsInitialResult, setFilterFundingStreamsInitialResult] = useState<SearchFacetValue[]>(initialFacets);
+    const {errors, addError} = useErrors();
 
     useEffect(()=>{
         searchDatasetDefinitions(searchRequest);
@@ -63,8 +66,11 @@ export function DownloadDataSchema() {
                 setFilterFundingStreams(datasetDefinitionResponse.facets[2].facetValues);
                 setFilterFundingStreamsInitialResult(datasetDefinitionResponse.facets[2].facetValues);
             }
+        }).catch(err => {
+            addError({error: err, description: `Error while searching dataset definitions`});
+        }).finally(() => {
             setIsLoading(false);
-        })
+        });
     }
 
     function setPagination(e: number) {
@@ -153,7 +159,7 @@ export function DownloadDataSchema() {
     return <div>
         <Header location={Section.Datasets}/>
         <div className="govuk-width-container">
-            <div className="govuk-grid-row  govuk-!-margin-bottom-9">
+            <div className="govuk-grid-row govuk-!-margin-bottom-9">
                 <div className="govuk-grid-column-full">
                     <Breadcrumbs>
                         <Breadcrumb name={"Calculate funding"} url={"/"}/>
@@ -161,6 +167,11 @@ export function DownloadDataSchema() {
                         <Breadcrumb name={"Download data schema template"}/>
                     </Breadcrumbs>
                     <h1 className="govuk-heading-xl">Download data schema template</h1>
+                </div>
+            </div>
+            <div className="govuk-grid-row govuk-!-margin-bottom-9">
+                <div className="govuk-grid-column-full">
+                    <MultipleErrorSummary errors={errors} />
                 </div>
             </div>
             <div className="govuk-grid-row">

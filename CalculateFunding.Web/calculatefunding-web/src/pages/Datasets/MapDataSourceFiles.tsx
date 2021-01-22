@@ -14,6 +14,8 @@ import {BackToTop} from "../../components/BackToTop";
 import {NoData} from "../../components/NoData";
 import {Footer} from "../../components/Footer";
 import {DateFormatter} from "../../components/DateFormatter";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {useErrors} from "../../hooks/useErrors";
 
 export function MapDataSourceFiles() {
     const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -57,6 +59,7 @@ export function MapDataSourceFiles() {
     const [filterFundingPeriods, setFilterFundingPeriods] = useState<string[]>([]);
     const [filterFundingPeriodsInitialResult, setFilterFundingPeriodsInitialResult] = useState<string[]>(initialFacets);
     const [datasetRelationships, setDatasetRelationships] = useState<SpecificationDatasourceRelationshipViewModel>(initialDatasetRelationships);
+    const {errors, addError} = useErrors();
 
     useEffect(() => {
         searchDatasetRelationships(searchRequest);
@@ -65,40 +68,39 @@ export function MapDataSourceFiles() {
     function searchDatasetRelationships(searchRequestViewModel: DatasetDefinitionRequestViewModel) {
         setIsLoading(true);
         searchDatasetRelationshipsService(searchRequestViewModel).then((response) => {
-            if (response.status === 200 || response.status === 201) {
-                const result = response.data as SpecificationDatasourceRelationshipViewModel;
-                setDatasetRelationships(result);
+            const result = response.data as SpecificationDatasourceRelationshipViewModel;
+            setDatasetRelationships(result);
 
-                if (result.items.length > 0) {
-                    const items = result.items;
-                    let fundingStreamsResult: string[] = [];
-                    items.map(item => {
-                        if (item.fundingStreamNames != null) {
-                            item.fundingStreamNames.map(f => {
-                                fundingStreamsResult.push(f)
-                            })
-                        }
-                    });
-                    fundingStreamsResult = [...new Set(fundingStreamsResult)];
-                    setFilterFundingStreamsInitialResult(fundingStreamsResult);
-                    setFilterFundingStreams(fundingStreamsResult);
+            if (result.items.length > 0) {
+                const items = result.items;
+                let fundingStreamsResult: string[] = [];
+                items.map(item => {
+                    if (item.fundingStreamNames != null) {
+                        item.fundingStreamNames.map(f => {
+                            fundingStreamsResult.push(f)
+                        })
+                    }
+                });
+                fundingStreamsResult = [...new Set(fundingStreamsResult)];
+                setFilterFundingStreamsInitialResult(fundingStreamsResult);
+                setFilterFundingStreams(fundingStreamsResult);
 
-                    let fundingPeriodsResult: string[] = [];
-                    items.map(item => {
-                        if (item.fundingPeriodName != null) {
-                            fundingPeriodsResult.push(item.fundingPeriodName)
-                        }
-                    });
-                    fundingPeriodsResult.filter((value, index, self) => {
-                        return self.indexOf(value) === index;
-                    });
-                    fundingPeriodsResult = [...new Set(fundingPeriodsResult)];
-                    setFilterFundingPeriodsInitialResult(fundingPeriodsResult);
-                    setFilterFundingPeriods(fundingPeriodsResult);
-                }
-                setIsLoading(false);
+                let fundingPeriodsResult: string[] = [];
+                items.map(item => {
+                    if (item.fundingPeriodName != null) {
+                        fundingPeriodsResult.push(item.fundingPeriodName)
+                    }
+                });
+                fundingPeriodsResult.filter((value, index, self) => {
+                    return self.indexOf(value) === index;
+                });
+                fundingPeriodsResult = [...new Set(fundingPeriodsResult)];
+                setFilterFundingPeriodsInitialResult(fundingPeriodsResult);
+                setFilterFundingPeriods(fundingPeriodsResult);
             }
-        }).catch((er) => {
+        }).catch((err) => {
+            addError({error: err, description: `Error while searching dataset relationships`});
+        }).finally(() => {
             setIsLoading(false);
         });
     }
@@ -192,7 +194,7 @@ export function MapDataSourceFiles() {
     return <div id="map-datasource-files">
         <Header location={Section.Datasets} />
         <div className="govuk-width-container">
-            <div className="govuk-grid-row  govuk-!-margin-bottom-9">
+            <div className="govuk-grid-row govuk-!-margin-bottom-9">
                 <div className="govuk-grid-column-full">
                     <Breadcrumbs>
                         <Breadcrumb name={"Calculate funding"} url={"/"} />
@@ -201,6 +203,11 @@ export function MapDataSourceFiles() {
                     </Breadcrumbs>
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Map data source files</h1>
                     <span className="govuk-caption-xl">Map data source files to data sets for a specification</span>
+                </div>
+            </div>
+            <div className="govuk-grid-row govuk-!-margin-bottom-9">
+                <div className="govuk-grid-column-full">
+                    <MultipleErrorSummary errors={errors} />
                 </div>
             </div>
             <div className="govuk-grid-row">
