@@ -226,3 +226,12 @@ export async function getCurrentDatasetVersionByDatasetId(datasetId: string) {
         }
     })
 }
+
+export async function downloadValidateDatasetValidationErrorSasUrl(jobId: string) {
+    return axios(`${baseUrl}/download-validate-dataset-error-url/${jobId}`, {
+        method: "GET",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}

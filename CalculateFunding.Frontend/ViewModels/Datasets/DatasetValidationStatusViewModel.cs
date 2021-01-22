@@ -21,6 +21,8 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
 
         public IDictionary<string, IEnumerable<string>> ValidationFailures { get; set; }
 
+        public string ValidateDatasetJobId { get; set; }
+
         public string LastUpdatedFormatted
         {
             get

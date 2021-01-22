@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {RouteComponentProps, useHistory} from "react-router";
@@ -7,14 +7,28 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {DatasetVersionHistoryViewModel, Result} from "../../types/Datasets/DatasetVersionHistoryViewModel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {getCurrentDatasetVersionByDatasetId, getDatasetHistoryService, getDatasetValidateStatusService, updateDatasetService, uploadDatasetVersionService, validateDatasetService} from "../../services/datasetService";
+import {
+    downloadValidateDatasetValidationErrorSasUrl,
+    getCurrentDatasetVersionByDatasetId,
+    getDatasetHistoryService,
+    updateDatasetService,
+    uploadDatasetVersionService,
+    validateDatasetService
+} from "../../services/datasetService";
 import {DateFormatter} from "../../components/DateFormatter";
-import {DatasetValidateStatusResponse, UpdateNewDatasetVersionResponseViewModel, ValidationStates} from "../../types/Datasets/UpdateDatasetRequestViewModel";
+import {
+    UpdateNewDatasetVersionResponseViewModel
+} from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import {Footer} from "../../components/Footer";
 import {UpdateStatus} from "../../types/Datasets/UpdateStatus";
 import {MergeSummary} from "./MergeSummary/MergeSummary";
 import {MergeMatch} from "./MergeSummary/MergeMatch";
 import {MergeDatasetViewModel} from "../../types/Datasets/MergeDatasetViewModel";
+import {JobType} from "../../types/jobType";
+import {useErrors} from "../../hooks/useErrors";
+import {useMonitorForAnyNewJob} from "../../hooks/Jobs/useMonitorForAnyNewJob";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -41,8 +55,6 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [uploadFileExtension, setUploadFileExtension] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [changeNote, setChangeNote] = useState<string>("");
-    const [loadingStatus, setLoadingStatus] = useState<string>("Update data source");
-    const [validationFailures, setValidationFailures] = useState<{ [key: string]: string[] }>();
     const validExtensions = [".csv", ".xls", ".xlsx"];
     const [validation, setValidation] = useState({
         fileValid: true,
@@ -52,6 +64,31 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [mergeResults, setMergeResults] = useState<MergeDatasetViewModel>();
     const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
     const history = useHistory();
+    const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
+    const {newJob} = useMonitorForAnyNewJob(
+        [JobType.ValidateDatasetJob],
+        err => addError({error: err, description: "An error occurred while monitoring the running jobs."})
+    );
+    const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
+
+    useEffect(() => {
+        if (!newJob || newJob.jobId !== validateDatasetJobId) return;
+        clearErrorMessages();
+        if (newJob.runningStatus === RunningStatus.Completed) {
+            if (newJob.isSuccessful && newJob.outcome !== "ValidationFailed") {
+                return onDatasetValidated(updateType);
+            } else {
+                downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
+                    let validationErrorFileUrl = result.data;
+                    addValidationErrors({"blobUrl": [validationErrorFileUrl]}, "Validation failed");
+                    setIsLoading(false);
+                }).catch(() => {
+                    addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+                    setIsLoading(false);
+                });
+            }
+        }
+    }, [newJob]);
     
     useEffectOnce(() => {
         setIsLoading(true);
@@ -71,19 +108,15 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             return;
         }
 
+        clearErrorMessages();
         setIsLoading(true);
 
         updateDatasetService(match.params.fundingStreamId, match.params.datasetId, uploadFileName).then((result) => {
-            if (result.status === 200 || result.status === 201) {
-                const newDataset = result.data as UpdateNewDatasetVersionResponseViewModel;
-                newDataset.mergeExisting = updateType === "merge";
-                uploadFileToServer(newDataset);
-            } else {
-                setValidationFailures({"error-message": ["Unable to update data source"]});
-                setIsLoading(false);
-            }
-        }).catch(() => {
-            setValidationFailures({"error-message": ["Unable to update data source"]});
+            const newDataset = result.data as UpdateNewDatasetVersionResponseViewModel;
+            newDataset.mergeExisting = updateType === "merge";
+            uploadFileToServer(newDataset);
+        }).catch((err) => {
+            addError({error: err, description: "Unable to update data source"});
             setIsLoading(false);
         });
     }
@@ -94,98 +127,66 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 request,
                 uploadFile
             )
-                .then((uploadDatasetVersionResponse) => {
-                    if (uploadDatasetVersionResponse.status === 200 || uploadDatasetVersionResponse.status === 201) {
-                        validateDatasetService(
-                            request.datasetId,
-                            request.fundingStreamId,
-                            request.filename,
-                            request.version.toString(),
-                            request.mergeExisting,
-                            description,
-                            changeNote).then((validateDatasetResponse) => {
-                            if (validateDatasetResponse.status === 200 || validateDatasetResponse.status === 201) {
-                                const validateOperationId: any = validateDatasetResponse.data.operationId;
-                                if (!validateOperationId) {
-                                    setValidationFailures({"error-message": ["Unable to locate dataset validate operationId"]});
-                                    setIsLoading(false);
-                                    return;
-                                }
-                                getDatasetValidateStatus(validateOperationId)
-                            } else {
-                                setValidationFailures({"error-message": ["Unable to validate dataset"]});
-                                setIsLoading(false);
-                                return;
-                            }
-                        }).catch(() => {
-                            setValidationFailures({"error-message": ["Unable to validate dataset"]});
+                .then(() => {
+                    validateDatasetService(
+                        request.datasetId,
+                        request.fundingStreamId,
+                        request.filename,
+                        request.version.toString(),
+                        request.mergeExisting,
+                        description,
+                        changeNote).then((validateDatasetResponse) => {
+                        const validateOperationId: any = validateDatasetResponse.data.operationId;
+                        if (!validateOperationId) {
+                            addError({error: "Unable to locate dataset validate operationId"});
                             setIsLoading(false);
-                        })
-                    } else {
-                        setValidationFailures({"error-message": ["Unable to upload file"]});
+                            return;
+                        }
+                        setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
+                        setIsLoading(true);
+                    }).catch(() => {
+                        addError({error: "Unable to retrieve validation report", description: "Validation failed"});
                         setIsLoading(false);
                         return;
-                    }
+                    })
+
                 })
+                .catch(() => {
+                    addError({error: "Unable to upload file"});
+                    setIsLoading(false);
+                    return;
+                });
         } else {
             setIsLoading(false);
             return;
         }
     }
 
-    function getDatasetValidateStatus(operationId: string) {
-        getDatasetValidateStatusService(operationId).then((datasetValidateStatusResponse) => {
-            if (datasetValidateStatusResponse.status === 200 || datasetValidateStatusResponse.status === 201) {
-                const result: DatasetValidateStatusResponse = datasetValidateStatusResponse.data;
-                if (result.currentOperation === "Validated") {
-                    if (updateType === "merge")
-                    {
-                        getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
-                        ((response) => {
-                                const mergeDatasetResult = response.data as MergeDatasetViewModel;
+    function onDatasetValidated(updateType: string)
+    {
+        if (updateType === "merge")
+        {
+            getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
+            ((response) => {
+                    const mergeDatasetResult = response.data as MergeDatasetViewModel;
 
-                                if (mergeDatasetResult.amendedRowCount === 0 && mergeDatasetResult.newRowCount === 0) {
-                                    setUpdateStatus(UpdateStatus.Matched)
-                                } else {
-                                    setUpdateStatus(UpdateStatus.Successful);
-                                }
+                    if (mergeDatasetResult.amendedRowCount === 0 && mergeDatasetResult.newRowCount === 0) {
+                        setUpdateStatus(UpdateStatus.Matched)
+                    } else {
+                        setUpdateStatus(UpdateStatus.Successful);
+                    }
 
-                                setMergeResults(mergeDatasetResult);
-                                setIsLoading(false);
-                            }
-                        );
-                        return;
-                    }
-                    else
-                    {
-                        history.push("/Datasets/ManageDataSourceFiles");
-                        return;
-                    }
-                } else if (result.currentOperation === "FailedValidation" || result.currentOperation === "MergeFailed") {
-                    setValidationFailures(result.validationFailures);
+                    setMergeResults(mergeDatasetResult);
                     setIsLoading(false);
-                    return;
-                } else {
-                    let message: string = ValidationStates[result.currentOperation];
-                    if (!message) {
-                        message = "Unknown state: " + result.currentOperation;
-                    }
-                    setLoadingStatus(message);
                 }
-            } else {
-                setValidationFailures({"error-message": ["Unable to get dataset validation status"]});
-                setIsLoading(false);
-                return;
-            }
-
-            setTimeout(function () {
-                getDatasetValidateStatus(operationId);
-            }, 2500);
-
-        }).catch(() => {
-            setValidationFailures({"error-message": ["Unable to get dataset validation status"]});
-            setIsLoading(false);
-        });
+            );
+            return;
+        }
+        else
+        {
+            history.push("/Datasets/ManageDataSourceFiles");
+            return;
+        }
     }
 
     function validateForm() {
@@ -196,7 +197,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 fileValid: true
             }
         });
-        setValidationFailures(undefined);
+
+        clearErrorMessages();
 
         let isValid = true;
 
@@ -264,49 +266,11 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"}/>
                 <Breadcrumb name="Update data source file"/>
             </Breadcrumbs>
-            <LoadingStatus title={loadingStatus} hidden={!isLoading}
+            <LoadingStatus title={"Update data source"} hidden={!isLoading}
                            subTitle={"Please wait whilst the data source is updated"}/>
-            <div hidden={((validation.changeNoteValid && validation.fileValid && validationFailures === undefined) || isLoading)}
-                 className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                 data-module="govuk-error-summary">
-                <h2 className="govuk-error-summary__title">
-                    There is a problem
-                </h2>
-                <div className="govuk-error-summary__body">
-                    <ul id="error-summary-list" className="govuk-list govuk-error-summary__list">
-                        {
-                            (!validation.fileValid) ?
-                                <li><a href={"#select-data-source"}>Upload a xls or xlsx file</a></li>
-                                : ""
-                        }
-                        {
-                            (validationFailures !== undefined && validationFailures["error-message"] != null) ?
-                                <li>{validationFailures["error-message"]}</li>
-                                : ""
-                        }
-                        {
-                            (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
-                                <li>{validationFailures["FundingStreamId"]}</li>
-                                : ""
-                        }
-                        {
-                            (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
-                                <li><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></li>
-                                : ""
-                        }
-                        {
-                            (!validation.changeNoteValid) ?
-                                <li><a href={"#change-note"}>Enter change note</a></li>
-                                : ""
-                        }
-                        {
-                            (!validation.updateTypeValid) ?
-                                <li><a href={"#update-type"}>Select update type</a></li>
-                                : ""
-                        }
-                    </ul>
-                </div>
-            </div>
+
+            <MultipleErrorSummary errors={errors} />
+
             <fieldset className="govuk-fieldset" hidden={isLoading || updateStatus !== UpdateStatus.Unset}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">
@@ -319,18 +283,18 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     {dataset.name} (version {dataset.version})
                 </span>
                     </summary>
-                    <div id={"last-updated-by-author"} className="govuk-details__text">
+                    <div id={"last-updated-by-author"} className="govuk-details__text" data-testid="update-datasource-author" >
                         {dataset.lastUpdatedByName} <span className="govuk-!-margin-left-2"><DateFormatter utc={false} date={dataset.lastUpdatedDate}/></span>
                     </div>
                 </details>
                 <div id="update-type"
-                     className={"govuk-form-group" + (validationFailures !== undefined || !validation.updateTypeValid ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (!validation.updateTypeValid ? " govuk-form-group--error" : "")}>
                     <div className="govuk-radios">
                         <label className="govuk-label" htmlFor="update-type-radios">
                             Select update type
                         </label>
                         <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-type-merge" name="update-type" type="radio" value="merge" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                            <input className="govuk-radios__input" id="update-type-merge" name="update-type" type="radio" data-testid="update-datasource-merge" value="merge" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
                             <label className="govuk-label govuk-radios__label" htmlFor="update-type-merge">
                                 Merge existing version
                             </label>
@@ -339,7 +303,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             </div>
                         </div>
                         <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-type-new" name="update-type" type="radio" value="new" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                            <input className="govuk-radios__input" id="update-type-new" name="update-type" type="radio" value="new" data-testid="update-datasource-new" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
                             <label className="govuk-label govuk-radios__label" htmlFor="update-type-new">
                                 Create new version
                             </label>
@@ -350,12 +314,12 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     </div>
                 </div>
                 <div id="select-data-source"
-                     className={"govuk-form-group" + (validationFailures !== undefined || !validation.fileValid ? " govuk-form-group--error" : "")}>
+                     className={"govuk-form-group" + (!validation.fileValid ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="file-upload-data-source">
                         Select data source file
                     </label>
                     {
-                        (validationFailures !== undefined || !validation.fileValid) ?
+                        (!validation.fileValid) ?
                             <span id="data-source-error-message" className="govuk-error-message">
                                 <span className="govuk-visually-hidden">Error:</span>
                                 {
@@ -363,27 +327,13 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                         "Upload a xls or xlsx file"
                                         : ""
                                 }
-                                {
-                                    (validationFailures !== undefined && validationFailures["error-message"] != null) ?
-                                        validationFailures["error-message"]
-                                        : ""
-                                }
-                                {
-                                    (validationFailures !== undefined && validationFailures["FundingStreamId"] != null) ?
-                                        validationFailures["FundingStreamId"]
-                                        : ""
-                                }
-                                {
-                                    (validationFailures !== undefined && validationFailures["blobUrl"] != null) ?
-                                        <span><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></span>
-                                        : ""
-                                }
                             </span>
                             : ""
                     }
-                    <input className={"govuk-file-upload" + (validationFailures !== undefined && validationFailures["error-message"] !== undefined ? " govuk-file-upload--error" : "")}
+                    <input className={"govuk-file-upload" + (!validation.fileValid ? " govuk-file-upload--error" : "")}
                            id="file-upload-data-source" name="file-upload-data-source" type="file" onChange={(e) => storeFileUpload(e)}
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"/>
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                           data-testid="update-datasource-file-upload" />
                 </div>
 
                 <div className="govuk-form-group">
@@ -417,12 +367,13 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     <textarea className={"govuk-textarea" + (!validation.changeNoteValid ? " govuk-textarea--error" : "")}
                               rows={5}
                               aria-describedby="more-detail-hint" value={changeNote}
-                              onChange={(e) => setChangeNote(e.target.value)}>
+                              onChange={(e) => setChangeNote(e.target.value)}
+                              data-testid="update-datasource-changenote">
                     </textarea>
                 </div>
 
                 <button id={"submit-datasource-file"} className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                        onClick={submitDataSourceFile}>
+                        onClick={submitDataSourceFile} data-testid="update-datasource-save">
                     Save
                 </button>
                 <Link id={"cancel-datasource-link"} to={`/Datasets/ManageData`} className="govuk-button govuk-button--secondary"

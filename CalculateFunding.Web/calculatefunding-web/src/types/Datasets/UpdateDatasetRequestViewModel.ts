@@ -21,6 +21,7 @@ export interface DatasetValidateStatusResponse {
     lastUpdatedFormatted: string;
     datasetId: string;
     validationFailures: { [key: string]: string[] };
+    validateDatasetJobId: string;
 }
 
 export const ValidationStates: { [state: string]: string } = {

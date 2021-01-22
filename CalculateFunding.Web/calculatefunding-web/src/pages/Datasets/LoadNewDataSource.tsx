@@ -4,17 +4,26 @@ import {Section} from "../../types/Sections";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {AutoComplete} from "../../components/AutoComplete";
-import {createDatasetService, getDatasetDefinitionsService, getDatasetsForFundingStreamService, getDatasetValidateStatusService, uploadDataSourceService, validateDatasetService} from "../../services/datasetService";
+import {
+    createDatasetService,
+    downloadValidateDatasetValidationErrorSasUrl,
+    getDatasetDefinitionsService,
+    getDatasetsForFundingStreamService,
+    uploadDataSourceService,
+    validateDatasetService
+} from "../../services/datasetService";
 import {CreateDatasetRequestViewModel} from "../../types/Datasets/CreateDatasetRequestViewModel";
 import {useHistory} from "react-router";
 import {FundingStream} from "../../types/viewFundingTypes";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
-import {NewDatasetVersionResponseErrorModel, NewDatasetVersionResponseViewModel} from "../../types/Datasets/NewDatasetVersionResponseViewModel";
+import {
+    NewDatasetVersionResponseErrorModel,
+    NewDatasetVersionResponseViewModel
+} from "../../types/Datasets/NewDatasetVersionResponseViewModel";
 import {AxiosError} from "axios";
 import {ErrorSummary} from "../../components/ErrorSummary";
 import {Link} from "react-router-dom";
-import {DatasetValidateStatusResponse, ValidationStates} from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import {getFundingStreamsService} from "../../services/policyService";
 import {Footer} from "../../components/Footer";
 import {PermissionStatus} from "../../components/PermissionStatus";
@@ -24,8 +33,11 @@ import {IStoreState} from "../../reducers/rootReducer";
 import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 import {usePermittedFundingStreams} from "../../hooks/useFundingStreamPermissions";
 import {UserPermission} from "../../types/UserPermission";
-import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
+import {useMonitorForAnyNewJob} from "../../hooks/Jobs/useMonitorForAnyNewJob";
+import {JobType} from "../../types/jobType";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export function LoadNewDataSource() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
@@ -33,16 +45,15 @@ export function LoadNewDataSource() {
     const [dataSchemaSuggestions, setDataSchemaSuggestions] = useState<DataschemaDetailsViewModel[]>([]);
     const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream | undefined>();
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
-    const [validationFailures, setValidationFailures] = useState<{[key: string]: string[]}>();
     const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [loadingStatus, setLoadingStatus] = useState<string>("Create data source");
     const [description, setDescription] = useState<string>("");
     const [datasetSourceFileName, setDatasetSourceFileName] = useState<string>("");
     const [uploadFileName, setUploadFileName] = useState<string>("");
     const [uploadFile, setUploadFile] = useState<File>();
     const [fundingStreamIsLoading, setFundingStreamIsLoading] = useState<boolean>(false);
     const [dataSchemaIsLoading, setDataSchemaIsLoading] = useState<boolean>(false);
+    const [fundingStreamsIsFiltered, setFundingStreamsIsFiltered] = useState<boolean>(false);
     const [validateForm, setValidateForm] = useState({
         nameValid: true,
         descriptionValid: true,
@@ -53,7 +64,33 @@ export function LoadNewDataSource() {
     const [errorResponse, setErrorResponse] = useState<NewDatasetVersionResponseErrorModel>();
     const history = useHistory();
     const permittedFundingStreams = usePermittedFundingStreams(UserPermission.CanUploadDataSourceFiles);
-    const {errors, addError} = useErrors();
+
+    const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
+    const {newJob} = useMonitorForAnyNewJob(
+        [JobType.ValidateDatasetJob],
+        err => addError({ error: err, description: "An error occurred while monitoring the running jobs."}));
+    const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
+    const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
+
+    useEffect(() => {
+        if (!newJob || newJob.jobId !== validateDatasetJobId) return;
+        clearErrorMessages();
+        if (newJob.runningStatus === RunningStatus.Completed) {
+            if (newJob.isSuccessful && newJob.outcome !== "ValidationFailed") {
+                history.push("/Datasets/ManageDataSourceFiles");
+            } else {
+                downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
+                    let validationErrorFileUrl = result.data;
+                    addValidationErrors({"blobUrl": [validationErrorFileUrl]}, "Validation failed");
+                    setIsLoading(false);
+                }).catch((err) => {
+                    addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+                    setIsLoading(false);
+                });
+            }
+        }
+    }, [newJob]);
+
 
     useEffect(() => {
         setMissingPermissions([]);
@@ -63,39 +100,17 @@ export function LoadNewDataSource() {
         }
     }, [permissions, selectedFundingStream]);
 
-    function getDatasetValidateStatus(operationId: string) {
-        getDatasetValidateStatusService(operationId)
-            .then((datasetValidateStatusResponse) => {
-                if (datasetValidateStatusResponse.status === 200 || datasetValidateStatusResponse.status === 201) {
-                    const result: DatasetValidateStatusResponse = datasetValidateStatusResponse.data;
-                    if (result.currentOperation === "Validated") {
-                        history.push("/Datasets/ManageDataSourceFiles");
-                        return;
-                    } else if (result.currentOperation === "FailedValidation") {
-                        setValidationFailures(result.validationFailures);
-                        setIsLoading(false);
-                        return;
-                    } else {
-                        let message: string = ValidationStates[result.currentOperation];
-                        if (!message) {
-                            message = "Unknown state: " + result.currentOperation;
-                        }
-                        setLoadingStatus(message);
-                    }
-                } else {
-                    setValidationFailures({"error-message": ["Unable to get validation status"]});
-                    setIsLoading(false);
-                    return;
-                }
+    useEffect(() => {
+        if (fundingStreams.length > 0 && !fundingStreamsIsFiltered) {
+            filterFundingStreamsByPermittedStreams();
+            setFundingStreamsIsFiltered(true);
+        }
+    }, [fundingStreams]);
 
-                setTimeout(function () {
-                    getDatasetValidateStatus(operationId);
-                }, 2500);
-            })
-            .catch(() => {
-                setValidationFailures({"error-message": ["Unable to get validation status"]});
-                setIsLoading(false);
-            });
+    function filterFundingStreamsByPermittedStreams()
+    {
+        const permittedStreams = fundingStreams.filter(fs => permittedFundingStreams.some(permitted => permitted === fs.id));
+        setFundingStreamSuggestions(permittedStreams);
     }
 
     function updateFundingStreamSelection(e: string) {
@@ -138,53 +153,53 @@ export function LoadNewDataSource() {
         setFundingStreamIsLoading(true);
         getFundingStreamsService(false)
             .then((response) => {
-                const permittedStreams = response.data.filter(fs => permittedFundingStreams.some(permitted => permitted === fs.id));
-                setFundingStreamSuggestions(permittedStreams);
+                setFundingStreams(response.data);
             })
             .catch(err => addError({error: err, description: `Error while getting funding streams`}))
             .finally(() => setFundingStreamIsLoading(false));
     }
 
+
+
     async function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
         if (uploadFile) {
-            try {
-                const uploadResponse = await uploadDataSourceService(
-                    request.blobUrl,
-                    uploadFile,
-                    request.datasetId,
-                    request.fundingStreamId,
-                    request.author.name,
-                    request.author.id,
-                    selectedDataSchema,
-                    datasetSourceFileName,
-                    description);
-                if (uploadResponse.status !== 201) {
-                    setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
+            await uploadDataSourceService(
+                request.blobUrl,
+                uploadFile,
+                request.datasetId,
+                request.fundingStreamId,
+                request.author.name,
+                request.author.id,
+                selectedDataSchema,
+                datasetSourceFileName,
+                description)
+                .then(() => {
+                    validateDatasetService(
+                        request.datasetId,
+                        request.fundingStreamId,
+                        request.filename,
+                        request.version.toString(),
+                        false,
+                        description,
+                        "").then((validateDatasetResponse) => {
+                        const validateOperationId: any = validateDatasetResponse.data.operationId;
+                        if (!validateOperationId) {
+                            addError({error: "Unable to locate dataset validate operationId"})
+                            setIsLoading(false);
+                            return;
+                        }
+                        setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
+                        setIsLoading(true);
+                    }).catch(() => {
+                        addError({error: "Unable to validate dataset"})
+                        setIsLoading(false);
+                        return;
+                    })
+                }).catch(() => {
+                    addError({error: "Unable to upload file", suggestion: "Please check the file is valid and not locked"})
                     setIsLoading(false);
                     return;
-                }
-
-                const validationResponse = await validateDatasetService(
-                    request.datasetId,
-                    request.fundingStreamId,
-                    request.filename,
-                    request.version.toString(),
-                    false,
-                    description,
-                    "");
-
-                if (validationResponse) {
-                    const validateOperationId: any = validationResponse.data.operationId;
-                    if (validateOperationId) {
-                        return await getDatasetValidateStatus(validateOperationId)
-                    }
-                }
-                setValidationFailures({"error-message": ["Failed to get validation progress tracking ID"]});
-                setIsLoading(false);
-            } catch (err) {
-                setValidationFailures({"error-message": ["Unable to validate dataset: " + err.message]});
-                setIsLoading(false);
-            }
+                });
         } else {
             setValidateForm(prevState => {
                 return {
@@ -224,7 +239,7 @@ export function LoadNewDataSource() {
                     if (error.response !== undefined) {
                         const response = error.response.data as NewDatasetVersionResponseErrorModel;
                         setErrorResponse(response);
-                        setValidationFailures({"error-message": ["Unable to upload file. Please check the file is valid and not locked."]});
+                        addError({error: "Unable to upload file", suggestion: "Please check the file is valid and not locked"})
                     }
                     setIsLoading(false);
                 });
@@ -420,7 +435,7 @@ export function LoadNewDataSource() {
                     </Breadcrumbs>
                 </div>
             </div>
-            <LoadingStatus title={loadingStatus} hidden={!isLoading}
+            <LoadingStatus title={"Create data source"} hidden={!isLoading}
                 subTitle={"Please wait whilst the data source is created"} />
             <div className="govuk-grid-row govuk-!-margin-bottom-9">
                 <div className="govuk-grid-column-full">
@@ -431,26 +446,6 @@ export function LoadNewDataSource() {
                 <div className="govuk-grid-column-full">
                     <PermissionStatus requiredPermissions={missingPermissions} hidden={permissions.length === 0} />
                 </div>
-            </div>
-            <div hidden={(validationFailures === undefined || isLoading)}
-                className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert"
-                data-module="govuk-error-summary">
-                <h2 className="govuk-error-summary__title">
-                    There is a problem
-                    </h2>
-                {validationFailures && Object.keys(validationFailures).length > 0 &&
-                    <div className="govuk-error-summary__body">
-                        <ul className="govuk-list govuk-error-summary__list">
-                            {Object.keys(validationFailures).map((errKey, index) =>
-                                errKey === "blobUrl" ?
-                                    <li key={index}>
-                                        <span>Please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a>
-                                    </li>
-                                    :
-                                    <li key={index}>{validationFailures[errKey]}</li>
-                            )}
-                        </ul>
-                    </div>}
             </div>
             <div className="govuk-grid-row" hidden={isLoading}>
                 <div className="govuk-grid-column-two-thirds">
@@ -498,35 +493,24 @@ export function LoadNewDataSource() {
                         <span id="event-name-hint" className="govuk-hint">
                             Use a descriptive unique name other users can understand
                             </span>
-                        <input className="govuk-input" id="dataset-source-filename" name="dataset-source-filename" type="text"
-                            onChange={(e) => setDatasetSourceFileName(e.target.value)} />
-                    </div>
+                            <input className="govuk-input" id="dataset-source-filename" name="dataset-source-filename" type="text"
+                                   onChange={(e) => setDatasetSourceFileName(e.target.value)}
+                                   data-testid="new-datasource-filename" />
+                        </div>
 
                     <div className={"govuk-form-group" + (validateForm.descriptionValid ? "" : " govuk-form-group--error")}>
                         <label className="govuk-label" htmlFor="more-detail">
                             Description
                             </label>
-                        <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8} aria-describedby="more-detail-hint"
-                            onChange={(e) => setDescription(e.target.value)} />
-                    </div>
-
+                            <textarea className="govuk-textarea" id="more-detail" name="more-detail" rows={8} aria-describedby="more-detail-hint"
+                                      onChange={(e) => setDescription(e.target.value)}
+                                      data-testid="new-datasource-description"/>
+                        </div>
                     <div className={"govuk-form-group" + (validateForm.filenameValid ? "" : " govuk-form-group--error")}>
                         <div className="govuk-form-group">
                             <label className="govuk-label" htmlFor="file-upload-1">
                                 Upload data source file
                                 </label>
-                            {
-                                (validationFailures !== undefined) ?
-                                    <span className="govuk-error-message">
-                                        <span className="govuk-visually-hidden">Error:</span>
-                                        {validationFailures["error-message"]}
-                                        {validationFailures["FundingStreamId"]}
-                                        {validationFailures["blobUrl"] != null &&
-                                            <span><span> please see </span><a href={validationFailures["blobUrl"].toString()}>error report</a></span>
-                                        }
-                                    </span>
-                                    : ""
-                            }
                             <input className="govuk-file-upload"
                                 id="file-upload-1"
                                 name="file-upload-1"

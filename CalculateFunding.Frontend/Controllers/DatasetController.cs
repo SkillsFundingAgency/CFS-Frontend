@@ -506,7 +506,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/datasets/download-validate-dataset-error-url/{schemaId}")]
+        [Route("api/datasets/download-validate-dataset-error-url/{jobId}")]
         public async Task<IActionResult> DownloadValidateDatasetValidationErrorSasUrl([FromRoute] string jobId)
         {
             Guard.IsNullOrWhiteSpace(jobId, nameof(jobId));
@@ -520,7 +520,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.ValidationErrorFileUrl))
             {
-                return Redirect(apiResponse.Content.ValidationErrorFileUrl);
+                return new OkObjectResult(apiResponse.Content.ValidationErrorFileUrl);
             }
 
             return new NotFoundResult();
