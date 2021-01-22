@@ -78,8 +78,8 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
                 }
                 <li>
                     <p className="govuk-body">
-                        Job initiated by {props.job.invokerUserDisplayName} on
-                        <DateFormatter date={props.job.created as Date} utc={true}/>
+                        <span>Job initiated by {props.job.invokerUserDisplayName} on </span>
+                        <span><DateFormatter date={props.job.created as Date} utc={true}/></span>
                     </p>
                 </li>
                 {(props.job.runningStatus === RunningStatus.InProgress || props.job.isComplete) &&

@@ -16,7 +16,7 @@ const renderComponent = async (specificationId: string, publishedProvidersSelect
         <QueryClientProviderTestWrapper>
             <Provider store={store}>
                 <CsvDownloadPublishedProviders specificationId={specificationId}
-                                               actionType={actionType} error={callBackSpy}/>
+                                               actionType={actionType} addError={callBackSpy}/>
             </Provider>
         </QueryClientProviderTestWrapper>
     </MemoryRouter>);
@@ -64,7 +64,7 @@ describe('<CsvDownloadPublishedProviders />', () => {
 
         test('renders the link correctly', async () => {
             await renderComponent("ABC123", [], FundingActionType.Release);
-            waitForElementToBeRemoved(screen.getByText(/Please wait/)).then(() => {
+            waitForElementToBeRemoved(screen.getByText(/Generating export of providers/)).then(() => {
                     expect(screen.getByText(/Export all as CSV/) as HTMLAnchorElement).toBeInTheDocument();
                 }
             );
@@ -75,7 +75,7 @@ describe('<CsvDownloadPublishedProviders />', () => {
 
         test('renders the link correctly', async () => {
             await renderComponent("ABC123", ["ABC", "DEF"], FundingActionType.Release);
-            expect(screen.getByText(/Please wait/)).toBeInTheDocument();
+            expect(screen.getByText(/Generating export of providers/)).toBeInTheDocument();
             waitForElementToBeRemoved(document.querySelector('span.loader-inline')).then(() => {
                     expect(screen.getByText(/Export all as CSV/) as HTMLAnchorElement).toBeInTheDocument();
                 }
@@ -88,7 +88,7 @@ describe('<CsvDownloadPublishedProviders />', () => {
 
         test('renders the link correctly', async () => {
             await renderComponent("ABC123", [], FundingActionType.Approve);
-            waitForElementToBeRemoved(screen.getByText(/Please wait/)).then(() => {
+            waitForElementToBeRemoved(screen.getByText(/Generating export of providers/)).then(() => {
                     expect(screen.getByText(/Export all as CSV/) as HTMLAnchorElement).toBeInTheDocument();
                 }
             );
@@ -99,7 +99,7 @@ describe('<CsvDownloadPublishedProviders />', () => {
     describe('<CsvDownloadPublishedProviders /> with the Approve Type and some published providers selected', () => {
         test('renders the link correctly', async () => {
             await renderComponent("ABC123", ["ABC", "DEF"], FundingActionType.Approve);
-            waitForElementToBeRemoved(screen.getByText(/Please wait/)).then(() => {
+            waitForElementToBeRemoved(screen.getByText(/Generating export of providers/)).then(() => {
                     expect(screen.getByText(/Export all as CSV/) as HTMLAnchorElement).toBeInTheDocument();
                 }
             );

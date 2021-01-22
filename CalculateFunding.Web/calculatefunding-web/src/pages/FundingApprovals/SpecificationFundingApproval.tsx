@@ -147,8 +147,9 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         try {
             setJobId((await publishService.refreshSpecificationFundingService(specificationId)).data.jobId);
         } catch (e) {
-            setIsLoadingRefresh(false);
             addErrorMessage(e, "Error trying to refresh funding");
+        } finally {
+            setIsLoadingRefresh(false);
         }
     }
 

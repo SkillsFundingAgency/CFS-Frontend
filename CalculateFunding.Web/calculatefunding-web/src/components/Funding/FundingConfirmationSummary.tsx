@@ -29,6 +29,7 @@ export interface FundingConfirmationSummaryProps {
     specification: SpecificationSummary,
     canReleaseFunding: boolean,
     canApproveFunding: boolean,
+    isConfirmingOrConfirmed: boolean,
     isLoading: boolean,
     addError: (props: ErrorProps) => void,
 }
@@ -81,7 +82,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
 
     } else {
 
-        if (fundingSummary.count === 0) {
+        if (fundingSummary.count === 0 && !props.isLoading && !props.isConfirmingOrConfirmed) {
             props.addError({error: "There are no providers to " + props.actionType.toLowerCase()})
         }
         return (
@@ -107,7 +108,10 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                             <tr className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header">Providers selected</th>
                                 <td className="govuk-table__cell">
-                                    <CsvDownloadPublishedProviders actionType={props.actionType} specificationId={props.specification.id} error={(errorMessage, description, fieldName) => props.addError} />
+                                    <CsvDownloadPublishedProviders 
+                                        actionType={props.actionType} 
+                                        specificationId={props.specification.id} 
+                                        addError={props.addError} />
                                 </td>
                                 <td className="govuk-table__cell govuk-table__cell--numeric">
                                     <p className="govuk-body">{fundingSummary.count}</p>
