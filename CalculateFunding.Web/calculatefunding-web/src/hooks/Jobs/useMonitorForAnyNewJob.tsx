@@ -1,5 +1,5 @@
 ﻿import {JobType} from "../../types/jobType";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {AxiosError} from "axios";
@@ -14,40 +14,44 @@ export const useMonitorForAnyNewJob = (
     jobTypes: JobType[],
     onError: (err: AxiosError | Error | string) => void): MonitorForAnyNewJobResult => {
     const [newJob, setNewJob] = useState<JobDetails>();
+    const [hubConnection, setHubConnection] = useState<HubConnection>();
     const hubRef = useRef<HubConnection>();
 
     useEffectOnce(() => {
         monitorJobNotifications();
     });
 
+    useEffect(() => {
+        if (!hubConnection) return;
+        hubRef.current = hubConnection;
+        return () => {
+            hubRef.current?.stop();
+        }
+    }, [hubConnection]);
+
     async function monitorJobNotifications() {
         let hubConnect: HubConnection;
-        if (hubRef.current) {
-            hubConnect = hubRef.current;
-        } else {
-            hubConnect = new HubConnectionBuilder()
-                .withUrl(`/api/notifications`)
-                .withAutomaticReconnect()
-                .build();
-            hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
-            hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
-            hubRef.current = hubConnect;
-        }
-
         try {
-            if (hubConnect.connectionId === null) {
-                await hubConnect.start();
+            if (!hubRef.current) {
+                hubConnect = new HubConnectionBuilder()
+                    .withUrl(`/api/notifications`)
+                    .withAutomaticReconnect()
+                    .build();
+                hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
+                hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
+                // register listeners before calling start
                 hubConnect.on('NotificationEvent', (job: JobResponse) => {
                     const jobType: JobType | undefined = JobType[job.jobType as keyof typeof JobType];
                     if (isThisJobValid(job) && amInterestedInJobType(jobType)) {
                         setNewJob(getJobDetailsFromJobResponse(job));
                     }
                 });
+                await hubConnect.start();
+                await hubConnect.invoke("StartWatchingForAllNotifications");
+                setHubConnection(hubConnect);
             }
-            await hubConnect.invoke("StartWatchingForAllNotifications");
         } catch (err) {
             onError(`Error while monitoring jobs: ${err.message}`);
-            await hubConnect.stop();
         }
     }
 
