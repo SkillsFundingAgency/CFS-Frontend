@@ -291,7 +291,7 @@ export function CreateSpecification() {
 
                 <MultipleErrorSummary errors={errors}/>
 
-                <fieldset className="govuk-fieldset" id="create-specification-fieldset">
+                <fieldset hidden={isSaving} className="govuk-fieldset" id="create-specification-fieldset">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
                             Create specification

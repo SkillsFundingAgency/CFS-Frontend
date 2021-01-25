@@ -70,6 +70,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isApprovingAllCalculations, setIsApprovingAllCalculations] = useState(false);
+    const [displayApproveAllJobStatus, setDisplayApproveAllJobStatus] = useState<boolean>(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
     const {canApproveAllCalculations, canChooseFunding, missingPermissions} =
@@ -143,6 +144,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     async function submitApproveAllCalculations(confirm: boolean) {
         if (confirm) {
+            setDisplayApproveAllJobStatus(true);
             setIsApprovingAllCalculations(true);
             try {
                 const response = await approveAllCalculationsService(specificationId);
@@ -254,7 +256,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             {(isCheckingForJob || hasJob) &&
                 <div className="govuk-form-group">
                     <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob} />
-                    {hasJob && !isApprovingAllCalculations && <JobProgressNotificationBanner job={approveAllCalculationsJob} />}
+                    {hasJob && !isApprovingAllCalculations && <JobProgressNotificationBanner
+                        job={approveAllCalculationsJob} displaySuccessfulJob={displayApproveAllJobStatus} />}
                 </div>}
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>

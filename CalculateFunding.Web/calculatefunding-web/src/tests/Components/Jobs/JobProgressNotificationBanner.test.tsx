@@ -8,10 +8,13 @@ import {JobProgressNotificationBanner} from "../../../components/Jobs/JobProgres
 import {JobDetails} from "../../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 
-const renderComponent = (job: JobDetails) => {
+const renderComponent = (job: JobDetails, displaySuccessfulJob?: boolean) => {
   const {JobProgressNotificationBanner} = require("../../../components/Jobs/JobProgressNotificationBanner");
-  return render(<JobProgressNotificationBanner job={job} hasActiveJob={job.runningStatus !== RunningStatus.Completed} />);
+  return render(<JobProgressNotificationBanner job={job} displaySuccessfulJob={displaySuccessfulJob}
+                                               hasActiveJob={job.runningStatus !== RunningStatus.Completed} />);
 };
+
+
 
 describe('<JobProgressNotificationBanner />', () => {
 
@@ -87,6 +90,37 @@ describe('<JobProgressNotificationBanner />', () => {
     expect(screen.getByText(/job-id-5472345/)).toBeInTheDocument();
   });
 
+  it("does not render status of successfully completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
+
+    renderComponent(job, false);
+
+    expect(screen.queryByText("Job completed successfully: Mapping dataset")).not.toBeInTheDocument();
+  });
+
+  it("renders status based on Queued completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(undefined, RunningStatus.Queued);
+
+    renderComponent(job, false);
+
+    expect(screen.getByText("Job in queue: Mapping dataset"));
+  });
+
+  it("renders status based on InProgress completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(undefined, RunningStatus.InProgress);
+
+    renderComponent(job, false);
+
+    expect(screen.getByText("Job in progress: Mapping dataset"));
+  });
+
+  it("renders status based on failed completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
+
+    renderComponent(job, false);
+
+    expect(screen.getByText("Job failed: Mapping dataset"));
+  });
 });
 
 function createTestJob(completionStatus: CompletionStatus | undefined, runningStatus: RunningStatus) : JobDetails {

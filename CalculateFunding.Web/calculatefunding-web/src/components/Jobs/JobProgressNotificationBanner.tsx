@@ -3,13 +3,20 @@ import {DateFormatter} from "../DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
 
 export interface JobProgressNotificationBannerProps {
-    job: JobDetails | undefined
+    job: JobDetails | undefined,
+    displaySuccessfulJob?: boolean
 }
 
 export function JobProgressNotificationBanner(props: JobProgressNotificationBannerProps) {
     if (!props.job) {
         return null;
     }
+
+    if (props.displaySuccessfulJob != null && props.displaySuccessfulJob === false && props.job.isSuccessful)
+    {
+        return null;
+    }
+
     const cssClass = props.job.isFailed ? "govuk-error-summary-red" :
         props.job.isSuccessful ? "govuk-error-summary-green" :
             props.job.isActive ? "govuk-error-summary-orange" :
@@ -22,6 +29,7 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
         tabIndex={-1}
         data-module="govuk-error-summary"
         data-testid="job-notification">
+
         <h2 className="govuk-error-summary__title" id="error-summary-title">
             <span data-testid="job-notification-title">
                 Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
