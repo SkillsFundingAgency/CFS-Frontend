@@ -234,15 +234,21 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                                                      selectedSearchType={searchType}/>
                                         <RadioSearch text="UKPRN" timeout={900} radioId={"ukprn"} characterRestrictions={CharacterRestrictions.NumericOnly}
                                                      radioName={"search-providers-radios"} searchType={"ukprn"}
-                                                     minimumChars={3} callback={searchText}
+                                                     minimumChars={3}
+                                                     maximumChars={8}
+                                                     callback={searchText}
                                                      selectedSearchType={searchType}/>
                                         <RadioSearch text="UPIN" timeout={900} radioId={"upin"} characterRestrictions={CharacterRestrictions.NumericOnly}
                                                      radioName={"search-providers-radios"} searchType={"upin"}
-                                                     minimumChars={3} callback={searchText}
+                                                     minimumChars={3}
+                                                     maximumChars={6}
+                                                     callback={searchText}
                                                      selectedSearchType={searchType}/>
                                         <RadioSearch text="URN" timeout={900} radioId={"urn"} characterRestrictions={CharacterRestrictions.NumericOnly}
                                                      radioName={"search-providers-radios"} searchType={"urn"}
-                                                     minimumChars={3} callback={searchText}
+                                                     minimumChars={3}
+                                                     maximumChars={6}
+                                                     callback={searchText}
                                                      selectedSearchType={searchType}/>
                                     </div>
                                 </div>

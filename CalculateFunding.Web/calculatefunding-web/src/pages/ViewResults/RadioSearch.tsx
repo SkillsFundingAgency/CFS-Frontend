@@ -11,6 +11,7 @@ export function RadioSearch(props: {
     radioName: string,
     searchType: string,
     minimumChars: number,
+    maximumChars?: number,
     characterRestrictions: CharacterRestrictions
     callback: any
 }) {
@@ -40,20 +41,20 @@ export function RadioSearch(props: {
             if (regEx.test(value)) {
                 addError({error: "Numeric characters only", description: "Only numbers allowed"});
                 searchValid = false;
-            }else{
+            } else {
                 clearErrorMessages();
             }
-        }else if(props.characterRestrictions === CharacterRestrictions.AlphaOnly) {
+        } else if (props.characterRestrictions === CharacterRestrictions.AlphaOnly) {
             let regEx = new RegExp("[^0-9]");
             if (!regEx.test(value)) {
                 addError({error: "Alpha characters only", description: "Only letters allowed"});
                 searchValid = false;
-            }else{
+            } else {
                 clearErrorMessages();
             }
         }
 
-        if(searchValid) {
+        if (searchValid) {
             setSearchQuery(() => {
                 return {
                     searchName: name,
@@ -68,14 +69,16 @@ export function RadioSearch(props: {
     }
 
     return <div className={"govuk-radios__item"}>
-        <input type="radio" className={"govuk-radios__input"}
+        <label className={"govuk-radios__label"} htmlFor={props.radioId}><input type="radio" className={"govuk-radios__input"}
                id={props.radioId}
                name={props.radioName} onChange={() => setSearch(props.searchType)}/>
-        <label className={"govuk-radios__label"} htmlFor={props.radioId}>{props.text}</label>
+        {props.text}</label>
         <div className="govuk-inset-text" hidden={props.selectedSearchType !== props.searchType}>
-            <input className={"govuk-input" + (errors.length > 0 ? " govuk-input--error" : "")} type={"text"}
-                   onChange={(e) => updateSearch(props.searchType, e.target.value)}/>
-            {(errors as ErrorMessage[]).map((err, index) => <span key={index} className={"govuk-error-message"}>{err.message}</span>)}
+            <input role={'searchTerm'} className={"govuk-input" + (errors.length > 0 ? " govuk-input--error" : "")} type={"text"}
+                   onChange={(e) => updateSearch(props.searchType, e.target.value)}
+                   maxLength={props.maximumChars}></input>
+            {(errors as ErrorMessage[]).map((err, index) => <span key={index}
+                                                                  className={"govuk-error-message"}>{err.message}</span>)}
         </div>
     </div>
 }
