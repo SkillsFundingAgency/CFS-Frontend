@@ -260,48 +260,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         </label>
                         <h3 className="govuk-heading-m" id="funding-period">{specification && specification.fundingPeriod.name}</h3>
                     </div>
-
-                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "enableTracking").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="enableTracking">
-                            Track latest core provider data?
-                        </label>
-                        <div id="enableTracking-hint" className="govuk-hint govuk-!-margin-bottom-4">
-                            Select yes if you wish to use the latest available provider data.
-                        </div>
-                        <div className="govuk-radios">
-                            <div className="govuk-radios__item">
-                                <input className="govuk-radios__input" 
-                                       id="sign-in" 
-                                       name="sign-in" 
-                                       type="radio" 
-                                       value="government-gateway" 
-                                       aria-describedby="sign-in-item-hint" >
-                                    <label className="govuk-label govuk-radios__label" htmlFor="sign-in">
-                                        Yes
-                                    </label>
-                                    <div id="sign-in-item-hint" className="govuk-hint govuk-radios__hint">
-                                        This specification will use the latest available provider data
-                                    </div>
-                                </input>
-                            </div>
-                            <div className="govuk-radios__item">
-                                <input className="govuk-radios__input" 
-                                       id="sign-in-2" 
-                                       name="sign-in" 
-                                       type="radio" 
-                                       value="govuk-verify" 
-                                       aria-describedby="sign-in-2-item-hint">
-                                    <label className="govuk-label govuk-radios__label" htmlFor="sign-in-2">
-                                        No
-                                    </label>
-                                    <div id="sign-in-2-item-hint" className="govuk-hint govuk-radios__hint">
-                                        I will select which provider data to use
-                                    </div>
-                                </input>
-                            </div>
-                        </div>
-                    </div>
-
+                    
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data
