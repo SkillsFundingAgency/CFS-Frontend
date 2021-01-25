@@ -487,7 +487,9 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return new OkObjectResult(response.Content);
+                return new OkObjectResult(response.Content
+                    .OrderByDescending(v=>v.Version)
+                    .ThenByDescending(v=>v.LastUpdated));
             }
 
             return new BadRequestObjectResult(response.Content);
