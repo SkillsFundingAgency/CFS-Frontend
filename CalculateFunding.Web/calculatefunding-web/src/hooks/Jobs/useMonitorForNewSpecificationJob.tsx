@@ -16,8 +16,8 @@ export const useMonitorForNewSpecificationJob = (
     onError: (err: AxiosError | Error | string) => void): MonitorForNewSpecificationJobResult => {
     const [newJob, setNewJob] = useState<JobDetails>();
     const [isMonitoring, setIsMonitoring] = useState<boolean>(false);
+    const [hubConnection, setHubConnection] = useState<HubConnection>();
     const hubRef = useRef<HubConnection>();
-    const specRef = useRef<string>("");
 
     useEffect(() => {
         if (specificationId && specificationId.length > 0) {
@@ -26,38 +26,37 @@ export const useMonitorForNewSpecificationJob = (
         }
     }, [specificationId]);
 
+    useEffect(() => {
+        if (!hubConnection) return;
+        hubRef.current = hubConnection;
+        return () => {
+            hubRef.current?.stop();
+        }
+    }, [hubConnection]);
+
     async function monitorSpecJobNotifications(specId: string) {
         let hubConnect: HubConnection;
-        if (hubRef.current) {
-            hubConnect = hubRef.current;
-        } else {
-            hubConnect = new HubConnectionBuilder()
-                .withUrl(`/api/notifications`)
-                .withAutomaticReconnect()
-                .build();
-            hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
-            hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
-            hubRef.current = hubConnect;
-        }
-
         try {
-            if (hubConnect.connectionId === null) {
-                await hubConnect.start();
+            if (!hubRef.current) {
+                hubConnect = new HubConnectionBuilder()
+                    .withUrl(`/api/notifications`)
+                    .withAutomaticReconnect()
+                    .build();
+                hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
+                hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
+                // register listeners before calling start
                 hubConnect.on('NotificationEvent', (job: JobResponse) => {
                     const jobType: JobType | undefined = JobType[job.jobType as keyof typeof JobType];
                     if (isThisJobValid(job) && amInterestedInJobType(jobType)) {
                         setNewJob(getJobDetailsFromJobResponse(job));
                     }
                 });
+                await hubConnect.start();
+                await hubConnect.invoke("StartWatchingForAllNotifications");
+                setHubConnection(hubConnect);
             }
-            if (specRef.current.length > 0) {
-                await hubConnect.invoke("StopWatchingForSpecificationNotifications", specRef.current);
-            }
-            specRef.current = specId;
-            await hubConnect.invoke("StartWatchingForSpecificationNotifications", specId);
         } catch (err) {
             onError(`Error while monitoring jobs: ${err.message}`);
-            await hubConnect.stop();
             setIsMonitoring(false);
         }
     }
