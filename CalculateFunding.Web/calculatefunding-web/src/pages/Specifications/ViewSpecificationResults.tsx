@@ -64,7 +64,10 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         showApproveButton={false} /> : ""}
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
-                                <AdditionalCalculations specificationId={specificationId} addError={addErrorMessage}/>
+                                <AdditionalCalculations
+                                    specificationId={specificationId}
+                                    addError={addErrorMessage}
+                                    showCreateButton={false} />
                             </Tabs.Panel>
                             <Tabs.Panel label="downloadable-reports">
                                 <DownloadableReports

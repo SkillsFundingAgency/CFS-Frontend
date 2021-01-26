@@ -20,7 +20,6 @@ import {
     updateFundingLineExpandStatus
 } from "./FundingLineStructureHelper";
 import {getFundingLineStructureService} from "../../services/fundingStructuresService";
-import {AxiosError} from "axios";
 import {getFundingStructureResultsForProviderAndSpecification} from "../../services/providerService";
 import {InputSearch} from "../InputSearch";
 import {getCalculationSummaryBySpecificationId} from "../../services/calculationService";

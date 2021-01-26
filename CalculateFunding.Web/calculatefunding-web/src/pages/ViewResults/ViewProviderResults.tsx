@@ -229,9 +229,11 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                 }
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
-                                {specificationSummary && <AdditionalCalculations
+                                {specificationSummary &&
+                                    <AdditionalCalculations
                                         specificationId={specificationSummary.id}
-                                        addError={addError} />
+                                        addError={addError}
+                                        showCreateButton={false} />
                                 }
                             </Tabs.Panel>
                             <Tabs.Panel label={"provider-data"}>

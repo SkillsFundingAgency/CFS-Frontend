@@ -14,6 +14,7 @@ import {ErrorProps} from "../../hooks/useErrors";
 export interface AdditionalCalculationsProps {
     specificationId: string,
     addError: (props: ErrorProps) => void,
+    showCreateButton: boolean
 }
 
 export function AdditionalCalculations(props: AdditionalCalculationsProps) {
@@ -120,10 +121,10 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                 <tbody className="govuk-table__body">
                     {additionalCalculations.calculations.map((ac, index) => {
                         const hasError = circularReferenceErrors && circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
-
+                        const linkUrl =  props.showCreateButton ? `/Specifications/EditCalculation/${ac.id}` : `/ViewCalculationResults/${ac.id}`;
                         return <tr className="govuk-table__row" key={index}>
                             <td className="govuk-table__cell text-overflow">
-                                <Link to={`/Specifications/EditCalculation/${ac.id}`}>{ac.name}</Link>
+                                <Link to={linkUrl}>{ac.name}</Link>
                                 <br />
                                 {hasError ? <span className="govuk-error-message">circular reference detected in calculation script</span> : ""}
                             </td>
@@ -149,21 +150,21 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                         <strong className="govuk-warning-text__text">
                             <span className="govuk-warning-text__assistive">Warning</span>
                     No additional calculations available. &nbsp;
-                    {canCreateAdditionalCalculation &&
-                                <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}>
-                                    Create a calculation
-                    </Link>
-                            }
+                    {canCreateAdditionalCalculation && props.showCreateButton &&
+                        <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}>
+                            Create a calculation
+                        </Link>
+                    }
                         </strong>
                     </div>
                 }
-                {additionalCalculations.calculations.length > 0 && canCreateAdditionalCalculation &&
+                {additionalCalculations.calculations.length > 0 && canCreateAdditionalCalculation && props.showCreateButton &&
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
                             <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}
                                 className="govuk-link govuk-button">
                                 Create a calculation
-                    </Link>
+                            </Link>
                         </div>
                     </div>
                 }

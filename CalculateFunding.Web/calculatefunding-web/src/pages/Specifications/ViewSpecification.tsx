@@ -328,8 +328,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     showApproveButton={true} />
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
-                                <AdditionalCalculations specificationId={specificationId}
-                                    addError={addErrorMessage} />
+                                <AdditionalCalculations
+                                    specificationId={specificationId}
+                                    addError={addErrorMessage}
+                                    showCreateButton={true} />
                             </Tabs.Panel>
                             <Tabs.Panel label="datasets">
                                 <Datasets specificationId={specificationId} />

@@ -3,6 +3,7 @@ import React from "react";
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
+import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {CalculationSearchResult, CalculationType} from "../../../types/CalculationSearchResponse";
 import {ValueType} from "../../../types/ValueType";
@@ -11,39 +12,63 @@ import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {QueryClient, QueryClientProvider} from "react-query";
 
-const renderComponent = async () => {
-    const {AdditionalCalculations} = require('../../../components/Calculations/AdditionalCalculations');
-    const component = render(<MemoryRouter initialEntries={['/AdditionalCalculations/SPEC123']}>
-        <QueryClientProvider client={new QueryClient()}>
-            <Switch>
-            <Route path="/AdditionalCalculations/:specificationId" component={AdditionalCalculations} />
-        </Switch>
-        </QueryClientProvider>
-    </MemoryRouter>);
-    await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-    });
-    return component;
-}
-
 describe('<AdditionalCalculations /> tests', () => {
+    beforeAll(() => {
+        jest.mock('../../../services/calculationService', () => mockCalculationService());
+    });
 
-    afterEach(() => jest.clearAllMocks());
+    afterEach(() => {
+        jest.clearAllMocks();
+        mockCircularReferenceErrors.mockReset();
+        mockPermissions.mockReset();
+    });
 
-    describe("<AdditionalCalculations /> service call checks ", () => {
-        it("it calls the services correct number of times", async () => {
-            jest.mock('../../../services/calculationService', () => mockCalculationService());
-            const {searchCalculationsForSpecification} = require('../../../services/calculationService');
-            await renderComponent();
-            await waitFor(() => expect(searchCalculationsForSpecification).toBeCalledTimes(1));
+    describe('<AdditionalCalculations /> with permissions but without create button', () => {
+        beforeEach(async () => {
+            mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
+            mockPermissions.mockImplementation(() => (fullPermissions));
+            await renderComponent(false);
+        });
+
+        it('create button is not displayed', async () => {
+            expect(screen.queryByText(/Create a calculation/i)).not.toBeInTheDocument();
+        });
+
+        it('calculation link to view calculation results', async () => {
+            expect(screen.getByText(testCalc1.name).closest('a')).toHaveAttribute('href', '/ViewCalculationResults/54723')
         });
     });
 
-    describe('<AdditionalCalculations /> without circular ref error', () => {
+    describe('<AdditionalCalculations /> without create permissions but with create button', () => {
         beforeEach(async () => {
-            jest.mock('../../../services/calculationService', () => mockCalculationService());
-            mockNoCircularRefErrors();
-            await renderComponent();
+            mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
+            mockPermissions.mockImplementation(() => (noPermissions));
+            await renderComponent(true);
+        });
+
+        it('create button is not displayed', async () => {
+            expect(screen.queryByText(/Create a calculation/i)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('<AdditionalCalculations /> with permissions but without circular ref error', () => {
+        beforeEach(async () => {
+            mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
+            mockPermissions.mockImplementation(() => (fullPermissions));
+            await renderComponent(true);
+        });
+
+        it('calculation link to view calculation results', async () => {
+            expect(screen.getByText(testCalc1.name).closest('a')).toHaveAttribute('href', '/Specifications/EditCalculation/54723')
+        });
+
+        it("it calls the services correct number of times", async () => {
+            const {searchCalculationsForSpecification} = require('../../../services/calculationService');
+            await waitFor(() => expect(searchCalculationsForSpecification).toBeCalledTimes(1));
+        });
+
+        it('create button is displayed', async () => {
+            expect(await screen.findByText(/Create a calculation/i)).toBeInTheDocument();
         });
 
         it('additional calculations are displayed', async () => {
@@ -58,15 +83,15 @@ describe('<AdditionalCalculations /> tests', () => {
         });
 
         it('does not render error message', async () => {
-            expect(await screen.queryAllByText(/circular reference detected in calculation script/)).toHaveLength(0);
+            expect(screen.queryAllByText(/circular reference detected in calculation script/)).toHaveLength(0);
         });
     });
 
-    describe('<AdditionalCalculations /> with circular ref error', () => {
+    describe('<AdditionalCalculations /> with permissions but with circular ref error', () => {
         beforeEach(async () => {
-            jest.mock('../../../services/calculationService', () => mockCalculationService());
-            mockCircularRefErrors();
-            await renderComponent();
+            mockCircularReferenceErrors.mockImplementation(() => (withCircularRefErrorsResult));
+            mockPermissions.mockImplementation(() => (fullPermissions));
+            await renderComponent(true);
         });
 
         it('additional calculations are displayed', async () => {
@@ -79,11 +104,31 @@ describe('<AdditionalCalculations /> tests', () => {
         });
 
         it('error status is displayed for calculation without circular reference error', async () => {
-            expect(await screen.queryByText(testCalc2.status)).not.toBeInTheDocument();
+            expect(screen.queryByText(testCalc2.status)).not.toBeInTheDocument();
             expect(await screen.findByText(testCalc1.status)).toBeInTheDocument();
         });
     });
 });
+
+const renderComponent = async (showCreateButton: boolean) => {
+    const {AdditionalCalculations} = require('../../../components/Calculations/AdditionalCalculations');
+    const component = render(<MemoryRouter initialEntries={['/AdditionalCalculations/SPEC123']}>
+        <QueryClientProvider client={new QueryClient()}>
+            <Switch>
+            <Route path="/AdditionalCalculations/:specificationId">
+                <AdditionalCalculations
+                    specificationId="SPEC123"
+                    addError={jest.fn()}
+                    showCreateButton={showCreateButton} />
+            </Route>
+        </Switch>
+        </QueryClientProvider>
+    </MemoryRouter>);
+    await waitFor(() => {
+        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+    });
+    return component;
+}
 
 const fundingStream: FundingStream = {
     name: "FS123",
@@ -152,10 +197,46 @@ const noCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
     circularReferenceErrors: [],
     isLoadingCircularDependencies: false
 }
-const mockCircularRefErrors = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
-    .mockImplementation(() => (withCircularRefErrorsResult));
-const mockNoCircularRefErrors = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
-    .mockImplementation(() => (noCircularRefErrorsResult));
+
+const fullPermissions: permissionsHook.SpecificationPermissionsResult = {
+    canApproveAllCalculations: false,
+    canChooseFunding: false,
+    canRefreshFunding: true,
+    canApproveFunding: true,
+    canReleaseFunding: true,
+    isPermissionsFetched: true,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    missingPermissions: [],
+    canEditSpecification: false,
+    canCreateSpecification: false,
+    canMapDatasets: false,
+    canApproveCalculation: false,
+    canEditCalculation: false,
+    canCreateAdditionalCalculation: true
+};
+
+const noPermissions: permissionsHook.SpecificationPermissionsResult = {
+    canApproveAllCalculations: false,
+    canChooseFunding: false,
+    canRefreshFunding: true,
+    canApproveFunding: true,
+    canReleaseFunding: true,
+    isPermissionsFetched: true,
+    hasMissingPermissions: false,
+    isCheckingForPermissions: false,
+    missingPermissions: [],
+    canEditSpecification: false,
+    canCreateSpecification: false,
+    canMapDatasets: false,
+    canApproveCalculation: false,
+    canEditCalculation: false,
+    canCreateAdditionalCalculation: false
+};
+
+const mockCircularReferenceErrors = jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies');
+const mockPermissions = jest.spyOn(permissionsHook, 'useSpecificationPermissions');
+
 const mockCalculationService = () => {
     const calculationService = jest.requireActual('../../../services/calculationService');
     return {
