@@ -112,7 +112,7 @@ export async function generateCsvForReleaseBatch(specificationId: string, publis
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         data:{
-            request: publishedProviderIds
+            publishedProviderIds: publishedProviderIds
         }
     });
 }
@@ -133,7 +133,7 @@ export async function generateCsvForApprovalBatch(specificationId: string, publi
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         data:{
-            request: publishedProviderIds
+            publishedProviderIds: publishedProviderIds
         }
     });
 }
