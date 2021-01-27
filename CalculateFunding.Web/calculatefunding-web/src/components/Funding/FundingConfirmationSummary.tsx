@@ -13,13 +13,13 @@ import {
     getFundingSummaryForApprovingService,
     getFundingSummaryForReleasingService
 } from "../../services/publishService";
-import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {CsvDownloadPublishedProviders} from "./CsvDownloadPublishedProviders";
 import {ErrorProps} from "../../hooks/useErrors";
 import {AxiosError} from "axios";
+import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 
 export interface FundingConfirmationSummaryProps {
     fundingStreamId: string,
@@ -37,14 +37,14 @@ export interface FundingConfirmationSummaryProps {
 export function FundingConfirmationSummary(props: FundingConfirmationSummaryProps) {
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
 
-    const {publishedProviderIds, isLoadingPublishedProviderIds} =
-        usePublishedProviderIds(props.fundingStreamId, props.fundingPeriodId, props.specification.id,
+    const {publishedProviderIds} =
+        usePublishedProviderIds(state.searchCriteria, props.approvalMode,
             {
                 enabled: props.approvalMode !== ApprovalMode.Batches,
                 onError: err => props.addError({error: err, description: "Error while loading provider ids"})
             });
-    const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.providerVersionIds.length > 0 ?
-        state.providerVersionIds : publishedProviderIds ? publishedProviderIds : [];
+    const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.selectedProviderIds.length > 0 ?
+        state.selectedProviderIds : publishedProviderIds ? publishedProviderIds : [];
 
     const {data: batchApprovalSummary, isLoading: isLoadingBatchApprovalSummary} =
         useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-approval`,
@@ -144,7 +144,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                     </div>
                 </div>
 
-                {state.providerVersionIds.length > 0 && !props.isLoading &&
+                {state.selectedProviderIds.length > 0 && !props.isLoading &&
                 <div className="govuk-grid-row govuk-!-margin-bottom-9">
                     <div className="govuk-grid-column-three-quarters">
                         <Link to={`/Approvals/SpecificationFundingApproval/${props.fundingStreamId}/${props.fundingPeriodId}/${props.specification.id}`}

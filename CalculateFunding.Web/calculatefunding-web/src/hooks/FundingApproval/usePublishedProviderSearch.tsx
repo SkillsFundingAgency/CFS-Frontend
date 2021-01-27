@@ -1,27 +1,43 @@
 ﻿import {AxiosError} from "axios";
 import {useQuery, UseQueryOptions} from "react-query";
 import {PublishedProviderSearchRequest} from "../../types/publishedProviderSearchRequest";
-import {searchForPublishedProviderResults} from "../../services/publishedProviderService";
 import {PublishedProviderSearchResults} from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import {QueryObserverResult, RefetchOptions} from "react-query/types/core/types";
+import * as publishedProviderService from "../../services/publishedProviderService";
+import {ApprovalMode} from "../../types/ApprovalMode";
+import {usePublishedProviderIds} from "./usePublishedProviderIds";
 
 export type PublishedProviderSearchQueryResult = {
     publishedProviderSearchResults: PublishedProviderSearchResults | undefined,
     isLoadingSearchResults: boolean,
-    refetchSearchResults: (options?: RefetchOptions) => Promise<QueryObserverResult<PublishedProviderSearchResults, AxiosError>>,
+    publishedProviderIds: string[] | undefined,
+    refetchSearchResults: () => void,
 }
 
 export const usePublishedProviderSearch = (searchRequest: PublishedProviderSearchRequest | undefined,
+                                           approvalMode: ApprovalMode | undefined,
                                            queryConfig: UseQueryOptions<PublishedProviderSearchResults, AxiosError>)
     : PublishedProviderSearchQueryResult => {
-    const {data, isLoading, refetch} =
+
+    const {data: publishedProviderSearchResults, isLoading: isLoadingResults, refetch: refetchSearchResults} =
         useQuery<PublishedProviderSearchResults, AxiosError>(
             ["published-provider-search", searchRequest],
-            async () => (await searchForPublishedProviderResults(searchRequest as PublishedProviderSearchRequest)).data,
-            queryConfig);
+            async () => (await publishedProviderService.searchForPublishedProviderResults(searchRequest as PublishedProviderSearchRequest)).data,
+            {...queryConfig, refetchOnWindowFocus: false});
+
+    const {publishedProviderIds, isLoadingPublishedProviderIds, refetchPublishedProviderIds} =
+        usePublishedProviderIds(searchRequest, approvalMode,
+            {
+                enabled: queryConfig.enabled,
+                onError: queryConfig.onError,
+                refetchOnWindowFocus: false
+            });
+
     return {
-        publishedProviderSearchResults: data,
-        isLoadingSearchResults: isLoading,
-        refetchSearchResults: refetch
+        publishedProviderSearchResults,
+        isLoadingSearchResults: isLoadingResults || isLoadingPublishedProviderIds,
+        publishedProviderIds,
+        refetchSearchResults: () => {
+            refetchSearchResults() && approvalMode === ApprovalMode.Batches && refetchPublishedProviderIds()
+        }
     }
 };

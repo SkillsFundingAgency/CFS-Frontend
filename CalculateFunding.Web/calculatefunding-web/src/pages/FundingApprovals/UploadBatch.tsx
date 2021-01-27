@@ -5,7 +5,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import React, {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
 import {Footer} from "../../components/Footer";
-import {getPublishedProvidersByBatch, uploadBatchOfPublishedProviders, validatePublishedProvidersByBatch} from "../../services/publishedProviderService";
+import * as publishedProviderService from "../../services/publishedProviderService";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useMutation, useQuery} from "react-query";
 import {JobCreatedResponse} from "../../types/JobCreatedResponse";
@@ -18,7 +18,7 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {BatchValidationRequest} from "../../types/PublishedProvider/BatchValidationRequest";
 import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {useDispatch} from "react-redux";
-import {addProvidersToFundingSelection, initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
+import * as actions from "../../actions/FundingSearchSelectionActions";
 import {HistoryPage} from "../../types/HistoryPage";
 
 
@@ -60,7 +60,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
     const {mutate: uploadBatchFile, isLoading: isUploadingBatchFile} =
         useMutation<BatchUploadResponse, AxiosError, File>(
             async (theFile) => {
-                return (await uploadBatchOfPublishedProviders(theFile)).data;
+                return (await publishedProviderService.uploadBatchOfPublishedProviders(theFile)).data;
             },
             {
                 onError: err => addError({error: err, description: "Error while trying to queue job to validate your batch file"}),
@@ -77,7 +77,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         );
     const {data: publishedProviderIds, isLoading: isExtractingProviderIds} = useQuery<string[], AxiosError>(
         `batch-${batchId}-publishedProviderIds`,
-        async () => (await getPublishedProvidersByBatch(batchId as string)).data,
+        async () => (await publishedProviderService.getPublishedProvidersByBatch(batchId as string)).data,
         {
             enabled: (batchId !== undefined && jobId && latestJob && latestJob.jobId === jobId && latestJob.isSuccessful) === true,
             cacheTime: 0,
@@ -86,7 +86,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
     const {mutate: createValidationJob, isLoading: isCreatingValidationJob} =
         useMutation<JobCreatedResponse, AxiosError, BatchValidationRequest>(
             async (request) => {
-                return (await validatePublishedProvidersByBatch(request)).data;
+                return (await publishedProviderService.validatePublishedProvidersByBatch(request)).data;
             },
             {
                 onError: err => addError({error: err, description: "Error while trying to create job to validate your batch file"}),
@@ -130,8 +130,8 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
             addError({error: latestJob.outcome ? latestJob.outcome : "", description: "Validation failed"});
             setIsUpdating(false);
         } else if (latestJob.isSuccessful && publishedProviderIds) {
-            dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
-            dispatch(addProvidersToFundingSelection(publishedProviderIds));
+            dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+            dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
             history.push(
                 `/Approvals/ConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${actionType}`,

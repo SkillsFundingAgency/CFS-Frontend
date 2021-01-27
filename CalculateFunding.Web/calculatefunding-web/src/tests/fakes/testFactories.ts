@@ -34,13 +34,13 @@ export const createPublishedProviderResult = (providers: PublishedProviderResult
     };
 };
 
-export const createPublishedProviderSearchQueryResult = (results: PublishedProviderSearchResults)
+export const createPublishedProviderSearchQueryResult = (results: PublishedProviderSearchResults, ids: string[])
     : PublishedProviderSearchQueryResult => {
     return {
         publishedProviderSearchResults: results,
         isLoadingSearchResults: false,
-        isErrorLoadingSearchResults: false,
-        errorLoadingSearchResults: ""
+        publishedProviderIds: ids,
+        refetchSearchResults: jest.fn()
     };
 };
 
@@ -58,5 +58,6 @@ export const createPublishedProviderIdsQueryResult = (ids: string[])
     return {
         publishedProviderIds: ids,
         isLoadingPublishedProviderIds: false,
+        refetchPublishedProviderIds: jest.fn()
     };
 };

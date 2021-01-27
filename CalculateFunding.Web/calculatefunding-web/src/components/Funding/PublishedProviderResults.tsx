@@ -1,4 +1,4 @@
-﻿import React, {useState} from "react";
+﻿import React, {useEffect, useState} from "react";
 import {NoData} from "../NoData";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {BackToTop} from "../BackToTop";
@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {PublishedProviderRow} from "./PublishedProviderRow";
-import {addProvidersToFundingSelection, removeProvidersFromFundingSelection, updateFundingSearch} from "../../actions/FundingSearchSelectionActions";
+import * as actions from "../../actions/FundingSearchSelectionActions";
 
 export interface IPublishedProviderResultsProps {
     specificationId: string,
@@ -34,14 +34,20 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
         props.providerSearchResults.providers.length > 0;
     const [selectAll, setSelectAll] = useState<boolean>(false);
     const dispatch = useDispatch();
+    
+    useEffect(() => {
+        if (selectAll && props.allPublishedProviderIds && props.allPublishedProviderIds.length === 0) {
+            setSelectAll(false);
+        }
+    }, [selectAll, props.allPublishedProviderIds])
 
     const handleToggleAllProviders = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (props.allPublishedProviderIds) {
             const checked = e.target.checked;
             setSelectAll(checked);
             dispatch(checked ?
-                addProvidersToFundingSelection(props.allPublishedProviderIds) :
-                removeProvidersFromFundingSelection(props.allPublishedProviderIds));
+                actions.addProvidersToFundingSelection(props.allPublishedProviderIds) :
+                actions.removeProvidersFromFundingSelection(props.allPublishedProviderIds));
         }
     };
 
@@ -49,17 +55,17 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
         const checked = e.target.checked;
         const providerId = e.target.value;
         dispatch(checked ?
-            addProvidersToFundingSelection([providerId]) :
-            removeProvidersFromFundingSelection([providerId]));
+            actions.addProvidersToFundingSelection([providerId]) :
+            actions.removeProvidersFromFundingSelection([providerId]));
     };
 
     async function handlePageChange(pageNumber: string) {
-        dispatch(updateFundingSearch({...state.searchCriteria, pageNumber: parseInt(pageNumber)}));
+        dispatch(actions.setPage(parseInt(pageNumber)));
     }
 
     return <>
         <NoData hidden={havePageResults}/>
-        
+
         {havePageResults && props.providerSearchResults &&
         <table className="govuk-table" data-testid={"published-provider-results"}>
             <thead>
@@ -69,7 +75,7 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                     <>
                         <br/>
                         <span className="govuk-!-margin-right-2">
-                                    <span id="checkbox-checked">{state.providerVersionIds.length}</span> / <span
+                                    <span id="checkbox-checked">{state.selectedProviderIds ? state.selectedProviderIds.length : 0}</span> / <span
                             id="checkbox-count">{props.totalResults}</span>
                                 </span>
                         <div className="govuk-checkboxes govuk-checkboxes--small">
@@ -103,16 +109,16 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                     publishedProvider={provider}
                     specCoreProviderVersionId={props.specCoreProviderVersionId}
                     enableSelection={props.enableBatchSelection}
-                    isSelected={state.providerVersionIds.includes(provider.publishedProviderVersionId)}
+                    isSelected={state.selectedProviderIds.includes(provider.publishedProviderVersionId)}
                     handleItemSelectionToggle={handleItemSelectionToggle}
                 />
             )}
             </tbody>
         </table>
         }
-        
+
         <BackToTop id="top"/>
-        
+
         {props.totalResults > 0 && props.providerSearchResults &&
         <nav className="govuk-!-margin-top-5 govuk-!-margin-bottom-9" role="navigation" aria-label="Pagination">
             <div className="pagination__summary">

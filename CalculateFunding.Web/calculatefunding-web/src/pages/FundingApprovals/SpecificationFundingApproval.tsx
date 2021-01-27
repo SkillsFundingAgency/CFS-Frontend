@@ -21,7 +21,6 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {usePublishedProviderSearch} from "../../hooks/FundingApproval/usePublishedProviderSearch";
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {usePublishedProviderErrorSearch} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
-import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {useErrors} from "../../hooks/useErrors";
 import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelectionActions";
@@ -43,6 +42,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const specificationId = match.params.specificationId;
 
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
+    const isSearchCriteriaInitialised = state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
     const {latestJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(
             specificationId,
@@ -54,25 +54,15 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             err => addError({error: err, description: "Error while checking for job"}));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {publishedProviderSearchResults, isLoadingSearchResults, refetchSearchResults} =
-        usePublishedProviderSearch(state.searchCriteria,
-            {
-                onError: err => addError({error: err, description: "Error while searching for providers"}),
-                enabled: state.searchCriteria !== undefined && state.searchCriteria.fundingStreamId !== undefined && state.searchCriteria.fundingPeriodId !== undefined
-            });
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
             err => addErrorMessage(err.message, "", "Error while loading funding configuration"));
-    const {publishedProviderIds, isLoadingPublishedProviderIds, refetchPublishedProviderIds} =
-        usePublishedProviderIds(fundingStreamId, fundingPeriodId, specificationId,
+    const {publishedProviderSearchResults, publishedProviderIds, isLoadingSearchResults, refetchSearchResults} =
+        usePublishedProviderSearch(state.searchCriteria, fundingConfiguration && fundingConfiguration.approvalMode,
             {
-                onError: err => addError({error: err, description: "Error while loading provider ids"}),
-                enabled: specificationId !== undefined && specificationId.length > 0 &&
-                    fundingStreamId !== undefined && fundingStreamId.length > 0 &&
-                    fundingPeriodId !== undefined && fundingPeriodId.length > 0 &&
-                    !isCheckingForJob && !(latestJob && latestJob.isActive) &&
-                    fundingConfiguration !== undefined &&
-                    fundingConfiguration.approvalMode === ApprovalMode.Batches
+                onError: err => addError({error: err, description: "Error while searching for providers"}),
+                enabled: (isSearchCriteriaInitialised && 
+                    state.searchCriteria && state.searchCriteria.fundingStreamId && state.searchCriteria.fundingPeriodId) !== undefined
             });
     const {publishedProvidersWithErrors, isLoadingPublishedProviderErrors} =
         usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !(latestJob && latestJob.isActive),
@@ -87,12 +77,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
 
     useEffect(() => {
-        if (!state.searchCriteria ||
-            (state.searchCriteria &&
-                state.searchCriteria.specificationId !== specificationId)) {
+        if (!isSearchCriteriaInitialised) {
             dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
         }
-    }, [match, state]);
+    }, [match, isSearchCriteriaInitialised]);
+    
 
     async function handleApprove() {
         if (publishedProviderSearchResults && canApproveFunding && publishedProviderSearchResults.canApprove) {
@@ -176,10 +165,16 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         setIsLoadingRefresh(false);
         setJobId("");
         refetchSearchResults();
-        refetchPublishedProviderIds();
     }
 
-    const isLoading = errors.length === 0 && (isLoadingSpecification || isLoadingFundingConfiguration || isCheckingForJob || (latestJob && latestJob.isActive) || isLoadingSearchResults || isLoadingPublishedProviderIds || isLoadingRefresh);
+    const isLoading = errors.length === 0 && 
+        (!isSearchCriteriaInitialised || 
+            isLoadingSpecification ||
+            isLoadingFundingConfiguration || 
+            isCheckingForJob || 
+            (latestJob && latestJob.isActive) || 
+            isLoadingSearchResults || 
+            isLoadingRefresh);
     const loadingTitle =
         isLoadingSpecification ? "Loading specification..." :
             isLoadingRefresh ? "Requesting refresh of funding..." :
@@ -234,7 +229,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         </div>
                         }
                         {!isCheckingForJob && !(latestJob && latestJob.isActive) && !isLoadingRefresh && !isLoadingSearchResults &&
-                        !isLoadingPublishedProviderIds && !isLoadingSpecification && specification &&
+                        !isLoadingSpecification && specification &&
                         <PublishedProviderResults
                             specificationId={specificationId}
                             fundingStreamId={fundingStreamId}

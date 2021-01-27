@@ -18,18 +18,18 @@ export function CsvDownloadPublishedProviders(
     const [url, setUrl] = useState<string>("");
 
     const generateCsv = async () => {
-        const isBatch = state.providerVersionIds && state.providerVersionIds.length > 0;
+        const isBatch = state.selectedProviderIds && state.selectedProviderIds.length > 0;
         try {
             if (props.actionType === FundingActionType.Approve) {
                 const response = isBatch ?
-                    await publishService.generateCsvForApprovalBatch(props.specificationId, state.providerVersionIds) :
+                    await publishService.generateCsvForApprovalBatch(props.specificationId, state.selectedProviderIds) :
                     await publishService.generateCsvForApprovalAll(props.specificationId);
                 setUrl(response.data.url);
             }
 
             if (props.actionType === FundingActionType.Release) {
                 const response = isBatch ?
-                    await publishService.generateCsvForReleaseBatch(props.specificationId, state.providerVersionIds) :
+                    await publishService.generateCsvForReleaseBatch(props.specificationId, state.selectedProviderIds) :
                     await publishService.generateCsvForReleaseAll(props.specificationId);
                 setUrl(response.data.url);
             }

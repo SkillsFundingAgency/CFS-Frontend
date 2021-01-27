@@ -18,7 +18,6 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasFundingConfigurationWithApproveAll();
             test.hasFullPermissions();
             test.hasProvidersWithErrors([]);
-            test.hasProviderIds([test.provider1.publishedProviderVersionId]);
             test.hasSearchResults([test.provider1]);
 
             test.renderPage();

@@ -9,7 +9,7 @@ import * as redux from "react-redux";
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {QueryCache, QueryClient, QueryClientProvider} from "react-query";
+import {QueryClient, QueryClientProvider} from "react-query";
 import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -352,11 +352,11 @@ const mockConfirmReleaseRoute: match<ConfirmFundingRouteProps> = {
     isExact: true,
 };
 const noSelectedProviders: FundingSearchSelectionState = {
-    providerVersionIds: [],
+    selectedProviderIds: [],
     searchCriteria: undefined
 }
 const selectedProviders: FundingSearchSelectionState = {
-    providerVersionIds: [provider1.publishedProviderVersionId, provider1.publishedProviderVersionId],
+    selectedProviderIds: [provider1.publishedProviderVersionId, provider1.publishedProviderVersionId],
     searchCriteria: undefined
 }
 const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));

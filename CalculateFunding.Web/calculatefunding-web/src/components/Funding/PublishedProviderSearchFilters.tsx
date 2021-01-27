@@ -6,7 +6,7 @@ import {PublishedProviderSearchFacet, PublishedProviderSearchRequest} from "../.
 import {useDispatch, useSelector} from "react-redux";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {IStoreState} from "../../reducers/rootReducer";
-import {updateFundingSearch} from "../../actions/FundingSearchSelectionActions";
+import * as actions from "../../actions/FundingSearchSelectionActions";
 
 export interface IPublishedProviderSearchFiltersProps {
     facets: Facet[],
@@ -51,7 +51,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        dispatch(updateFundingSearch({...state.searchCriteria, localAuthority: filterUpdate, pageNumber: 1}));
+        dispatch(actions.updateLocalAuthorityFilters(filterUpdate));
     }
 
     function changeStatusFilter(e: React.ChangeEvent<HTMLInputElement>) {
@@ -62,7 +62,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        dispatch(updateFundingSearch({...state.searchCriteria, status: filterUpdate, pageNumber: 1}));
+        dispatch(actions.updateStatusFilters(filterUpdate));
     }
 
     function changeProviderTypeFilter(e: React.ChangeEvent<HTMLInputElement>) {
@@ -73,7 +73,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        dispatch(updateFundingSearch({...state.searchCriteria, providerType: filterUpdate, pageNumber: 1}));
+        dispatch(actions.updateProviderTypeFilters(filterUpdate));
     }
 
     function changeProviderSubTypeFilter(e: React.ChangeEvent<HTMLInputElement>) {
@@ -85,7 +85,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             const position = filterUpdate.indexOf(e.target.value);
             filterUpdate.splice(position, 1);
         }
-        dispatch(updateFundingSearch({...state.searchCriteria, providerSubType: filterUpdate, pageNumber: 1}));
+        dispatch(actions.updateProviderSubTypeFilters(filterUpdate));
     }
 
     function changeSearchTextFilter(searchField: string, searchTerm: string) {
@@ -94,14 +94,14 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             if (searchField != null && searchField !== "") {
                 searchFields.push(searchField);
             }
-            dispatch(updateFundingSearch({...state.searchCriteria, searchTerm: searchTerm, searchFields: searchFields, pageNumber: 1}));
+            dispatch(actions.updateSearchTextFilter({searchTerm: searchTerm, searchFields}));
         }
     }
 
     function changeErrorFilter(e: React.ChangeEvent<HTMLInputElement>) {
         const withErrors = e.target.value === "with-errors" ? e.target.checked : filterWithErrors;
         const withoutErrors = e.target.value === "without-errors" ? e.target.checked : filterWithoutErrors;
-        dispatch(updateFundingSearch({...(state.searchCriteria as PublishedProviderSearchRequest), hasErrors: withErrors === withoutErrors ? undefined : withErrors, pageNumber: 1}));
+        dispatch(actions.setHasErrors(withErrors === withoutErrors ? undefined : withErrors));
         setFilterWithoutErrors(withoutErrors);
         setFilterWithErrors(withErrors);
     }

@@ -45,7 +45,7 @@ const storeWithData: IStoreState = {
     profilingPatternVisible: false
   },
   fundingSearchSelection: {
-    providerVersionIds: [],
+    selectedProviderIds: [],
     searchCriteria: undefined
   }
 };

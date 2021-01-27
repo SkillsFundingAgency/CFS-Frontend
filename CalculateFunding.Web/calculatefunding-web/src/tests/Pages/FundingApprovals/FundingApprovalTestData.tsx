@@ -234,7 +234,7 @@ export function FundingApprovalTestData() {
     };
 
     const fundingSearchSelectionState: FundingSearchSelectionState = {
-        providerVersionIds: [],
+        selectedProviderIds: [],
         searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, testSpec.id)
     }
 
@@ -277,7 +277,11 @@ export function FundingApprovalTestData() {
     const hasSearchResults = (providers: PublishedProviderResult[]) => jest.spyOn(providerSearchHook, 'usePublishedProviderSearch')
         .mockImplementation(() => (
             createPublishedProviderSearchQueryResult(
-                createPublishedProviderResult(providers, true, true, defaultFacets))));
+                createPublishedProviderResult(providers, true, true, defaultFacets), [])));
+    const hasSearchResultsWithProviderIds = (providers: PublishedProviderResult[], ids: string[]) => jest.spyOn(providerSearchHook, 'usePublishedProviderSearch')
+        .mockImplementation(() => (
+            createPublishedProviderSearchQueryResult(
+                createPublishedProviderResult(providers, true, true, defaultFacets), ids)));
 
 
     return {
@@ -305,6 +309,7 @@ export function FundingApprovalTestData() {
         hasProvidersWithErrors,
         hasProviderIds,
         hasSearchResults,
+        hasSearchResultsWithProviderIds,
         renderPage
     }
 }

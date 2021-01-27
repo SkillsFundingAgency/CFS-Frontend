@@ -63,8 +63,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasFundingConfigurationWithBatchApproval();
             test.hasFullPermissions();
             test.hasProvidersWithErrors(["Error: missing something"]);
-            test.hasProviderIds([test.providerWithError1.publishedProviderVersionId]);
-            test.hasSearchResults([test.providerWithError1]);
+            test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
 
             test.renderPage();
         });

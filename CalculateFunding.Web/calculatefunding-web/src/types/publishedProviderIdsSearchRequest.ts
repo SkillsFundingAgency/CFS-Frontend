@@ -10,17 +10,3 @@
     providerSubType: string[],
     searchFields: string[],
 }
-
-export const buildInitialPublishedProviderIdsSearchRequest = (fundingStreamId: string, fundingPeriodId: string, specificationId: string):
-    PublishedProviderIdsSearchRequest => {return {
-    searchTerm: "",
-    status: [],
-    providerType: [],
-    providerSubType: [],
-    localAuthority: [],
-    fundingStreamId: fundingStreamId,
-    specificationId: specificationId,
-    hasErrors: undefined,
-    fundingPeriodId: fundingPeriodId,
-    searchFields: []
-}};

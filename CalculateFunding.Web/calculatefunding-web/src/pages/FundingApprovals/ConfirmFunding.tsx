@@ -95,9 +95,9 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         try {
             if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
                 if (mode === FundingActionType.Approve) {
-                    setJobId((await publishService.approveProvidersFundingService(specificationId, state.providerVersionIds)).data.jobId);
+                    setJobId((await publishService.approveProvidersFundingService(specificationId, state.selectedProviderIds)).data.jobId);
                 } else if (mode === FundingActionType.Release) {
-                    setJobId((await publishService.releaseProvidersFundingService(specificationId, state.providerVersionIds)).data.jobId);
+                    setJobId((await publishService.releaseProvidersFundingService(specificationId, state.selectedProviderIds)).data.jobId);
                 }
             } else {
                 if (mode === FundingActionType.Approve) {

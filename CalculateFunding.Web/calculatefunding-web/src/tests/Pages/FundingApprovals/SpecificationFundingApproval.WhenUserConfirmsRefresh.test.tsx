@@ -30,7 +30,6 @@ describe("<SpecificationFundingApproval />", () => {
                 test.hasFundingConfigurationWithApproveAll();
                 test.hasFullPermissions();
                 test.hasProvidersWithErrors([]);
-                test.hasProviderIds([test.provider1.publishedProviderVersionId]);
                 test.hasSearchResults([test.provider1]);
                 jest.spyOn(publishService, 'preValidateForRefreshFundingService')
                     .mockImplementation(mockValidationError);
@@ -77,8 +76,8 @@ describe("<SpecificationFundingApproval />", () => {
                 test.hasFundingConfigurationWithApproveAll();
                 test.hasFullPermissions();
                 test.hasProvidersWithErrors([]);
-                test.hasProviderIds([test.provider1.publishedProviderVersionId]);
                 test.hasSearchResults([test.provider1]);
+                test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
                 jest.spyOn(publishService, 'preValidateForRefreshFundingService')
                     .mockImplementation(mockNoValidationError);
                 jest.spyOn(publishService, 'refreshSpecificationFundingService')
