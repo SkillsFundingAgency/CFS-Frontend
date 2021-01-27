@@ -8,7 +8,6 @@ using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
@@ -69,9 +68,6 @@ namespace CalculateFunding.Frontend.Controllers
                 return new StatusCodeResult((int)specificationResponse.StatusCode);
             }
 
-            bool isAuthorizedToMap = await _authorizationHelper.DoesUserHavePermission(User, specificationResponse.Content.GetSpecificationId(),
-                SpecificationActionTypes.CanMapDatasets);
-
             SpecificationDatasetRelationshipsViewModel viewModel = await PopulateViewModel(specificationResponse.Content);
 
             if (viewModel == null)
@@ -109,7 +105,7 @@ namespace CalculateFunding.Frontend.Controllers
                 IsLatestVersion = m.IsLatestVersion,
                 LastUpdatedDate = m.LastUpdatedDate,
                 LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name) ? "Unknown" : m.LastUpdatedAuthor.Name,
-            });
+            }).OrderBy(_ => _.RelationName);
 
             return viewModel;
         }
