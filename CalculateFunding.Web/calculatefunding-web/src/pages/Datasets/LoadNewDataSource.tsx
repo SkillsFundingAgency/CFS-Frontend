@@ -26,9 +26,6 @@ import {Link} from "react-router-dom";
 import {getFundingStreamsService} from "../../services/policyService";
 import {Footer} from "../../components/Footer";
 import {PermissionStatus} from "../../components/PermissionStatus";
-import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
-import {useSelector} from "react-redux";
-import {IStoreState} from "../../reducers/rootReducer";
 import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 import {usePermittedFundingStreams} from "../../hooks/useFundingStreamPermissions";
 import {UserPermission} from "../../types/UserPermission";
@@ -39,12 +36,10 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
 
 export function LoadNewDataSource() {
-    const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
     const [dataSchemaSuggestions, setDataSchemaSuggestions] = useState<DataschemaDetailsViewModel[]>([]);
     const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream | undefined>();
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
-    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [description, setDescription] = useState<string>("");
     const [datasetSourceFileName, setDatasetSourceFileName] = useState<string>("");
@@ -61,8 +56,8 @@ export function LoadNewDataSource() {
         fundingStreamValid: true
     });
     const history = useHistory();
-    const permittedFundingStreams = usePermittedFundingStreams(UserPermission.CanUploadDataSourceFiles);
-
+    const requiredPermission = UserPermission.CanUploadDataSourceFiles;
+    const permittedFundingStreams = usePermittedFundingStreams(requiredPermission);
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
     const {newJob} = useMonitorForAnyNewJob(
         [JobType.ValidateDatasetJob],
@@ -70,6 +65,11 @@ export function LoadNewDataSource() {
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
     const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
     const validExtensions = [".csv", ".xls", ".xlsx"];
+
+
+    useEffect(() => {
+        filterFundingStreamsByPermittedStreams();
+    }, [permittedFundingStreams]);
 
     useEffect(() => {
         if (!newJob || newJob.jobId !== validateDatasetJobId) return;
@@ -89,15 +89,6 @@ export function LoadNewDataSource() {
         }
     }, [newJob]);
 
-
-    useEffect(() => {
-        setMissingPermissions([]);
-        if (!selectedFundingStream) return;
-        if (!permittedFundingStreams || !permittedFundingStreams.includes(selectedFundingStream.id)) {
-            setMissingPermissions([`create a datasource file for the ${selectedFundingStream.name} funding stream`]);
-        }
-    }, [permissions, selectedFundingStream]);
-
     useEffect(() => {
         if (fundingStreams.length > 0 && !fundingStreamsIsFiltered) {
             filterFundingStreamsByPermittedStreams();
@@ -107,7 +98,9 @@ export function LoadNewDataSource() {
 
     function filterFundingStreamsByPermittedStreams() {
         const permittedStreams = fundingStreams.filter(fs => permittedFundingStreams.some(permitted => permitted === fs.id));
-        setFundingStreamSuggestions(permittedStreams);
+        if (fundingStreamSuggestions.length !== permittedStreams.length) {
+            setFundingStreamSuggestions(permittedStreams);
+        }
     }
 
     function updateFundingStreamSelection(e: string) {
@@ -436,7 +429,7 @@ export function LoadNewDataSource() {
     }
 
     function CreateDataSourceButton() {
-        const isDisabled = missingPermissions.length > 0;
+        const isDisabled = permittedFundingStreams.length === 0;
         return (
             <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                     onClick={createDataset} disabled={isDisabled} data-testid="create-button">
@@ -467,7 +460,10 @@ export function LoadNewDataSource() {
                 </div>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-full">
-                        <PermissionStatus requiredPermissions={missingPermissions} hidden={permissions.length === 0}/>
+                        <PermissionStatus requiredPermissions={[requiredPermission]}
+                                          hidden={permittedFundingStreams.length > 0
+                                          || dataSchemaIsLoading
+                                          || fundingStreamIsLoading}/>
                     </div>
                 </div>
                 <div className="govuk-grid-row" hidden={isLoading}>
