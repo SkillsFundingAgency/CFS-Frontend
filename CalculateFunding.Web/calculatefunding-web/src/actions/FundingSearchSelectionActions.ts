@@ -75,7 +75,12 @@ export interface IUpdateProviderSubTypeFiltersAction {
 
 export interface IUpdateSearchTextFilterAction {
     type: FundingSearchSelectionActionEvent.UPDATE_SEARCH_TEXT_FILTER;
-    payload: { searchFields: string[], searchTerm: string }
+    payload: TextSearchModel
+}
+
+export interface TextSearchModel {
+    searchFields: string[],
+    searchTerm: string
 }
 
 export const initialiseFundingSearchSelection: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IInitialiseFundingSearchSelectionAction>> =
@@ -152,11 +157,11 @@ export const updateLocalAuthorityFilters: ActionCreator<ThunkAction<Promise<any>
     };
 
 export const updateSearchTextFilter: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IUpdateSearchTextFilterAction>> =
-    (searchFields: string[], searchTerm: string) => {
+    (search: TextSearchModel) => {
         return async (dispatch) => {
             dispatch({
                 type: FundingSearchSelectionActionEvent.UPDATE_SEARCH_TEXT_FILTER,
-                payload: {searchFields, searchTerm}
+                payload: search
             });
         }
     };

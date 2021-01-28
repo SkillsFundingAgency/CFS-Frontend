@@ -94,7 +94,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             if (searchField != null && searchField !== "") {
                 searchFields.push(searchField);
             }
-            dispatch(actions.updateSearchTextFilter({searchTerm: searchTerm, searchFields}));
+            dispatch(actions.updateSearchTextFilter({searchTerm: searchTerm, searchFields: searchFields}));
         }
     }
 
