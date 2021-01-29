@@ -1,31 +1,15 @@
 import React from 'react';
+import {DateTime} from "luxon";
 
-export function formatDate(date?: Date, utc?: boolean) {
+export function formatDate(date?: Date) {
     if (!date) return "";
+    const luxonDate : DateTime = DateTime.fromJSDate(new Date(date)).toUTC();
 
-    const actualDate: Date = new Date(date);
-    const day: number = actualDate.getDate();
-    const month: string = actualDate.toLocaleString('default', {month: 'long'});
-    const year: number = actualDate.getFullYear();
-
-    if (utc === null || utc === undefined) {
-        return `${day} ${month} ${year}`;
-    }
-
-    const hours: number = actualDate.getHours();
-    const minutes: number = actualDate.getMinutes();
-
-    if (utc) {
-        const utcTime: string = actualDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', hour12: false});
-        return `${day} ${month} ${year} ${utcTime}`;
-    } else {
-        return `${day} ${month} ${year} ${hours}:${minutes < 10 ? "0" + minutes : minutes} ${hours < 12 ? "am" : "pm"}`;
-
-    }
+    return luxonDate.toFormat("d MMMM yyyy");
 }
 
-export function DateFormatter(props: {date?: Date, utc?: boolean}) {
+export function DateFormatter(props: {date?: Date}) {
     return (
-        <span>{formatDate(props.date, props.utc)}</span>
+        <span data-testid="date-formatter">{formatDate(props.date)}</span>
     );
 }

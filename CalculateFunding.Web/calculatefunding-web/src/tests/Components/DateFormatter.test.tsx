@@ -1,45 +1,25 @@
 import React from 'react';
 import {DateFormatter} from "../../components/DateFormatter";
-import {shallow} from "enzyme";
+import {render, screen} from "@testing-library/react";
+
+const renderDateFormatter = (date:Date, isUtc?:boolean) => {
+    return render(<DateFormatter date={date} utc={isUtc} />)
+}
 
 describe('<DateFormatter />', () => {
-    it(' renders a panel', () => {
-        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 0, 0)} utc={true} />);
-
-        const actual = wrapper.find('span');
-
-        expect(actual.length).toBe(1);
+    it(' renders a panel', async () => {
+        renderDateFormatter(new Date(2000, 0, 1, 0, 0), true);
+        expect(screen.getByTestId(/date-formatter/)).toBeDefined();
     });
 
-    it(' has the correct date and time for a utc clock', () => {
-        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 1, 0)} utc={true} />);
-
-        const actual = wrapper.find('span');
-
-        expect(actual.text()).toBe("1 January 2000 01:00");
+    it(' has the correct date', () => {
+        renderDateFormatter(new Date(2000, 0, 1, 1, 0), true);
+        expect(screen.getByText(/1 January 2000/));
     });
 
-    it(' has the correct date and time for a 12 hour clock', () => {
-        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 1, 0)} utc={false} />);
-
-        const actual = wrapper.find('span');
-
-        expect(actual.text()).toBe("1 January 2000 1:00 am");
-    });
-
-    it(' has the correct date and midnight time for a 12 hour clock', () => {
-        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 0, 0)} utc={false} />);
-
-        const actual = wrapper.find('span');
-
-        expect(actual.text()).toBe("1 January 2000 0:00 am");
-    });
-
-    it(' excludes time when utc is undefined', () => {
-        const wrapper = shallow(<DateFormatter date={new Date(2000, 0, 1, 0, 0)} />);
-
-        const actual = wrapper.find('span');
-
-        expect(actual.text()).toBe("1 January 2000");
-    });
+    it('can parse a JSON date and accept it', () => {
+        const date :Date = new Date("2000-01-01T01:00:00.00+00:00");
+        renderDateFormatter(date, true);
+        expect(screen.getByText(/1 January 2000/));
+    })
 });

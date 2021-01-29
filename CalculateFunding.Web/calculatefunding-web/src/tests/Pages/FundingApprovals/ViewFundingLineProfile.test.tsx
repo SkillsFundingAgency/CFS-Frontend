@@ -61,7 +61,7 @@ describe("<ViewFundingLineProfile />", () => {
                 expect(screen.getByTestId('funding-line-name')).toHaveTextContent("name")
                 expect(screen.getByTestId("provider-name")).toHaveTextContent("provider");
                 expect(screen.getByTestId("ukprn")).toHaveTextContent("UKPRN: 12345");
-                expect(screen.getByTestId("last-updated-by")).toHaveTextContent("Last updated by test user on 10 September 1907 0:00 am");
+                expect(screen.getByTestId("last-updated-by")).toHaveTextContent("Last updated by test user on 10 September 1907");
                 expect(screen.getByTestId("total-allocation")).toHaveTextContent("£100.00");
                 expect(screen.getByTestId("amount-already-paid")).toHaveTextContent("£50.00");
                 expect(screen.getByTestId("remaining-amount")).toHaveTextContent("£50.00");

@@ -37,7 +37,7 @@ describe("<UpdateDataSourceFile />", () => {
 
         it("has the correct last updated author name", async () => {
             const author = screen.getByTestId("update-datasource-author") as HTMLElement;
-            expect(author.textContent).toContain("Joe Bloggs 1 January 2000 1:00 am");
+            expect(author.textContent).toContain("Joe Bloggs 1 January 2000");
         })
     });
 
