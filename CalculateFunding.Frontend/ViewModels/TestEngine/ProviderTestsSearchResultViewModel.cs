@@ -2,7 +2,6 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
     using CalculateFunding.Frontend.ViewModels.Common;
 
     public class ProviderTestsSearchResultViewModel : SearchResultViewModel
