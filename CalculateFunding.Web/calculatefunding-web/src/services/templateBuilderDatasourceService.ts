@@ -620,7 +620,7 @@ export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         data: searchRequest
-    })
+    });
 }
 
 export async function getTemplateById(templateId: string): Promise<AxiosResponse<TemplateResponse>> {
