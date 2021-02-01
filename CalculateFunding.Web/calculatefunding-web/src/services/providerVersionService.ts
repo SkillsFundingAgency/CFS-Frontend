@@ -3,7 +3,7 @@ import {CoreProviderSummary} from "../types/CoreProviderSummary";
 
 const baseURL = "/api/providerVersions";
 
-export async function getProviderByFundingStreamIdService(fundingStreamId: string):
+export async function getCoreProvidersByFundingStream(fundingStreamId: string):
     Promise<AxiosResponse<CoreProviderSummary[]>> {
     return axios(`${baseURL}/getByFundingStream/${fundingStreamId}`, {
         method: 'GET',

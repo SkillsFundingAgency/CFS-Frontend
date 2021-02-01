@@ -32,11 +32,17 @@ interface NameValuePair {
 export function EditSpecification({match}: RouteComponentProps<EditSpecificationRouteProps>) {
     const specificationId = match.params.specificationId;
 
+    const [selectedName, setSelectedName] = useState<string>("");
+    const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>();
+    const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>();
+    const [selectedDescription, setSelectedDescription] = useState<string>("");
+
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId,
             err => addError({error: err, description: "Error while loading specification"}),
             result => {
                 setSelectedName(result.name);
+                setSelectedDescription(result.description ? result.description : "");
             });
 
     const fundingStreamId = specification && specification.fundingStreams[0].id
@@ -52,11 +58,12 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     const {data: coreProviders, isLoading: isLoadingCoreProviders} = useQuery<CoreProviderSummary[], AxiosError>(
         `coreProviderSummary-for-${fundingStreamId}`,
-        async () => (await providerVersionService.getProviderByFundingStreamIdService(fundingStreamId as string)).data,
+        async () => (await providerVersionService.getCoreProvidersByFundingStream(fundingStreamId as string)).data,
         {
             enabled: providerSource === ProviderSource.CFS,
             retry: false,
-            onError: err => err.response?.status !== 404 && addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
+            onError: err => err.response?.status !== 404 && 
+                addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
             onSuccess: results => {
                 if (providerSource === ProviderSource.CFS) {
                     clearErrorMessages(["selectCoreProvider"]);
@@ -71,23 +78,27 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             }
         }
     );
+    
     const {data: providerSnapshots, isLoading: isLoadingProviderSnapshots} = useQuery<ProviderSnapshot[], AxiosError>(
         `coreProviderSummary-for-${fundingStreamId}`,
-        async () => (await providerService.getProviderSnapshotsForFundingStreamService(fundingStreamId as string)).data,
+        async () => (await providerService.getProviderSnapshotsByFundingStream(fundingStreamId as string)).data,
         {
             enabled: providerSource === ProviderSource.FDZ,
             retry: false,
-            onError: err => err.response?.status !== 404 && addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
+            onError: err => err.response?.status !== 404 && 
+                addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
             onSuccess: results => {
-                if (providerSource === ProviderSource.FDZ) {
-                    clearErrorMessages(["selectCoreProvider"]);
+                clearErrorMessages(["selectCoreProvider"]);
+                if (results && providerSource === ProviderSource.FDZ) {
                     const providerData = results.map(coreProviderItem => ({
                         name: coreProviderItem.name,
                         value: coreProviderItem.providerSnapshotId?.toString()
                     }));
                     setCoreProviderData(providerData);
                     const selectedProviderSnapshot = providerData.find(p => specification && p.value === specification.providerSnapshotId?.toString());
-                    selectedProviderSnapshot && setSelectedProviderVersionId(selectedProviderSnapshot.value);
+                    if (selectedProviderSnapshot) {
+                        setSelectedProviderVersionId(selectedProviderSnapshot.value);
+                    }
                 }
             }
         }
@@ -100,7 +111,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         {
             enabled: (fundingStreamId && fundingStreamId.length > 0 && fundingPeriodId && fundingPeriodId.length > 0) === true,
             retry: false,
-            onError: err => err.response?.status !== 404 && addError({error: err, description: "Could not find any published funding templates", fieldName: "selectTemplateVersion"}),
+            onError: err => err.response?.status !== 404 && 
+                addError({error: err, description: "Could not find any published funding templates", fieldName: "selectTemplateVersion"}),
             onSuccess: results => {
                 clearErrorMessages(["selectTemplateVersion"]);
                 if (specification && fundingStreamId) {
@@ -110,16 +122,14 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     }));
                     setTemplateVersionData(templateVersionData);
                     const selectedVersion = templateVersionData.find(t => t.value === specification.templateIds[fundingStreamId]);
-                    selectedVersion && setSelectedTemplateVersion(selectedVersion.value);
+                    if (selectedVersion) {
+                        setSelectedTemplateVersion(selectedVersion.value);
+                    }
                 }
             }
         }
     );
 
-    const [selectedName, setSelectedName] = useState<string>("");
-    const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>("");
-    const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>("");
-    const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [isUpdating, setIsUpdating] = useState(false);
     const history = useHistory();
     const {errors, addError, clearErrorMessages} = useErrors();
@@ -185,15 +195,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 fundingPeriodId: fundingPeriodId,
                 fundingStreamId: fundingStreamId,
                 name: selectedName,
-                providerVersionId: specification.providerVersionId,
+                providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
+                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderVersionId ? parseInt(selectedProviderVersionId) : undefined,
                 assignedTemplateIds: assignedTemplateIdsValue,
             };
-
-            if (providerSource === ProviderSource.CFS) {
-                updateSpecificationViewModel.providerVersionId = selectedProviderVersionId;
-            } else if (providerSource === ProviderSource.FDZ) {
-                updateSpecificationViewModel.providerSnapshotId = parseInt(selectedProviderVersionId);
-            }
 
             try {
                 await specificationService.updateSpecificationService(updateSpecificationViewModel, specificationId);
@@ -210,7 +215,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         }
     }
 
-    const isLoading = isLoadingPublishedFundingTemplates || isLoadingFundingConfiguration || isLoadingCoreProviders || isLoadingProviderSnapshots || isLoadingSpecification;
+    const isLoading: boolean = isLoadingPublishedFundingTemplates || isLoadingFundingConfiguration || isLoadingCoreProviders || isLoadingProviderSnapshots || isLoadingSpecification;
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -221,10 +226,16 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 <Breadcrumb name={"Edit specification"}/>
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
-                <LoadingStatus title={isUpdating ? "Updating Specification" : "Loading"}
+                {(isLoading || isUpdating) &&
+                <LoadingStatus title={isUpdating ? "Updating Specification" :
+                    `Loading ${isLoadingSpecification ? "specification" :
+                        isLoadingFundingConfiguration ? "funding configuration" :
+                            isLoadingPublishedFundingTemplates ? "templates" :
+                                isLoadingProviderSnapshots ? "provider snapshots" :
+                                    isLoadingCoreProviders ? "core providers" : ""}`}
                                subTitle="Please wait"
-                               description={isUpdating ? "This can take a few minutes" : ""}
-                               hidden={!isUpdating && !isLoading}/>
+                               description={isUpdating ? "This can take a few minutes" : ""} />
+                }
 
                 <MultipleErrorSummary errors={errors}/>
 
@@ -236,12 +247,13 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         </h1>
                     </legend>
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "name").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="name">
+                        <label className="govuk-label" htmlFor="name" id="name-description">
                             Specification name
                         </label>
                         <input className="govuk-input"
                                id="name"
                                name="name"
+                               aria-describedby="name-description"
                                type="text"
                                value={selectedName}
                                onChange={saveSpecificationName}/>
@@ -260,7 +272,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         </label>
                         <h3 className="govuk-heading-m" id="funding-period">{specification && specification.fundingPeriod.name}</h3>
                     </div>
-                    
+
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data
@@ -300,12 +312,12 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     </div>
 
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <label className="govuk-label" htmlFor="description">
+                        <label className="govuk-label" htmlFor="description" id="description-hint">
                             Can you provide more detail?
                         </label>
-                        <textarea className="govuk-textarea" 
-                                  id="description" 
-                                  name="description" 
+                        <textarea className="govuk-textarea"
+                                  id="description"
+                                  name="description"
                                   rows={8}
                                   aria-describedby="description-hint"
                                   onChange={saveDescriptionName}

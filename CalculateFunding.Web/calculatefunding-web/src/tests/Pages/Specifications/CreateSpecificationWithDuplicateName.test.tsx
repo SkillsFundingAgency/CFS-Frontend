@@ -1,14 +1,16 @@
 import React from 'react';
 import {screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import {CreateSpecificationTestData} from "./CreateSpecificationTestData";
+import {SpecificationTestData} from "./SpecificationTestData";
 import userEvent from "@testing-library/user-event";
+import {ProviderSource} from "../../../types/CoreProviderSummary";
+import {ApprovalMode} from "../../../types/ApprovalMode";
 
-const test = CreateSpecificationTestData();
+const test = SpecificationTestData();
 
 describe("<CreateSpecification /> with duplicated specification name", () => {
     beforeEach(async () => {
-        test.mockPolicyService();
+        test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
         test.mockSpecificationServiceWithDuplicateNameResponse();
         test.mockProviderService();
         test.mockProviderVersionService();
@@ -22,7 +24,7 @@ describe("<CreateSpecification /> with duplicated specification name", () => {
         const {createSpecificationService} = require('../../../services/specificationService');
 
         const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
-        const {getProviderByFundingStreamIdService} = require('../../../services/providerVersionService');
+        const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
         expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
         const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
@@ -43,16 +45,16 @@ describe("<CreateSpecification /> with duplicated specification name", () => {
 
         await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
 
-        await waitFor(() => expect(getProviderByFundingStreamIdService).toBeCalledTimes(1));
+        await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
         const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-        expect(coreProviderSelect).toHaveLength(2);
+        expect(coreProviderSelect).toHaveLength(3);
 
-        userEvent.selectOptions(coreProviderSelect, test.providerVersion.name);
+        userEvent.selectOptions(coreProviderSelect, test.coreProvider2.name);
 
         await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
         const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
-        expect(templateVersionSelect).toHaveLength(2);
-        userEvent.selectOptions(templateVersionSelect, test.template.templateVersion);
+        expect(templateVersionSelect).toHaveLength(3);
+        userEvent.selectOptions(templateVersionSelect, test.template2.templateVersion);
 
         const moreDetailField = await screen.findByTestId(`description-textarea`);
         userEvent.type(moreDetailField, "test description");
@@ -63,24 +65,11 @@ describe("<CreateSpecification /> with duplicated specification name", () => {
 
         await waitFor(() => expect(createSpecificationService).toBeCalledTimes(1));
         expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
-        
-        /*const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
-        userEvent.type(specificationField, "test specification name");
-        const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
-        userEvent.selectOptions(fundingStreamSelect, "test funding stream id");
-        const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
-        userEvent.selectOptions(fundingPeriodSelect, "test funding period id");
-        const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
-        userEvent.selectOptions(coreProviderSelect, "test core provider id");
-        const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
-        userEvent.selectOptions(templateVersionSelect, "test template version id");
-        const moreDetailField = await screen.findByTestId(`more-detail-textarea`);
-        userEvent.type(moreDetailField, "test value");*/
 
         const buildButton = screen.getByRole("button", {name: /Save and continue/});
         userEvent.click(buildButton);
 
-        waitFor(() => {
+        await waitFor(() => {
             expect(screen.queryByText(/unique name error/)).toBeInTheDocument();
         });
     });

@@ -6,7 +6,7 @@ export interface SpecificationSummary {
     approvalStatus: string;
     isSelectedForFunding: boolean;
     description: string | null;
-    providerVersionId: string;
+    providerVersionId?: string;
     fundingStreams: FundingStream[];
     fundingPeriod: FundingPeriod
     providerSnapshotId?: number;

@@ -1,9 +1,10 @@
 import axios, {AxiosResponse} from "axios"
-import {ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
+import {PagedProviderVersionSearchResults, ProviderVersionSearchModel} from "../types/Provider/ProviderVersionSearchResults";
 import {ProviderSummary, ProviderTransactionSummary} from "../types/ProviderSummary";
 import {SpecificationInformation} from "../types/Provider/SpecificationInformation";
 import {PublishedProviderError} from "../types/PublishedProviderError";
 import {ProviderResultForSpecification} from "../types/Provider/ProviderResultForSpecification";
+import {ProviderSnapshot} from "../types/CoreProviderSummary";
 
 const baseURL = "/api/provider";
 
@@ -29,46 +30,39 @@ export async function getReleasedProfileTotalsService(fundingStreamId: string, f
 export async function getLocalAuthoritiesService(fundingStreamId: string, fundingPeriodId: string, searchText: string) {
     return axios(`${baseURL}/getlocalauthorities/${fundingStreamId}/${fundingPeriodId}/?searchText=${searchText}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     });
 }
 
-export async function getProvidersByFundingStreamService(fundingStreamId: string, search: ProviderVersionSearchModel) {
+export async function getProvidersByFundingStreamService(fundingStreamId: string, search: ProviderVersionSearchModel):
+    Promise<AxiosResponse<PagedProviderVersionSearchResults>> {
     return axios(`${baseURL}/fundingstreams/${fundingStreamId}/current/search`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: search
     });
 }
 
-export async function getProviderResultsService(providerId: string): Promise<AxiosResponse<SpecificationInformation[]>> {
+export async function getProviderResultsService(providerId: string): 
+    Promise<AxiosResponse<SpecificationInformation[]>> {
     return axios(`${baseURL}/getproviderresults/${providerId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     });
 }
 
-export async function getProviderSnapshotsForFundingStreamService(fundingStreamId:string) {
+export async function getProviderSnapshotsByFundingStream(fundingStreamId: string): 
+    Promise<AxiosResponse<ProviderSnapshot[]>> {
     return axios(`/api/providers/fundingStreams/${fundingStreamId}/snapshots`, {
         method: 'GET',
-        headers: {
-            'Content-Type':'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }
 
-export async function getFundingStructureResultsForProviderAndSpecification(specificationId: string, providerId: string)
-: Promise<AxiosResponse<ProviderResultForSpecification>> {
+export async function getFundingStructureResultsForProviderAndSpecification(specificationId: string, providerId: string): 
+    Promise<AxiosResponse<ProviderResultForSpecification>> {
     return axios(`/api/results/specifications/${specificationId}/providers/${providerId}/template-results`, {
         method: 'GET',
-        headers: {
-            'Content-Type':'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }

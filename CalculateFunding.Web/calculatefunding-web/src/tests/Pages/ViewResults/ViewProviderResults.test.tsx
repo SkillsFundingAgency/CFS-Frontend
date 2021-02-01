@@ -1,13 +1,10 @@
 import React from 'react';
-import {mount} from "enzyme";
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
 import {ViewProviderResults, ViewProviderResultsRouteProps} from "../../../pages/ViewResults/ViewProviderResults";
 import {ProviderSummary} from "../../../types/ProviderSummary";
 import {ProviderVersionQueryResult} from "../../../hooks/Providers/useProviderVersion";
 import {render} from "@testing-library/react";
-import {Provider} from "react-redux";
-import * as specHook from "../../../hooks/useSpecificationSummary";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');

@@ -1,7 +1,7 @@
 export interface UpdateSpecificationViewModel {
     name: string;
     fundingStreamId: string;
-    providerVersionId: string;
+    providerVersionId?: string;
     providerSnapshotId?: number;
     description: string;
     fundingPeriodId: string;

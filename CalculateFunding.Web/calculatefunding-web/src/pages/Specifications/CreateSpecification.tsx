@@ -72,7 +72,7 @@ export function CreateSpecification() {
 
     const {data: coreProviders, isLoading: isLoadingCoreProviders} = useQuery<CoreProviderSummary[], AxiosError>(
         `coreProviderSummary-for-${selectedFundingStreamId}`,
-        async () => (await providerVersionService.getProviderByFundingStreamIdService(selectedFundingStreamId as string)).data,
+        async () => (await providerVersionService.getCoreProvidersByFundingStream(selectedFundingStreamId as string)).data,
         {
             enabled: (selectedFundingStreamId && providerSource === ProviderSource.CFS) === true,
             retry: false,
@@ -84,7 +84,7 @@ export function CreateSpecification() {
     );
     const {data: providerSnapshots, isLoading: isLoadingProviderSnapshots} = useQuery<ProviderSnapshot[], AxiosError>(
         `coreProviderSummary-for-${selectedFundingStreamId}`,
-        async () => (await providerService.getProviderSnapshotsForFundingStreamService(selectedFundingStreamId as string)).data,
+        async () => (await providerService.getProviderSnapshotsByFundingStream(selectedFundingStreamId as string)).data,
         {
             enabled: (selectedFundingStreamId && providerSource === ProviderSource.FDZ) === true,
             retry: false,

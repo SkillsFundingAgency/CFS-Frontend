@@ -111,9 +111,7 @@ export async function createSpecificationService(createSpecificationViewModel: C
 export async function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationViewModel, specificationId: string) {
     return axios(`${baseURL}/update/${specificationId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: updateSpecificationViewModel
     });
 }

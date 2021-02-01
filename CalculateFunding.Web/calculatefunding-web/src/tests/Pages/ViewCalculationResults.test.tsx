@@ -15,6 +15,7 @@ import {FundingPeriod, FundingStream} from "../../types/viewFundingTypes";
 import {CalculationProviderSearchRequestViewModel} from "../../types/calculationProviderSearchRequestViewModel";
 import * as calcHook from "../../hooks/Calculations/useCalculation";
 import * as specHook from "../../hooks/useSpecificationSummary";
+import {CalculationDataType} from "../../types/Calculations/CalculationCompilePreviewResponse";
 
 const latestSpecJobMonitorResult: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
@@ -174,6 +175,7 @@ const testSpec1: SpecificationSummary = {
     templateIds: {}
 };
 const testCalc1: CalculationDetails = {
+    dataType: CalculationDataType.Decimal,
     id: "C123",
     name: "Calc123",
     fundingStreamId: "PSG",
