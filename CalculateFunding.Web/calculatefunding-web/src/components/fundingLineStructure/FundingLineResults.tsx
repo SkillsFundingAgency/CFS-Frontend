@@ -215,8 +215,7 @@ export function FundingLineResults({
 
     function visitNode(node: FundingStructureItemViewModel, hashMap: any,
         calculationSummaries: CalculationSummary[], providerResults: ProviderResultForSpecification | undefined) {
-        if (node.calculationId && !hashMap[`calc-${node.calculationId}`]) {
-            hashMap[`calc-${node.calculationId}`] = true;
+        if (node.calculationId) {
             const calculationSummary = calculationSummaries.find(c => c.id === node.calculationId);
             node.calculationPublishStatus = calculationSummary?.status;
             if (providerResults) {
