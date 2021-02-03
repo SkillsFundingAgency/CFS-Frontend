@@ -1,4 +1,6 @@
-export interface UpdateSpecificationViewModel {
+import {ProviderDataTrackingMode} from "./ProviderDataTrackingMode";
+
+export interface UpdateSpecificationModel {
     name: string;
     fundingStreamId: string;
     providerVersionId?: string;
@@ -6,4 +8,5 @@ export interface UpdateSpecificationViewModel {
     description: string;
     fundingPeriodId: string;
     assignedTemplateIds: { [key: string]: string[] };
+    coreProviderVersionUpdates: ProviderDataTrackingMode | undefined
 }

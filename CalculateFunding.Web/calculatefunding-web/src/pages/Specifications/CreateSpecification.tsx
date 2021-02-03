@@ -6,7 +6,7 @@ import * as policyService from "../../services/policyService";
 import * as providerVersionService from "../../services/providerVersionService";
 import {FundingPeriod} from "../../types/viewFundingTypes";
 import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
-import {CreateSpecificationViewModel} from "../../types/Specifications/CreateSpecificationViewModel";
+import {CreateSpecificationModel} from "../../types/Specifications/CreateSpecificationModel";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
@@ -26,6 +26,7 @@ import {useQuery} from "react-query";
 import {AxiosError} from "axios";
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {milliseconds} from "../../helpers/TimeInMs";
+import {ProviderDataTrackingMode} from "../../types/Specifications/ProviderDataTrackingMode";
 
 export function CreateSpecification() {
     const {fundingStreams, isLoadingFundingStreams} = useFundingStreams(true);
@@ -35,6 +36,7 @@ export function CreateSpecification() {
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string | undefined>();
     const [selectedProviderSnapshotId, setSelectedProviderSnapshotId] = useState<string | undefined>();
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string | undefined>();
+    const [enableTrackProviderData, setEnableTrackProviderData] = useState<ProviderDataTrackingMode | undefined>();
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [providerSource, setProviderSource] = useState<ProviderSource>();
 
@@ -183,6 +185,11 @@ export function CreateSpecification() {
         clearErrorMessages(["selectCoreProvider"]);
     }
 
+    function handleTrackProviderDataChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setEnableTrackProviderData(e.target.value === "yes" ? ProviderDataTrackingMode.UseLatest : ProviderDataTrackingMode.Manual);
+        clearErrorMessages(["trackProviderData"]);
+    }
+
     function handleTemplateVersionChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const templateVersionId = e.target.value;
         setSelectedTemplateVersion(templateVersionId);
@@ -211,17 +218,20 @@ export function CreateSpecification() {
             addError({error: "Missing funding period", fieldName: "funding-period"})
             isValid = false;
         }
-        if (providerSource === ProviderSource.CFS && (!selectedProviderVersionId || selectedProviderVersionId.length == 0)) {
-            addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
-            isValid = false;
-        }
-        if (providerSource === ProviderSource.FDZ && (!selectedProviderSnapshotId || selectedProviderSnapshotId.length == 0)) {
-            addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
-            isValid = false;
-        }
-        if (!providerSource) {
-            addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
-            isValid = false;
+        if (providerSource) {
+            if (providerSource === ProviderSource.CFS && (!selectedProviderVersionId || selectedProviderVersionId.length == 0)) {
+                addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
+                isValid = false;
+            }
+            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === undefined) {
+                addError({error: "Please select whether you want to track latest core provider data", fieldName: "trackProviderData"});
+                isValid = false;
+            }
+            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual &&
+                (!selectedProviderSnapshotId || selectedProviderSnapshotId.length == 0)) {
+                addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
+                isValid = false;
+            }
         }
         if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
             addError({error: "Missing template version", fieldName: "selectTemplateVersion"})
@@ -242,20 +252,17 @@ export function CreateSpecification() {
             const assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[selectedFundingStreamId] = selectedTemplateVersion;
 
-            const createSpecificationViewModel: CreateSpecificationViewModel = {
+            const createSpecificationViewModel: CreateSpecificationModel = {
                 description: selectedDescription,
                 fundingPeriodId: selectedFundingPeriodId,
                 fundingStreamId: selectedFundingStreamId,
                 name: selectedName,
-                assignedTemplateIds: assignedTemplateIdsValue
+                assignedTemplateIds: assignedTemplateIdsValue,
+                providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
+                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderVersionId && enableTrackProviderData === ProviderDataTrackingMode.Manual ? parseInt(selectedProviderVersionId) : undefined,
+                coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
             };
-
-            if (providerSource === ProviderSource.CFS) {
-                createSpecificationViewModel.providerVersionId = selectedProviderVersionId;
-            } else if (providerSource === ProviderSource.FDZ && selectedProviderSnapshotId) {
-                createSpecificationViewModel.providerSnapshotId = selectedProviderSnapshotId
-            }
-
+            
             try {
                 const createSpecificationResult = await specificationService.createSpecificationService(createSpecificationViewModel);
                 setNewSpecificationId(createSpecificationResult.data.id);
@@ -355,6 +362,59 @@ export function CreateSpecification() {
                         }
                     </div>
 
+                    {providerSource === ProviderSource.FDZ &&
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <fieldset className="govuk-fieldset" id="trackProviderData" aria-describedby="trackProviderData-hint" role="radiogroup">
+                            <legend className="govuk-label" id="trackProviderData-label">
+                                Track latest core provider data?
+                            </legend>
+                            <div id="trackProviderData-hint" className="govuk-hint">
+                                Select yes if you wish to use the latest available provider data.
+                            </div>
+                            <span className="govuk-error-message govuk-visually-hidden" id="trackProviderData-error">
+                              <span className="govuk-visually-hidden">Error:</span> Please select an option
+                            </span>
+                            <div className="govuk-radios">
+                                <div className="govuk-radios__item">
+                                    <input className="govuk-radios__input"
+                                           id="trackProviderData-yes"
+                                           name="trackProviderData-yes"
+                                           type="radio"
+                                           value="yes"
+                                           checked={enableTrackProviderData === ProviderDataTrackingMode.UseLatest}
+                                           onChange={handleTrackProviderDataChange}
+                                           aria-describedby="provider-data-item-hint"
+                                    />
+                                    <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-yes">
+                                        Yes
+                                    </label>
+                                    <div id="trackProviderData-yes-hint" className="govuk-hint govuk-radios__hint">
+                                        This specification will use the latest available provider data
+                                    </div>
+                                </div>
+                                <div className="govuk-radios__item">
+                                    <input className="govuk-radios__input"
+                                           id="trackProviderData-no"
+                                           name="trackProviderData-no"
+                                           type="radio"
+                                           value="no"
+                                           checked={enableTrackProviderData === ProviderDataTrackingMode.Manual}
+                                           onChange={handleTrackProviderDataChange}
+                                           aria-describedby="trackProviderData-no-hint"
+                                    />
+                                    <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-no">
+                                        No
+                                    </label>
+                                    <div id="trackProviderData-no-hint" className="govuk-hint govuk-radios__hint">
+                                        I will select which provider data to use
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    }
+
+                    {(providerSource === ProviderSource.CFS || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data
@@ -387,6 +447,7 @@ export function CreateSpecification() {
                         <LoadingFieldStatus title="Loading..."/>
                         }
                     </div>
+                    }
 
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectTemplateVersion").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectedTemplateVersion">

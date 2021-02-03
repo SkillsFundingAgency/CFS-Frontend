@@ -2,8 +2,8 @@ import axios, {AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
-import {CreateSpecificationViewModel} from "../types/Specifications/CreateSpecificationViewModel";
-import {UpdateSpecificationViewModel} from "../types/Specifications/UpdateSpecificationViewModel";
+import {CreateSpecificationModel} from "../types/Specifications/CreateSpecificationModel";
+import {UpdateSpecificationModel} from "../types/Specifications/UpdateSpecificationModel";
 import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {FundingPeriod, Specification} from "../types/viewFundingTypes";
@@ -97,7 +97,7 @@ export async function approveFundingLineStructureService(specificationId: string
     });
 }
 
-export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationViewModel): 
+export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationModel): 
     Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/create`, {
         method: 'POST',
@@ -108,7 +108,7 @@ export async function createSpecificationService(createSpecificationViewModel: C
     });
 }
 
-export async function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationViewModel, specificationId: string) {
+export async function updateSpecificationService(updateSpecificationViewModel: UpdateSpecificationModel, specificationId: string) {
     return axios(`${baseURL}/update/${specificationId}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},

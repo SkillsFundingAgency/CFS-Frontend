@@ -1,5 +1,4 @@
 import React, {useState} from "react";
-import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import * as specificationService from "../../services/specificationService";
 import * as providerVersionService from "../../services/providerVersionService";
@@ -7,8 +6,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
 import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
-import {UpdateSpecificationViewModel} from "../../types/Specifications/UpdateSpecificationViewModel";
-import {Link} from "react-router-dom";
+import {UpdateSpecificationModel} from "../../types/Specifications/UpdateSpecificationModel";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import * as policyService from "../../services/policyService";
@@ -19,6 +17,9 @@ import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {useQuery} from "react-query";
 import {AxiosError} from "axios";
 import * as providerService from "../../services/providerService";
+import {ProviderDataTrackingMode} from "../../types/Specifications/ProviderDataTrackingMode";
+import {Link} from "react-router-dom";
+import {Footer} from "../../components/Footer";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -36,6 +37,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>();
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>();
     const [selectedDescription, setSelectedDescription] = useState<string>("");
+    const [enableTrackProviderData, setEnableTrackProviderData] = useState<ProviderDataTrackingMode | undefined>();
 
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId,
@@ -43,6 +45,9 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             result => {
                 setSelectedName(result.name);
                 setSelectedDescription(result.description ? result.description : "");
+                if (result.coreProviderVersionUpdates) {
+                    setEnableTrackProviderData(result.coreProviderVersionUpdates);
+                }
             });
 
     const fundingStreamId = specification && specification.fundingStreams[0].id
@@ -135,28 +140,33 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const {errors, addError, clearErrorMessages} = useErrors();
     const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
 
-    function saveSpecificationName(e: React.ChangeEvent<HTMLInputElement>) {
+    function handleSpecificationNameChange(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
         setSelectedName(specificationName);
         clearErrorMessages(["name"]);
     }
 
-    function selectCoreProvider(e: React.ChangeEvent<HTMLSelectElement>) {
+    function handleCoreProviderChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const coreProviderId = e.target.value;
         setSelectedProviderVersionId(coreProviderId);
         clearErrorMessages(["selectCoreProvider"]);
     }
 
-    function selectTemplateVersion(e: React.ChangeEvent<HTMLSelectElement>) {
+    function handleTemplateVersionChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const templateVersionId = e.target.value;
         setSelectedTemplateVersion(templateVersionId);
         clearErrorMessages(["selectedTemplateVersion"]);
     }
 
-    function saveDescriptionName(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    function handleDescriptionChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
         const specificationDescription = e.target.value;
         setSelectedDescription(specificationDescription);
         clearErrorMessages(["description"]);
+    }
+
+    function handleTrackProviderDataChange(enable: boolean) {
+        setEnableTrackProviderData(enable ? ProviderDataTrackingMode.UseLatest : ProviderDataTrackingMode.Manual);
+        clearErrorMessages(["trackProviderData"]);
     }
 
     function validateForm() {
@@ -171,7 +181,9 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             addError({error: "Missing description", fieldName: "description"})
             isValid = false;
         }
-        if (!selectedProviderVersionId || selectedProviderVersionId.length == 0) {
+        const requiresSpecificProviderVersion = providerSource === ProviderSource.CFS || 
+            (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual);
+        if (requiresSpecificProviderVersion && (!selectedProviderVersionId || selectedProviderVersionId.length == 0)) {
             addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
             isValid = false;
         }
@@ -190,14 +202,16 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             const assignedTemplateIdsValue: any = {};
             assignedTemplateIdsValue[fundingStreamId] = selectedTemplateVersion;
 
-            const updateSpecificationViewModel: UpdateSpecificationViewModel = {
+            const updateSpecificationViewModel: UpdateSpecificationModel = {
                 description: selectedDescription,
                 fundingPeriodId: fundingPeriodId,
                 fundingStreamId: fundingStreamId,
                 name: selectedName,
                 providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
-                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderVersionId ? parseInt(selectedProviderVersionId) : undefined,
+                providerSnapshotId: providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual && selectedProviderVersionId ? 
+                    parseInt(selectedProviderVersionId) : undefined,
                 assignedTemplateIds: assignedTemplateIdsValue,
+                coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
             };
 
             try {
@@ -256,7 +270,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                aria-describedby="name-description"
                                type="text"
                                value={selectedName}
-                               onChange={saveSpecificationName}/>
+                               onChange={handleSpecificationNameChange}/>
                     </div>
 
                     <div className="govuk-form-group">
@@ -273,6 +287,61 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         <h3 className="govuk-heading-m" id="funding-period">{specification && specification.fundingPeriod.name}</h3>
                     </div>
 
+                    {providerSource === ProviderSource.FDZ &&
+                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <fieldset className="govuk-fieldset" id="trackProviderData" aria-describedby="trackProviderData-hint" role="radiogroup">
+                            <legend className="govuk-label" id="trackProviderData-label">
+                                Track latest core provider data?
+                            </legend>
+                            <div id="trackProviderData-hint" className="govuk-hint">
+                                Select yes if you wish to use the latest available provider data.
+                            </div>
+                            {errors.map(error => error.fieldName === "trackProviderData" &&
+                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                            <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                        </span>
+                            )}
+                            <div className="govuk-radios">
+                                <div className="govuk-radios__item">
+                                    <input className="govuk-radios__input"
+                                           id="trackProviderData-yes"
+                                           name="trackProviderData-yes"
+                                           type="radio"
+                                           value="yes"
+                                           checked={enableTrackProviderData === ProviderDataTrackingMode.UseLatest}
+                                           onChange={() => handleTrackProviderDataChange(true)}
+                                           aria-describedby="provider-data-item-hint"
+                                    />
+                                    <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-yes">
+                                        Yes
+                                    </label>
+                                    <div id="trackProviderData-yes-hint" className="govuk-hint govuk-radios__hint">
+                                        This specification will use the latest available provider data
+                                    </div>
+                                </div>
+                                <div className="govuk-radios__item">
+                                    <input className="govuk-radios__input"
+                                           id="trackProviderData-no"
+                                           name="trackProviderData-no"
+                                           type="radio"
+                                           value="no"
+                                           checked={enableTrackProviderData === ProviderDataTrackingMode.Manual}
+                                           onChange={() => handleTrackProviderDataChange(false)}
+                                           aria-describedby="trackProviderData-no-hint"
+                                    />
+                                    <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-no">
+                                        No
+                                    </label>
+                                    <div id="trackProviderData-no-hint" className="govuk-hint govuk-radios__hint">
+                                        I will select which provider data to use
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    }
+
+                    {(providerSource === ProviderSource.CFS || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data
@@ -282,7 +351,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 name="selectCoreProvider"
                                 disabled={coreProviderData.length === 0}
                                 value={selectedProviderVersionId}
-                                onChange={selectCoreProvider}>
+                                onChange={handleCoreProviderChange}>
                             <option value="">Select core provider</option>
                             {coreProviderData.map((cp, index) =>
                                 <option key={`provider-${index}`}
@@ -291,6 +360,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 </option>)}
                         </select>
                     </div>
+                    }
 
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectTemplateVersion").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectTemplateVersion">
@@ -301,7 +371,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 name="selectTemplateVersion"
                                 disabled={templateVersionData.length === 0}
                                 value={selectedTemplateVersion}
-                                onChange={selectTemplateVersion}>
+                                onChange={handleTemplateVersionChange}>
                             <option value="">Select template version</option>
                             {templateVersionData.map((cp, index) =>
                                 <option key={`template-version-${index}`}
@@ -320,7 +390,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                   name="description"
                                   rows={8}
                                   aria-describedby="description-hint"
-                                  onChange={saveDescriptionName}
+                                  onChange={handleDescriptionChange}
                                   value={selectedDescription}/>
                     </div>
                     <div className="govuk-form-group">

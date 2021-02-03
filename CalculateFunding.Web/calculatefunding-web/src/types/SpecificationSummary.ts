@@ -1,4 +1,5 @@
 import {FundingPeriod, FundingStream} from "./viewFundingTypes";
+import {ProviderDataTrackingMode} from "./Specifications/ProviderDataTrackingMode";
 
 export interface SpecificationSummary {
     name: string;
@@ -12,4 +13,5 @@ export interface SpecificationSummary {
     providerSnapshotId?: number;
     templateIds: { [key: string]: string };
     dataDefinitionRelationshipIds: string[];
+    coreProviderVersionUpdates: ProviderDataTrackingMode | undefined
 }

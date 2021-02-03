@@ -10,6 +10,7 @@ import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {PublishedFundingTemplate} from "../../../types/TemplateBuilderDefinitions";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -151,23 +152,38 @@ export function SpecificationTestData() {
         description: "Lorem ipsum lalala",
         fundingPeriod: mockFundingPeriod,
         fundingStreams: [mockFundingStream],
-        id: "ABC123",
+        id: "CFS457457",
         isSelectedForFunding: true,
         providerVersionId: mockCoreProvider2.providerVersionId,
         dataDefinitionRelationshipIds: [],
         templateIds: {"stream-547" : mockTemplate2.templateVersion},
+        coreProviderVersionUpdates: undefined
     };
-    const mockFdzSpec: SpecificationSummary = {
-        name: "Wizard Training",
+    const mockFdzSpecWithTrackingLatest: SpecificationSummary = {
+        name: "Wizard Training With Tracking",
         approvalStatus: "",
         description: "Lorem ipsum lalala",
         fundingPeriod: mockFundingPeriod,
         fundingStreams: [mockFundingStream],
-        id: "ABC123",
+        id: "FDZ4683",
+        isSelectedForFunding: true,
+        providerSnapshotId: undefined,
+        dataDefinitionRelationshipIds: [],
+        templateIds: {"stream-547" : mockTemplate2.templateVersion},
+        coreProviderVersionUpdates: ProviderDataTrackingMode.UseLatest
+    };
+    const mockFdzSpecWithoutTracking: SpecificationSummary = {
+        name: "Wizard Training Without Tracking",
+        approvalStatus: "",
+        description: "Lorem ipsum blablabla",
+        fundingPeriod: mockFundingPeriod,
+        fundingStreams: [mockFundingStream],
+        id: "FDZ9345",
         isSelectedForFunding: true,
         providerSnapshotId: mockProviderSnapshot2.providerSnapshotId,
         dataDefinitionRelationshipIds: [],
         templateIds: {"stream-547" : mockTemplate2.templateVersion},
+        coreProviderVersionUpdates: ProviderDataTrackingMode.Manual
     };
 
     const mockSpecificationServiceWithDuplicateNameResponse = () => {
@@ -189,7 +205,7 @@ export function SpecificationTestData() {
         });
     }
 
-    const mockSpecificationService = (mockSpec: SpecificationSummary) => {
+    const mockSpecificationService = (mockSpec?: SpecificationSummary) => {
         jest.mock("../../../services/specificationService", () => {
             const service = jest.requireActual("../../../services/specificationService");
             return {
@@ -255,7 +271,8 @@ export function SpecificationTestData() {
         mockProviderVersionService,
         mockProviderService,
         specificationCfs: mockCfsSpec,
-        specificationFdz: mockFdzSpec,
+        specificationFdzWithoutTracking: mockFdzSpecWithoutTracking,
+        specificationFdzWithTrackingLatest: mockFdzSpecWithTrackingLatest,
         fundingStream: mockFundingStream,
         fundingPeriod: mockFundingPeriod,
         template1: mockTemplate1,

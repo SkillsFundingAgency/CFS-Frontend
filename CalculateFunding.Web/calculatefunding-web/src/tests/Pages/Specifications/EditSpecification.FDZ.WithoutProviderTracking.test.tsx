@@ -9,14 +9,15 @@ const test = SpecificationTestData();
 
 describe("<EditSpecification />", () => {
 
-    describe("<EditSpecification /> with FDZ", () => {
+    const spec = test.specificationFdzWithoutTracking;
+    describe("<EditSpecification /> with FDZ without Tracking Latest Provider Data", () => {
         beforeEach(async () => {
-            test.mockSpecificationService(test.specificationFdz);
+            test.mockSpecificationService(spec);
             test.mockProviderService();
             test.mockProviderVersionService();
             test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All);
 
-            await test.renderEditSpecificationPage(test.specificationFdz.id);
+            await test.renderEditSpecificationPage(spec.id);
 
             await waitFor(() => {
                 expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
@@ -74,22 +75,33 @@ describe("<EditSpecification />", () => {
 
             it("renders the specification name", async () => {
                 const specNameInput = screen.getByRole("textbox", {name: /Specification name/});
-                expect(specNameInput).toHaveValue(test.specificationFdz.name);
+                expect(specNameInput).toHaveValue(spec.name);
             });
 
             it("renders the specification description", async () => {
                 const specNameInput = screen.getByRole("textbox", {name: /Can you provide more detail?/});
-                expect(specNameInput).toHaveValue(test.specificationFdz.description);
+                expect(specNameInput).toHaveValue(spec.description);
             });
 
             it("renders the funding stream name", async () => {
                 expect(screen.getByText("Funding stream")).toBeInTheDocument();
-                expect(screen.getByRole("heading", {name: test.specificationFdz.fundingStreams[0].id}));
+                expect(screen.getByRole("heading", {name: spec.fundingStreams[0].id}));
             });
 
             it("renders the funding period name", async () => {
                 expect(screen.getByText("Funding period")).toBeInTheDocument();
-                expect(screen.getByRole("heading", {name: test.specificationFdz.fundingPeriod.name}));
+                expect(screen.getByRole("heading", {name: spec.fundingPeriod.name}));
+            });
+
+            it("renders the provider tracking options correctly", async () => {
+                const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
+                await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
+
+                const trackingSelect = screen.getByRole("radiogroup", {name: /Track latest core provider data?/}) as HTMLInputElement;
+                const optionYes = within(trackingSelect).getByRole("radio", {name: /Yes/}) as HTMLInputElement;
+                expect(optionYes).not.toBeChecked();
+                const optionNo = within(trackingSelect).getByRole("radio", {name: /No/}) as HTMLInputElement;
+                expect(optionNo).toBeChecked();
             });
 
             it("renders the Core provider options", async () => {
@@ -142,26 +154,28 @@ describe("<EditSpecification />", () => {
                 expect(button).toBeEnabled();
                 await waitFor(() => userEvent.click(button));
 
-                expect(updateSpecificationService).toHaveBeenCalledWith({
-                        assignedTemplateIds: {"stream-547": test.template2.templateVersion},
-                        description: "Lorem ipsum lalala",
-                        fundingPeriodId: test.fundingPeriod.id,
-                        fundingStreamId: test.fundingStream.id,
-                        name: test.specificationCfs.name,
-                        providerSnapshotId: test.providerSnapshot2.providerSnapshotId,
-                        providerVersionId: undefined,
-                    }, test.specificationFdz.id
-                );
+                expect(updateSpecificationService)
+                    .toHaveBeenCalledWith({
+                            assignedTemplateIds: {"stream-547": test.template2.templateVersion},
+                            description: test.specificationFdzWithoutTracking.description,
+                            fundingPeriodId: test.fundingPeriod.id,
+                            fundingStreamId: test.fundingStream.id,
+                            name: spec.name,
+                            providerSnapshotId: test.providerSnapshot2.providerSnapshotId,
+                            providerVersionId: undefined,
+                            coreProviderVersionUpdates: "Manual"
+                        }, spec.id
+                    );
                 expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
             });
 
             it("it submits form given all fields are provided", async () => {
                 await waitForPageToLoad();
 
-                const coreProviderSelect = screen.getByRole("combobox", {name: /Core provider data/}) as HTMLSelectElement;
-                expect(coreProviderSelect).toHaveLength(3);
+                const trackingSelect = screen.getByRole("radiogroup", {name: /Track latest core provider data?/}) as HTMLInputElement;
+                const optionYes = within(trackingSelect).getByRole("radio", {name: /Yes/}) as HTMLInputElement;
 
-                userEvent.selectOptions(coreProviderSelect, test.providerSnapshot1.name);
+                userEvent.click(optionYes);
 
                 const templateVersionSelect = screen.getByRole("combobox", {name: /Template version/});
                 expect(templateVersionSelect).toHaveLength(3);
@@ -177,16 +191,18 @@ describe("<EditSpecification />", () => {
                 await waitFor(() => userEvent.click(button));
 
                 const {updateSpecificationService} = require('../../../services/specificationService');
-                expect(updateSpecificationService).toHaveBeenCalledWith({
-                        assignedTemplateIds: {"stream-547": test.template1.templateVersion},
-                        description: "new description",
-                        fundingPeriodId: test.fundingPeriod.id,
-                        fundingStreamId: test.fundingStream.id,
-                        name: test.specificationCfs.name,
-                        providerSnapshotId: test.providerSnapshot1.providerSnapshotId,
-                        providerVersionId: undefined
-                    }, test.specificationCfs.id
-                );
+                expect(updateSpecificationService)
+                    .toHaveBeenCalledWith({
+                            assignedTemplateIds: {"stream-547": test.template1.templateVersion},
+                            description: "new description",
+                            fundingPeriodId: test.fundingPeriod.id,
+                            fundingStreamId: test.fundingStream.id,
+                            name: spec.name,
+                            providerSnapshotId: undefined,
+                            providerVersionId: undefined,
+                            coreProviderVersionUpdates: "UseLatest"
+                        }, spec.id
+                    );
 
                 expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
             });
