@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using CalculationType = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationType;
 using CalcsJob = CalculateFunding.Common.ApiClient.Calcs.Models.Job;
 using ResultsJob = CalculateFunding.Common.ApiClient.Results.Models.Job;
+using CalculateFunding.Frontend.ViewModels.Common;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -463,15 +464,13 @@ namespace CalculateFunding.Frontend.Controllers
                             LastUpdatedDate = c.LastUpdatedDate
                         });
 
-                var calcs = new SearchResults<AdditionalCalculationSearchResultViewModel>
-                {
-                    TotalCount = calcSearchResults.TotalCount,
-                    Results = additionalCalcs,
-                    Facets = calcSearchResults.Facets,
-                    TotalErrorCount = calcSearchResults.TotalErrorCount,
-                };
+                AdditionalCalculationViewModel additionalCalculationViewModel =
+                    new AdditionalCalculationViewModel(additionalCalcs, calcSearchResults.TotalCount,
+                        pageNumber, (int)Math.Ceiling(calcSearchResults.TotalCount / (double)50),
+                            50, calcSearchResults.TotalErrorCount, calcSearchResults.Facets);
 
-                return Ok(calcs);
+
+                return Ok(additionalCalculationViewModel);
             }
 
             return BadRequest(result.Content);

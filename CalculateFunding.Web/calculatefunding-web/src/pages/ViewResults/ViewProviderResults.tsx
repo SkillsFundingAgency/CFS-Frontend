@@ -10,12 +10,8 @@ import {getSpecificationSummaryService} from "../../services/specificationServic
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Tabs} from "../../components/Tabs";
 import {DateFormatter} from "../../components/DateFormatter";
-import {searchForCalculationsByProviderService} from "../../services/calculationService";
-import {Link} from "react-router-dom";
-import Pagination from "../../components/Pagination";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {NoData} from "../../components/NoData";
-import {AdditionalCalculationSearchResultViewModel} from "../../types/Calculations/AdditionalCalculation";
 import {Footer} from "../../components/Footer";
 import * as QueryString from "query-string";
 import {getFundingStreamByIdService} from "../../services/policyService";
@@ -35,8 +31,6 @@ export interface ViewProviderResultsRouteProps {
 
 export function ViewProviderResults({match}: RouteComponentProps<ViewProviderResultsRouteProps>) {
     const [providerResults, setProviderResults] = useState<SpecificationInformation[]>();
-    const [additionalCalculations, setAdditionalCalculations] = useState<AdditionalCalculationSearchResultViewModel>();
-    const [additionalCalculationsSearchTerm, setAdditionalCalculationsSearchTerm] = useState("");
     const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState<boolean>(false);
     const [isLoadingProviderData, setIsLoadingProviderData] = useState<boolean>(true);
@@ -49,7 +43,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
 
     const {providerVersion: providerDetails, isLoadingProviderVersion} = useProviderVersion(
         providerId,
-        specificationSummary ? specificationSummary.providerVersionId : "",
+        specificationSummary && specificationSummary.providerVersionId ? specificationSummary.providerVersionId : "",
         (err: AxiosError) => addError({error: err.message, description: "Error while loading provider"}));
 
     useEffect(() => {
@@ -110,41 +104,6 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
         fetchData();
     }, []);
 
-    useEffect(() => {
-        if (!additionalCalculations) return;
-        if (additionalCalculations.currentPage !== 0) {
-            setIsLoadingAdditionalCalculations(false);
-        }
-    }, [additionalCalculations]);
-
-    function populateAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
-        setIsLoadingAdditionalCalculations(true);
-        searchForCalculationsByProviderService({
-            specificationId: specificationId,
-            status: status,
-            pageNumber: pageNumber,
-            searchTerm: searchTerm,
-            calculationType: "Additional"
-        }, providerId)
-            .then((response) => {
-                setAdditionalCalculations(response.data);
-            }).catch((err) => {
-                addError({error: err});
-            }).finally(() => {
-                setIsLoadingAdditionalCalculations(false);
-            });
-    }
-
-    function movePage(pageNumber: number) {
-        if (!specificationSummary) return;
-        populateAdditionalCalculations(specificationSummary.id, "", pageNumber, additionalCalculationsSearchTerm);
-    }
-
-    function searchAdditionalCalculations() {
-        if (!specificationSummary) return;
-        populateAdditionalCalculations(specificationSummary.id, "", 1, additionalCalculationsSearchTerm);
-    }
-
     function setSelectedSpecification(e: React.ChangeEvent<HTMLSelectElement>) {
         const specificationId = e.target.value;
         populateSpecification(specificationId);
@@ -155,7 +114,6 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
             const result = response.data as SpecificationSummary;
             setSelectedSpecificationId(result.id);
             setSpecificationSummary(response.data);
-            populateAdditionalCalculations(result.id, "", 1, additionalCalculationsSearchTerm);
         }).catch((e) => {
             addError({error: e});
         });
@@ -232,6 +190,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                 {specificationSummary &&
                                     <AdditionalCalculations
                                         specificationId={specificationSummary.id}
+                                        providerId={providerId}
                                         addError={addError}
                                         showCreateButton={false} />
                                 }

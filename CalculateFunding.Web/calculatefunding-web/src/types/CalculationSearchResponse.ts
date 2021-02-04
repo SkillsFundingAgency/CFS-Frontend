@@ -40,6 +40,7 @@ export interface CalculationSearchResult {
     description?: string | undefined;
     status: PublishStatus;
     lastUpdatedDate: Date;
+    value?: number | null;
 }
 
 export interface PagerState {

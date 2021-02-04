@@ -3,71 +3,107 @@ import {Link} from "react-router-dom";
 import {DateFormatter} from "../DateFormatter";
 import Pagination from "../Pagination";
 import * as React from "react";
-import {searchCalculationsForSpecification} from "../../services/calculationService";
+import {searchCalculationsForSpecification, searchForCalculationsByProviderService} from "../../services/calculationService";
 import {CalculationSearchResultResponse, CalculationType} from "../../types/CalculationSearchResponse";
 import {useEffect, useState} from "react";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {ErrorProps} from "../../hooks/useErrors";
+import {formatNumber, NumberType} from "../FormattedNumber";
+import {cloneDeep} from "lodash";
+import {ValueType} from "../../types/ValueType";
 
 export interface AdditionalCalculationsProps {
     specificationId: string,
+    providerId?: string,
     addError: (props: ErrorProps) => void,
     showCreateButton: boolean
 }
 
-export function AdditionalCalculations(props: AdditionalCalculationsProps) {
-    const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSearchResultResponse>({
-        calculations: [],
-        currentPage: 0,
-        endItemNumber: 0,
-        facets: [],
-        lastPage: 0,
-        pagerState: {
-            lastPage: 0,
-            currentPage: 0,
-            pages: [],
-            displayNumberOfPages: 0,
-            nextPage: 0,
-            previousPage: 0
-        },
-        startItemNumber: 0,
-        totalCount: 0,
-        totalErrorResults: 0,
-        totalResults: 0
-    });
+export function AdditionalCalculations({
+    specificationId, providerId, addError, showCreateButton
+}: AdditionalCalculationsProps) {
+    const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSearchResultResponse>();
     const [additionalCalculationsSearchTerm, setAdditionalCalculationSearchTerm] = useState('');
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(false);
     const [statusFilter] = useState("");
     const {canCreateAdditionalCalculation} =
-        useSpecificationPermissions(props.specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
+        useSpecificationPermissions(specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
     const {circularReferenceErrors, isLoadingCircularDependencies} =
-        useCalculationCircularDependencies(props.specificationId,
-            err => props.addError({error: err, description: "Error while checking for circular reference errors"}));
+        useCalculationCircularDependencies(specificationId,
+            err => addError({error: err, description: "Error while checking for circular reference errors"}));
+    const firstPage = 1;
 
     useEffect(() => {
-        findAdditionalCalculations(props.specificationId, statusFilter, 1, additionalCalculationsSearchTerm);
-    }, [props.specificationId])
+        movePage(firstPage);
+    }, [specificationId]);
 
-    function findAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
+    function renderValue(value: number | null | undefined, calculationType: ValueType): string {
+        if (!value) return '';
+        switch (calculationType) {
+            case ValueType.Currency:
+                return formatNumber(value, NumberType.FormattedMoney, 0);
+            case ValueType.Percentage:
+                return formatNumber(value, NumberType.FormattedPercentage, 0);
+            case ValueType.Number:
+                return formatNumber(value, NumberType.FormattedDecimalNumber, 0);
+        }
+        return `${value}`;
+    }
+
+    async function movePage(pageNumber: number) {
+        await findAdditionalCalculations(specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm);
+    }
+
+    async function findAdditionalCalculations(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
         if (!isLoadingAdditionalCalculations) {
             setIsLoadingAdditionalCalculations(true);
         }
-        searchCalculationsForSpecification({
-            specificationId: specificationId,
-            status: status,
-            pageNumber: pageNumber,
-            searchTerm: additionalCalculationsSearchTerm,
-            calculationType: CalculationType.Additional
-        }).then((response) => {
-            setAdditionalCalculations(response.data);
-            setIsLoadingAdditionalCalculations(false);
-        }).catch((err) => props.addError({error: err, description: "Error while fetching additional calculations", fieldName: "additional-calculations"}));
-    }
+        try {
+            if (providerId) {
+                const additionalCalculationsResponse = (await searchForCalculationsByProviderService({
+                    specificationId: specificationId,
+                    status: status,
+                    pageNumber: pageNumber,
+                    searchTerm: searchTerm,
+                    calculationType: "Additional"
+                }, providerId)).data;
 
-    function movePage(pageNumber: number) {
-        findAdditionalCalculations(props.specificationId, statusFilter, pageNumber, additionalCalculationsSearchTerm);
+                const mappedResults: CalculationSearchResultResponse = {
+                    totalCount: additionalCalculationsResponse.totalCount,
+                    totalResults: additionalCalculationsResponse.totalResults,
+                    totalErrorResults: additionalCalculationsResponse.totalErrorResults,
+                    currentPage: additionalCalculationsResponse.currentPage,
+                    lastPage: additionalCalculationsResponse.lastPage,
+                    startItemNumber: additionalCalculationsResponse.startItemNumber,
+                    endItemNumber: additionalCalculationsResponse.endItemNumber,
+                    pagerState: cloneDeep(additionalCalculationsResponse.pagerState),
+                    facets: cloneDeep(additionalCalculationsResponse.facets),
+                    calculations: cloneDeep(additionalCalculationsResponse.calculations)
+                }
+
+                setAdditionalCalculations(mappedResults);
+            } else {
+                const searchCalculationsForSpecificationResponse = await searchCalculationsForSpecification({
+                    specificationId: specificationId,
+                    status: status,
+                    pageNumber: pageNumber,
+                    searchTerm: searchTerm,
+                    calculationType: CalculationType.Additional
+                });
+
+                setAdditionalCalculations(searchCalculationsForSpecificationResponse.data);
+            }
+        } catch (err) {
+            addError({
+                error: err,
+                description: "Error while fetching additional calculations",
+                fieldName: "additional-calculations"
+            });
+        } finally {
+            setIsLoadingAdditionalCalculations(false);
+        }
     }
 
     return <section className="govuk-tabs__panel" id="additional-calculations">
@@ -75,7 +111,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
             <LoadingStatus title="Loading additional calculations"
                 description="Please wait" />
         }
-        <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
+        {!isLoadingAdditionalCalculations && additionalCalculations && <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
             <div className="govuk-grid-column-two-thirds">
                 <h2 className="govuk-heading-l">Additional calculations</h2>
             </div>
@@ -86,7 +122,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                         ${additionalCalculations.totalResults} calculations`}
                 </p>
             </div>
-        </div>
+        </div>}
         <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
             <div className="govuk-grid-column-two-thirds">
                 <div className="govuk-form-group search-container">
@@ -102,39 +138,41 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                 <button
                     className="govuk-button"
                     type="submit"
-                    onClick={() => findAdditionalCalculations(props.specificationId, statusFilter, 1, additionalCalculationsSearchTerm)}>
+                    onClick={() => findAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm)}>
                     Search
                 </button>
             </div>
         </div>
 
-        {!isLoadingAdditionalCalculations &&
+        {!isLoadingAdditionalCalculations && additionalCalculations &&
             <table className="govuk-table">
                 <thead className="govuk-table__head">
                     <tr className="govuk-table__row">
                         <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                        <th scope="col" className="govuk-table__header">Status</th>
-                        <th scope="col" className="govuk-table__header">Value type</th>
-                        <th scope="col" className="govuk-table__header">Last edited date</th>
+                        {!providerId && <th scope="col" className="govuk-table__header">Status</th>}
+                        <th scope="col" className="govuk-table__header">Type</th>
+                        {providerId && <th scope="col" className="govuk-table__header">Value</th>}
+                        {!providerId && <th scope="col" className="govuk-table__header">Last edited date</th>}
                     </tr>
                 </thead>
                 <tbody className="govuk-table__body">
                     {additionalCalculations.calculations.map((ac, index) => {
                         const hasError = circularReferenceErrors && circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
-                        const linkUrl =  props.showCreateButton ? `/Specifications/EditCalculation/${ac.id}` : `/ViewCalculationResults/${ac.id}`;
+                        const linkUrl = showCreateButton ? `/Specifications/EditCalculation/${ac.id}` : `/ViewCalculationResults/${ac.id}`;
                         return <tr className="govuk-table__row" key={index}>
                             <td className="govuk-table__cell text-overflow">
                                 <Link to={linkUrl}>{ac.name}</Link>
                                 <br />
                                 {hasError ? <span className="govuk-error-message">circular reference detected in calculation script</span> : ""}
                             </td>
-                            <td className="govuk-table__cell">
+                            {!providerId && <td className="govuk-table__cell">
                                 {isLoadingCircularDependencies ? <LoadingFieldStatus title="Checking..." /> : hasError ? "Error" : ac.status}
-                            </td>
+                            </td>}
                             <td className="govuk-table__cell">{ac.valueType}</td>
-                            <td className="govuk-table__cell">
-                                <DateFormatter date={ac.lastUpdatedDate} utc={false} />
-                            </td>
+                            {providerId && <td className="govuk-table__cell">{renderValue(ac.value, ac.valueType)}</td>}
+                            {!providerId && <td className="govuk-table__cell">
+                                <DateFormatter date={ac.lastUpdatedDate} />
+                            </td>}
                         </tr>
                     }
                     )}
@@ -150,18 +188,18 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                         <strong className="govuk-warning-text__text">
                             <span className="govuk-warning-text__assistive">Warning</span>
                     No additional calculations available. &nbsp;
-                    {canCreateAdditionalCalculation && props.showCreateButton &&
-                        <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}>
-                            Create a calculation
+                    {canCreateAdditionalCalculation && showCreateButton &&
+                                <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`}>
+                                    Create a calculation
                         </Link>
-                    }
+                            }
                         </strong>
                     </div>
                 }
-                {additionalCalculations.calculations.length > 0 && canCreateAdditionalCalculation && props.showCreateButton &&
+                {additionalCalculations.calculations.length > 0 && canCreateAdditionalCalculation && showCreateButton &&
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
-                            <Link to={`/specifications/CreateAdditionalCalculation/${props.specificationId}`}
+                            <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`}
                                 className="govuk-link govuk-button">
                                 Create a calculation
                             </Link>
@@ -170,7 +208,7 @@ export function AdditionalCalculations(props: AdditionalCalculationsProps) {
                 }
             </>
         }
-        {additionalCalculations.totalResults > 0 &&
+        {additionalCalculations && additionalCalculations.totalResults > 0 &&
             <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
                 <div className="pagination__summary" hidden={additionalCalculations.currentPage === 1 && additionalCalculations.pagerState.lastPage <= 1}>
                     <p className="govuk-body right-align">

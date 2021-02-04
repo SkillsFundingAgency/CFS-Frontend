@@ -27,7 +27,7 @@ describe('<AdditionalCalculations /> tests', () => {
         beforeEach(async () => {
             mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
             mockPermissions.mockImplementation(() => (fullPermissions));
-            await renderComponent(false);
+            await renderComponent(false, undefined);
         });
 
         it('create button is not displayed', async () => {
@@ -43,7 +43,7 @@ describe('<AdditionalCalculations /> tests', () => {
         beforeEach(async () => {
             mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
             mockPermissions.mockImplementation(() => (noPermissions));
-            await renderComponent(true);
+            await renderComponent(true, undefined);
         });
 
         it('create button is not displayed', async () => {
@@ -55,7 +55,7 @@ describe('<AdditionalCalculations /> tests', () => {
         beforeEach(async () => {
             mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
             mockPermissions.mockImplementation(() => (fullPermissions));
-            await renderComponent(true);
+            await renderComponent(true, undefined);
         });
 
         it('calculation link to view calculation results', async () => {
@@ -87,11 +87,52 @@ describe('<AdditionalCalculations /> tests', () => {
         });
     });
 
+    describe('<AdditionalCalculations /> with permissions and with providerId', () => {
+        beforeEach(async () => {
+            mockCircularReferenceErrors.mockImplementation(() => (noCircularRefErrorsResult));
+            mockPermissions.mockImplementation(() => (fullPermissions));
+            await renderComponent(true, "PROVIDER123");
+        });
+
+        it('calculation link to view calculation results', async () => {
+            expect(screen.getByText(testCalc1.name).closest('a')).toHaveAttribute('href', '/Specifications/EditCalculation/54723')
+        });
+
+        it("it calls the services correct number of times", async () => {
+            const {searchForCalculationsByProviderService} = require('../../../services/calculationService');
+            await waitFor(() => expect(searchForCalculationsByProviderService).toBeCalledTimes(1));
+        });
+
+        it('create button is displayed', async () => {
+            expect(await screen.findByText(/Create a calculation/i)).toBeInTheDocument();
+        });
+
+        it('additional calculations are displayed', async () => {
+            expect(await screen.findByText(testCalc1.name)).toBeInTheDocument();
+            expect(await screen.findByText(testCalc2.name)).toBeInTheDocument();
+        });
+
+        it('does not render status columns', async () => {
+            expect(await screen.queryByText(testCalc1.status)).not.toBeInTheDocument();
+            expect(await screen.queryByText(testCalc2.status)).not.toBeInTheDocument();
+            expect(screen.queryByText("Error")).not.toBeInTheDocument();
+        });
+
+        it('renders value columns with correct formatting', async () => {
+            expect(await screen.findByText(/£100/)).toBeInTheDocument();
+            expect(await screen.findByText(/200%/)).toBeInTheDocument();
+        });
+
+        it('does not render error message', async () => {
+            expect(screen.queryAllByText(/circular reference detected in calculation script/)).toHaveLength(0);
+        });
+    });
+
     describe('<AdditionalCalculations /> with permissions but with circular ref error', () => {
         beforeEach(async () => {
             mockCircularReferenceErrors.mockImplementation(() => (withCircularRefErrorsResult));
             mockPermissions.mockImplementation(() => (fullPermissions));
-            await renderComponent(true);
+            await renderComponent(true, undefined);
         });
 
         it('additional calculations are displayed', async () => {
@@ -110,7 +151,7 @@ describe('<AdditionalCalculations /> tests', () => {
     });
 });
 
-const renderComponent = async (showCreateButton: boolean) => {
+const renderComponent = async (showCreateButton: boolean, providerId: string | undefined) => {
     const {AdditionalCalculations} = require('../../../components/Calculations/AdditionalCalculations');
     const component = render(<MemoryRouter initialEntries={['/AdditionalCalculations/SPEC123']}>
         <QueryClientProvider client={new QueryClient()}>
@@ -119,6 +160,7 @@ const renderComponent = async (showCreateButton: boolean) => {
                 <AdditionalCalculations
                     specificationId="SPEC123"
                     addError={jest.fn()}
+                    providerId={providerId}
                     showCreateButton={showCreateButton} />
             </Route>
         </Switch>
@@ -163,7 +205,8 @@ const testCalc1: CalculationSearchResult = {
     specificationId: testSpec.id,
     valueType: ValueType.Currency,
     specificationName: testSpec.name,
-    wasTemplateCalculation: false
+    wasTemplateCalculation: false,
+    value: 100
 }
 const testCalc2: CalculationSearchResult = {
     calculationType: CalculationType.Additional,
@@ -177,7 +220,8 @@ const testCalc2: CalculationSearchResult = {
     specificationId: testSpec.id,
     valueType: ValueType.Percentage,
     specificationName: testSpec.name,
-    wasTemplateCalculation: false
+    wasTemplateCalculation: false,
+    value: 200
 }
 const withCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
     circularReferenceErrors: [{
@@ -242,6 +286,28 @@ const mockCalculationService = () => {
     return {
         ...calculationService,
         searchCalculationsForSpecification: jest.fn(() => Promise.resolve({
+            status: 200,
+            data: {
+                totalCount: 2,
+                totalResults: 2,
+                totalErrorResults: 0,
+                currentPage: 1,
+                lastPage: 1,
+                startItemNumber: 0,
+                endItemNumber: 0,
+                pagerState: {
+                    displayNumberOfPages: 0,
+                    previousPage: 0,
+                    nextPage: 0,
+                    lastPage: 0,
+                    pages: [],
+                    currentPage: 0
+                },
+                facets: [],
+                calculations: [testCalc1, testCalc2]
+            }
+        })),
+        searchForCalculationsByProviderService: jest.fn(() => Promise.resolve({
             status: 200,
             data: {
                 totalCount: 2,

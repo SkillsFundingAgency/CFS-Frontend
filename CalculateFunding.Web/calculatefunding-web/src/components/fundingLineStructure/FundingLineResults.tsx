@@ -299,7 +299,7 @@ export function FundingLineResults({
                         <div className="govuk-form-group search-container">
                             <label className="govuk-label">
                                 Search by calculation
-                    </label>
+                            </label>
                             <InputSearch id={"input-auto-complete"} suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
                         </div>
                     </div>
