@@ -25,6 +25,6 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
 
         public IDictionary<string, string> AssignedTemplateIds { get; set; }
 
-        public CoreProviderVersionUpdates CoreProviderVersionUpdates { get; set; }
+        public CalculateFunding.Common.ApiClient.Specifications.Models.CoreProviderVersionUpdates CoreProviderVersionUpdates { get; set; }
     }
 }

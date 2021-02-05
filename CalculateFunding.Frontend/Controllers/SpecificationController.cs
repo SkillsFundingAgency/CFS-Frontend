@@ -327,7 +327,8 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingStreamIds = fundingStreamIds,
                 ProviderVersionId = viewModel.ProviderVersionId,
                 AssignedTemplateIds = viewModel.AssignedTemplateIds,
-                ProviderSnapshotId = viewModel.ProviderSnapshotId
+                ProviderSnapshotId = viewModel.ProviderSnapshotId,
+                CoreProviderVersionUpdates = viewModel.CoreProviderVersionUpdates
             };
 
             ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.CreateSpecification(specification);
