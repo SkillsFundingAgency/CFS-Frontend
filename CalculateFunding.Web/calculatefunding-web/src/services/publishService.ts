@@ -49,7 +49,7 @@ export async function preValidateForRefreshFundingService(specificationId: strin
 }
 
 export async function refreshSpecificationFundingService(specificationId: string): 
-    Promise<AxiosResponse<JobCreatedResponse>> {
+    Promise<AxiosResponse<string>> {
     return axios(`/api/specs/${specificationId}/refresh`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'}

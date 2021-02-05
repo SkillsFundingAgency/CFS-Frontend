@@ -38,6 +38,7 @@ import {cloneDeep} from "lodash";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -70,12 +71,15 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isApprovingAllCalculations, setIsApprovingAllCalculations] = useState(false);
+    const [isRefreshFundingInProgress, setIsRefreshFundingInProgress] = useState(false);
+
     const [displayApproveAllJobStatus, setDisplayApproveAllJobStatus] = useState<boolean>(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
     const {canApproveAllCalculations, canChooseFunding, missingPermissions} =
         useSpecificationPermissions(specificationId,
             [SpecificationPermissions.ApproveAllCalculations, SpecificationPermissions.ChooseFunding]);
+    const [initiatedRefreshFundingJobId, setInitiatedRefreshFundingJobId] = useState<string>("");
     const history = useHistory();
     const location = useLocation();
 
@@ -83,6 +87,25 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.ApproveAllCalculationsJob],
             err => addError({error: err, description: "Error while checking for approve all calculation job"}));
+
+    const {latestJob: refreshFundingJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.RefreshFundingJob],
+            err => addError({error: err, description: "Error while checking for refresh funding job"}));
+
+    useEffect(() => {
+        if (!refreshFundingJob || refreshFundingJob.jobId !== initiatedRefreshFundingJobId) return;
+        clearErrorMessages();
+        if (refreshFundingJob.runningStatus === RunningStatus.Completed) {
+            if (refreshFundingJob.isSuccessful) {
+                setIsRefreshFundingInProgress(false);
+                history.push(`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
+            } else {
+                setIsRefreshFundingInProgress(false);
+                addError({error: "Error while choosing specification for funding"});
+            }
+        }
+    }, [refreshFundingJob]);
 
     useEffect(() => {
         const params = QueryString.parse(location.search);
@@ -116,7 +139,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 setSelectedForFundingSpecId(spec.id);
             } else {
                 await spec.fundingStreams.some(async (stream) => {
-                    const selectedSpecs = (await getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id)).data;
+                    const result = await getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id);
+                    const selectedSpecs = result.data;
                     const hasAnySelectedForFunding = selectedSpecs !== null && selectedSpecs.length > 0;
                     if (hasAnySelectedForFunding) {
                         setSelectedForFundingSpecId(selectedSpecs[0].id);
@@ -176,13 +200,17 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         if (confirm) {
             try {
                 const response = await refreshSpecificationFundingService(specificationId);
-                if (response.status === 200) {
-                    history.push(`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
+                const jobId = response.data as string;
+                if (jobId != null && jobId !== "") {
+                    setInitiatedRefreshFundingJobId(jobId);
+                    setIsRefreshFundingInProgress(true);
                 } else {
                     addErrorMessage("A problem occurred while refreshing funding");
+                    setIsRefreshFundingInProgress(false);
                 }
             } catch (err) {
                 addErrorMessage("A problem occurred while refreshing funding: " + err);
+                setIsRefreshFundingInProgress(false);
             }
         }
     }
@@ -249,7 +277,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <MultipleErrorSummary errors={errors} />
 
             <LoadingStatus title={"Checking calculations"}
-                hidden={!isApprovingAllCalculations}
+                hidden={!isApprovingAllCalculations && !isRefreshFundingInProgress}
                 subTitle={"Please wait, this could take several minutes"}
                 description={"Please do not refresh the page, you will be redirected automatically"} />
 
@@ -260,7 +288,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         job={approveAllCalculationsJob} displaySuccessfulJob={displayApproveAllJobStatus} />}
                 </div>}
 
-            <div className="govuk-grid-row" hidden={isApprovingAllCalculations}>
+            <div className="govuk-grid-row" hidden={isApprovingAllCalculations || isRefreshFundingInProgress}>
                 <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
                     <span className="govuk-caption-l">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
@@ -281,7 +309,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 calculation</Link>
                         </li>
                         <li>
-                            <button type="button" className="govuk-link" onClick={approveAllCalculations}>Approve all calculations</button>
+                            <button type="button" className="govuk-link" onClick={approveAllCalculations}
+                                    data-testid="approve-calculations">Approve all calculations</button>
                         </li>
                         <li>
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
@@ -290,21 +319,22 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <LoadingFieldStatus title={"checking funding status..."} />
                         }
                         {!isLoadingSelectedForFunding &&
-                            <li>
-                                {specification.isSelectedForFunding || selectedForFundingSpecId ?
-                                    <Link className="govuk-link govuk-link--no-visited-state"
-                                        to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
-                                        View funding
+                        <li>
+                            {specification.isSelectedForFunding || selectedForFundingSpecId ?
+                                <Link className="govuk-link govuk-link--no-visited-state"
+                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
+                                    View funding
                                 </Link>
-                                    :
-                                    <button type="button" className="govuk-link" onClick={chooseForFunding}>Choose for funding</button>
-                                }
-                            </li>
+                                :
+                                <button type="button" className="govuk-link" onClick={chooseForFunding}
+                                        data-testid="choose-for-funding">Choose for funding</button>
+                            }
+                        </li>
                         }
                     </ul>
                 </div>
             </div>
-            {initialTab.length > 0 && !isApprovingAllCalculations && specification.id.length > 0 &&
+            {initialTab.length > 0 && !isApprovingAllCalculations && specification.id.length > 0 && !isRefreshFundingInProgress &&
                 <div className="govuk-main-wrapper  govuk-!-padding-top-2">
                     <div className="govuk-grid-row" data-testid="hi">
                         <Tabs initialTab={"fundingline-structure"}>

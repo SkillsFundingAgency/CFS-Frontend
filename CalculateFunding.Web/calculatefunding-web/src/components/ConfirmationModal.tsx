@@ -48,7 +48,7 @@ export function ConfirmationModal(message: any,
                         {message}
                     </div>
                     <button id="confirm" className="govuk-button govuk-!-margin-left-2 govuk-!-margin-right-1" data-module="govuk-button"
-                            onClick={handleContinue}>
+                            onClick={handleContinue} data-testid="confirm-modal-continue-button">
                         {confirmButtonText}
                     </button>
                     <button id="cancel" className="govuk-button govuk-button--warning" data-module="govuk-button"
