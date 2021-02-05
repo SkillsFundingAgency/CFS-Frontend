@@ -247,7 +247,7 @@ export function DownloadDataSchema() {
                                         </details>
                                     </div>
                                 </th>
-                                <td className="govuk-table__cell"><DateFormatter date={d.lastUpdatedDate} utc={false}/></td>
+                                <td className="govuk-table__cell"><DateFormatter date={d.lastUpdatedDate} /></td>
                                 <td className="govuk-table__cell">
                                     <p className="govuk-body-s">
                                         <a className="govuk-link" target="_self" href={`/api/datasets/download-dataset-schema/${d.id}`}>{d.name}.xlsx</a>

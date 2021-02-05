@@ -313,7 +313,7 @@ export function SpecificationsList() {
                                     {s.isSelectedForFunding && <strong className="govuk-tag govuk-!-margin-top-2">Chosen for funding</strong>}
                                 </th>
                                 <td className="govuk-table__cell">
-                                    <DateFormatter date={s.lastUpdatedDate} utc={false}/>
+                                    <DateFormatter date={s.lastUpdatedDate} />
                                 </td>
                                 <td className="govuk-table__cell">{s.status}</td>
                             </tr>)}

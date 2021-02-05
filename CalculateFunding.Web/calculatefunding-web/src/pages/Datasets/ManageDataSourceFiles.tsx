@@ -268,7 +268,7 @@ export function ManageDataSourceFiles() {
                                         </div>
                                     </th>
 
-                                    <td className="govuk-table__cell"><DateFormatter date={ds.lastUpdated} utc={false} /></td>
+                                    <td className="govuk-table__cell"><DateFormatter date={ds.lastUpdated} /></td>
                                     <td className="govuk-table__cell">
                                         <div>
                                             <p className="govuk-body">

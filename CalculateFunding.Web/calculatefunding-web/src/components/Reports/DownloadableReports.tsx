@@ -147,7 +147,7 @@ export function DownloadableReports(props: {
                                     </h4>
                                     <p className="govuk-body-s">
                                         <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
-                                        utc={false} date={dlr.lastModified}/></span>
+                                        date={dlr.lastModified}/></span>
                                     </p>
                                 </div>
                                 <div className="govuk-clearfix"></div>
@@ -247,7 +247,7 @@ export function DownloadableReports(props: {
                                 </h4>
                                 <p className="govuk-body-s">
                                     <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
-                                    utc={false} date={dlr.lastModified}/></span>
+                                    date={dlr.lastModified}/></span>
                                 </p>
                             </div>
                             <div className="govuk-clearfix"></div>

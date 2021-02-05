@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from "react-redux";
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import {IStoreState} from './reducers/rootReducer';
@@ -61,6 +61,7 @@ import {ConfirmFunding} from "./pages/FundingApprovals/ConfirmFunding";
 import {RefreshSql} from "./pages/Datasets/RefreshSql";
 import {UploadBatch} from "./pages/FundingApprovals/UploadBatch";
 import {initialiseAppInsights, setAppInsightsAuthenticatedUser} from "./services/appInsightsService";
+import {useEffectOnce} from "./hooks/useEffectOnce";
 
 const queryClient = new QueryClient();
 
@@ -71,10 +72,10 @@ const App: React.FunctionComponent = () => {
 
     const dispatch = useDispatch();
 
-    useEffect(() => {
+    useEffectOnce(() => {
         dispatch(getHasUserConfirmedSkills());
         dispatch(userActionGetUser());
-    }, []);
+    });
 
     useEffect(() => {
         if (username.length> 0)

@@ -769,7 +769,7 @@ export function EditTemplate() {
                         handlePublish={handlePublishClick}
                     />}
                     <p className="govuk-body">
-                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} utc={false} />
+                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} />
                         {` by ${template && template.authorName}`}
                     </p>
                     {saveMessage.length > 0 ? <span className="govuk-error-message" style={isFullScreen ? saveMessageFullScreenStyle : {}}>{saveMessage}</span> : null}

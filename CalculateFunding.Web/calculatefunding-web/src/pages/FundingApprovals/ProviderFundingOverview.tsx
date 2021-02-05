@@ -151,7 +151,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                             }
                         </Tabs.Panel>
                         <Tabs.Panel label="profiling">
-                            {featureFlagsState.profilingPatternVisible ? isLoadingProfilingPatterns : isLoadingSpecification || isLoadingProfileTotals &&
+                            {featureFlagsState.profilingPatternVisible ? isLoadingProfilingPatterns : (isLoadingSpecification || isLoadingProfileTotals) &&
                                 <LoadingStatus title={"Loading..."}/>
                             }
                             {!featureFlagsState.profilingPatternVisible && !isLoadingSpecification && specification && profileTotals && !isLoadingProfileTotals &&
@@ -181,7 +181,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 </div>
             </div>}
             <div className="govuk-clearfix"></div>
-            <a href="#" className="govuk-back-link" onClick={history.goBack}>Back</a>
+            <button type={"button"} className={"govuk-link"} onClick={history.goBack}>Back</button>
         </div>
         <Footer/>
     </div>;

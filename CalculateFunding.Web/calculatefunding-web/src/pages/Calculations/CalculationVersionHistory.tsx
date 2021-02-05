@@ -133,7 +133,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                                 </th>
                                 <td className="govuk-table__cell">{cvh.publishStatus}</td>
                                 <td className="govuk-table__cell">{cvh.version}</td>
-                                <td className="govuk-table__cell"><DateFormatter date={cvh.lastUpdated} utc={false}/>
+                                <td className="govuk-table__cell"><DateFormatter date={cvh.lastUpdated}/>
                                 </td>
                                 <td className="govuk-table__cell">{cvh.author.name}</td>
                             </tr>

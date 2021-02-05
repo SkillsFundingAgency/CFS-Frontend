@@ -187,8 +187,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                         canReleaseFunding={canReleaseFunding}
                         addError={addError}
                         isConfirmingOrConfirmed={jobId !== undefined && jobId.length > 0}
-                        isLoading={(isLoadingFundingConfiguration || isCheckingForJob || isConfirming || !specification || !fundingConfiguration ||
-                            latestJob && latestJob.runningStatus !== RunningStatus.Completed) === true}
+                        isLoading={((isLoadingFundingConfiguration || isCheckingForJob || isConfirming || !specification || !fundingConfiguration ||
+                            latestJob) && latestJob?.runningStatus !== RunningStatus.Completed) === true}
                     />
                 </>
                 }

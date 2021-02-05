@@ -292,7 +292,7 @@ export function ViewFundingLineProfile({match}: RouteComponentProps<ViewFundingL
                                     <br />
                                     <p className="govuk-body-s" data-testid="last-updated-by">
                                         {`Last updated by ${fundingLineProfile.lastUpdatedUser.name} on `}
-                                        {fundingLineProfile.lastUpdatedDate && <DateFormatter date={fundingLineProfile.lastUpdatedDate} utc={false} />}
+                                        {fundingLineProfile.lastUpdatedDate && <DateFormatter date={fundingLineProfile.lastUpdatedDate} />}
                                     </p>
                                 </div>
                             </div>

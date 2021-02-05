@@ -16,7 +16,7 @@ export function DateInput(props: { date: Date, callback: any, inputName?: string
 
     function getDateString (dateIn: Date)
     {
-        return dateIn.getFullYear() != DateTime.fromMillis(0).year ? dateIn.toISOString().substr(0,10) : "";
+        return dateIn.getFullYear() !== DateTime.fromMillis(0).year ? dateIn.toISOString().substr(0,10) : "";
     }
 
     function generateRandomId() {

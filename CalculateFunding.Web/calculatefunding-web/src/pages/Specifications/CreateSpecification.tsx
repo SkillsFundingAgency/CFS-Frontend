@@ -91,7 +91,7 @@ export function CreateSpecification() {
             enabled: (selectedFundingStreamId && providerSource === ProviderSource.FDZ) === true,
             retry: false,
             onError: err => err.response?.status !== 404 && addError({error: err, description: "There is no provider data for your selection"}),
-            onSettled: data => (!data || data.length === 0 && providerSource === ProviderSource.FDZ) ?
+            onSettled: data => ((!data || data.length === 0) && providerSource === ProviderSource.FDZ) ?
                 addError({error: "No provider data sources exist for your selections", fieldName: "selectCoreProvider"}) :
                 clearErrorMessages(["selectCoreProvider"])
         }
@@ -206,15 +206,15 @@ export function CreateSpecification() {
         clearErrorMessages();
         let isValid: boolean = true;
 
-        if (!selectedName || selectedName.length == 0) {
+        if (!selectedName || selectedName.length === 0) {
             addError({error: "Invalid specification name", fieldName: "name"})
             isValid = false;
         }
-        if (!selectedFundingStreamId || selectedFundingStreamId.length == 0) {
+        if (!selectedFundingStreamId || selectedFundingStreamId.length === 0) {
             addError({error: "Missing funding stream", fieldName: "funding-stream"})
             isValid = false;
         }
-        if (!selectedFundingPeriodId || selectedFundingPeriodId.length == 0) {
+        if (!selectedFundingPeriodId || selectedFundingPeriodId.length === 0) {
             addError({error: "Missing funding period", fieldName: "funding-period"})
             isValid = false;
         }
@@ -233,11 +233,11 @@ export function CreateSpecification() {
                 isValid = false;
             }
         }
-        if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
+        if (!selectedTemplateVersion || selectedTemplateVersion.length === 0) {
             addError({error: "Missing template version", fieldName: "selectTemplateVersion"})
             isValid = false;
         }
-        if (!selectedDescription || selectedDescription.length == 0) {
+        if (!selectedDescription || selectedDescription.length === 0) {
             addError({error: "Missing description", fieldName: "description"})
             isValid = false;
         }

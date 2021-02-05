@@ -260,7 +260,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                         <span className="govuk-hint">
                                             <strong>Description:</strong> {getNationalPatternDescription()}
                                         </span>
-                                        <button className="govuk-link" onClick={e => handlePreviewProfile(null)}>Preview profile</button>
+                                        <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>Preview profile</button>
                                     </label>
                                 </div>
                                 <div className="govuk-form-group">
@@ -299,7 +299,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                                                             rbp.profilePatternDisplayName : "Unknown name"}
                                                                         <span className="govuk-hint">{rbp.profilePatternDescription && rbp.profilePatternDescription !== null ?
                                                                             rbp.profilePatternDescription : "Unknown description"}</span>
-                                                                        <button className="govuk-link" onClick={e => handlePreviewProfile(patternKey)}>Preview profile</button>
+                                                                        <button className="govuk-link" onClick={() => handlePreviewProfile(patternKey)}>Preview profile</button>
                                                                     </label>
                                                                 </div>
                                                             }

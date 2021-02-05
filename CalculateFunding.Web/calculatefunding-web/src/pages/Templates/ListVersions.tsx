@@ -198,7 +198,7 @@ export const ListVersions = () => {
                                                                 <span><strong className="govuk-tag govuk-tag--green">Published</strong></span>}
                                                         </td>
                                                         <td className="govuk-table__cell">
-                                                            <DateFormatter date={item.lastModificationDate} utc={false} /><br />
+                                                            <DateFormatter date={item.lastModificationDate} /><br />
                                                 by {item.authorName}
                                                         </td>
                                                     </tr>)

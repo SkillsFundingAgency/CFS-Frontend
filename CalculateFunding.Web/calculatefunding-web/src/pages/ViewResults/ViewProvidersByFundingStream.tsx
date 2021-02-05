@@ -386,7 +386,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                                             ((providerVersionSearchResult.dateOpened == null) ?
                                                     " Unknown"
                                                     : <DateFormatter date={providerVersionSearchResult.dateOpened}
-                                                                     utc={true}/>
+                                                                     />
                                             )}
                                     </strong>
                                 </span>

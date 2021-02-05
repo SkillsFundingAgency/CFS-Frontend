@@ -239,7 +239,7 @@ export function RefreshSql() {
             return (
                 <DateFormatter
                     date={refreshJobDateTime}
-                    utc={true} />
+                    />
             );
         }
         if (!lastSqlJob || !lastSqlJob.lastUpdated) {
@@ -251,7 +251,7 @@ export function RefreshSql() {
             <>
                 <DateFormatter
                     date={lastSqlJob.lastUpdated}
-                    utc={true} />
+                    />
                 <span className="govuk-body">{previousJobFailed ? " (Failed)" : ""}</span>
             </>
         );
@@ -270,7 +270,7 @@ export function RefreshSql() {
         return (
             <DateFormatter
                 date={latestPublishedDate.value}
-                utc={true} />
+                />
         );
     }
 
@@ -331,7 +331,7 @@ export function RefreshSql() {
                                 <dd className="govuk-summary-list__value">
                                     <DateFormatter
                                         date={refreshJobDateTime}
-                                        utc={true} />
+                                        />
                                 </dd>
                             </div>
                             <div className="govuk-summary-list__row">

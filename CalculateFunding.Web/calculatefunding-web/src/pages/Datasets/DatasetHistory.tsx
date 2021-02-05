@@ -120,7 +120,7 @@ export function DatasetHistory({match}: RouteComponentProps<DatasetHistoryRouteP
                                     </details>
                                 </div>
                             </th>
-                            <td className="govuk-table__cell"><DateFormatter utc={false} date={dh.lastUpdatedDate} /></td>
+                            <td className="govuk-table__cell"><DateFormatter date={dh.lastUpdatedDate} /></td>
                             <td className="govuk-table__cell">
                                 <div className="attachment__thumbnail">
                                     <a className="govuk-link" target="_self" tabIndex={-1} aria-hidden="true"

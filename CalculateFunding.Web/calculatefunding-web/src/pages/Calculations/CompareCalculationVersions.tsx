@@ -190,13 +190,13 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                 <div className="govuk-grid-column-one-half">
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
-                            <DateFormatter date={calculationVersions[0].lastUpdated} utc={true} /> <span className="right-align">{calculationVersions[0].publishStatus}</span>
+                            <DateFormatter date={calculationVersions[0].lastUpdated} /> <span className="right-align">{calculationVersions[0].publishStatus}</span>
                         </label></div>
                 </div>
                 <div className="govuk-grid-column-one-half">
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
-                            <DateFormatter date={calculationVersions[1].lastUpdated} utc={true} /> <span className="right-align">{calculationVersions[1].publishStatus}</span>
+                            <DateFormatter date={calculationVersions[1].lastUpdated} /> <span className="right-align">{calculationVersions[1].publishStatus}</span>
                         </label></div>
                 </div>
                 <div className="govuk-grid-column-full">

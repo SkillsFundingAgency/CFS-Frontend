@@ -129,7 +129,7 @@ export const ListTemplates = () => {
                                                     </details>
                                                 </div>
                                             </th>
-                                            <td className="govuk-table__cell"><DateFormatter date={template.lastUpdatedDate} utc={false} /></td>
+                                            <td className="govuk-table__cell"><DateFormatter date={template.lastUpdatedDate} /></td>
                                         </tr>)
                                     }
                                 </tbody>

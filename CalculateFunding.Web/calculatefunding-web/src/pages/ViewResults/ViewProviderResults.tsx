@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getProviderResultsService} from "../../services/providerService";
 import {RouteComponentProps, useLocation} from "react-router";
 import {Header} from "../../components/Header";
@@ -144,7 +144,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                 }
 
                 <WarningText text={`There are no specifications for ${defaultFundingStreamName}`} hidden={defaultFundingStreamName === "" || isLoadingProviderVersion} />
-                <NoData hidden={specificationSummary && specificationSummary.id !== "" || true} />
+                <NoData hidden={(specificationSummary && specificationSummary.id !== "") || true} />
 
                 <div className="govuk-grid-row govuk-!-margin-bottom-6" hidden={isLoadingProviderVersion}>
                     {specificationSummary && providerResults && <div className="govuk-grid-column-two-thirds">
@@ -386,7 +386,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
                                                     {(providerDetails !== undefined) ?
-                                                        <DateFormatter date={providerDetails.dateOpened} utc={false} /> : "Unknown"}
+                                                        <DateFormatter date={providerDetails.dateOpened} /> : "Unknown"}
                                                 </dd>
                                             </div>
                                             <div className="govuk-summary-list__row">
@@ -395,7 +395,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
                                                     {(providerDetails !== undefined) ?
-                                                        <DateFormatter date={providerDetails.dateClosed} utc={false} /> : "Unknown"}
+                                                        <DateFormatter date={providerDetails.dateClosed} /> : "Unknown"}
                                                 </dd>
                                             </div>
                                             <div className="govuk-summary-list__row">

@@ -1,5 +1,4 @@
 import axios from "axios";
-import {DatasetRelationshipSearchRequestViewModel} from "../types/Datasets/DatasetRelationshipSearchRequestViewModel";
 
 const baseUrl = "/api/datasetrelationships";
 

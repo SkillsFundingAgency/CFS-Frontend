@@ -3,7 +3,7 @@ import {DateFormatter} from "../../components/DateFormatter";
 import {render, screen} from "@testing-library/react";
 
 const renderDateFormatter = (date:Date, isUtc?:boolean) => {
-    return render(<DateFormatter date={date} utc={isUtc} />)
+    return render(<DateFormatter date={date} />)
 }
 
 describe('<DateFormatter />', () => {

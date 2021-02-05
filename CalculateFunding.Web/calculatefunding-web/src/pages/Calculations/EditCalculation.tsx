@@ -264,7 +264,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
                 {calculation &&
                 <p id="last-saved-date" className={"govuk-body"}>
-                    Last saved <DateFormatter date={calculation.lastUpdated} utc={false}/>
+                    Last saved <DateFormatter date={calculation.lastUpdated} />
                 </p>
                 }
 

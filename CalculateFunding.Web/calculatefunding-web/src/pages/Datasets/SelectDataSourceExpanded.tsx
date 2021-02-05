@@ -232,7 +232,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                                                     <div className="govuk-details__text">
                                                                         <p className="govuk-body-s">
                                                                             <strong>Last updated:</strong>
-                                                                            <DateFormatter date={v.date} utc={false} />
+                                                                            <DateFormatter date={v.date} />
                                                                         </p>
                                                                         <p className="govuk-body-s">
                                                                             <strong>Last updated by:</strong> {v.author.name}

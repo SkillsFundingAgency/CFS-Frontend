@@ -96,7 +96,7 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                             }
                         </span>
                         <span className="collapsible-step-header-updated-date">
-                            <DateFormatter date={props.lastUpdatedDate} utc={true} />
+                            <DateFormatter date={props.lastUpdatedDate} />
                         </span>
                         <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={updateExpandedStatus}>
                             <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"} />
