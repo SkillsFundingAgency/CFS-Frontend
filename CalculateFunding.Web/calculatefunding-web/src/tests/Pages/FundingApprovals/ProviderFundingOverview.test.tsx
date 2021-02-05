@@ -166,21 +166,14 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible false", () => 
         expect(screen.getByText(testSpec.name)).toBeInTheDocument();
     });
     
-    it("renders the funding stream name", async () => {
-        expect(screen.getByText("Funding stream")).toBeInTheDocument();
-        expect(screen.getByText(testSpec.fundingStreams[0].name)).toBeInTheDocument();
+    it("renders the funding stream and period name", async () => {
+        expect(screen.getByText(testSpec.fundingStreams[0].name + " for " + testSpec.fundingPeriod.name)).toBeInTheDocument();
     });
-    
-    it("renders the funding period name", async () => {
-        expect(screen.getByText("Funding period")).toBeInTheDocument();
-        expect(screen.getByText(testSpec.fundingPeriod.name)).toBeInTheDocument();
-    });
-    
+
     it("renders the Provider name", async () => {
         jest.mock("../../../services/providerService");
         const getProviderByIdAndVersionService = jest.fn()
         getProviderByIdAndVersionService.mockResolvedValue({data: testProvider});
-        expect(screen.getByText("Provider name")).toBeInTheDocument();
         expect(await screen.findByText(/Hogwarts School of Witchcraft and Wizardry/)).toBeInTheDocument();
     });
 

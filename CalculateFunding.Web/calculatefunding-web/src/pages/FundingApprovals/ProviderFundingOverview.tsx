@@ -112,28 +112,11 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 specification={specification}
                 isLoadingSpecification={isLoadingSpecification}
                 providerVersion={providerVersion}
-                isLoadingProviderVersion={isLoadingProviderVersion}/>
+                isLoadingProviderVersion={isLoadingProviderVersion}
+                status={isLoadingTransactions ? "" : transactions ? transactions.latestStatus : ""}
+                fundingTotal={isLoadingTransactions ? "" : transactions ? transactions.fundingTotal : ""}
+            />
 
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full">
-                    <div className="funding-status">
-                        <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible"/>
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-one-half">
-                                <p className="govuk-body">Latest status: <strong className="govuk-warning-text">
-                                    {isLoadingTransactions ? <LoadingFieldStatus title="Loading..."/> : transactions ? transactions.latestStatus : ""}
-                                </strong></p>
-                            </div>
-                            <div className="govuk-grid-column-one-half">
-                                <p className="govuk-body">Funding total: <strong className="govuk-warning-text">
-                                    {isLoadingTransactions ? <LoadingFieldStatus title="Loading..."/> : transactions ? transactions.fundingTotal : ""}
-                                </strong></p>
-                            </div>
-                        </div>
-                        <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-5"/>
-                    </div>
-                </div>
-            </div>
             {initialTab.length > 0 &&
             <div className="govuk-grid-row govuk-!-padding-top-5">
                 <div className="govuk-grid-column-full">
