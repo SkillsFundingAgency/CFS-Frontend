@@ -262,7 +262,7 @@ export function CreateSpecification() {
                 providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderVersionId && enableTrackProviderData === ProviderDataTrackingMode.Manual ? parseInt(selectedProviderVersionId) : undefined,
                 coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
             };
-            
+
             try {
                 const createSpecificationResult = await specificationService.createSpecificationService(createSpecificationViewModel);
                 setNewSpecificationId(createSpecificationResult.data.id);
@@ -461,10 +461,12 @@ export function CreateSpecification() {
                                 value={selectedTemplateVersion || ""}
                                 data-testid={"template-version-dropdown"}>
                             <option value="">Select template version</option>
-                            {publishedFundingTemplates && publishedFundingTemplates.map((publishedFundingTemplate, index) =>
-                                <option key={index} value={publishedFundingTemplate.templateVersion}>
-                                    {publishedFundingTemplate.templateVersion}
-                                </option>)}
+                            {publishedFundingTemplates && publishedFundingTemplates
+                                .sort((a, b) => parseFloat(b.templateVersion) - parseFloat(a.templateVersion))
+                                .map((publishedFundingTemplate, index) =>
+                                    <option key={index} value={publishedFundingTemplate.templateVersion}>
+                                        {publishedFundingTemplate.templateVersion}
+                                    </option>)}
                         </select>
                         {isLoadingPublishedFundingTemplates &&
                         <LoadingFieldStatus title="Loading..."/>
