@@ -123,7 +123,7 @@ export function CreateSpecification() {
                 await hubConnect.start();
 
                 hubConnect.on('NotificationEvent', (message: JobResponse) => {
-                    if (message.jobType === "AssignTemplateCalculationsJob" &&
+                    if (message.jobType === "CreateSpecificationJob" &&
                         message.runningStatus === RunningStatus.Completed &&
                         message.specificationId === newSpecificationId) {
                         hubConnect.invoke("StopWatchingForAllNotifications").then(() => {
