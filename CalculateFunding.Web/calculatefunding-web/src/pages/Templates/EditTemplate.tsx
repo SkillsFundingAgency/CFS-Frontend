@@ -541,6 +541,10 @@ export function EditTemplate() {
         position: "fixed"
     }
 
+    const errorMessageFullScreenStyle: React.CSSProperties = {
+        position: "fixed"
+    }
+
     const saveMessageFullScreenStyle: React.CSSProperties = {
         zIndex: 10,
         width: "90%",
@@ -571,7 +575,7 @@ export function EditTemplate() {
                 <div className="govuk-main-wrapper">
                     {errors.length > 0 &&
                         <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-two-thirds">
+                            <div className="govuk-grid-column-full">
                                 <div className="govuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabIndex={-1}>
                                     <h2 className="govuk-error-summary__title" id="error-summary-title">
                                         There is a problem
@@ -710,7 +714,7 @@ export function EditTemplate() {
                         <div id="template"
                             className={`govuk-form-group govuk-!-margin-bottom-0 ${errors.filter(error => error.fieldName === "template").length > 0 ? 'govuk-form-group--error' : ''}`}>
                             {errors.map((error, i) => error.fieldName === "template" &&
-                                <span key={`error${i}`} className="govuk-error-message govuk-!-margin-bottom-1">
+                                <span key={`error${i}`} className="govuk-error-message govuk-!-margin-bottom-1" style={isFullScreen ? errorMessageFullScreenStyle : {}}>
                                     <span className="govuk-visually-hidden">Error:</span> {error.message}
                                 </span>
                             )}
