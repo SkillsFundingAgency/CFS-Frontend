@@ -1,22 +1,23 @@
 import React from "react";
 import {render, screen, within} from "@testing-library/react";
+import * as redux from "react-redux";
 import {Provider} from "react-redux";
 import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
+import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
-import * as redux from "react-redux";
+import {ProviderVersionQueryResult, useProviderVersion} from "../../../hooks/Providers/useProviderVersion";
 import {ProviderFundingOverviewRoute} from "../../../pages/FundingApprovals/ProviderFundingOverview";
 import {createBrowserHistory, createLocation} from "history";
 import {match, MemoryRouter} from "react-router";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
-import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {ProviderSummary} from "../../../types/ProviderSummary";
-import {ProviderVersionQueryResult, useProviderVersion} from "../../../hooks/Providers/useProviderVersion";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {createStore, Store} from "redux";
 import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
 import {QueryClient, QueryClientProvider} from "react-query";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
 jest.mock('../../../services/fundingLineDetailsService', () => ({
     getCurrentProfileConfigService: jest.fn()
@@ -62,6 +63,7 @@ const testSpec: SpecificationSummary = {
     providerVersionId: "",
     dataDefinitionRelationshipIds: [],
     templateIds: {},
+    coreProviderVersionUpdates: ProviderDataTrackingMode.Manual
 };
 const specResult: SpecificationSummaryQueryResult = {
     specification: testSpec,

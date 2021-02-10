@@ -16,7 +16,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasSpecification();
             test.hasNoActiveJobsRunning();
             test.hasFundingConfigurationWithApproveAll();
-            test.hasFullPermissions();
+            test.hasFullSpecPermissions();
             test.hasProvidersWithErrors([]);
             test.hasSearchResults([test.provider1]);
 

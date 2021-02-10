@@ -14,7 +14,7 @@ export interface IPublishedProviderResultsProps {
     specificationId: string,
     fundingStreamId: string,
     fundingPeriodId: string,
-    specCoreProviderVersionId: string,
+    specCoreProviderVersionId?: string,
     enableBatchSelection: boolean,
     providerSearchResults: PublishedProviderSearchResults | undefined,
     canRefreshFunding: boolean | undefined,

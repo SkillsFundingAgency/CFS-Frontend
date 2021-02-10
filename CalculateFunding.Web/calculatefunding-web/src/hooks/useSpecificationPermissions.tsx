@@ -13,6 +13,7 @@ export enum SpecificationPermissions {
     ApproveAllCalculations = "Approve All Calculations",
     ChooseFunding = "Choose Funding",
     CreateAdditionalCalculations = "Create Additional Calculations",
+    CanApplyCustomProfilePattern = "Can Edit Funding Line Profiles",
     MapDatasets = "Map Datasets",
     Release = "Release",
     Refresh = "Refresh",
@@ -32,6 +33,7 @@ export interface SpecificationPermissionsResult {
     canEditCalculation: boolean | undefined,
     canApproveCalculation: boolean | undefined,
     canApproveAllCalculations: boolean | undefined,
+    canApplyCustomProfilePattern: boolean | undefined,
     canChooseFunding: boolean | undefined,
     hasMissingPermissions: boolean,
     missingPermissions: string[]
@@ -97,6 +99,10 @@ export const useSpecificationPermissions = (
         return permissions && permissions.canEditCalculations;
     }, [permissions]);
 
+    const canApplyCustomProfilePattern = useMemo(() => {
+        return permissions && permissions.canApplyCustomProfilePattern;
+    }, [permissions]);
+
 
     const missingPermissions = useMemo(() => {
         const missing: string[] = [];
@@ -133,8 +139,11 @@ export const useSpecificationPermissions = (
         if (!canCreateAdditionalCalculations && requiredPermissions.includes(SpecificationPermissions.CreateAdditionalCalculations)) {
             missing.push(SpecificationPermissions.CreateAdditionalCalculations);
         }
+        if (!canApplyCustomProfilePattern && requiredPermissions.includes(SpecificationPermissions.CanApplyCustomProfilePattern)) {
+            missing.push(SpecificationPermissions.CanApplyCustomProfilePattern);
+        }
         return missing;
-    }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding,
+    }, [canCreateSpecification, canEditSpecification, canRefreshFunding, canApproveFunding, canReleaseFunding, canApplyCustomProfilePattern,
         canMapDatasets, requiredPermissions, canEditCalculation, canApproveCalculation, canApproveAllCalculations, canChooseFunding]);
 
     return {
@@ -146,6 +155,7 @@ export const useSpecificationPermissions = (
         canRefreshFunding,
         canReleaseFunding,
         canMapDatasets,
+        canApplyCustomProfilePattern,
         canCreateAdditionalCalculation: canCreateAdditionalCalculations,
         canEditCalculation,
         canApproveCalculation,

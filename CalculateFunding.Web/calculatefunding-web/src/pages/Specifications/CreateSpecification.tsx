@@ -273,7 +273,7 @@ export function CreateSpecification() {
                 } else {
                     const axiosError = error as AxiosError;
                     if (axiosError && axiosError.response && axiosError.response.status === 400) {
-                        addValidationErrors(axiosError.response.data, "Error trying to create specification");
+                        addValidationErrors({validationErrors: axiosError.response.data, message: "Error trying to create specification"});
                     } else {
                         addError({error: error, description: `Specification failed to create. Please try again`});
                     }

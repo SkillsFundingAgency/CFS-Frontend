@@ -35,7 +35,7 @@ import {PublishStatus} from "../../types/PublishStatusModel";
 export interface ProviderFundingOverviewRoute {
     specificationId: string;
     providerId: string;
-    specCoreProviderVersionId: string;
+    specCoreProviderVersionId?: string;
     fundingStreamId: string;
     fundingPeriodId: string;
 }
@@ -55,7 +55,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
 
-    const {providerVersion, isLoadingProviderVersion} = useProviderVersion(providerId, specCoreProviderVersionId,
+    const {providerVersion, isLoadingProviderVersion} = useProviderVersion(providerId, specCoreProviderVersionId ? specCoreProviderVersionId : "",
         (err: AxiosError) => addError({error: err, description: "Error while loading provider"}));
     
     const {data: transactions, isLoading: isLoadingTransactions} =

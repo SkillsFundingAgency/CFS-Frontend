@@ -81,6 +81,7 @@ export function ViewSpecificationTestData() {
         canApproveCalculation: true,
         canApproveAllCalculations: true,
         canChooseFunding: true,
+        canApplyCustomProfilePattern: true,
         hasMissingPermissions: true,
         isCheckingForPermissions: true,
         isPermissionsFetched: true,

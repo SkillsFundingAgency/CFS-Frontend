@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import {act, fireEvent, getByText, render, screen, waitFor, within} from "@testing-library/react";
+import {render, screen, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {ProviderFundingProfilingPatterns, ProviderFundingProfilingProps} from "../../../components/Funding/ProviderFundingProfilingPatterns";
 import {FundingApprovalTestData} from "../../Pages/FundingApprovals/FundingApprovalTestData";

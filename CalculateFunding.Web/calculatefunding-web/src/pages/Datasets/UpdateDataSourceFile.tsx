@@ -80,7 +80,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             } else {
                 downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
                     let validationErrorFileUrl = result.data;
-                    addValidationErrors({"blobUrl": [validationErrorFileUrl]}, "Validation failed");
+                    addValidationErrors({validationErrors: {"blobUrl": [validationErrorFileUrl]}, message: "Validation failed"});
                     setIsLoading(false);
                 }).catch(() => {
                     addError({error: "Unable to retrieve validation report", description: "Validation failed"});

@@ -3,6 +3,9 @@ import {PublishedProviderSearchQueryResult} from "../../hooks/FundingApproval/us
 import {PublishedProviderErrorSearchQueryResult} from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import {PublishedProviderIdsQueryResult} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {PublishedProviderSearchFacet} from "../../types/publishedProviderSearchRequest";
+import {SpecificationPermissionsResult} from "../../hooks/useSpecificationPermissions";
+import * as specPermsHook from "../../hooks/useSpecificationPermissions";
+import * as permissionsHook from "../../hooks/useSpecificationPermissions";
 
 export const defaultFacets = [
     {name: PublishedProviderSearchFacet.HasErrors, facetValues: [{"name": "True", "count": 1}, {"name": "False", "count": 0}]},
@@ -11,6 +14,31 @@ export const defaultFacets = [
     {name: PublishedProviderSearchFacet.LocalAuthority, facetValues: [{"name": "East London", "count": 1}]},
     {name: PublishedProviderSearchFacet.ProviderType, facetValues: []}
 ];
+
+
+export const fullSpecPermissions: SpecificationPermissionsResult = {
+    canApproveFunding: true,
+    canCreateSpecification: true,
+    canEditCalculation: true,
+    canEditSpecification: true,
+    canMapDatasets: true,
+    canRefreshFunding: true,
+    canReleaseFunding: true,
+    canApproveCalculation: true,
+    canApproveAllCalculations: true,
+    canChooseFunding: true,
+    hasMissingPermissions: true,
+    isCheckingForPermissions: true,
+    isPermissionsFetched: true,
+    canApplyCustomProfilePattern: true,
+    missingPermissions: [],
+    canCreateAdditionalCalculation: true
+}
+export const hasFullSpecPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullSpecPermissions));
+export const hasSpecPermissions = (expectedSpecificationPermissionsResult: SpecificationPermissionsResult) => {
+    jest.spyOn(specPermsHook, 'useSpecificationPermissions')
+        .mockImplementation(() => (expectedSpecificationPermissionsResult));
+}
 
 export const createPublishedProviderResult = (providers: PublishedProviderResult[],
                                               canApprove = true,

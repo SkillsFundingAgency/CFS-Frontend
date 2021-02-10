@@ -8,6 +8,13 @@ export interface ErrorProps {
     fieldName ? : string, 
     suggestion?: any
 }
+export interface ValidationErrorProps {
+    validationErrors: ValidationErrors, 
+    message : string, 
+    description? : string, 
+    fieldName? : string, 
+    suggestion?: any
+}
 
 export const useErrors = () => {
     const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
@@ -47,7 +54,7 @@ export const useErrors = () => {
         addErrorMessage(errorMessage.length > 0 ? errorMessage : error.toString(), description, fieldName, suggestion);
     };
 
-    const addValidationErrors = (validationErrors: ValidationErrors, message: string, description?: string, fieldName?: string) => {
+    const addValidationErrors = ({validationErrors, message, description, fieldName}: ValidationErrorProps) => {
         const errorCount: number = errors.length;
         const errorMessage: ErrorMessage = {
             id: errorCount + 1,

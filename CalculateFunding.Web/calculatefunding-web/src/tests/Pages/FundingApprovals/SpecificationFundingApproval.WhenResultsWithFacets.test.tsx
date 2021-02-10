@@ -14,7 +14,7 @@ describe("<SpecificationFundingApproval />", () => {
         beforeEach(() => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasNoActiveJobsRunning();
-            test.hasFullPermissions();
+            test.hasFullSpecPermissions();
             test.hasSpecification();
             test.hasFundingConfigurationWithApproveAll();
             test.hasProvidersWithErrors([]);

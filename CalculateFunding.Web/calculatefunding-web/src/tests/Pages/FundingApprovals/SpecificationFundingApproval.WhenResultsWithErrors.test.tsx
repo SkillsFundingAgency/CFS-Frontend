@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import {act, render, screen, waitFor, within} from "@testing-library/react";
+import {act, screen, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as redux from "react-redux";
 import {FundingApprovalTestData} from "./FundingApprovalTestData";
@@ -18,7 +18,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasSpecification();
             test.hasNoActiveJobsRunning();
             test.hasFundingConfigurationWithApproveAll();
-            test.hasFullPermissions();
+            test.hasFullSpecPermissions();
             test.hasProvidersWithErrors(["Error: missing something"]);
             test.hasProviderIds([test.providerWithError1.publishedProviderVersionId]);
             test.hasSearchResults([test.providerWithError1]);
@@ -61,7 +61,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasSpecification();
             test.hasNoActiveJobsRunning();
             test.hasFundingConfigurationWithBatchApproval();
-            test.hasFullPermissions();
+            test.hasFullSpecPermissions();
             test.hasProvidersWithErrors(["Error: missing something"]);
             test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
 

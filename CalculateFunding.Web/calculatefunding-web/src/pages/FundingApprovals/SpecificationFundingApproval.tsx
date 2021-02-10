@@ -123,7 +123,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         } catch (error) {
             const axiosError = error as AxiosError;
             if (axiosError && axiosError.response && axiosError.response.status === 400) {
-                addValidationErrors(axiosError.response.data, "Error trying to refresh funding");
+                addValidationErrors({validationErrors: axiosError.response.data, message: "Error trying to refresh funding"});
             } else {
                 addError({error: error, description: `Error trying to refresh funding`});
             }
@@ -134,7 +134,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     async function refreshFunding() {
         setIsLoadingRefresh(true);
         try {
-            setJobId((await publishService.refreshSpecificationFundingService(specificationId)).data.jobId);
+            setJobId((await publishService.refreshSpecificationFundingService(specificationId)).data);
         } catch (e) {
             addErrorMessage(e, "Error trying to refresh funding");
         } finally {

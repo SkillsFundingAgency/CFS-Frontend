@@ -1,17 +1,19 @@
 ﻿import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
+import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
+import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {PublishedProviderResult} from "../../../types/PublishedProvider/PublishedProviderSearchResults";
 import {PublishStatus} from "../../../types/PublishStatusModel";
-import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import {FundingSearchSelectionState} from "../../../states/FundingSearchSelectionState";
 import {buildInitialPublishedProviderSearchRequest} from "../../../types/publishedProviderSearchRequest";
 import {match, MemoryRouter} from "react-router";
@@ -19,18 +21,15 @@ import {SpecificationFundingApprovalRouteProps} from "../../../pages/FundingAppr
 import {render} from "@testing-library/react";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {Provider} from "react-redux";
-import * as specHook from "../../../hooks/useSpecificationSummary";
-import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
-import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
 import * as providerErrorsHook from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
-import {createPublishedProviderErrorSearchQueryResult, createPublishedProviderIdsQueryResult, createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets} from "../../fakes/testFactories";
+import {createPublishedProviderErrorSearchQueryResult, createPublishedProviderIdsQueryResult, createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets, fullSpecPermissions, hasFullSpecPermissions, hasSpecPermissions} from "../../fakes/testFactories";
 import * as providerIdsSearchHook from "../../../hooks/FundingApproval/usePublishedProviderIds";
 import * as providerSearchHook from "../../../hooks/FundingApproval/usePublishedProviderSearch";
 import React from "react";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {FundingLineProfile, ProfileTotal} from "../../../types/FundingLineProfile";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
 export function FundingApprovalTestData() {
 
@@ -52,6 +51,7 @@ export function FundingApprovalTestData() {
         isSelectedForFunding: true,
         providerVersionId: "",
         dataDefinitionRelationshipIds: [],
+        coreProviderVersionUpdates: ProviderDataTrackingMode.Manual,
         templateIds: {}
     };
     const specResult: SpecificationSummaryQueryResult = {
@@ -215,23 +215,6 @@ export function FundingApprovalTestData() {
         totalAllocation: undefined,
         ukprn: provider1.ukprn
     }
-    const fullPermissions: SpecificationPermissionsResult = {
-        canApproveAllCalculations: false,
-        canChooseFunding: false,
-        canRefreshFunding: true,
-        canApproveFunding: true,
-        canReleaseFunding: true,
-        isPermissionsFetched: true,
-        hasMissingPermissions: false,
-        isCheckingForPermissions: false,
-        missingPermissions: [],
-        canEditSpecification: false,
-        canCreateSpecification: false,
-        canMapDatasets: false,
-        canApproveCalculation: false,
-        canEditCalculation: false,
-        canCreateAdditionalCalculation: false
-    };
 
     const fundingSearchSelectionState: FundingSearchSelectionState = {
         selectedProviderIds: [],
@@ -269,7 +252,6 @@ export function FundingApprovalTestData() {
     const hasSuccessfulCompletedJob = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (successfulCompletedJob));
     const hasFundingConfigurationWithApproveAll = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (fundingConfigWithApproveAllResult));
     const hasFundingConfigurationWithBatchApproval = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (fundingConfigWithBatchApprovalResult));
-    const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullPermissions));
     const hasProvidersWithErrors = (errors: string[]) => jest.spyOn(providerErrorsHook, 'usePublishedProviderErrorSearch').mockImplementation(() => (
         createPublishedProviderErrorSearchQueryResult(errors)));
     const hasProviderIds = (ids: string[]) => jest.spyOn(providerIdsSearchHook, 'usePublishedProviderIds').mockImplementation(() => (
@@ -288,7 +270,8 @@ export function FundingApprovalTestData() {
         matchMock,
         fundingStream,
         fundingPeriod,
-        fullPermissions,
+        hasFullSpecPermissions,
+        hasSpecPermissions,
         testSpec,
         provider1,
         providerWithError1,
@@ -305,7 +288,6 @@ export function FundingApprovalTestData() {
         hasSuccessfulCompletedJob,
         hasFundingConfigurationWithApproveAll,
         hasFundingConfigurationWithBatchApproval,
-        hasFullPermissions,
         hasProvidersWithErrors,
         hasProviderIds,
         hasSearchResults,

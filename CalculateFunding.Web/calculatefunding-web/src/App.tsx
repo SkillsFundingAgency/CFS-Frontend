@@ -48,7 +48,7 @@ import {ConfirmationModal} from "./components/ConfirmationModal";
 import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
 import {CompareCalculationVersions} from "./pages/Calculations/CompareCalculationVersions";
-import {ViewFundingLineProfile} from "./pages/FundingApprovals/ViewFundingLineProfile";
+import {ViewEditFundingLineProfile} from "./pages/FundingApprovals/ViewEditFundingLineProfile";
 import {ChangeProfileType} from "./pages/FundingApprovals/ChangeProfileType";
 import {
     QueryClient,
@@ -128,7 +128,7 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
                                component={ChangeProfileType}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
-                               component={ViewFundingLineProfile}/>
+                               component={ViewEditFundingLineProfile}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
                                component={ProviderFundingOverview}/>
                         <Route path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode" component={ProfileHistory}/>

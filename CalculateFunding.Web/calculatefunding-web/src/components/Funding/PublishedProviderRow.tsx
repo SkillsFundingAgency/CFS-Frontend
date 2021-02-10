@@ -5,7 +5,7 @@ import {PublishedProviderNameColumn} from "./PublishedProviderNameColumn";
 
 export interface IPublishedProviderRowProps {
     publishedProvider: PublishedProviderResult;
-    specCoreProviderVersionId: string;
+    specCoreProviderVersionId?: string;
     enableSelection: boolean;
     isSelected: boolean;
     handleItemSelectionToggle: any
