@@ -259,7 +259,7 @@ export function CreateSpecification() {
                 name: selectedName,
                 assignedTemplateIds: assignedTemplateIdsValue,
                 providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
-                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderVersionId && enableTrackProviderData === ProviderDataTrackingMode.Manual ? parseInt(selectedProviderVersionId) : undefined,
+                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderSnapshotId && enableTrackProviderData === ProviderDataTrackingMode.Manual ? parseInt(selectedProviderSnapshotId) : undefined,
                 coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
             };
 

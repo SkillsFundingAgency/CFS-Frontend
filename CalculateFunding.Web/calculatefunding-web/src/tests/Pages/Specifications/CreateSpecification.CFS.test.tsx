@@ -48,7 +48,6 @@ describe("<CreateSpecification />", () => {
                 userEvent.click(button);
 
                 expect(await screen.findByTestId("error-summary")).toBeInTheDocument();
-                screen.debug(screen.getByTestId("error-summary"))
                 expect(screen.getByText(/Invalid specification name/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing funding stream/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing funding period/)).toBeInTheDocument();

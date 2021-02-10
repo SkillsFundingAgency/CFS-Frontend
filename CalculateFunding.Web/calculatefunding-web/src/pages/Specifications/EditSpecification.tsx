@@ -35,6 +35,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     const [selectedName, setSelectedName] = useState<string>("");
     const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string>();
+    const [selectedProviderSnapshotId, setSelectedProviderSnapshotId] = useState<string | undefined>();
     const [selectedTemplateVersion, setSelectedTemplateVersion] = useState<string>();
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [enableTrackProviderData, setEnableTrackProviderData] = useState<ProviderDataTrackingMode | undefined>();
@@ -102,7 +103,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     setCoreProviderData(providerData);
                     const selectedProviderSnapshot = providerData.find(p => specification && p.value === specification.providerSnapshotId?.toString());
                     if (selectedProviderSnapshot) {
-                        setSelectedProviderVersionId(selectedProviderSnapshot.value);
+                        setSelectedProviderSnapshotId(selectedProviderSnapshot.value);
                     }
                 }
             }
@@ -147,8 +148,14 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     }
 
     function handleCoreProviderChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        const coreProviderId = e.target.value;
-        setSelectedProviderVersionId(coreProviderId);
+        const selectedId: string = e.target.value as string;
+        if (providerSource === ProviderSource.CFS) {
+            setSelectedProviderVersionId(selectedId);
+            setSelectedProviderSnapshotId(undefined);
+        } else if (providerSource === ProviderSource.FDZ) {
+            setSelectedProviderSnapshotId(selectedId);
+            setSelectedProviderVersionId(undefined);
+        }
         clearErrorMessages(["selectCoreProvider"]);
     }
 
@@ -181,11 +188,20 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             addError({error: "Missing description", fieldName: "description"})
             isValid = false;
         }
-        const requiresSpecificProviderVersion = providerSource === ProviderSource.CFS || 
-            (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual);
-        if (requiresSpecificProviderVersion && (!selectedProviderVersionId || selectedProviderVersionId.length == 0)) {
-            addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
-            isValid = false;
+        if (providerSource) {
+            if (providerSource === ProviderSource.CFS && (!selectedProviderVersionId || selectedProviderVersionId.length == 0)) {
+                addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
+                isValid = false;
+            }
+            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === undefined) {
+                addError({error: "Please select whether you want to track latest core provider data", fieldName: "trackProviderData"});
+                isValid = false;
+            }
+            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual &&
+                (!selectedProviderSnapshotId || selectedProviderSnapshotId.length == 0)) {
+                addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
+                isValid = false;
+            }
         }
         if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
             addError({error: "Missing template version", fieldName: "selectTemplateVersion"})
@@ -208,8 +224,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 fundingStreamId: fundingStreamId,
                 name: selectedName,
                 providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
-                providerSnapshotId: providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual && selectedProviderVersionId ? 
-                    parseInt(selectedProviderVersionId) : undefined,
+                providerSnapshotId: providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual && selectedProviderSnapshotId ? 
+                    parseInt(selectedProviderSnapshotId) : undefined,
                 assignedTemplateIds: assignedTemplateIdsValue,
                 coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
             };
