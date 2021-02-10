@@ -16,12 +16,22 @@ export function PermissionStatus(props: { requiredPermissions: string[], hidden:
         return null;
     } else {
         return props.requiredPermissions.length > 0 ?
-            <div className="govuk-warning-text permissions-banner">
-                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong className="govuk-warning-text__text">
+            <div className="govuk-notification-banner" 
+                 role="region" 
+                 aria-labelledby="govuk-notification-banner-title" 
+                 data-module="govuk-notification-banner">
+                <div className="govuk-notification-banner__header">
+                    <h2 className="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                        Permissions
+                    </h2>
+                </div>
+                <div className="govuk-notification-banner__content">
                     <span className="govuk-warning-text__assistive">Warning</span>
-                    <span data-testid="permission-alert-message">{permissionAlertMessage}</span>
-                </strong>
+                    <p className="govuk-notification-banner__heading"
+                       data-testid="permission-alert-message">
+                        {permissionAlertMessage}
+                    </p>
+                </div>
             </div> : null
     }
 }
