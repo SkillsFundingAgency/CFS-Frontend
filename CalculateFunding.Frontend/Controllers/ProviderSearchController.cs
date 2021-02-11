@@ -33,7 +33,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/providerversions/getbyfundingstream/{fundingStreamId}")]
         public async Task<IActionResult> GetProviderVersionsByFundingStream(string fundingStreamId)
         {
-            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
             IEnumerable<ProviderVersionMetadata> result = await _providerSearchService.GetProviderVersionsByFundingStream(fundingStreamId);
             if (result != null)
@@ -127,9 +127,7 @@ namespace CalculateFunding.Frontend.Controllers
 				});
             }
 
-
             CalculationProviderResultSearchResultViewModel searchResults = await _calculationProviderResultsSearchService.PerformSearch(request);
-
 
             CalculationProviderResultSearchResultViewModel result = searchResults;
 
@@ -140,6 +138,5 @@ namespace CalculateFunding.Frontend.Controllers
 
             return new InternalServerErrorResult($"Find provider results HTTP request failed");
         }
-
     }
 }

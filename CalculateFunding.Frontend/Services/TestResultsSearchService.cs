@@ -19,7 +19,7 @@ namespace CalculateFunding.Frontend.Services
         private IMapper _mapper;
         private ILogger _logger;
 
-        const int PageSize = 50;
+        private const int PageSize = 50;
 
         public TestResultsSearchService(ITestEngineApiClient testsApiClient, IMapper mapper, ILogger logger)
         {
@@ -34,10 +34,12 @@ namespace CalculateFunding.Frontend.Services
 
         public async Task<ProviderTestsSearchResultViewModel> PerformProviderTestResultsSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
-                PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
+                PageSize = request.PageSize.HasValue ? request.PageSize.Value : PageSize,
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = true,
                 Filters = request.Filters,

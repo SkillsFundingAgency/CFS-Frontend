@@ -26,6 +26,10 @@ namespace CalculateFunding.Frontend.Controllers
         public ProviderController(IProvidersApiClient providersApiClient, IResultsApiClient resultsApiClient,
             IFundingDataZoneApiClient fundingDataZoneApiClient)
         {
+            Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(fundingDataZoneApiClient, nameof(fundingDataZoneApiClient));
+
             _providersApiClient = providersApiClient;
             _resultsApiClient = resultsApiClient;
             _fundingDataZoneApiClient = fundingDataZoneApiClient;
@@ -35,6 +39,9 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/provider/getproviderbyversionandid/{providerVersionId}/{providerId}")]
         public async Task<IActionResult> GetProviderById(string providerVersionId, string providerId)
         {
+            Guard.IsNullOrWhiteSpace(providerVersionId, nameof(providerVersionId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
             ApiResponse<ProviderVersionSearchResult> result =
                 await _providersApiClient.GetProviderByIdFromProviderVersion(providerVersionId, providerId);
 
@@ -63,6 +70,9 @@ namespace CalculateFunding.Frontend.Controllers
             [FromRoute] string fundingStreamId,
             [FromBody] SearchModel search)
         {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(search, nameof(search));
+
             ApiResponse<ProviderVersionSearchResults> result =
                 await _providersApiClient.SearchCurrentProviderVersionForFundingStream(fundingStreamId, search);
 
@@ -106,9 +116,10 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("/api/provider/getproviderresults/{providerId}")]
         public async Task<IActionResult> GetProviderResults(string providerId)
         {
-            Guard.ArgumentNotNull(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            ApiResponse<IEnumerable<SpecificationInformation>> result = await _resultsApiClient.GetSpecificationsWithProviderResultsForProviderId(providerId);
+            ApiResponse<IEnumerable<SpecificationInformation>> result = 
+                await _resultsApiClient.GetSpecificationsWithProviderResultsForProviderId(providerId);
             
             if (result.StatusCode == HttpStatusCode.OK)
             {
@@ -132,9 +143,10 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/providers/fundingStreams/{fundingStreamId}/snapshots")]
         public async Task<IActionResult> GetProviderSnapshotsForFundingStream(string fundingStreamId)
         {
-            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<ProviderSnapshot>> providerSnapshotsResponse = await _fundingDataZoneApiClient.GetProviderSnapshotsForFundingStream(fundingStreamId);
+            ApiResponse<IEnumerable<ProviderSnapshot>> providerSnapshotsResponse = 
+                await _fundingDataZoneApiClient.GetProviderSnapshotsForFundingStream(fundingStreamId);
 
             IActionResult providerSnapshotsErrorResult =
                 providerSnapshotsResponse.IsSuccessOrReturnFailureResult("GetFundingStructuresByProviderId");

@@ -143,7 +143,7 @@ namespace CalculateFunding.Frontend.Services
 
                 foreach (TestScenarioResultItemViewModel vm in result.TestResults)
                 {
-                    TestScenarioResultCounts counts = rowCounts.Content.Where(r => r.TestScenarioId == vm.Id).FirstOrDefault();
+                    TestScenarioResultCounts counts = rowCounts.Content.FirstOrDefault(r => r.TestScenarioId == vm.Id);
                     if (counts != null)
                     {
                         vm.Failures = counts.Failed;

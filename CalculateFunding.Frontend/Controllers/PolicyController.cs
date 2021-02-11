@@ -123,6 +123,8 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/policy/fundingstream-by-id/{fundingStreamId}")]
         public async Task<IActionResult> GetFundingStreamById(string fundingStreamId)
         {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
             ApiResponse<FundingStream> apiResponse = await _policiesApiClient.GetFundingStreamById(fundingStreamId);
 
             IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedFundingTemplate));
@@ -134,6 +136,8 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/policy/fundingperiods/{fundingStreamId}")]
         public async Task<IActionResult> GetFundingPeriods(string fundingStreamId)
         {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
             Task<ApiResponse<IEnumerable<FundingConfiguration>>> fundingConfigsLookupTask = _policiesApiClient.GetFundingConfigurationsByFundingStreamId(fundingStreamId);
 
             Task<ApiResponse<IEnumerable<FundingPeriod>>> fundingPeriodsLookupTask = _policiesApiClient.GetFundingPeriods();

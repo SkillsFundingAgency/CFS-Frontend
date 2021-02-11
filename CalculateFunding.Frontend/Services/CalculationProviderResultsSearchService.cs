@@ -42,6 +42,8 @@ namespace CalculateFunding.Frontend.Services
 
         public async Task<CalculationProviderResultSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             int pageNumber = request.PageNumber.GetValueOrDefault(1);
             int pageSize = request.PageSize.GetValueOrDefault(50);
 

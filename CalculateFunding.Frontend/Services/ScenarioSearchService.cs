@@ -4,12 +4,12 @@
     using System.Linq;
     using System.Threading.Tasks;
     using AutoMapper;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
+    using Common.Utility;
+    using Common.ApiClient.Models;
+    using Clients.ScenariosClient.Models;
+    using Interfaces.ApiClient;
     using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Scenarios;
+    using ViewModels.Scenarios;
     using Serilog;
 
     public class ScenarioSearchService : IScenarioSearchService
@@ -32,6 +32,8 @@
 
         public async Task<ScenarioSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,

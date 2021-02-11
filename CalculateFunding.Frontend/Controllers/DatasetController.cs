@@ -18,7 +18,6 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using Serilog;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Common.Models.Search;
@@ -40,6 +39,8 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _datasetApiClient = datasetApiClient;
             _logger = logger;
@@ -52,11 +53,11 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/datasets")]
         public async Task<IActionResult> SaveDataset([FromBody] CreateDatasetViewModel vm)
         {
-            Guard.ArgumentNotNull(vm.Name, nameof(vm.Name));
-            Guard.ArgumentNotNull(vm.Description, nameof(vm.Description));
-            Guard.ArgumentNotNull(vm.Filename, nameof(vm.Filename));
-            Guard.ArgumentNotNull(vm.FundingStreamId, nameof(vm.FundingStreamId));
-            Guard.ArgumentNotNull(vm.DataDefinitionId, nameof(vm.DataDefinitionId));
+            Guard.IsNullOrWhiteSpace(vm.Name, nameof(vm.Name));
+            Guard.IsNullOrWhiteSpace(vm.Description, nameof(vm.Description));
+            Guard.IsNullOrWhiteSpace(vm.Filename, nameof(vm.Filename));
+            Guard.IsNullOrWhiteSpace(vm.FundingStreamId, nameof(vm.FundingStreamId));
+            Guard.IsNullOrWhiteSpace(vm.DataDefinitionId, nameof(vm.DataDefinitionId));
 
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = await _datasetApiClient.CreateNewDataset(
                 new CreateNewDatasetModel
@@ -110,22 +111,11 @@ namespace CalculateFunding.Frontend.Controllers
                     Filename = vm.Filename
                 });
 
-            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult("DatasetVersionUpdate");
+            if (errorResult != null)
             {
-                _logger.Warning("Invalid model provided");
-
-                return badRequest;
-            }
-            else
-            {
-                if (!response.StatusCode.IsSuccess())
-                {
-                    int statusCode = (int) response.StatusCode;
-
-                    _logger.Error("Error when posting data set with status code: {statusCode}", statusCode);
-
-                    return new InternalServerErrorResult($"Error when posting data set with status code: {statusCode}");
-                }
+                return errorResult;
             }
 
             return new OkObjectResult(response.Content);
@@ -136,6 +126,11 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> ValidateDataset([FromBody] ValidateDatasetModel vm)
         {
             Guard.ArgumentNotNull(vm, nameof(vm));
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             
             FundingStreamPermission permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User, vm.FundingStreamId);
             
@@ -143,11 +138,6 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 _logger.Error($"User [{User?.Identity?.Name}] has insufficient permissions to upload a dataset file for {vm.FundingStreamId}");
                 return Forbid(new AuthenticationProperties());
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
             }
 
             ValidatedApiResponse<DatasetValidationStatusModel> apiResponse = await _datasetApiClient.ValidateDataset(
@@ -191,35 +181,30 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/dataset-validate-status/{operationId}")]
         public async Task<IActionResult> GetDatasetValidateStatus([FromRoute] string operationId)
         {
-            if (string.IsNullOrWhiteSpace(operationId))
-            {
-                return new BadRequestObjectResult("Missing operationId");
-            }
+            Guard.IsNullOrWhiteSpace(operationId, nameof(operationId));
 
             ApiResponse<DatasetValidationStatusModel> statusResponse =
                 await _datasetApiClient.GetValidateDatasetStatus(operationId);
-            if (statusResponse.StatusCode == HttpStatusCode.NotFound)
+
+            IActionResult errorResult =
+                statusResponse.IsSuccessOrReturnFailureResult("GetCalculationStatusCounts");
+            if (errorResult != null)
             {
-                return new NotFoundObjectResult("Validation status not found");
+                return errorResult;
             }
-            else if (statusResponse.StatusCode == HttpStatusCode.OK)
-            {
-                DatasetValidationStatusViewModel result =
-                    _mapper.Map<DatasetValidationStatusViewModel>(statusResponse.Content);
-                return new OkObjectResult(result);
-            }
-            else
-            {
-                _logger.Error(
-                    $"{nameof(GetDatasetValidateStatus)} returned unexpected HTTP status {statusResponse.StatusCode}");
-                return new InternalServerErrorResult("Unable to query Validate Status");
-            }
+
+            DatasetValidationStatusViewModel result =
+                _mapper.Map<DatasetValidationStatusViewModel>(statusResponse.Content);
+
+            return new OkObjectResult(result);
         }
 
         [HttpGet]
         [Route("api/datasets/getdatasetsbyspecificationid/{specificationId}")]
         public async Task<IActionResult> GetDatasetBySpecificationId(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> result =
                 await _datasetApiClient.GetRelationshipsBySpecificationId(specificationId);
 
@@ -240,14 +225,16 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/datasets/get-dataset-definitions/")]
         public async Task<IActionResult> GetDatasetDefinitions()
         {
-            ApiResponse<IEnumerable<DatasetDefinition>> result = await _datasetApiClient.GetDatasetDefinitions();
+            ApiResponse<IEnumerable<DatasetDefinition>> response = await _datasetApiClient.GetDatasetDefinitions();
 
-            if (result.StatusCode == HttpStatusCode.OK)
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult("GetDatasetDefinitions");
+            if (errorResult != null)
             {
-                return new OkObjectResult(result.Content);
+                return errorResult;
             }
 
-            return BadRequest(result.StatusCode);
+            return Ok(response.Content);
         }
 
         [HttpPut]

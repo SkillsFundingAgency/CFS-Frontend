@@ -16,6 +16,9 @@ namespace CalculateFunding.Frontend.Controllers
 
         public DownloadDatasourceController(IDatasetsApiClient datasetApiClient, ILogger logger)
         {
+            Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+
             _datasetApiClient = datasetApiClient;
             _logger = logger;
         }

@@ -1,18 +1,17 @@
 ﻿using System.Collections.Concurrent;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace CalculateFunding.Frontend.Services
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using CalculateFunding.Common.Utility;
-    using CalculateFunding.Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Specifications;
-    using CalculateFunding.Common.ApiClient.Specifications.Models;
+    using Common.Utility;
+    using Common.ApiClient.Models;
+    using Common.ApiClient.Specifications;
+    using Common.ApiClient.Specifications.Models;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
-    using CalculateFunding.Frontend.ViewModels.Specs;
+    using ViewModels.Specs;
     using Serilog;
 
     public class DatasetRelationshipsSearchService : IDatasetRelationshipsSearchService
@@ -33,7 +32,9 @@ namespace CalculateFunding.Frontend.Services
 
         public async Task<SpecificationDatasourceRelationshipSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
-	        var filters = request.Filters.IsNullOrEmpty()
+            Guard.ArgumentNotNull(request, nameof(request));
+
+	        IDictionary<string, string[]> filters = request.Filters.IsNullOrEmpty()
 		        ? new ConcurrentDictionary<string, string[]>()
 		        : request.Filters;
 	        if (filters.ContainsKey(""))
@@ -41,7 +42,7 @@ namespace CalculateFunding.Frontend.Services
 		        filters.Remove("");
 	        }
 
-            SearchFilterRequest requestOptions = new SearchFilterRequest()
+            SearchFilterRequest requestOptions = new SearchFilterRequest
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
                 PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
@@ -55,21 +56,16 @@ namespace CalculateFunding.Frontend.Services
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<SpecificationDatasourceRelationshipSearchResultItem> pagedResult = await _specsClient.FindSpecificationAndRelationships(requestOptions);
+            PagedResult<SpecificationDatasourceRelationshipSearchResultItem> pagedResult = 
+                await _specsClient.FindSpecificationAndRelationships(requestOptions);
 
             if (pagedResult == null)
             {
                 _logger.Error("Find specification data source relationships HTTP request failed");
             }
 
-            int totalPages = pagedResult.TotalItems / pagedResult.PageSize;
-            if (pagedResult.TotalItems % pagedResult.PageSize > 0)
-            {
-                totalPages++;
-            }
-
-            int startNumber = ((pagedResult.PageSize * pagedResult.PageNumber) - pagedResult.PageSize) + 1;
-            int endNumber = (pagedResult.PageSize * pagedResult.PageNumber);
+            int startNumber = pagedResult.PageSize * pagedResult.PageNumber - pagedResult.PageSize + 1;
+            int endNumber = pagedResult.PageSize * pagedResult.PageNumber;
             if (endNumber > pagedResult.TotalItems)
             {
                 endNumber = pagedResult.TotalItems;
@@ -86,20 +82,6 @@ namespace CalculateFunding.Frontend.Services
                 };
 
             return viewModel;
-        }
-
-        private string BuildCountPhrase(int relationshipCount)
-        {
-            if (relationshipCount == 0)
-            {
-                return "No data sources mapped to datasets";
-            }
-            else if (relationshipCount == 1)
-            {
-                return "1 data source mapped to dataset";
-            }
-
-            return $"{relationshipCount} data sources mapped to datasets";
         }
     }
 }

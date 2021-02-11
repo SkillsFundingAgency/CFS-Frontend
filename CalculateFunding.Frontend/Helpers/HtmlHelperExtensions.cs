@@ -29,10 +29,5 @@ namespace CalculateFunding.Frontend.Helpers
 
 	        return Properties.PageText.ExcludedText;
         }
-
-        public static string AsFormatCalculationTypeText(this decimal? value, string textType)
-	    {
-            return value.AsFormatCalculationType(Enum.Parse<CalculationValueTypeViewModel>(textType));
-        }
     }
 }

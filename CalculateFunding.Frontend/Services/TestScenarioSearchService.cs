@@ -19,7 +19,6 @@ namespace CalculateFunding.Frontend.Services
         private IMapper _mapper;
         private ILogger _logger;
 
-
         public TestScenarioSearchService(ITestEngineApiClient testEngineApiClient, IMapper mapper, ILogger logger)
         {
             Guard.ArgumentNotNull(testEngineApiClient, nameof(testEngineApiClient));
@@ -48,7 +47,8 @@ namespace CalculateFunding.Frontend.Services
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<TestScenarioSearchResultItem> TestScenarioResult = await _testEngineApiClient.FindTestScenariosForProvider(requestOptions);
+            PagedResult<TestScenarioSearchResultItem> TestScenarioResult = 
+                await _testEngineApiClient.FindTestScenariosForProvider(requestOptions);
 
             if (TestScenarioResult == null)
             {

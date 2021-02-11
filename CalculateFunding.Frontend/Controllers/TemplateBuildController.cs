@@ -21,13 +21,17 @@ namespace CalculateFunding.Frontend.Controllers
 {
     public class TemplateBuildController : ControllerBase
     {
-        private readonly ITemplateBuilderApiClient _client;
+        private readonly ITemplateBuilderApiClient _templateBuilderApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly ILogger _logger;
 
-        public TemplateBuildController(ITemplateBuilderApiClient client, IAuthorizationHelper authorizationHelper, ILogger logger)
+        public TemplateBuildController(ITemplateBuilderApiClient templateBuilderApiClient, IAuthorizationHelper authorizationHelper, ILogger logger)
         {
-            _client = client;
+            Guard.ArgumentNotNull(templateBuilderApiClient, nameof(templateBuilderApiClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+
+            _templateBuilderApiClient = templateBuilderApiClient;
             _authorizationHelper = authorizationHelper;
             _logger = logger;
         }
@@ -36,7 +40,9 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/{templateId}")]
         public async Task<IActionResult> GetTemplate([FromRoute] string templateId)
         {
-            ApiResponse<TemplateResource> result = await _client.GetTemplate(templateId);
+            Guard.IsNullOrWhiteSpace(templateId, nameof(templateId));
+
+            ApiResponse<TemplateResource> result = await _templateBuilderApiClient.GetTemplate(templateId);
 
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
@@ -48,7 +54,10 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/{templateId}/versions/{version}")]
         public async Task<IActionResult> GetTemplateVersion([FromRoute] string templateId, [FromRoute] string version)
         {
-            ApiResponse<TemplateResource> result = await _client.GetTemplateVersion(templateId, version);
+            Guard.IsNullOrWhiteSpace(templateId, nameof(templateId));
+            Guard.IsNullOrWhiteSpace(version, nameof(version));
+
+            ApiResponse<TemplateResource> result = await _templateBuilderApiClient.GetTemplateVersion(templateId, version);
 
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
@@ -61,7 +70,10 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> GetPublishedTemplatesByFundingStreamAndPeriod([FromRoute] string fundingStreamId,
             [FromRoute] string fundingPeriodId)
         {
-            ApiResponse<IEnumerable<TemplateResource>> result = await _client
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
+            ApiResponse<IEnumerable<TemplateResource>> result = await _templateBuilderApiClient
                 .GetPublishedTemplatesByFundingStreamAndPeriod(fundingStreamId, fundingPeriodId);
 
             if (result.StatusCode.IsSuccess())
@@ -78,8 +90,10 @@ namespace CalculateFunding.Frontend.Controllers
             [FromQuery] int page, 
             [FromQuery] int itemsPerPage)
         {
+            Guard.IsNullOrWhiteSpace(templateId, nameof(templateId));
+
             ApiResponse<TemplateVersionListResponse> result = 
-                await _client.GetTemplateVersions(templateId, statuses, page, itemsPerPage);
+                await _templateBuilderApiClient.GetTemplateVersions(templateId, statuses, page, itemsPerPage);
 
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
@@ -91,7 +105,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/available-stream-periods")]
         public async Task<IActionResult> GetFundingStreamPeriodsWithoutTemplates()
         {
-            ApiResponse<List<FundingStreamWithPeriods>> result = await _client.GetFundingStreamPeriodsWithoutTemplates();
+            ApiResponse<List<FundingStreamWithPeriods>> result = await _templateBuilderApiClient.GetFundingStreamPeriodsWithoutTemplates();
 
             if (result.StatusCode.IsSuccess())
                 return Ok(result.Content);
@@ -117,7 +131,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Forbid(new AuthenticationProperties());
             }
 
-            ValidatedApiResponse<string> result = await _client.CreateDraftTemplate(new TemplateCreateCommand
+            ValidatedApiResponse<string> result = await _templateBuilderApiClient.CreateDraftTemplate(new TemplateCreateCommand
             {
                 Description = createModel.Description,
                 FundingStreamId = createModel.FundingStreamId,
@@ -154,7 +168,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Forbid(new AuthenticationProperties());
             }
 
-            ValidatedApiResponse<string> result = await _client.CreateTemplateAsClone(createModel);
+            ValidatedApiResponse<string> result = await _templateBuilderApiClient.CreateTemplateAsClone(createModel);
 
             switch (result.StatusCode)
             {
@@ -178,7 +192,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<int> result = await _client.UpdateTemplateContent(new TemplateContentUpdateCommand
+            ValidatedApiResponse<int> result = await _templateBuilderApiClient.UpdateTemplateContent(new TemplateContentUpdateCommand
             {
                 TemplateId = model.TemplateId,
                 TemplateFundingLinesJson = model.TemplateFundingLinesJson
@@ -213,7 +227,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<int> result = await _client.RestoreContent(new TemplateContentUpdateCommand
+            ValidatedApiResponse<int> result = await _templateBuilderApiClient.RestoreContent(new TemplateContentUpdateCommand
             {
                 TemplateId = model.TemplateId,
                 TemplateFundingLinesJson = model.TemplateFundingLinesJson,
@@ -242,7 +256,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
-            ValidatedApiResponse<string> result = await _client.UpdateTemplateDescription(new TemplateDescriptionUpdateCommand
+            ValidatedApiResponse<string> result = await _templateBuilderApiClient.UpdateTemplateDescription(new TemplateDescriptionUpdateCommand
             {
                 TemplateId = model.TemplateId,
                 Description = model.Description
@@ -265,7 +279,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(model, nameof(model));
 
-            NoValidatedContentApiResponse result = await _client.PublishTemplate(model);
+            NoValidatedContentApiResponse result = await _templateBuilderApiClient.PublishTemplate(model);
 
             if (result.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -279,15 +293,17 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/{templateId}/export")]
         public async Task<IActionResult> Export([FromRoute] string templateId, [FromQuery] string version)
         {
+            Guard.IsNullOrWhiteSpace(templateId, nameof(templateId));
+
             ApiResponse<TemplateResource> result;
 
             if (!string.IsNullOrWhiteSpace(version))
             {
-                result = await _client.GetTemplateVersion(templateId, version);
+                result = await _templateBuilderApiClient.GetTemplateVersion(templateId, version);
             }
             else
             {
-                result = await _client.GetTemplate(templateId);
+                result = await _templateBuilderApiClient.GetTemplate(templateId);
             }
 
             if (result.StatusCode.IsSuccess())
@@ -317,7 +333,9 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/templates/build/search")]
         public async Task<IActionResult> SearchTemplates([FromBody] SearchModel request)
         {
-            ValidatedApiResponse<SearchResults<TemplateIndex>> result = await _client.SearchTemplates(request);
+            Guard.ArgumentNotNull(request, nameof(request));
+
+            ValidatedApiResponse<SearchResults<TemplateIndex>> result = await _templateBuilderApiClient.SearchTemplates(request);
 
             switch (result.StatusCode)
             {

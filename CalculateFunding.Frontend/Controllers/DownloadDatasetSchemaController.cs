@@ -4,8 +4,6 @@ using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -16,6 +14,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         public DownloadDatasetSchemaController(IDatasetsApiClient datasetApiClient)
         {
+            Guard.ArgumentNotNull(datasetApiClient, nameof(datasetApiClient));
             _datasetApiClient = datasetApiClient;
         }
 

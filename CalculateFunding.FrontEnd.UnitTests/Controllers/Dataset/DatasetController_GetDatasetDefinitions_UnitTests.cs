@@ -61,7 +61,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
 		    var actual = _sut.GetDatasetDefinitions();
 
 		    actual.Should().NotBeNull();
-		    actual.Result.Should().BeOfType<BadRequestObjectResult>();
+		    actual.Result.Should().BeOfType<BadRequestResult>();
 	    }
     }
 }

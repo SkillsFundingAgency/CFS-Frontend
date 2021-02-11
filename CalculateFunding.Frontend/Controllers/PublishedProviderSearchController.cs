@@ -14,13 +14,14 @@ namespace CalculateFunding.Frontend.Controllers
 {
     public class PublishedProviderSearchController : Controller
     {
-        private IPublishedProviderSearchService _publishedProviderSearchService;
+        private readonly IPublishedProviderSearchService _publishedProviderSearchService;
         private readonly IPublishingApiClient _publishingApiClient;
 
         public PublishedProviderSearchController(IPublishedProviderSearchService publishedProviderSearchService,
             IPublishingApiClient publishingApiClient)
         {
             Guard.ArgumentNotNull(publishedProviderSearchService, nameof(publishedProviderSearchService));
+            Guard.ArgumentNotNull(publishingApiClient, nameof(publishingApiClient));
 
             _publishedProviderSearchService = publishedProviderSearchService;
             _publishingApiClient = publishingApiClient;
@@ -30,6 +31,8 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/publishedProviders/search/ids")]
         public async Task<IActionResult> GetProviderIds([FromBody] SearchPublishedProvidersRequest request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             PublishedProviderIdSearchModel searchModel = new PublishedProviderIdSearchModel
             {
                 Filters = ExtractFilters(request),
@@ -39,7 +42,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<IEnumerable<string>> response = await _publishingApiClient.SearchPublishedProviderIds(searchModel);
 
-            var errorResult = response.IsSuccessOrReturnFailureResult("search");
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("search");
             if (errorResult != null)
             {
                 return errorResult;

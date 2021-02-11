@@ -28,6 +28,11 @@ namespace CalculateFunding.Frontend.Services
 
         public PublishedProviderSearchService(IPublishingApiClient publishingApiClient, IPoliciesApiClient policiesApiClient, ILogger logger, IMapper mapper)
         {
+            Guard.ArgumentNotNull(publishingApiClient, nameof(publishingApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+            Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+
             _publishingApiClient = publishingApiClient;
             _policiesApiClient = policiesApiClient;
             _logger = logger;
@@ -54,8 +59,11 @@ namespace CalculateFunding.Frontend.Services
                 requestOptions.PageNumber = request.PageNumber.Value;
             }
 
-            var searchTask = _publishingApiClient.SearchPublishedProvider(requestOptions);
-            var fundingConfigTask = _policiesApiClient.GetFundingConfiguration(request.FundingStreamId, request.FundingPeriodId);
+            Task<ApiResponse<SearchResults<PublishedProviderSearchItem>>> searchTask = 
+                _publishingApiClient.SearchPublishedProvider(requestOptions);
+
+            Task<ApiResponse<FundingConfiguration>> fundingConfigTask = 
+                _policiesApiClient.GetFundingConfiguration(request.FundingStreamId, request.FundingPeriodId);
 
             ApiResponse<SearchResults<PublishedProviderSearchItem>> searchResponse = await searchTask;
             if (searchResponse == null)

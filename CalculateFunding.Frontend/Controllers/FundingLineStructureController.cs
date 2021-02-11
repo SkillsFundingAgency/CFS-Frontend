@@ -26,6 +26,10 @@ namespace CalculateFunding.Frontend.Controllers
             [FromRoute] string fundingPeriodId,
             [FromRoute] string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             string etag = Request.ReadETagHeaderValue();
 
             ApiResponse<FundingStructure> fundingStructureApiResponse = await _specificationsApiClient.GetFundingStructure(fundingStreamId,

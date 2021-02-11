@@ -35,6 +35,8 @@ namespace CalculateFunding.Frontend.Services
 
         public async Task<DatasetDefinitionSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
 	        int pageNumber = Math.Max(1, request.PageNumber.GetValueOrDefault(1));
 	        int pageSize = request.PageSize.GetValueOrDefault(50);
 	        

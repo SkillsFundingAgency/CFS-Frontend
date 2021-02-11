@@ -1,6 +1,7 @@
 ﻿using CalculateFunding.Frontend.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -11,6 +12,8 @@ namespace CalculateFunding.Frontend.Controllers
         public GraphController(
             IGraphCalculationService graphCalculationService)
         {
+            Guard.ArgumentNotNull(graphCalculationService, nameof(graphCalculationService));
+
             _graphCalculationService = graphCalculationService;
         }
 
@@ -19,6 +22,7 @@ namespace CalculateFunding.Frontend.Controllers
 		public async Task<IActionResult> GetCalculationCircularDependencies(
             [FromRoute] string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             return await _graphCalculationService.GetCalculationCircularDependencies(specificationId);
         }
     }

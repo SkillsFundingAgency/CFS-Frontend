@@ -57,7 +57,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/calculations/getcalculationsforspecification")]
         public async Task<IActionResult> GetAdditionalCalculationsForSpecification(CalculationSearchRequestViewModel viewModel)
         {
-			Guard.ArgumentNotNull(viewModel.SpecificationId, nameof(viewModel.SpecificationId));
+			Guard.IsNullOrWhiteSpace(viewModel.SpecificationId, nameof(viewModel.SpecificationId));
 			Guard.ArgumentNotNull(viewModel.CalculationType, nameof(viewModel.CalculationType));
 
 			SearchRequestViewModel request = new SearchRequestViewModel
@@ -77,7 +77,6 @@ namespace CalculateFunding.Frontend.Controllers
 			{
 				request.SearchTerm = viewModel.SearchTerm;
 			}
-
 
 			CalculationSearchResultViewModel result = await _calculationSearchService.PerformSearch(request);
             if (result != null)

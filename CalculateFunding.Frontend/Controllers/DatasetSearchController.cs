@@ -62,7 +62,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/datasets/getdatasetversions/{datasetId}")]
-        public async Task<IActionResult> GetDatasetVersions(string datasetId, [FromQuery]int pageNumber, [FromQuery]int pageSize)
+        public async Task<IActionResult> GetDatasetVersions(
+            string datasetId, [FromQuery]int pageNumber, [FromQuery]int pageSize)
         {
             Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
 

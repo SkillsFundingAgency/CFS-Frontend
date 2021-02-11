@@ -48,12 +48,12 @@ namespace CalculateFunding.Frontend.Controllers
             [FromRoute] string providerId,
             [FromRoute] string specificationId)
         {
-            Guard.ArgumentNotNull(providerId, nameof(providerId));
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<SpecificationSummary> specificationResult = await _specsClient.GetSpecificationSummaryById(specificationId);
             IActionResult specificationErrorResult =
-                            specificationResult.IsSuccessOrReturnFailureResult("GetFundingStructureResultsForProviderAndSpecification");
+                            specificationResult.IsSuccessOrReturnFailureResult("GetSpecificationSummaryById");
             if (specificationErrorResult != null)
             {
                 return specificationErrorResult;
@@ -131,6 +131,11 @@ namespace CalculateFunding.Frontend.Controllers
             IEnumerable<Common.ApiClient.Results.Models.CalculationResultResponse> calcEngineResults,
             IEnumerable<CalculationMetadata> specificationCalculationMetadata)
         {
+            Guard.ArgumentNotNull(templateMapping, nameof(templateMapping));
+            Guard.ArgumentNotNull(templateCalculations, nameof(templateCalculations));
+            Guard.ArgumentNotNull(calcEngineResults, nameof(calcEngineResults));
+            Guard.ArgumentNotNull(specificationCalculationMetadata, nameof(specificationCalculationMetadata));
+
             Dictionary<uint, TemplateCalculationResult> calculationResults = new Dictionary<uint, TemplateCalculationResult>();
             Dictionary<string, object> calculationValues = new Dictionary<string, object>();
             Dictionary<string, string> calculationExceptionMessages = new Dictionary<string, string>();
@@ -182,13 +187,15 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return calculationResults;
-
         }
 
         private static Dictionary<uint, FundingLineResult> GenerateFundingLineResults(
             IEnumerable<TemplateMetadataFundingLine> templateFundingLines,
             IEnumerable<Common.ApiClient.Results.Models.FundingLineResult> fundingLineResultValues)
         {
+            Guard.ArgumentNotNull(templateFundingLines, nameof(templateFundingLines));
+            Guard.ArgumentNotNull(fundingLineResultValues, nameof(fundingLineResultValues));
+
             Dictionary<uint, FundingLineResult> fundingLineResults = new Dictionary<uint, FundingLineResult>();
 
             foreach (TemplateMetadataFundingLine fundingLine in templateFundingLines)
@@ -205,7 +212,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             foreach (Common.ApiClient.Results.Models.FundingLineResult fundingLine in fundingLineResultValues)
             {
-                if (uint.TryParse(fundingLine.FundingLine.Id, out uint fundingLineId))
+                if (uint.TryParse(fundingLine.FundingLine?.Id, out uint fundingLineId))
                 {
                     if (fundingLineResults.ContainsKey(fundingLineId))
                     {

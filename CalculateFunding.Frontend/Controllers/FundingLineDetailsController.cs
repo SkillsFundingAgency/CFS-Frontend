@@ -31,6 +31,12 @@ namespace CalculateFunding.Frontend.Controllers
         public FundingLineDetailsController(IPublishingApiClient publishingApiClient, IProvidersApiClient providersApiClient,
             ISpecificationsApiClient specificationsApiClient, IPoliciesApiClient policiesApiClient, IAuthorizationHelper authorizationHelper)
         {
+            Guard.ArgumentNotNull(publishingApiClient, nameof(publishingApiClient));
+            Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+
             _publishingApiClient = publishingApiClient;
             _providersApiClient = providersApiClient;
             _specificationsApiClient = specificationsApiClient;
@@ -47,6 +53,12 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingLineCode,
             string fundingPeriodId)
         {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(fundingLineCode, nameof(fundingLineCode));
+            Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
+
             ApiResponse<FundingConfiguration> fundingConfig = await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
 
             ApiResponse<FundingLineProfile> fundingLineApiResponse = await _publishingApiClient
@@ -81,6 +93,11 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingStreamId,
             string fundingLineCode)
         {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(fundingLineCode, nameof(fundingLineCode));
+
             ApiResponse<bool> fundingLineApiResponse = await _publishingApiClient
                 .PreviousProfileExistsForSpecificationForProviderForFundingLine(
                     specificationId,
@@ -104,10 +121,10 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingStreamId,
             string fundingLineCode)
         {
-            Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
-            Guard.ArgumentNotNull(providerId, nameof(providerId));
-            Guard.ArgumentNotNull(fundingLineCode, nameof(fundingLineCode));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(fundingLineCode, nameof(fundingLineCode));
 
             ApiResponse<IEnumerable<FundingLineChange>> fundingLineApiResponse = await _publishingApiClient
                 .GetPreviousProfilesForSpecificationForProviderForFundingLine(
@@ -158,6 +175,10 @@ namespace CalculateFunding.Frontend.Controllers
             [FromRoute] string providerId,
             [FromRoute] string fundingStreamId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
             ApiResponse<IEnumerable<FundingLineProfile>> fundingLineApiResponse = await _publishingApiClient
                 .GetCurrentProfileConfig(
                     specificationId,
@@ -178,6 +199,8 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/publishedproviderfundinglinedetails/customprofiles")]
         public async Task<IActionResult> ApplyCustomProfile([FromBody] ApplyCustomProfileRequest request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             if (!ModelState.IsValid)
             {
                 return new BadRequestObjectResult(ModelState);

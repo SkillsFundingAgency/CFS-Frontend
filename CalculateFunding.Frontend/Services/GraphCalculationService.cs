@@ -7,6 +7,7 @@ using CalculateFunding.Frontend.ViewModels.Graph;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -19,12 +20,17 @@ namespace CalculateFunding.Frontend.Services
             IGraphApiClient graphApiClient,
             IMapper mapper)
         {
+            Guard.ArgumentNotNull(graphApiClient, nameof(graphApiClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+
             _graphApiClient = graphApiClient;
             _mapper = mapper;
         }
 
         public async Task<IActionResult> GetCalculationCircularDependencies(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             ApiResponse<IEnumerable<Entity<Calculation>>> getCircularDependenciesApiResponse
                 = await _graphApiClient.GetCircularDependencies(specificationId);
 

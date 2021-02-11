@@ -56,7 +56,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 		{
 			var actual = await _sut.GetCalculationById("FooBar");
 
-			actual.Should().BeOfType<BadRequestObjectResult>();
+			actual.Should().BeOfType<BadRequestResult>();
 		}
     }
 }

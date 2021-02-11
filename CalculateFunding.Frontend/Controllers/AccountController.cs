@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Constants;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +20,12 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IUsersApiClient _usersApiClient;
         private readonly IAuthorizationHelper _authHelper;
         private readonly IUserProfileService _userProfileService;
-        private readonly AuthenticationOptions _authenticationOptions;
 
         public AccountController(IUsersApiClient usersApiClient, IAuthorizationHelper authHelper, IUserProfileService userProfileService)
         {
+            Guard.ArgumentNotNull(usersApiClient, nameof(usersApiClient));
+            Guard.ArgumentNotNull(authHelper, nameof(authHelper));
+            Guard.ArgumentNotNull(userProfileService, nameof(userProfileService));
             _usersApiClient = usersApiClient;
             _authHelper = authHelper;
             _userProfileService = userProfileService;
@@ -40,7 +42,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/account/IsAuthenticated")]
         public IActionResult IsAuthenticated()
         {
-            if (User.Identity.IsAuthenticated)
+            if (IsUserAuthenticated())
             {
                 return new OkObjectResult(User.Identity);
             }
@@ -57,7 +59,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Ok();
             }
             
-            if (!User.Identity.IsAuthenticated)
+            if (!IsUserAuthenticated())
             {
                 return new UnauthorizedResult();
             }
@@ -92,7 +94,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Ok();
             }
 
-            if (!User.Identity.IsAuthenticated)
+            if (!IsUserAuthenticated())
             {
                 return new UnauthorizedResult();
             }
@@ -102,7 +104,7 @@ namespace CalculateFunding.Frontend.Controllers
             UserConfirmModel confirmSkillsModel = new UserConfirmModel
             {
                 Name = userProfile.Fullname,
-                Username = User.Identity.Name
+                Username = User?.Identity?.Name
             };
 
             ValidatedApiResponse<User> confirmResult = await _usersApiClient.ConfirmSkills(userProfile.Id, confirmSkillsModel);
@@ -119,5 +121,8 @@ namespace CalculateFunding.Frontend.Controllers
         {
             return _authHelper.GetType().FullName == typeof(LocalDevelopmentAuthorizationHelper).FullName;
         }
+
+        private bool IsUserAuthenticated() => 
+            User?.Identity?.IsAuthenticated == true;
     }
 }

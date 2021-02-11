@@ -18,10 +18,8 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 return match.Value.Trim();
             }
-            else
-            {
-                return paragraph;
-            }
+
+            return paragraph;
         }
     }
 }

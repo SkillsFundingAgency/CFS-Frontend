@@ -21,6 +21,7 @@ namespace CalculateFunding.Frontend.Controllers
         public JobsController(IJobsApiClient jobsApiClient, IMapper mapper)
         {
             Guard.ArgumentNotNull(jobsApiClient, nameof(jobsApiClient));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
 
             _jobsApiClient = jobsApiClient;
             _mapper = mapper;
@@ -31,11 +32,14 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/jobs/{specificationId}/{jobTypes}")]
         public async Task<IActionResult> GetSpecificationJobs([FromRoute] string specificationId, [FromRoute] string jobTypes)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(jobTypes, nameof(jobTypes));
+
             string[] jobTypesArray = jobTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
             ApiResponse<IEnumerable<JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypesArray);
 
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary", treatNoContentAsSuccess: true);
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("GetLatestJobsForSpecification", treatNoContentAsSuccess: true);
 
             if (errorResult != null)
             {
@@ -57,6 +61,9 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/jobs/latest-success/{specificationId}/{jobDefinitionId}")]
         public async Task<IActionResult> GetSpecificationLatestSucessfulJob([FromRoute] string specificationId, [FromRoute] string jobDefinitionId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(jobDefinitionId, nameof(jobDefinitionId));
+
             ApiResponse<JobSummary> response = await _jobsApiClient.GetLatestSuccessfulJobForSpecification(specificationId, jobDefinitionId);
 
             if (response.StatusCode == HttpStatusCode.NotFound)

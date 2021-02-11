@@ -46,6 +46,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveTimetable([FromBody] ReleaseTimetableViewModel viewModel)
         {
+            Guard.ArgumentNotNull(viewModel, nameof(viewModel));
+
             if (!await _authorizationHelper.DoesUserHavePermission(
                 User,
                 viewModel.SpecificationId,
@@ -81,6 +83,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTimetable(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             ApiResponse<SpecificationPublishDateModel> result =
                 await _specificationsApiClient.GetPublishDates(specificationId);
 
@@ -96,6 +100,8 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/specs/{specificationId}/selectforfunding")]
         public async Task<IActionResult> SelectSpecificationForFunding(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             return await ChooseRefresh(specificationId, SpecificationActionTypes.CanChooseFunding);
         }
 
@@ -103,6 +109,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> RefreshFunding(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             return await ChooseRefresh(specificationId, SpecificationActionTypes.CanRefreshFunding);
         }
 
@@ -110,10 +118,11 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> ValidateSpecificationForRefresh(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             ValidatedApiResponse<IEnumerable<string>> response =
                 await _publishingApiClient.ValidateSpecificationForRefresh(specificationId);
 
-            
             return response.Handle(nameof(Specification), 
                 onSuccess: x => Ok(), 
                 treatNoContentAsSuccess: true);
@@ -123,6 +132,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> ApproveFunding(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             if (!await _authorizationHelper.DoesUserHavePermission(
                 User,
                 specificationId,
@@ -147,6 +158,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> PublishFunding(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             if (!await _authorizationHelper.DoesUserHavePermission(
                 User,
                 specificationId,
@@ -166,6 +179,8 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProviderStatusCounts(string specificationId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
             ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> result =
                 await _publishingApiClient.GetProviderStatusCounts(specificationId);
 
@@ -181,6 +196,9 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetPublishedProviderTransactions(string specificationId, string providerId)
         {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
             ApiResponse<IEnumerable<PublishedProviderTransaction>> result =
                 await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
 
@@ -493,7 +511,7 @@ namespace CalculateFunding.Frontend.Controllers
             [FromRoute] string specificationId)
         {
             Guard.ArgumentNotNull(request, nameof(request));
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<PublishedProviderDataDownload> response = 
                 await _publishingApiClient.GenerateCsvForBatchPublishedProvidersForApproval(request, specificationId);
@@ -506,7 +524,7 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> GenerateCsvForAllPublishedProvidersForApproval(
             [FromRoute] string specificationId)
         {
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<PublishedProviderDataDownload> response =
                 await _publishingApiClient.GenerateCsvForAllPublishedProvidersForApproval(specificationId);
@@ -521,7 +539,7 @@ namespace CalculateFunding.Frontend.Controllers
             [FromRoute] string specificationId)
         {
             Guard.ArgumentNotNull(request, nameof(request));
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<PublishedProviderDataDownload> response =
                 await _publishingApiClient.GenerateCsvForBatchPublishedProvidersForRelease(request, specificationId);
@@ -534,7 +552,7 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> GenerateCsvForAllPublishedProvidersForRelease(
             [FromRoute] string specificationId)
         {
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<PublishedProviderDataDownload> response =
                 await _publishingApiClient.GenerateCsvForAllPublishedProvidersForRelease(specificationId);

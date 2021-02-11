@@ -35,7 +35,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/specs/{specificationId}/scenario-compile")]
         public async Task<IActionResult> CompileTestScenario(string specificationId, [FromBody] ScenarioCompileViewModel vm)
         {
-            Guard.ArgumentNotNull(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(vm, nameof(vm));
 
             if (!ModelState.IsValid)

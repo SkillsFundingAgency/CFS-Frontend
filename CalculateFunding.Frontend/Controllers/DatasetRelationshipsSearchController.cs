@@ -26,9 +26,18 @@ namespace CalculateFunding.Frontend.Controllers
         private IMapper _mapper;
         private IDatasetsApiClient _datasetsApiClient;
 
-        public DatasetRelationshipsSearchController(IDatasetRelationshipsSearchService searchService, ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper, IMapper mapper, IDatasetsApiClient datasetsApiClient)
+        public DatasetRelationshipsSearchController(
+            IDatasetRelationshipsSearchService searchService, 
+            ISpecificationsApiClient specificationsApiClient, 
+            IAuthorizationHelper authorizationHelper, 
+            IMapper mapper, 
+            IDatasetsApiClient datasetsApiClient)
         {
             Guard.ArgumentNotNull(searchService, nameof(searchService));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
+            Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
+            Guard.ArgumentNotNull(datasetsApiClient, nameof(datasetsApiClient));
 
             _searchService = searchService;
             _specificationsApiClient = specificationsApiClient;
@@ -61,7 +70,8 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<SpecificationSummary> specificationResponse = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+            ApiResponse<SpecificationSummary> specificationResponse =
+                await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
 
             if (specificationResponse.StatusCode != HttpStatusCode.OK)
             {
@@ -83,7 +93,8 @@ namespace CalculateFunding.Frontend.Controllers
             SpecificationSummaryViewModel vm = _mapper.Map<SpecificationSummaryViewModel>(specification);
             SpecificationDatasetRelationshipsViewModel viewModel = new SpecificationDatasetRelationshipsViewModel(vm);
 
-            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> apiResponse = await _datasetsApiClient.GetRelationshipsBySpecificationId(specification.Id);
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> apiResponse = 
+                await _datasetsApiClient.GetRelationshipsBySpecificationId(specification.Id);
 
             if (apiResponse.StatusCode != HttpStatusCode.OK || apiResponse.Content == null)
             {

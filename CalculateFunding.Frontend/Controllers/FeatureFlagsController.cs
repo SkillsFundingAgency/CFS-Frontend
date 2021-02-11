@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.FeatureManagement;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CalculateFunding.Common.Utility;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -14,6 +15,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         public FeatureFlagsController(IFeatureManager featureManager)
         {
+            Guard.ArgumentNotNull(featureManager, nameof(featureManager));
             _featureManager = featureManager;
         }
 

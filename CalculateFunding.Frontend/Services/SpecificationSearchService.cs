@@ -6,7 +6,7 @@
     using AutoMapper;
     using Common.Utility;
     using Common.ApiClient.Models;
-    using CalculateFunding.Common.ApiClient.Specifications;
+    using Common.ApiClient.Specifications;
     using CalculateFunding.Frontend.Interfaces.Services;
     using CalculateFunding.Frontend.ViewModels.Common;
     using ViewModels.Specs;
@@ -25,7 +25,6 @@
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(logger, nameof(logger));
 
-
             _specsApiClient = specsApiClient;
             _mapper = mapper;
             _logger = logger;
@@ -33,6 +32,8 @@
 
         public async Task<SpecificationSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,

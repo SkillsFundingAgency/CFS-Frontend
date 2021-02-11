@@ -32,22 +32,28 @@ namespace CalculateFunding.Frontend.Services
         }
 
         public async Task<CalculationSearchResultViewModel> PerformSearch(string specificationId,
-	        CalculationType calculationType,
-	        PublishStatus? status,
-	        string searchTerm,
-	        int? page)
+            CalculationType calculationType,
+            PublishStatus? status,
+            string searchTerm,
+            int? page)
         {
-	        ApiResponse<SearchResults<CalculationSearchResult>> calculationsResult = await _calculationsApiClient.SearchCalculationsForSpecification(specificationId,
-		        calculationType,
-		        status,
-		        searchTerm,
-		        page);
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(calculationType, nameof(calculationType));
 
-	        return BuildResults(calculationsResult, page.GetValueOrDefault(1), 50);
+            ApiResponse<SearchResults<CalculationSearchResult>> calculationsResult =
+                await _calculationsApiClient.SearchCalculationsForSpecification(specificationId,
+                    calculationType,
+                    status,
+                    searchTerm,
+                    page);
+
+            return BuildResults(calculationsResult, page.GetValueOrDefault(1), 50);
         }
 
         public async Task<CalculationSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
+            Guard.ArgumentNotNull(request, nameof(request));
+
             SearchFilterRequest requestOptions = new SearchFilterRequest()
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
@@ -64,53 +70,60 @@ namespace CalculateFunding.Frontend.Services
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            ApiResponse<SearchResults<CalculationSearchResult>> calculationsResult = await _calculationsApiClient.FindCalculations(requestOptions);
+            ApiResponse<SearchResults<CalculationSearchResult>> calculationsResult =
+                await _calculationsApiClient.FindCalculations(requestOptions);
 
             return BuildResults(calculationsResult, requestOptions.Page, requestOptions.PageSize);
         }
 
-        private CalculationSearchResultViewModel BuildResults(ApiResponse<SearchResults<CalculationSearchResult>> calculationsResult, int page, int pageSize)
+        private CalculationSearchResultViewModel BuildResults(
+            ApiResponse<SearchResults<CalculationSearchResult>> calculationsResultResponse, int page, int pageSize)
         {
-	        if (calculationsResult == null)
-	        {
-		        _logger.Error("Find calculations HTTP request failed");
-		        return null;
-	        }
+            if (calculationsResultResponse?.Content == null)
+            {
+                _logger.Error("Find calculations HTTP request failed");
+                return null;
+            }
 
-	        CalculationSearchResultViewModel result = new CalculationSearchResultViewModel
-	        {
-		        TotalResults = calculationsResult.Content?.TotalCount ?? 0,
-		        CurrentPage = page,
-		        Calculations = calculationsResult.Content?.Results?.Select(m => _mapper.Map<CalculationSearchResultItemViewModel>(m))
-	        };
+            SearchResults<CalculationSearchResult> calculationsResult = calculationsResultResponse.Content;
 
-	        List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
-	        if (calculationsResult.Content != null && calculationsResult.Content.Facets != null)
-	        {
-		        searchFacets.AddRange(calculationsResult.Content.Facets.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)));
-	        }
+            CalculationSearchResultViewModel result = new CalculationSearchResultViewModel
+            {
+                TotalResults = calculationsResult.TotalCount,
+                CurrentPage = page,
+                Calculations = calculationsResult.Results?.Select(m =>
+                    _mapper.Map<CalculationSearchResultItemViewModel>(m))
+            };
 
-	        result.Facets = searchFacets.AsEnumerable();
+            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
+            if (calculationsResult.Facets != null)
+            {
+                searchFacets.AddRange(calculationsResultResponse.Content.Facets.Select(facet =>
+                    _mapper.Map<SearchFacetViewModel>(facet)));
+            }
 
-	        if (result.TotalResults == 0)
-	        {
-		        result.StartItemNumber = 0;
-		        result.EndItemNumber = 0;
-	        }
-	        else
-	        {
-		        result.StartItemNumber = ((page - 1) * pageSize) + 1;
-		        result.EndItemNumber = result.StartItemNumber + pageSize - 1;
-	        }
+            result.Facets = searchFacets.AsEnumerable();
 
-	        if (result.EndItemNumber > result.TotalResults)
-	        {
-		        result.EndItemNumber = result.TotalResults;
-	        }
+            if (result.TotalResults == 0)
+            {
+                result.StartItemNumber = 0;
+                result.EndItemNumber = 0;
+            }
+            else
+            {
+                result.StartItemNumber = ((page - 1) * pageSize) + 1;
+                result.EndItemNumber = result.StartItemNumber + pageSize - 1;
+            }
 
-            result.PagerState = new PagerState(page, (int)Math.Ceiling(result.TotalResults / (double)pageSize), 2);
+            if (result.EndItemNumber > result.TotalResults)
+            {
+                result.EndItemNumber = result.TotalResults;
+            }
 
-	        return result;
+            result.PagerState =
+                new PagerState(page, (int) Math.Ceiling(result.TotalResults / (double) pageSize), 2);
+
+            return result;
         }
     }
 }
