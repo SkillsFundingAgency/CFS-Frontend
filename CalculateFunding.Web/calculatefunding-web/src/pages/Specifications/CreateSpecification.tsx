@@ -7,26 +7,23 @@ import * as providerVersionService from "../../services/providerVersionService";
 import {FundingPeriod} from "../../types/viewFundingTypes";
 import {CoreProviderSummary, ProviderSnapshot, ProviderSource} from "../../types/CoreProviderSummary";
 import {CreateSpecificationModel} from "../../types/Specifications/CreateSpecificationModel";
-import {LoadingStatus} from "../../components/LoadingStatus";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
-import {HubConnectionBuilder} from "@microsoft/signalr";
 import {PublishedFundingTemplate} from "../../types/TemplateBuilderDefinitions";
 import * as providerService from "../../services/providerService";
-import {CompletionStatus} from "../../types/CompletionStatus";
-import {RunningStatus} from "../../types/RunningStatus";
 import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {JobResponse} from "../../types/jobDetails";
 import {useFundingStreams} from "../../hooks/useFundingStreams";
 import {useQuery} from "react-query";
 import {AxiosError} from "axios";
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {milliseconds} from "../../helpers/TimeInMs";
 import {ProviderDataTrackingMode} from "../../types/Specifications/ProviderDataTrackingMode";
+import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
+import {JobNotificationBanner, SpinnerDisplaySetting} from "../../components/Jobs/JobNotificationBanner";
 
 export function CreateSpecification() {
     const {fundingStreams, isLoadingFundingStreams} = useFundingStreams(true);
@@ -71,7 +68,6 @@ export function CreateSpecification() {
             }
         }
     );
-
     const {data: coreProviders, isLoading: isLoadingCoreProviders} = useQuery<CoreProviderSummary[], AxiosError>(
         `coreProviderSummary-for-${selectedFundingStreamId}`,
         async () => (await providerVersionService.getCoreProvidersByFundingStream(selectedFundingStreamId as string)).data,
@@ -96,7 +92,6 @@ export function CreateSpecification() {
                 clearErrorMessages(["selectCoreProvider"])
         }
     );
-
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(selectedFundingStreamId, selectedFundingPeriodId,
             err => addError({error: err, description: "Error while loading funding configuration"}),
@@ -109,44 +104,19 @@ export function CreateSpecification() {
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
     const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
 
+    const {newJob} = useJobMonitor({
+        filterBy: {specificationId: newSpecificationId},
+        isEnabled: isSaving && newSpecificationId.length > 0,
+        onError: err => addError({error: err, description: "An error occurred while creating this specification"})
+    });
+
     useEffect(() => {
-        if (newSpecificationId?.length === 0) return;
+        if (!newJob) return;
 
-        const createHubConnection = async () => {
-            const hubConnect = new HubConnectionBuilder()
-                .withUrl(`/api/notifications`)
-                .build();
-            hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
-            hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
-
-            try {
-                await hubConnect.start();
-
-                hubConnect.on('NotificationEvent', (message: JobResponse) => {
-                    if (message.jobType === "CreateSpecificationJob" &&
-                        message.runningStatus === RunningStatus.Completed &&
-                        message.specificationId === newSpecificationId) {
-                        hubConnect.invoke("StopWatchingForAllNotifications").then(() => {
-                            hubConnect.stop();
-                        });
-                        if (message.completionStatus !== CompletionStatus.Succeeded) {
-                            addError({error: message.outcome ? message.outcome : "Job failed", description: "Error while creating specification", suggestion: errorSuggestion});
-                        } else {
-                            history.push(`/ViewSpecification/${newSpecificationId}`);
-                        }
-                    }
-                });
-
-                await hubConnect.invoke("StartWatchingForAllNotifications");
-
-            } catch (err) {
-                await hubConnect.stop();
-                history.push(`/ViewSpecification/${newSpecificationId}`);
-            }
-        };
-
-        createHubConnection();
-    }, [newSpecificationId]);
+        if (newJob.isSuccessful) {
+            history.push(`/ViewSpecification/${newSpecificationId}`);
+        }
+    }, [newJob]);
 
     function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
@@ -291,12 +261,17 @@ export function CreateSpecification() {
                 <Breadcrumb name={"Create specification"}/>
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
-                <LoadingStatus title={"Creating Specification"}
-                               subTitle={"Please wait whilst we create the specification"}
-                               description={"This can take a few minutes"} id={"create-specification"}
-                               hidden={!isSaving}/>
 
                 <MultipleErrorSummary errors={errors}/>
+
+                <JobNotificationBanner job={newJob}
+                                       isCheckingForJob={isSaving && newJob === undefined}
+                                       spinner={{
+                                           display: SpinnerDisplaySetting.ShowPageSpinner,
+                                           loadingText: "Creating Specification",
+                                           loadingDescription: "This can take a few minutes"
+                                       }}
+                />
 
                 <fieldset hidden={isSaving} className="govuk-fieldset" id="create-specification-fieldset">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">

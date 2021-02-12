@@ -7,7 +7,7 @@ import {
     getDatasetHistoryService,
     updateDatasetService, uploadDatasetVersionService, validateDatasetService
 } from "../../../services/datasetService";
-import * as monitor from "../../../hooks/Jobs/useMonitorForAnyNewJob";
+import * as monitor from "../../../hooks/Jobs/useJobMonitor";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import userEvent from "@testing-library/user-event";
@@ -162,7 +162,7 @@ const submitForm = async() =>
     userEvent.click(saveButton);
 }
 
-const jobMonitorSpy = jest.spyOn(monitor, 'useMonitorForAnyNewJob');
+const jobMonitorSpy = jest.spyOn(monitor, 'useJobMonitor');
 jobMonitorSpy.mockImplementation(() => {
     return {
         newJob: undefined

@@ -52,7 +52,7 @@ export const useMonitorForNewSpecificationJob = (
                     }
                 });
                 await hubConnect.start();
-                await hubConnect.invoke("StartWatchingForAllNotifications");
+                await hubConnect.invoke("StartWatchingForSpecificationNotifications", specId);
                 setHubConnection(hubConnect);
             }
         } catch (err) {

@@ -30,7 +30,7 @@ import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetails
 import {usePermittedFundingStreams} from "../../hooks/useFundingStreamPermissions";
 import {UserPermission} from "../../types/UserPermission";
 import {useErrors} from "../../hooks/useErrors";
-import {useMonitorForAnyNewJob} from "../../hooks/Jobs/useMonitorForAnyNewJob";
+import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {JobType} from "../../types/jobType";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
@@ -59,9 +59,10 @@ export function LoadNewDataSource() {
     const requiredPermission = UserPermission.CanUploadDataSourceFiles;
     const permittedFundingStreams = usePermittedFundingStreams(requiredPermission);
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
-    const {newJob} = useMonitorForAnyNewJob(
-        [JobType.ValidateDatasetJob],
-        err => addError({error: err, description: "An error occurred while monitoring the running jobs."}));
+    const {newJob} = useJobMonitor({
+        filterBy: {jobTypes: [JobType.ValidateDatasetJob]},
+        onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
+    });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
     const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
     const validExtensions = [".csv", ".xls", ".xlsx"];

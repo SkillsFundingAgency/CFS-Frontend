@@ -12,7 +12,7 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
         return null;
     }
 
-    if (props.displaySuccessfulJob != null && props.displaySuccessfulJob === false && props.job.isSuccessful)
+    if (props.displaySuccessfulJob != null && !props.displaySuccessfulJob && props.job.isSuccessful)
     {
         return null;
     }

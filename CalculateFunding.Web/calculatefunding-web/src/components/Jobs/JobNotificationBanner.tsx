@@ -3,19 +3,47 @@ import {DateFormatter} from "../DateFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {JobDetails} from "../../types/jobDetails";
+import {LoadingStatus} from "../LoadingStatus";
 
+export enum SpinnerDisplaySetting {
+    HideSpinner,
+    ShowFieldSpinner,
+    ShowPageSpinner
+}
+export interface SpinnerSettings {
+    display: SpinnerDisplaySetting,
+    loadingText?: string,
+    loadingDescription?: string
+}
 export interface JobNotificationBannerProps {
     job: JobDetails | undefined,
     isCheckingForJob: boolean,
     jobCompletedOutcomeFailedMessage?: string
-    jobFailedMessage?: string
+    jobFailedMessage?: string,
+    spinner?: SpinnerSettings
 }
 
 export function JobNotificationBanner(props: JobNotificationBannerProps) {
+    
     if (props.isCheckingForJob) {
-        return <div className=" govuk-!-margin-bottom-4">
-            <LoadingFieldStatus title={"Checking for running jobs"}/>
-        </div>
+        const displaySetting = props.spinner && props.spinner.display ? props.spinner.display : SpinnerDisplaySetting.ShowFieldSpinner;
+        switch (displaySetting) {
+            case SpinnerDisplaySetting.ShowFieldSpinner:
+                return <div className=" govuk-!-margin-bottom-4">
+                    <LoadingFieldStatus 
+                        title={props.spinner?.loadingText ? props.spinner.loadingText : "Checking for running jobs"}
+                    />
+                </div>
+            case SpinnerDisplaySetting.ShowPageSpinner:
+                return <div className=" govuk-!-margin-bottom-4">
+                    <LoadingStatus 
+                        title={props.spinner?.loadingText ? props.spinner.loadingText : "Checking for running jobs"}
+                        description={props.spinner?.loadingDescription}
+                    />
+                </div>
+            default:
+                return null;
+        }
     }
 
     if (!props.job) {

@@ -26,7 +26,7 @@ import {MergeMatch} from "./MergeSummary/MergeMatch";
 import {MergeDatasetViewModel} from "../../types/Datasets/MergeDatasetViewModel";
 import {JobType} from "../../types/jobType";
 import {useErrors} from "../../hooks/useErrors";
-import {useMonitorForAnyNewJob} from "../../hooks/Jobs/useMonitorForAnyNewJob";
+import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
 
@@ -65,10 +65,10 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
     const history = useHistory();
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
-    const {newJob} = useMonitorForAnyNewJob(
-        [JobType.ValidateDatasetJob],
-        err => addError({error: err, description: "An error occurred while monitoring the running jobs."})
-    );
+    const {newJob} = useJobMonitor({
+        filterBy: {jobTypes: [JobType.ValidateDatasetJob]},
+        onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
+    });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
 
     useEffect(() => {

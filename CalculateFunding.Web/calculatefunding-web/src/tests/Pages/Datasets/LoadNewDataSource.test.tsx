@@ -11,7 +11,7 @@ import {
     uploadDataSourceService, validateDatasetService
 } from "../../../services/datasetService";
 import userEvent from "@testing-library/user-event";
-import * as monitor from "../../../hooks/Jobs/useMonitorForAnyNewJob";
+import * as monitor from "../../../hooks/Jobs/useJobMonitor";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 
@@ -726,7 +726,7 @@ jest.mock('react-router', () => ({
     }),
 }));
 
-const jobMonitorSpy = jest.spyOn(monitor, 'useMonitorForAnyNewJob');
+const jobMonitorSpy = jest.spyOn(monitor, 'useJobMonitor');
 jobMonitorSpy.mockImplementation(() => {
     return {
         newJob: undefined
