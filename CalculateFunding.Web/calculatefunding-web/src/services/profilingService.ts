@@ -4,8 +4,11 @@ import {FundingStreamPeriodProfilePattern} from "../types/ProviderProfileTotalsF
 
 const baseURL = "/api/profiling";
 
-export async function getProfilePatternsService(fundingStreamId: string, fundingPeriodId: string) {
-    return axios.get(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}`);
+export async function getProfilePatternsForFundingLine(fundingStreamId: string, fundingPeriodId: string, fundingLineId: string) {
+    return axios(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}/fundingLineId/${fundingLineId}`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    });
 }
 
 export async function getAllProfilePatterns(fundingStreamId: string, fundingPeriodId: string) {

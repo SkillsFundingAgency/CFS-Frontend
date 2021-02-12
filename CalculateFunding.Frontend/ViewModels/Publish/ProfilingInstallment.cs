@@ -9,18 +9,21 @@ namespace CalculateFunding.Frontend.ViewModels.Publish
 		public string InstallmentMonth { get; }
 		public int InstallmentNumber { get; }
 		public decimal InstallmentValue { get; }
-		public bool IsPaid { get; private set; }
+        public string PeriodType { get; set; }
+        public bool IsPaid { get; private set; }
 
-		public ProfilingInstallment(
+        public ProfilingInstallment(
 			int installmentYear, 
 			string installmentMonth, 
 			int installmentNumber, 
-			decimal installmentValue)
+			decimal installmentValue,
+            string periodType)
 		{
 			InstallmentYear = installmentYear;
 			InstallmentMonth = installmentMonth;
 			InstallmentNumber = installmentNumber;
 			InstallmentValue = installmentValue;
+            PeriodType = periodType;
 
 			CalculateIsPaidValue();
 		}
@@ -28,8 +31,7 @@ namespace CalculateFunding.Frontend.ViewModels.Publish
 		private void CalculateIsPaidValue()
 		{
 			int month = DateTime.ParseExact(InstallmentMonth, "MMMM", CultureInfo.CurrentCulture).Month;
-
-			IsPaid = InstallmentYear < DateTime.Now.Year ||
+            IsPaid = InstallmentYear < DateTime.Now.Year ||
 			         InstallmentYear == DateTime.Now.Year && month < DateTime.Now.Month;
 		}
 	}

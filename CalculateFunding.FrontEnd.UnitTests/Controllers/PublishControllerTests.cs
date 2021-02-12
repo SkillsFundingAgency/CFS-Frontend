@@ -317,21 +317,24 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 Occurrence = 1,
                 TypeValue = "October",
                 Year = DateTime.Now.AddYears(-1).Year,
-                Value = 111.0m
+                Value = 111.0m,
+                PeriodType = "CalendarMonth"
             };
             ProfileTotal aProfileTotalOneMonthInThePast = new ProfileTotal
             {
                 Occurrence = 2,
                 TypeValue = DateTime.Now.AddMonths(-1).ToString("MMMM"),
                 Year = DateTime.Now.AddMonths(-1).Year,
-                Value = 112.0m
+                Value = 112.0m,
+                PeriodType = "CalendarMonth"
             };
             ProfileTotal aProfileTotalOneYearInTheFuture = new ProfileTotal
             {
                 Occurrence = 3,
                 TypeValue = "April",
                 Year = DateTime.Now.AddYears(1).Year,
-                Value = 113.0m
+                Value = 113.0m,
+                PeriodType = "CalendarMonth"
             };
             List<ProfileTotal> profileTotals = new List<ProfileTotal>
             {

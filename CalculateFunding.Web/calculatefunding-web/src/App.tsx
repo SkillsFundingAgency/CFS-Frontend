@@ -156,7 +156,7 @@ const App: React.FunctionComponent = () => {
                         {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
                         <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation}/>
                         <Route path="/Specifications/EditCalculation/:calculationId" component={EditCalculation}/>
-                        <Route path="/Specifications/EditVariationPoints/:specificationId" component={EditVariationPoints}/>
+                        <Route path="/Specifications/EditVariationPoints/:specificationId/:fundingLineId" component={EditVariationPoints}/>
                         <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
                         <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
                         <Route path="*">

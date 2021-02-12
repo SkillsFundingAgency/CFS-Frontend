@@ -24,6 +24,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     {
         private const string ValidFundingStreamId = "A Valid Funding Stream ID";
         private const string ValidFundingPeriodId = "A Valid Funding Period ID";
+        private const string ValidFundingLineId = "A Valid Funding Line ID";
 
         private Mock<IProfilingApiClient> _profilingApiClient;
         private ProfilingController _profilingController;
@@ -68,12 +69,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 FundingPeriodId = NewRandomString(),
                 FundingStreamId = NewRandomString(),
                 ProfilePatternKey = NewRandomString()
-            };       
-            
+            };
+
             IEnumerable<ProfileTotal> profileTotals = ArraySegment<ProfileTotal>.Empty;
-            
+
             GivenTheProfilePreview(requestViewModel, profileTotals);
-            
+
             OkObjectResult result = await WhenTheProfileChangeIsPreviewed(requestViewModel) as OkObjectResult;
 
             result?
@@ -134,11 +135,24 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             };
             List<ProfilingInstallment> expectedFutureInstallments = new List<ProfilingInstallment>
             {
+                 new ProfilingInstallment(
+                    profilePeriodPatternInThePast.PeriodYear,
+                    profilePeriodPatternInThePast.Period,
+                    profilePeriodPatternInThePast.Occurrence,
+                    0,
+                    profilePeriodPatternInThePast.PeriodType.ToString()),
+                new ProfilingInstallment(
+                    profilePeriodPatternInTheCurrentTime.PeriodYear,
+                    profilePeriodPatternInTheCurrentTime.Period,
+                    profilePeriodPatternInTheCurrentTime.Occurrence,
+                    0,
+                    profilePeriodPatternInTheCurrentTime.PeriodType.ToString()),
                 new ProfilingInstallment(
                     profilePeriodPatternInTheFuture.PeriodYear,
                     profilePeriodPatternInTheFuture.Period,
                     profilePeriodPatternInTheFuture.Occurrence,
-                    0)
+                    0,
+                    profilePeriodPatternInTheFuture.PeriodType.ToString())
             };
             _profilingApiClient.Setup(_ =>
                     _.GetProfilePatternsForFundingStreamAndFundingPeriod(It.IsAny<string>(), It.IsAny<string>()))
@@ -149,6 +163,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                         {
                             FundingPeriodId = ValidFundingPeriodId,
                             FundingStreamId = ValidFundingStreamId,
+                            FundingLineId = ValidFundingLineId,
                             FundingStreamPeriodEndDate = new DateTime(2021, 3, 31),
                             FundingStreamPeriodStartDate = new DateTime(2020, 4, 1),
                             ProfilePattern = new[]
@@ -161,9 +176,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                         }
                     }));
 
-            IActionResult actionResult = await _profilingController.GetFutureInstallments(
+            IActionResult actionResult = await _profilingController.GetProfilingInstalments(
                 ValidFundingStreamId,
-                ValidFundingPeriodId);
+                ValidFundingPeriodId,
+                ValidFundingLineId);
 
             actionResult.Should().BeAssignableTo<OkObjectResult>();
             List<ProfilingInstallment> futureInstallmentsResult = actionResult.As<OkObjectResult>().Value.As<List<ProfilingInstallment>>();
@@ -173,9 +189,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetFutureInstallments_Returns_InternalServerError_Result_Given_No_Result_Is_Returned_From_Client()
         {
-            IActionResult result = await _profilingController.GetFutureInstallments(
+            IActionResult result = await _profilingController.GetProfilingInstalments(
                 ValidFundingStreamId,
-                ValidFundingPeriodId);
+                ValidFundingPeriodId,
+                ValidFundingLineId);
 
             result.Should().BeAssignableTo<InternalServerErrorResult>();
         }
@@ -187,9 +204,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _.GetProfilePatternsForFundingStreamAndFundingPeriod(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(new ApiResponse<IEnumerable<FundingStreamPeriodProfilePattern>>(HttpStatusCode.NotFound));
 
-            IActionResult result = await _profilingController.GetFutureInstallments(
+            IActionResult result = await _profilingController.GetProfilingInstalments(
                 ValidFundingStreamId,
-                ValidFundingPeriodId);
+                ValidFundingPeriodId,
+                ValidFundingLineId);
 
             result.Should().BeAssignableTo<NotFoundObjectResult>();
         }
@@ -227,9 +245,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                         }
                     }));
 
-            IActionResult actionResult = await _profilingController.GetFutureInstallments(
+            IActionResult actionResult = await _profilingController.GetProfilingInstalments(
                 ValidFundingStreamId,
-                ValidFundingPeriodId);
+                ValidFundingPeriodId,
+                ValidFundingLineId);
 
             actionResult.Should().BeAssignableTo<OkObjectResult>();
             List<ProfilingInstallment> futureInstallmentsResult = actionResult.As<OkObjectResult>().Value.As<List<ProfilingInstallment>>();

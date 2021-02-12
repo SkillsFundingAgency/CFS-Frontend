@@ -5,10 +5,14 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models;
+using CalculateFunding.Common.TemplateMetadata.Enums;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
@@ -23,6 +27,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class SpecificationControllerTests
     {
         private ISpecificationsApiClient _specificationsApiClient;
+        private IPoliciesApiClient _policiesApiClient;
         private IAuthorizationHelper _authorizationHelper;
         private SpecificationController _specificationController;
 
@@ -31,8 +36,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             _authorizationHelper = Substitute.For<IAuthorizationHelper>();
             _specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
+            _policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
-            _specificationController = new SpecificationController(_specificationsApiClient, _authorizationHelper);
+            _specificationController = new SpecificationController(_specificationsApiClient, _policiesApiClient, _authorizationHelper);
         }
 
         [TestMethod]
@@ -144,7 +150,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             result.Should().BeOfType<OkObjectResult>();
 
             OkObjectResult typedResult = result as OkObjectResult;
-            IEnumerable<SpecificationSummary> specificationSummariesResult = (IEnumerable<SpecificationSummary>) typedResult.Value;
+            IEnumerable<SpecificationSummary> specificationSummariesResult = (IEnumerable<SpecificationSummary>)typedResult.Value;
 
             specificationSummariesResult.First().Name.Should().Be(selectedForFundingOnFirstOrder.Name);
             specificationSummariesResult.Last().Name.Should().Be(selectedForFundingOnSecondOrder.Name);
@@ -221,16 +227,72 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetProfileVariationPointers_Returns_Funding_Streams_Given_A_Successful_Request()
         {
             string aValidSpecificationId = "ABC";
+            string aValidFundingStreamId = "345";
+            string aValidFundingPeriodId = "123";
+            string aValidTemplateVersion = "1.0";
+
             List<ProfileVariationPointer> aValidProfileVariationPointers = CreateTestProfileVariationPointers().ToList();
+            List<FundingLineProfileVariationPointer> validFundingLineProfileVariationPointers = aValidProfileVariationPointers
+                .Select(s => new FundingLineProfileVariationPointer
+                {
+                    FundingLineId = s.FundingLineId,
+                    ProfileVariationPointer = s
+                }).ToList();
+
             _specificationsApiClient
                 .GetProfileVariationPointers(aValidSpecificationId)
                 .Returns(Task.FromResult(
                     new ApiResponse<IEnumerable<ProfileVariationPointer>>(HttpStatusCode.OK, aValidProfileVariationPointers)));
 
+            _specificationsApiClient
+                .GetSpecificationSummaryById(aValidSpecificationId)
+                .Returns(Task.FromResult(
+                    new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary
+                    {
+                        FundingStreams = new List<Reference>
+                        {
+                            new Reference
+                            {
+                                Id = aValidFundingStreamId,
+                                Name = aValidFundingStreamId
+                            }
+                        },
+                        FundingPeriod = new Reference
+                        {
+                            Id = aValidFundingPeriodId,
+                            Name = aValidFundingPeriodId
+                        },
+                        TemplateIds = new Dictionary<string, string>
+                        {
+                            { aValidFundingStreamId, aValidTemplateVersion }
+                        }
+                    })));
+
+            _policiesApiClient
+                .GetDistinctTemplateMetadataFundingLinesContents(aValidFundingStreamId, aValidFundingPeriodId, aValidTemplateVersion)
+                .Returns(Task.FromResult(
+                    new ApiResponse<TemplateMetadataDistinctFundingLinesContents>(HttpStatusCode.OK,
+                        new TemplateMetadataDistinctFundingLinesContents
+                        {
+                            FundingLines = new List<TemplateMetadataFundingLine>
+                            {
+                                new TemplateMetadataFundingLine
+                                {
+                                    FundingLineCode = "Funding line 1",
+                                    Type = FundingLineType.Payment
+                                },
+                                new TemplateMetadataFundingLine
+                                {
+                                    FundingLineCode = "Funding line 2",
+                                    Type = FundingLineType.Payment
+                                }
+                            }
+                        })));
+
             IActionResult result = await _specificationController.GetProfileVariationPointers(aValidSpecificationId);
 
-            result.As<OkObjectResult>().Value.As<List<ProfileVariationPointer>>().Should()
-                .BeEquivalentTo(aValidProfileVariationPointers);
+            result.As<OkObjectResult>().Value.As<IEnumerable<FundingLineProfileVariationPointer>>().Should()
+                .BeEquivalentTo(validFundingLineProfileVariationPointers);
         }
 
         [TestMethod]
@@ -298,7 +360,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             {
                 CanCreateSpecification = true
             });
-            
+
             _specificationsApiClient.CreateSpecification(Arg.Any<CreateSpecificationModel>())
                 .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.BadRequest));
 
@@ -309,7 +371,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Should()
                 .BeOfType<BadRequestObjectResult>();
         }
-        
+
         [TestMethod]
         public async Task UpdateSpecification_ReturnsBadRequestObjectResultWhenApiResponseIsBadRequest()
         {
@@ -317,7 +379,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.BadRequest));
 
 
-            IActionResult actionResult = await _specificationController.UpdateSpecification( new EditSpecificationModel(), NewRandomString());
+            IActionResult actionResult = await _specificationController.UpdateSpecification(new EditSpecificationModel(), NewRandomString());
 
             actionResult
                 .Should()

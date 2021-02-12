@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -58,13 +57,15 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/profiling/patterns/fundingStream/{fundingStreamId}/fundingPeriod/{fundingPeriodId}")]
-        public async Task<IActionResult> GetFutureInstallments(
+        [Route("api/profiling/patterns/fundingStream/{fundingStreamId}/fundingPeriod/{fundingPeriodId}/fundingLineId/{fundingLineId}")]
+        public async Task<IActionResult> GetProfilingInstalments(
             string fundingStreamId,
-            string fundingPeriodId)
+            string fundingPeriodId,
+            string fundingLineId)
         {
             Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
             Guard.ArgumentNotNull(fundingPeriodId, nameof(fundingPeriodId));
+            Guard.ArgumentNotNull(fundingLineId, nameof(fundingLineId));
 
             ApiResponse<IEnumerable<FundingStreamPeriodProfilePattern>> apiResponse =
                 await _profilingApiClient.GetProfilePatternsForFundingStreamAndFundingPeriod(fundingStreamId,
@@ -79,18 +80,13 @@ namespace CalculateFunding.Frontend.Controllers
             IEnumerable<FundingStreamPeriodProfilePattern> fundingStreamPeriodProfilePatterns =
                 apiResponse.Content;
 
-            var profilePatterns =
-                fundingStreamPeriodProfilePatterns.SelectMany(p => p.ProfilePattern).ToList();
+            var profilePatterns = fundingStreamPeriodProfilePatterns
+                .Where(p => p.FundingLineId == fundingLineId)
+                .SelectMany(p => p.ProfilePattern).ToList();
 
-            var futureProfilePatterns = profilePatterns.Where(f =>
-                    f.PeriodYear > DateTime.Now.Year ||
-                    f.PeriodYear == DateTime.Now.Year &&
-                    f.PeriodStartDate.Month > DateTime.Now.Month)
-                .ToList();
-
-            return Ok(!futureProfilePatterns.Any()
+            return Ok(!profilePatterns.Any()
                 ? new List<ProfilingInstallment>()
-                : MapToFutureInstallmentModel(futureProfilePatterns));
+                : MapToProfilingInstallment(profilePatterns));
         }
 
         [HttpGet]
@@ -130,19 +126,21 @@ namespace CalculateFunding.Frontend.Controllers
 
             HttpStatusCode apiResponse =
                 await _publishingApiClient.AssignProfilePatternKeyToPublishedProvider(
-                    fundingStreamId, fundingPeriodId,providerId, profilePatternKey);
+                    fundingStreamId, fundingPeriodId, providerId, profilePatternKey);
 
             return StatusCode((int)apiResponse);
         }
 
-        private static List<ProfilingInstallment> MapToFutureInstallmentModel(
+        private static List<ProfilingInstallment> MapToProfilingInstallment(
             IEnumerable<ProfilePeriodPattern> profilePatterns) =>
             profilePatterns
                 .Select(profilingTotal =>
                     new ProfilingInstallment(
                         profilingTotal.PeriodYear,
                         profilingTotal.Period,
-                        profilingTotal.Occurrence, 0))
+                        profilingTotal.Occurrence,
+                        0,
+                        profilingTotal.PeriodType.ToString()))
                 .ToList();
     }
 }

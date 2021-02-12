@@ -2,42 +2,53 @@ import React from "react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import {cleanup, render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
+import * as specificationService from "../../../services/specificationService";
+
+const specificationId = "SPEC123";
 
 const renderVariationManagement = () => {
-    const {VariationManagement} = require('../../../components/Specifications/VariationManagement');
-    return render(<MemoryRouter initialEntries={['/VariationManagement/SPEC123']}>
-        <Switch>
-            <Route path="/VariationManagement/:specificationId" component={VariationManagement}/>
-        </Switch>
-    </MemoryRouter>)
+    const {VariationManagement} = require('../../../components/specifications/VariationManagement');
+    return render(
+        <MemoryRouter initialEntries={[`/VariationManagement/${specificationId}`]}>
+            <Switch>
+                <Route path={`/VariationManagement/${specificationId}`}>
+                    <VariationManagement
+                        specificationId={specificationId}
+                        addError={jest.fn()}
+                        clearErrorMessages={jest.fn()}
+                    />
+                </Route>
+            </Switch>
+        </MemoryRouter>);
 }
-
-beforeAll(() => {
-    function mockSpecificationService() {
-        const specificationService = jest.requireActual('../../../services/specificationService');
-        return {
-            ...specificationService,
-            getProfileVariationPointersService: jest.fn(() => Promise.resolve({
-                data: [{
-                    fundingStreamId: "TEST",
-                    fundingLineId: "TEST",
-                    periodType: "TEST",
-                    typeValue: "TEST",
-                    year: 2020,
-                    occurrence: 1,
-                }]
-            }))
-        }
-    }
-    jest.mock('../../../services/specificationService', () => mockSpecificationService());
-})
-
-afterEach(cleanup);
 
 describe("<VariationManagement /> ", () => {
     it("calls getProfileVariationPointersService from the specificationService", async () => {
-        const {getProfileVariationPointersService} = require('../../../services/specificationService');
-        renderVariationManagement();
-        await waitFor(() => expect(getProfileVariationPointersService).toBeCalled())
+        await waitFor(() => {
+            renderVariationManagement();
+        });
+
+        expect(getProfileVariationPointersServiceSpy).toBeCalledTimes(1);
     });
+});
+
+const getProfileVariationPointersServiceSpy = jest.spyOn(specificationService, 'getProfileVariationPointersService');
+getProfileVariationPointersServiceSpy.mockResolvedValue({
+    data: [
+        {
+            fundingLineId: "fundingLineId",
+            profileVariationPointer: {
+                fundingStreamId: "fundingStreamId",
+                fundingLineId: "fundingLineId",
+                occurrence: 2,
+                periodType: "CalendarMonth",
+                typeValue: "March",
+                year: 2021,
+            }
+        }
+    ],
+    status: 200,
+    statusText: "",
+    headers: {},
+    config: {}
 });

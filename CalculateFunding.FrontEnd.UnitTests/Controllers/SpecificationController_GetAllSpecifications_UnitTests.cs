@@ -1,4 +1,5 @@
 ﻿using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Frontend.Controllers;
@@ -17,12 +18,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     {
         private SpecificationController _sut;
         private Mock<ISpecificationsApiClient> _mockSpecificationsApiClient;
+        private Mock<IPoliciesApiClient> _mockPoliciesApiClient;
         private Mock<IAuthorizationHelper> _mockAuthorizationHelper;
 
         [TestInitialize]
         public void Setup()
         {
             _mockSpecificationsApiClient = new Mock<ISpecificationsApiClient>();
+            _mockPoliciesApiClient = new Mock<IPoliciesApiClient>();
             _mockAuthorizationHelper = new Mock<IAuthorizationHelper>();
         }
 
@@ -38,7 +41,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 		            .With(x => 
 			            x.Items = Builder<SpecificationSearchResultItem>.CreateListOfSize(10).Build()).Build());
 			
-	        _sut = new SpecificationController(_mockSpecificationsApiClient.Object, _mockAuthorizationHelper.Object);
+	        _sut = new SpecificationController(_mockSpecificationsApiClient.Object, _mockPoliciesApiClient.Object, _mockAuthorizationHelper.Object);
 
             var actual = _sut.GetAllSpecifications(data);
 
@@ -55,7 +58,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 		        Status = null
 	        };
             _mockSpecificationsApiClient.Setup(x => x.FindSpecifications(null)).ReturnsAsync(Builder<PagedResult<SpecificationSearchResultItem>>.CreateNew().Build);
-	        _sut = new SpecificationController(_mockSpecificationsApiClient.Object, _mockAuthorizationHelper.Object);
+	        _sut = new SpecificationController(_mockSpecificationsApiClient.Object, _mockPoliciesApiClient.Object, _mockAuthorizationHelper.Object);
 
             var actual = _sut.GetAllSpecifications(data);
 

@@ -604,7 +604,8 @@ namespace CalculateFunding.Frontend.Controllers
                             profilingTotal.Year,
                             profilingTotal.TypeValue,
                             profilingTotal.Occurrence,
-                            profilingTotal.Value))
+                            profilingTotal.Value,
+                            profilingTotal.PeriodType.ToString()))
                 : Array.Empty<ProfilingInstallment>();
 
             return new ProfilingViewModel(profilingInstallments, previousAllocation);

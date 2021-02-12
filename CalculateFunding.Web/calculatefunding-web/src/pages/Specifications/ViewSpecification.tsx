@@ -312,7 +312,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         </li>
                         <li>
                             <button type="button" className="govuk-link" onClick={approveAllCalculations}
-                                    data-testid="approve-calculations">Approve all calculations</button>
+                                data-testid="approve-calculations">Approve all calculations</button>
                         </li>
                         <li>
                             <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
@@ -321,17 +321,17 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                             <LoadingFieldStatus title={"checking funding status..."} />
                         }
                         {!isLoadingSelectedForFunding &&
-                        <li>
-                            {specification.isSelectedForFunding || selectedForFundingSpecId ?
-                                <Link className="govuk-link govuk-link--no-visited-state"
-                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
-                                    View funding
+                            <li>
+                                {specification.isSelectedForFunding || selectedForFundingSpecId ?
+                                    <Link className="govuk-link govuk-link--no-visited-state"
+                                        to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
+                                        View funding
                                 </Link>
-                                :
-                                <button type="button" className="govuk-link" onClick={chooseForFunding}
+                                    :
+                                    <button type="button" className="govuk-link" onClick={chooseForFunding}
                                         data-testid="choose-for-funding">Choose for funding</button>
-                            }
-                        </li>
+                                }
+                            </li>
                         }
                     </ul>
                 </div>
@@ -377,7 +377,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 </section>
                             </Tabs.Panel>
                             <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>
-                                <VariationManagement specificationId={specificationId} />
+                                <VariationManagement
+                                    specificationId={specificationId}
+                                    addError={addError}
+                                    clearErrorMessages={clearErrorMessages} />
                             </Tabs.Panel>
                         </Tabs>
                     </div>

@@ -9,6 +9,7 @@ export interface ProfilingInstallments {
     installmentMonth: string,
     installmentNumber: number,
     installmentValue: number;
+    periodType: string;
     isPaid: boolean
 }
 

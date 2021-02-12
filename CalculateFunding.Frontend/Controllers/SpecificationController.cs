@@ -17,20 +17,27 @@ using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.ViewModels.Common;
+using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.TemplateMetadata.Enums;
 
 namespace CalculateFunding.Frontend.Controllers
 {
     public class SpecificationController : Controller
     {
         private readonly ISpecificationsApiClient _specificationsApiClient;
+        private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IAuthorizationHelper _authorizationHelper;
 
-        public SpecificationController(ISpecificationsApiClient specificationsApiClient, IAuthorizationHelper authorizationHelper)
+        public SpecificationController(ISpecificationsApiClient specificationsApiClient,
+            IPoliciesApiClient policiesApiClient, IAuthorizationHelper authorizationHelper)
         {
             Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _specificationsApiClient = specificationsApiClient;
+            _policiesApiClient = policiesApiClient;
             _authorizationHelper = authorizationHelper;
         }
 
@@ -295,7 +302,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new BadRequestResult();
             }
 
-            return new StatusCodeResult((int) apiResponse.StatusCode);
+            return new StatusCodeResult((int)apiResponse.StatusCode);
         }
 
         [HttpPost]
@@ -307,7 +314,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new BadRequestObjectResult(ModelState);
             }
 
-            var fundingStreamIds = new List<string> {viewModel.FundingStreamId};
+            var fundingStreamIds = new List<string> { viewModel.FundingStreamId };
 
             IEnumerable<FundingStreamPermission> fundingStreamPermissions = await _authorizationHelper.GetUserFundingStreamPermissions(User);
             bool hasPermissionsOnAllTheseStreams = fundingStreamIds
@@ -488,7 +495,7 @@ namespace CalculateFunding.Frontend.Controllers
 
                 byte[] data = client.DownloadData(response.Content.Url);
 
-                FileContentResult fileContentResult = new FileContentResult(data, "text/csv") {FileDownloadName = response.Content.FileName};
+                FileContentResult fileContentResult = new FileContentResult(data, "text/csv") { FileDownloadName = response.Content.FileName };
 
                 return fileContentResult;
             }
@@ -500,22 +507,64 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/specs/{specificationId}/profile-variation-pointers")]
         public async Task<IActionResult> GetProfileVariationPointers(string specificationId)
         {
-            ApiResponse<IEnumerable<ProfileVariationPointer>> apiResponse =
+            ApiResponse<TemplateMetadataDistinctFundingLinesContents> templateMetaDataResponse = null;
+            ApiResponse<SpecificationSummary> specResponse = null;
+            ApiResponse<IEnumerable<ProfileVariationPointer>> profileResponse =
                 await _specificationsApiClient.GetProfileVariationPointers(specificationId);
 
-            if (apiResponse.StatusCode == HttpStatusCode.OK)
+            if (profileResponse.StatusCode == HttpStatusCode.OK)
             {
-                return Ok(apiResponse.Content);
+                IEnumerable<ProfileVariationPointer> currentProfileVariationPointers = profileResponse.Content;
+
+                specResponse = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+
+                if (specResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    SpecificationSummary spec = specResponse.Content;
+                    string fundingStreamId = spec.FundingStreams.First().Id;
+                    string fundingPeriodId = spec.FundingPeriod.Id;
+                    string templateVersion = spec.TemplateIds[fundingStreamId];
+
+                    templateMetaDataResponse =
+                        await _policiesApiClient.GetDistinctTemplateMetadataFundingLinesContents(fundingStreamId, fundingPeriodId, templateVersion);
+
+                    if (templateMetaDataResponse.StatusCode == HttpStatusCode.OK)
+                    {
+                        TemplateMetadataDistinctFundingLinesContents templateMetaData = templateMetaDataResponse.Content;
+
+                        IEnumerable<FundingLineProfileVariationPointer> result = templateMetaData.FundingLines.Where(fl => fl.Type == FundingLineType.Payment).Select(s =>
+                            new FundingLineProfileVariationPointer
+                            {
+                                FundingLineId = s.FundingLineCode,
+                                ProfileVariationPointer = currentProfileVariationPointers.SingleOrDefault(p => p.FundingLineId == s.FundingLineCode)
+                            });
+
+                        return Ok(result);
+                    }
+                }
             }
 
-            if (apiResponse.StatusCode == HttpStatusCode.NoContent)
+            if (profileResponse.StatusCode == HttpStatusCode.NoContent)
             {
-                return NoContent();
+                return new NoContentResult();
             }
 
-            if (apiResponse.StatusCode == HttpStatusCode.BadRequest)
+            IActionResult profileErrorResult = profileResponse.IsSuccessOrReturnFailureResult(nameof(IEnumerable<ProfileVariationPointer>));
+            if (profileErrorResult != null)
             {
-                return new BadRequestResult();
+                return profileErrorResult;
+            }
+
+            IActionResult templateErrorResult = templateMetaDataResponse.IsSuccessOrReturnFailureResult(nameof(TemplateMetadataDistinctFundingLinesContents));
+            if (templateErrorResult != null)
+            {
+                return templateErrorResult;
+            }
+
+            IActionResult specErrorResult = specResponse.IsSuccessOrReturnFailureResult(nameof(SpecificationSummary));
+            if (specErrorResult != null)
+            {
+                return specErrorResult;
             }
 
             return new StatusCodeResult(500);

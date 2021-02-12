@@ -6,3 +6,8 @@ export interface ProfileVariationPointer {
     year: number;
     occurrence: number;
 }
+
+export interface FundingLineProfileVariationPointer {
+    fundingLineId: string;
+    profileVariationPointer: ProfileVariationPointer | null;
+}
