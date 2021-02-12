@@ -11,6 +11,10 @@ import {PublishedFundingTemplate} from "../../../types/TemplateBuilderDefinition
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
+import * as monitorHook from "../../../hooks/Jobs/useJobMonitor";
+import {JobDetails} from "../../../types/jobDetails";
+import {RunningStatus} from "../../../types/RunningStatus";
+import {CompletionStatus} from "../../../types/CompletionStatus";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -51,6 +55,26 @@ export function SpecificationTestData() {
         });
         return component;
     };
+    
+    const jobMonitorResult: JobDetails = {
+        failures: [], 
+        isComplete: false, 
+        isFailed: false, 
+        jobDescription: "Creating Specification", 
+        jobId: "5re34ygw534e", 
+        statusDescription: "Complete",
+        completionStatus: CompletionStatus.Succeeded,
+        outcome: "", 
+        isSuccessful: true, 
+        isActive: false,
+        runningStatus: RunningStatus.Completing
+    };
+
+    const mockJobMonitorHookWithSuccessfulJob = () => jest.spyOn(monitorHook, 'useJobMonitor')
+        .mockImplementation(() => ({newJob: jobMonitorResult}));
+
+    const mockJobMonitorHookWithNoJob = () => jest.spyOn(monitorHook, 'useJobMonitor')
+        .mockImplementation(() => ({newJob: undefined}));
 
     const mockFundingStream: FundingStream = {
         id: "stream-547",
@@ -270,6 +294,8 @@ export function SpecificationTestData() {
         mockSpecificationServiceWithDuplicateNameResponse,
         mockProviderVersionService,
         mockProviderService,
+        haveSuccessfulJobCompletion: mockJobMonitorHookWithSuccessfulJob,
+        haveNoJobRunning: mockJobMonitorHookWithNoJob,
         specificationCfs: mockCfsSpec,
         specificationFdzWithoutTracking: mockFdzSpecWithoutTracking,
         specificationFdzWithTrackingLatest: mockFdzSpecWithTrackingLatest,

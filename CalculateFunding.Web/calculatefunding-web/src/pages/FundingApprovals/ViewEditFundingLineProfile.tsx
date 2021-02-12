@@ -84,7 +84,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
         setPageTitle(title);
     }, [isEditMode, fundingLineProfile]);
 
-    const {canApplyCustomProfilePattern, missingPermissions} =
+    const {canApplyCustomProfilePattern, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.CanApplyCustomProfilePattern]);
 
     const {errors, addError, clearErrorMessages, addValidationErrors} = useErrors();
@@ -258,7 +258,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                         </Breadcrumbs>
                         <div className="govuk-grid-row">
                             <div className="govuk-grid-column-full">
-                                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading}/>
+                                <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
                             </div>
                         </div>
                         <div className="govuk-grid-row">

@@ -146,7 +146,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                 </div>}
                 {!isLoadingRelationshipData && isPermissionsFetched && hasMissingPermissions &&
                 <div className="govuk-grid-row">
-                    <PermissionStatus requiredPermissions={missingPermissions} hidden={false}/>
+                    <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
                 </div>}
                 {!isLoadingRelationshipData && !isUpdating &&
                 <div className="govuk-grid-row">

@@ -6,7 +6,7 @@ export interface CreateSpecificationModel {
     providerVersionId?: string;
     description: string;
     fundingPeriodId: string;
-    assignedTemplateIds: { [key: string]: string[] };
+    assignedTemplateIds: Record<string, string>;
     providerSnapshotId?: number;
     coreProviderVersionUpdates: ProviderDataTrackingMode | undefined;
 }

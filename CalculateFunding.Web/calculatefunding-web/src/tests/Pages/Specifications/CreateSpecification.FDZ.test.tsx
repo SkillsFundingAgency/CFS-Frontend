@@ -5,6 +5,8 @@ import {SpecificationTestData} from "./SpecificationTestData";
 import userEvent from "@testing-library/user-event";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
+import {CreateSpecificationModel} from "../../../types/Specifications/CreateSpecificationModel";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
 const test = SpecificationTestData();
 
@@ -15,6 +17,7 @@ describe("<CreateSpecification />", () => {
             test.mockSpecificationService();
             test.mockProviderService();
             test.mockProviderVersionService();
+            test.haveNoJobRunning();
 
             await test.renderCreateSpecificationPage();
         });
@@ -276,14 +279,26 @@ describe("<CreateSpecification />", () => {
             expect(templateVersionSelect).toHaveLength(3);
             userEvent.selectOptions(templateVersionSelect, test.template1.templateVersion);
 
-            const moreDetailField = await screen.findByTestId(`description-textarea`);
-            userEvent.type(moreDetailField, "test description");
+            const descriptionTextArea = await screen.findByTestId(`description-textarea`);
+            userEvent.clear(descriptionTextArea);
+            userEvent.type(descriptionTextArea, "test description");
             expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
 
             const button = screen.getByRole("button", {name: /Save and continue/});
             userEvent.click(button);
 
-            await waitFor(() => expect(createSpecificationService).toBeCalledTimes(1));
+            const expectedSaveModel: CreateSpecificationModel = {
+                name: "test specification name",
+                assignedTemplateIds: {"stream-547": test.template1.templateVersion},
+                description: "test description",
+                fundingPeriodId: test.fundingPeriod.id,
+                fundingStreamId: test.fundingStream.id,
+                providerVersionId: undefined,
+                coreProviderVersionUpdates: ProviderDataTrackingMode.UseLatest,
+                providerSnapshotId: undefined
+            };
+            await waitFor(() => expect(createSpecificationService).toHaveBeenCalledWith(expectedSaveModel));
+
             expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
         });
     });

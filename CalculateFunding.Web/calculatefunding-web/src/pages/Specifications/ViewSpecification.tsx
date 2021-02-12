@@ -48,6 +48,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
     const initialSpecification: SpecificationSummary = {
+        coreProviderVersionUpdates: undefined,
         name: "",
         approvalStatus: "",
         description: "",
@@ -76,7 +77,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [displayApproveAllJobStatus, setDisplayApproveAllJobStatus] = useState<boolean>(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
-    const {canApproveAllCalculations, canChooseFunding, missingPermissions} =
+    const {canApproveAllCalculations, canChooseFunding, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId,
             [SpecificationPermissions.ApproveAllCalculations, SpecificationPermissions.ChooseFunding]);
     const [initiatedRefreshFundingJobId, setInitiatedRefreshFundingJobId] = useState<string>("");
@@ -272,7 +273,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name} />
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={isApprovingAllCalculations} />
+            <PermissionStatus requiredPermissions={missingPermissions} 
+                              hidden={!isPermissionsFetched} />
 
             <MultipleErrorSummary errors={errors} />
 

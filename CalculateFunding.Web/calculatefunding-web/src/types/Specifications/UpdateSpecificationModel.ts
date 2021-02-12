@@ -7,6 +7,6 @@ export interface UpdateSpecificationModel {
     providerSnapshotId?: number;
     description: string;
     fundingPeriodId: string;
-    assignedTemplateIds: { [key: string]: string[] };
+    assignedTemplateIds: Record<string, string>;
     coreProviderVersionUpdates: ProviderDataTrackingMode | undefined
 }

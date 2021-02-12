@@ -3,14 +3,12 @@ import {EditCalculationRouteProps} from "../../../pages/Calculations/EditCalcula
 import {createLocation, createMemoryHistory} from 'history';
 import {match} from 'react-router';
 import {MemoryRouter} from 'react-router-dom';
-import {render, screen, waitFor, waitForElementToBeRemoved} from '@testing-library/react';
+import {render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
-import * as calcHook from "../../../hooks/Calculations/useCalculation";
-import {CalculationQueryResult} from "../../../hooks/Calculations/useCalculation";
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
@@ -25,7 +23,6 @@ import {
 import {CalculationDetails} from "../../../types/CalculationDetails";
 import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
-import {getCalculationByIdService} from "../../../services/calculationService";
 
 const history = createMemoryHistory();
 
@@ -59,6 +56,7 @@ export function EditCalculationTestData() {
         name: "2019-20"
     };
     const mockSpecData: SpecificationSummary = {
+        coreProviderVersionUpdates: undefined,
         name: "Wizard Training",
         approvalStatus: "",
         description: "",
@@ -256,6 +254,7 @@ export function EditCalculationTestData() {
         calculation: mockSuccessfulCalcData
     };
     const specFullPermsResult: SpecificationPermissionsResult = {
+        canApplyCustomProfilePattern: false,
         canApproveFunding: false,
         canCreateSpecification: false,
         canEditCalculation: true,
@@ -273,6 +272,7 @@ export function EditCalculationTestData() {
         canChooseFunding: true
     }
     const specNoPermsResult: SpecificationPermissionsResult = {
+        canApplyCustomProfilePattern: false,
         canApproveFunding: false,
         canCreateSpecification: false,
         canEditCalculation: false,

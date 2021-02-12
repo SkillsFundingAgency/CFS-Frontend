@@ -67,7 +67,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const {publishedProvidersWithErrors, isLoadingPublishedProviderErrors} =
         usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !(latestJob && latestJob.isActive),
             err => addErrorMessage(err.message, "Error while loading provider funding errors"));
-    const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions} =
+    const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
     const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
     const [jobId, setJobId] = useState<string>("");
@@ -200,7 +200,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     <Breadcrumb name={"Funding approval results"}/>
                 </Breadcrumbs>
 
-                <PermissionStatus requiredPermissions={missingPermissions} hidden={!publishedProviderSearchResults}/>
+                <PermissionStatus requiredPermissions={missingPermissions} 
+                                  hidden={!isPermissionsFetched}/>
 
                 <MultipleErrorSummary errors={errors}/>
 

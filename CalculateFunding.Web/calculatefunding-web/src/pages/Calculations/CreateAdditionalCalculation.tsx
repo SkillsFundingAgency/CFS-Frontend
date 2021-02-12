@@ -29,7 +29,7 @@ export interface CreateAdditionalCalculationRouteProps {
 export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteComponentProps<CreateAdditionalCalculationRouteProps> & CreateAdditionalCalculationProps) {
     const specificationId = match.params.specificationId;
     const {errors, addError, addErrorMessage, clearErrorMessages} = useErrors();
-    const {canCreateAdditionalCalculation, missingPermissions} =
+    const {canCreateAdditionalCalculation, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
@@ -94,7 +94,8 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                 <Breadcrumb name={"Create additional calculation"}/>
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={!specification}/>
+            <PermissionStatus requiredPermissions={missingPermissions} 
+                              hidden={!isPermissionsFetched}/>
 
             {(isLoadingSpecification || isSaving) &&
             <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>

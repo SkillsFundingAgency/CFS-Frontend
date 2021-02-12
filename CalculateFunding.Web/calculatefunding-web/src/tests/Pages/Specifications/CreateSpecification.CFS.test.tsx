@@ -5,6 +5,7 @@ import {SpecificationTestData} from "./SpecificationTestData";
 import userEvent from "@testing-library/user-event";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
+import {CreateSpecificationModel} from "../../../types/Specifications/CreateSpecificationModel";
 
 const test = SpecificationTestData();
 
@@ -15,6 +16,7 @@ describe("<CreateSpecification />", () => {
             test.mockSpecificationService();
             test.mockProviderService();
             test.mockProviderVersionService();
+            test.haveNoJobRunning();
 
             await test.renderCreateSpecificationPage();
         });
@@ -28,7 +30,7 @@ describe("<CreateSpecification />", () => {
             });
         });
 
-       describe("page render checks ", () => {
+        describe("page render checks ", () => {
             it('the breadcrumbs are correct', async () => {
                 expect((await screen.findAllByText(/Create specification/))[0]).toHaveClass("govuk-breadcrumbs__list-item");
             });
@@ -73,16 +75,16 @@ describe("<CreateSpecification />", () => {
             it("it displays correct errors given funding period is not selected", async () => {
                 const {getFundingStreamsService} = require('../../../services/policyService');
                 await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
-                
+
                 const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
                 userEvent.type(specificationField, "test specification name");
-                
+
                 const fundingStreamSelect = await screen.findByTestId(`funding-stream-dropdown`);
                 userEvent.selectOptions(fundingStreamSelect, test.fundingStream.name);
-                
+
                 const {getFundingPeriodsByFundingStreamIdService} = require('../../../services/specificationService');
                 await waitFor(() => expect(getFundingPeriodsByFundingStreamIdService).toBeCalledTimes(1));
-                
+
                 const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
                 expect(fundingPeriodSelect).toHaveLength(2);
 
@@ -117,16 +119,16 @@ describe("<CreateSpecification />", () => {
                 const fundingPeriodSelect = await screen.findByTestId(`funding-period-dropdown`);
                 expect(fundingPeriodSelect).toHaveLength(2);
                 userEvent.selectOptions(fundingPeriodSelect, test.fundingPeriod.name);
-                
+
                 await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
                 await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
                 const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
                 expect(coreProviderSelect).toHaveLength(3);
-                
+
                 await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
                 const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
                 expect(templateVersionSelect).toHaveLength(3);
-                
+
                 expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
                 const button = screen.getByRole("button", {name: /Save and continue/});
@@ -167,11 +169,11 @@ describe("<CreateSpecification />", () => {
                 await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
                 const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
                 expect(templateVersionSelect).toHaveLength(3);
-                
+
                 await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
                 const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
                 expect(coreProviderSelect).toHaveLength(3);
-                
+
                 userEvent.selectOptions(coreProviderSelect, test.coreProvider2.name);
 
                 const button = screen.getByRole("button", {name: /Save and continue/});
@@ -268,15 +270,27 @@ describe("<CreateSpecification />", () => {
             const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
             expect(templateVersionSelect).toHaveLength(3);
             userEvent.selectOptions(templateVersionSelect, test.template1.templateVersion);
-            
-            const moreDetailField = await screen.findByTestId(`description-textarea`);
-            userEvent.type(moreDetailField, "test description");
+
+            const descriptionTextArea = await screen.findByTestId(`description-textarea`);
+            userEvent.clear(descriptionTextArea);
+            userEvent.type(descriptionTextArea, "test description");
             expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
 
             const button = screen.getByRole("button", {name: /Save and continue/});
             userEvent.click(button);
-
-            await waitFor(() => expect(createSpecificationService).toBeCalledTimes(1));
+            
+            const expectedSaveModel: CreateSpecificationModel = {
+                name: "test specification name",
+                assignedTemplateIds: {"stream-547": test.template1.templateVersion},
+                description: "test description",
+                fundingPeriodId: test.fundingPeriod.id,
+                fundingStreamId: test.fundingStream.id,
+                providerVersionId: test.coreProvider2.providerVersionId,
+                coreProviderVersionUpdates: undefined,
+                providerSnapshotId: undefined
+            };
+            await waitFor(() => expect(createSpecificationService).toHaveBeenCalledWith(expectedSaveModel));
+            
             expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
         });
     });

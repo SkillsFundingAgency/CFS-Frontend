@@ -62,7 +62,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
             err => addError({error: err, description: "Error checking for job"}));
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
-    const {canApproveFunding, canReleaseFunding, missingPermissions} =
+    const {canApproveFunding, canReleaseFunding, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Approve, SpecificationPermissions.Release]);
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
@@ -126,7 +126,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                     <Breadcrumb name={mode + " funding"}/>
                 </Breadcrumbs>
 
-                <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoadingSpecification}/>
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
                 <div>
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">

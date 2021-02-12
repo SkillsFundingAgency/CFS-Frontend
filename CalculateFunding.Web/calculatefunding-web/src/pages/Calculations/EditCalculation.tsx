@@ -43,7 +43,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
     const [specificationId, setSpecificationId] = useState<string>("");
     const [calculation, setCalculation] = useState<CalculationDetails | undefined>();
     const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
-    const {canEditCalculation, canApproveCalculation, missingPermissions} =
+    const {canEditCalculation, canApproveCalculation, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.EditCalculations, SpecificationPermissions.ApproveCalculations]);
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
@@ -145,7 +145,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                 <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`}/>
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={!calculation || !specification}/>
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
             {(isApproving || updateCalculation.isLoading) && calculation &&
             <LoadingStatus title={updateCalculation.isLoading ? `Saving ${calculation.calculationType} calculation` : `Approving ${calculation.calculationType} calculation`}
