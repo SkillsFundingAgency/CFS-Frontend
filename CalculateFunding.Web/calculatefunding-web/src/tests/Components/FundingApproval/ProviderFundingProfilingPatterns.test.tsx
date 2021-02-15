@@ -88,4 +88,25 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
             expect(screen.queryByRole("link", {name: /View/})).not.toBeInTheDocument();
         });
     });
+
+    describe('with profiling funding line error', () => {
+        const props: ProviderFundingProfilingProps = {
+            routeParams: {
+                specificationId: test.provider1.specificationId,
+                fundingStreamId: test.provider1.fundingStreamId,
+                fundingPeriodId: test.provider1.fundingPeriodId,
+                providerId: test.provider1.publishedProviderVersionId,
+                specCoreProviderVersionId: test.testSpec.providerVersionId
+            },
+            profilingPatterns: [test.fundingLineWithError]
+        }
+        beforeEach(() => {
+            renderComponent(props);
+        });
+
+        it('renders funding line profiling table with error on funding line', async () => {
+            expect(screen.getByTestId("profiling-table")).toBeInTheDocument();
+            expect(screen.findByText(/There is an error with this funding line/));
+        });
+    });
 });

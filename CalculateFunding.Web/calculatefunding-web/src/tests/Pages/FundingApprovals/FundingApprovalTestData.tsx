@@ -22,7 +22,7 @@ import {render} from "@testing-library/react";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {Provider} from "react-redux";
 import * as providerErrorsHook from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
-import {createPublishedProviderErrorSearchQueryResult, createPublishedProviderIdsQueryResult, createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets, fullSpecPermissions, hasFullSpecPermissions, hasSpecPermissions} from "../../fakes/testFactories";
+import {createPublishedProviderErrorSearchQueryResult, createPublishedProviderIdsQueryResult, createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets, hasFullSpecPermissions, hasSpecPermissions} from "../../fakes/testFactories";
 import * as providerIdsSearchHook from "../../../hooks/FundingApproval/usePublishedProviderIds";
 import * as providerSearchHook from "../../../hooks/FundingApproval/usePublishedProviderSearch";
 import React from "react";
@@ -198,8 +198,37 @@ export function FundingApprovalTestData() {
         providerId: provider1.publishedProviderVersionId, 
         providerName: provider1.providerName, 
         totalAllocation: 895436.74,
-        ukprn: provider1.ukprn
+        ukprn: provider1.ukprn,
+        errors: []
     }
+
+    const fundingLineWithError : FundingLineProfile = {
+        amountAlreadyPaid: 53450,
+        fundingLineCode: "KNIT",
+        fundingLineName: "Knitting",
+        lastUpdatedUser: {name: "Bob", id: "1"},
+        profilePatternDescription: "A nice smooth lined knitting pattern",
+        profilePatternKey: "pattern-key",
+        profilePatternName: "Stockinette Stitch Pattern",
+        profileTotalAmount: 5794330,
+        profileTotals: [profileTotal],
+        providerId: provider1.publishedProviderVersionId,
+        providerName: provider1.providerName,
+        totalAllocation: 895436.74,
+        ukprn: provider1.ukprn,
+        errors:[
+            {
+                detailedErrorMessage: "There is an error with this funding line",
+                fundingLine: "Funding line 1",
+                fundingLineCode: "ERROR",
+                fundingStreamId: "ERR",
+                summaryErrorMessage : "Here is a summary of the error",
+                type: "Error type"
+            }
+        ]
+
+    }
+
     const fundingLineProfileWithMissingTotalAllocation: FundingLineProfile = {
         amountAlreadyPaid: 53450,
         fundingLineCode: "KNIT", 
@@ -213,7 +242,8 @@ export function FundingApprovalTestData() {
         providerId: provider1.publishedProviderVersionId, 
         providerName: provider1.providerName, 
         totalAllocation: undefined,
-        ukprn: provider1.ukprn
+        ukprn: provider1.ukprn,
+        errors: []
     }
 
     const fundingSearchSelectionState: FundingSearchSelectionState = {
@@ -276,6 +306,7 @@ export function FundingApprovalTestData() {
         provider1,
         providerWithError1,
         fundingLineProfile1,
+        fundingLineWithError,
         fundingLineProfileWithMissingTotalAllocation,
         fundingSearchSelectionState,
         activeJob,

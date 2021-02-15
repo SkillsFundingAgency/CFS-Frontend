@@ -1,5 +1,14 @@
 import {Reference} from "./Reference";
 
+export interface ProfileError {
+    detailedErrorMessage: string
+    fundingLine: string | null
+    fundingLineCode: string
+    fundingStreamId: string
+    summaryErrorMessage: string
+    type: string
+}
+
 export interface FundingLineProfile {
     fundingLineCode: string,
     fundingLineName: string,
@@ -16,7 +25,8 @@ export interface FundingLineProfile {
     lastUpdatedUser: Reference,
     lastUpdatedDate?: Date,
     profileTotalAmount?: number,
-    profileTotals: ProfileTotal[]
+    profileTotals: ProfileTotal[],
+    errors: ProfileError[]
 }
 
 export interface ProfileTotal {

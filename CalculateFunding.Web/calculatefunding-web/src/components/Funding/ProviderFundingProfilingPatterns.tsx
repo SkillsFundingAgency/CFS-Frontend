@@ -36,14 +36,20 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                                 <th scope="col" className="govuk-table__header">Funding line</th>
                                 <th scope="col" className="govuk-table__header">Pattern type</th>
                                 <th scope="col" className="govuk-table__header">Total allocation</th>
-                                <th scope="col" className="govuk-table__header">&nbsp; </th>
+                                <th scope="col" className="govuk-table__header">&nbsp;</th>
                             </tr>
                             </thead>
                             <tbody className="govuk-table__body">
                             {props.profilingPatterns.map((profile, key) => {
                                 return <tr className="govuk-table__row" key={key}>
                                     <th scope="row" className="govuk-table__header">
-                                        {profile.fundingLineName}
+                                        {profile.errors?.length > 0 ?
+                                        <div className="govuk-form-group--error">
+                                            {profile.fundingLineName}
+                                            <span className="govuk-error-message">
+                                                {profile.errors[0].detailedErrorMessage}
+                                            </span>
+                                        </div> : profile.fundingLineName}
                                     </th>
                                     <td className="govuk-table__cell">
                                         {profile.totalAllocation !== undefined ? profile.profilePatternName : ""}

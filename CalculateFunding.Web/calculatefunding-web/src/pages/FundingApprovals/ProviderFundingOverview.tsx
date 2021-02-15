@@ -70,7 +70,14 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 enabled: featureFlagsState.profilingPatternVisible,
                 onError: err => err.response?.status === 404 ?
                     addError({error: "No profile patterns found for this provider", description: "Error while loading profile patterns"}) :
-                    addError({error: err, description: "Error while loading profile patterns"})
+                    addError({error: err, description: "Error while loading profile patterns"}),
+                onSuccess: data => {
+                    data.forEach(profilePattern => {
+                        profilePattern.errors?.forEach(err => {
+                            addError({error: err.detailedErrorMessage, description: err.summaryErrorMessage})
+                        })
+                    })
+                }
             });
 
     const {data: profileTotals, isLoading: isLoadingProfileTotals} =
