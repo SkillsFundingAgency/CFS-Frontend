@@ -65,6 +65,12 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
                         pageNumber: 1
                     }
                 };
+            case FundingSearchSelectionActionEvent.HAS_ERRORS:
+                return {
+                    ...state,
+                    selectedProviderIds: [],
+                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), hasErrors: action.payload, pageNumber: 1}
+                };
             default:
                 return state;
         }

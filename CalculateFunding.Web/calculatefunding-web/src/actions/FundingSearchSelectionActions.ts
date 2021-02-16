@@ -35,7 +35,7 @@ export interface IInitialiseFundingSearchSelectionAction {
 
 export interface ISetHasErrors {
     type: FundingSearchSelectionActionEvent.HAS_ERRORS;
-    payload: boolean
+    payload: string
 }
 
 export interface IUpdatePage {
