@@ -112,6 +112,9 @@ describe("<EditSpecification />", () => {
                 expect(within(coreProviderSelect).getByRole("option", {name: /Select core provider/}));
                 expect(within(coreProviderSelect).getByRole("option", {name: test.providerSnapshot1.name}));
                 expect(within(coreProviderSelect).getByRole("option", {name: test.providerSnapshot2.name}));
+
+                const option = within(coreProviderSelect).getByRole("option", {name: test.providerSnapshot2.name}) as HTMLOptionElement;
+                expect(option.selected).toBeTruthy()
             });
 
             it("renders the template options", async () => {
@@ -123,6 +126,9 @@ describe("<EditSpecification />", () => {
                 expect(within(templateVersionSelect).getByRole("option", {name: /Select template version/}));
                 expect(within(templateVersionSelect).getByRole("option", {name: test.template1.templateVersion}));
                 expect(within(templateVersionSelect).getByRole("option", {name: test.template2.templateVersion}));
+                
+                const option = within(templateVersionSelect).getByRole("option", {name: test.template2.templateVersion}) as HTMLOptionElement;
+                expect(option.selected).toBeTruthy()
             });
 
             it("renders the save button as enabled", async () => {

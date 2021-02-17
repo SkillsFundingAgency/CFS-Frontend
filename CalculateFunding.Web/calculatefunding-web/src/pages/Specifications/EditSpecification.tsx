@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import * as specificationService from "../../services/specificationService";
 import * as providerVersionService from "../../services/providerVersionService";
@@ -40,26 +40,17 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [enableTrackProviderData, setEnableTrackProviderData] = useState<ProviderDataTrackingMode | undefined>();
 
-    const {specification, isLoadingSpecification} =
-        useSpecificationSummary(specificationId,
-            err => addError({error: err, description: "Error while loading specification"}),
-            result => {
-                setSelectedName(result.name);
-                setSelectedDescription(result.description ? result.description : "");
-                if (result.coreProviderVersionUpdates) {
-                    setEnableTrackProviderData(result.coreProviderVersionUpdates);
-                }
-            });
+    const {specification, isLoadingSpecification, clearSpecificationFromCache} =
+        useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
 
     const fundingStreamId = specification && specification.fundingStreams[0].id
     const fundingPeriodId = specification && specification.fundingPeriod.id;
 
-    const {isLoadingFundingConfiguration} =
+    const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
-            err => addError({error: err, description: "Error while loading funding configuration"}),
-            result => setProviderSource(result.providerSource));
+            err => addError({error: err, description: "Error while loading funding configuration"}));
 
-    const [providerSource, setProviderSource] = useState<ProviderSource>();
+    const providerSource = fundingConfiguration?.providerSource;
     const [coreProviderData, setCoreProviderData] = useState<NameValuePair[]>([]);
 
     const {data: coreProviders, isLoading: isLoadingCoreProviders} = useQuery<CoreProviderSummary[], AxiosError>(
@@ -68,44 +59,23 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         {
             enabled: providerSource === ProviderSource.CFS,
             retry: false,
-            onError: err => err.response?.status !== 404 && 
+            refetchOnWindowFocus: false,
+            onError: err => err.response?.status !== 404 &&
                 addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
-            onSuccess: results => {
-                if (providerSource === ProviderSource.CFS) {
-                    clearErrorMessages(["selectCoreProvider"]);
-                    const providerData = results.map(coreProviderItem => ({
-                        name: coreProviderItem.name,
-                        value: coreProviderItem.providerVersionId
-                    }));
-                    setCoreProviderData(providerData);
-                    const selectedProviderVersion = providerData.find(p => specification && p.value === specification.providerVersionId);
-                    selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
-                }
-            }
         }
     );
-    
+
     const {data: providerSnapshots, isLoading: isLoadingProviderSnapshots} = useQuery<ProviderSnapshot[], AxiosError>(
         `coreProviderSummary-for-${fundingStreamId}`,
         async () => (await providerService.getProviderSnapshotsByFundingStream(fundingStreamId as string)).data,
         {
             enabled: providerSource === ProviderSource.FDZ,
             retry: false,
-            onError: err => err.response?.status !== 404 && 
+            refetchOnWindowFocus: false,
+            onError: err => err.response?.status !== 404 &&
                 addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
             onSuccess: results => {
                 clearErrorMessages(["selectCoreProvider"]);
-                if (results && providerSource === ProviderSource.FDZ) {
-                    const providerData = results.map(coreProviderItem => ({
-                        name: coreProviderItem.name,
-                        value: coreProviderItem.providerSnapshotId?.toString()
-                    }));
-                    setCoreProviderData(providerData);
-                    const selectedProviderSnapshot = providerData.find(p => specification && p.value === specification.providerSnapshotId?.toString());
-                    if (selectedProviderSnapshot) {
-                        setSelectedProviderSnapshotId(selectedProviderSnapshot.value);
-                    }
-                }
             }
         }
     );
@@ -117,21 +87,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         {
             enabled: (fundingStreamId && fundingStreamId.length > 0 && fundingPeriodId && fundingPeriodId.length > 0) === true,
             retry: false,
-            onError: err => err.response?.status !== 404 && 
+            refetchOnWindowFocus: false,
+            onError: err => err.response?.status !== 404 &&
                 addError({error: err, description: "Could not find any published funding templates", fieldName: "selectTemplateVersion"}),
             onSuccess: results => {
                 clearErrorMessages(["selectTemplateVersion"]);
-                if (specification && fundingStreamId) {
-                    const templateVersionData = results.map(publishedFundingTemplate => ({
-                        name: publishedFundingTemplate.templateVersion,
-                        value: publishedFundingTemplate.templateVersion
-                    }));
-                    setTemplateVersionData(templateVersionData);
-                    const selectedVersion = templateVersionData.find(t => t.value === specification.templateIds[fundingStreamId]);
-                    if (selectedVersion) {
-                        setSelectedTemplateVersion(selectedVersion.value);
-                    }
-                }
             }
         }
     );
@@ -203,6 +163,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 isValid = false;
             }
         }
+        
         if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
             addError({error: "Missing template version", fieldName: "selectTemplateVersion"})
             isValid = false;
@@ -224,7 +185,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 fundingStreamId: fundingStreamId,
                 name: selectedName,
                 providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
-                providerSnapshotId: providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual && selectedProviderSnapshotId ? 
+                providerSnapshotId: providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual && selectedProviderSnapshotId ?
                     parseInt(selectedProviderSnapshotId) : undefined,
                 assignedTemplateIds: assignedTemplateIdsValue,
                 coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
@@ -233,6 +194,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             try {
                 await specificationService.updateSpecificationService(updateSpecificationViewModel, specificationId);
                 setIsUpdating(false);
+                await clearSpecificationFromCache();
                 history.push(`/ViewSpecification/${specificationId}`);
             } catch (error) {
                 if (error.response && error.response.data["Name"] !== undefined) {
@@ -244,6 +206,66 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             }
         }
     }
+    
+    useEffect(() => {
+        if (specification) {
+            setSelectedName(specification.name);
+            setSelectedDescription(specification.description ? specification.description : "");
+            setEnableTrackProviderData(specification.coreProviderVersionUpdates);
+
+            if (specification.providerVersionId && providerSource === ProviderSource.CFS) {
+                setSelectedProviderVersionId(specification.providerVersionId);
+                setSelectedProviderSnapshotId(undefined);
+            }
+
+            if (providerSource === ProviderSource.FDZ && specification.coreProviderVersionUpdates) {
+                if (specification.coreProviderVersionUpdates === ProviderDataTrackingMode.Manual && specification.providerSnapshotId) {
+                    setSelectedProviderSnapshotId(specification.providerSnapshotId.toString());
+                } else {
+                    setSelectedProviderSnapshotId(undefined);
+                }
+            }
+        }
+    }, [specification])
+    
+    useEffect(() => {
+        if (specification && fundingStreamId && publishedFundingTemplates) {
+            const templates = publishedFundingTemplates.map(publishedFundingTemplate => ({
+                name: publishedFundingTemplate.templateVersion,
+                value: publishedFundingTemplate.templateVersion
+            }));
+            setTemplateVersionData(templates);
+            const selectedVersion = templates.find(t => t.value === specification.templateIds[fundingStreamId]);
+            if (selectedVersion) {
+                setSelectedTemplateVersion(selectedVersion.value);
+            }
+        }
+    }, [specification, publishedFundingTemplates])
+    
+    useEffect(() => {
+        if (providerSource === ProviderSource.CFS && coreProviders) {
+            clearErrorMessages(["selectCoreProvider"]);
+            const providerData = coreProviders.map(data => ({
+                name: data.name,
+                value: data.providerVersionId
+            }));
+            setCoreProviderData(providerData);
+            const selectedProviderVersion = providerData.find(p => specification && p.value === specification.providerVersionId);
+            selectedProviderVersion && setSelectedProviderVersionId(selectedProviderVersion.value);
+        }
+
+        if (providerSnapshots && providerSource === ProviderSource.FDZ) {
+            const providerData = providerSnapshots.map(coreProviderItem => ({
+                name: coreProviderItem.name,
+                value: coreProviderItem.providerSnapshotId?.toString()
+            }));
+            setCoreProviderData(providerData);
+            const selectedProviderSnapshot = providerData.find(p => specification && p.value === specification.providerSnapshotId?.toString());
+            if (selectedProviderSnapshot) {
+                setSelectedProviderSnapshotId(selectedProviderSnapshot.value);
+            }
+        }
+    }, [providerSource, coreProviders, providerSnapshots])
 
     const isLoading: boolean = isLoadingPublishedFundingTemplates || isLoadingFundingConfiguration || isLoadingCoreProviders || isLoadingProviderSnapshots || isLoadingSpecification;
 
@@ -256,6 +278,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 <Breadcrumb name={"Edit specification"}/>
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
+                <MultipleErrorSummary errors={errors}/>
                 {(isLoading || isUpdating) &&
                 <LoadingStatus title={isUpdating ? "Updating Specification" :
                     `Loading ${isLoadingSpecification ? "specification" :
@@ -264,11 +287,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 isLoadingProviderSnapshots ? "provider snapshots" :
                                     isLoadingCoreProviders ? "core providers" : ""}`}
                                subTitle="Please wait"
-                               description={isUpdating ? "This can take a few minutes" : ""} />
+                               description={isUpdating ? "This can take a few minutes" : ""}/>
                 }
-
-                <MultipleErrorSummary errors={errors}/>
-
                 {!isLoading && !isUpdating &&
                 <fieldset className="govuk-fieldset" id="update-specification-fieldset">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -366,7 +386,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 id="selectCoreProvider"
                                 name="selectCoreProvider"
                                 disabled={coreProviderData.length === 0}
-                                value={selectedProviderVersionId}
+                                value={providerSource === ProviderSource.CFS ? selectedProviderVersionId : selectedProviderSnapshotId}
                                 onChange={handleCoreProviderChange}>
                             <option value="">Select core provider</option>
                             {coreProviderData.map((cp, index) =>
@@ -392,10 +412,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             {templateVersionData
                                 .sort((a, b) => parseFloat(b.value) - parseFloat(a.value))
                                 .map((cp, index) =>
-                                <option key={`template-version-${index}`}
-                                        value={cp.value}>
-                                    {cp.name}
-                                </option>)}
+                                    <option key={`template-version-${index}`}
+                                            value={cp.value}>
+                                        {cp.name}
+                                    </option>)}
                         </select>
                     </div>
 
