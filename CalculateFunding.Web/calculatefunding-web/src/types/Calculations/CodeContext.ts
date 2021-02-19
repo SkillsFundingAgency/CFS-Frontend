@@ -31,13 +31,18 @@ export interface CodeContext {
     type: string;
 }
 
+export interface EnumItem {
+    name: string;
+    isObsolete: boolean;
+}
+
 export interface ITypeInformationResponse {
     name: string;
     description: string;
     type: string;
     methods: Array<IMethodInformationResponse>;
     properties: Array<IPropertyInformationResponse>;
-    enumValues: Array<string>;
+    enumValues: Array<EnumItem>;
 }
 
 export interface IMethodInformationResponse {
@@ -45,8 +50,8 @@ export interface IMethodInformationResponse {
     friendlyName: string;
     description: string;
     returnType: string;
-    returnTypeClass:string;
-    returnTypeIsNullable:boolean;
+    returnTypeClass: string;
+    returnTypeIsNullable: boolean;
     entityId: string;
     isCustom: boolean;
     parameters: Array<IParameterInformationResponse>;

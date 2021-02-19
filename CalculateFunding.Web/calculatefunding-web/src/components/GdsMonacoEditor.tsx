@@ -183,13 +183,13 @@ export function GdsMonacoEditor(props: {
                             if (enumItems.enumValues !== null) {
                                 enumItems.enumValues.forEach(x => {
                                     // @ts-ignore
-                                    enumVariable.items[x.toLowerCase()] = {
-                                        description: x,
-                                        friendlyName: x,
+                                    enumVariable.items[x.name.toLowerCase()] = {
+                                        description: x.name,
+                                        friendlyName: x.name,
                                         isAggregable: false,
                                         items: {},
-                                        name: x,
-                                        type: x,
+                                        name: x.name,
+                                        type: x.name,
                                         variableType: monaco.languages.CompletionItemKind.EnumMember
                                     }
                                 })
@@ -235,12 +235,12 @@ export function GdsMonacoEditor(props: {
 
                         const tempContainer: IVariableContainer = {};
 
-                        optionItem.enumValues.forEach(x => tempContainer[x.toLowerCase()] = {
-                            name: x,
-                            description: x,
-                            friendlyName: x,
+                        optionItem.enumValues.forEach(x => tempContainer[x.name.toLowerCase()] = {
+                            name: x.name,
+                            description: x.name,
+                            friendlyName: x.name,
                             isAggregable: false,
-                            type: x,
+                            type: x.name,
                             variableType: monaco.languages.CompletionItemKind.EnumMember,
                         })
 
