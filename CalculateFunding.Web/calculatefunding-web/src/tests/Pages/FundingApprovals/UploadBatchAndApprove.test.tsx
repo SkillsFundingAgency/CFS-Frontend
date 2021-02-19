@@ -62,22 +62,16 @@ describe("<UploadBatch />", () => {
         });
         afterEach(() => jest.clearAllMocks());
 
-        it('disables file upload input', async () => {
-            const input = screen.getByLabelText(/Upload an XLSX file/);
-            expect(input).toBeInTheDocument();
-            await waitFor(() => expect(input).toBeDisabled());
+        it('does not render file upload input', async () => {
+            expect(screen.queryByText(/Upload an XLSX file/)).not.toBeInTheDocument();
         });
 
-        it('disables approve button', async () => {
-            const button = screen.getByRole("button", {name: /Approve funding/});
-            expect(button).toBeInTheDocument();
-            expect(button).toBeDisabled();
+        it('does not render approve button', async () => {
+            expect(screen.queryByText(/Approve funding/)).not.toBeInTheDocument();
         });
 
-        it('disables release button', async () => {
-            const button = screen.getByRole("button", {name: /Release funding/});
-            expect(button).toBeInTheDocument();
-            expect(button).toBeDisabled();
+        it('does not render release button', async () => {
+            expect(screen.queryByText(/Release funding/)).not.toBeInTheDocument();
         });
 
         it('calls api to upload file', async () => {

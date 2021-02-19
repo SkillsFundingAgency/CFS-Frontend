@@ -129,6 +129,7 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         if (latestJob.isFailed) {
             addError({error: latestJob.outcome ? latestJob.outcome : "", description: "Validation failed"});
             setIsUpdating(false);
+            setFileName("");
         } else if (latestJob.isSuccessful && publishedProviderIds) {
             dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
             dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
@@ -144,7 +145,6 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
     const hasActiveJob = latestJob && latestJob.isActive;
     const hasUsersValidationJobActive = latestJob && latestJob.isActive && latestJob.jobId === jobId;
     const isValidatingOrUploading = isUpdating || isUploadingBatchFile || isCreatingValidationJob || isWaitingForJob || hasUsersValidationJobActive;
-
 
     return <div>
         <Header location={Section.Approvals}/>
@@ -201,44 +201,44 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
                                                    isWaitingForJob ? "Waiting for validation job to start..." :
                                                        latestJob && latestJob.isActive ? `Job ${latestJob.statusDescription}: ${latestJob.jobDescription}` : ""}/>
                         }
-
-                        <div className="govuk-grid-row">
-                            <div className="govuk-grid-column-two-thirds">
-                                <div className="govuk-form-group">
-                                    <label className="govuk-label" htmlFor="file-upload"><strong>
-                                        Upload an XLSX file</strong>
-                                    </label>
-                                    <input className="govuk-file-upload"
-                                           id="file-upload"
-                                           name="file-upload"
-                                           type="file"
-                                           disabled={isBlocked}
-                                           onChange={getFileToUpload}
-                                    />
+                        {
+                            !isBlocked &&
+                            <div className="govuk-grid-row">
+                                <div className="govuk-grid-column-two-thirds">
+                                    <div className="govuk-form-group">
+                                        <label className="govuk-label" htmlFor="file-upload"><strong>
+                                            Upload an XLSX file</strong>
+                                        </label>
+                                        <input className="govuk-file-upload"
+                                               id="file-upload"
+                                               name="file-upload"
+                                               type="file"
+                                               disabled={isBlocked}
+                                               onChange={getFileToUpload}
+                                        />
+                                    </div>
+                                    <button className="govuk-button govuk-!-margin-right-1"
+                                            type="button"
+                                            onClick={uploadForApprove}
+                                            disabled={fileName.length === 0 || isBlocked}
+                                            data-module="govuk-button">
+                                        Approve funding
+                                    </button>
+                                    <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+                                            type="button"
+                                            onClick={uploadForRelease}
+                                            disabled={fileName.length === 0 || isBlocked}
+                                            data-module="govuk-button">
+                                        Release funding
+                                    </button>
+                                    <Link className="govuk-button govuk-button--secondary"
+                                          data-module="govuk-button"
+                                          to={`/Approvals/Select`}>
+                                        Cancel
+                                    </Link>
                                 </div>
-                                <button className="govuk-button govuk-!-margin-right-1"
-                                        type="button"
-                                        onChange={uploadForApprove}
-                                        onClick={uploadForApprove}
-                                        disabled={fileName.length === 0 || isBlocked}
-                                        data-module="govuk-button">
-                                    Approve funding
-                                </button>
-                                <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                                        type="button"
-                                        onChange={uploadForRelease}
-                                        onClick={uploadForRelease}
-                                        disabled={fileName.length === 0 || isBlocked}
-                                        data-module="govuk-button">
-                                    Release funding
-                                </button>
-                                <Link className="govuk-button govuk-button--secondary"
-                                      data-module="govuk-button"
-                                      to={`/Approvals/Select`}>
-                                    Cancel
-                                </Link>
                             </div>
-                        </div>
+                        }
                     </main>
                 </div>
             </div>
