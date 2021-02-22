@@ -46,6 +46,10 @@ describe("<UpdateDataSourceFile />", () => {
             expect(screen.queryByTestId(`error-summary`)).not.toBeInTheDocument();
         });
 
+        it("it does not displays job notification banner on load", async () => {
+            expect(screen.queryByTestId(`job-notification-banner`)).not.toBeInTheDocument();
+        });
+
         it("file error is displayed given no file has been selected ", async () => {
             await submitForm();
             expect(await screen.getByText("Upload a xls or xlsx file")).toBeInTheDocument();
@@ -123,6 +127,17 @@ describe("<UpdateDataSourceFile />", () => {
                 const errorReportLink = screen.queryByText(`error report`) as HTMLAnchorElement;
                 expect(screen.queryByText(`Validation failed`)).toBeInTheDocument();
                 expect(errorReportLink.href).toContain('aTestValidationReportUrl')
+            });
+        })
+
+        it("it displays job notification banner when a job is completed ", async () => {
+            await givenFormIsCompleted();
+
+            await submitForm();
+            await sendANewJobNotification();
+
+            await waitFor(() => {
+                expect(screen.getByTestId(`job-notification-banner`)).toBeInTheDocument();
             });
         })
     });

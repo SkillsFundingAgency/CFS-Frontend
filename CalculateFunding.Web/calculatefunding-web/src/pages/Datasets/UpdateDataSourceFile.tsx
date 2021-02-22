@@ -29,6 +29,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
+import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -49,6 +50,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         version: 0
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [isCheckingForJob, setIsCheckingForJob] = useState(false);
     const [updateType, setUpdateType] = useState<string>("");
     const [uploadFileName, setUploadFileName] = useState<string>("");
     const [uploadFile, setUploadFile] = useState<File>();
@@ -67,24 +69,41 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
     const {newJob} = useJobMonitor({
         filterBy: {jobTypes: [JobType.ValidateDatasetJob]},
-        onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
+        onError: err => {
+            addError({error: err, description: "An error occurred while monitoring the running jobs"});
+            setIsLoading(false);
+        },
+        isEnabled: isCheckingForJob
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
 
     useEffect(() => {
         if (!newJob || newJob.jobId !== validateDatasetJobId) return;
         clearErrorMessages();
+
+        if (newJob.isFailed || newJob.failures.length > 0)
+        {
+            setIsLoading(false);
+            setIsCheckingForJob(false);
+            return ;
+        }
+
         if (newJob.runningStatus === RunningStatus.Completed) {
             if (newJob.isSuccessful && newJob.outcome !== "ValidationFailed") {
                 return onDatasetValidated(updateType);
             } else {
                 downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
                     let validationErrorFileUrl = result.data;
-                    addValidationErrors({validationErrors: {"blobUrl": [validationErrorFileUrl]}, message: "Validation failed"});
+                    addValidationErrors({
+                        validationErrors: {"blobUrl": [validationErrorFileUrl]},
+                        message: "Validation failed"
+                    });
                     setIsLoading(false);
+                    setIsCheckingForJob(false);
                 }).catch(() => {
                     addError({error: "Unable to retrieve validation report", description: "Validation failed"});
                     setIsLoading(false);
+                    setIsCheckingForJob(false);
                 });
             }
         }
@@ -143,6 +162,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             return;
                         }
                         setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
+                        setIsCheckingForJob(true);
                         setIsLoading(true);
                     }).catch(() => {
                         addError({error: "Unable to retrieve validation report", description: "Validation failed"});
@@ -268,6 +288,12 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             </Breadcrumbs>
             <LoadingStatus title={"Update data source"} hidden={!isLoading}
                            subTitle={"Please wait whilst the data source is updated"}/>
+
+            {(newJob && newJob.isComplete) &&
+            <JobNotificationBanner
+                job={newJob}
+                isCheckingForJob={isLoading}/>
+            }
 
             <MultipleErrorSummary errors={errors} />
 
