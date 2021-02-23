@@ -13,7 +13,7 @@ import {SpecificationDatasourceRelationshipViewModel} from "../../types/Datasets
 import {BackToTop} from "../../components/BackToTop";
 import {NoData} from "../../components/NoData";
 import {Footer} from "../../components/Footer";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
 
@@ -316,7 +316,7 @@ export function MapDataSourceFiles() {
                                         }
                                         {
                                             dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ?
-                                                <p className="govuk-body"> Last mapped <DateFormatter date={dr.mapDatasetLastUpdated} /></p>
+                                                <p className="govuk-body"> Last mapped <DateTimeFormatter date={dr.mapDatasetLastUpdated} /></p>
                                                 : null
                                         }
                                     </th>

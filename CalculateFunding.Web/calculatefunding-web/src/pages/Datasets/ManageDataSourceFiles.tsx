@@ -7,7 +7,7 @@ import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {searchDatasetService} from "../../services/datasetService";
 import {SearchMode} from "../../types/SearchMode";
 import {DatasetSearchResponseViewModel} from "../../types/Datasets/DatasetSearchResponseViewModel";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import Pagination from "../../components/Pagination";
 import {DatasetSearchRequestViewModel} from "../../types/Datasets/DatasetSearchRequestViewModel";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -268,7 +268,7 @@ export function ManageDataSourceFiles() {
                                         </div>
                                     </th>
 
-                                    <td className="govuk-table__cell"><DateFormatter date={ds.lastUpdated} /></td>
+                                    <td className="govuk-table__cell"><DateTimeFormatter date={ds.lastUpdated} /></td>
                                     <td className="govuk-table__cell">
                                         <div>
                                             <p className="govuk-body">

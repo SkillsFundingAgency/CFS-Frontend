@@ -10,7 +10,7 @@ import {Link} from "react-router-dom";
 import {FundingLineProfile, FundingLineProfileViewModel} from "../../types/PublishedProvider/FundingLineProfile";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {EditableProfileTotal} from "../../components/Funding/EditableProfileTotal";
 import {cloneDeep} from "lodash";
@@ -277,7 +277,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                     </h3>
                                     <p className="govuk-body-s" data-testid="last-updated-by">
                                         {`Last updated by ${fundingLineProfile.lastUpdatedUser.name} on `}
-                                        {fundingLineProfile.lastUpdatedDate && <DateFormatter date={fundingLineProfile.lastUpdatedDate}/>}
+                                        {fundingLineProfile.lastUpdatedDate && <DateTimeFormatter date={fundingLineProfile.lastUpdatedDate}/>}
                                     </p>
                                 </div>
                             </div>
@@ -321,7 +321,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                             .map((p, i) => {
                                                 return <tr className="govuk-table__row" key={p.installmentNumber} data-testid="profile-total">
                                                     <th scope="row" className="govuk-table__header">
-                                                        {p.actualDate ? <DateFormatter date={p.actualDate}/> : `${p.typeValue} ${p.year}`}
+                                                        {p.actualDate ? <DateTimeFormatter date={p.actualDate}/> : `${p.typeValue} ${p.year}`}
                                                     </th>
                                                     <td className="govuk-table__cell" data-testid={`paid-${i}`}>
                                                         {p.isPaid ? <strong className="govuk-tag">Paid</strong> : null}

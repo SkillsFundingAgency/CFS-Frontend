@@ -1,5 +1,5 @@
 import React from 'react';
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {ErrorSummary} from "../../components/ErrorSummary";
 
 const Adapter = require('enzyme-adapter-react-16');

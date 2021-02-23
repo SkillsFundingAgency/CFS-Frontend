@@ -11,7 +11,7 @@ import {CalculationVersionHistorySummary} from "../../types/Calculations/Calcula
 import {GdsMonacoDiffEditor} from "../../components/GdsMonacoDiffEditor";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Link} from "react-router-dom";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {CalculationDetails} from "../../types/CalculationDetails";
 import {CalculationType} from "../../types/CalculationSearchResponse";
 import {ValueType} from "../../types/ValueType";
@@ -19,6 +19,7 @@ import {PublishStatus} from "../../types/PublishStatusModel";
 import {CalculationDataType} from "../../types/Calculations/CalculationCompilePreviewResponse";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
+import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 
 export interface CompareCalculationVersionsRouteProps {
     calculationId: string;
@@ -50,7 +51,8 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
         name: "",
         providerVersionId: "",
         dataDefinitionRelationshipIds: [],
-        templateIds: {}
+        templateIds: {},
+        coreProviderVersionUpdates: undefined
     });
     const [calculation, setCalculation] = useState<CalculationDetails>({
         calculationType: CalculationType.Template,
@@ -190,13 +192,13 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                 <div className="govuk-grid-column-one-half">
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
-                            <DateFormatter date={calculationVersions[0].lastUpdated} /> <span className="right-align">{calculationVersions[0].publishStatus}</span>
+                            <DateTimeFormatter date={calculationVersions[0].lastUpdated} /> <span className="right-align">{calculationVersions[0].publishStatus}</span>
                         </label></div>
                 </div>
                 <div className="govuk-grid-column-one-half">
                     <div className="govuk-form-group">
                         <label className="govuk-label" htmlFor="more-detail">
-                            <DateFormatter date={calculationVersions[1].lastUpdated} /> <span className="right-align">{calculationVersions[1].publishStatus}</span>
+                            <DateTimeFormatter date={calculationVersions[1].lastUpdated} /> <span className="right-align">{calculationVersions[1].publishStatus}</span>
                         </label></div>
                 </div>
                 <div className="govuk-grid-column-full">

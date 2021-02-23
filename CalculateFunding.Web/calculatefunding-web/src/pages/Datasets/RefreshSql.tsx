@@ -9,7 +9,7 @@ import {Section} from "../../types/Sections";
 import {FundingPeriodWithSpecificationSelectedForFunding, FundingStreamWithSpecificationSelectedForFunding} from "../../types/SpecificationSelectedForFunding";
 import {useErrors} from "../../hooks/useErrors";
 import {JobType} from "../../types/jobType";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {useQuery} from "react-query";
 import {LatestPublishedDate} from "../../types/PublishedProvider/LatestPublishedDate";
 import {AxiosError} from "axios";
@@ -237,7 +237,7 @@ export function RefreshSql() {
         }
         if (refreshJobDateTime) {
             return (
-                <DateFormatter
+                <DateTimeFormatter
                     date={refreshJobDateTime}
                     />
             );
@@ -249,7 +249,7 @@ export function RefreshSql() {
 
         return (
             <>
-                <DateFormatter
+                <DateTimeFormatter
                     date={lastSqlJob.lastUpdated}
                     />
                 <span className="govuk-body">{previousJobFailed ? " (Failed)" : ""}</span>
@@ -268,7 +268,7 @@ export function RefreshSql() {
             return <span className="govuk-body">N/A</span>
         }
         return (
-            <DateFormatter
+            <DateTimeFormatter
                 date={latestPublishedDate.value}
                 />
         );
@@ -329,8 +329,8 @@ export function RefreshSql() {
                                     Last SQL update
                                 </dt>
                                 <dd className="govuk-summary-list__value">
-                                    <DateFormatter
-                                        date={refreshJobDateTime}
+                                    <DateTimeFormatter
+                                        date={refreshJobDateTime as Date}
                                         />
                                 </dd>
                             </div>

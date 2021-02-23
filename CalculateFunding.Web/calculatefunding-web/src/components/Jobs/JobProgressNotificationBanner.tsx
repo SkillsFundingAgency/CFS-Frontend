@@ -1,5 +1,5 @@
 import React from "react";
-import {DateFormatter} from "../DateFormatter";
+import {DateTimeFormatter} from "../DateTimeFormatter";
 import {JobDetails} from "../../types/jobDetails";
 
 export interface JobProgressNotificationBannerProps {
@@ -55,7 +55,7 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
                     <p className="govuk-body">
                         {`Initiated by ${props.job.invokerUserDisplayName} on `}
                         <span data-testid="formatted-created-date">
-                            <DateFormatter date={props.job.created as Date} />
+                            <DateTimeFormatter date={props.job.created as Date} />
                         </span>
                     </p>
                 </li>
@@ -71,7 +71,7 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
                     <p className="govuk-body-s">
                         <strong>Completed: </strong>
                         <span data-testid="formatted-completed-date">
-                            <DateFormatter date={props.job.lastUpdated as Date} />
+                            <DateTimeFormatter date={props.job.lastUpdated as Date} />
                         </span>
                     </p>
                 </li>}

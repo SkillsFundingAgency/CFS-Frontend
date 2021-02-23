@@ -1,5 +1,5 @@
 import {MultipleErrorSummary} from "../MultipleErrorSummary";
-import {DateFormatter} from "../DateFormatter";
+import {DateTimeFormatter} from "../DateTimeFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import * as React from "react";
@@ -146,7 +146,7 @@ export function DownloadableReports(props: {
                                         }
                                     </h4>
                                     <p className="govuk-body-s">
-                                        <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
+                                        <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateTimeFormatter
                                         date={dlr.lastModified}/></span>
                                     </p>
                                 </div>
@@ -246,7 +246,7 @@ export function DownloadableReports(props: {
                                        href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
                                 </h4>
                                 <p className="govuk-body-s">
-                                    <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateFormatter
+                                    <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateTimeFormatter
                                     date={dlr.lastModified}/></span>
                                 </p>
                             </div>

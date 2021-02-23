@@ -1,6 +1,6 @@
 import {LoadingStatus} from "../LoadingStatus";
 import {Link} from "react-router-dom";
-import {DateFormatter} from "../DateFormatter";
+import {DateTimeFormatter} from "../DateTimeFormatter";
 import Pagination from "../Pagination";
 import * as React from "react";
 import {searchCalculationsForSpecification, searchForCalculationsByProviderService} from "../../services/calculationService";
@@ -171,7 +171,7 @@ export function AdditionalCalculations({
                             <td className="govuk-table__cell">{ac.valueType}</td>
                             {providerId && <td className="govuk-table__cell">{renderValue(ac.value, ac.valueType)}</td>}
                             {!providerId && <td className="govuk-table__cell">
-                                <DateFormatter date={ac.lastUpdatedDate} />
+                                <DateTimeFormatter date={ac.lastUpdatedDate} />
                             </td>}
                         </tr>
                     }

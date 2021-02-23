@@ -3,7 +3,7 @@ import React, {useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Section} from "../../types/Sections";
 import {CalculationVersionHistorySummary} from "../../types/Calculations/CalculationVersionHistorySummary";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
@@ -133,7 +133,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                                 </th>
                                 <td className="govuk-table__cell">{cvh.publishStatus}</td>
                                 <td className="govuk-table__cell">{cvh.version}</td>
-                                <td className="govuk-table__cell"><DateFormatter date={cvh.lastUpdated}/>
+                                <td className="govuk-table__cell"><DateTimeFormatter date={cvh.lastUpdated}/>
                                 </td>
                                 <td className="govuk-table__cell">{cvh.author.name}</td>
                             </tr>

@@ -15,7 +15,7 @@ import {
     uploadDatasetVersionService,
     validateDatasetService
 } from "../../services/datasetService";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {
     UpdateNewDatasetVersionResponseViewModel
 } from "../../types/Datasets/UpdateDatasetRequestViewModel";
@@ -310,7 +310,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 </span>
                     </summary>
                     <div id={"last-updated-by-author"} className="govuk-details__text" data-testid="update-datasource-author" >
-                        {dataset.lastUpdatedByName} <span className="govuk-!-margin-left-2"><DateFormatter date={dataset.lastUpdatedDate}/></span>
+                        {dataset.lastUpdatedByName} <span className="govuk-!-margin-left-2"><DateTimeFormatter date={dataset.lastUpdatedDate}/></span>
                     </div>
                 </details>
                 <div id="update-type"

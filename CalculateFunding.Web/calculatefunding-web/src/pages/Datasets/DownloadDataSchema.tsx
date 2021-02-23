@@ -5,7 +5,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {searchDatasetDefinitionsService} from "../../services/datasetService";
 import {DatasetDefinitionRequestViewModel} from "../../types/Datasets/DatasetDefinitionRequestViewModel";
 import {DatasetDefinitionResponseViewModel} from "../../types/Datasets/DatasetDefinitionResponseViewModel";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import Pagination from "../../components/Pagination";
 import {Footer} from "../../components/Footer";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -247,7 +247,7 @@ export function DownloadDataSchema() {
                                         </details>
                                     </div>
                                 </th>
-                                <td className="govuk-table__cell"><DateFormatter date={d.lastUpdatedDate} /></td>
+                                <td className="govuk-table__cell"><DateTimeFormatter date={d.lastUpdatedDate} /></td>
                                 <td className="govuk-table__cell">
                                     <p className="govuk-body-s">
                                         <a className="govuk-link" target="_self" href={`/api/datasets/download-dataset-schema/${d.id}`}>{d.name}.xlsx</a>

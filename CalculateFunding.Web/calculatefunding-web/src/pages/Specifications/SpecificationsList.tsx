@@ -4,7 +4,7 @@ import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {CollapsiblePanel} from "../../components/CollapsiblePanel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import Pagination from "../../components/Pagination";
 import {SpecificationSearchRequestViewModel} from "../../types/SpecificationSearchRequestViewModel";
 import {Section} from "../../types/Sections";
@@ -313,7 +313,7 @@ export function SpecificationsList() {
                                     {s.isSelectedForFunding && <strong className="govuk-tag govuk-!-margin-top-2">Chosen for funding</strong>}
                                 </th>
                                 <td className="govuk-table__cell">
-                                    <DateFormatter date={s.lastUpdatedDate} />
+                                    <DateTimeFormatter date={s.lastUpdatedDate} />
                                 </td>
                                 <td className="govuk-table__cell">{s.status}</td>
                             </tr>)}

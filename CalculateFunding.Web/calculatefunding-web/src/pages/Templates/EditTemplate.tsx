@@ -53,7 +53,7 @@ import {
     FundingLineDictionaryItem
 } from '../../types/TemplateBuilderDefinitions';
 import "../../styles/EditTemplate.scss";
-import {DateFormatter} from '../../components/DateFormatter';
+import {DateTimeFormatter} from '../../components/DateTimeFormatter';
 import {Breadcrumbs, Breadcrumb} from '../../components/Breadcrumbs';
 import {LoadingStatus} from '../../components/LoadingStatus';
 import {EditDescriptionModal} from '../../components/TemplateBuilder/EditDescriptionModal';
@@ -773,7 +773,7 @@ export function EditTemplate() {
                         handlePublish={handlePublishClick}
                     />}
                     <p className="govuk-body">
-                        Last updated: <DateFormatter date={template ? template.lastModificationDate : new Date()} />
+                        Last updated: <DateTimeFormatter date={template ? template.lastModificationDate : new Date()} />
                         {` by ${template && template.authorName}`}
                     </p>
                     {saveMessage.length > 0 ? <span className="govuk-error-message" style={isFullScreen ? saveMessageFullScreenStyle : {}}>{saveMessage}</span> : null}

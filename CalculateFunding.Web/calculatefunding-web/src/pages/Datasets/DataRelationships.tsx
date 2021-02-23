@@ -11,7 +11,7 @@ import {SpecificationDatasetRelationshipsViewModel} from "../../types/Datasets/S
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {NoData} from "../../components/NoData";
 import {Footer} from "../../components/Footer";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
 
@@ -140,7 +140,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                                     <strong>Description:</strong> {sdr.definitionDescription}
                                                 </p>
                                                 <p className="govuk-body">
-                                                    <strong>Last mapped:</strong> <DateFormatter date={sdr.lastUpdatedDate} />
+                                                    <strong>Last mapped:</strong> <DateTimeFormatter date={sdr.lastUpdatedDate} />
                                                 </p>
                                                 <p className="govuk-body">
                                                     <strong>Last mapped by:</strong> {sdr.lastUpdatedAuthorName}

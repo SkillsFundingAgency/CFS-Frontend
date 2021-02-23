@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import {DateFormatter} from "../DateFormatter";
+import {DateTimeFormatter} from "../DateTimeFormatter";
 import {Dataset} from "../../types/Datasets/RelationshipData";
 
 export interface DatasetVersionSelectionProps {
@@ -29,7 +29,7 @@ export function DatasetVersionSelection(props: DatasetVersionSelectionProps) {
                                 </p>
                                 <p className="govuk-body-s">
                                     <strong>Last updated:</strong>
-                                    <DateFormatter date={version.date} /></p>
+                                    <DateTimeFormatter date={version.date} /></p>
                                 <p className="govuk-body-s">
                                     <strong>Last updated by:</strong> {version.author.name}
                                 </p>

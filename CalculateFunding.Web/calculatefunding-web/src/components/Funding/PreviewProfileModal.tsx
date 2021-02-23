@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {previewProfile} from '../../services/profilingService';
 import "../../styles/PreviewProfileModal.scss";
 import {ProfileTotal} from '../../types/FundingLineProfile';
-import {DateFormatter} from '../DateFormatter';
+import {DateTimeFormatter} from '../DateTimeFormatter';
 import {FormattedNumber, NumberType} from '../FormattedNumber';
 import {LoadingStatus} from '../LoadingStatus';
 
@@ -97,7 +97,7 @@ export function PreviewProfileModal({
                                         .sort((a, b) => a.installmentNumber - b.installmentNumber)
                                         .map(pt => (
                                             <tr key={`installment-${pt.installmentNumber}`} className="govuk-table__row">
-                                                <th scope="row" className="govuk-table__header"><DateFormatter date={pt.actualDate} /></th>
+                                                <th scope="row" className="govuk-table__header"><DateTimeFormatter date={pt.actualDate as Date} /></th>
                                                 <td className="govuk-table__cell">{pt.isPaid ? <strong className="govuk-tag">Paid</strong> : null}</td>
                                                 <td className="govuk-table__cell">{pt.installmentNumber}</td>
                                                 <td className="govuk-table__cell"><FormattedNumber value={pt.profileRemainingPercentage} type={NumberType.FormattedPercentage} /></td>

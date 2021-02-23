@@ -5,7 +5,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {assignDataSourceService, getExpandedDataSources} from "../../services/datasetService";
 import {RouteComponentProps, useHistory} from "react-router";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {getSpecificationSummaryService} from "../../services/specificationService";
 import {LoadingStatus} from "../../components/LoadingStatus";
@@ -72,7 +72,8 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
         name: "",
         providerVersionId: "",
         dataDefinitionRelationshipIds: [],
-        templateIds: {}
+        templateIds: {},
+        coreProviderVersionUpdates: undefined
     })
     const [datasourceVersions, setDatasourceVersions] = useState<DatasetRelationshipPagedResponseViewModel>({
         endItemNumber: 0,
@@ -232,7 +233,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                                                     <div className="govuk-details__text">
                                                                         <p className="govuk-body-s">
                                                                             <strong>Last updated:</strong>
-                                                                            <DateFormatter date={v.date} />
+                                                                            <DateTimeFormatter date={v.date} />
                                                                         </p>
                                                                         <p className="govuk-body-s">
                                                                             <strong>Last updated by:</strong> {v.author.name}

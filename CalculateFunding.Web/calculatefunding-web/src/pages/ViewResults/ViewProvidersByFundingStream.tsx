@@ -14,7 +14,7 @@ import {
 import Pagination from "../../components/Pagination";
 import {FacetValue} from "../../types/Facet";
 import {BackToTop} from "../../components/BackToTop";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {NoData} from "../../components/NoData";
 import {getFundingStreamByIdService} from "../../services/policyService";
 import {FundingStream} from "../../types/viewFundingTypes";
@@ -385,7 +385,7 @@ export function ViewProvidersByFundingStream({match}: RouteComponentProps<ViewPr
                                         {
                                             ((providerVersionSearchResult.dateOpened == null) ?
                                                     " Unknown"
-                                                    : <DateFormatter date={providerVersionSearchResult.dateOpened}
+                                                    : <DateTimeFormatter date={providerVersionSearchResult.dateOpened}
                                                                      />
                                             )}
                                     </strong>

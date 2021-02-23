@@ -9,7 +9,8 @@ import {useQuery} from 'react-query'
 import {getPreviousProfilesForSpecificationForProviderForFundingLine} from "../../services/fundingLineDetailsService";
 import {FundingLineChangeViewModel} from "../../types/PublishedProvider/FundingLineProfile";
 import {ErrorSummary} from "../../components/ErrorSummary";
-import {DateFormatter, formatDate} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
+import {formatDateTime} from "../../helpers/DateHelper";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {AccordianPanel} from "../../components/AccordianPanel";
 import {Link} from "react-router-dom";
@@ -103,9 +104,9 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
                                     </div>
                                     {data.fundingLineChanges.map((_, i) => (
                                         <AccordianPanel key={`panel-${i}`} id={`panel-${i}`} expanded={false}
-                                            title={`Profile prior to ${formatDate(_.lastUpdatedDate)}`} autoExpand={allExpanded}
+                                            title={`Profile prior to ${formatDateTime(_.lastUpdatedDate)}`} autoExpand={allExpanded}
                                             boldSubtitle={""}
-                                            subtitle={`Last updated by ${_.lastUpdatedUser.name} on ${formatDate(_.lastUpdatedDate, false)}`}>
+                                            subtitle={`Last updated by ${_.lastUpdatedUser.name} on ${formatDateTime(_.lastUpdatedDate)}`}>
                                             <div id="accordion-default-content-1" className="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-1">
                                                 <div className="govuk-grid-row">
                                                     <div className="govuk-grid-column-two-thirds">
@@ -137,7 +138,7 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
                                                                     .sort((a, b) => a.installmentNumber - b.installmentNumber)
                                                                     .map(pt => (
                                                                         <tr key={`installment-${pt.installmentNumber}`} className="govuk-table__row">
-                                                                            <th scope="row" className="govuk-table__header"><DateFormatter date={pt.actualDate} /></th>
+                                                                            <th scope="row" className="govuk-table__header"><DateTimeFormatter date={pt.actualDate as Date} /></th>
                                                                             <td className="govuk-table__cell" data-testid={`paid-${i}`}>{pt.isPaid ? <strong className="govuk-tag">Paid</strong> : null}</td>
                                                                             <td className="govuk-table__cell">{pt.installmentNumber}</td>
                                                                             <td className="govuk-table__cell"><FormattedNumber value={pt.profileRemainingPercentage} type={NumberType.FormattedPercentage} /></td>

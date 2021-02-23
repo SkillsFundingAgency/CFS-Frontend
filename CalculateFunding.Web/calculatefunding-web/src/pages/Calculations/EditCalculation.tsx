@@ -13,7 +13,7 @@ import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 import React, {useEffect, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {useErrors} from "../../hooks/useErrors";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
@@ -264,7 +264,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
 
                 {calculation &&
                 <p id="last-saved-date" className={"govuk-body"}>
-                    Last saved <DateFormatter date={calculation.lastUpdated} />
+                    Last saved <DateTimeFormatter date={calculation.lastUpdated} />
                 </p>
                 }
 

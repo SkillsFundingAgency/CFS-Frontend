@@ -4,7 +4,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 // @ts-ignore
 import {Link, useParams} from "react-router-dom";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {DateFormatter} from "../../components/DateFormatter";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import React, {useEffect, useState} from "react";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {getTemplateById, getVersionsOfTemplate} from "../../services/templateBuilderDatasourceService";
@@ -198,7 +198,7 @@ export const ListVersions = () => {
                                                                 <span><strong className="govuk-tag govuk-tag--green">Published</strong></span>}
                                                         </td>
                                                         <td className="govuk-table__cell">
-                                                            <DateFormatter date={item.lastModificationDate} /><br />
+                                                            <DateTimeFormatter date={item.lastModificationDate} /><br />
                                                 by {item.authorName}
                                                         </td>
                                                     </tr>)

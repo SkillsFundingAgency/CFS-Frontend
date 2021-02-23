@@ -2,7 +2,7 @@ import '../styles/CollapsibleSteps.scss';
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import {DateFormatter} from "./DateFormatter";
+import {DateTimeFormatter} from "./DateTimeFormatter";
 import {FundingStructureItemViewModel} from "../types/FundingStructureItem";
 import {PublishStatus} from "../types/PublishStatusModel";
 
@@ -96,7 +96,7 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                             }
                         </span>
                         <span className="collapsible-step-header-updated-date">
-                            <DateFormatter date={props.lastUpdatedDate} />
+                            <DateTimeFormatter date={props.lastUpdatedDate as Date} />
                         </span>
                         <span className="collapsible-step-panel-button" hidden={!props.hasChildren} onClick={updateExpandedStatus}>
                             <label className={expanded ? "govuk-collapsiblepanel-heading-collapser" : "govuk-collapsiblepanel-heading-expander"} />
