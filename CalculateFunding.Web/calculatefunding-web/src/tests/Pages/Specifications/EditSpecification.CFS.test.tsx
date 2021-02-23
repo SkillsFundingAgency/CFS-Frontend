@@ -15,6 +15,7 @@ describe("<EditSpecification />", () => {
             test.mockProviderService();
             test.mockProviderVersionService();
             test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
+            test.haveSpecificationMonitorHookWithNoJob();
 
             await test.renderEditSpecificationPage(test.specificationCfs.id);
 

@@ -20,6 +20,8 @@ import * as providerService from "../../services/providerService";
 import {ProviderDataTrackingMode} from "../../types/Specifications/ProviderDataTrackingMode";
 import {Link} from "react-router-dom";
 import {Footer} from "../../components/Footer";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {JobType} from "../../types/jobType";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -41,7 +43,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [enableTrackProviderData, setEnableTrackProviderData] = useState<ProviderDataTrackingMode | undefined>();
 
     const {specification, isLoadingSpecification, clearSpecificationFromCache} =
-        useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
+        useSpecificationSummary(specificationId, err => addError({
+            error: err,
+            description: "Error while loading specification"
+        }));
 
     const fundingStreamId = specification && specification.fundingStreams[0].id
     const fundingPeriodId = specification && specification.fundingPeriod.id;
@@ -53,6 +58,13 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const providerSource = fundingConfiguration?.providerSource;
     const [coreProviderData, setCoreProviderData] = useState<NameValuePair[]>([]);
 
+    const {hasJob, latestJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.RefreshFundingJob, JobType.ApproveAllProviderFundingJob,
+                JobType.ApproveBatchProviderFundingJob, JobType.PublishAllProviderFundingJob,
+                JobType.PublishBatchProviderFundingJob],
+            err => addError({error: err, description: "Error while checking for specification jobs"}));
+
     const {data: coreProviders, isLoading: isLoadingCoreProviders} = useQuery<CoreProviderSummary[], AxiosError>(
         `coreProviderSummary-for-${fundingStreamId}`,
         async () => (await providerVersionService.getCoreProvidersByFundingStream(fundingStreamId as string)).data,
@@ -61,7 +73,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             retry: false,
             refetchOnWindowFocus: false,
             onError: err => err.response?.status !== 404 &&
-                addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
+                addError({
+                    error: err,
+                    description: "Could not find a provider data source",
+                    fieldName: "selectCoreProvider"
+                }),
         }
     );
 
@@ -73,7 +89,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             retry: false,
             refetchOnWindowFocus: false,
             onError: err => err.response?.status !== 404 &&
-                addError({error: err, description: "Could not find a provider data source", fieldName: "selectCoreProvider"}),
+                addError({
+                    error: err,
+                    description: "Could not find a provider data source",
+                    fieldName: "selectCoreProvider"
+                }),
             onSuccess: results => {
                 clearErrorMessages(["selectCoreProvider"]);
             }
@@ -89,7 +109,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             retry: false,
             refetchOnWindowFocus: false,
             onError: err => err.response?.status !== 404 &&
-                addError({error: err, description: "Could not find any published funding templates", fieldName: "selectTemplateVersion"}),
+                addError({
+                    error: err,
+                    description: "Could not find any published funding templates",
+                    fieldName: "selectTemplateVersion"
+                }),
             onSuccess: results => {
                 clearErrorMessages(["selectTemplateVersion"]);
             }
@@ -99,7 +123,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [isUpdating, setIsUpdating] = useState(false);
     const history = useHistory();
     const {errors, addError, clearErrorMessages} = useErrors();
-    const errorSuggestion = <p>If the problem persists please contact the <a href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
+    const errorSuggestion = <p>If the problem persists please contact the <a
+        href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
 
     function handleSpecificationNameChange(e: React.ChangeEvent<HTMLInputElement>) {
         const specificationName = e.target.value;
@@ -154,7 +179,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 isValid = false;
             }
             if (providerSource === ProviderSource.FDZ && enableTrackProviderData === undefined) {
-                addError({error: "Please select whether you want to track latest core provider data", fieldName: "trackProviderData"});
+                addError({
+                    error: "Please select whether you want to track latest core provider data",
+                    fieldName: "trackProviderData"
+                });
                 isValid = false;
             }
             if (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual &&
@@ -163,7 +191,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 isValid = false;
             }
         }
-        
+
         if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
             addError({error: "Missing template version", fieldName: "selectTemplateVersion"})
             isValid = false;
@@ -198,7 +226,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 history.push(`/ViewSpecification/${specificationId}`);
             } catch (error) {
                 if (error.response && error.response.data["Name"] !== undefined) {
-                    addError({error: error.response.data["Name"], description: `Failed to save`, suggestion: errorSuggestion});
+                    addError({
+                        error: error.response.data["Name"],
+                        description: `Failed to save`,
+                        suggestion: errorSuggestion
+                    });
                 } else {
                     addError({error: error, description: `Specification failed to update, please try again`});
                 }
@@ -206,7 +238,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             }
         }
     }
-    
+
     useEffect(() => {
         if (specification) {
             setSelectedName(specification.name);
@@ -227,7 +259,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             }
         }
     }, [specification])
-    
+
     useEffect(() => {
         if (specification && fundingStreamId && publishedFundingTemplates) {
             const templates = publishedFundingTemplates.map(publishedFundingTemplate => ({
@@ -241,7 +273,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             }
         }
     }, [specification, publishedFundingTemplates])
-    
+
     useEffect(() => {
         if (providerSource === ProviderSource.CFS && coreProviders) {
             clearErrorMessages(["selectCoreProvider"]);
@@ -279,24 +311,27 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
                 <MultipleErrorSummary errors={errors}/>
-                {(isLoading || isUpdating) &&
+                {(isLoading || isUpdating || (hasJob && !latestJob?.isComplete)) &&
                 <LoadingStatus title={isUpdating ? "Updating Specification" :
-                    `Loading ${isLoadingSpecification ? "specification" :
-                        isLoadingFundingConfiguration ? "funding configuration" :
-                            isLoadingPublishedFundingTemplates ? "templates" :
-                                isLoadingProviderSnapshots ? "provider snapshots" :
-                                    isLoadingCoreProviders ? "core providers" : ""}`}
+                    `Loading ${
+                        (hasJob && !latestJob?.isComplete) ? "specification jobs" :
+                            isLoadingSpecification ? "specification" :
+                                isLoadingFundingConfiguration ? "funding configuration" :
+                                    isLoadingPublishedFundingTemplates ? "templates" :
+                                        isLoadingProviderSnapshots ? "provider snapshots" :
+                                            isLoadingCoreProviders ? "core providers" : ""}`}
                                subTitle="Please wait"
                                description={isUpdating ? "This can take a few minutes" : ""}/>
                 }
-                {!isLoading && !isUpdating &&
-                <fieldset className="govuk-fieldset" id="update-specification-fieldset">
+                {!isLoading && !isUpdating && (!hasJob || latestJob?.isComplete) &&
+                <fieldset className="govuk-fieldset" id="update-specification-fieldset" data-testid="edit-specification-form">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
                             Edit specification
                         </h1>
                     </legend>
-                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "name").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                    <div
+                        className={`govuk-form-group ${errors.filter(e => e.fieldName === "name").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="name" id="name-description">
                             Specification name
                         </label>
@@ -320,12 +355,15 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         <label className="govuk-label" htmlFor="funding-period">
                             Funding period
                         </label>
-                        <h3 className="govuk-heading-m" id="funding-period">{specification && specification.fundingPeriod.name}</h3>
+                        <h3 className="govuk-heading-m"
+                            id="funding-period">{specification && specification.fundingPeriod.name}</h3>
                     </div>
 
                     {providerSource === ProviderSource.FDZ &&
-                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                        <fieldset className="govuk-fieldset" id="trackProviderData" aria-describedby="trackProviderData-hint" role="radiogroup">
+                    <div
+                        className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                        <fieldset className="govuk-fieldset" id="trackProviderData"
+                                  aria-describedby="trackProviderData-hint" role="radiogroup">
                             <legend className="govuk-label" id="trackProviderData-label">
                                 Track latest core provider data?
                             </legend>
@@ -378,7 +416,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     }
 
                     {(providerSource === ProviderSource.CFS || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
-                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                    <div
+                        className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data
                         </label>
@@ -398,7 +437,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     </div>
                     }
 
-                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectTemplateVersion").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                    <div
+                        className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectTemplateVersion").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectTemplateVersion">
                             Template version
                         </label>
@@ -419,7 +459,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                         </select>
                     </div>
 
-                    <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                    <div
+                        className={`govuk-form-group ${errors.filter(e => e.fieldName === "description").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="description" id="description-hint">
                             Can you provide more detail?
                         </label>

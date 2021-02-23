@@ -12,6 +12,7 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 import * as monitorHook from "../../../hooks/Jobs/useJobMonitor";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobDetails} from "../../../types/jobDetails";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
@@ -41,6 +42,17 @@ export function SpecificationTestData() {
     };
 
     const renderEditSpecificationPage = async (mockSpecId: string) => {
+        const {EditSpecification} = require('../../../pages/Specifications/EditSpecification');
+        return render(<MemoryRouter initialEntries={[`/Specifications/EditSpecification/${mockSpecId}`]}>
+            <QueryClientProviderTestWrapper>
+                <Switch>
+                    <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
+                </Switch>
+            </QueryClientProviderTestWrapper>
+        </MemoryRouter>);
+    };
+
+    const renderLoadedEditSpecificationPage = async (mockSpecId: string) => {
         const {EditSpecification} = require('../../../pages/Specifications/EditSpecification');
         const component = render(<MemoryRouter initialEntries={[`/Specifications/EditSpecification/${mockSpecId}`]}>
             <QueryClientProviderTestWrapper>
@@ -75,6 +87,40 @@ export function SpecificationTestData() {
 
     const mockJobMonitorHookWithNoJob = () => jest.spyOn(monitorHook, 'useJobMonitor')
         .mockImplementation(() => ({newJob: undefined}));
+
+    const mockLatestSpecJobMonitorHookWithNoJob = () =>
+        jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring')
+            .mockImplementation(() => ({
+                hasJob: false,
+                latestJob: undefined,
+                isMonitoring: false,
+                isFetching: true,
+                isFetched: true,
+                isCheckingForJob: true
+            }));
+
+    const mockLatestSpecJobMonitorHookWithARunningJob = () =>
+        jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring')
+        .mockImplementation(() => ({
+            hasJob: true,
+            latestJob: {
+                jobId: "aValidJobId",
+                statusDescription: "",
+                jobDescription: "",
+                runningStatus: RunningStatus.InProgress,
+                failures: [],
+                isSuccessful: false,
+                isFailed: false,
+                isActive: false,
+                isComplete: false,
+                completionStatus: CompletionStatus.Succeeded,
+                outcome: "ValidationFailed"
+            },
+            isMonitoring: false,
+            isFetching: true,
+            isFetched: true,
+            isCheckingForJob: true
+        }));
 
     const mockFundingStream: FundingStream = {
         id: "stream-547",
@@ -288,13 +334,16 @@ export function SpecificationTestData() {
 
     return {
         renderCreateSpecificationPage,
-        renderEditSpecificationPage,
+        renderEditSpecificationPageWithJobRunning: renderEditSpecificationPage,
+        renderEditSpecificationPage: renderLoadedEditSpecificationPage,
         mockPolicyService,
         mockSpecificationService,
         mockSpecificationServiceWithDuplicateNameResponse,
         mockProviderVersionService,
         mockProviderService,
         haveSuccessfulJobCompletion: mockJobMonitorHookWithSuccessfulJob,
+        haveSpecificationMonitorHookWithNoJob: mockLatestSpecJobMonitorHookWithNoJob,
+        haveRunningSpecificationMonitorJob: mockLatestSpecJobMonitorHookWithARunningJob,
         haveNoJobRunning: mockJobMonitorHookWithNoJob,
         specificationCfs: mockCfsSpec,
         specificationFdzWithoutTracking: mockFdzSpecWithoutTracking,

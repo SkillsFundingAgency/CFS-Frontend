@@ -16,6 +16,7 @@ describe("<EditSpecification />", () => {
             test.mockProviderService();
             test.mockProviderVersionService();
             test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All);
+            test.haveSpecificationMonitorHookWithNoJob();
 
             await test.renderEditSpecificationPage(spec.id);
 
