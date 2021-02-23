@@ -273,8 +273,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name} />
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} 
-                              hidden={!isPermissionsFetched} />
+            <PermissionStatus requiredPermissions={missingPermissions}
+                hidden={!isPermissionsFetched} />
 
             <MultipleErrorSummary errors={errors} />
 

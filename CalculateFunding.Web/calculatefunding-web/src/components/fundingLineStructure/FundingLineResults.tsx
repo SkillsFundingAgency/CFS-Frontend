@@ -29,6 +29,8 @@ import {ValueFormatType} from "../../types/TemplateBuilderDefinitions";
 import {formatNumber, NumberType} from "../FormattedNumber";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
 import {ErrorProps} from "../../hooks/useErrors";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {JobType} from "../../types/jobType";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -53,7 +55,7 @@ export function FundingLineResults({
     clearErrorMessages,
     setStatusToApproved,
     refreshFundingLines,
-    showApproveButton = false
+    showApproveButton = false,
 }: FundingLineResultsProps) {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
@@ -72,6 +74,13 @@ export function FundingLineResults({
     const {circularReferenceErrors, isLoadingCircularDependencies} =
         useCalculationCircularDependencies(specificationId,
             err => addError({error: err, description: "Error while checking for circular reference errors"}));
+
+    const {latestJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.AssignTemplateCalculationsJob, JobType.RefreshFundingJob, JobType.ApproveAllProviderFundingJob,
+                JobType.ApproveBatchProviderFundingJob, JobType.PublishAllProviderFundingJob,
+                    JobType.PublishBatchProviderFundingJob, JobType.PublishedFundingUndoJob],
+            err => addError({error: err, description: "Error while checking for assign template calculations job"}));
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
         const response = await approveFundingLineStructureService(specificationId);
@@ -275,77 +284,81 @@ export function FundingLineResults({
         return '';
     }
 
-    return <section className="govuk-tabs__panel" id="fundingline-structure">
-        <LoadingStatus title={"Loading funding line structure"}
-            hidden={!isLoadingFundingLineStructure}
-            description={"Please wait whilst funding line structure is loading"} />
-        <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
-            <div className="govuk-grid-column-two-thirds">
-                <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
+    return (
+        <section className="govuk-tabs__panel" id="fundingline-structure">
+            <LoadingStatus title={"Loading funding line structure"}
+                hidden={!isLoadingFundingLineStructure && (latestJob && latestJob.isComplete)}
+                description={"Please wait whilst funding line structure is loading"} />
+            <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
+                <div className="govuk-grid-column-two-thirds">
+                    <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
+                </div>
             </div>
-        </div>
-        {!isLoadingFundingLineStructure && !isLoadingCircularDependencies && !fundingLineStructureError &&
-            <>
-                <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-two-thirds">
-                        <h2 className="govuk-heading-l">Funding line structure</h2>
-                    </div>
-                    <div className="govuk-grid-column-one-third">
-                        {showApproveButton && <ApproveStatusButton id={specificationId}
-                            status={fundingLinePublishStatus}
-                            callback={handleApproveFundingLineStructure} />}
-                    </div>
-                    <div className="govuk-grid-column-two-thirds">
-                        <div className="govuk-form-group search-container">
-                            <label className="govuk-label">
-                                Search by calculation
-                            </label>
-                            <InputSearch id={"input-auto-complete"} suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
+            {!isLoadingFundingLineStructure && !isLoadingCircularDependencies &&
+                !fundingLineStructureError &&
+                    (latestJob && latestJob.isComplete) &&
+                <>
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-two-thirds">
+                            <h2 className="govuk-heading-l">Funding line structure</h2>
+                        </div>
+                        <div className="govuk-grid-column-one-third">
+                            {showApproveButton && <ApproveStatusButton id={specificationId}
+                                status={fundingLinePublishStatus}
+                                callback={handleApproveFundingLineStructure} />}
+                        </div>
+                        <div className="govuk-grid-column-two-thirds">
+                            <div className="govuk-form-group search-container">
+                                <label className="govuk-label">
+                                    Search by calculation
+                                </label>
+                                <InputSearch id={"input-auto-complete"} suggestions={fundingLineSearchSuggestions} callback={searchFundingLines} />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="govuk-accordion__controls">
-                    <button type="button" className="govuk-accordion__open-all"
-                        aria-expanded="false"
-                        onClick={() => openCloseAllFundingLines(true)}
-                        hidden={fundingLinesExpandedStatus}>Open all<span
-                            className="govuk-visually-hidden"> sections</span></button>
-                    <button type="button" className="govuk-accordion__open-all"
-                        aria-expanded="true"
-                        onClick={() => openCloseAllFundingLines(false)}
-                        hidden={!fundingLinesExpandedStatus}>Close all<span
-                            className="govuk-visually-hidden"> sections</span></button>
-                </div>
-                <ul className="collapsible-steps">
-                    {
-                        fundingLines.map((f, index) => {
-                            let linkValue: string = getLinkValue(f.calculationId, showApproveButton);
-                            return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
-                                <CollapsibleSteps
-                                    customRef={f.customRef}
-                                    key={"collapsible-steps" + index}
-                                    uniqueKey={index.toString()}
-                                    title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
-                                    value={f.value != null ? f.value : ""}
-                                    description={f.name}
-                                    status={f.calculationPublishStatus}
-                                    step={f.level.toString()}
-                                    expanded={fundingLinesExpandedStatus || f.expanded === true}
-                                    link={linkValue}
-                                    hasChildren={f.fundingStructureItems != null}
-                                    callback={collapsibleStepsChanged}
-                                    calculationErrorMessage={f.errorMessage}>
-                                    <FundingLineStep
-                                        key={f.name.replace(" ", "") + index}
-                                        showResults={!showApproveButton}
-                                        expanded={fundingLinesExpandedStatus}
-                                        fundingStructureItem={f}
-                                        callback={collapsibleStepsChanged} />
-                                </CollapsibleSteps>
-                            </li>
-                        })}
-                </ul>
-            </>}
-        <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0} />
-    </section>
+                    <div className="govuk-accordion__controls">
+                        <button type="button" className="govuk-accordion__open-all"
+                            aria-expanded="false"
+                            onClick={() => openCloseAllFundingLines(true)}
+                            hidden={fundingLinesExpandedStatus}>Open all<span
+                                className="govuk-visually-hidden"> sections</span></button>
+                        <button type="button" className="govuk-accordion__open-all"
+                            aria-expanded="true"
+                            onClick={() => openCloseAllFundingLines(false)}
+                            hidden={!fundingLinesExpandedStatus}>Close all<span
+                                className="govuk-visually-hidden"> sections</span></button>
+                    </div>
+                    <ul className="collapsible-steps">
+                        {
+                            fundingLines.map((f, index) => {
+                                let linkValue: string = getLinkValue(f.calculationId, showApproveButton);
+                                return <li key={"collapsible-steps-top" + index} className="collapsible-step step-is-shown">
+                                    <CollapsibleSteps
+                                        customRef={f.customRef}
+                                        key={"collapsible-steps" + index}
+                                        uniqueKey={index.toString()}
+                                        title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
+                                        value={f.value != null ? f.value : ""}
+                                        description={f.name}
+                                        status={f.calculationPublishStatus}
+                                        step={f.level.toString()}
+                                        expanded={fundingLinesExpandedStatus || f.expanded === true}
+                                        link={linkValue}
+                                        hasChildren={f.fundingStructureItems != null}
+                                        callback={collapsibleStepsChanged}
+                                        calculationErrorMessage={f.errorMessage}>
+                                        <FundingLineStep
+                                            key={f.name.replace(" ", "") + index}
+                                            showResults={!showApproveButton}
+                                            expanded={fundingLinesExpandedStatus}
+                                            fundingStructureItem={f}
+                                            callback={collapsibleStepsChanged} />
+                                    </CollapsibleSteps>
+                                </li>
+                            })}
+                    </ul>
+                </>}
+            <BackToTop id={"fundingline-structure"} hidden={fundingLines.length === 0} />
+        </section>
+    )
 }

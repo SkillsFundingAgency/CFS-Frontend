@@ -9,6 +9,9 @@ import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {CalculationValueType} from "../../../types/CalculationDetails";
 import {ValueFormatType} from "../../../types/TemplateBuilderDefinitions";
 import {LegacyCalculationType} from "../../../types/Provider/ProviderResultForSpecification";
+import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {RunningStatus} from "../../../types/RunningStatus";
 
 describe("<FundingLineResults/> tests", () => {
     beforeAll(() => {
@@ -17,9 +20,29 @@ describe("<FundingLineResults/> tests", () => {
         jest.mock('../../../services/calculationService', () => mockCalculationService());
     });
 
-    afterEach(() => jest.clearAllMocks());
+    afterEach(() => {
+        jest.clearAllMocks();
+        jobMonitorSpy.mockReset();
+    });
+
+    describe("<FundingLineResults /> loading checks", () => {
+        beforeEach(() => {
+            jobMonitorSpy.mockImplementation(
+                () => (runningLatestJob));
+        });
+
+        it('shows loading panel', async () => {
+            renderProviderFundingLineResults();
+            await waitFor(() => expect(screen.getByText(/Loading funding line structure/i)).toBeInTheDocument());
+        });
+    });
 
     describe("<FundingLineResults service checks />  ", () => {
+        beforeEach(() => {
+            jobMonitorSpy.mockImplementation(
+                () => (completedLatestJob));
+        });
+
         it("calls getFundingLineStructureService, getCalculationSummaryBySpecificationId and getCalculationCircularDependencies", async () => {
             const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
             const {getCalculationSummaryBySpecificationId} = require('../../../services/calculationService');
@@ -54,6 +77,11 @@ describe("<FundingLineResults/> tests", () => {
     });
 
     describe('<FundingLineResults /> page renders correctly ', () => {
+        beforeEach(() => {
+            jobMonitorSpy.mockImplementation(
+                () => (completedLatestJob));
+        });
+
         it('shows approve status in funding line structure tab', async () => {
             const {queryAllByText} = renderViewSpecificationFundingLineResults();
             await waitFor(() => expect(queryAllByText('Draft')[0]).toHaveClass("govuk-tag"));
@@ -93,6 +121,11 @@ describe("<FundingLineResults/> tests", () => {
     });
 
     describe('<FundingLineResults /> when providerId provided', () => {
+        beforeEach(() => {
+            jobMonitorSpy.mockImplementation(
+                () => (completedLatestJob));
+        });
+
         it('renders calculation value and format correctly', async () => {
             renderProviderFundingLineResults();
             await waitFor(() => expect(screen.getByText('100')).toBeInTheDocument());
@@ -154,6 +187,38 @@ const renderProviderFundingLineResults = () => {
         </QueryClientProvider>
     </MemoryRouter>);
 }
+
+const completedLatestJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    latestJob: {
+        isComplete: true,
+        jobId: "123",
+        statusDescription: "string",
+        jobDescription: "string",
+        runningStatus: RunningStatus.Completed,
+        failures: [],
+        isSuccessful: true,
+        isFailed: false,
+        isActive: false
+    },
+};
+
+const runningLatestJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    latestJob: {
+        isComplete: false,
+    },
+};
+
+const jobMonitorSpy = jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring');
 
 const mockFundingLineStructureService = () => {
     const fundingLineStructureService = jest.requireActual('../../../services/fundingStructuresService');

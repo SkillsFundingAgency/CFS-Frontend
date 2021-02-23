@@ -1,13 +1,14 @@
 import React from "react";
 import {MemoryRouter} from "react-router";
-import {ViewSpecificationResults} from "../../../pages/Specifications/ViewSpecificationResults";
 import {render} from "@testing-library/react";
 import {Route, Switch} from "react-router-dom";
 import {waitFor} from "@testing-library/dom";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {testSpec} from "../../Hooks/useSpecificationSummary.test";
 import {QueryClient, QueryClientProvider} from "react-query";
-
+import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {RunningStatus} from "../../../types/RunningStatus";
 
 function renderViewSpecificationResults() {
     const {ViewSpecificationResults} = require('../../../pages/Specifications/ViewSpecificationResults');
@@ -61,3 +62,25 @@ describe("<ViewSpecificationResults />  ", () => {
         await waitFor(() => expect(getByTestId("tab-downloadable-reports").textContent).toContain("Downloadable Reports"));
     });
 });
+
+const completedLatestJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true,
+    latestJob: {
+        isComplete: true,
+        jobId: "123",
+        statusDescription: "string",
+        jobDescription: "string",
+        runningStatus: RunningStatus.Completed,
+        failures: [],
+        isSuccessful: true,
+        isFailed: false,
+        isActive: false
+    },
+};
+
+jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
+    () => (completedLatestJob));

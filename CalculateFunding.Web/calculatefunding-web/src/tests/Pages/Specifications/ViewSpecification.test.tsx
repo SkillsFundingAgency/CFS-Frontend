@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
+import {RunningStatus} from "../../../types/RunningStatus";
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
@@ -28,7 +29,17 @@ describe('<ViewSpecification /> ', () => {
                 return {
                     hasJob: false,
                     isCheckingForJob: false,
-                    latestJob: undefined,
+                    latestJob: {
+                        isComplete: true,
+                        jobId: "123",
+                        statusDescription: "string",
+                        jobDescription: "string",
+                        runningStatus: RunningStatus.Completed,
+                        failures: [],
+                        isSuccessful: true,
+                        isFailed: false,
+                        isActive: false
+                    },
                     isFetched: true,
                     isFetching: false,
                     isMonitoring: false,
