@@ -1,9 +1,9 @@
 import React from "react";
-import {DateFormatter} from "../DateFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {JobDetails} from "../../types/jobDetails";
 import {LoadingStatus} from "../LoadingStatus";
+import {DateTimeFormatter} from "../DateTimeFormatter";
 
 export enum SpinnerDisplaySetting {
     HideSpinner,
@@ -107,14 +107,14 @@ export function JobNotificationBanner(props: JobNotificationBannerProps) {
                 <li>
                     <p className="govuk-body">
                         <span>Job initiated by {props.job.invokerUserDisplayName} on </span>
-                        <span><DateFormatter date={props.job.created as Date} /></span>
+                        <span><DateTimeFormatter date={props.job.created as Date} /></span>
                     </p>
                 </li>
                 {(props.job.runningStatus === RunningStatus.InProgress || props.job.isComplete) &&
                 <li>
                     <p className="govuk-body-s">
                         <strong>Results updated: </strong>
-                        <DateFormatter date={props.job.lastUpdated as Date} />
+                        <DateTimeFormatter date={props.job.lastUpdated as Date} />
                     </p>
                 </li>
                 }

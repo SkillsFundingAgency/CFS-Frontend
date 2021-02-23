@@ -388,7 +388,7 @@ const testFundingLineProfile = {
         id: "1",
         name: "test user"
     },
-    lastUpdatedDate: new Date(2, 2, 2020),
+    lastUpdatedDate: new Date(Date.UTC(2, 2, 2020)),
     profileTotalAmount: 100,
     profileTotals: [{
         year: 2020,
@@ -412,6 +412,6 @@ const testFundingLineProfile = {
             installmentNumber: 2,
             profileRemainingPercentage: 100,
             distributionPeriodId: "period",
-            actualDate: new Date(2, 1, 2020)
+            actualDate: new Date(Date.UTC(2, 1, 2020))
         }]
 };

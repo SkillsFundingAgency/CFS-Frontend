@@ -78,6 +78,7 @@ describe('<JobNotificationBanner />', () => {
             expect(screen.queryByText(/a test jobCompletedOutcomeFailedMessage/)).not.toBeInTheDocument();
             expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
             expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+            expect(screen.getByText(/2 April 2020 23:00/)).toBeInTheDocument();
             expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
         });
     });
@@ -99,6 +100,7 @@ describe('<JobNotificationBanner />', () => {
                 expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
                 expect(screen.getByText(/a test jobCompletedOutcomeFailedMessage/)).toBeInTheDocument();
                 expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+                expect(screen.getByText(/1 February 2020 09:00/)).toBeInTheDocument();
                 expect(screen.getByText(`Job ID: ${mockFailedJobWithNoChildFailedOutcomesResult.jobId}`)).toBeInTheDocument();
             });
             it('renders jobCompletedOutcomeFailedMessage error message correctly when failed child jobs', async () => {
@@ -116,6 +118,7 @@ describe('<JobNotificationBanner />', () => {
                 expect(screen.getByText(`${mockFailedJobResult.failures[0].jobDescription}: ${mockFailedJobResult.failures[0].description}`)).toBeInTheDocument();
                 expect(screen.getByText(`${mockFailedJobResult.failures[1].jobDescription}: ${mockFailedJobResult.failures[1].description}`)).toBeInTheDocument();
                 expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+                expect(screen.getByText(/2 May 2020 06:00/)).toBeInTheDocument();
                 expect(screen.getByText(`Job ID: ${mockFailedJobResult.jobId}`)).toBeInTheDocument();
             });
         });
@@ -135,6 +138,7 @@ describe('<JobNotificationBanner />', () => {
                 expect(screen.getByText(/a test jobFailedMessage/)).toBeInTheDocument();
                 expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
                 expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+                expect(screen.getByText(/1 February 2020 09:00/)).toBeInTheDocument();
                 expect(screen.getByText(`Job ID: ${mockFailedJobWithNoChildFailedOutcomesResult.jobId}`)).toBeInTheDocument();
             });
 
@@ -153,6 +157,7 @@ describe('<JobNotificationBanner />', () => {
                 expect(screen.getByText(`${mockFailedJobResult.failures[1].jobDescription}: ${mockFailedJobResult.failures[1].description}`)).toBeInTheDocument();
                 expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
                 expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+                expect(screen.getByText(/2 May 2020 06:00/)).toBeInTheDocument();
                 expect(screen.getByText(`Job ID: ${mockFailedJobResult.jobId}`)).toBeInTheDocument();
             });
         });
@@ -173,6 +178,7 @@ describe('<JobNotificationBanner />', () => {
                 expect(screen.getByText(`${mockFailedJobResult.failures[1].jobDescription}: ${mockFailedJobResult.failures[1].description}`)).toBeInTheDocument();
                 expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
                 expect(screen.getByText(/Results updated/)).toBeInTheDocument();
+                expect(screen.getByText(/2 May 2020 06:00/)).toBeInTheDocument();
                 expect(screen.getByText(`Job ID: ${mockFailedJobResult.jobId}`)).toBeInTheDocument();
             });
         });
@@ -191,8 +197,8 @@ const mockQueuedJobResult: JobDetails = getJobDetailsFromJobResponse({
     specificationId: "spec 6545",
     runningStatus: RunningStatus.Queued,
     completionStatus: undefined,
-    lastUpdated: new Date(),
-    created: new Date(),
+    lastUpdated: new Date(2020, 2, 2, 18, 0, 0),
+    created: new Date(2020, 2, 1, 4, 0, 0),
     invokerUserDisplayName: "a valid invoker user",
     invokerUserId: "xxx",
     trigger: emptyTrigger,
@@ -205,8 +211,8 @@ const mockFailedJobWithNoChildFailedOutcomesResult: JobDetails = getJobDetailsFr
     specificationId: "spec 342",
     runningStatus: RunningStatus.Completed,
     completionStatus: CompletionStatus.Failed,
-    lastUpdated: new Date(),
-    created: new Date(),
+    lastUpdated: new Date(Date.UTC(2020, 1, 2, 10, 0, 0)),
+    created: new Date(Date.UTC(2020, 1, 1, 9, 0, 0)),
     invokerUserDisplayName: "a valid invoker user",
     trigger: emptyTrigger,
     outcomes: []
@@ -218,8 +224,8 @@ const mockCompletedJobWithNoOutcomeTypeResult: JobDetails = getJobDetailsFromJob
     specificationId: "spec 574",
     runningStatus: RunningStatus.Completed,
     completionStatus: CompletionStatus.Succeeded,
-    lastUpdated: new Date(),
-    created: new Date(),
+    lastUpdated: new Date(Date.UTC(2020, 3, 2, 23, 0, 0)),
+    created: new Date(Date.UTC(2020, 3, 1, 23, 0, 0)),
     invokerUserDisplayName: "a valid invoker user",
     trigger: emptyTrigger,
     outcomes: []
@@ -231,8 +237,8 @@ const mockFailedJobResult: JobDetails = getJobDetailsFromJobResponse({
     specificationId: "spec 684",
     runningStatus: RunningStatus.Completed,
     completionStatus: CompletionStatus.Failed,
-    lastUpdated: new Date(),
-    created: new Date(),
+    lastUpdated: new Date(Date.UTC(2020, 4, 2, 6, 0, 0)),
+    created: new Date(Date.UTC(2020, 4, 1, 6, 0, 0)),
     invokerUserDisplayName: "a valid invoker user",
     trigger: emptyTrigger,
     outcomes: [{

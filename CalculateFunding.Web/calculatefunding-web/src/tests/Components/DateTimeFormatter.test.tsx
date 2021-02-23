@@ -13,7 +13,7 @@ describe('<DateTimeFormatter />', () => {
     });
 
     it(' has the correct date and time', () => {
-        renderDateTimeFormatter(new Date(2020, 2, 11, 12, 46));
+        renderDateTimeFormatter(new Date(Date.UTC(2020, 2, 11, 12, 46)));
         expect(screen.getByText(/11 March 2020 12:46/));
     });
 
@@ -24,7 +24,7 @@ describe('<DateTimeFormatter />', () => {
     })
 
     it('has only the date time in the span', ()=>{
-        renderDateTimeFormatter(new Date(1995, 10, 29, 13, 32));
+        renderDateTimeFormatter(new Date(Date.UTC(1995, 10, 29, 13, 32)));
         expect(screen.getByTestId(/datetime-formatter/).textContent).toBe('29 November 1995 13:32');
     });
 });
