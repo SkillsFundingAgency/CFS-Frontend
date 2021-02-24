@@ -7,6 +7,7 @@ using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
@@ -31,6 +32,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private Mock<IResultsApiClient> _resultsApiClient;
         private Mock<IPoliciesApiClient> _policiesApiClient;
         private Mock<ICalculationsApiClient> _calculationsApiClient;
+        private Mock<IPublishingApiClient> _pubishingApiClient;
 
         private string _providerId;
         private string _specificationId;
@@ -51,9 +53,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _resultsApiClient = new Mock<IResultsApiClient>();
             _policiesApiClient = new Mock<IPoliciesApiClient>();
             _calculationsApiClient = new Mock<ICalculationsApiClient>();
+            _pubishingApiClient = new Mock<IPublishingApiClient>();
 
             _providerResultsController = new ProviderResultsController(_specificationApiClient.Object,
-                _resultsApiClient.Object, _policiesApiClient.Object, _calculationsApiClient.Object);
+                _resultsApiClient.Object, _policiesApiClient.Object, _calculationsApiClient.Object, _pubishingApiClient.Object);
 
             _providerId = "providerId";
             _specificationId = "specificationId";

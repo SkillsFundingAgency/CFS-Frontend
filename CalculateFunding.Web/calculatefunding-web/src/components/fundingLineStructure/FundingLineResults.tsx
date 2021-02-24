@@ -31,7 +31,6 @@ import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCa
 import {ErrorProps} from "../../hooks/useErrors";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
-import {RunningStatus} from "../../types/RunningStatus";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -44,6 +43,8 @@ export interface FundingLineResultsProps {
     setStatusToApproved?: () => void,
     refreshFundingLines?: boolean | undefined,
     showApproveButton: boolean,
+    useCalcEngine : boolean,
+    jobTypes : JobType[]
 }
 
 export function FundingLineResults({
@@ -56,7 +57,9 @@ export function FundingLineResults({
     clearErrorMessages,
     setStatusToApproved,
     refreshFundingLines,
+    jobTypes,
     showApproveButton = false,
+    useCalcEngine = true
 }: FundingLineResultsProps) {
     const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
     const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
@@ -78,9 +81,7 @@ export function FundingLineResults({
 
     const {latestJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
-            [JobType.AssignTemplateCalculationsJob, JobType.RefreshFundingJob, JobType.ApproveAllProviderFundingJob,
-            JobType.ApproveBatchProviderFundingJob, JobType.PublishAllProviderFundingJob,
-            JobType.PublishBatchProviderFundingJob, JobType.PublishedFundingUndoJob],
+            jobTypes,
             err => addError({error: err, description: "Error while checking for assign template calculations job"}));
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
@@ -263,7 +264,7 @@ export function FundingLineResults({
                 setCalculationSummaries(calculationSummariesResponse.data);
 
                 if (providerId) {
-                    const providerResultsResponse = await getFundingStructureResultsForProviderAndSpecification(specificationId, providerId);
+                    const providerResultsResponse = await getFundingStructureResultsForProviderAndSpecification(specificationId, providerId, useCalcEngine);
                     setProviderResults(providerResultsResponse.data);
                 }
 

@@ -59,9 +59,9 @@ export async function getProviderSnapshotsByFundingStream(fundingStreamId: strin
     })
 }
 
-export async function getFundingStructureResultsForProviderAndSpecification(specificationId: string, providerId: string): 
+export async function getFundingStructureResultsForProviderAndSpecification(specificationId: string, providerId: string, useCalcEngine: boolean): 
     Promise<AxiosResponse<ProviderResultForSpecification>> {
-    return axios(`/api/results/specifications/${specificationId}/providers/${providerId}/template-results`, {
+    return axios(`/api/results/specifications/${specificationId}/providers/${providerId}/template-results/${useCalcEngine}`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
     })

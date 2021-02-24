@@ -23,6 +23,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {AdditionalCalculations} from "../../components/Calculations/AdditionalCalculations";
+import { JobType } from "../../types/jobType";
 
 export interface ViewProviderResultsRouteProps {
     providerId: string;
@@ -183,7 +184,9 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                         providerId={providerId}
                                         addError={addError}
                                         clearErrorMessages={clearErrorMessages} 
-                                        showApproveButton={false} />
+                                        showApproveButton={false} 
+                                        useCalcEngine={true}
+                                        jobTypes={[JobType.AssignTemplateCalculationsJob]}/>
                                 }
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">

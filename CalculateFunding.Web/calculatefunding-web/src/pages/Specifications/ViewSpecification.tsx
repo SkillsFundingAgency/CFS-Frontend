@@ -357,7 +357,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     clearErrorMessages={clearErrorMessages}
                                     setStatusToApproved={setApprovalStatusToApproved}
                                     refreshFundingLines={approveAllCalculationsJob?.isSuccessful}
-                                    showApproveButton={true} />
+                                    showApproveButton={true}
+                                    useCalcEngine={true}
+                                    jobTypes={[JobType.AssignTemplateCalculationsJob]} />
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
                                 <AdditionalCalculations

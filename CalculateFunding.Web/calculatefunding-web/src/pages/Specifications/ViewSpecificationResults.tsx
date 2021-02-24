@@ -13,6 +13,7 @@ import {PublishStatus} from "../../types/PublishStatusModel";
 import {DownloadableReports} from "../../components/Reports/DownloadableReports";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
+import { JobType } from "../../types/jobType";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
@@ -61,7 +62,9 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         status={specification.approvalStatus as PublishStatus}
                                         addError={addError}
                                         clearErrorMessages={clearErrorMessages}
-                                        showApproveButton={false} /> : ""}
+                                        showApproveButton={false}
+                                        useCalcEngine={true}
+                                        jobTypes={[JobType.AssignTemplateCalculationsJob]} /> : ""}
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
                                 <AdditionalCalculations

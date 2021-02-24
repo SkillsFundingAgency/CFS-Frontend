@@ -5,6 +5,7 @@ using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
@@ -26,27 +27,32 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IResultsApiClient _resultsClient;
         private readonly IPoliciesApiClient _policiesClient;
         private readonly ICalculationsApiClient _calculationsClient;
+        private readonly IPublishingApiClient _publishingApiClient;
 
         public ProviderResultsController(ISpecificationsApiClient specificationsApiClient,
             IResultsApiClient resultsApiClient,
             IPoliciesApiClient policiesApiClient,
-            ICalculationsApiClient calculationsApiClient)
+            ICalculationsApiClient calculationsApiClient,
+            IPublishingApiClient publishingApiClient)
         {
             Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
-            Guard.ArgumentNotNull(specificationsApiClient, nameof(resultsApiClient));
-            Guard.ArgumentNotNull(specificationsApiClient, nameof(policiesApiClient));
-            Guard.ArgumentNotNull(specificationsApiClient, nameof(calculationsApiClient));
+            Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
+            Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
+            Guard.ArgumentNotNull(publishingApiClient, nameof(publishingApiClient));
 
             _specsClient = specificationsApiClient;
             _resultsClient = resultsApiClient;
             _policiesClient = policiesApiClient;
             _calculationsClient = calculationsApiClient;
+            _publishingApiClient = publishingApiClient;
         }
 
-        [HttpGet("api/results/specifications/{specificationId}/providers/{providerId}/template-results")]
+        [HttpGet("api/results/specifications/{specificationId}/providers/{providerId}/template-results/{useCalcEngine}")]
         public async Task<IActionResult> GetFundingStructureResultsForProviderAndSpecification(
             [FromRoute] string providerId,
-            [FromRoute] string specificationId)
+            [FromRoute] string specificationId,
+            [FromRoute] bool useCalcEngine = true)
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -67,16 +73,64 @@ namespace CalculateFunding.Frontend.Controllers
 
             string fundingStreamTemplateVersion = specification.TemplateIds[fundingStream.Id];
 
+            List<Task> tasks = new List<Task>();
+
             Task<ApiResponse<TemplateMetadataDistinctContents>> distictTemplateContentsRequest = _policiesClient.GetDistinctTemplateMetadataContents(fundingStream.Id, specification.FundingPeriod.Id, fundingStreamTemplateVersion);
             Task<ApiResponse<TemplateMapping>> templateMappingRequest = _calculationsClient.GetTemplateMapping(specificationId, fundingStream.Id);
-            Task<ApiResponse<Common.ApiClient.Results.Models.ProviderResultResponse>> calculationEngineResultsRequest = _resultsClient.GetProviderResults(providerId, specificationId);
-            Task<ApiResponse<IEnumerable<CalculationMetadata>>> calculationMetadataRequest = _calculationsClient.GetCalculationMetadataForSpecification(specificationId);
 
-            await TaskHelper.WhenAllAndThrow(distictTemplateContentsRequest, templateMappingRequest, calculationEngineResultsRequest, calculationMetadataRequest);
+            tasks.Add(distictTemplateContentsRequest);
+            tasks.Add(templateMappingRequest);
+
+            Task<ApiResponse<Common.ApiClient.Results.Models.ProviderResultResponse>> calculationEngineResultsRequest = null;
+            Task<ApiResponse<Common.ApiClient.Publishing.Models.PublishedProviderVersion>> publishProviderResultsRequest = null;
+
+            if (useCalcEngine)
+            {
+                calculationEngineResultsRequest = _resultsClient.GetProviderResults(providerId, specificationId);
+                tasks.Add(calculationEngineResultsRequest);
+            }
+            else
+            {
+                publishProviderResultsRequest = _publishingApiClient.GetCurrentPublishedProviderVersion(specificationId, fundingStream.Id, providerId);
+                tasks.Add(publishProviderResultsRequest);
+            }
+            
+            Task<ApiResponse<IEnumerable<CalculationMetadata>>> calculationMetadataRequest = _calculationsClient.GetCalculationMetadataForSpecification(specificationId);
+            tasks.Add(calculationMetadataRequest);
+
+            await TaskHelper.WhenAllAndThrow(tasks.ToArray());
 
             IActionResult distictTemplateContentsErrorResult = distictTemplateContentsRequest.Result.IsSuccessOrReturnFailureResult(nameof(TemplateMetadataDistinctContents));
             IActionResult templateMappingErrorResult = templateMappingRequest.Result.IsSuccessOrReturnFailureResult(nameof(TemplateMapping));
-            IActionResult calculationEngineResultsErrorResult = calculationEngineResultsRequest.Result.IsSuccessOrReturnFailureResult(nameof(Common.ApiClient.Results.Models.ProviderResultResponse));
+
+            IEnumerable<(string id, object value, string exception)> calcResults = null;
+            IEnumerable<(string id, decimal? value, string exception)> fundingResults = null;
+
+            if (useCalcEngine)
+            {
+                IActionResult calculationEngineResultsErrorResult = calculationEngineResultsRequest.Result.IsSuccessOrReturnFailureResult(nameof(Common.ApiClient.Results.Models.ProviderResultResponse));
+
+                if (calculationEngineResultsErrorResult != null)
+                {
+                    return calculationEngineResultsErrorResult;
+                }
+
+                calcResults = calculationEngineResultsRequest.Result.Content.CalculationResults.Select(_ => (_.Calculation.Id, _.Value, _.ExceptionMessage));
+                fundingResults = calculationEngineResultsRequest.Result.Content.FundingLineResults.Select(_ => (_.FundingLine.Id, _.Value, _.ExceptionMessage));
+            }
+            else
+            {
+                IActionResult publishedProviderResultsErrorResult = publishProviderResultsRequest.Result.IsSuccessOrReturnFailureResult(nameof(Common.ApiClient.Publishing.Models.PublishedProviderVersion));
+
+                if (publishedProviderResultsErrorResult != null)
+                {
+                    return publishedProviderResultsErrorResult;
+                }
+
+                calcResults = publishProviderResultsRequest.Result.Content.Calculations.Select(_ => (_.TemplateCalculationId.ToString(), _.Value, string.Empty));
+                fundingResults = publishProviderResultsRequest.Result.Content.FundingLines.Select(_ => (_.TemplateLineId.ToString(), _.Value, string.Empty));
+            }
+            
             IActionResult calculationMetadataErrorResult = calculationMetadataRequest.Result.IsSuccessOrReturnFailureResult(nameof(CalculationMetadata));
 
             if (distictTemplateContentsErrorResult != null)
@@ -87,11 +141,6 @@ namespace CalculateFunding.Frontend.Controllers
             if (templateMappingErrorResult != null)
             {
                 return templateMappingErrorResult;
-            }
-
-            if (calculationEngineResultsErrorResult != null)
-            {
-                return calculationEngineResultsErrorResult;
             }
 
             if (calculationMetadataErrorResult != null)
@@ -107,12 +156,12 @@ namespace CalculateFunding.Frontend.Controllers
             Dictionary<uint, TemplateCalculationResult> calculationResults = GenerateCalculationResults(
                 templateMapping,
                 templateCalculations,
-                calculationEngineResultsRequest.Result.Content.CalculationResults,
+                calcResults,
                 calculationMetadataRequest.Result.Content
                 );
 
             Dictionary<uint, FundingLineResult> fundingLineResults = GenerateFundingLineResults(templateFundingLines,
-                calculationEngineResultsRequest.Result.Content.FundingLineResults);
+                fundingResults);
 
             return Ok(new ProviderResultForSpecification()
             {
@@ -128,7 +177,7 @@ namespace CalculateFunding.Frontend.Controllers
         private Dictionary<uint, TemplateCalculationResult> GenerateCalculationResults(
             IEnumerable<TemplateMappingItem> templateMapping,
             IEnumerable<TemplateMetadataCalculation> templateCalculations,
-            IEnumerable<Common.ApiClient.Results.Models.CalculationResultResponse> calcEngineResults,
+            IEnumerable<(string calculationId, object value, string exception)> calcEngineResults,
             IEnumerable<CalculationMetadata> specificationCalculationMetadata)
         {
             Guard.ArgumentNotNull(templateMapping, nameof(templateMapping));
@@ -139,10 +188,10 @@ namespace CalculateFunding.Frontend.Controllers
             Dictionary<uint, TemplateCalculationResult> calculationResults = new Dictionary<uint, TemplateCalculationResult>();
             Dictionary<string, object> calculationValues = new Dictionary<string, object>();
             Dictionary<string, string> calculationExceptionMessages = new Dictionary<string, string>();
-            foreach (Common.ApiClient.Results.Models.CalculationResultResponse calculationResult in calcEngineResults)
+            foreach ((string calculationId, object value, string exception) in calcEngineResults)
             {
-                calculationValues.Add(calculationResult.Calculation.Id, calculationResult.Value);
-                calculationExceptionMessages.Add(calculationResult.Calculation.Id, calculationResult.ExceptionMessage);
+                calculationValues.Add(calculationId, value);
+                calculationExceptionMessages.Add(calculationId, exception);
             }
 
             Dictionary<string, PublishStatus> approvalStatus = new Dictionary<string, PublishStatus>();
@@ -171,10 +220,18 @@ namespace CalculateFunding.Frontend.Controllers
                     {
                         result.Value = calculationValues[calculationId];
                     }
+                    else if(calculationValues.ContainsKey(definition.TemplateCalculationId.ToString()))
+                    {
+                        result.Value = calculationValues[definition.TemplateCalculationId.ToString()];
+                    }
 
                     if (calculationExceptionMessages.ContainsKey(calculationId))
                     {
                         result.ExceptionMessage = calculationExceptionMessages[calculationId];
+                    }
+                    else if(calculationValues.ContainsKey(definition.TemplateCalculationId.ToString()))
+                    {
+                        result.ExceptionMessage = calculationExceptionMessages[definition.TemplateCalculationId.ToString()];
                     }
 
                     if (approvalStatus.ContainsKey(calculationId))
@@ -191,7 +248,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         private static Dictionary<uint, FundingLineResult> GenerateFundingLineResults(
             IEnumerable<TemplateMetadataFundingLine> templateFundingLines,
-            IEnumerable<Common.ApiClient.Results.Models.FundingLineResult> fundingLineResultValues)
+            IEnumerable<(string id, decimal? value, string exception)> fundingLineResultValues)
         {
             Guard.ArgumentNotNull(templateFundingLines, nameof(templateFundingLines));
             Guard.ArgumentNotNull(fundingLineResultValues, nameof(fundingLineResultValues));
@@ -210,15 +267,15 @@ namespace CalculateFunding.Frontend.Controllers
                 fundingLineResults.Add(fundingLine.TemplateLineId, result);
             }
 
-            foreach (Common.ApiClient.Results.Models.FundingLineResult fundingLine in fundingLineResultValues)
+            foreach ((string id, decimal? value, string exception) in fundingLineResultValues)
             {
-                if (uint.TryParse(fundingLine.FundingLine?.Id, out uint fundingLineId))
+                if (uint.TryParse(id, out uint fundingLineId))
                 {
                     if (fundingLineResults.ContainsKey(fundingLineId))
                     {
                         FundingLineResult result = fundingLineResults[fundingLineId];
-                        result.Value = fundingLine.Value;
-                        result.ExceptionMessage = fundingLine.ExceptionMessage;
+                        result.Value = value;
+                        result.ExceptionMessage = exception;
                     }
                 }
             }

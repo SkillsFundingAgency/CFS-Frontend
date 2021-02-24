@@ -31,6 +31,7 @@ import {ProviderSummarySection} from "../../components/Providers/ProviderSummary
 import {useErrors} from "../../hooks/useErrors";
 import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
 import {PublishStatus} from "../../types/PublishStatusModel";
+import { JobType } from '../../types/jobType';
 
 export interface ProviderFundingOverviewRoute {
     specificationId: string;
@@ -165,6 +166,10 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                                                 providerId={providerId}
                                                 addError={addError}
                                                 showApproveButton={false}
+                                                useCalcEngine={false}
+                                                jobTypes={[JobType.RefreshFundingJob, JobType.ApproveAllProviderFundingJob,
+                                                    JobType.ApproveBatchProviderFundingJob, JobType.PublishAllProviderFundingJob,
+                                                        JobType.PublishBatchProviderFundingJob, JobType.PublishedFundingUndoJob]}
                                                 clearErrorMessages={clearErrorMessages} />
                         </Tabs.Panel>
                     </Tabs>
