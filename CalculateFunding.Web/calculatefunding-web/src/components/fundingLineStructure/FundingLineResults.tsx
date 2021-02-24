@@ -31,6 +31,7 @@ import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCa
 import {ErrorProps} from "../../hooks/useErrors";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
+import { RunningStatus } from "../../types/RunningStatus";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -287,7 +288,7 @@ export function FundingLineResults({
     return (
         <section className="govuk-tabs__panel" id="fundingline-structure">
             <LoadingStatus title={"Loading funding line structure"}
-                hidden={!isLoadingFundingLineStructure && (latestJob && latestJob.isComplete)}
+                hidden={!isLoadingFundingLineStructure && !(latestJob && latestJob.isActive)}
                 description={"Please wait whilst funding line structure is loading"} />
             <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
                 <div className="govuk-grid-column-two-thirds">
@@ -296,7 +297,7 @@ export function FundingLineResults({
             </div>
             {!isLoadingFundingLineStructure && !isLoadingCircularDependencies &&
                 !fundingLineStructureError &&
-                    (latestJob && latestJob.isComplete) &&
+                !(latestJob && latestJob.isActive) &&
                 <>
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">
