@@ -31,9 +31,10 @@ describe("<FundingLineResults/> tests", () => {
                 () => (runningLatestJob));
         });
 
-        it('shows loading panel', async () => {
+        it('shows loading panel when another job is running', async () => {
             renderProviderFundingLineResults();
-            await waitFor(() => expect(screen.getByText(/Loading funding line structure/i)).toBeInTheDocument());
+            await waitFor(() => expect(screen.queryByText(/Please wait whilst funding line structure is loading/i)).not.toBeInTheDocument());
+            await waitFor(() => expect(screen.getByText(/Please wait. A funding job is running./i)).toBeInTheDocument());
         });
     });
 
@@ -215,6 +216,14 @@ const runningLatestJob: LatestSpecificationJobWithMonitoringResult = {
     isMonitoring: true,
     latestJob: {
         isComplete: false,
+        jobId: "123",
+        statusDescription: "string",
+        jobDescription: "string",
+        runningStatus: RunningStatus.Completed,
+        failures: [],
+        isSuccessful: true,
+        isFailed: false,
+        isActive: true
     },
 };
 

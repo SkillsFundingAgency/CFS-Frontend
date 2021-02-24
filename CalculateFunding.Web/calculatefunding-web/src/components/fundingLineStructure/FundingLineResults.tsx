@@ -31,7 +31,7 @@ import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCa
 import {ErrorProps} from "../../hooks/useErrors";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
-import { RunningStatus } from "../../types/RunningStatus";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -79,8 +79,8 @@ export function FundingLineResults({
     const {latestJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.AssignTemplateCalculationsJob, JobType.RefreshFundingJob, JobType.ApproveAllProviderFundingJob,
-                JobType.ApproveBatchProviderFundingJob, JobType.PublishAllProviderFundingJob,
-                    JobType.PublishBatchProviderFundingJob, JobType.PublishedFundingUndoJob],
+            JobType.ApproveBatchProviderFundingJob, JobType.PublishAllProviderFundingJob,
+            JobType.PublishBatchProviderFundingJob, JobType.PublishedFundingUndoJob],
             err => addError({error: err, description: "Error while checking for assign template calculations job"}));
 
     const handleApproveFundingLineStructure = async (specificationId: string) => {
@@ -287,9 +287,9 @@ export function FundingLineResults({
 
     return (
         <section className="govuk-tabs__panel" id="fundingline-structure">
-            <LoadingStatus title={"Loading funding line structure"}
-                hidden={!isLoadingFundingLineStructure && !(latestJob && latestJob.isActive)}
-                description={"Please wait whilst funding line structure is loading"} />
+            {(isLoadingFundingLineStructure || (latestJob && latestJob.isActive)) &&
+                <LoadingStatus title={"Loading funding line structure"}
+                    description={`${isLoadingFundingLineStructure ? 'Please wait whilst funding line structure is loading' : 'Please wait. A funding job is running.'}`} />}
             <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
                 <div className="govuk-grid-column-two-thirds">
                     <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
