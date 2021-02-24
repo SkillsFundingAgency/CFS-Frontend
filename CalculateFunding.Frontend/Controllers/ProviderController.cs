@@ -5,6 +5,7 @@ using CalculateFunding.Common.ApiClient.FundingDataZone;
 using CalculateFunding.Common.ApiClient.FundingDataZone.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers;
+using CalculateFunding.Common.ApiClient.Providers.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
@@ -118,14 +119,14 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            ApiResponse<IEnumerable<SpecificationInformation>> result = 
+            ApiResponse<IEnumerable<SpecificationInformation>> result =
                 await _resultsApiClient.GetSpecificationsWithProviderResultsForProviderId(providerId);
-            
+
             if (result.StatusCode == HttpStatusCode.OK)
             {
                 return new OkObjectResult(result.Content);
             }
-            
+
             if (result.StatusCode == HttpStatusCode.BadRequest)
             {
                 return BadRequest(result.Content);
@@ -145,7 +146,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<ProviderSnapshot>> providerSnapshotsResponse = 
+            ApiResponse<IEnumerable<ProviderSnapshot>> providerSnapshotsResponse =
                 await _fundingDataZoneApiClient.GetProviderSnapshotsForFundingStream(fundingStreamId);
 
             IActionResult providerSnapshotsErrorResult =
@@ -156,6 +157,41 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(providerSnapshotsResponse.Content);
+        }
+
+        [HttpGet("api/provider/fundingStreams/{fundingStreamId}/current")]
+        public async Task<IActionResult> GetCurrentProviderVersionForFundingStream([FromRoute] string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<CurrentProviderVersionMetadata> currentProviderMetadataResponse =
+                await _providersApiClient.GetCurrentProviderMetadataForFundingStream(fundingStreamId);
+            IActionResult currentProviderMetadataErrorResult =
+                currentProviderMetadataResponse.IsSuccessOrReturnFailureResult(
+                    "GetCurrentProviderMetadataForFundingStream");
+            if (currentProviderMetadataErrorResult != null)
+            {
+                return currentProviderMetadataErrorResult;
+            }
+
+            ApiResponse<ProviderVersionMetadata> providerVersionMetadataResponse =
+                await _providersApiClient.GetProviderVersionMetadata(currentProviderMetadataResponse.Content.ProviderVersionId);
+            IActionResult providerVersionMetadataErrorResult =
+                providerVersionMetadataResponse.IsSuccessOrReturnFailureResult("GetProviderVersionMetadata");
+            if (providerVersionMetadataErrorResult != null)
+            {
+                return providerVersionMetadataErrorResult;
+            }
+
+            return Ok(new CurrentProviderVersionForFundingStream
+            {
+                ProviderSnapshotId = currentProviderMetadataResponse.Content.ProviderSnapshotId,
+                Name = providerVersionMetadataResponse.Content.Name,
+                ProviderVersionId = currentProviderMetadataResponse.Content.ProviderVersionId,
+                TargetDate = providerVersionMetadataResponse.Content.TargetDate,
+                Version = providerVersionMetadataResponse.Content.Version,
+                Description = providerVersionMetadataResponse.Content.Description,
+            });
         }
     }
 }
