@@ -35,7 +35,7 @@ export interface IInitialiseFundingSearchSelectionAction {
 
 export interface ISetHasErrors {
     type: FundingSearchSelectionActionEvent.HAS_ERRORS;
-    payload: string
+    payload: boolean
 }
 
 export interface IUpdatePage {
@@ -55,22 +55,22 @@ export interface IRemoveProvidersFromFundingSelectionAction {
 
 export interface IUpdateStatusFiltersAction {
     type: FundingSearchSelectionActionEvent.UPDATE_STATUS_FILTERS;
-    payload: string[]
+    payload: SearchFilter
 }
 
 export interface IUpdateLocalAuthorityFiltersAction {
     type: FundingSearchSelectionActionEvent.UPDATE_LOCAL_AUTHORITY_FILTERS;
-    payload: string[]
+    payload: SearchFilter
 }
 
 export interface IUpdateProviderTypeFiltersAction {
     type: FundingSearchSelectionActionEvent.UPDATE_PROVIDER_TYPE_FILTERS;
-    payload: string[]
+    payload: SearchFilter
 }
 
 export interface IUpdateProviderSubTypeFiltersAction {
     type: FundingSearchSelectionActionEvent.UPDATE_PROVIDER_SUB_TYPE_FILTERS;
-    payload: string[]
+    payload: SearchFilter
 }
 
 export interface IUpdateSearchTextFilterAction {
@@ -81,6 +81,11 @@ export interface IUpdateSearchTextFilterAction {
 export interface TextSearchModel {
     searchFields: string[],
     searchTerm: string
+}
+
+export interface SearchFilter {
+    value: string,
+    isSelected: boolean
 }
 
 export const initialiseFundingSearchSelection: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IInitialiseFundingSearchSelectionAction>> =
@@ -137,21 +142,21 @@ export const removeProvidersFromFundingSelection: ActionCreator<ThunkAction<Prom
     };
 
 export const updateStatusFilters: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IUpdateStatusFiltersAction>> =
-    (filters: string[]) => {
+    (filterChange: SearchFilter) => {
         return async (dispatch) => {
             dispatch({
                 type: FundingSearchSelectionActionEvent.UPDATE_STATUS_FILTERS,
-                payload: filters
+                payload: filterChange
             });
         }
     };
 
 export const updateLocalAuthorityFilters: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IUpdateLocalAuthorityFiltersAction>> =
-    (filters: string[]) => {
+    (filterChange: SearchFilter) => {
         return async (dispatch) => {
             dispatch({
                 type: FundingSearchSelectionActionEvent.UPDATE_LOCAL_AUTHORITY_FILTERS,
-                payload: filters
+                payload: filterChange
             });
         }
     };
@@ -167,21 +172,21 @@ export const updateSearchTextFilter: ActionCreator<ThunkAction<Promise<any>, Fun
     };
 
 export const updateProviderTypeFilters: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IUpdateProviderTypeFiltersAction>> =
-    (filters: string[]) => {
+    (filterChange: SearchFilter) => {
         return async (dispatch) => {
             dispatch({
                 type: FundingSearchSelectionActionEvent.UPDATE_PROVIDER_TYPE_FILTERS,
-                payload: filters
+                payload: filterChange
             });
         }
     };
 
 export const updateProviderSubTypeFilters: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IUpdateProviderSubTypeFiltersAction>> =
-    (filters: string[]) => {
+    (filterChange: SearchFilter) => {
         return async (dispatch) => {
             dispatch({
                 type: FundingSearchSelectionActionEvent.UPDATE_PROVIDER_SUB_TYPE_FILTERS,
-                payload: filters
+                payload: filterChange
             });
         }
     };

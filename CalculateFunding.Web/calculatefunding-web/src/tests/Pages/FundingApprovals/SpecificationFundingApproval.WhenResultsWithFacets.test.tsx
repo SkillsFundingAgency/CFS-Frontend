@@ -32,7 +32,7 @@ describe("<SpecificationFundingApproval />", () => {
             expect(screen.getByRole("radio", {name: "URN"})).toBeInTheDocument();
             expect(screen.getByRole("checkbox", {name: "With errors"})).toBeInTheDocument();
             expect(screen.getByRole("checkbox", {name: "Without errors"})).toBeInTheDocument();
-            expect(screen.getByRole("checkbox", {name: "East London"})).toBeInTheDocument();
+            expect(screen.getByRole("checkbox", {name: /East London/})).toBeInTheDocument();
         });
     });
 });

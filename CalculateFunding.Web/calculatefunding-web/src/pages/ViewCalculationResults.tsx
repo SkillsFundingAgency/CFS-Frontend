@@ -18,13 +18,14 @@ import {getCalculationProvidersService} from "../services/calculationService";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {JobType} from "../types/jobType";
-import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
+import {ProviderSearchBox} from "../components/ProviderSearchBox";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../hooks/useSpecificationSummary";
 import {useErrors} from "../hooks/useErrors";
 import {MultipleErrorSummary} from "../components/MultipleErrorSummary";
 import {useCalculation} from "../hooks/Calculations/useCalculation";
+import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
 
 export interface ViewCalculationResultsRoute {
     calculationId: string

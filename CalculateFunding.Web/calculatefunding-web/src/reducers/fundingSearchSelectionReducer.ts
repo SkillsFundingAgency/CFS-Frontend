@@ -1,6 +1,6 @@
 ﻿import {Reducer} from "redux";
 import {FundingSearchSelectionState} from "../states/FundingSearchSelectionState";
-import {FundingSearchSelectionActionEvent, IFundingSearchSelectionActions} from "../actions/FundingSearchSelectionActions";
+import {FundingSearchSelectionActionEvent, IFundingSearchSelectionActions, SearchFilter} from "../actions/FundingSearchSelectionActions";
 import {PublishedProviderSearchRequest} from "../types/publishedProviderSearchRequest";
 
 const initialState: FundingSearchSelectionState = {searchCriteria: undefined, selectedProviderIds: []};
@@ -8,6 +8,18 @@ const initialState: FundingSearchSelectionState = {searchCriteria: undefined, se
 export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionState, IFundingSearchSelectionActions> =
     (state: FundingSearchSelectionState = initialState, action: IFundingSearchSelectionActions): FundingSearchSelectionState => {
 
+        function applyFilterChange(original: string[], filterChange: SearchFilter) {
+            if (filterChange.isSelected) {
+                original.push(filterChange.value);
+
+            } else {
+                const position = filters.providerType.indexOf(filterChange.value);
+                original.splice(position, 1);
+            }
+            return original;
+        }
+
+        const filters = (state.searchCriteria as PublishedProviderSearchRequest);
         switch (action.type) {
             case FundingSearchSelectionActionEvent.INITIALISE:
                 const searchCriteria = action.payload;
@@ -29,37 +41,37 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
                 return {
                     ...state,
                     selectedProviderIds: [],
-                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), providerType: action.payload, pageNumber: 1}
+                    searchCriteria: {...filters, providerType: applyFilterChange(filters.providerType, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_STATUS_FILTERS:
                 return {
                     ...state,
                     selectedProviderIds: [],
-                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), status: action.payload, pageNumber: 1}
+                    searchCriteria: {...filters, status: applyFilterChange(filters.status, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_LOCAL_AUTHORITY_FILTERS:
                 return {
                     ...state,
                     selectedProviderIds: [],
-                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), localAuthority: action.payload, pageNumber: 1}
+                    searchCriteria: {...filters, localAuthority: applyFilterChange(filters.localAuthority, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_PROVIDER_SUB_TYPE_FILTERS:
                 return {
                     ...state,
                     selectedProviderIds: [],
-                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), providerSubType: action.payload, pageNumber: 1}
+                    searchCriteria: {...filters, providerSubType: applyFilterChange(filters.providerSubType, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_PAGE:
                 return {
                     ...state,
-                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), pageNumber: action.payload}
+                    searchCriteria: {...filters, pageNumber: action.payload}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_SEARCH_TEXT_FILTER:
                 return {
                     ...state,
                     selectedProviderIds: [],
                     searchCriteria: {
-                        ...(state.searchCriteria as PublishedProviderSearchRequest),
+                        ...filters,
                         searchFields: action.payload.searchFields,
                         searchTerm: action.payload.searchTerm,
                         pageNumber: 1
@@ -69,7 +81,7 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
                 return {
                     ...state,
                     selectedProviderIds: [],
-                    searchCriteria: {...(state.searchCriteria as PublishedProviderSearchRequest), hasErrors: action.payload, pageNumber: 1}
+                    searchCriteria: {...filters, hasErrors: action.payload, pageNumber: 1}
                 };
             default:
                 return state;

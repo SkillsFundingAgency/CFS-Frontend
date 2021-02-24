@@ -1,8 +1,8 @@
 ﻿import React from 'react';
-import {CollapsibleSearchBox} from "../../../components/CollapsibleSearchBox";
 import {render, screen,} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
+import {CollapsibleSearchBox} from "../../../components/CollapsibleSearchBox";
 
 const renderComponent = (searchTerm = "") => {
     const callback: (searchField: string, searchTerm: string) => void = jest.fn();
