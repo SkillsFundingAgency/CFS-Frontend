@@ -322,7 +322,7 @@ export function GdsMonacoEditor(props: {
                                                 range: editorRange
                                             };
 
-                                            if (contextVariables[pathVariable.label.toString().toLowerCase()] === undefined) {
+                                            if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
                                                 let description = "";
                                                 let friendlyName = "";
 
@@ -352,6 +352,7 @@ export function GdsMonacoEditor(props: {
                                                 // @ts-ignore
                                                 results.suggestions.push(pathVariable);
                                             }
+
                                         }
                                     }
 
@@ -367,7 +368,7 @@ export function GdsMonacoEditor(props: {
                                                 range: editorRange
                                             };
 
-                                            if (contextVariables[pathVariable.label.toString().toLowerCase()] === undefined) {
+                                            if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
                                                 let description = "";
                                                 let friendlyName = "";
 
@@ -420,7 +421,7 @@ export function GdsMonacoEditor(props: {
                                             range: editorRange
                                         };
 
-                                        if (contextVariables[pathVariable.label.toString().toLowerCase()] === undefined) {
+                                        if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
                                             let description = "";
                                             let friendlyName = "";
 
