@@ -30,6 +30,8 @@ import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
 import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
+import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -57,6 +59,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [uploadFileExtension, setUploadFileExtension] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [changeNote, setChangeNote] = useState<string>("");
+    const [coreProviderTargetDate, setCoreProviderTargetDate] = useState<Date>();
     const validExtensions = [".csv", ".xls", ".xlsx"];
     const [validation, setValidation] = useState({
         fileValid: true,
@@ -81,11 +84,10 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         if (!newJob || newJob.jobId !== validateDatasetJobId) return;
         clearErrorMessages();
 
-        if (newJob.isFailed || newJob.failures.length > 0)
-        {
+        if (newJob.isFailed) {
             setIsLoading(false);
             setIsCheckingForJob(false);
-            return ;
+            return;
         }
 
         if (newJob.runningStatus === RunningStatus.Completed) {
@@ -108,7 +110,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             }
         }
     }, [newJob]);
-    
+
     useEffectOnce(() => {
         setIsLoading(true);
         getDatasetHistoryService(match.params.datasetId, 1, 1).then((result) => {
@@ -116,6 +118,20 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             setDataset(response.results[0]);
             setDescription(response.results[0].description);
             setChangeNote(response.results[0].changeNote);
+            getCurrentProviderVersionForFundingStream(match.params.fundingStreamId).then((providerVersionResult) => {
+                const providerVersion = providerVersionResult.data;
+                if (providerVersion != null) {
+                    setCoreProviderTargetDate(providerVersion.targetDate);
+                }
+            }).catch(err => addError({
+                error: err,
+                description: `Error while getting current provider version for funding stream ${match.params.fundingStreamId}`
+            }));
+        }).catch((err) => {
+            addError({
+                error: err,
+                description: `Error while getting dataset ${match.params.datasetId}`
+            })
         }).finally(() => {
             setIsLoading(false);
         });
@@ -182,10 +198,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         }
     }
 
-    function onDatasetValidated(updateType: string)
-    {
-        if (updateType === "merge")
-        {
+    function onDatasetValidated(updateType: string) {
+        if (updateType === "merge") {
             getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
             ((response) => {
                     const mergeDatasetResult = response.data as MergeDatasetViewModel;
@@ -201,9 +215,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 }
             );
             return;
-        }
-        else
-        {
+        } else {
             history.push("/Datasets/ManageDataSourceFiles");
             return;
         }
@@ -295,32 +307,44 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 isCheckingForJob={isLoading}/>
             }
 
-            <MultipleErrorSummary errors={errors} />
+            <MultipleErrorSummary errors={errors}/>
 
             <fieldset className="govuk-fieldset" hidden={isLoading || updateStatus !== UpdateStatus.Unset}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">
-                        Update data source
+                        Update {dataset.name} (version {dataset.version})
                     </h1>
                 </legend>
-                <details className="govuk-details" data-module="govuk-details">
-                    <summary className="govuk-details__summary">
-                <span id={"summary-text"} className="govuk-details__summary-text">
-                    {dataset.name} (version {dataset.version})
-                </span>
-                    </summary>
-                    <div id={"last-updated-by-author"} className="govuk-details__text" data-testid="update-datasource-author" >
-                        {dataset.lastUpdatedByName} <span className="govuk-!-margin-left-2"><DateTimeFormatter date={dataset.lastUpdatedDate}/></span>
+                <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
+                    <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">
+                            Last updated by
+                        </dt>
+                        <dd className="govuk-summary-list__value" data-testid="update-datasource-author"> {dataset.lastUpdatedByName} <span
+                            className="govuk-!-margin-left-2">
+                                <DateTimeFormatter date={dataset.lastUpdatedDate}/>
+                            </span>
+                        </dd>
                     </div>
-                </details>
+                    <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">
+                            Core provider data version to upload against
+                        </dt>
+                        <dd className="govuk-summary-list__value" data-testid="provider-target-date"><DateFormatter
+                            date={coreProviderTargetDate}/>
+                        </dd>
+                    </div>
+                </dl>
                 <div id="update-type"
                      className={"govuk-form-group" + (!validation.updateTypeValid ? " govuk-form-group--error" : "")}>
                     <div className="govuk-radios">
-                        <label className="govuk-label" htmlFor="update-type-radios">
+                        <label className="govuk-label govuk-!-margin-bottom-5" htmlFor="update-type-radios">
                             Select update type
                         </label>
                         <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-type-merge" name="update-type" type="radio" data-testid="update-datasource-merge" value="merge" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                            <input className="govuk-radios__input" id="update-type-merge" name="update-type"
+                                   type="radio" data-testid="update-datasource-merge" value="merge"
+                                   onClick={(e) => setUpdateType(e.currentTarget.value)}/>
                             <label className="govuk-label govuk-radios__label" htmlFor="update-type-merge">
                                 Merge existing version
                             </label>
@@ -329,7 +353,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             </div>
                         </div>
                         <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-type-new" name="update-type" type="radio" value="new" data-testid="update-datasource-new" onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                            <input className="govuk-radios__input" id="update-type-new" name="update-type" type="radio"
+                                   value="new" data-testid="update-datasource-new"
+                                   onClick={(e) => setUpdateType(e.currentTarget.value)}/>
                             <label className="govuk-label govuk-radios__label" htmlFor="update-type-new">
                                 Create new version
                             </label>
@@ -357,9 +383,10 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             : ""
                     }
                     <input className={"govuk-file-upload" + (!validation.fileValid ? " govuk-file-upload--error" : "")}
-                           id="file-upload-data-source" name="file-upload-data-source" type="file" onChange={(e) => storeFileUpload(e)}
+                           id="file-upload-data-source" name="file-upload-data-source" type="file"
+                           onChange={(e) => storeFileUpload(e)}
                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                           data-testid="update-datasource-file-upload" />
+                           data-testid="update-datasource-file-upload"/>
                 </div>
 
                 <div className="govuk-form-group">
@@ -375,7 +402,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     </textarea>
                 </div>
 
-                <div id="change-note" className={"govuk-form-group" + (!validation.changeNoteValid ? " govuk-form-group--error" : "")}>
+                <div id="change-note"
+                     className={"govuk-form-group" + (!validation.changeNoteValid ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="more-detail">
                         Change note
                     </label>
@@ -390,19 +418,22 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             </span>
                             : ""
                     }
-                    <textarea className={"govuk-textarea" + (!validation.changeNoteValid ? " govuk-textarea--error" : "")}
-                              rows={5}
-                              aria-describedby="more-detail-hint" value={changeNote}
-                              onChange={(e) => setChangeNote(e.target.value)}
-                              data-testid="update-datasource-changenote">
+                    <textarea
+                        className={"govuk-textarea" + (!validation.changeNoteValid ? " govuk-textarea--error" : "")}
+                        rows={5}
+                        aria-describedby="more-detail-hint" value={changeNote}
+                        onChange={(e) => setChangeNote(e.target.value)}
+                        data-testid="update-datasource-changenote">
                     </textarea>
                 </div>
 
-                <button id={"submit-datasource-file"} className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                <button id={"submit-datasource-file"} className="govuk-button govuk-!-margin-right-1"
+                        data-module="govuk-button"
                         onClick={submitDataSourceFile} data-testid="update-datasource-save">
                     Save
                 </button>
-                <Link id={"cancel-datasource-link"} to={`/Datasets/ManageData`} className="govuk-button govuk-button--secondary"
+                <Link id={"cancel-datasource-link"} to={`/Datasets/ManageData`}
+                      className="govuk-button govuk-button--secondary"
                       data-module="govuk-button">
                     Cancel
                 </Link>
@@ -410,12 +441,12 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             {(mergeResults !== undefined) ?
                 <>
                     <MergeSummary additionalRowsCreated={mergeResults.newRowCount}
-                                dataSchemaName={dataset.definitionName}
-                                dataSource={mergeResults.name}
-                                dataSourceVersion={mergeResults.version}
-                                existingRowsAmended={mergeResults.amendedRowCount}
-                                hidden={updateStatus !== UpdateStatus.Successful}
-                />
+                                  dataSchemaName={dataset.definitionName}
+                                  dataSource={mergeResults.name}
+                                  dataSourceVersion={mergeResults.version}
+                                  existingRowsAmended={mergeResults.amendedRowCount}
+                                  hidden={updateStatus !== UpdateStatus.Successful}
+                    />
                     <MergeMatch additionalRowsCreated={mergeResults.newRowCount}
                                 dataSchemaName={dataset.definitionName}
                                 dataSource={mergeResults.name}
@@ -423,7 +454,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 existingRowsAmended={mergeResults.amendedRowCount}
                                 hidden={updateStatus !== UpdateStatus.Matched}
                     />
-                    </>
+                </>
                 : ""
             }
         </div>

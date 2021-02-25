@@ -34,6 +34,8 @@ import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {JobType} from "../../types/jobType";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
+import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
+import {DateFormatter} from "../../components/DateFormatter";
 
 export function LoadNewDataSource() {
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
@@ -47,6 +49,7 @@ export function LoadNewDataSource() {
     const [uploadFile, setUploadFile] = useState<File>();
     const [fundingStreamIsLoading, setFundingStreamIsLoading] = useState<boolean>(false);
     const [dataSchemaIsLoading, setDataSchemaIsLoading] = useState<boolean>(false);
+    const [coreProviderTargetDate, setCoreProviderTargetDate] = useState<Date>();
     const [fundingStreamsIsFiltered, setFundingStreamsIsFiltered] = useState<boolean>(false);
     const [validateForm, setValidateForm] = useState({
         fileNameValid: true,
@@ -109,6 +112,7 @@ export function LoadNewDataSource() {
         if (result) {
             setSelectedFundingStream(result);
             populateDataSchemaSuggestions(result.id);
+            populateCoreProvider(result.id);
         } else {
             setSelectedFundingStream(undefined);
             populateDataSchemaSuggestions();
@@ -141,6 +145,18 @@ export function LoadNewDataSource() {
                 .catch(err => addError({error: err, description: `Error while getting dataset definitions`}))
                 .finally(() => setDataSchemaIsLoading(false));
         }
+    }
+
+    function populateCoreProvider(fundingStreamId: string) {
+        getCurrentProviderVersionForFundingStream(fundingStreamId).then((providerVersionResult) => {
+            const providerVersion = providerVersionResult.data;
+            if (providerVersion != null) {
+                setCoreProviderTargetDate(providerVersion.targetDate);
+            }
+        }).catch(err => addError({
+            error: err,
+            description: `Error while getting current provider version for funding stream ${fundingStreamId}`
+        }));
     }
 
     async function populateFundingStreamSuggestions() {
@@ -491,6 +507,21 @@ export function LoadNewDataSource() {
                             }
 
                         </div>
+                        {coreProviderTargetDate &&
+                        <div className={"govuk-form-group"}>
+                            <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
+                                <div className="govuk-summary-list__row">
+                                    <dt className="govuk-summary-list__key">
+                                        Core provider data version to upload against
+                                    </dt>
+                                    <dd className="govuk-summary-list__value" data-testid="provider-target-date"><DateFormatter
+                                        date={coreProviderTargetDate}/>
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                        }
+
                         <div
                             className={"govuk-form-group" + (validateForm.dataDefinitionIdValid ? "" : " govuk-form-group--error")}>
                             <label className="govuk-label" htmlFor="sort">

@@ -19,6 +19,7 @@ describe("<LoadNewDataSource />", () => {
     beforeEach(async () => {
         mockPolicyService();
         mockDatasetService();
+        mockProviderService();
         useSelectorSpy.mockReturnValue([
             {
                 fundingStreamId: "1619",
@@ -61,10 +62,24 @@ describe("<LoadNewDataSource />", () => {
     });
 
     describe("form submission checks ", () => {
-        it("does not show a permissions message for funding stream where user has canUploadDataSourceFiles permission", async () => {
-            const fundingStreams = screen.getAllByTestId("input-auto-complete")[0];
+        it("displays core provider target date given a funding stream is selected", async () => {
+            const {getCurrentProviderVersionForFundingStream } = require('../../../services/providerService');
+            const fundingStreams = await screen.getAllByTestId("input-auto-complete")[0];
             fireEvent.change(fundingStreams, {target: {value: "GAG"}});
 
+            fireEvent.click(screen.getByTestId("GAG"), {target: {innerText: 'GAG'}});
+            await waitFor(() => {
+                expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
+            });
+
+            expect(getCurrentProviderVersionForFundingStream).toBeCalledTimes(1);
+            const providerDate = screen.getByTestId("provider-target-date") as HTMLElement;
+            expect(providerDate.textContent).toContain("27 July 2020");
+        });
+
+        it("does not show a permissions message for funding stream where user has canUploadDataSourceFiles permission", async () => {
+            const fundingStreams = await screen.getAllByTestId("input-auto-complete")[0];
+            fireEvent.change(fundingStreams, {target: {value: "GAG"}});
             await waitFor(() => {
                 expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
             });
@@ -715,6 +730,24 @@ const mockDatasetService = () => {
                     "name": "test name"
                 }
             })),
+        }
+    });
+}
+
+const mockProviderService = () => {
+    jest.mock("../../../services/providerService", () => {
+        const service = jest.requireActual("../../../services/providerService");
+        return {
+            ...service,
+            getCurrentProviderVersionForFundingStream: jest.fn(() => Promise.resolve({
+                data: {
+                    name: "",
+                    providerVersionId: 1,
+                    description: "",
+                    targetDate: new Date("2020-07-27"),
+                    version: 1
+                }
+            }))
         }
     });
 }

@@ -619,3 +619,9 @@ a.govuk-link-red:hover:focus:active,
   font-weight: 700;
   text-align: left;
 }
+
+.core-provider-dataversion .govuk-summary-list__key,
+.core-provider-dataversion .govuk-summary-list__value:last-child
+{
+  width:50%;
+}

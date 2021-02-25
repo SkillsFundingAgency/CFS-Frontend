@@ -15,6 +15,7 @@ import userEvent from "@testing-library/user-event";
 describe("<UpdateDataSourceFile />", () => {
     beforeEach(async () => {
         mockDatasetService();
+        mockProviderService();
         await renderUpdateDataSourceFile();
     });
 
@@ -25,19 +26,26 @@ describe("<UpdateDataSourceFile />", () => {
     describe("service call checks ", () => {
         it("calls the correct services on initial page load", async () => {
             const {getDatasetHistoryService, downloadValidateDatasetValidationErrorSasUrl} = require('../../../services/datasetService');
+            const {getCurrentProviderVersionForFundingStream } = require('../../../services/providerService');
             await waitFor(() => expect(getDatasetHistoryService).toBeCalledTimes(1));
+            await waitFor(() => expect(getCurrentProviderVersionForFundingStream).toBeCalledTimes(1));
             await waitFor(() => expect(downloadValidateDatasetValidationErrorSasUrl).not.toBeCalled());
         })
     });
 
     describe("renders elements on initial page load ", () => {
         it("has the correct summary text", async () => {
-            expect(screen.getByText("dataset-name (version 1)")).toBeInTheDocument();
+            expect(screen.getByText("Update dataset-name (version 1)")).toBeInTheDocument();
         })
 
         it("has the correct last updated author name", async () => {
             const author = screen.getByTestId("update-datasource-author") as HTMLElement;
             expect(author.textContent).toContain("Joe Bloggs 1 January 2000");
+        })
+
+        it("has the correct provider data version", async () => {
+            const providerDate = screen.getByTestId("provider-target-date") as HTMLElement;
+            expect(providerDate.textContent).toContain("27 July 2020");
         })
     });
 
@@ -294,6 +302,24 @@ const mockDatasetService = () => {
                     "name": "test name"
                 }
             })),
+        }
+    });
+}
+
+const mockProviderService = () => {
+    jest.mock("../../../services/providerService", () => {
+        const service = jest.requireActual("../../../services/providerService");
+        return {
+            ...service,
+            getCurrentProviderVersionForFundingStream: jest.fn(() => Promise.resolve({
+                data: {
+                    name: "",
+                    providerVersionId: 1,
+                    description: "",
+                    targetDate: new Date("2020-07-27"),
+                    version: 1
+                }
+            }))
         }
     });
 }
