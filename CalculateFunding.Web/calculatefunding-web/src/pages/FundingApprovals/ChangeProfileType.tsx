@@ -77,6 +77,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
     const [validated, setValidated] = useState<boolean>(false);
     const [missingData, setMissingData] = useState<boolean>(false);
     const [showModal, setShowModal] = useState<boolean>(false);
+    const [noRuleBasedPatterns, setNoRuleBasedPatterns] = useState<boolean>(false);
     const [previewProfilePatternKey, setPreviewProfilePatternKey] = useState<string | null | undefined>();
 
     useEffect(() => {
@@ -207,7 +208,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
         if (ruleBasedPatterns.length > 0) {
             return ruleBasedPatterns;
         }
-        addErrorMessage("No rule based profile patterns found for this funding line.");
+        setNoRuleBasedPatterns(true);
         setMissingData(true);
         return [];
     }, [profilePatterns]);
@@ -242,6 +243,9 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                             <div className="govuk-grid-column-two-thirds">
                                 <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Change profile type</h1>
                             </div>
+                            {noRuleBasedPatterns && <div className="govuk-inset-text">
+                                {`No rule based patterns are available. ${fundingLineName} is using the national pattern.`}
+                            </div>}
                         </div>
                         <div className="govuk-form-group">
                             <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -258,7 +262,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                     <label className="govuk-label govuk-radios__label" htmlFor="national" id="national-type">
                                         {getNationalPatternName()}
                                         <span className="govuk-hint">
-                                            <strong>Description:</strong> {getNationalPatternDescription()}
+                                            {getNationalPatternDescription()}
                                         </span>
                                         <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>Preview profile</button>
                                     </label>
@@ -270,7 +274,9 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                                 <input className="govuk-radios__input" name="rule-based"
                                                     type="radio" aria-controls="rule-based-pattern" aria-expanded={patternType === PatternType.RuleBased}
                                                     value={PatternType.RuleBased} checked={patternType === PatternType.RuleBased}
-                                                    onChange={handleProfilePatternSelected} aria-labelledby="rule-based-type" />
+                                                    onChange={handleProfilePatternSelected} aria-labelledby="rule-based-type"
+                                                    disabled={noRuleBasedPatterns}
+                                                    />
                                                 <label className="govuk-label govuk-radios__label" htmlFor="rule-based" id="rule-based-type">
                                                     Rule based
                                                 </label>

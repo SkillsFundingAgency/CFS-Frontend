@@ -1,6 +1,6 @@
 import React from "react";
 import * as redux from "react-redux";
-import {render, waitFor, fireEvent, cleanup} from "@testing-library/react";
+import {render, waitFor, fireEvent, screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {ChangeProfileTypeProps} from "../../../pages/FundingApprovals/ChangeProfileType";
@@ -10,8 +10,65 @@ import userEvent from "@testing-library/user-event";
 import {QueryClient, QueryClientProvider} from "react-query";
 
 describe("<ChangeProfileType /> ", () => {
+    beforeEach(() => {
+        mockGetAllProfilePatterns.mockResolvedValue({
+            data: [{
+                fundingPeriodId: "FY-2021",
+                fundingStreamId: "DSG",
+                fundingLineId: "DSG-004",
+                roundingStrategy: "roundingStrategy",
+                profilePatternKey: null,
+                fundingStreamPeriodStartDate: new Date(),
+                fundingStreamPeriodEndDate: new Date(),
+                reProfilePastPeriods: true,
+                calculateBalancingPayment: true,
+                allowUserToEditProfilePattern: true,
+                profilePattern: [],
+                profilePatternDisplayName: "National",
+                profilePatternDescription: "National pattern",
+                providerTypeSubTypes: [],
+                id: "national"
+            },
+            {
+                fundingPeriodId: "FY-2021",
+                fundingStreamId: "DSG",
+                fundingLineId: "DSG-004",
+                roundingStrategy: "roundingStrategy",
+                profilePatternKey: "pattern key 1",
+                fundingStreamPeriodStartDate: new Date(),
+                fundingStreamPeriodEndDate: new Date(),
+                reProfilePastPeriods: true,
+                calculateBalancingPayment: true,
+                allowUserToEditProfilePattern: true,
+                profilePattern: [],
+                profilePatternDisplayName: "pattern key 1",
+                profilePatternDescription: "rule based pattern",
+                providerTypeSubTypes: [],
+                id: "rule-based-1"
+            },
+            {
+                fundingPeriodId: "FY-2021",
+                fundingStreamId: "DSG",
+                fundingLineId: "DSG-004",
+                roundingStrategy: "roundingStrategy",
+                profilePatternKey: "pattern key 2",
+                fundingStreamPeriodStartDate: new Date(),
+                fundingStreamPeriodEndDate: new Date(),
+                reProfilePastPeriods: true,
+                calculateBalancingPayment: true,
+                allowUserToEditProfilePattern: true,
+                profilePattern: [],
+                profilePatternDisplayName: "pattern key 2",
+                profilePatternDescription: "rule based pattern",
+                providerTypeSubTypes: [],
+                id: "rule-based-2"
+            }]
+        });
+    });
+
     afterEach(async () => {
         jest.clearAllMocks();
+        mockGetAllProfilePatterns.mockReset();
     });
 
     describe("when user has canApplyCustomProfilePattern permission", () => {
@@ -223,6 +280,68 @@ describe("<ChangeProfileType /> ", () => {
                 expect(getByText(/There is a problem/i)).toBeInTheDocument();
             });
         });
+
+        describe("when only national pattern exists", () => {
+            beforeEach(() => {
+                mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
+                    data: {
+                        fundingLineProfile: {
+                            fundingLineCode: "DSG-004",
+                            fundingLineName: "Pupil Led Factors",
+                            totalAllocation: null,
+                            amountAlreadyPaid: 0.0,
+                            remainingAmount: null,
+                            carryOverAmount: 0.0,
+                            providerId: "10005143",
+                            providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
+                            ukprn: "10005143",
+                            profilePatternKey: null,
+                            profilePatternName: "National",
+                            profilePatternDescription: null,
+                            lastUpdatedUser: {
+                                id: "testid",
+                                name: "testuser"
+                            },
+                            lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
+                            profileTotalAmount: 0.0,
+                            profileTotals: []
+                        },
+                        enableUserEditableCustomProfiles: true,
+                        enableUserEditableRuleBasedProfiles: true
+                    }
+                });
+
+                mockGetAllProfilePatterns.mockResolvedValue({
+                    data: [{
+                        fundingPeriodId: "FY-2021",
+                        fundingStreamId: "DSG",
+                        fundingLineId: "DSG-004",
+                        roundingStrategy: "roundingStrategy",
+                        profilePatternKey: null,
+                        fundingStreamPeriodStartDate: new Date(),
+                        fundingStreamPeriodEndDate: new Date(),
+                        reProfilePastPeriods: true,
+                        calculateBalancingPayment: true,
+                        allowUserToEditProfilePattern: true,
+                        profilePattern: [],
+                        profilePatternDisplayName: "National",
+                        profilePatternDescription: "National pattern",
+                        providerTypeSubTypes: [],
+                        id: "national"
+                    }]
+                });
+            });
+
+            it("displays no rule based patterns message", async () => {
+                renderPage();
+                await waitFor(() => {
+                    expect(screen.getByLabelText(/National/)).toBeChecked();
+                });
+                expect(screen.getByText(/No rule based patterns are available. Pupil Led Factors is using the national pattern./)).toBeInTheDocument();
+                expect(screen.getByLabelText(/Rule based/)).toBeDisabled();
+                expect(screen.getByText(/Apply/).closest("button")).toBeDisabled();
+            });
+        });
     });
 
     describe("when user does not have canApplyCustomProfilePattern permission ", () => {
@@ -231,32 +350,6 @@ describe("<ChangeProfileType /> ", () => {
                 fundingStreamId: "DSG",
                 canApplyCustomProfilePattern: false
             }]);
-            mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
-                data: {
-                    fundingLineProfile: {
-                        fundingLineCode: "DSG-004",
-                        fundingLineName: "Pupil Led Factors",
-                        totalAllocation: null,
-                        amountAlreadyPaid: 0.0,
-                        remainingAmount: null,
-                        carryOverAmount: 0.0,
-                        providerId: "10005143",
-                        providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
-                        ukprn: "10005143",
-                        profilePatternKey: "pattern key 2",
-                        profilePatternName: "pattern key 2",
-                        profilePatternDescription: null,
-                        lastUpdatedUser: {
-                            id: "testid",
-                            name: "testuser"
-                        },
-                        lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
-                        profileTotalAmount: 0.0,
-                        profileTotals: []
-                    }, enableUserEditableCustomProfiles: true,
-                    enableUserEditableRuleBasedProfiles: true
-                }
-            });
         });
 
         it("shows a permissions message", async () => {
@@ -277,6 +370,7 @@ describe("<ChangeProfileType /> ", () => {
 
 // Setup module mocks
 const mockGetFundingLinePublishedProviderDetails = jest.fn();
+const mockGetAllProfilePatterns = jest.fn();
 const mockPreviewProfile = jest.fn(() => Promise.resolve({
     data: []
 }));
@@ -284,59 +378,7 @@ const mockPreviewProfile = jest.fn(() => Promise.resolve({
 jest.mock('../../../services/profilingService', () => ({
     previewProfile: mockPreviewProfile,
     assignProfilePatternKeyToPublishedProvider: jest.fn(() => Promise.resolve()),
-    getAllProfilePatterns: jest.fn(() => Promise.resolve({
-        data: [{
-            fundingPeriodId: "FY-2021",
-            fundingStreamId: "DSG",
-            fundingLineId: "DSG-004",
-            roundingStrategy: "roundingStrategy",
-            profilePatternKey: null,
-            fundingStreamPeriodStartDate: new Date(),
-            fundingStreamPeriodEndDate: new Date(),
-            reProfilePastPeriods: true,
-            calculateBalancingPayment: true,
-            allowUserToEditProfilePattern: true,
-            profilePattern: [],
-            profilePatternDisplayName: "National",
-            profilePatternDescription: "National pattern",
-            providerTypeSubTypes: [],
-            id: "national"
-        },
-        {
-            fundingPeriodId: "FY-2021",
-            fundingStreamId: "DSG",
-            fundingLineId: "DSG-004",
-            roundingStrategy: "roundingStrategy",
-            profilePatternKey: "pattern key 1",
-            fundingStreamPeriodStartDate: new Date(),
-            fundingStreamPeriodEndDate: new Date(),
-            reProfilePastPeriods: true,
-            calculateBalancingPayment: true,
-            allowUserToEditProfilePattern: true,
-            profilePattern: [],
-            profilePatternDisplayName: "pattern key 1",
-            profilePatternDescription: "rule based pattern",
-            providerTypeSubTypes: [],
-            id: "rule-based-1"
-        },
-        {
-            fundingPeriodId: "FY-2021",
-            fundingStreamId: "DSG",
-            fundingLineId: "DSG-004",
-            roundingStrategy: "roundingStrategy",
-            profilePatternKey: "pattern key 2",
-            fundingStreamPeriodStartDate: new Date(),
-            fundingStreamPeriodEndDate: new Date(),
-            reProfilePastPeriods: true,
-            calculateBalancingPayment: true,
-            allowUserToEditProfilePattern: true,
-            profilePattern: [],
-            profilePatternDisplayName: "pattern key 2",
-            profilePatternDescription: "rule based pattern",
-            providerTypeSubTypes: [],
-            id: "rule-based-2"
-        }]
-    })),
+    getAllProfilePatterns: mockGetAllProfilePatterns,
 }));
 
 jest.mock('../../../services/providerService', () => ({
