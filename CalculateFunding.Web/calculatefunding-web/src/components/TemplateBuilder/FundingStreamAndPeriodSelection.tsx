@@ -36,6 +36,7 @@ export const FundingStreamAndPeriodSelection: React.FC<IFundingStreamAndPeriodSe
             onFundingPeriodChange(e.target.value);
         };
 
+        const sortedFundingStreams = fundingStreams.sort((a, b) => a.name.localeCompare(b.name));
 
         return (
             <div className="govuk-grid-row">
@@ -49,8 +50,8 @@ export const FundingStreamAndPeriodSelection: React.FC<IFundingStreamAndPeriodSe
                         {fundingStreams &&
                         <select className="govuk-select" id="fundingStreamId" data-testid="fundingStreamId" name="fundingStreamId"
                                 onChange={handleFundingStreamChange}>
-                            {fundingStreams.map(stream =>
-                                <option key={stream.id} value={stream.id}>{stream.name}</option>)
+                            {sortedFundingStreams.map(stream =>
+                                <option key={stream.id} value={stream.id} data-testid={"fundingStreamOption"}>{stream.name}</option>)
                             }
                         </select>}
                         {errors.map(error => error.fieldName === "fundingStreamId" &&
