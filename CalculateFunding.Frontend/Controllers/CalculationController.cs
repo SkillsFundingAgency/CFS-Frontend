@@ -268,10 +268,9 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/specs/{specificationId}/calculations/createadditionalcalculation")]
-        public async Task<IActionResult> CreateCalculation(string specificationId, string calculationId, [FromBody] CreateAdditionalCalculationViewModel vm)
+        public async Task<IActionResult> CreateCalculation(string specificationId, [FromBody] CreateAdditionalCalculationViewModel vm)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
             Guard.ArgumentNotNull(vm, nameof(vm));
 
             if (!ModelState.IsValid)
@@ -287,7 +286,6 @@ namespace CalculateFunding.Frontend.Controllers
             CalculationCreateModel createCalculation = _mapper.Map<CalculationCreateModel>(vm);
 
             createCalculation.SpecificationId = specificationId;
-            createCalculation.Id = calculationId;
             createCalculation.Name = vm.CalculationName;
             createCalculation.ValueType = vm.CalculationType;
 
