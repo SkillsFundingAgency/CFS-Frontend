@@ -27,7 +27,6 @@ import {getFundingStreamsService} from "../../services/policyService";
 import {Footer} from "../../components/Footer";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
-import {usePermittedFundingStreams} from "../../hooks/useFundingStreamPermissions";
 import {UserPermission} from "../../types/UserPermission";
 import {useErrors} from "../../hooks/useErrors";
 import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
@@ -35,6 +34,7 @@ import {JobType} from "../../types/jobType";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
 import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
+import {usePermittedFundingStreams} from "../../hooks/Permissions/usePermittedFundingStreams";
 import {DateFormatter} from "../../components/DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
 

@@ -8,7 +8,7 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {QueryClient, QueryClientProvider} from "react-query";
 import {hasSpecPermissions} from "../../fakes/testFactories";
-import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 
 describe("<ViewEditFundingLineProfile />", () => {
     afterEach(async () => {

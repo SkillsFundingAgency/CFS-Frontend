@@ -14,7 +14,7 @@ import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionSt
 import {useDispatch, useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {SpecificationSummarySection} from "../../components/Funding/SpecificationSummarySection";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";

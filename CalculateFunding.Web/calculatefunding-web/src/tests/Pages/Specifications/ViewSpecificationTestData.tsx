@@ -5,8 +5,8 @@ import '@testing-library/jest-dom/extend-expect';
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
-import * as specPermsHook from "../../../hooks/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {QueryClient, QueryClientProvider} from "react-query";
 
 export function ViewSpecificationTestData() {

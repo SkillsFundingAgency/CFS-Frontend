@@ -20,6 +20,7 @@ import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {useHistory} from "react-router";
 import {FundingStreamAndPeriodSelection} from "../../components/TemplateBuilder/FundingStreamAndPeriodSelection";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {BackLink} from "../../components/BackLink";
 
 export const CloneTemplate = () => {
     const {templateId, version} = useParams();
@@ -219,11 +220,7 @@ export const CloneTemplate = () => {
                                 </div>
                             </div>
 
-                            <Link to={`/Templates/${templateId}/Edit?version=${version}`}
-                                id="back-button"
-                                className="govuk-link govuk-back-link govuk-link--no-visited-state">
-                                Back
-                        </Link>
+                            <BackLink to={`/Templates/${templateId}/Edit?version=${version}`} />
                         </form>
                     }
                 </div>

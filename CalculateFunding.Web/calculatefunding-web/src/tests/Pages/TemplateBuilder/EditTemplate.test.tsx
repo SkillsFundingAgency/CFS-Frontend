@@ -8,6 +8,7 @@ import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import {ConfirmationModal} from "../../../components/ConfirmationModal";
 import * as hooks from "../../../hooks/TemplateBuilder/useTemplateUndo";
+import {buildPermissions} from "../../fakes/testFactories";
 
 jest.useFakeTimers();
 
@@ -26,67 +27,9 @@ jest.spyOn(hooks, 'useTemplateUndo').mockImplementation(
         redoCount: jest.fn()
     }));
 
-const noPermissionsState: FundingStreamPermissions[] = [{
-    fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false,
-    canRefreshPublishedQa: false,
-    canUploadDataSourceFiles: false
-}];
+const noPermissionsState: FundingStreamPermissions[] = [buildPermissions({fundingStreamId: "DSG"})];
 
-const permissionsState: FundingStreamPermissions[] = [{
-    fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: true,
-    canEditTemplates: true,
-    canDeleteTemplates: true,
-    canApproveTemplates: true,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false,
-    canRefreshPublishedQa: false,
-    canUploadDataSourceFiles: false
-}];
+const permissionsState: FundingStreamPermissions[] = [buildPermissions({fundingStreamId: "DSG", setAllPermsEnabled: true})];
 
 const mockTemplate: TemplateResponse = {
     templateId: "12352346",

@@ -1,11 +1,19 @@
 import React from "react";
 
-export function WarningText(props: { text: string, hidden?:boolean }) {
-    return <div className="govuk-warning-text" hidden={props.hidden}>
+export interface WarningTextProps {
+    text: string, 
+    hidden?: boolean,
+    className?: string,
+}
+
+export function WarningText({ text, className, hidden = false }: WarningTextProps) {
+    
+    return (
+        <div className={`govuk-warning-text ${className || ''}`} hidden={hidden}>
         <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
         <strong className="govuk-warning-text__text">
             <span className="govuk-warning-text__assistive">Warning</span>
-            <span>{props.text}</span>
+            <span>{text}</span>
         </strong>
-    </div>
+    </div>)
 }

@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
@@ -15,12 +19,16 @@ namespace CalculateFunding.Frontend.Helpers
     public class LocalDevelopmentAuthorizationHelper : IAuthorizationHelper
     {
         private readonly IAuthorizationService _authorizationService;
+        private readonly IPoliciesApiClient _policyClient;
 
-        public LocalDevelopmentAuthorizationHelper(IAuthorizationService authorizationService)
+        public LocalDevelopmentAuthorizationHelper(
+            IAuthorizationService authorizationService,
+            IPoliciesApiClient policyClient)
         {
             Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
 
             _authorizationService = authorizationService;
+            _policyClient = policyClient;
         }
 
         public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
@@ -33,157 +41,23 @@ namespace CalculateFunding.Frontend.Helpers
         {
             return Task.FromResult(new FundingStreamPermission
             {
-                CanAdministerFundingStream = true,
-                CanApproveFunding = true,
-                CanApproveSpecification = true,
-                CanChooseFunding = true,
-                CanCreateQaTests = true,
-                CanCreateSpecification = true,
-                CanEditCalculations = true,
-                CanEditQaTests = true,
-                CanEditSpecification = true,
-                CanMapDatasets = true,
-                CanReleaseFunding = true,
-                CanRefreshFunding = true,
-                CanCreateTemplates = true,
-                CanEditTemplates = true,
-                CanDeleteTemplates = true,
-                CanApproveTemplates = true,
-                CanApproveAllCalculations = true,
-                CanRefreshPublishedQa = true,
-                CanUploadDataSourceFiles = true,
                 UserId = user.GetUserProfile()?.Id,
                 FundingStreamId = fundingStreamId
-            });
+            }.SetAllBooleansTo(true));
         }
 
-        public Task<IEnumerable<FundingStreamPermission>> GetUserFundingStreamPermissions(ClaimsPrincipal user)
+        public async Task<IEnumerable<FundingStreamPermission>> GetUserFundingStreamPermissions(ClaimsPrincipal user)
         {
-            return Task.FromResult(new[]
-            {
+            string userId = user.GetUserProfile()?.Id;
+            ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = await _policyClient.GetFundingStreams();
+            var fundingStreams = fundingStreamsResponse.Content;
+
+            return fundingStreams.Select(fs =>
                 new FundingStreamPermission
                 {
-                    CanAdministerFundingStream = true,
-                    CanApproveFunding = true,
-                    CanApproveSpecification = true,
-                    CanChooseFunding = true,
-                    CanCreateQaTests = true,
-                    CanCreateSpecification = true,
-                    CanEditCalculations = true,
-                    CanEditQaTests = true,
-                    CanEditSpecification = true,
-                    CanMapDatasets = true,
-                    CanReleaseFunding = true,
-                    CanRefreshFunding = true,
-                    CanCreateTemplates = true,
-                    CanEditTemplates = true,
-                    CanDeleteTemplates = true,
-                    CanApproveTemplates = true,
-                    CanEditProfilePattern = true,
-                    CanApproveCalculations = true,
-                    CanApproveAllCalculations = true,
-                    CanDeleteCalculations = true,
-                    CanDeleteQaTests = true,
-                    CanAssignProfilePattern = true,
-                    CanApplyCustomProfilePattern = true,
-                    CanDeleteSpecification = true,
-                    CanRefreshPublishedQa = true,
-                    CanUploadDataSourceFiles = true,
-                    UserId = user.GetUserProfile()?.Id,
-                    FundingStreamId = "DSG"
-                },
-                new FundingStreamPermission
-                {
-                    CanAdministerFundingStream = true,
-                    CanApproveFunding = true,
-                    CanApproveSpecification = true,
-                    CanChooseFunding = true,
-                    CanCreateQaTests = true,
-                    CanCreateSpecification = true,
-                    CanEditCalculations = true,
-                    CanEditQaTests = true,
-                    CanEditSpecification = true,
-                    CanMapDatasets = true,
-                    CanReleaseFunding = true,
-                    CanRefreshFunding = true,
-                    CanCreateTemplates = false,
-                    CanEditTemplates = false,
-                    CanDeleteTemplates = false,
-                    CanApproveTemplates = false,
-                    CanEditProfilePattern = true,
-                    CanApproveCalculations = true,
-                    CanApproveAllCalculations = true,
-                    CanDeleteCalculations = true,
-                    CanDeleteQaTests = true,
-                    CanAssignProfilePattern = true,
-                    CanApplyCustomProfilePattern = true,
-                    CanDeleteSpecification = true,
-                    CanRefreshPublishedQa = true,
-                    CanUploadDataSourceFiles = true,
-                    UserId = user.GetUserProfile()?.Id,
-                    FundingStreamId = "PSG"
-                },
-                new FundingStreamPermission
-                {
-                    CanAdministerFundingStream = true,
-                    CanApproveFunding = true,
-                    CanApproveSpecification = true,
-                    CanChooseFunding = true,
-                    CanCreateQaTests = true,
-                    CanCreateSpecification = true,
-                    CanEditCalculations = true,
-                    CanEditQaTests = true,
-                    CanEditSpecification = true,
-                    CanMapDatasets = true,
-                    CanReleaseFunding = true,
-                    CanRefreshFunding = true,
-                    CanCreateTemplates = true,
-                    CanEditTemplates = true,
-                    CanDeleteTemplates = true,
-                    CanApproveTemplates = true,
-                    CanApproveCalculations = true,
-                    CanApproveAllCalculations = true,
-                    CanDeleteCalculations = true,
-                    CanDeleteQaTests = true,
-                    CanAssignProfilePattern = true,
-                    CanApplyCustomProfilePattern = true,
-                    CanDeleteSpecification = true,
-                    CanRefreshPublishedQa = true,
-                    CanUploadDataSourceFiles = true,
-                    UserId = user.GetUserProfile()?.Id,
-                    FundingStreamId = "DSG-AT"
-                },
-                new FundingStreamPermission
-                {
-                    CanAdministerFundingStream = true,
-                    CanApproveFunding = true,
-                    CanApproveSpecification = true,
-                    CanChooseFunding = true,
-                    CanCreateQaTests = true,
-                    CanCreateSpecification = true,
-                    CanEditCalculations = true,
-                    CanEditQaTests = true,
-                    CanEditSpecification = true,
-                    CanMapDatasets = true,
-                    CanReleaseFunding = true,
-                    CanRefreshFunding = true,
-                    CanCreateTemplates = true,
-                    CanEditTemplates = true,
-                    CanDeleteTemplates = true,
-                    CanApproveTemplates = true,
-                    CanApproveCalculations = true,
-                    CanApproveAllCalculations = true,
-                    CanDeleteCalculations = true,
-                    CanDeleteQaTests = true,
-                    CanAssignProfilePattern = true,
-                    CanApplyCustomProfilePattern = true,
-                    CanDeleteSpecification = true,
-                    CanRefreshPublishedQa = true,
-                    CanUploadDataSourceFiles = true,
-                    UserId = user.GetUserProfile()?.Id,
-                    FundingStreamId = "GAG"
-                }
-            } as IEnumerable<FundingStreamPermission>);
+                    UserId = userId,
+                    FundingStreamId = fs.Id
+                }.SetAllBooleansTo(true));
         }
 
         public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
@@ -209,30 +83,9 @@ namespace CalculateFunding.Frontend.Helpers
 
             return await Task.FromResult(new EffectiveSpecificationPermission
             {
-                CanAdministerFundingStream = true,
-                CanApproveFunding = true,
-                CanApproveSpecification = true,
-                CanChooseFunding = true,
-                CanCreateQaTests = true,
-                CanCreateSpecification = true,
-                CanEditCalculations = true,
-                CanEditQaTests = true,
-                CanEditSpecification = true,
-                CanMapDatasets = true,
-                CanReleaseFunding = true,
-                CanRefreshFunding = true,
-                CanApproveCalculations = true,
-                CanApproveAnyCalculations = true,
-                CanApproveAllCalculations = true,
-                CanDeleteCalculations = true,
-                CanDeleteQaTests = true,
-                CanAssignProfilePattern = true,
-                CanApplyCustomProfilePattern = true,
-                CanDeleteSpecification = true,
-                CanRefreshPublishedQa = true,
                 SpecificationId = specificationId,
                 UserId = user.GetUserProfile()?.Id,
-            });
+            }.SetAllBooleansTo(true));
         }
     }
 }

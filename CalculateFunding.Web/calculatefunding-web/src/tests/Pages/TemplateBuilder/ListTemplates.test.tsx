@@ -6,6 +6,7 @@ import {MemoryRouter} from "react-router";
 import {TemplateSearchResponse, TemplateStatus} from "../../../types/TemplateBuilderDefinitions";
 import {render, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
+import {buildPermissions} from "../../fakes/testFactories";
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
@@ -66,63 +67,12 @@ function mockSearchForTemplates(response: TemplateSearchResponse) {
     }
 }
 
-export const noPermissionsState: FundingStreamPermissions[] = [{
-    fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-}];
 
-export const permissionsState: FundingStreamPermissions[] = [{
+const noPermissionsState: FundingStreamPermissions[] = [buildPermissions({fundingStreamId: "DSG"})];
+const permissionsState: FundingStreamPermissions[] = [buildPermissions({
     fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: true,
-    canEditTemplates: true,
-    canDeleteTemplates: true,
-    canApproveTemplates: true,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-}];
+    actions: [p => p.canCreateTemplates = true, p => p.canEditTemplates = true, p => p.canDeleteTemplates = true, p => p.canApproveTemplates = true]
+})];
 
 const renderListTemplatesPage = () => {
     const {ListTemplates} = require('../../../pages/Templates/ListTemplates');

@@ -10,7 +10,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
 import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {ValueType} from "../../types/ValueType";
 import {PermissionStatus} from "../../components/PermissionStatus";

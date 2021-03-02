@@ -16,6 +16,7 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useQuery} from "react-query";
 import {AxiosError} from "axios";
 import {getCalculationVersionHistoryService} from "../../services/calculationService";
+import {BackLink} from "../../components/BackLink";
 
 export interface CalculationVersionHistoryRoute {
     calculationId: string
@@ -146,10 +147,7 @@ export function CalculationVersionHistory({match}: RouteComponentProps<Calculati
                     </button>
                 </div>
             </div>
-            <Link className="govuk-link govuk-back-link govuk-link--no-visited-state"
-                  to={`/Specifications/EditCalculation/${calculationId}`}>
-                Back
-            </Link>
+            <BackLink to={`/Specifications/EditCalculation/${calculationId}`} />
         </div>
         <Footer/>
     </div>

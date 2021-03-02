@@ -1,7 +1,6 @@
 import React from 'react';
 import {WarningText} from "../../components/WarningText";
 import {mount} from "enzyme";
-import {ConfirmationPanel} from "../../components/ConfirmationPanel";
 
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');

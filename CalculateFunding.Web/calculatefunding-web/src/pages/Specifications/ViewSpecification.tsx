@@ -30,7 +30,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {CalculationType} from "../../types/CalculationSearchResponse";
 import {CalculationSummary} from "../../types/CalculationDetails";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {refreshSpecificationFundingService} from "../../services/publishService";
 import {approveAllCalculationsService, getCalculationSummaryBySpecificationId} from "../../services/calculationService";

@@ -19,7 +19,7 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useCalculation} from "../../hooks/Calculations/useCalculation";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
 import {ValueType} from "../../types/ValueType";

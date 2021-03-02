@@ -1,77 +1,18 @@
 ﻿import * as redux from "react-redux";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {renderHook} from "@testing-library/react-hooks";
-import {usePermittedFundingStreams} from "../../hooks/useFundingStreamPermissions";
 import {UserPermission} from "../../types/UserPermission";
+import {usePermittedFundingStreams} from "../../hooks/Permissions/usePermittedFundingStreams";
+import {buildPermissions} from "../fakes/testFactories";
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
-const noPermissionsFundingStream: FundingStreamPermissions = {
-    fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canApproveAllCalculations: false,
-    canApproveCalculations: false,
-    canApproveAnyCalculations: false,
-    canCreateProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canRefreshPublishedQa: false,
-    canUploadDataSourceFiles: false
-}
-const withChooseForFundingPermissionsFundingStream: FundingStreamPermissions = {
+
+const noPermissionsFundingStream: FundingStreamPermissions = buildPermissions({fundingStreamId: "DSG", setAllPermsEnabled: false});
+const withChooseForFundingPermissionsFundingStream: FundingStreamPermissions = buildPermissions({
     fundingStreamId: "GAG",
-    userId: "",
-    canChooseFunding: true,
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canApproveAllCalculations: false,
-    canApproveCalculations: false,
-    canApproveAnyCalculations: false,
-    canEditProfilePattern: false,
-    canRefreshPublishedQa: false,
-    canDeleteProfilePattern: false,
-    canCreateProfilePattern: false,
-    canUploadDataSourceFiles: false
-}
+    actions: [p => p.canChooseFunding = true]
+});
 
 describe("usePermittedFundingStreams tests", () => {
     describe("when user has some funding stream permission", () => {

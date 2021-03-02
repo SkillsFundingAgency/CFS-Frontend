@@ -10,7 +10,7 @@ import {assignDataSourceService} from "../../services/datasetService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {JobType} from "../../types/jobType";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";

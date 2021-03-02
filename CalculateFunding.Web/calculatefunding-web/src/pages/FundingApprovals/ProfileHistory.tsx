@@ -14,6 +14,7 @@ import {formatDateTime} from "../../helpers/DateHelper";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {AccordianPanel} from "../../components/AccordianPanel";
 import {Link} from "react-router-dom";
+import {BackLink} from "../../components/BackLink";
 
 export interface ProfileHistoryProps {
     providerId: string;
@@ -171,10 +172,7 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
                                         </AccordianPanel>
                                     ))}
                                 </div>
-                                <Link to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}
-                                    className="govuk-back-link">
-                                    Back
-                                </Link>
+                                <BackLink to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}/>
                             </>
                         }
                     </>

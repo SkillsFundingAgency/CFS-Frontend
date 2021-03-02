@@ -1,9 +1,24 @@
 ﻿import {useMemo} from "react";
-import {getUserPermissionsService} from "../services/userService";
+import {getUserPermissionsService} from "../../services/userService";
 import {useQuery, UseQueryOptions} from "react-query";
 import { AxiosError } from "axios";
-import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
-import {milliseconds} from "../helpers/TimeInMs";
+import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
+import {milliseconds} from "../../helpers/TimeInMs";
+
+export enum Permissions {
+    Create = "Create",
+    Edit = "Edit",
+    EditCalculations = "Edit Calculations",
+    ApproveCalculations = "Approve Calculations",
+    ApproveAllCalculations = "Approve All Calculations",
+    ChooseFunding = "Choose Funding",
+    CreateAdditionalCalculations = "Create Additional Calculations",
+    CanApplyCustomProfilePattern = "Can Edit Funding Line Profiles",
+    MapDatasets = "Map Datasets",
+    Release = "Release",
+    Refresh = "Refresh",
+    Approve = "Approve"
+}
 
 export enum SpecificationPermissions {
     Create = "Create",

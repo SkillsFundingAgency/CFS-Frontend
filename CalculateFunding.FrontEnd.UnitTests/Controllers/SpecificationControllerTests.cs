@@ -16,6 +16,7 @@ using CalculateFunding.Common.TemplateMetadata.Enums;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
+using CalculateFunding.Frontend.ViewModels.Users;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -356,7 +357,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task CreateSpecification_ReturnsBadRequestObjectResultWhenApiResponseIsBadRequest()
         {
-            SetupFundingStreamPermissions(new FundingStreamPermission
+            SetupFundingStreamPermissions(new FundingStreamPermissionModel
             {
                 CanCreateSpecification = true
             });
@@ -395,7 +396,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(true);
         }
 
-        private void SetupFundingStreamPermissions(params FundingStreamPermission[] fundingStreamPermissions)
+        private void SetupFundingStreamPermissions(params FundingStreamPermissionModel[] fundingStreamPermissions)
         {
             _authorizationHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>())
                 .Returns(fundingStreamPermissions);

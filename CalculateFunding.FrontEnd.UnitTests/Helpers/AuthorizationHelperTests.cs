@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
@@ -12,6 +13,7 @@ using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels;
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -76,7 +78,16 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             IPoliciesApiClient policyClient = Substitute.For<IPoliciesApiClient>();
             policyClient.GetFundingStreams().Returns(streamsResponse);
             
-            return new AuthorizationHelper(authorizationService, usersClient, policyClient, logger, permissionOptions);
+            return new AuthorizationHelper(authorizationService, usersClient, policyClient, CreateMapper(), logger, permissionOptions);
+        }
+        private static IMapper CreateMapper()
+        {
+            MapperConfiguration mapperConfig = new MapperConfiguration(c =>
+            {
+                c.AddProfile<FrontEndMappingProfile>();
+            });
+
+            return mapperConfig.CreateMapper();
         }
 
         [TestMethod]

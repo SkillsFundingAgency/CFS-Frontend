@@ -8,77 +8,16 @@ import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import {Route, Switch} from "react-router";
 import {TemplateResponse} from "../../../types/TemplateBuilderDefinitions";
+import {buildPermissions} from "../../fakes/testFactories";
 
 const fetchMock = new MockAdapter(axios);
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
-export const noPermissionsState: FundingStreamPermissions[] = [{
+const noPermissionsState: FundingStreamPermissions[] = [buildPermissions({fundingStreamId: "MPG", setAllPermsEnabled: false})];
+const permissionsState: FundingStreamPermissions[] = [buildPermissions({
     fundingStreamId: "MPG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: false,
-    canApproveAllCalculations: false,
-    canApproveAnyCalculations: false,
-    canApproveCalculations: false,
-    canUploadDataSourceFiles: false,
-    canRefreshPublishedQa: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-}];
-
-export const permissionsState: FundingStreamPermissions[] = [{
-    fundingStreamId: "MPG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: true,
-    canEditTemplates: true,
-    canDeleteTemplates: true,
-    canApproveTemplates: true,
-    canRefreshPublishedQa: false,
-    canUploadDataSourceFiles: false,
-    canApproveCalculations: false,
-    canApproveAnyCalculations: false,
-    canApproveAllCalculations: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-}];
+    actions: [p => p.canCreateTemplates = true, p => p.canEditTemplates = true, p => p.canDeleteTemplates = true, p => p.canApproveTemplates = true]
+})];
 
 const mockTemplateToCloneFrom: TemplateResponse = {
     templateId: "12352346",

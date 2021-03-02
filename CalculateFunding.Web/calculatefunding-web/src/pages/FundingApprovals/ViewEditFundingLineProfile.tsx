@@ -17,8 +17,9 @@ import {cloneDeep} from "lodash";
 import {ApplyCustomProfileRequest, ProfilePeriodType} from "../../types/PublishedProvider/ApplyCustomProfileRequest";
 import {ProfileTotal} from "../../types/FundingLineProfile";
 import {ProfileHistoryPanel} from "./ProfileHistoryPanel";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useErrors} from "../../hooks/useErrors";
+import {BackLink} from "../../components/BackLink";
 
 export interface ViewEditFundingLineProfileProps {
     providerId: string;
@@ -421,10 +422,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                 <ProfileHistoryPanel
                                     specificationId={specificationId} providerId={providerId} providerVersionId={providerVersionId}
                                     fundingStreamId={fundingStreamId} fundingPeriodId={fundingPeriodId} fundingLineCode={fundingLineId}/>
-                                <Link to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
-                                      className="govuk-back-link">
-                                    Back
-                                </Link>
+                                <BackLink to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}/>
                             </div>
                         </div>
                     </>}

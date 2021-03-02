@@ -4,10 +4,14 @@ import axios from "axios"
 import MockAdapter from "axios-mock-adapter";
 import {IStoreState} from "../../reducers/rootReducer";
 import {getUserFundingStreamPermissions, UserActionEvent, userActionGetUser} from '../../actions/userAction';
+import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
+import {buildPermissions} from "../fakes/testFactories";
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 const fetchMock = new MockAdapter(axios);
+
+const noPermissionsState: FundingStreamPermissions[] = [buildPermissions({fundingStreamId: "DSG", setAllPermsEnabled: false})];
 
 describe("user-permissions-actions", () => {
     beforeEach(() => {
@@ -15,34 +19,10 @@ describe("user-permissions-actions", () => {
     });
 
     it("fetches user permissions", async () => {
-        const payload = [{
-            canAdministerFundingStream: false,
-            canApproveFunding: false,
-            canApproveSpecification: false,
-            canChooseFunding: false,
-            canCreateQaTests: false,
-            canCreateSpecification: false,
-            canDeleteCalculations: false,
-            canDeleteQaTests: false,
-            canDeleteSpecification: false,
-            canEditCalculations: false,
-            canEditQaTests: false,
-            canEditSpecification: false,
-            canMapDatasets: false,
-            canRefreshFunding: false,
-            canReleaseFunding: false,
-            canApproveTemplates: false,
-            canCreateTemplates: false,
-            canDeleteTemplates: false,
-            canEditTemplates: false,
-            fundingStreamId: 'DSG',
-            userId: ''
-        }];
-
-        fetchMock.onGet("/api/users/permissions/fundingstreams").reply(200, payload);
+        fetchMock.onGet("/api/users/permissions/fundingstreams").reply(200, noPermissionsState);
 
         const expectedActions = [
-            {type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS, payload: payload},
+            {type: UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS, payload: noPermissionsState},
         ];
 
         const store = mockStore(storeWithData);

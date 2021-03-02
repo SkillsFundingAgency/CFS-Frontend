@@ -10,6 +10,7 @@ using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Search;
@@ -26,6 +27,7 @@ using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Scenarios;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.TestEngine;
+using CalculateFunding.Frontend.ViewModels.Users;
 using IEnumerableExtensions = System.Linq.IEnumerableExtensions;
 using GraphApiModels = CalculateFunding.Common.ApiClient.Graph.Models;
 using Newtonsoft.Json.Linq;
@@ -44,6 +46,13 @@ namespace CalculateFunding.Frontend.ViewModels
             MapScenario();
             MapTestEngine();
             MapGraph();
+            MapUserPermissions();
+        }
+
+        private void MapUserPermissions()
+        {
+            CreateMap<FundingStreamPermission, FundingStreamPermissionModel>()
+                .ForMember(m => m.FundingStreamName, opt => opt.Ignore());
         }
 
         private void MapGraph()

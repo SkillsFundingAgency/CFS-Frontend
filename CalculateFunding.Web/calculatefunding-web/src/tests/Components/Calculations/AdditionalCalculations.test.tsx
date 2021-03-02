@@ -3,7 +3,7 @@ import React from "react";
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
-import * as permissionsHook from "../../../hooks/useSpecificationPermissions";
+import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {CalculationSearchResult, CalculationType} from "../../../types/CalculationSearchResponse";
 import {ValueType} from "../../../types/ValueType";

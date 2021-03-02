@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function BackButton(props: { name: string, callback:any }) {
+export function BackAnchor(props: { name: string, callback:any }) {
     const callback = props.callback;
     return (
         // eslint-disable-next-line jsx-a11y/anchor-is-valid

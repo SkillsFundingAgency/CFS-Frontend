@@ -4,8 +4,8 @@ import {createLocation, createMemoryHistory} from "history";
 import {SelectDataSourceRouteProps} from "../../../pages/Datasets/SelectDataSource";
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import * as useSpecificationPermissionsHook from "../../../hooks/useSpecificationPermissions";
-import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
+import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
 import * as useLatestSpecificationJobWithMonitoringHook
     from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";

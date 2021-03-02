@@ -5,7 +5,7 @@ import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/useSpecificationPermissions";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";

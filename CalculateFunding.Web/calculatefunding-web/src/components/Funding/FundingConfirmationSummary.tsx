@@ -20,6 +20,7 @@ import {CsvDownloadPublishedProviders} from "./CsvDownloadPublishedProviders";
 import {ErrorProps} from "../../hooks/useErrors";
 import {AxiosError} from "axios";
 import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
+import {BackLink} from "../BackLink";
 
 export interface FundingConfirmationSummaryProps {
     fundingStreamId: string,
@@ -89,8 +90,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
             <>
                 <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
                     <div className="govuk-grid-column-full">
-                        <Link to={`/Approvals/SpecificationFundingApproval/${props.fundingStreamId}/${props.fundingPeriodId}/${props.specification.id}`}
-                              className="govuk-back-link">Back</Link>
+                        <BackLink to={`/Approvals/SpecificationFundingApproval/${props.fundingStreamId}/${props.fundingPeriodId}/${props.specification.id}`}/>
                     </div>
                 </div>
                 <div className="govuk-grid-row  govuk-!-margin-bottom-4">

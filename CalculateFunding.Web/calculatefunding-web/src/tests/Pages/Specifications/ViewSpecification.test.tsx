@@ -3,7 +3,7 @@ import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
-import {SpecificationPermissionsResult} from "../../../hooks/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
 import {RunningStatus} from "../../../types/RunningStatus";
 

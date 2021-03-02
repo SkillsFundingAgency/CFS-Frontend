@@ -65,6 +65,7 @@ import {ErrorMessage} from '../../types/ErrorMessage';
 import {useHistory, useLocation} from "react-router";
 import {AutoComplete, AutoCompleteMode} from '../../components/AutoComplete';
 import * as QueryString from "query-string";
+import {BackLink} from "../../components/BackLink";
 
 enum Mode {
     View = 'view',
@@ -777,11 +778,7 @@ export function EditTemplate() {
                         {` by ${template && template.authorName}`}
                     </p>
                     {saveMessage.length > 0 ? <span className="govuk-error-message" style={isFullScreen ? saveMessageFullScreenStyle : {}}>{saveMessage}</span> : null}
-                    <Link to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"}
-                        id="back-button"
-                        className="govuk-link govuk-back-link govuk-link--no-visited-state">
-                        Back
-                    </Link>
+                    <BackLink to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"} />
                     <Sidebar sidebar={
                         <SidebarContent
                             data={selectedNodes}

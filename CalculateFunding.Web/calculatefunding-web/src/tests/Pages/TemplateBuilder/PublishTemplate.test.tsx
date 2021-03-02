@@ -4,76 +4,16 @@ import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
 import {render, waitFor, screen} from "@testing-library/react";
+import {buildPermissions} from "../../fakes/testFactories";
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
-export const noPermissionsState: FundingStreamPermissions[] = [{
+const noPermissionsState: FundingStreamPermissions[] = [buildPermissions({fundingStreamId: "DSG", setAllPermsEnabled: false})];
+const permissionsState: FundingStreamPermissions[] = [buildPermissions({
     fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: true,
-    canApproveFunding: true,
-    canApproveSpecification: true,
-    canChooseFunding: true,
-    canCreateQaTests: true,
-    canCreateSpecification: true,
-    canDeleteCalculations: true,
-    canDeleteQaTests: true,
-    canDeleteSpecification: true,
-    canEditCalculations: true,
-    canEditQaTests: true,
-    canEditSpecification: true,
-    canMapDatasets: true,
-    canRefreshFunding: true,
-    canReleaseFunding: true,
-    canCreateTemplates: true,
-    canEditTemplates: true,
-    canDeleteTemplates: true,
-    canApproveTemplates: false,
-    canApplyCustomProfilePattern: false,
-    canApproveAllCalculations: false,
-    canApproveAnyCalculations: false,
-    canApproveCalculations: false,
-    canUploadDataSourceFiles: false,
-    canRefreshPublishedQa: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-}];
+    actions: [p => p.canApproveTemplates = true]
+})];
 
-export const permissionsState: FundingStreamPermissions[] = [{
-    fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: true,
-    canRefreshPublishedQa: false,
-    canUploadDataSourceFiles: false,
-    canApproveCalculations: false,
-    canApproveAnyCalculations: false,
-    canApproveAllCalculations: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-}];
 
 export const setupGetTemplate = function () {
     jest.mock('../../../services/templateBuilderDatasourceService', () => ({

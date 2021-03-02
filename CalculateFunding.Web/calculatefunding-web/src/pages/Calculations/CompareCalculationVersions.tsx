@@ -20,6 +20,7 @@ import {CalculationDataType} from "../../types/Calculations/CalculationCompilePr
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
+import {BackLink} from "../../components/BackLink";
 
 export interface CompareCalculationVersionsRouteProps {
     calculationId: string;
@@ -224,7 +225,7 @@ export function CompareCalculationVersions({match}: RouteComponentProps<CompareC
                     </div>
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">
-                            <Link to={`/Calculations/CalculationVersionHistory/${calculationId}`} className="govuk-back-link">Back</Link>
+                            <BackLink to={`/Calculations/CalculationVersionHistory/${calculationId}`} />
                         </div>
                     </div>
                 </div>
