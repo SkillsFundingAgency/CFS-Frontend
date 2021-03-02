@@ -11,7 +11,6 @@ export type PublishedProviderIdsQueryResult = {
     refetchPublishedProviderIds: (options?: RefetchOptions) => Promise<QueryObserverResult<string[], AxiosError>>,
 }
 export const usePublishedProviderIds = (searchRequest: PublishedProviderSearchRequest | undefined,
-                                        approvalMode: ApprovalMode | undefined,
                                         queryConfig: UseQueryOptions<string[], AxiosError>)
     : PublishedProviderIdsQueryResult => {
     const providerIdSearchRequest: PublishedProviderSearchRequest | undefined = searchRequest ?
@@ -23,7 +22,7 @@ export const usePublishedProviderIds = (searchRequest: PublishedProviderSearchRe
             async () => (await publishedProviderService
                 .getAllProviderVersionIdsForSearch(providerIdSearchRequest as PublishedProviderSearchRequest)).data,
             {
-                enabled: queryConfig.enabled && searchRequest !== undefined && approvalMode && approvalMode === ApprovalMode.Batches,
+                enabled: queryConfig.enabled && searchRequest !== undefined,
                 onError: queryConfig.onError
             });
     return {

@@ -38,9 +38,9 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
     const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
 
     const {publishedProviderIds} =
-        usePublishedProviderIds(state.searchCriteria, props.approvalMode,
+        usePublishedProviderIds(state.searchCriteria,
             {
-                enabled: props.approvalMode !== ApprovalMode.Batches,
+                enabled: props.approvalMode === ApprovalMode.Batches,
                 onError: err => props.addError({error: err, description: "Error while loading provider ids"})
             });
     const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.selectedProviderIds.length > 0 ?

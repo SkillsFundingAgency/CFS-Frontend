@@ -25,7 +25,7 @@ export const usePublishedProviderSearch = (searchRequest: PublishedProviderSearc
             {...queryConfig, refetchOnWindowFocus: false});
 
     const {publishedProviderIds, isLoadingPublishedProviderIds, refetchPublishedProviderIds} =
-        usePublishedProviderIds(searchRequest, approvalMode,
+        usePublishedProviderIds(searchRequest,
             {
                 enabled: queryConfig.enabled,
                 onError: queryConfig.onError,
