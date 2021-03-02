@@ -138,16 +138,15 @@ describe("<UpdateDataSourceFile />", () => {
             });
         })
 
-        it("it displays job notification banner when a job is completed ", async () => {
+        it("validation error is displayed given job failed with validation error information ", async () => {
             await givenFormIsCompleted();
-
             await submitForm();
-            await sendANewJobNotification();
-
+            await sendANewJobNotificationWithErrorOutcome();
             await waitFor(() => {
-                expect(screen.getByTestId(`job-notification-banner`)).toBeInTheDocument();
+                expect(screen.getByText("Some validation errors")).toBeInTheDocument();
             });
         })
+
     });
 });
 
@@ -173,11 +172,30 @@ const sendANewJobNotification = async() =>
             isFailed: false,
             isActive: false,
             isComplete: true,
-            completionStatus: CompletionStatus.Succeeded,
+            completionStatus: CompletionStatus.Failed,
             outcome: "ValidationFailed"
         }
     });
 }
+
+const sendANewJobNotificationWithErrorOutcome = async() => {
+    jobMonitorSpy.mockReturnValue({
+        newJob: {
+            jobId: "aValidJobId",
+            statusDescription: "",
+            jobDescription: "",
+            runningStatus: RunningStatus.Completed,
+            failures: [],
+            isSuccessful: false,
+            isFailed: false,
+            isActive: false,
+            isComplete: true,
+            completionStatus: CompletionStatus.Failed,
+            outcome: "Some validation errors"
+        }
+    });
+}
+
 
 const submitForm = async() =>
 {

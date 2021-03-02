@@ -29,9 +29,9 @@ import {useErrors} from "../../hooks/useErrors";
 import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
-import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
 import {DateFormatter} from "../../components/DateFormatter";
+import {JobDetails} from "../../types/jobDetails";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -79,37 +79,47 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         isEnabled: isCheckingForJob
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
+    const isOutcomeValidationFailedWithReport = (outcome: string) => outcome === "ValidationFailed";
 
     useEffect(() => {
-        if (!newJob || newJob.jobId !== validateDatasetJobId) return;
+        if (!newJob
+            || newJob.jobId !== validateDatasetJobId
+            || newJob.runningStatus !== RunningStatus.Completed) return;
+
+        if (newJob.isSuccessful) {
+            return onDatasetValidated(updateType);
+        } else {
+            onValidationJobFailed(newJob);
+        }
         clearErrorMessages();
-
-        if (newJob.isFailed) {
-            setIsLoading(false);
-            setIsCheckingForJob(false);
-            return;
-        }
-
-        if (newJob.runningStatus === RunningStatus.Completed) {
-            if (newJob.isSuccessful && newJob.outcome !== "ValidationFailed") {
-                return onDatasetValidated(updateType);
-            } else {
-                downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
-                    let validationErrorFileUrl = result.data;
-                    addValidationErrors({
-                        validationErrors: {"blobUrl": [validationErrorFileUrl]},
-                        message: "Validation failed"
-                    });
-                    setIsLoading(false);
-                    setIsCheckingForJob(false);
-                }).catch(() => {
-                    addError({error: "Unable to retrieve validation report", description: "Validation failed"});
-                    setIsLoading(false);
-                    setIsCheckingForJob(false);
-                });
-            }
-        }
+        setIsLoading(false);
+        setIsCheckingForJob(false);
     }, [newJob]);
+
+    function onValidationJobFailed(newJob: JobDetails) {
+        if (newJob.outcome != undefined) {
+            if (isOutcomeValidationFailedWithReport(newJob.outcome)) {
+                displayFailedValidationReportFile();
+            } else {
+                addError({error: newJob.outcome});
+            }
+        } else {
+            addError({error: "Unable to retrieve validation outcome", description: "Validation failed"});
+        }
+    }
+
+    function displayFailedValidationReportFile() {
+        downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
+            const validationErrorFileUrl = result.data;
+            addValidationErrors({
+                validationErrors: {"blobUrl": [validationErrorFileUrl]},
+                message: "Validation failed"
+            });
+            setIsLoading(false);
+        }).catch((err) => {
+            addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+        });
+    }
 
     useEffectOnce(() => {
         setIsLoading(true);
@@ -300,12 +310,6 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             </Breadcrumbs>
             <LoadingStatus title={"Update data source"} hidden={!isLoading}
                            subTitle={"Please wait whilst the data source is updated"}/>
-
-            {(newJob && newJob.isComplete) &&
-            <JobNotificationBanner
-                job={newJob}
-                isCheckingForJob={isLoading}/>
-            }
 
             <MultipleErrorSummary errors={errors}/>
 

@@ -36,6 +36,7 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
 import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
 import {DateFormatter} from "../../components/DateFormatter";
+import {JobDetails} from "../../types/jobDetails";
 
 export function LoadNewDataSource() {
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
@@ -69,29 +70,51 @@ export function LoadNewDataSource() {
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
     const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
     const validExtensions = [".csv", ".xls", ".xlsx"];
-
+    const isOutcomeValidationFailedWithReport = (outcome: string) => outcome === "ValidationFailed";
 
     useEffect(() => {
         filterFundingStreamsByPermittedStreams();
     }, [permittedFundingStreams]);
 
     useEffect(() => {
-        if (!newJob || newJob.jobId !== validateDatasetJobId) return;
-        if (newJob.runningStatus === RunningStatus.Completed) {
-            if (newJob.isSuccessful && newJob.outcome !== "ValidationFailed") {
-                history.push("/Datasets/ManageDataSourceFiles");
-            } else {
-                downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
-                    let validationErrorFileUrl = result.data;
-                    addValidationErrors({validationErrors: {"blobUrl": [validationErrorFileUrl]}, message: "Validation failed"});
-                    setIsLoading(false);
-                }).catch((err) => {
-                    addError({error: "Unable to retrieve validation report", description: "Validation failed"});
-                    setIsLoading(false);
-                });
-            }
+        if (!newJob
+            || newJob.jobId !== validateDatasetJobId
+            || newJob.runningStatus !== RunningStatus.Completed) return;
+        if (newJob.isSuccessful) {
+            return onDatasetValidated(newJob);
+        } else {
+            onValidationJobFailed(newJob);
         }
+        setIsLoading(false);
     }, [newJob]);
+
+    function onDatasetValidated(newJob: JobDetails) {
+        history.push("/Datasets/ManageDataSourceFiles");
+    }
+
+    function onValidationJobFailed(newJob: JobDetails) {
+        if (newJob.outcome != undefined) {
+            if (isOutcomeValidationFailedWithReport(newJob.outcome)) {
+                displayFailedValidationReportFile();
+            } else {
+                addError({error: newJob.outcome});
+            }
+        } else {
+            addError({error: "Unable to retrieve validation outcome", description: "Validation failed"});
+        }
+    }
+
+    function displayFailedValidationReportFile() {
+        downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
+            const validationErrorFileUrl = result.data;
+            addValidationErrors({
+                validationErrors: {"blobUrl": [validationErrorFileUrl]},
+                message: "Validation failed"
+            });
+        }).catch((err) => {
+            addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+        });
+    }
 
     useEffect(() => {
         if (fundingStreams.length > 0 && !fundingStreamsIsFiltered) {
@@ -272,6 +295,9 @@ export function LoadNewDataSource() {
                                 suggestion: "Please check the file is valid and not locked"
                             })
                         }
+                    }
+                    else {
+                        addError({error: "Unable to create dataset"})
                     }
                     setIsLoading(false);
                 });
