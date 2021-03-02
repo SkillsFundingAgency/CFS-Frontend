@@ -9,12 +9,12 @@ export interface DatasetVersionSelectionProps {
 }
 
 export function DatasetVersionSelection(props: DatasetVersionSelectionProps) {
-    return <div className="govuk-radios govuk-radios--small">
+    return <form><div className="govuk-radios govuk-radios--small">
         {props.dataset.versions.slice(0, 5).map((version, index) =>
             <div className="govuk-radios__item" key={index}>
                 <input className="govuk-radios__input"
                        id={`datasource-${version.version}`}
-                       name={`datasource-${version.version}`}
+                       name={`datasource-${props.dataset.id}`}
                        type="radio"
                        value={version.version}
                        defaultChecked={version.version === props.newVersionNumber || version.version === props.dataset.selectedVersion}
@@ -39,5 +39,5 @@ export function DatasetVersionSelection(props: DatasetVersionSelectionProps) {
                 </label>
             </div>
         )}
-    </div>
+    </div></form>
 }

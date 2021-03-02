@@ -220,7 +220,7 @@ export function SelectDataSourceExpanded({match}: RouteComponentProps<SelectData
                                                     datasourceVersions2.version - datasourceVersions1.version)
                                                 .map(v =>
                                                     <div className="govuk-radios__item">
-                                                        <input className="govuk-radios__input" id={`datasource-${v.version}`} name={`datasource-${v.version}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)} />
+                                                        <input className="govuk-radios__input" id={`datasource-${v.version}`} name={`datasource-${datasourceVersions.id}`} type="radio" value={`${datasourceVersions.id}_${v.version}`} onChange={(e) => saveSelection(e)} />
                                                         <label className="govuk-label govuk-radios__label" htmlFor={`datasource-${v.version}`}>
                                                             {datasourceVersions.name} (Version {v.version})
                                                                 <div className="govuk-!-margin-top-1">
