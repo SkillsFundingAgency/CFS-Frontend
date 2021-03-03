@@ -35,23 +35,17 @@ describe("<SpecificationFundingApproval />", () => {
             const alerts = await screen.findAllByRole("alert");
             alerts.some(alert => within(alert).getByText(/Error: missing something/));
         });
-
-        it('blocks user from approving with an error message', async () => {
-            const button = screen.getByRole("button", {name: /Approve/});
-
-            act(() => userEvent.click(button));
-            
-            const alerts = await screen.findAllByRole("alert");
-            alerts.some(alert => within(alert).getByText(/Funding cannot be approved as there are providers in error/));
+        
+        it('renders approve button as enabled', async () => {
+            const button = screen.getByRole("button", {name: /Approve funding/});
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
         });
-
-        it('blocks user from releasing with an error message', async () => {
+        
+        it('renders release button as enabled', async () => {
             const button = screen.getByRole("button", {name: /Release/});
-
-            act(() => userEvent.click(button));
-            
-            const alerts = await screen.findAllByRole("alert");
-            alerts.some(alert => within(alert).getByText(/Funding cannot be released as there are providers in error/));
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
         });
     });
     
@@ -80,6 +74,8 @@ describe("<SpecificationFundingApproval />", () => {
 
         it('does not block user from approving with an error message', async () => {
             const button = screen.getByRole("button", {name: /Approve/});
+            
+            expect(button).toBeEnabled();
 
             act(() => userEvent.click(button));
 
@@ -88,6 +84,8 @@ describe("<SpecificationFundingApproval />", () => {
 
         it('does not block user from releasing with an error message', async () => {
             const button = screen.getByRole("button", {name: /Release/});
+            
+            expect(button).toBeEnabled();
 
             act(() => userEvent.click(button));
             

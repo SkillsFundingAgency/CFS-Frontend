@@ -61,7 +61,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         usePublishedProviderSearch(state.searchCriteria, fundingConfiguration && fundingConfiguration.approvalMode,
             {
                 onError: err => addError({error: err, description: "Error while searching for providers"}),
-                enabled: (isSearchCriteriaInitialised && 
+                enabled: (isSearchCriteriaInitialised &&
                     state.searchCriteria && state.searchCriteria.fundingStreamId && state.searchCriteria.fundingPeriodId) !== undefined
             });
     const {publishedProvidersWithErrors, isLoadingPublishedProviderErrors} =
@@ -81,7 +81,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
         }
     }, [match, isSearchCriteriaInitialised]);
-    
+
 
     async function handleApprove() {
         if (publishedProviderSearchResults && canApproveFunding && publishedProviderSearchResults.canApprove) {
@@ -167,13 +167,13 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         refetchSearchResults();
     }
 
-    const isLoading = errors.length === 0 && 
-        (!isSearchCriteriaInitialised || 
+    const isLoading = errors.length === 0 &&
+        (!isSearchCriteriaInitialised ||
             isLoadingSpecification ||
-            isLoadingFundingConfiguration || 
-            isCheckingForJob || 
-            (latestJob && latestJob.isActive) || 
-            isLoadingSearchResults || 
+            isLoadingFundingConfiguration ||
+            isCheckingForJob ||
+            (latestJob && latestJob.isActive) ||
+            isLoadingSearchResults ||
             isLoadingRefresh);
     const loadingTitle =
         isLoadingSpecification ? "Loading specification..." :
@@ -188,6 +188,11 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             isCheckingForJob ? "Searching for any running jobs" :
                 (latestJob && latestJob.isActive) ? "Monitoring job progress. Please wait, this could take several minutes" :
                     "";
+    
+    const haveAnyProviderErrors = isLoadingPublishedProviderErrors ||
+        (publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0);
+    
+    const blockActionBasedOnProviderErrors = fundingConfiguration?.approvalMode === ApprovalMode.All && haveAnyProviderErrors;
 
     return (
         <div>
@@ -200,7 +205,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     <Breadcrumb name={"Funding approval results"}/>
                 </Breadcrumbs>
 
-                <PermissionStatus requiredPermissions={missingPermissions} 
+                <PermissionStatus requiredPermissions={missingPermissions}
                                   hidden={!isPermissionsFetched}/>
 
                 <MultipleErrorSummary errors={errors}/>
@@ -259,11 +264,19 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                     onClick={handleRefresh}>Refresh funding
                             </button>
                             <button className="govuk-button"
-                                    disabled={(latestJob && latestJob.isActive) || !publishedProviderSearchResults?.canApprove || !canApproveFunding || isLoadingRefresh || isLoadingPublishedProviderErrors}
+                                    disabled={(latestJob && latestJob.isActive) ||
+                                    !publishedProviderSearchResults?.canApprove ||
+                                    !canApproveFunding ||
+                                    isLoadingRefresh ||
+                                    blockActionBasedOnProviderErrors}
                                     onClick={handleApprove}>Approve funding
                             </button>
                             <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                                    disabled={(latestJob && latestJob.isActive) || !publishedProviderSearchResults?.canPublish || !canReleaseFunding || isLoadingRefresh || isLoadingPublishedProviderErrors}
+                                    disabled={(latestJob && latestJob.isActive) || 
+                                    !publishedProviderSearchResults?.canPublish || 
+                                    !canReleaseFunding || 
+                                    isLoadingRefresh ||
+                                    blockActionBasedOnProviderErrors}
                                     onClick={handleRelease}>Release funding
                             </button>
                         </div>
