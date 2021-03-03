@@ -58,7 +58,7 @@ export function getPermissionDescription(permission: Permission) {
             return "Can approve all calculations";
         case Permission.CanRefreshPublishedQa:
             return "Can push CFS data into SQL for QA";
-        case Permission.CanUploadDataSourceFile:
+        case Permission.CanUploadDataSourceFiles:
             return "Can upload or update data source files for a data schema belonging to the funding stream";
         default:
             return permission as string;

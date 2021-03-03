@@ -27,5 +27,5 @@
     CanApproveAnyCalculations = "Can approve any calculations",
     CanApproveAllCalculations = "Can approve all calculations",
     CanRefreshPublishedQa = "Can push CFS data into SQL for QA",
-    CanUploadDataSourceFile = "Can upload data source files"
+    CanUploadDataSourceFiles = "Can upload data source files"
 }

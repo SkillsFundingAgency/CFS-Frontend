@@ -57,6 +57,8 @@ namespace CalculateFunding.Frontend.Controllers
                 string fundingStreamName = fundingStreamsResponse.Content.SingleOrDefault(_ => _.Id == fundingStreamPermission.FundingStreamId)?.Name;
 
                 permissionModel.FundingStreamName = string.IsNullOrWhiteSpace(fundingStreamName) ? fundingStreamPermission.FundingStreamId : fundingStreamName;
+                
+                results.Add(permissionModel);
             }
 
             return results;

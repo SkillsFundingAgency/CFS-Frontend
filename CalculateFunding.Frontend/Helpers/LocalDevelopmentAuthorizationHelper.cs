@@ -57,7 +57,8 @@ namespace CalculateFunding.Frontend.Helpers
                 {
                     UserId = userId,
                     FundingStreamId = fs.Id
-                }.SetAllBooleansTo(true));
+                }.SetAllBooleansTo(true))
+                .ToList();
         }
 
         public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired)
