@@ -15,8 +15,10 @@ export function Permissions() {
     const pageTitle = document.title = "My user permissions";
     const [currentFundingStream, setCurrentFundingStreamId] = useState<FundingStreamPermissions>();
     const permitted = useFundingStreamPermissions(currentFundingStream);
-    const permissionsToShow: Permission[] = useMemo(() => 
-        Object.values(Permission).filter(p => ![Permission.CanCreateQaTests, Permission.CanEditQaTests, Permission.CanDeleteQaTests].includes(p)), []);
+    const permissionsToShow: Permission[] = useMemo(() => {
+        const excludedPermissions = [Permission.CanCreateQaTests, Permission.CanEditQaTests, Permission.CanDeleteQaTests, Permission.CanDeleteCalculations, Permission.CanDeleteTemplates, Permission.CanDeleteSpecification, Permission.CanDeleteProfilePattern];
+        return Object.values(Permission).filter(p => !excludedPermissions.includes(p))
+    }, []);
     
     function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {
         setCurrentFundingStreamId(permissions.find(p => p.fundingStreamId === e.target.value));

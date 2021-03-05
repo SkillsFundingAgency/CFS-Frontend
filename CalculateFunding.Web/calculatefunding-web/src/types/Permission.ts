@@ -3,7 +3,7 @@
     CanCreateSpecification = "Can create specifications",
     CanEditSpecification = "Can edit specifications",
     CanApproveSpecification = "Can approve specifications",
-    CanDeleteSpecification = "Can delete calculations",
+    CanDeleteSpecification = "Can delete specifications",
     CanEditCalculations = "Can edit calculations",
     CanDeleteCalculations = "Can delete calculations",
     CanMapDatasets = "Can map data sets",
