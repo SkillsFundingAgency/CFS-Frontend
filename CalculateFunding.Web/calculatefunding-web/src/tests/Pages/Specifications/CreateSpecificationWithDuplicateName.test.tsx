@@ -10,6 +10,7 @@ const test = SpecificationTestData();
 
 describe("<CreateSpecification /> with duplicated specification name", () => {
     beforeEach(async () => {
+        test.hasCreatePermissions();
         test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
         test.mockSpecificationServiceWithDuplicateNameResponse();
         test.mockProviderService();

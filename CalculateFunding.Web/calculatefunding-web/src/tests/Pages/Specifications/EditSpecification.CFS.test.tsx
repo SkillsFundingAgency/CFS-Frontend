@@ -11,6 +11,7 @@ describe("<EditSpecification />", () => {
 
     describe("<EditSpecification /> with CFS", () => {
         beforeEach(async () => {
+            test.hasEditPermissions();
             test.mockSpecificationService(test.specificationCfs);
             test.mockProviderService();
             test.mockProviderVersionService();

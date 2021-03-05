@@ -9,6 +9,7 @@ describe("<EditSpecification /> ", () => {
 
     describe("<EditSpecification /> with specification jobs running", () => {
         beforeEach(async () => {
+            test.hasEditPermissions();
             test.mockSpecificationService(test.specificationCfs);
             test.mockProviderService();
             test.mockProviderVersionService();

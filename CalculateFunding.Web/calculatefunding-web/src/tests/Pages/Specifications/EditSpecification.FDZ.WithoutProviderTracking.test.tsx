@@ -12,6 +12,7 @@ describe("<EditSpecification />", () => {
     const spec = test.specificationFdzWithoutTracking;
     describe("<EditSpecification /> with FDZ without Tracking Latest Provider Data", () => {
         beforeEach(async () => {
+            test.hasEditPermissions();
             test.mockSpecificationService(spec);
             test.mockProviderService();
             test.mockProviderVersionService();

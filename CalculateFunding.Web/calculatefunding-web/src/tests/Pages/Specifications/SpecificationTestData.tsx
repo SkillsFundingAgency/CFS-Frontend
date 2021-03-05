@@ -16,6 +16,10 @@ import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Job
 import {JobDetails} from "../../../types/jobDetails";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
+import * as redux from "react-redux";
+import {buildPermissions} from "../../fakes/testFactories";
+import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
+import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -24,6 +28,7 @@ const store: Store<IStoreState> = createStore(
 store.dispatch = jest.fn();
 
 export function SpecificationTestData() {
+    const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
     const renderCreateSpecificationPage = async () => {
         const {CreateSpecification} = require('../../../pages/Specifications/CreateSpecification');
@@ -331,6 +336,68 @@ export function SpecificationTestData() {
             }
         });
     }
+    
+    const hasMissingPermissionToCreate = () => {
+        const permissions = [buildPermissions({
+            fundingStreamId: mockFundingStream.id,
+            fundingStreamName: mockFundingStream.name,
+            setAllPermsEnabled: false
+        })];
+        useSelectorSpy.mockReturnValue(permissions);
+    }
+    const hasCreatePermissions = () => {
+        const permissions = [buildPermissions({
+            fundingStreamId: mockFundingStream.id,
+            fundingStreamName: mockFundingStream.name,
+            setAllPermsEnabled: false,
+            actions: [p => p.canCreateSpecification = true]
+        })];
+        useSelectorSpy.mockReturnValue(permissions);
+    }
+    
+    const withoutSpecPermissions: SpecificationPermissionsResult = {
+        isCheckingForPermissions: false,
+        isPermissionsFetched: true,
+        hasMissingPermissions: true,
+        missingPermissions: [SpecificationPermissions.Edit],
+        canApplyCustomProfilePattern: false,
+        canApproveAllCalculations: false,
+        canApproveCalculation: false,
+        canChooseFunding: false,
+        canCreateAdditionalCalculation: false,
+        canEditCalculation: false,
+        canMapDatasets: false,
+        canApproveFunding: false,
+        canCreateSpecification: false,
+        canEditSpecification: false,
+        canRefreshFunding: false,
+        canReleaseFunding: false
+    };
+    const withSpecPermissions: SpecificationPermissionsResult = {
+        isCheckingForPermissions: false,
+        isPermissionsFetched: true,
+        hasMissingPermissions: false,
+        missingPermissions: [],
+        canApplyCustomProfilePattern: false,
+        canApproveAllCalculations: false,
+        canApproveCalculation: false,
+        canChooseFunding: false,
+        canCreateAdditionalCalculation: false,
+        canEditCalculation: false,
+        canMapDatasets: false,
+        canApproveFunding: false,
+        canCreateSpecification: false,
+        canEditSpecification: true,
+        canRefreshFunding: false,
+        canReleaseFunding: false
+    };
+    const hasMissingPermissionToEdit = () => {
+        jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutSpecPermissions));
+    }
+    
+    const hasEditPermissions = () => {
+        jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withSpecPermissions));
+    }
 
     return {
         renderCreateSpecificationPage,
@@ -355,6 +422,10 @@ export function SpecificationTestData() {
         coreProvider1: mockCoreProvider1,
         coreProvider2: mockCoreProvider2,
         providerSnapshot1: mockProviderSnapshot1,
-        providerSnapshot2: mockProviderSnapshot2
+        providerSnapshot2: mockProviderSnapshot2,
+        hasCreatePermissions,
+        hasEditPermissions,
+        hasMissingPermissionToCreate,
+        hasMissingPermissionToEdit
     }
 }

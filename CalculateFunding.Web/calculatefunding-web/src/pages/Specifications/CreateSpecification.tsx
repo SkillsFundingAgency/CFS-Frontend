@@ -24,6 +24,10 @@ import {milliseconds} from "../../helpers/TimeInMs";
 import {ProviderDataTrackingMode} from "../../types/Specifications/ProviderDataTrackingMode";
 import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {JobNotificationBanner, SpinnerDisplaySetting} from "../../components/Jobs/JobNotificationBanner";
+import {PermissionStatus} from "../../components/PermissionStatus";
+import {usePermittedFundingStreams} from "../../hooks/Permissions/usePermittedFundingStreams";
+import {UserPermission} from "../../types/UserPermission";
+import {Permission} from "../../types/Permission";
 
 export function CreateSpecification() {
     const {fundingStreams, isLoadingFundingStreams} = useFundingStreams(true);
@@ -37,6 +41,8 @@ export function CreateSpecification() {
     const [selectedDescription, setSelectedDescription] = useState<string>("");
     const [providerSource, setProviderSource] = useState<ProviderSource>();
 
+    const permittedFundingStreams = usePermittedFundingStreams(UserPermission.CanCreateSpecification);
+    
     const {data: fundingPeriods, isLoading: isLoadingFundingPeriods} = useQuery<FundingPeriod[], AxiosError>(
         `funding-periods-for-stream-${selectedFundingStreamId}`,
         async () => (await specificationService.getFundingPeriodsByFundingStreamIdService(selectedFundingStreamId as string)).data,
@@ -261,6 +267,9 @@ export function CreateSpecification() {
                 <Breadcrumb name={"Create specification"}/>
             </Breadcrumbs>
             <div className="govuk-main-wrapper">
+
+                <PermissionStatus requiredPermissions={[Permission.CanCreateSpecification]} 
+                                  hidden={!permittedFundingStreams || permittedFundingStreams.length > 0}/>
 
                 <MultipleErrorSummary errors={errors}/>
 

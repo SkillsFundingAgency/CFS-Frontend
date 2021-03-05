@@ -1,5 +1,9 @@
 ﻿import {Permission} from "../types/Permission";
 
+export function convertToPermissions(permissions: string[]): Permission[] {
+    return permissions.map(p => (<any>Permission)[p]);
+}
+
 export function getPermissionDescription(permission: Permission) {
     switch (permission) {
         case Permission.CanAdministerFundingStream:

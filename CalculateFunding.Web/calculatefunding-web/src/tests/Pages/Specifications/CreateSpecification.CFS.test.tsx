@@ -10,9 +10,11 @@ import {CreateSpecificationModel} from "../../../types/Specifications/CreateSpec
 const test = SpecificationTestData();
 
 describe("<CreateSpecification />", () => {
+
     describe("<CreateSpecification /> with CFS provider source", () => {
         beforeEach(async () => {
             test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
+            test.hasCreatePermissions();
             test.mockSpecificationService();
             test.mockProviderService();
             test.mockProviderVersionService();
@@ -43,6 +45,7 @@ describe("<CreateSpecification />", () => {
                 expect((await screen.findAllByText(/Create specification/))[1]).toHaveClass("govuk-fieldset__heading");
             });
         });
+
         describe("form submission checks ", () => {
 
             it("it displays correct errors given nothing entered before submitting", async () => {
@@ -278,7 +281,7 @@ describe("<CreateSpecification />", () => {
 
             const button = screen.getByRole("button", {name: /Save and continue/});
             userEvent.click(button);
-            
+
             const expectedSaveModel: CreateSpecificationModel = {
                 name: "test specification name",
                 assignedTemplateIds: {"stream-547": test.template1.templateVersion},
@@ -290,7 +293,7 @@ describe("<CreateSpecification />", () => {
                 providerSnapshotId: undefined
             };
             await waitFor(() => expect(createSpecificationService).toHaveBeenCalledWith(expectedSaveModel));
-            
+
             expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
         });
     });

@@ -10,13 +10,13 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
 import {useErrors} from "../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {ValueType} from "../../types/ValueType";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {InlineError} from "../../components/InlineError";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
 import { CalculationDataType } from "../../types/Calculations/CalculationCompilePreviewResponse";
+import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 
 export interface CreateAdditionalCalculationProps {
     excludeMonacoEditor?: boolean

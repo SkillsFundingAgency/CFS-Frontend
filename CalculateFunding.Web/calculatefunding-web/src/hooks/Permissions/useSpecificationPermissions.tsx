@@ -5,6 +5,7 @@ import { AxiosError } from "axios";
 import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 import {milliseconds} from "../../helpers/TimeInMs";
 
+// TODO: refactor all this to use the new Permission enum so everything works against the same data
 export enum Permissions {
     Create = "Create",
     Edit = "Edit",
@@ -51,7 +52,7 @@ export interface SpecificationPermissionsResult {
     canApplyCustomProfilePattern: boolean | undefined,
     canChooseFunding: boolean | undefined,
     hasMissingPermissions: boolean,
-    missingPermissions: string[]
+    missingPermissions: string[] // todo: user Permission[] for permissions the user has vs missing
 }
 
 export const useSpecificationPermissions = (

@@ -95,8 +95,7 @@ describe("<CreateAdditionalCalculation> tests", () => {
 
         it("renders permissions warning", async () => {
             const permissionsWarning = await screen.findByTestId("permission-alert-message");
-            expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following actions:/)).toBeInTheDocument();
-            expect(within(permissionsWarning).getByText(/Create Calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following action: Create Calculations/)).toBeInTheDocument();
 
             expect(screen.getByText(testSpec.name)).toBeInTheDocument();
         });
