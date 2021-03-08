@@ -41,6 +41,7 @@ export interface CalculationSearchResult {
     status: PublishStatus;
     lastUpdatedDate: Date;
     value?: number | null;
+    exceptionMessage:string | undefined;
 }
 
 export interface PagerState {

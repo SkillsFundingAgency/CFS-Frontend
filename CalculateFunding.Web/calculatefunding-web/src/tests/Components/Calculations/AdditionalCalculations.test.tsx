@@ -191,7 +191,9 @@ const testSpec: SpecificationSummary = {
     isSelectedForFunding: true,
     providerVersionId: "",
     templateIds: {},
-    dataDefinitionRelationshipIds: []
+    dataDefinitionRelationshipIds: [],
+    providerSnapshotId: undefined,
+    coreProviderVersionUpdates: undefined
 };
 const testCalc1: CalculationSearchResult = {
     calculationType: CalculationType.Additional,
@@ -206,7 +208,8 @@ const testCalc1: CalculationSearchResult = {
     valueType: ValueType.Currency,
     specificationName: testSpec.name,
     wasTemplateCalculation: false,
-    value: 100
+    value: 100,
+    exceptionMessage:undefined
 }
 const testCalc2: CalculationSearchResult = {
     calculationType: CalculationType.Additional,
@@ -221,7 +224,8 @@ const testCalc2: CalculationSearchResult = {
     valueType: ValueType.Percentage,
     specificationName: testSpec.name,
     wasTemplateCalculation: false,
-    value: 200
+    value: 200,
+    exceptionMessage: undefined
 }
 const withCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
     circularReferenceErrors: [{
@@ -257,7 +261,8 @@ const fullPermissions: permissionsHook.SpecificationPermissionsResult = {
     canMapDatasets: false,
     canApproveCalculation: false,
     canEditCalculation: false,
-    canCreateAdditionalCalculation: true
+    canCreateAdditionalCalculation: true,
+    canApplyCustomProfilePattern: false
 };
 
 const noPermissions: permissionsHook.SpecificationPermissionsResult = {
@@ -275,7 +280,8 @@ const noPermissions: permissionsHook.SpecificationPermissionsResult = {
     canMapDatasets: false,
     canApproveCalculation: false,
     canEditCalculation: false,
-    canCreateAdditionalCalculation: false
+    canCreateAdditionalCalculation: false,
+    canApplyCustomProfilePattern: false
 };
 
 const mockCircularReferenceErrors = jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies');

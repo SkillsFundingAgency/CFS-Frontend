@@ -21,5 +21,7 @@ namespace CalculateFunding.Frontend.ViewModels.Calculations
         {
             get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown"; }
         }
+
+        public string ExceptionMessage { get; set; }
     }
 }

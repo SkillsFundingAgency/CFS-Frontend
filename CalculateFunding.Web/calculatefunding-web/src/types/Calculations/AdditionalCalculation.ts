@@ -17,6 +17,7 @@ export interface AdditionalCalculation {
     wasTemplateCalculation: boolean;
     description?: string | undefined;
     status: PublishStatus;
+    exceptionMessage:string | undefined;
 }
 
 export interface AdditionalCalculationSearchResultViewModel {

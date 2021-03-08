@@ -161,14 +161,16 @@ export function AdditionalCalculations({
                         const linkUrl = showCreateButton ? `/Specifications/EditCalculation/${ac.id}` : `/ViewCalculationResults/${ac.id}`;
                         return <tr className="govuk-table__row" key={index}>
                             <td className="govuk-table__cell text-overflow">
-                                <Link to={linkUrl}>{ac.name}</Link>
+                                <Link className={ac.exceptionMessage ? "govuk-form-group--error" : ""} to={linkUrl}>{ac.name}</Link>
+                                {ac.exceptionMessage ? <span className={"govuk-error-message"}>{ac.exceptionMessage}</span> : ""}
                                 <br />
                                 {hasError ? <span className="govuk-error-message">circular reference detected in calculation script</span> : ""}
                             </td>
+
                             {!providerId && <td className="govuk-table__cell">
                                 {isLoadingCircularDependencies ? <LoadingFieldStatus title="Checking..." /> : hasError ? "Error" : ac.status}
                             </td>}
-                            <td className="govuk-table__cell">{ac.valueType}</td>
+                            <td className="govuk-table__cell">{ac.exceptionMessage == null ? ac.valueType : <span className="govuk-error-message">Error</span>}</td>
                             {providerId && <td className="govuk-table__cell">{renderValue(ac.value, ac.valueType)}</td>}
                             {!providerId && <td className="govuk-table__cell">
                                 <DateTimeFormatter date={ac.lastUpdatedDate} />

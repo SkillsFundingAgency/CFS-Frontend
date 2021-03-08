@@ -462,7 +462,10 @@ namespace CalculateFunding.Frontend.Controllers
                         Value = providerResultResponse.Content.CalculationResults
                             .FirstOrDefault(calcResult =>
                                 calcResult.Calculation != null && calcResult.Calculation.Id == c.Id)?.Value,
-                        LastUpdatedDate = c.LastUpdatedDate
+                        LastUpdatedDate = c.LastUpdatedDate,
+                        ExceptionMessage = providerResultResponse.Content.CalculationResults
+                            .FirstOrDefault(calcResult =>
+                                calcResult.Calculation != null && calcResult.Calculation.Id == c.Id)?.ExceptionMessage,
                     });
 
             AdditionalCalculationViewModel additionalCalculationViewModel =
