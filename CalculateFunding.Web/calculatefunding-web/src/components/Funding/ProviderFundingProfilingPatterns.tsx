@@ -63,7 +63,7 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                                             {profile.totalAllocation !== undefined &&
                                         <>
                                             <Link className="govuk-link right-align"
-                                                  to={`/Approvals/ProviderFundingOverview/${params.specificationId}/${params.providerId}/${params.specCoreProviderVersionId}/${params.fundingStreamId}/${params.fundingPeriodId}/${profile.fundingLineCode}`}>
+                                                  to={`/Approvals/ProviderFundingOverview/${params.specificationId}/${params.providerId}/${params.specCoreProviderVersionId}/${params.fundingStreamId}/${params.fundingPeriodId}/${profile.fundingLineCode}/view`}>
                                                 View
                                             </Link>
                                             <span className="govuk-visually-hidden">{profile.fundingLineName}</span>

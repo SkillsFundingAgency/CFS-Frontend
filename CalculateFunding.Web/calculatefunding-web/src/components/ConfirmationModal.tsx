@@ -47,11 +47,15 @@ export function ConfirmationModal(message: any,
                     <div className="govuk-modal-dialogue__content govuk-!-width-full govuk-body-m">
                         {message}
                     </div>
-                    <button id="confirm" className="govuk-button govuk-!-margin-left-2 govuk-!-margin-right-1" data-module="govuk-button"
+                    <button id="confirm" 
+                            className="govuk-button govuk-button--warning govuk-!-margin-left-2 govuk-!-margin-right-1" 
+                            data-module="govuk-button"
                             onClick={handleContinue} data-testid="confirm-modal-continue-button">
                         {confirmButtonText}
                     </button>
-                    <button id="cancel" className="govuk-button govuk-button--warning" data-module="govuk-button"
+                    <button id="cancel" 
+                            className="govuk-button" 
+                            data-module="govuk-button"
                             onClick={handleCancel}>
                         {cancelButtonText}
                     </button>

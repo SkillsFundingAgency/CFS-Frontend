@@ -172,7 +172,7 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
                                         </AccordianPanel>
                                     ))}
                                 </div>
-                                <BackLink to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}/>
+                                <BackLink to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}/view`}/>
                             </>
                         }
                     </>

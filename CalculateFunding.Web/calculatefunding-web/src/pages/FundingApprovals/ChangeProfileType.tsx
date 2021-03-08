@@ -226,7 +226,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                             <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
                             <Breadcrumb name={"Funding approval results"} url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`} />
                             <Breadcrumb name={providerName} url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`} />
-                            <Breadcrumb name={fundingLineName} url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}`} />
+                            <Breadcrumb name={fundingLineName} url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`} />
                             <Breadcrumb name="Change profile type" />
                         </Breadcrumbs>
                         <div className="govuk-grid-row">

@@ -12,6 +12,7 @@ interface EditableProfileTotalProps {
     remainingAmount: number,
     profileTotal: ProfileTotal,
     setProfileTotal: (instalmentNumber: number, profileTotal: ProfileTotal) => void,
+    setIsDirty: (isDirty: boolean) => void,
     errors: ErrorMessage[],
     addError: (props: ErrorProps) => void,
     clearErrorMessages: (fieldNames?: string[]) => void,
@@ -24,6 +25,7 @@ export function EditableProfileTotal(
         remainingAmount,
         profileTotal,
         setProfileTotal,
+        setIsDirty,
         errors,
         addError,
         clearErrorMessages,
@@ -51,11 +53,13 @@ export function EditableProfileTotal(
 
     const handlePercentChange = (e: ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value;
+        setIsDirty(true);
         setPercent(rawValue);
     }
 
     const handleValueChange = (e: ChangeEvent<HTMLInputElement>) => {
         const rawValue = e.target.value;
+        setIsDirty(true);
         setValue(rawValue);
     }
 
@@ -63,6 +67,7 @@ export function EditableProfileTotal(
         const updatedProfileTotal = clone(profileTotal);
         updatedProfileTotal.value = value;
         updatedProfileTotal.profileRemainingPercentage = percent;
+        setIsDirty(true);
         setProfileTotal(installmentNumber, updatedProfileTotal);
     }
 
@@ -71,6 +76,7 @@ export function EditableProfileTotal(
         if (!percent || percent.length === 0) {
             setValueAndPercent(0, 0);
         } else {
+            setIsDirty(true);
             const newPercent = getCurrentPercentAsNumber();
             const newValue = (newPercent / 100) * remainingAmount;
             setValueAndPercent(newValue, newPercent);
@@ -96,6 +102,7 @@ export function EditableProfileTotal(
         if (!value || value.length === 0) {
             setValueAndPercent(0, 0);
         } else {
+            setIsDirty(true);
             const newValue = getCurrentValueAsNumber();
             const newPercent = (newValue / remainingAmount) * 100;
             setValueAndPercent(newValue, newPercent);

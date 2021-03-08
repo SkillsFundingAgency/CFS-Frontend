@@ -128,7 +128,7 @@ const App: React.FunctionComponent = () => {
                         <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
                                component={ChangeProfileType}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId"
+                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/:editMode"
                                component={ViewEditFundingLineProfile}/>
                         <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
                                component={ProviderFundingOverview}/>

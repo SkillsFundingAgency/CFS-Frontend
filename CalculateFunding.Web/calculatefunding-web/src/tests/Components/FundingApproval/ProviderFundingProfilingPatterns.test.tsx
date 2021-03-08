@@ -51,7 +51,7 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
             const link = screen.getByRole("link", {name: /View/}) as HTMLAnchorElement;
             expect(link).toBeInTheDocument();
             expect(link.getAttribute("href"))
-                .toBe(`/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${props.profilingPatterns[0].fundingLineCode}`);
+                .toBe(`/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${props.profilingPatterns[0].fundingLineCode}/view`);
         });
     });
     

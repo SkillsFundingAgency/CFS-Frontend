@@ -1,16 +1,18 @@
-import React from "react";
+﻿import React from "react";
 import * as redux from "react-redux";
 import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
 import {ViewEditFundingLineProfileProps} from "../../../pages/FundingApprovals/ViewEditFundingLineProfile";
-import {waitFor, fireEvent, render, screen, within} from "@testing-library/react";
+import {waitFor, render, screen, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {QueryClient, QueryClientProvider} from "react-query";
 import {hasSpecPermissions} from "../../fakes/testFactories";
 import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import userEvent from "@testing-library/user-event";
+import {ConfirmationModal} from "../../../components/ConfirmationModal";
 
-describe("<ViewEditFundingLineProfile />", () => {
+describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
     afterEach(async () => {
         mockHistoryPush.mockClear();
         mockApplyCustomProfile.mockClear();
@@ -21,7 +23,7 @@ describe("<ViewEditFundingLineProfile />", () => {
         useSelectorSpy.mockClear();
     });
 
-    describe("when user has canApplyCustomProfilePattern permission", () => {
+    describe("rendering checks", () => {
         beforeEach(async () => {
             useSelectorSpy.mockReturnValue([{
                 fundingStreamId: "fundingStreamId",
@@ -35,7 +37,7 @@ describe("<ViewEditFundingLineProfile />", () => {
                 }
             });
             hasSpecPermissions(minimalSpecPermissions);
-            
+
             await renderPage();
         });
 
@@ -43,8 +45,8 @@ describe("<ViewEditFundingLineProfile />", () => {
             expect(screen.queryByTestId("permission-alert-message")).not.toBeInTheDocument();
         });
 
-        it("edit profile button is enabled", async () => {
-            expect(await screen.findByRole("button", {name: /Edit profile/})).not.toBeDisabled();
+        it("edit profile button is not rendered", async () => {
+            expect(await screen.queryByRole("button", {name: /Edit profile/})).not.toBeInTheDocument();
         });
 
         it("fields are all in read only view", async () => {
@@ -85,42 +87,30 @@ describe("<ViewEditFundingLineProfile />", () => {
             expect(within(balanceAvailableEl).getByText(/£60.00/)).toBeInTheDocument();
         });
 
-        it("shows the correct funding line profile values", async () => {
-            expect(await screen.findByTestId("balance-carried-forward")).toHaveTextContent("£0.00");
-            expect(screen.getAllByTestId("profile-total")).toHaveLength(2);
-            expect(screen.getByTestId("paid-0")).toHaveTextContent("Paid");
-            expect(screen.getByTestId("paid-1")).toHaveTextContent("");
-            expect(screen.getByTestId("instalment-number-0")).toHaveTextContent("1");
-            expect(screen.getByTestId("instalment-number-1")).toHaveTextContent("2");
-            expect(screen.getByTestId("remaining-percentage-0")).toHaveTextContent("");
-            expect(screen.getByTestId("remaining-percentage-1")).toHaveTextContent("100.00%");
-            expect(screen.getByTestId("remaining-value-0")).toHaveTextContent("£40.00");
-            expect(screen.getByTestId("remaining-value-1")).toHaveTextContent("£60.00");
-            expect(screen.getByTestId("total-allocation-percent")).toHaveTextContent("100%");
-            expect(screen.getByTestId("total-allocation-amount")).toHaveTextContent("£100.00");
+        it("redirects user to view mode when user clicks cancel button", async () => {
+            const button = await screen.findByRole("button", {name: /Cancel/});
+
+            userEvent.click(button);
+
+            expect(mockHistoryPush).toBeCalledWith("/Approvals/ProviderFundingOverview/specId/providerId/providerVersionId/fundingStreamId/fundingPeriodId/fundingLineId/view");
         });
 
-        it("switches to edit view when edit profile button clicked (makes unpaid instalments editable)", async () => {
-            const editButton = await screen.findByRole("button", {name: /Edit profile/});
+        it("blocks user from navigating when user has edited something", async () => {
+            const profileInput = screen.getByTestId("value-2");
 
-            fireEvent.click(editButton);
-
-            await waitFor(() => {
-                expect(screen.queryByTestId("value-1")).not.toBeInTheDocument();
-                expect(screen.getByTestId("value-2")).toBeInTheDocument();
-            });
+            userEvent.clear(profileInput);
+            userEvent.type(profileInput, "11");
+            userEvent.tab();
+            
+            const cancelButton = await screen.findByRole("button", {name: /Cancel/});
+            userEvent.click(cancelButton);
+            
+            expect(mockHistoryBlock).toBeCalled();
         });
 
         it("posts custom profile to api when apply profile button clicked", async () => {
-            const editButton = await screen.findByRole("button", {name: /Edit profile/});
-
-            fireEvent.click(editButton);
-
-            await waitFor(() => {
-                expect(screen.getByText("Apply profile")).toBeInTheDocument();
-            });
-
-            fireEvent.click(screen.getByText("Apply profile"));
+            const saveButton = await screen.findByRole("button", {name: /Apply profile/});
+            userEvent.click(saveButton);
 
             await waitFor(() => {
                 expect(mockApplyCustomProfile).toHaveBeenCalledTimes(1);
@@ -154,24 +144,19 @@ describe("<ViewEditFundingLineProfile />", () => {
         });
 
         it("posts correct custom profile to api when carry over applies", async () => {
-            const editButton = await screen.findByRole("button", {name: /Edit profile/});
-
-            fireEvent.click(editButton);
-
-            await waitFor(() => {
-                expect(screen.getByText("Apply profile")).toBeInTheDocument();
-            });
-
             const profileInput = screen.getByTestId("value-2");
             const profilePercent = screen.getByTestId("percent-2") as HTMLInputElement;
-            fireEvent.change(profileInput, {target: {value: '25'}});
-            fireEvent.blur(profileInput);
+            
+            userEvent.clear(profileInput);
+            userEvent.type(profileInput, "25");
+            userEvent.tab();
 
             await waitFor(() => {
                 expect(profilePercent.value).toBe('41.67');
             });
 
-            fireEvent.click(screen.getByText("Apply profile"));
+            const saveButton = await screen.findByRole("button", {name: /Apply profile/});
+            userEvent.click(saveButton);
 
             await waitFor(() => {
                 expect(mockApplyCustomProfile).toHaveBeenCalledTimes(1);
@@ -206,7 +191,7 @@ describe("<ViewEditFundingLineProfile />", () => {
     });
 
     describe("when user does not have canApplyCustomProfilePattern permission", () => {
-        beforeAll(async () => {
+        beforeAll(() => {
             mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
                 data: {
                     fundingLineProfile: testFundingLineProfile,
@@ -223,14 +208,14 @@ describe("<ViewEditFundingLineProfile />", () => {
 
         it("shows a permissions message", async () => {
             await renderPage();
-            
+
             expect(await screen.findByTestId("permission-alert-message")).toBeInTheDocument();
         });
 
-        it("edit profile button is disabled", async () => {
+        it("apply profile button is disabled", async () => {
             await renderPage();
 
-            expect(await screen.findByRole("button", {name: /Edit profile/})).toBeDisabled();
+            expect(await screen.findByRole("button", {name: /Apply profile/})).toBeDisabled();
         });
 
         it("fields initially load in read (not edit) view", async () => {
@@ -283,6 +268,7 @@ describe("<ViewEditFundingLineProfile />", () => {
 // Setup mocks and spies
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 const mockHistoryPush = jest.fn();
+const mockHistoryBlock = jest.fn();
 const mockApplyCustomProfile = jest.fn();
 const mockGetFundingLinePublishedProviderDetails = jest.fn();
 
@@ -296,21 +282,23 @@ jest.mock('react-router', () => ({
     ...jest.requireActual('react-router'),
     useHistory: () => ({
         push: mockHistoryPush,
+        block: mockHistoryBlock
     }),
 }));
 
 const renderPage = async () => {
     const {ViewEditFundingLineProfile} = require("../../../pages/FundingApprovals/ViewEditFundingLineProfile");
     const page = render(
-        <MemoryRouter>
+        <MemoryRouter
+            getUserConfirmation={(message, callback) => ConfirmationModal(message, callback, 'Leave this page', 'Stay on this page')}>
             <QueryClientProvider client={new QueryClient()}>
                 <ViewEditFundingLineProfile match={matchMock} location={location} history={history}/>
             </QueryClientProvider>
         </MemoryRouter>
     );
-    
+
     await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
-    
+
     return page;
 }
 
@@ -323,7 +311,8 @@ const matchMock: match<ViewEditFundingLineProfileProps> = {
         specCoreProviderVersionId: "providerVersionId",
         fundingLineId: "fundingLineId",
         fundingPeriodId: "fundingPeriodId",
-        fundingStreamId: "fundingStreamId"
+        fundingStreamId: "fundingStreamId",
+        editMode: "edit"
     },
     path: "",
     isExact: true,

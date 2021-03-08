@@ -6,7 +6,6 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {Footer} from "../../components/Footer";
 import {getFundingLinePublishedProviderDetails, applyCustomProfile} from "../../services/publishedProviderFundingLineService";
-import {Link} from "react-router-dom";
 import {FundingLineProfile, FundingLineProfileViewModel} from "../../types/PublishedProvider/FundingLineProfile";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
@@ -20,8 +19,10 @@ import {ProfileHistoryPanel} from "./ProfileHistoryPanel";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useErrors} from "../../hooks/useErrors";
 import {BackLink} from "../../components/BackLink";
+import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
 
 export interface ViewEditFundingLineProfileProps {
+    editMode?: string;
     providerId: string;
     fundingStreamId: string;
     fundingPeriodId: string;
@@ -37,6 +38,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     const fundingLineId = match.params.fundingLineId;
     const providerId = match.params.providerId;
     const providerVersionId = match.params.specCoreProviderVersionId;
+    const isEditMode: boolean = match.params.editMode === "edit";
 
     const history = useHistory();
 
@@ -70,14 +72,14 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
-    const [isEditMode, setIsEditMode] = useState<boolean>(false);
+    const [isDirty, setIsDirty] = useState<boolean>(false);
     const [pageTitle, setPageTitle] = useState<string>();
     const [canEditCustomProfile, setCanEditCustomProfile] = useState<boolean>(false);
     const [canChangeToRuleBasedProfile, setCanChangeToRuleBasedProfile] = useState<boolean>(false);
 
     useEffect(() => {
         getFundingLineProfile();
-    }, []);
+    }, [isEditMode]);
 
     useEffect(() => {
         const title = `${isEditMode ? "Edit " : ""}Profile${fundingLineProfile ? " for " + fundingLineProfile.fundingLineName : ""}`;
@@ -87,6 +89,8 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
 
     const {canApplyCustomProfilePattern, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.CanApplyCustomProfilePattern]);
+
+    useConfirmLeavePage(isEditMode && !isSaving && isDirty, `Are you sure you want to leave without saving your changes?`);
 
     const {errors, addError, clearErrorMessages, addValidationErrors} = useErrors();
 
@@ -121,8 +125,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
 
     const handleEditProfileClick = async () => {
         if (!isEditMode) {
-            setIsEditMode(true);
-            window.scrollTo(0, 0);
+            history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit`);
         } else {
             try {
                 clearErrorMessages(["totalPercent", "totalAllocation"]);
@@ -155,7 +158,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
 
                 await applyCustomProfile(request);
                 await getFundingLineProfile();
-                setIsEditMode(false);
+                history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`);
             } catch (err) {
                 if (err.response.status === 400) {
                     const errResponse = err.response.data;
@@ -170,8 +173,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     }
 
     const handleCancelClick = () => {
-        setEditedFundingLineProfile(fundingLineProfile);
-        setIsEditMode(false);
+        history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`);
     }
 
     const handleChangeToRuleBasedProfileClick = () => {
@@ -241,7 +243,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     const totalUnpaidAllocationPercent = calculateUnpaidTotalAllocationPercent();
     const totalAllocationAmount = calculateTotalPaidAndUnpaidAllocationAmount();
     const newCarryForwardAmount = calculateNewCarryForwardAmount(totalUnpaidAllocationAmount);
-
+    
     return (
         <div>
             <Header location={Section.Approvals}/>
@@ -336,6 +338,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                                         remainingAmount={editedFundingLineProfile.remainingAmount || 0}
                                                         setProfileTotal={updateProfileTotal}
                                                         isEditMode={isEditMode}
+                                                        setIsDirty={setIsDirty}
                                                         errors={errors}
                                                         addError={addError}
                                                         clearErrorMessages={clearErrorMessages}/>
