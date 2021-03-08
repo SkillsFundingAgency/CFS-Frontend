@@ -39,7 +39,7 @@ export function VariationManagement({specificationId, addError, clearErrorMessag
                     <NoData hidden={profileVariationPointers.length > 0 || isLoadingVariationManagement} />
                 </div>
                 <div className="govuk-grid-column-full" hidden={profileVariationPointers.length === 0}>
-                    <h2 className="govuk-heading-l">Variation Management</h2>
+                    <h2 className="govuk-heading-l">Variations</h2>
                     <p className="govuk-body">Set the installment from which a variation should take effect.</p>
                 </div>
                 <div className="govuk-grid-column-two-thirds">

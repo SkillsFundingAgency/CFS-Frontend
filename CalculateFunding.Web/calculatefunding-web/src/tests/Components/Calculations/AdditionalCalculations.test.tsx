@@ -103,6 +103,12 @@ describe('<AdditionalCalculations /> tests', () => {
             await waitFor(() => expect(searchForCalculationsByProviderService).toBeCalledTimes(1));
         });
 
+        it('renders the create calculation link correctly', async () => {
+            const button = await screen.findByRole("link", {name: /Create additional calculation/}) as HTMLAnchorElement;
+            expect(button).toBeInTheDocument();
+            expect(button.getAttribute("href")).toBe("/Specifications/CreateAdditionalCalculation/SPEC123");
+        });
+
         it('create button is displayed', async () => {
             expect(await screen.findByText(/Create a calculation/i)).toBeInTheDocument();
         });

@@ -20,8 +20,8 @@ export function Datasets(props: { specificationId: string }) {
                 if (response.status === 200) {
                     setDatasets(response.data as DatasetSummary);
                 }
-            }).finally(() =>{
-                setIsLoadingDatasets(false);
+            }).finally(() => {
+            setIsLoadingDatasets(false);
         });
     }, [props.specificationId]);
 
@@ -34,11 +34,16 @@ export function Datasets(props: { specificationId: string }) {
                 <h2 className="govuk-heading-l">Datasets</h2>
             </div>
             <div className="govuk-grid-column-one-third">
-                <Link to={`/Datasets/DataRelationships/${props.specificationId}`}
-                      id={"dataset-specification-relationship-button"}
-                      className="govuk-link govuk-button" data-module="govuk-button">
-                    Map data source file to data set</Link>
+                <div><Link role={"link"} to={`/Datasets/DataRelationships/${props.specificationId}`}
+                           id={"dataset-specification-relationship-button"}
+                           className="govuk-link" data-module="govuk-button">Map data source file to data set</Link>
+                </div>
+                <div>
+                    <Link role={"link"} to={`/Datasets/CreateDataset/${props.specificationId}`} className="govuk-link">Create
+                        dataset</Link>
+                </div>
             </div>
+
         </div>
         <table className="govuk-table" hidden={isLoadingDatasets}>
             <caption className="govuk-table__caption">Dataset and schemas</caption>

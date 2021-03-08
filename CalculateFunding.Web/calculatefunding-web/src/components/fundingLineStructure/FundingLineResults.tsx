@@ -302,12 +302,13 @@ export function FundingLineResults({
                 <>
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-two-thirds">
-                            <h2 className="govuk-heading-l">Funding line structure</h2>
+                            <h2 className="govuk-heading-l">Funding line structure
+                            {showApproveButton && <ApproveStatusButton id={specificationId}
+                                                                       status={fundingLinePublishStatus}
+                                                                       callback={handleApproveFundingLineStructure} />}
+                            </h2>
                         </div>
                         <div className="govuk-grid-column-one-third">
-                            {showApproveButton && <ApproveStatusButton id={specificationId}
-                                status={fundingLinePublishStatus}
-                                callback={handleApproveFundingLineStructure} />}
                         </div>
                         <div className="govuk-grid-column-two-thirds">
                             <div className="govuk-form-group search-container">

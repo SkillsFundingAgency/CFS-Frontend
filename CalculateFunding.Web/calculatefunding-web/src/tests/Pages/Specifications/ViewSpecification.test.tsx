@@ -1,7 +1,6 @@
 import React from "react";
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
-import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
@@ -70,21 +69,9 @@ describe('<ViewSpecification /> ', () => {
                 expect(button.getAttribute("href")).toBe("/Specifications/EditSpecification/SPEC123");
             });
 
-            it('renders the create calculation link correctly', async () => {
-                const button = await screen.findByRole("link", {name: /Create additional calculation/}) as HTMLAnchorElement;
-                expect(button).toBeInTheDocument();
-                expect(button.getAttribute("href")).toBe("/Specifications/CreateAdditionalCalculation/SPEC123");
-            });
-
-            it('renders the create dataset link correctly', async () => {
-                const button = await screen.findByRole("link", {name: /Create dataset/}) as HTMLAnchorElement;
-                expect(button).toBeInTheDocument();
-                expect(button.getAttribute("href")).toBe("/Datasets/CreateDataset/SPEC123");
-            });
-
-            it('shows Variation Management tab given specification is not chosen for funding', async () => {
+            it('shows Variations tab given specification is not chosen for funding', async () => {
                 await waitFor(() => {
-                    expect(screen.getByText('Variation Management')).toBeVisible()
+                    expect(screen.getByText('Variations')).toBeVisible()
                 });
             });
         });
@@ -125,7 +112,8 @@ describe('<ViewSpecification /> ', () => {
                 isCheckingForPermissions: true,
                 isPermissionsFetched: true,
                 missingPermissions: [],
-                canCreateAdditionalCalculation: true
+                canCreateAdditionalCalculation: true,
+                canApplyCustomProfilePattern: false
             }
             testData.mockSpecificationPermissions(permission);
             testData.mockSpecificationService();

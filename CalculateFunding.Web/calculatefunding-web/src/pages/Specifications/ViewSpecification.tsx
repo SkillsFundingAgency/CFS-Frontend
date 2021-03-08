@@ -306,16 +306,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             <Link to={`/Specifications/EditSpecification/${specificationId}`} className="govuk-link">Edit specification</Link>
                         </li>
-                        <li>
-                            <Link to={`/Specifications/CreateAdditionalCalculation/${specificationId}`} className="govuk-link">Create additional
-                                calculation</Link>
-                        </li>
+
                         <li>
                             <button type="button" className="govuk-link" onClick={approveAllCalculations}
                                 data-testid="approve-calculations">Approve all calculations</button>
-                        </li>
-                        <li>
-                            <Link to={`/Datasets/CreateDataset/${specificationId}`} className="govuk-link">Create dataset</Link>
                         </li>
                         {isLoadingSelectedForFunding &&
                             <LoadingFieldStatus title={"checking funding status..."} />
@@ -345,7 +339,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                 <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
                                 <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                                 <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
-                                <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variation-management-tab"} label="variation-management">Variation Management</Tabs.Tab>
+                                <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variations-tab"} label="variations">Variations</Tabs.Tab>
                             </ul>
                             <Tabs.Panel label="fundingline-structure">
                                 <FundingLineResults
@@ -378,7 +372,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         errors={errors} />
                                 </section>
                             </Tabs.Panel>
-                            <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variation-management"}>
+                            <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variations"}>
                                 <VariationManagement
                                     specificationId={specificationId}
                                     addError={addError}

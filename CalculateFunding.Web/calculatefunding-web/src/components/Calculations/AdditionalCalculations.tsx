@@ -115,12 +115,9 @@ export function AdditionalCalculations({
             <div className="govuk-grid-column-two-thirds">
                 <h2 className="govuk-heading-l">Additional calculations</h2>
             </div>
-            <div className="govuk-grid-column-one-third ">
-                <p className="govuk-body right-align"
-                    hidden={additionalCalculations.totalResults === 0}>
-                    {`Showing ${additionalCalculations.startItemNumber} - ${additionalCalculations.endItemNumber} of 
-                        ${additionalCalculations.totalResults} calculations`}
-                </p>
+            <div className="govuk-grid-column-one-third">
+                    <Link to={`/Specifications/CreateAdditionalCalculation/${specificationId}`} className="govuk-link">Create additional
+                        calculation</Link>
             </div>
         </div>}
         <div className="govuk-grid-row" hidden={isLoadingAdditionalCalculations}>
