@@ -10,6 +10,7 @@ export interface FundingLineProfile {
   profilePatternKey: string,
   profilePatternName: string,
   profilePatternDescription: string,
+  isCustomProfile: boolean,
   lastUpdatedUser: Reference,
   lastUpdatedDate?: Date,
   profileTotalAmount: number,

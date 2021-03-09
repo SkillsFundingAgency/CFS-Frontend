@@ -31,7 +31,8 @@ export interface ChangeProfileTypeProps {
 
 enum PatternType {
     National = "National",
-    RuleBased = "RuleBased"
+    RuleBased = "RuleBased",
+    Custom = "Custom",
 }
 
 export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileTypeProps>) {
@@ -64,7 +65,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                 onError: err => addErrorMessage(err.message, "Error while loading funding line profile"),
                 refetchOnWindowFocus: false
             });
-    
+
     const fundingLineProfile = fundingLineProfileViewModel ?
         fundingLineProfileViewModel.fundingLineProfile : undefined;
 
@@ -73,7 +74,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [profilePatternKey, setProfilePatternKey] = useState<string | null | undefined>();
     const [patternType, setPatternType] = useState<PatternType | undefined>();
-    const [ruleBasedPatternKey, setRuleBasedPatternKey] = useState<string | undefined>();
+    const [ruleBasedPatternKey, setRuleBasedPatternKey] = useState<string | undefined>(undefined);
     const [validated, setValidated] = useState<boolean>(false);
     const [missingData, setMissingData] = useState<boolean>(false);
     const [showModal, setShowModal] = useState<boolean>(false);
@@ -92,15 +93,17 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
 
     useEffect(() => {
         if (!fundingLineProfile || fundingLineProfile.profilePatternKey === undefined) return;
-        if (fundingLineProfile.profilePatternKey === null) {
-            setPatternType(PatternType.National);
-            setProfilePatternKey(null);
-            setRuleBasedPatternKey(undefined);
+        if (fundingLineProfile.isCustomProfile) {
+            setPatternType(PatternType.Custom);
         } else {
-            setPatternType(PatternType.RuleBased);
-            setProfilePatternKey(fundingLineProfile.profilePatternKey);
-            setRuleBasedPatternKey(fundingLineProfile.profilePatternKey);
+            if (fundingLineProfile.profilePatternKey === null) {
+                setPatternType(PatternType.National);
+            } else {
+                setPatternType(PatternType.RuleBased);
+                setRuleBasedPatternKey(fundingLineProfile.profilePatternKey);
+            }
         }
+        setProfilePatternKey(fundingLineProfile.profilePatternKey);
     }, [fundingLineProfile]);
 
     const isPageLoading = isFetchingProfilePatterns || isFetchingProviderVersion || isFetchingFundingLineProfile;
@@ -276,7 +279,7 @@ export function ChangeProfileType({match}: RouteComponentProps<ChangeProfileType
                                                     value={PatternType.RuleBased} checked={patternType === PatternType.RuleBased}
                                                     onChange={handleProfilePatternSelected} aria-labelledby="rule-based-type"
                                                     disabled={noRuleBasedPatterns}
-                                                    />
+                                                />
                                                 <label className="govuk-label govuk-radios__label" htmlFor="rule-based" id="rule-based-type">
                                                     Rule based
                                                 </label>

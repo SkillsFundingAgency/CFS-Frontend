@@ -342,6 +342,76 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/Apply/).closest("button")).toBeDisabled();
             });
         });
+
+        describe("when existing pattern is custom", () => {
+            beforeEach(() => {
+                mockGetFundingLinePublishedProviderDetails.mockResolvedValue({
+                    data: {
+                        fundingLineProfile: {
+                            fundingLineCode: "DSG-004",
+                            fundingLineName: "Pupil Led Factors",
+                            totalAllocation: null,
+                            amountAlreadyPaid: 0.0,
+                            remainingAmount: null,
+                            carryOverAmount: 0.0,
+                            providerId: "10005143",
+                            providerName: "BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
+                            ukprn: "10005143",
+                            profilePatternKey: null,
+                            profilePatternName: "custom",
+                            profilePatternDescription: null,
+                            isCustomProfile: true,
+                            lastUpdatedUser: {
+                                id: "testid",
+                                name: "testuser"
+                            },
+                            lastUpdatedDate: "2020-11-10T12:51:36.5248081+00:00",
+                            profileTotalAmount: 0.0,
+                            profileTotals: []
+                        },
+                        enableUserEditableCustomProfiles: true,
+                        enableUserEditableRuleBasedProfiles: true
+                    }
+                });
+            });
+
+            it("apply button is enabled", async () => {
+                const {getByText} = renderPage();
+                await waitFor(() => {
+                    expect(getByText(/Apply/).closest("button")).not.toBeDisabled();
+                });
+            });
+
+            it("renders a national profile type that is not checked by default", async () => {
+                const {getByLabelText} = renderPage();
+                await waitFor(() => {
+                    expect(getByLabelText(/National/)).not.toBeChecked();
+                });
+            });
+
+            it("renders correct number of rule based options", async () => {
+                const {getAllByLabelText} = renderPage();
+                await waitFor(() => {
+                    expect(getAllByLabelText(/pattern key/i).length).toBe(2);
+                });
+            });
+
+            it("renders rule based options that are not checked by default", async () => {
+                const {getByLabelText} = renderPage();
+                await waitFor(() => {
+                    expect(getByLabelText(/Rule based/)).not.toBeChecked();
+                    expect(getByLabelText(/pattern key 2/i)).not.toBeChecked();
+                });
+            });
+
+            it("does not display no rule based patterns message", async () => {
+                renderPage();
+                await waitFor(() => {
+                    expect(screen.getByLabelText(/National/)).not.toBeChecked();
+                });
+                expect(screen.queryByText(/No rule based patterns are available/i)).not.toBeInTheDocument();
+            });
+        });
     });
 
     describe("when user does not have canApplyCustomProfilePattern permission ", () => {
