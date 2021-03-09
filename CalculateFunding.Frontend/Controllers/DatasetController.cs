@@ -22,6 +22,7 @@ using Serilog;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Common.Models.Search;
 using Microsoft.AspNetCore.Authentication;
+using CalculateFunding.Common.ApiClient.Datasets.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -415,15 +416,15 @@ namespace CalculateFunding.Frontend.Controllers
                 Version = Convert.ToInt32(datasetVersionArray[1])
             };
 
-            HttpStatusCode httpStatusCode =
+            ApiResponse<JobCreationResponse> result =
                 await _datasetApiClient.AssignDatasourceVersionToRelationship(assignDatasetVersion);
 
-            if (httpStatusCode == HttpStatusCode.OK || httpStatusCode == HttpStatusCode.NoContent)
+            if (result.StatusCode == HttpStatusCode.OK)
             {
-                return new OkObjectResult(true);
+                return new OkObjectResult(result.Content);
             }
 
-            _logger.Error($"Failed to assign dataset version with status code: {httpStatusCode.ToString()}");
+            _logger.Error($"Failed to assign dataset version with status code: {result.StatusCode}");
 
             return new StatusCodeResult(500);
         }

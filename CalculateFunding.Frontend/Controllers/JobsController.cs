@@ -82,5 +82,32 @@ namespace CalculateFunding.Frontend.Controllers
 
             return Ok(jobs);
         }
+
+        [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [Route("api/jobs/latest-by-entity-id/{specificationId}/{entityId}")]
+        public async Task<IActionResult> GetLatestJobByTriggerEntityId([FromRoute] string specificationId, [FromRoute] string entityId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(entityId, nameof(entityId));
+
+            ApiResponse<JobSummary> response = await _jobsApiClient.GetLatestJobByTriggerEntityId(specificationId, entityId);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return Ok();
+            }
+
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary");
+
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            JobSummaryViewModel jobs = _mapper.Map<JobSummaryViewModel>(response.Content);
+
+            return Ok(jobs);
+        }
     }
 }

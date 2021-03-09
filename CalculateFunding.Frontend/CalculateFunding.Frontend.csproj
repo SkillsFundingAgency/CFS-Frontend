@@ -27,10 +27,10 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="7.1.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="5.8.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="6.0.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="1.5.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.4.5" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="4.1.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.4.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="4.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.3.0" />
