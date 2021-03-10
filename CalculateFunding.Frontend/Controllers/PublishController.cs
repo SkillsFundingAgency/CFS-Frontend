@@ -202,30 +202,32 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<IEnumerable<PublishedProviderTransaction>> result =
                 await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
 
-            if (result != null)
+            if (result == null || !result.Content.Any())
+                return new NotFoundObjectResult(Content("Error. Not Found."));
+
+            ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel
+                {Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>()};
+
+            foreach (PublishedProviderTransaction item in result.Content)
             {
-                ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel
-                    {Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>()};
-
-                foreach (PublishedProviderTransaction item in result.Content)
+                output.Results.Add(new ProviderTransactionResultsItemViewModel
                 {
-                    output.Results.Add(new ProviderTransactionResultsItemViewModel
-                    {
-                        Status = item.Status.ToString(),
-                        Author = item.Author.Name,
-                        DateChanged = $"{item.Date:M} {item.Date.Year} at {item.Date.DateTime:h:mm tt}",
-                        FundingStreamValue = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : ""
-                    });
-                }
-
-                output.FundingTotal = result.Content.OrderByDescending(x => x.Date).First() != null
-                    ? $"£{result.Content.OrderByDescending(x => x.Date).First().TotalFunding.Value:N2}"
-                    : "";
-                output.LatestStatus = result.Content.OrderByDescending(x => x.Date).FirstOrDefault()?.Status.ToString();
-                return new OkObjectResult(output);
+                    Status = item.Status.ToString(),
+                    Author = item.Author.Name,
+                    DateChanged = $"{item.Date:M} {item.Date.Year} at {item.Date.DateTime:h:mm tt}",
+                    FundingStreamValue = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : ""
+                });
             }
 
-            return new NotFoundObjectResult(Content("Error. Not Found."));
+            PublishedProviderTransaction latestPublishedProvider = result.Content.OrderByDescending(x => x.Date).First();
+
+            output.FundingTotal = latestPublishedProvider?.TotalFunding != null
+                ? $"£{latestPublishedProvider.TotalFunding.Value:N2}"
+                : "";
+
+            output.LatestStatus = result.Content.OrderByDescending(x => x.Date).FirstOrDefault()?.Status.ToString();
+
+            return new OkObjectResult(output);
         }
 
         [HttpGet]
