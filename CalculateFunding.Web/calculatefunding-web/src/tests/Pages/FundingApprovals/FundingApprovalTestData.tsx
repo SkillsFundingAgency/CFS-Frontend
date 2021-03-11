@@ -30,6 +30,7 @@ import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {FundingLineProfile, ProfileTotal} from "../../../types/FundingLineProfile";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
+import {JobResponse} from "../../../types/jobDetails";
 
 export function FundingApprovalTestData() {
 
@@ -246,6 +247,19 @@ export function FundingApprovalTestData() {
         errors: []
     }
 
+
+    const mockLastRefreshJob: JobResponse = {jobId: "", jobType: "", lastUpdated: new Date(Date.UTC(2021, 1, 9)), runningStatus: RunningStatus.Completed};
+    const hasLastRefreshJob = () => {
+        jest.mock("../../../services/jobService", () => {
+            const mockService = jest.requireActual("../../../services/jobService");
+
+            return {
+                ...mockService,
+                getLatestSuccessfulJob: mockLastRefreshJob,
+            }
+        });
+    }
+
     const fundingSearchSelectionState: FundingSearchSelectionState = {
         selectedProviderIds: [],
         searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, testSpec.id)
@@ -309,10 +323,12 @@ export function FundingApprovalTestData() {
         fundingLineWithError,
         fundingLineProfileWithMissingTotalAllocation,
         fundingSearchSelectionState,
+        mockLastRefreshJob,
         activeJob,
         failedJob,
         successfulCompletedJob,
         hasSpecification,
+        hasLastRefreshJob,
         hasNoActiveJobsRunning,
         hasActiveJobRunning,
         hasFailedJob,

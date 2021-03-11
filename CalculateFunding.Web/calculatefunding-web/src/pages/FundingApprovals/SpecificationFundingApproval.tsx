@@ -13,7 +13,6 @@ import {ApprovalMode} from "../../types/ApprovalMode";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {useDispatch, useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
-import {SpecificationSummarySection} from "../../components/Funding/SpecificationSummarySection";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
@@ -29,6 +28,12 @@ import * as publishService from "../../services/publishService";
 import {ConfirmationModal} from "../../components/ConfirmationModal";
 import {RunningStatus} from "../../types/RunningStatus";
 import {AxiosError} from "axios";
+import {Link} from "react-router-dom";
+import {useQuery} from "react-query";
+import {JobDetails} from "../../types/jobDetails";
+import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
+import {getLatestSuccessfulJob} from "../../services/jobService";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 
 export interface SpecificationFundingApprovalRouteProps {
     fundingStreamId: string;
@@ -69,8 +74,18 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             err => addErrorMessage(err.message, "Error while loading provider funding errors"));
     const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions, isPermissionsFetched} =
         useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
+    useQuery<JobDetails | undefined, AxiosError>(`last-spec-${specificationId}-refresh`,
+        async () => getJobDetailsFromJobResponse((await getLatestSuccessfulJob(specificationId, JobType.RefreshFundingJob)).data),
+        {
+            cacheTime: 0,
+            refetchOnWindowFocus: false,
+            enabled: specificationId !== undefined && specificationId.length > 0,
+            onSettled: data => setLastRefresh(data?.lastUpdated),
+            onError: err => addError({error: err, description: "Error while loading last refresh date"})
+        });
     const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
     const [jobId, setJobId] = useState<string>("");
+    const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
     const {errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages} = useErrors();
     const dispatch = useDispatch();
     const history = useHistory();
@@ -82,6 +97,18 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         }
     }, [match, isSearchCriteriaInitialised]);
 
+    useEffect(() => {
+        if (!latestJob || !latestJob.isComplete) return;
+        
+        if (latestJob.jobType !== JobType.RefreshFundingJob) {
+            setLastRefresh(latestJob?.lastUpdated);
+        }
+        if (latestJob.jobId === jobId) {
+            setIsLoadingRefresh(false);
+            setJobId("");
+            refetchSearchResults();
+        }
+    }, [latestJob, jobId]);
 
     async function handleApprove() {
         if (publishedProviderSearchResults && canApproveFunding && publishedProviderSearchResults.canApprove) {
@@ -121,6 +148,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
             ConfirmationModal(<ConfirmRefreshModelBody/>, refreshFunding, "Confirm", "Cancel");
         } catch (error) {
+            window.scrollTo(0, 0);
             const axiosError = error as AxiosError;
             if (axiosError && axiosError.response && axiosError.response.status === 400) {
                 addValidationErrors({validationErrors: axiosError.response.data, message: "Error trying to refresh funding"});
@@ -157,14 +185,12 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
         </div>
     }
 
-    if (publishedProvidersWithErrors) {
-        publishedProvidersWithErrors.forEach(err => addErrorMessage(err, "Provider error"));
+    const clearFundingSearchSelection = () => {
+        dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
     }
 
-    if (latestJob && latestJob.jobId === jobId && latestJob.runningStatus === RunningStatus.Completed) {
-        setIsLoadingRefresh(false);
-        setJobId("");
-        refetchSearchResults();
+    if (publishedProvidersWithErrors) {
+        publishedProvidersWithErrors.forEach(err => addErrorMessage(err, "Provider error"));
     }
 
     const isLoading = errors.length === 0 &&
@@ -216,16 +242,45 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     isCheckingForJob={isCheckingForJob}/>
                 }
 
-                <SpecificationSummarySection
-                    specification={specification}
-                    isLoadingSpecification={isLoadingSpecification}
-                />
+                {!isLoadingSpecification && specification &&
+                <div className="govuk-grid-row govuk-!-margin-bottom-5">
+                    <div className="govuk-grid-column-two-thirds">
+                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1" data-testid="specName"> {specification.name} </h1>
+                        <span className="govuk-caption-l" data-testid="fundingDetails">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
+                    </div>
+                    <div className="govuk-grid-column-one-third">
+                        <ul className="govuk-list right-align">
+                            {fundingConfiguration && fundingConfiguration.approvalMode === ApprovalMode.Batches &&
+                            <li>
+                                <Link className="govuk-link govuk-link--no-visited-state" 
+                                      to={`/Approvals/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}>
+                                    Upload batch file of providers
+                                </Link>
+                            </li>
+                            }
+                            <li>
+                                <button className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
+                                        disabled={(latestJob && latestJob.isActive) || !canRefreshFunding || isLoadingRefresh}
+                                        onClick={handleRefresh}>
+                                    Refresh funding
+                                </button>
+                            </li>
+                            {lastRefresh &&
+                            <p className="govuk-body-s govuk-!-margin-bottom-0">
+                                Last refresh <DateTimeFormatter date={lastRefresh as Date} />
+                            </p>
+                            }
+                        </ul>
+                    </div>
+                </div>
+                }
 
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-one-third" hidden={(latestJob && latestJob.isActive) || isCheckingForJob || isLoadingRefresh}>
                         <PublishedProviderSearchFilters
                             facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
                             numberOfProvidersWithErrors={0}
+                            clearFundingSearchSelection={clearFundingSearchSelection}
                         />
                     </div>
                     <div className="govuk-grid-column-two-thirds">

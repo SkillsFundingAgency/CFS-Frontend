@@ -12,7 +12,8 @@ import {FilterOptionProps} from "../Search/FilterCheckboxOption";
 
 export interface IPublishedProviderSearchFiltersProps {
     facets: Facet[],
-    numberOfProvidersWithErrors: number
+    numberOfProvidersWithErrors: number,
+    clearFundingSearchSelection: () => void
 }
 
 export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFiltersProps) {
@@ -89,7 +90,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         setFilterWithoutErrors(withoutErrors);
         setFilterWithErrors(withErrors);
     }
-
+    
     const providerTypeOptions: FilterOptionProps[] = providerTypeFacets.map((item, index) =>
         ({
             index,
@@ -174,5 +175,10 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
                 onChangeHandler={changeErrorFilter}
                 options={hasErrorOptions}/>
         </CollapsiblePanel>
+        <button id="clearFilters" 
+                className="govuk-button right-align"
+                onClick={props.clearFundingSearchSelection}>
+            Clear filters
+        </button>
     </>
 }

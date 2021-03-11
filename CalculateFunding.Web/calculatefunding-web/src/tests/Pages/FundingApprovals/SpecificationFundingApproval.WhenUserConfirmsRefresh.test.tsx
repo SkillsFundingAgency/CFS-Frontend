@@ -41,11 +41,9 @@ describe("<SpecificationFundingApproval />", () => {
             });
 
             it('renders error summary', async () => {
-                const button = screen.getByRole("button", {name: /Refresh funding/});
+                const refreshButtons = screen.getAllByRole("button", {name: /Refresh funding/});
 
-                act(() => {
-                    userEvent.click(button);
-                });
+                userEvent.click(refreshButtons[0]);
 
                 await waitFor(() => expect(mockValidationError).toHaveBeenCalledWith(test.testSpec.id));
 
@@ -73,6 +71,7 @@ describe("<SpecificationFundingApproval />", () => {
                 useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
                 test.hasSpecification();
                 test.hasNoActiveJobsRunning();
+                test.hasLastRefreshJob();
                 test.hasFundingConfigurationWithApproveAll();
                 test.hasFullSpecPermissions();
                 test.hasProvidersWithErrors([]);
@@ -90,15 +89,16 @@ describe("<SpecificationFundingApproval />", () => {
             });
 
             it('renders refresh button as enabled', async () => {
-                const button = screen.getByRole("button", {name: /Refresh funding/});
-                expect(button).toBeInTheDocument();
-                expect(button).toBeEnabled();
+                const buttons = screen.getAllByRole("button", {name: /Refresh funding/});
+                expect(buttons).toHaveLength(2);
+                expect(buttons[0]).toBeEnabled();
+                expect(buttons[1]).toBeEnabled();
             });
 
             it('renders modal confirmation', async () => {
-                const refreshButton = screen.getByRole("button", {name: /Refresh funding/});
+                const refreshButtons = screen.getAllByRole("button", {name: /Refresh funding/});
 
-                act(() => userEvent.click(refreshButton));
+                userEvent.click(refreshButtons[0]);
 
                 await waitFor(() => expect(mockNoValidationError).toHaveBeenCalledWith(test.testSpec.id));
 

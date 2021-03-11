@@ -30,10 +30,11 @@ describe("<SpecificationFundingApproval />", () => {
             expect(screen.getByTestId("published-provider-results")).toBeInTheDocument();
         });
 
-        it('renders refresh button as enabled', async () => {
-            const button = screen.getByRole("button", {name: /Refresh funding/});
-            expect(button).toBeInTheDocument();
-            expect(button).toBeEnabled();
+        it('renders refresh buttons as enabled', async () => {
+            const buttons = screen.getAllByRole("button", {name: /Refresh funding/});
+            expect(buttons).toHaveLength(2);
+            expect(buttons[0]).toBeEnabled();
+            expect(buttons[1]).toBeEnabled();
         });
 
         it('renders approve button as enabled', async () => {

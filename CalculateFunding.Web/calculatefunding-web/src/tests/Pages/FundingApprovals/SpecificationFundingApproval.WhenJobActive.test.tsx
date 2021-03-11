@@ -15,6 +15,7 @@ describe("<SpecificationFundingApproval />", () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasActiveJobRunning();
             test.hasSpecification();
+            test.hasLastRefreshJob();
             test.hasFundingConfigurationWithApproveAll();
             test.hasFullSpecPermissions();
             test.hasProvidersWithErrors([]);
@@ -41,9 +42,10 @@ describe("<SpecificationFundingApproval />", () => {
         });
 
         it('renders refresh button as disabled', async () => {
-            const button = screen.queryByRole("button", {name: /Refresh funding/});
-            expect(button).toBeInTheDocument();
-            expect(button).toBeDisabled();
+            const buttons = screen.getAllByRole("button", {name: /Refresh funding/});
+            expect(buttons).toHaveLength(2);
+            expect(buttons[0]).toBeDisabled();
+            expect(buttons[1]).toBeDisabled();
         });
 
         it('renders approve button as disabled', async () => {

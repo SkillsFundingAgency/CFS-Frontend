@@ -54,6 +54,7 @@ describe("<SpecificationFundingApproval />", () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasSpecification();
             test.hasNoActiveJobsRunning();
+            test.hasLastRefreshJob();
             test.hasFundingConfigurationWithBatchApproval();
             test.hasFullSpecPermissions();
             test.hasProvidersWithErrors(["Error: missing something"]);

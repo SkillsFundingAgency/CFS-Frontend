@@ -45,7 +45,8 @@ describe("<SpecificationFundingApproval />", () => {
         });
 
         it('renders refresh button', async () => {
-            expect(screen.getByRole("button", {name: /Refresh funding/})).toBeInTheDocument();
+            const buttons = screen.getAllByRole("button", {name: /Refresh funding/});
+            expect(buttons).toHaveLength(2);
         });
     });
 });
