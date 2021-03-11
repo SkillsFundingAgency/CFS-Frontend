@@ -34,7 +34,7 @@ describe("<SpecificationFundingApproval />", () => {
                 jest.spyOn(publishService, 'preValidateForRefreshFundingService')
                     .mockImplementation(mockValidationError);
 
-                test.renderPage();
+                await test.renderPage();
             });
             afterEach(() => {
                 jest.clearAllMocks();

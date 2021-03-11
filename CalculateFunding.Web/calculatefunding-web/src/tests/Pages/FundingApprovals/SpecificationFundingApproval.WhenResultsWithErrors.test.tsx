@@ -13,17 +13,18 @@ describe("<SpecificationFundingApproval />", () => {
 
 
     describe("when results with errors in Approve All mode", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasSpecification();
             test.hasNoActiveJobsRunning();
+            test.hasLastRefreshJob();
             test.hasFundingConfigurationWithApproveAll();
             test.hasFullSpecPermissions();
             test.hasProvidersWithErrors(["Error: missing something"]);
             test.hasProviderIds([test.providerWithError1.publishedProviderVersionId]);
             test.hasSearchResults([test.providerWithError1]);
 
-            test.renderPage();
+            await test.renderPage();
         });
 
         it('renders error summary', async () => {
@@ -50,7 +51,7 @@ describe("<SpecificationFundingApproval />", () => {
     });
     
     describe("when results with errors in Approve Batches mode", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasSpecification();
             test.hasNoActiveJobsRunning();
@@ -60,7 +61,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasProvidersWithErrors(["Error: missing something"]);
             test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
 
-            test.renderPage();
+            await test.renderPage();
         });
 
         it('renders error summary', async () => {

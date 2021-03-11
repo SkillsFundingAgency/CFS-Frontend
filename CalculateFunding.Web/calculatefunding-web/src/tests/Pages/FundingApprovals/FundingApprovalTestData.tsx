@@ -18,7 +18,7 @@ import {FundingSearchSelectionState} from "../../../states/FundingSearchSelectio
 import {buildInitialPublishedProviderSearchRequest} from "../../../types/publishedProviderSearchRequest";
 import {match, MemoryRouter} from "react-router";
 import {SpecificationFundingApprovalRouteProps} from "../../../pages/FundingApprovals/SpecificationFundingApproval";
-import {render} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {Provider} from "react-redux";
 import * as providerErrorsHook from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
@@ -278,17 +278,20 @@ export function FundingApprovalTestData() {
 
     const store: Store<IStoreState> = createStore(rootReducer);
 
-    const renderPage = () => {
+    const renderPage = async () => {
         const {SpecificationFundingApproval} = require('../../../pages/FundingApprovals/SpecificationFundingApproval');
         store.dispatch = jest.fn();
-        return render(<MemoryRouter>
+        render(<MemoryRouter>
             <QueryClientProvider client={new QueryClient()}>
                 <Provider store={store}>
                     <SpecificationFundingApproval location={location} history={history} match={matchMock}/>
                 </Provider>
             </QueryClientProvider>
-        </MemoryRouter>);
+        </MemoryRouter>)
+
+        await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
     };
+    
     const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));
     const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
     const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));

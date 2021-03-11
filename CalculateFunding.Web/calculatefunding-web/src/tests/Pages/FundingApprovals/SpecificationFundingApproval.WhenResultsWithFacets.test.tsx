@@ -11,7 +11,7 @@ describe("<SpecificationFundingApproval />", () => {
     afterEach(() => jest.clearAllMocks());
 
     describe("when results with facets", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasNoActiveJobsRunning();
             test.hasFullSpecPermissions();
@@ -19,7 +19,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasFundingConfigurationWithApproveAll();
             test.hasProvidersWithErrors([]);
             test.hasSearchResults([test.provider1]);
-            test.renderPage();
+            await test.renderPage();
         });
         afterEach(() => {
             jest.clearAllMocks();

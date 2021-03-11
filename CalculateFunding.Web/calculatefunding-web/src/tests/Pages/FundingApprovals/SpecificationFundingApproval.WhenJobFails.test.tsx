@@ -11,16 +11,17 @@ describe("<SpecificationFundingApproval />", () => {
     afterEach(() => jest.clearAllMocks());
 
     describe("when job has failed", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasFailedJob();
             test.hasSpecification();
+            test.hasLastRefreshJob();
             test.hasFundingConfigurationWithApproveAll();
             test.hasFullSpecPermissions();
             test.hasProvidersWithErrors([]);
             test.hasSearchResults([test.provider1]);
 
-            test.renderPage();
+            await test.renderPage();
         });
 
         it('renders Specification details', async () => {

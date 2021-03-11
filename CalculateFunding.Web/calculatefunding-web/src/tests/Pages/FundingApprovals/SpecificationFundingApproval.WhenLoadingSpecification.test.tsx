@@ -14,17 +14,24 @@ describe("<SpecificationFundingApproval />", () => {
         it('renders Specification loading', async () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasNoActiveJobsRunning();
+            test.hasLastRefreshJob();
             test.renderPage();
             expect(await screen.getByText("Loading specification...")).toBeInTheDocument();
         });
     });
 
     describe("when loading specification, no active jobs", () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasNoActiveJobsRunning();
             test.hasSpecification();
-            test.renderPage();
+            test.hasLastRefreshJob();
+            test.hasFundingConfigurationWithApproveAll();
+            test.hasFullSpecPermissions();
+            test.hasProvidersWithErrors([]);
+            test.hasSearchResults([test.provider1]);
+
+            await test.renderPage();
         });
 
         it('renders Specification details', async () => {
