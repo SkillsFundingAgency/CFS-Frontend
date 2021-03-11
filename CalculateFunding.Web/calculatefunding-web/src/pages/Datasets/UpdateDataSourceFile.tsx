@@ -190,12 +190,15 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
                         setIsCheckingForJob(true);
                         setIsLoading(true);
-                    }).catch(() => {
-                        addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+                    }).catch((error) => {
+                        if (error.response && error.response.data[""] !== undefined && error.response.data[""] !== "") {
+                            addError({error:  error.response.data[""]});
+                        } else {
+                            addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+                        }
                         setIsLoading(false);
                         return;
                     })
-
                 })
                 .catch(() => {
                     addError({error: "Unable to upload file"});
