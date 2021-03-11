@@ -52,6 +52,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
         profilePatternKey: '',
         profilePatternName: '',
         profilePatternDescription: '',
+        isCustomProfile: false,
         lastUpdatedUser: {id: '', name: '',},
         profileTotalAmount: 0,
         profileTotals: []
@@ -66,6 +67,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
         profilePatternKey: '',
         profilePatternName: '',
         profilePatternDescription: '',
+        isCustomProfile: false,
         lastUpdatedUser: {id: '', name: '',},
         profileTotalAmount: 0,
         profileTotals: []
