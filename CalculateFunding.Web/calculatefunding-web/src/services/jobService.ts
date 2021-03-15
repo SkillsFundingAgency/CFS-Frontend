@@ -20,3 +20,12 @@ export async function getLatestSuccessfulJob(specificationId: string, jobType: s
         },
     });
 }
+
+export async function getLatestJobByEntityId(specificationId:string, entityId:string): Promise<AxiosResponse<JobResponse | undefined>> {
+    return axios(`${baseURL}/latest-by-entity-id/${specificationId}/${entityId}`, {
+        method: 'GET',
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    })
+}

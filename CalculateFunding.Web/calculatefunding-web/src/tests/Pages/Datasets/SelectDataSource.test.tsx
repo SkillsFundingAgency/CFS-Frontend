@@ -7,9 +7,12 @@ import '@testing-library/jest-dom/extend-expect';
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
-import * as useLatestSpecificationJobWithMonitoringHook
+import * as useLatestEntityJobWithMonitoringHook
     from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {
+    LatestSpecificationJobWithMonitoringResult,
+    useLatestEntityJobWithMonitoring
+} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {RelationshipData} from "../../../types/Datasets/RelationshipData";
@@ -61,6 +64,12 @@ const specificationResult: SpecificationSummaryQueryResult = {
     isFetchingSpecification: false,
     isSpecificationFetched: false,
 };
+const relationshipResult : RelationshipDataQueryResult ={
+    relationshipData :mockRelationshipData,
+    errorLoadingRelationshipData:"",
+    isErrorLoadingRelationshipData: false,
+    isLoadingRelationshipData: false
+}
 const noJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: false,
     isCheckingForJob: false,
@@ -236,7 +245,7 @@ describe("<SelectDataSource/>", () => {
                     isErrorLoadingRelationshipData: false,
                     relationshipData: {}
                 } as RelationshipDataQueryResult));
-            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
+            jest.spyOn(useLatestEntityJobWithMonitoringHook, 'useLatestEntityJobWithMonitoring').mockImplementation(() => (noJob));
             renderPage();
         });
 
@@ -248,13 +257,13 @@ describe("<SelectDataSource/>", () => {
     describe("when background job is running", () => {
         beforeEach(() => {
             jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
-            jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(() => (relationshipResult));jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
                 () => ({
                     isLoadingRelationshipData: false,
                     isErrorLoadingRelationshipData: false,
                     relationshipData: {}
                 } as RelationshipDataQueryResult));
-            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));
+            jest.spyOn(useLatestEntityJobWithMonitoringHook, 'useLatestEntityJobWithMonitoring').mockImplementation(() => (activeJob));
             renderPage();
         });
 

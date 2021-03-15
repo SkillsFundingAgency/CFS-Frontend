@@ -4,15 +4,7 @@ import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {AxiosError} from "axios";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
-
-export type FetchLatestSpecificationJobResult = {
-    lastJob: JobDetails | undefined,
-    isCheckingForJob: boolean,
-    errorCheckingForJob: string,
-    haveErrorCheckingForJob: boolean,
-    isFetching: boolean,
-    isFetched: boolean,
-}
+import {FetchLatestSpecificationJobResult} from "../../types/Jobs/FetchLatestSpecificationJobResult";
 
 export const useFetchLatestSpecificationJob = (
     specificationId: string,

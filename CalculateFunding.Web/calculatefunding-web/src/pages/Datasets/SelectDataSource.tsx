@@ -11,8 +11,9 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
 import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
-import {JobType} from "../../types/jobType";
-import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {
+    useLatestEntityJobWithMonitoring
+} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
@@ -44,10 +45,10 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
         useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
 
     const {hasJob, latestJob, isCheckingForJob} =
-        useLatestSpecificationJobWithMonitoring(specificationId, 
-            [JobType.MapDatasetJob, JobType.MapFdzDatasetsJob, JobType.MapScopedDatasetJob, JobType.MapScopedDatasetJobWithAggregation],
-            err => addError({error: err, description: "Error while checking for job"}));
-    
+        useLatestEntityJobWithMonitoring(specificationId,
+            relationshipData?.relationshipId ?? "" ,
+                err => addError({error: err, description: "There has been data schema change since the last version of this data source file was uploaded. Retry uploading with the create new version option."}));
+
     function getCurrentDataset() {
         return newDataset ? newDataset :
             relationshipData ? relationshipData.datasets.find(x => x.selectedVersion !== null) :
