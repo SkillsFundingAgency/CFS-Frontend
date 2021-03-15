@@ -30,8 +30,8 @@ const testProvider: ProviderSummary = {
     providerSubType: "",
     providerType: "",
     providerVersionId: "",
-    reasonEstablishmentClosed: "",
-    reasonEstablishmentOpened: "",
+    reasonEstablishmentClosedCode: "",
+    reasonEstablishmentOpenedCode: "",
     rscRegionCode: "",
     rscRegionName: "",
     status: "",
@@ -43,7 +43,7 @@ const testProvider: ProviderSummary = {
     ukprn: "",
     upin: "",
     urn: "",
-    paymentOrganisationIdentifier: "",
+    paymentOrganisationId: "",
     paymentOrganisationName: "",
 };
 const providerResult: ProviderVersionQueryResult = {

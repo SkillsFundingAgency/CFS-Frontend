@@ -33,7 +33,6 @@ export interface ViewProviderResultsRouteProps {
 export function ViewProviderResults({match}: RouteComponentProps<ViewProviderResultsRouteProps>) {
     const [providerResults, setProviderResults] = useState<SpecificationInformation[]>();
     const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
-    const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState<boolean>(false);
     const [isLoadingProviderData, setIsLoadingProviderData] = useState<boolean>(true);
     const [selectedSpecificationId, setSelectedSpecificationId] = useState<string>("");
     const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
@@ -251,6 +250,14 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                     {providerDetails.urn}
                                                 </dd>
                                             </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Previous establishment number
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.previousEstablishmentNumber}
+                                                </dd>
+                                            </div>
                                         </dl>
                                         <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
                                         <h4 className="govuk-heading-m">Provider details</h4>
@@ -265,10 +272,26 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                             </div>
                                             <div className="govuk-summary-list__row">
                                                 <dt className="govuk-summary-list__key">
+                                                    Type code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.providerTypeCode}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
                                                     Sub type
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
                                                     {providerDetails.providerSubType}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Sub type code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.providerSubTypeCode}
                                                 </dd>
                                             </div>
                                             <div className="govuk-summary-list__row">
@@ -305,6 +328,22 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
                                                     {providerDetails.laCode}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Previous local authority name
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.previousLaName}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Previous local authority code
+                                                </dt>
+                                                <dd className="govuk-summary-list__value">
+                                                    {providerDetails.previousLaCode}
                                                 </dd>
                                             </div>
                                             <div className="govuk-summary-list__row">
@@ -406,7 +445,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                     Reason establishment opened
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
-                                                    {providerDetails.reasonEstablishmentOpened}
+                                                    {providerDetails.reasonEstablishmentOpenedCode}
                                                 </dd>
                                             </div>
                                             <div className="govuk-summary-list__row">
@@ -414,7 +453,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                     Reason establishment closed
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
-                                                    {providerDetails.reasonEstablishmentClosed}
+                                                    {providerDetails.reasonEstablishmentClosedCode}
                                                 </dd>
                                             </div>
                                         </dl>
@@ -462,7 +501,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                     Identifier
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
-                                                    {providerDetails.paymentOrganisationIdentifier}
+                                                    {providerDetails.paymentOrganisationId}
                                                 </dd>
                                             </div>
                                         </dl>

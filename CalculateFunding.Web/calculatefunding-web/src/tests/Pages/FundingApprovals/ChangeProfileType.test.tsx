@@ -492,7 +492,7 @@ jest.mock('../../../services/providerService', () => ({
             "street": null,
             "locality": null,
             "address3": null,
-            "paymentOrganisationIdentifier": null,
+            "paymentOrganisationId": null,
             "paymentOrganisationName": null
         }
     })),

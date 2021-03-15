@@ -115,7 +115,7 @@ function mockProviderService() {
                 "street": "Brunel Road",
                 "locality": "Malinslee",
                 "address3": "",
-                "paymentOrganisationIdentifier": null,
+                "paymentOrganisationId": null,
                 "paymentOrganisationName": null
             }
         ],
