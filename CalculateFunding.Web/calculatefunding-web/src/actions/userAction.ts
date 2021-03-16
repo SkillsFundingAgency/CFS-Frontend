@@ -98,9 +98,9 @@ export const getHasUserConfirmedSkills: ActionCreator<ThunkAction<Promise<any>, 
         
         let hasConfirmed: boolean | undefined = undefined;
 
-        const valueInLocalStorage = localStorage.getItem(hasConfirmedSkillsStateKey);
-        if (valueInLocalStorage) {
-            hasConfirmed = JSON.parse(valueInLocalStorage as string);
+        const valueInSessionStorage = sessionStorage.getItem(hasConfirmedSkillsStateKey);
+        if (valueInSessionStorage) {
+            hasConfirmed = JSON.parse(valueInSessionStorage as string);
         }
 
         if (hasConfirmed !== true) {

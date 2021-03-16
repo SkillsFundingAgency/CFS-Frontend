@@ -19,21 +19,21 @@ export const reduceUserState: Reducer<IUserState, IUserActions> =
             case UserActionEvent.GET_FUNDING_STREAM_PERMISSIONS:
                 return {...state, fundingStreamPermissions: action.payload};
             case UserActionEvent.GET_HAS_USER_CONFIRMED_SKILLS:
-                updateSkillsInLocalStorage(action.payload);
+                updateSkillsInSessionStorage(action.payload);
                 return {...state, hasConfirmedSkills: action.payload};
             case UserActionEvent.UPDATE_USER_CONFIRMED_SKILLS:
-                updateSkillsInLocalStorage(action.payload);
+                updateSkillsInSessionStorage(action.payload);
                 return {...state, hasConfirmedSkills: action.payload};
             default:
                 return state;
         }
     };
 
-const updateSkillsInLocalStorage = (hasConfirmedSkills: boolean) => {
+const updateSkillsInSessionStorage = (hasConfirmedSkills: boolean) => {
     if (hasConfirmedSkills) {
-        localStorage.setItem(hasConfirmedSkillsStateKey, hasConfirmedSkills.toString());
+        sessionStorage.setItem(hasConfirmedSkillsStateKey, hasConfirmedSkills.toString());
     } else {
-        localStorage.removeItem(hasConfirmedSkillsStateKey);
+        sessionStorage.removeItem(hasConfirmedSkillsStateKey);
     }
 };
 
