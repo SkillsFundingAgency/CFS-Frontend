@@ -56,6 +56,7 @@ export function FundingApprovalTestData() {
         templateIds: {}
     };
     const specResult: SpecificationSummaryQueryResult = {
+        clearSpecificationFromCache: () => Promise.resolve(),
         specification: testSpec,
         isLoadingSpecification: false,
         errorCheckingForSpecification: null,
@@ -261,7 +262,7 @@ export function FundingApprovalTestData() {
     }
 
     const fundingSearchSelectionState: FundingSearchSelectionState = {
-        selectedProviderIds: [],
+        selectedProviderIds: [provider1.publishedProviderVersionId],
         searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, testSpec.id)
     }
 

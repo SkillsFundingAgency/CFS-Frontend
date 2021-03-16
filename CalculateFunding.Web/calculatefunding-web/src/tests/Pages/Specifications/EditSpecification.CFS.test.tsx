@@ -19,10 +19,6 @@ describe("<EditSpecification />", () => {
             test.haveSpecificationMonitorHookWithNoJob();
 
             await test.renderEditSpecificationPage(test.specificationCfs.id);
-
-            await waitFor(() => {
-                expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-            });
         });
 
         afterEach(() => jest.clearAllMocks());
@@ -58,6 +54,11 @@ describe("<EditSpecification />", () => {
 
         describe("page render tests", () => {
 
+            it("does not render default warning", async () => {
+                expect(screen.queryByTestId("permission-alert-message")).not.toBeInTheDocument();
+                expect(screen.queryByText(/You do not have permissions to perform the following action: Can edit specification/)).not.toBeInTheDocument();
+            });
+            
             it("does not render any errors", async () => {
                 expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
             });
@@ -126,22 +127,10 @@ describe("<EditSpecification />", () => {
 
         describe("form submission tests", () => {
 
-            async function waitForPageToLoad() {
-                const {getSpecificationSummaryService} = require('../../../services/specificationService');
-                const {getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
-                const {getFundingConfiguration} = require('../../../services/policyService');
-                const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
-
-                await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1));
-                await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
-                await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
-                await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
-            }
-
             it("it submits form successfully given nothing is changed", async () => {
                 const {updateSpecificationService} = require('../../../services/specificationService');
 
-                await waitForPageToLoad();
+                await test.waitForPageToLoad();
 
                 const button = screen.getByRole("button", {name: /Save and continue/});
                 expect(button).toBeEnabled();
@@ -160,7 +149,7 @@ describe("<EditSpecification />", () => {
             });
 
             it("it submits form given all fields are provided", async () => {
-                await waitForPageToLoad();
+                await test.waitForPageToLoad();
 
                 const coreProviderSelect = screen.getByRole("combobox", {name: /Core provider data/}) as HTMLSelectElement;
                 expect(coreProviderSelect).toHaveLength(3);

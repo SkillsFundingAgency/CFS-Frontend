@@ -7,8 +7,6 @@ import {SpecificationPermissionsResult} from "../../hooks/Permissions/useSpecifi
 import * as specPermsHook from "../../hooks/Permissions/useSpecificationPermissions";
 import * as permissionsHook from "../../hooks/Permissions/useSpecificationPermissions";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
-import {Permission} from "../../types/Permission";
-import {capitalise} from "../../helpers/permissionsHelper";
 
 export const defaultFacets = [
     {name: PublishedProviderSearchFacet.HasErrors, facetValues: [{"name": "True", "count": 1}, {"name": "False", "count": 0}]},
@@ -17,7 +15,6 @@ export const defaultFacets = [
     {name: PublishedProviderSearchFacet.LocalAuthority, facetValues: [{"name": "East London", "count": 1}]},
     {name: PublishedProviderSearchFacet.ProviderType, facetValues: []}
 ];
-
 
 export const fullSpecPermissions: SpecificationPermissionsResult = {
     canApproveFunding: true,

@@ -28,7 +28,7 @@ import {RunningStatus} from "../../../types/RunningStatus";
 import {FundingSearchSelectionState} from "../../../states/FundingSearchSelectionState";
 import {ConfirmFundingRouteProps} from "../../../pages/FundingApprovals/ConfirmFunding";
 import {FundingActionType, PublishedProviderFundingCount} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
-import {createPublishedProviderIdsQueryResult} from "../../fakes/testFactories";
+import {createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets} from "../../fakes/testFactories";
 import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 
@@ -37,17 +37,22 @@ const history = createMemoryHistory();
 const location = createLocation("", "", "");
 const store: Store<IStoreState> = createStore(rootReducer);
 
-const renderConfirmApprovalPage = () => {
+const renderPage = async () => {
     const {ConfirmFunding} = require('../../../pages/FundingApprovals/ConfirmFunding');
     store.dispatch = jest.fn();
-    return render(<MemoryRouter>
+    const result = render(<MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
             <Provider store={store}>
                 <ConfirmFunding location={location} history={history} match={mockConfirmApprovalRoute}/>
             </Provider>
         </QueryClientProvider>
-    </MemoryRouter>);
+    </MemoryRouter>)
+
+    await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
+
+    return result;
 };
+
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 const useDispatchSpy = jest.spyOn(redux, 'useDispatch');
 
@@ -60,6 +65,7 @@ const fundingPeriod: FundingPeriod = {
     name: "2019-20"
 };
 const testSpec: SpecificationSummary = {
+    coreProviderVersionUpdates: undefined,
     name: "Wizard Training",
     approvalStatus: "",
     description: "",
@@ -72,6 +78,7 @@ const testSpec: SpecificationSummary = {
     templateIds: {}
 };
 const specResult: SpecificationSummaryQueryResult = {
+    clearSpecificationFromCache: () => Promise.resolve(),
     specification: testSpec,
     isLoadingSpecification: false,
     errorCheckingForSpecification: null,
@@ -127,6 +134,7 @@ const mockFundingConfigWithApprovalBatchMode: FundingConfigurationQueryResult = 
     errorLoadingFundingConfiguration: "",
 };
 const fullPermissions: SpecificationPermissionsResult = {
+    canApplyCustomProfilePattern: false,
     canApproveAllCalculations: false,
     canChooseFunding: false,
     canRefreshFunding: true,
@@ -182,148 +190,201 @@ const provider2: PublishedProviderResult = {
 
 describe("<ConfirmFunding />", () => {
 
-    describe("<ConfirmFunding /> when job is active", () => {
-        beforeEach(() => {
-            useSelectorSpy.mockReturnValueOnce(noSelectedProviders);
-            hasActiveJobRunning();
-            hasSpecification();
-            hasFundingConfigWithApproveAllMode();
-            hasFullPermissions();
-            hasProviderIds([provider1.publishedProviderVersionId]);
-            hasFundingApprovalSummary();
+    describe("<ConfirmFunding /> in approve all mode", () => {
 
-            renderConfirmApprovalPage();
-        });
-        afterEach(() => jest.clearAllMocks());
+        describe("when job is active", () => {
+            beforeEach(async () => {
+                useSelectorSpy.mockReturnValue(noSelectedProviders);
+                hasActiveJobRunning();
+                hasSpecification();
+                hasMockPublishedProviderService();
+                hasFundingConfigWithApproveAllMode();
+                hasFullPermissions();
+                hasMockPublishService();
+                await renderPage();
+            });
+            afterEach(() => jest.clearAllMocks());
 
-        it('renders job progress message', async () => {
-            const alert = await screen.findByRole("alert", {name: /job-notification/});
-            expect(within(alert).getByRole("alert", {name: /Monitoring job/})).toBeInTheDocument();
-            expect(within(alert).getByText(`Job ${activeJob?.latestJob?.statusDescription}: ${activeJob?.latestJob?.jobDescription}`)).toBeInTheDocument();
-        });
+            it('renders job progress message', async () => {
+                const alert = await screen.findByRole("alert", {name: /job-notification/});
+                expect(within(alert).getByRole("alert", {name: /Monitoring job/})).toBeInTheDocument();
+                expect(within(alert).getByText(`Job ${activeJob?.latestJob?.statusDescription}: ${activeJob?.latestJob?.jobDescription}`)).toBeInTheDocument();
+            });
 
-        it('does not render warning message', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
-            expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
-        });
+            it('renders warning message', async () => {
+                expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+            });
 
-        it('renders funding summary section', async () => {
-            expect(await screen.findByText("Providers selected")).toBeInTheDocument();
-        });
-
-        it('renders approve button as disabled', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
-            const button = screen.queryByRole("button", {name: /Confirm approval/});
-            expect(button).toBeInTheDocument();
-            expect(button).toBeDisabled();
-        });
-    });
-
-    describe("<ConfirmFunding /> when confirming approval of all funding", () => {
-        beforeEach(() => {
-            useSelectorSpy.mockReturnValueOnce(noSelectedProviders);
-            hasNoActiveJobsRunning();
-            hasSpecification();
-            hasFundingConfigWithApproveAllMode();
-            hasFullPermissions();
-            hasProviderIds([provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]);
-            hasFundingApprovalSummary();
-
-            renderConfirmApprovalPage();
-        });
-        afterEach(() => jest.clearAllMocks());
-
-        it('calls api to get funding summary', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService)
-                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
+            it('renders approve button as disabled', async () => {
+                const button = screen.queryByRole("button", {name: /Confirm approval/});
+                expect(button).toBeInTheDocument();
+                expect(button).toBeDisabled();
+            });
         });
 
-        it('does not render job progress spinner', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService)
-                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
-            expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
-        });
+        describe("when confirming approval of all funding", () => {
+            beforeEach(async () => {
+                useSelectorSpy.mockReturnValue(selectedProviders);
+                hasNoActiveJobsRunning();
+                hasSpecification();
+                hasFundingConfigWithApproveAllMode();
+                hasMockPublishService();
+                hasMockPublishedProviderService();
+                hasFullPermissions();
 
-        it('renders warning message', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService)
-                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
-            expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
-        });
+                await renderPage();
+            });
+            afterEach(() => jest.clearAllMocks());
 
-        it('renders funding summary section', async () => {
-            const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
-            expect(fundingSummaryTable).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText(fundingPeriod.name)).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText(testSpec.name)).toBeInTheDocument();
-        });
+            it('calls api to get search results', async () => {
+                await waitFor(() => expect(mockSearchService).toHaveBeenCalled());
+            });
 
-        it('does not render change selection link', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService)
-                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
-            expect(screen.queryByRole("link", {name: /Change selection/})).not.toBeInTheDocument();
-        });
+            it('does not call api to get funding summary', async () => {
+                expect(mockFundingSummaryForApprovingService).not.toHaveBeenCalled();
+            });
 
-        it('renders approve button as enabled', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService)
-                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider2.publishedProviderVersionId]));
-            const button = screen.queryByRole("button", {name: /Confirm approval/});
-            expect(button).toBeInTheDocument();
-            expect(button).toBeEnabled();
+            it('does not render job progress spinner', async () => {
+                expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
+            });
+
+            it('renders warning message', async () => {
+                expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+            });
+
+            it('renders funding summary section', async () => {
+                const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
+                expect(fundingSummaryTable).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(/Providers selected/)).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(fundingPeriod.name)).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(testSpec.name)).toBeInTheDocument();
+            });
+
+            it('does not render change selection link', async () => {
+                expect(screen.queryByRole("link", {name: /Change selection/})).not.toBeInTheDocument();
+            });
+
+            it('renders approve button as enabled', async () => {
+                const button = screen.queryByRole("button", {name: /Confirm approval/});
+                expect(button).toBeInTheDocument();
+                expect(button).toBeEnabled();
+            });
         });
     });
 
-    describe("<ConfirmFunding /> when confirming approval of batch funding", () => {
-        beforeEach(() => {
-            hasNoActiveJobsRunning();
-            hasSpecification();
-            hasFundingConfigWithApproveBatchMode();
-            hasFullPermissions();
-            hasProviderIds([provider1.publishedProviderVersionId, provider1.publishedProviderVersionId]);
-            hasFundingApprovalSummary();
-            useSelectorSpy.mockReturnValue(selectedProviders);
+    describe("<ConfirmFunding /> in approve batch mode", () => {
+        
+        describe("<ConfirmFunding /> when confirming approval of batch funding", () => {
+            beforeEach(async () => {
+                useSelectorSpy.mockReturnValue(selectedProviders);
+                hasNoActiveJobsRunning();
+                hasSpecification();
+                hasFundingConfigWithApproveBatchMode();
+                hasFullPermissions();
+                hasMockPublishService();
+                hasMockPublishedProviderService();
 
-            renderConfirmApprovalPage();
+                await renderPage();
+            });
+            afterEach(() => jest.clearAllMocks());
+
+            it('does not call api to get search results', async () => {
+                expect(mockSearchService).not.toHaveBeenCalled();
+            });
+
+            it('calls api to get funding summary', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService)
+                    .toHaveBeenCalledWith(testSpec.id, selectedProviders.selectedProviderIds));
+            });
+
+            it('does not render job progress spinner', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
+            });
+
+            it('renders funding summary section', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                expect(screen.getByTestId("funding-summary-section"))
+            });
+
+            it('renders warning message', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                const fundingSummarySection = screen.getByTestId("funding-summary-section");
+                expect(within(fundingSummarySection)
+                    .getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+            });
+
+            it('renders funding summary table', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                const fundingSummarySection = screen.getByTestId("funding-summary-section");
+                const fundingSummaryTable = await within(fundingSummarySection).findByRole("table", {name: "funding-summary-table"});
+                expect(fundingSummaryTable).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(fundingPeriod.name)).toBeInTheDocument();
+                expect(within(fundingSummaryTable).getByText(testSpec.name)).toBeInTheDocument();
+            });
+
+            it('renders change selection link as enabled', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                const link = await screen.findByRole("link", {name: /Change selection/}) as HTMLAnchorElement;
+                expect(link).toBeInTheDocument();
+                expect(link.getAttribute("href")).toBe(`/Approvals/SpecificationFundingApproval/${fundingStream.id}/${fundingPeriod.id}/${testSpec.id}`);
+                expect(link).toBeEnabled();
+            });
+
+            it('renders approve button as enabled', async () => {
+                await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
+                expect(button).toBeInTheDocument();
+                expect(button).toBeEnabled();
+            });
         });
-        afterEach(() => jest.clearAllMocks());
 
-        it('calls api to get funding summary', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService)
-                .toHaveBeenCalledWith(testSpec.id, [provider1.publishedProviderVersionId, provider1.publishedProviderVersionId]));
-        });
+        describe("when no selected providers", () => {
+            beforeEach(async () => {
+                useSelectorSpy.mockReturnValue(noSelectedProviders);
+                hasNoActiveJobsRunning();
+                hasSpecification();
+                hasFundingConfigWithApproveBatchMode();
+                hasFullPermissions();
+                hasMockPublishService();
+                hasMockPublishedProviderService();
 
-        it('does not render job progress spinner', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
-            expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
-        });
+                await renderPage();
+            });
+            afterEach(() => jest.clearAllMocks());
 
-        it('renders warning message', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
-            expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
-        });
+            it('does not call api to get funding summary', async () => {
+                expect(mockFundingSummaryForApprovingService).not.toHaveBeenCalled();
+            });
+            
+            it('does not call api to get search results', async () => {
+                expect(mockSearchService).not.toHaveBeenCalled();
+            });
 
-        it('renders funding summary section', async () => {
-            const fundingSummaryTable = await screen.findByRole("table", {name: "funding-summary-table"});
-            expect(fundingSummaryTable).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText("Providers selected")).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText(fundingStream.name)).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText(fundingPeriod.name)).toBeInTheDocument();
-            expect(within(fundingSummaryTable).getByText(testSpec.name)).toBeInTheDocument();
-        });
+            it('does not render job progress spinner', async () => {
+                expect(screen.queryByText(/Checking for jobs running/)).not.toBeInTheDocument();
+            });
 
-        it('renders change selection link as enabled', async () => {
-            const link = await screen.findByRole("link", {name: /Change selection/}) as HTMLAnchorElement;
-            expect(link).toBeInTheDocument();
-            expect(link.getAttribute("href")).toBe(`/Approvals/SpecificationFundingApproval/${fundingStream.id}/${fundingPeriod.id}/${testSpec.id}`);
-            expect(link).toBeEnabled();
-        });
+            it('renders funding summary section', async () => {
+                expect(screen.getByTestId("funding-summary-section"))
+            });
 
-        it('renders approve button as enabled', async () => {
-            await waitFor(() => expect(mockFundingSummaryForApprovingService).toHaveBeenCalled());
-            const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
-            expect(button).toBeInTheDocument();
-            expect(button).toBeEnabled();
+            it('renders warning message', async () => {
+                expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+            });
+
+            it('does not render funding summary table', async () => {
+                expect(screen.queryByRole("table", {name: "funding-summary-table"})).not.toBeInTheDocument();
+            });
+
+            it('renders approve button as disabled', async () => {
+                const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
+                expect(button).toBeInTheDocument();
+                expect(button).toBeDisabled();
+            });
         });
     });
 });
@@ -365,8 +426,6 @@ const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJob
 const hasFundingConfigWithApproveAllMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalAllMode));
 const hasFundingConfigWithApproveBatchMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalBatchMode));
 const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullPermissions));
-const hasProviderIds = (ids: string[]) => jest.spyOn(providerIdsSearchHook, 'usePublishedProviderIds')
-    .mockImplementation(() => (createPublishedProviderIdsQueryResult(ids)));
 const mockFundingSummary: PublishedProviderFundingCount = {
     count: 2,
     fundingStreamsFundings: [{totalFunding: 534.53, fundingStreamId: fundingStream.id}],
@@ -380,18 +439,38 @@ const mockFundingSummaryForApprovingService = jest.fn(() => Promise.resolve({
     data: {mockFundingSummary},
     status: 200
 }));
+const mockFundingSummaryForReleasingService = jest.fn(() => Promise.resolve({
+    data: {mockFundingSummary},
+    status: 200
+}));
 const mockApproveJobCreatedResponse: JobCreatedResponse = {jobId: "135235"}
 const mockApproveSpecService = jest.fn(() => Promise.resolve({
     data: {mockApproveJobCreatedResponse},
     status: 200
 }));
-const hasFundingApprovalSummary = () => {
+const mockSearchResponse =  createPublishedProviderSearchQueryResult(
+    createPublishedProviderResult([provider1, provider2], true, true, defaultFacets), selectedProviders.selectedProviderIds);
+const mockSearchService = jest.fn(() => Promise.resolve({
+    data: {mockSearchResponse},
+    status: 200
+}));
+const hasMockPublishedProviderService = () => {
+    jest.mock("../../../services/publishedProviderService", () => {
+        const mockService = jest.requireActual("../../../services/publishedProviderService");
+
+        return {
+            ...mockService,
+            searchForPublishedProviderResults: mockSearchService
+        }})
+};
+const hasMockPublishService = () => {
     jest.mock("../../../services/publishService", () => {
         const mockService = jest.requireActual("../../../services/publishService");
 
         return {
             ...mockService,
             getFundingSummaryForApprovingService: mockFundingSummaryForApprovingService,
+            getFundingSummaryForReleasingService: mockFundingSummaryForReleasingService,
             approveSpecificationFundingService: mockApproveSpecService,
             generateCsvForApprovalAll: jest.fn(() => Promise.resolve({
                 data: {

@@ -122,27 +122,37 @@ describe("<FundingLineResults/> tests", () => {
     });
 
     describe('<FundingLineResults /> when providerId provided', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             jobMonitorSpy.mockImplementation(
                 () => (completedLatestJob));
+            const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
+            const {getCalculationSummaryBySpecificationId} = require('../../../services/calculationService');
+            const {getCalculationCircularDependencies} = require('../../../services/calculationService');
+            const {getFundingStructureResultsForProviderAndSpecification} = require('../../../services/providerService');
+
+            renderProviderFundingLineResults();
+            
+            await waitFor(() => {
+                expect(getFundingLineStructureService).toBeCalled();
+                expect(getCalculationSummaryBySpecificationId).toBeCalled();
+                expect(getCalculationCircularDependencies).toBeCalled();
+                expect(getFundingStructureResultsForProviderAndSpecification).toBeCalled();
+            });
         });
 
         it('renders calculation value and format correctly', async () => {
-            renderProviderFundingLineResults();
-            await waitFor(() => expect(screen.getByText('100')).toBeInTheDocument());
-            await waitFor(() => expect(screen.getByText('£200')).toBeInTheDocument());
-            await waitFor(() => expect(screen.getByText('Number')).toBeInTheDocument());
-            await waitFor(() => expect(screen.getByText('Currency')).toBeInTheDocument());
+            expect(await screen.findByText(/100/)).toBeInTheDocument();
+            expect(screen.getByText(/200/)).toBeInTheDocument();
+            expect(screen.getByText(/Number/)).toBeInTheDocument();
+            expect(screen.getByText(/Currency/)).toBeInTheDocument();
         });
 
         it('shows calculation errors when providerId provided', async () => {
-            renderProviderFundingLineResults();
-            await waitFor(() => expect(screen.queryByText('exception')).toBeInTheDocument());
+            expect(await screen.findByText(/Error:/)).toBeInTheDocument();
         });
 
         it('shows circular reference errors when providerId provided', async () => {
-            renderProviderFundingLineResults();
-            await waitFor(() => expect(screen.queryByText(/Circular reference detected in calculation script. oops/i)).toBeInTheDocument());
+            expect(await screen.findByText(/Circular reference detected in calculation script/)).toBeInTheDocument();
         });
     });
 });

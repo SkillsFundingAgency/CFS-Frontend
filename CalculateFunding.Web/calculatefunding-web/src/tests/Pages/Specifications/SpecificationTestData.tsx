@@ -68,21 +68,21 @@ export function SpecificationTestData() {
         </MemoryRouter>);
 
         await waitFor(() => {
-            expect(screen.queryByText(/Loading.../)).not.toBeInTheDocument();
+            expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
         });
         return component;
     };
-    
+
     const jobMonitorResult: JobDetails = {
-        failures: [], 
-        isComplete: false, 
-        isFailed: false, 
-        jobDescription: "Creating Specification", 
-        jobId: "5re34ygw534e", 
+        failures: [],
+        isComplete: false,
+        isFailed: false,
+        jobDescription: "Creating Specification",
+        jobId: "5re34ygw534e",
         statusDescription: "Complete",
         completionStatus: CompletionStatus.Succeeded,
-        outcome: "", 
-        isSuccessful: true, 
+        outcome: "",
+        isSuccessful: true,
         isActive: false,
         runningStatus: RunningStatus.Completing
     };
@@ -106,26 +106,26 @@ export function SpecificationTestData() {
 
     const mockLatestSpecJobMonitorHookWithARunningJob = () =>
         jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring')
-        .mockImplementation(() => ({
-            hasJob: true,
-            latestJob: {
-                jobId: "aValidJobId",
-                statusDescription: "",
-                jobDescription: "",
-                runningStatus: RunningStatus.InProgress,
-                failures: [],
-                isSuccessful: false,
-                isFailed: false,
-                isActive: false,
-                isComplete: false,
-                completionStatus: CompletionStatus.Succeeded,
-                outcome: "ValidationFailed"
-            },
-            isMonitoring: false,
-            isFetching: true,
-            isFetched: true,
-            isCheckingForJob: true
-        }));
+            .mockImplementation(() => ({
+                hasJob: true,
+                latestJob: {
+                    jobId: "aValidJobId",
+                    statusDescription: "",
+                    jobDescription: "",
+                    runningStatus: RunningStatus.InProgress,
+                    failures: [],
+                    isSuccessful: false,
+                    isFailed: false,
+                    isActive: false,
+                    isComplete: false,
+                    completionStatus: CompletionStatus.Succeeded,
+                    outcome: "ValidationFailed"
+                },
+                isMonitoring: false,
+                isFetching: true,
+                isFetched: true,
+                isCheckingForJob: true
+            }));
 
     const mockFundingStream: FundingStream = {
         id: "stream-547",
@@ -151,32 +151,36 @@ export function SpecificationTestData() {
         schemaVersion: "1.4",
         templateVersion: "9.9"
     };
+    const mockGetFundingStreamsCall = jest.fn(() => Promise.resolve({
+        data:
+            [{
+                id: mockFundingStream.id,
+                name: mockFundingStream.name
+            }]
+    }));
+    const mockGetPublishedTemplatesByStreamAndPeriodCall = jest.fn(() => Promise.resolve({
+        data: [mockTemplate1, mockTemplate2]
+    }))
+    const mockGetFundingConfigurationCall = (mockProviderSource: ProviderSource, mockApprovalMode: ApprovalMode) =>
+        jest.fn(() => Promise.resolve({
+            data:
+                {
+                    fundingStreamId: mockFundingStream.id,
+                    fundingPeriodId: mockFundingPeriod.id,
+                    approvalMode: mockApprovalMode,
+                    providerSource: mockProviderSource,
+                    defaultTemplateVersion: mockTemplate2.templateVersion
+                }
+        }))
     const mockPolicyService = (mockProviderSource: ProviderSource, mockApprovalMode: ApprovalMode) => {
         jest.mock("../../../services/policyService", () => {
             const service = jest.requireActual("../../../services/policyService");
 
             return {
                 ...service,
-                getFundingStreamsService: jest.fn(() => Promise.resolve({
-                    data:
-                        [{
-                            id: mockFundingStream.id,
-                            name: mockFundingStream.name
-                        }]
-                })),
-                getPublishedTemplatesByStreamAndPeriod: jest.fn(() => Promise.resolve({
-                    data: [mockTemplate1, mockTemplate2]
-                })),
-                getFundingConfiguration: jest.fn(() => Promise.resolve({
-                    data:
-                        {
-                            fundingStreamId: mockFundingStream.id,
-                            fundingPeriodId: mockFundingPeriod.id,
-                            approvalMode: mockApprovalMode,
-                            providerSource: mockProviderSource,
-                            defaultTemplateVersion: mockTemplate2.templateVersion
-                        }
-                }))
+                getFundingStreamsService: mockGetFundingStreamsCall,
+                getPublishedTemplatesByStreamAndPeriod: mockGetPublishedTemplatesByStreamAndPeriodCall,
+                getFundingConfiguration: mockGetFundingConfigurationCall(mockProviderSource, mockApprovalMode)
             }
         });
     }
@@ -231,7 +235,7 @@ export function SpecificationTestData() {
         isSelectedForFunding: true,
         providerVersionId: mockCoreProvider2.providerVersionId,
         dataDefinitionRelationshipIds: [],
-        templateIds: {"stream-547" : mockTemplate2.templateVersion},
+        templateIds: {"stream-547": mockTemplate2.templateVersion},
         coreProviderVersionUpdates: undefined
     };
     const mockFdzSpecWithTrackingLatest: SpecificationSummary = {
@@ -244,7 +248,7 @@ export function SpecificationTestData() {
         isSelectedForFunding: true,
         providerSnapshotId: undefined,
         dataDefinitionRelationshipIds: [],
-        templateIds: {"stream-547" : mockTemplate2.templateVersion},
+        templateIds: {"stream-547": mockTemplate2.templateVersion},
         coreProviderVersionUpdates: ProviderDataTrackingMode.UseLatest
     };
     const mockFdzSpecWithoutTracking: SpecificationSummary = {
@@ -257,7 +261,7 @@ export function SpecificationTestData() {
         isSelectedForFunding: true,
         providerSnapshotId: mockProviderSnapshot2.providerSnapshotId,
         dataDefinitionRelationshipIds: [],
-        templateIds: {"stream-547" : mockTemplate2.templateVersion},
+        templateIds: {"stream-547": mockTemplate2.templateVersion},
         coreProviderVersionUpdates: ProviderDataTrackingMode.Manual
     };
 
@@ -336,7 +340,7 @@ export function SpecificationTestData() {
             }
         });
     }
-    
+
     const hasMissingPermissionToCreate = () => {
         const permissions = [buildPermissions({
             fundingStreamId: mockFundingStream.id,
@@ -354,7 +358,7 @@ export function SpecificationTestData() {
         })];
         useSelectorSpy.mockReturnValue(permissions);
     }
-    
+
     const withoutSpecPermissions: SpecificationPermissionsResult = {
         isCheckingForPermissions: false,
         isPermissionsFetched: true,
@@ -394,9 +398,22 @@ export function SpecificationTestData() {
     const hasMissingPermissionToEdit = () => {
         jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutSpecPermissions));
     }
-    
+
     const hasEditPermissions = () => {
         jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withSpecPermissions));
+    }
+
+
+    async function waitForPageToLoad() {
+        const {getSpecificationSummaryService} = require('../../../services/specificationService');
+        const {getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
+        const {getFundingConfiguration} = require('../../../services/policyService');
+        const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
+
+        await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1));
+        await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
+        await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
+        await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
     }
 
     return {
@@ -426,6 +443,10 @@ export function SpecificationTestData() {
         hasCreatePermissions,
         hasEditPermissions,
         hasMissingPermissionToCreate,
-        hasMissingPermissionToEdit
+        hasMissingPermissionToEdit,
+        mockGetFundingConfigurationCall,
+        mockGetFundingStreamsCall,
+        mockGetPublishedTemplatesByStreamAndPeriodCall,
+        waitForPageToLoad
     }
 }

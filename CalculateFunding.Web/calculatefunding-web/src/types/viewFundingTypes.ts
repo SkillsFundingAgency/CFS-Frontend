@@ -31,6 +31,5 @@ export interface FundingTypes{
 export interface FundingStream {
     id: string,
     name: string,
-    shortName: string,
 }
 

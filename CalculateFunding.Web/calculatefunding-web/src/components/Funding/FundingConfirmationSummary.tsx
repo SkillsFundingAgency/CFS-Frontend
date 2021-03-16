@@ -1,80 +1,36 @@
 ﻿import React from "react";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
-import {
-    FundingActionType,
-    PublishedProviderFundingCount
-} from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import {FundingActionType, PublishedProviderFundingCount} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {Link} from "react-router-dom";
-import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
-import {useSelector} from "react-redux";
-import {IStoreState} from "../../reducers/rootReducer";
-import {useQuery} from "react-query";
-import {
-    getFundingSummaryForApprovingService,
-    getFundingSummaryForReleasingService
-} from "../../services/publishService";
 import {ApprovalMode} from "../../types/ApprovalMode";
 import {FormattedNumber, NumberType} from "../FormattedNumber";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {CsvDownloadPublishedProviders} from "./CsvDownloadPublishedProviders";
-import {ErrorProps} from "../../hooks/useErrors";
-import {AxiosError} from "axios";
-import {usePublishedProviderIds} from "../../hooks/FundingApproval/usePublishedProviderIds";
 import {BackLink} from "../BackLink";
+import {ConfirmFundingRouteProps} from "../../pages/FundingApprovals/ConfirmFunding";
+import {ErrorProps} from "../../hooks/useErrors";
 
 export interface FundingConfirmationSummaryProps {
-    fundingStreamId: string,
-    fundingPeriodId: string,
+    routingParams: ConfirmFundingRouteProps,
     approvalMode: ApprovalMode,
-    actionType: FundingActionType,
     specification: SpecificationSummary,
+    fundingSummary: PublishedProviderFundingCount | undefined,
     canReleaseFunding: boolean,
     canApproveFunding: boolean,
-    isConfirmingOrConfirmed: boolean,
-    isLoading: boolean,
     addError: (props: ErrorProps) => void,
+    isWaitingForJob: boolean
 }
 
 export function FundingConfirmationSummary(props: FundingConfirmationSummaryProps) {
-    const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(state => state.fundingSearchSelection);
+    const actionType = props.routingParams.mode;
 
-    const {publishedProviderIds} =
-        usePublishedProviderIds(state.searchCriteria,
-            {
-                enabled: props.approvalMode === ApprovalMode.Batches,
-                onError: err => props.addError({error: err, description: "Error while loading provider ids"})
-            });
-    const selectedProviderIds = props.approvalMode === ApprovalMode.Batches && state.selectedProviderIds.length > 0 ?
-        state.selectedProviderIds : publishedProviderIds ? publishedProviderIds : [];
-
-    const {data: batchApprovalSummary, isLoading: isLoadingBatchApprovalSummary} =
-        useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-approval`,
-            async () => (await getFundingSummaryForApprovingService(props.specification.id, selectedProviderIds)).data,
-            {
-                enabled: props.actionType === FundingActionType.Approve && selectedProviderIds.length > 0,
-                cacheTime: 0,
-                staleTime: 0,
-                onError: err => props.addError({error: err.message, description: "Error while loading funding summary"})
-            });
-    const {data: batchReleaseSummary, isLoading: isLoadingBatchReleaseSummary} =
-        useQuery<PublishedProviderFundingCount, AxiosError>(`spec-${props.specification.id}-funding-summary-for-release`,
-            async () => (await getFundingSummaryForReleasingService(props.specification.id, selectedProviderIds)).data,
-            {
-                enabled: props.actionType === FundingActionType.Release && selectedProviderIds.length > 0,
-                cacheTime: 0,
-                staleTime: 0,
-                onError: err => props.addError({error: err.message, description: "Error while loading funding summary"})
-            });
-
-    if (props.actionType === FundingActionType.Refresh ||
-        props.actionType === FundingActionType.Release && !props.canReleaseFunding ||
-        props.actionType === FundingActionType.Approve && !props.canApproveFunding) {
+    if (actionType === FundingActionType.Refresh ||
+        actionType === FundingActionType.Release && !props.canReleaseFunding ||
+        actionType === FundingActionType.Approve && !props.canApproveFunding) {
         return (<></>);
     }
 
-    const fundingSummary = props.actionType === FundingActionType.Approve ? batchApprovalSummary : batchReleaseSummary;
-
-    if (!fundingSummary) {
+    if (!props.fundingSummary) {
         return (
             <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
                 <LoadingFieldStatus title={"Loading funding summary"}/>
@@ -82,15 +38,13 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
         );
 
     } else {
+        const batchSize = props.fundingSummary ? props.fundingSummary.count : 0;
 
-        if (fundingSummary.count === 0 && !props.isLoading && !props.isConfirmingOrConfirmed) {
-            props.addError({error: "There are no providers to " + props.actionType.toLowerCase()})
-        }
         return (
             <>
                 <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
                     <div className="govuk-grid-column-full">
-                        <BackLink to={`/Approvals/SpecificationFundingApproval/${props.fundingStreamId}/${props.fundingPeriodId}/${props.specification.id}`}/>
+                        <BackLink to={`/Approvals/SpecificationFundingApproval/${props.routingParams.fundingStreamId}/${props.routingParams.fundingPeriodId}/${props.specification.id}`}/>
                     </div>
                 </div>
                 <div className="govuk-grid-row  govuk-!-margin-bottom-4">
@@ -108,13 +62,16 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                             <tr className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header">Providers selected</th>
                                 <td className="govuk-table__cell">
-                                    <CsvDownloadPublishedProviders 
-                                        actionType={props.actionType} 
-                                        specificationId={props.specification.id} 
-                                        addError={props.addError} />
+                                    {props.approvalMode === ApprovalMode.Batches &&
+                                    <CsvDownloadPublishedProviders
+                                        actionType={actionType}
+                                        specificationId={props.specification.id}
+                                        addError={props.addError}
+                                    />
+                                    }
                                 </td>
                                 <td className="govuk-table__cell govuk-table__cell--numeric">
-                                    <p className="govuk-body">{fundingSummary.count}</p>
+                                    <p className="govuk-body">{batchSize}</p>
                                 </td>
                             </tr>
                             <tr className="govuk-table__row">
@@ -134,7 +91,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                                 <td className="govuk-table__cell">{props.specification.fundingStreams && props.specification.fundingStreams[0].name}</td>
                                 <td className="govuk-table__cell govuk-table__cell--numeric">
                                     <strong>
-                                        <FormattedNumber value={fundingSummary.totalFunding ? fundingSummary.totalFunding : 0}
+                                        <FormattedNumber value={props.fundingSummary.totalFunding ? props.fundingSummary.totalFunding : 0}
                                                          type={NumberType.FormattedMoney}/>
                                     </strong>
                                 </td>
@@ -144,10 +101,10 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                     </div>
                 </div>
 
-                {state.selectedProviderIds.length > 0 && !props.isLoading &&
+                {props.approvalMode === ApprovalMode.Batches && !props.isWaitingForJob &&
                 <div className="govuk-grid-row govuk-!-margin-bottom-9">
                     <div className="govuk-grid-column-three-quarters">
-                        <Link to={`/Approvals/SpecificationFundingApproval/${props.fundingStreamId}/${props.fundingPeriodId}/${props.specification.id}`}
+                        <Link to={`/Approvals/SpecificationFundingApproval/${props.routingParams.fundingStreamId}/${props.routingParams.fundingPeriodId}/${props.specification.id}`}
                               className="govuk-link govuk-link--no-visited-state right-align">
                             Change selection
                         </Link>
@@ -158,3 +115,6 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
         );
     }
 }
+
+export default React.memo(FundingConfirmationSummary);
+

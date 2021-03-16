@@ -26,7 +26,6 @@ import {initialiseFundingSearchSelection} from "../../actions/FundingSearchSelec
 import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import * as publishService from "../../services/publishService";
 import {ConfirmationModal} from "../../components/ConfirmationModal";
-import {RunningStatus} from "../../types/RunningStatus";
 import {AxiosError} from "axios";
 import {Link} from "react-router-dom";
 import {useQuery} from "react-query";
@@ -96,14 +95,15 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
         }
     }, [match, isSearchCriteriaInitialised]);
-
+    
     useEffect(() => {
         if (!latestJob || !latestJob.isComplete) return;
         
-        if (latestJob.jobType !== JobType.RefreshFundingJob) {
+        if (latestJob.jobType === JobType.RefreshFundingJob) {
+            setIsLoadingRefresh(false);
             setLastRefresh(latestJob?.lastUpdated);
         }
-        if (latestJob.jobId === jobId) {
+        if (isLoadingRefresh && jobId !== "" && latestJob.jobId === jobId) {
             setIsLoadingRefresh(false);
             setJobId("");
             refetchSearchResults();
