@@ -512,7 +512,7 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<IEnumerable<ProfileVariationPointer>> profileResponse =
                 await _specificationsApiClient.GetProfileVariationPointers(specificationId);
 
-            if (profileResponse.StatusCode == HttpStatusCode.OK)
+            if (profileResponse.StatusCode == HttpStatusCode.OK || profileResponse.StatusCode == HttpStatusCode.NoContent)
             {
                 IEnumerable<ProfileVariationPointer> currentProfileVariationPointers = profileResponse.Content;
 
@@ -536,17 +536,12 @@ namespace CalculateFunding.Frontend.Controllers
                             new FundingLineProfileVariationPointer
                             {
                                 FundingLineId = s.FundingLineCode,
-                                ProfileVariationPointer = currentProfileVariationPointers.SingleOrDefault(p => p.FundingLineId == s.FundingLineCode)
+                                ProfileVariationPointer = currentProfileVariationPointers?.SingleOrDefault(p => p.FundingLineId == s.FundingLineCode)
                             });
 
                         return Ok(result);
                     }
                 }
-            }
-
-            if (profileResponse.StatusCode == HttpStatusCode.NoContent)
-            {
-                return new NoContentResult();
             }
 
             IActionResult profileErrorResult = profileResponse.IsSuccessOrReturnFailureResult(nameof(IEnumerable<ProfileVariationPointer>));

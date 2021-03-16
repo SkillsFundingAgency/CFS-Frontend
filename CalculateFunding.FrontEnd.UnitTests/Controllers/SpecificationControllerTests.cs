@@ -297,17 +297,75 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task GetProfileVariationPointers_Returns_NoContent_Given_No_ProfilePointers()
+        public async Task GetProfileVariationPointers_Returns_Null_ProfilePointers_Given_No_Current_ProfilePointers()
         {
             string aValidSpecificationId = "ABC";
+            string aValidFundingStreamId = "345";
+            string aValidFundingPeriodId = "123";
+            string aValidTemplateVersion = "1.0";
+
+            List<ProfileVariationPointer> aValidProfileVariationPointers = CreateTestProfileVariationPointers().ToList();
+            List<FundingLineProfileVariationPointer> validFundingLineProfileVariationPointers = aValidProfileVariationPointers
+                .Select(s => new FundingLineProfileVariationPointer
+                {
+                    FundingLineId = s.FundingLineId,
+                    ProfileVariationPointer = null
+                }).ToList();
+
             _specificationsApiClient
                 .GetProfileVariationPointers(aValidSpecificationId)
                 .Returns(Task.FromResult(
                     new ApiResponse<IEnumerable<ProfileVariationPointer>>(HttpStatusCode.NoContent)));
 
+            _specificationsApiClient
+                .GetSpecificationSummaryById(aValidSpecificationId)
+                .Returns(Task.FromResult(
+                    new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, new SpecificationSummary
+                    {
+                        FundingStreams = new List<Reference>
+                        {
+                            new Reference
+                            {
+                                Id = aValidFundingStreamId,
+                                Name = aValidFundingStreamId
+                            }
+                        },
+                        FundingPeriod = new Reference
+                        {
+                            Id = aValidFundingPeriodId,
+                            Name = aValidFundingPeriodId
+                        },
+                        TemplateIds = new Dictionary<string, string>
+                        {
+                            { aValidFundingStreamId, aValidTemplateVersion }
+                        }
+                    })));
+
+            _policiesApiClient
+                .GetDistinctTemplateMetadataFundingLinesContents(aValidFundingStreamId, aValidFundingPeriodId, aValidTemplateVersion)
+                .Returns(Task.FromResult(
+                    new ApiResponse<TemplateMetadataDistinctFundingLinesContents>(HttpStatusCode.OK,
+                        new TemplateMetadataDistinctFundingLinesContents
+                        {
+                            FundingLines = new List<TemplateMetadataFundingLine>
+                            {
+                                new TemplateMetadataFundingLine
+                                {
+                                    FundingLineCode = "Funding line 1",
+                                    Type = FundingLineType.Payment
+                                },
+                                new TemplateMetadataFundingLine
+                                {
+                                    FundingLineCode = "Funding line 2",
+                                    Type = FundingLineType.Payment
+                                }
+                            }
+                        })));
+
             IActionResult result = await _specificationController.GetProfileVariationPointers(aValidSpecificationId);
 
-            result.Should().BeOfType<NoContentResult>();
+            result.As<OkObjectResult>().Value.As<IEnumerable<FundingLineProfileVariationPointer>>().Should()
+                .BeEquivalentTo(validFundingLineProfileVariationPointers);
         }
 
         [TestMethod]
