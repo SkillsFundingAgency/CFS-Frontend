@@ -26,6 +26,8 @@ import {buildInitialPublishedProviderSearchRequest} from "../../types/publishedP
 import {FundingConfirmationSummary} from "../../components/Funding/FundingConfirmationSummary";
 import {Footer} from "../../components/Footer";
 import * as publishedProviderService from "../../services/publishedProviderService";
+import {getSpecificationCalculationResultsMetadata} from "../../services/providerService";
+import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 
 export interface ConfirmFundingRouteProps {
     fundingStreamId: string,
@@ -75,6 +77,17 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         canApproveFunding === undefined ||
         canReleaseFunding === undefined, [specification, fundingConfiguration, isConfirming, canApproveFunding, canReleaseFunding]);
     const isWaitingForJob = useMemo(() => isCheckingForJob || latestJob !== undefined && !latestJob.isComplete, [isCheckingForJob, latestJob]);
+    const [specificationLastUpdatedDate, setSpecificationLastUpdatedDate] = useState<Date>();
+    useEffect(() => {
+        getSpecificationCalculationResultsMetadata(match.params.specificationId).then((result) => {
+            setSpecificationLastUpdatedDate(result.data.lastUpdated);
+        }).catch((err) => {
+            addError({
+                error: err,
+                description: `Error while getting specification calculation results metadata for specification Id: ${match.params.specificationId}`
+            })
+        });
+    },[match.params.specificationId]);
 
     useEffect(() => {
         if (!fundingConfiguration || fundingSummary) return;
@@ -206,6 +219,30 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                                             "Loading"} description="Please wait..."/>
                     </div>
                 </div>
+                }
+
+                {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
+                && latestJob.lastUpdated < specificationLastUpdatedDate &&
+                <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
+                    <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">
+                            Last refresh
+                        </dt>
+                        <dd className="govuk-summary-list__value" data-testid="last-refresh">
+                            <DateTimeFormatter date={latestJob.lastUpdated}/>
+                            <span> by {latestJob.invokerUserDisplayName}</span>
+                        </dd>
+                    </div>
+                    <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">
+                            Last calculation results update
+                        </dt>
+                        <dd className="govuk-summary-list__value" data-testid="last-calculation-results"><DateTimeFormatter
+                            date={specificationLastUpdatedDate}
+                        />
+                        </dd>
+                    </div>
+                </dl>
                 }
                 
                 {fundingConfiguration && specification && canApproveFunding !== undefined && canReleaseFunding !== undefined &&

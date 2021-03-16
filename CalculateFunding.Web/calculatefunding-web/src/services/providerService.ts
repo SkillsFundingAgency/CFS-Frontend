@@ -6,6 +6,7 @@ import {PublishedProviderError} from "../types/PublishedProviderError";
 import {ProviderResultForSpecification} from "../types/Provider/ProviderResultForSpecification";
 import {ProviderSnapshot} from "../types/CoreProviderSummary";
 import {CurrentProviderVersionForFundingStream} from "../types/Provider/CurrentProviderVersionForFundingStream";
+import {SpecificationCalculationResultsMetadata} from "../types/Provider/SpecificationCalculationResultsMetadata";
 
 const baseURL = "/api/provider";
 
@@ -71,6 +72,14 @@ export async function getFundingStructureResultsForProviderAndSpecification(spec
 export async function getCurrentProviderVersionForFundingStream(fundingStreamId: string):
     Promise<AxiosResponse<CurrentProviderVersionForFundingStream>> {
     return axios(`${baseURL}/fundingStreams/${fundingStreamId}/current`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    })
+}
+
+export async function getSpecificationCalculationResultsMetadata(specificationId: string):
+    Promise<AxiosResponse<SpecificationCalculationResultsMetadata>> {
+    return axios(`/api/results/specification-calculation-results-metadata/${specificationId}`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
     })

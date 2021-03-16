@@ -7,6 +7,7 @@ using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Helpers;
@@ -15,6 +16,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.ViewModels.ProviderResults;
 using Microsoft.AspNetCore.Mvc;
 using CalculationMetadata = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationMetadata;
+using FundingLineResult = CalculateFunding.Frontend.ViewModels.ProviderResults.FundingLineResult;
 using TemplateMapping = CalculateFunding.Common.ApiClient.Calcs.Models.TemplateMapping;
 using TemplateMappingItem = CalculateFunding.Common.ApiClient.Calcs.Models.TemplateMappingItem;
 
@@ -172,6 +174,27 @@ namespace CalculateFunding.Frontend.Controllers
                 CalculationResults = calculationResults,
                 FundingLineResults = fundingLineResults,
             });
+        }
+
+        
+
+        [HttpGet]
+        [Route("api/results/specification-calculation-results-metadata/{specificationId}")]
+        public async Task<IActionResult> GetSpecificationCalculationResultsMetadata([FromRoute] string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<SpecificationCalculationResultsMetadata> response =
+                await _resultsClient.GetSpecificationCalculationResultsMetadata(specificationId);
+
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult("GetSpecificationCalculationResultsMetadata");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return new OkObjectResult(response.Content);
         }
 
         private Dictionary<uint, TemplateCalculationResult> GenerateCalculationResults(

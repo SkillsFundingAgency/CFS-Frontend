@@ -103,7 +103,7 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
         runningStatus: RunningStatus.InProgress,
         invokerUserDisplayName: "testUser",
         created: new Date(),
-        lastUpdated: new Date()
+        lastUpdated: new Date("2020-01-01T10:30:00.0000000+00:00")
     }),
     isFetched: true,
     isFetching: false,
@@ -201,6 +201,7 @@ describe("<ConfirmFunding />", () => {
                 hasFundingConfigWithApproveAllMode();
                 hasFullPermissions();
                 hasMockPublishService();
+                hasProviderService();
                 await renderPage();
             });
             afterEach(() => jest.clearAllMocks());
@@ -220,6 +221,19 @@ describe("<ConfirmFunding />", () => {
                 expect(button).toBeInTheDocument();
                 expect(button).toBeDisabled();
             });
+
+            it('renders last refresh information', async () => {
+                const {getSpecificationCalculationResultsMetadata} = require('../../../services/providerService');
+                await waitFor(() => {
+                    expect(getSpecificationCalculationResultsMetadata).toBeCalledTimes(1);
+                });
+
+                const lastRefresh = screen.getByTestId("last-refresh") as HTMLElement;
+                expect(lastRefresh.textContent).toContain("1 January 2020 10:30 by testUser");
+
+                const lastCalculation = screen.getByTestId("last-calculation-results") as HTMLElement;
+                expect(lastCalculation.textContent).toContain("1 January 2021 10:30");
+            });
         });
 
         describe("when confirming approval of all funding", () => {
@@ -229,6 +243,7 @@ describe("<ConfirmFunding />", () => {
                 hasSpecification();
                 hasFundingConfigWithApproveAllMode();
                 hasMockPublishService();
+                hasProviderService();
                 hasMockPublishedProviderService();
                 hasFullPermissions();
 
@@ -270,6 +285,11 @@ describe("<ConfirmFunding />", () => {
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
             });
+
+            it('does not render last refresh information', async () => {
+                expect(screen.queryByText(/Last refresh/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Last calculation results update/)).not.toBeInTheDocument();
+            });
         });
     });
 
@@ -283,6 +303,7 @@ describe("<ConfirmFunding />", () => {
                 hasFundingConfigWithApproveBatchMode();
                 hasFullPermissions();
                 hasMockPublishService();
+                hasProviderService();
                 hasMockPublishedProviderService();
 
                 await renderPage();
@@ -350,6 +371,7 @@ describe("<ConfirmFunding />", () => {
                 hasFundingConfigWithApproveBatchMode();
                 hasFullPermissions();
                 hasMockPublishService();
+                hasProviderService();
                 hasMockPublishedProviderService();
 
                 await renderPage();
@@ -496,6 +518,22 @@ const hasMockPublishService = () => {
                 },
                 status: 200
             })),
+        }
+    });
+};
+
+const hasProviderService = () => {
+    jest.mock("../../../services/providerService", () => {
+        const mockService = jest.requireActual("../../../services/providerService");
+        return {
+            ...mockService,
+            getSpecificationCalculationResultsMetadata: jest.fn(() => Promise.resolve({
+                data: {
+                    specificationId: "ABC123",
+                    lastUpdated: new Date("2021-01-01T10:30:00.0000000+00:00")
+                },
+                status: 200
+            }))
         }
     });
 };
