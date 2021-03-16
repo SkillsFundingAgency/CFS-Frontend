@@ -171,6 +171,7 @@ export function LoadNewDataSource() {
     }
 
     function populateCoreProvider(fundingStreamId: string) {
+        clearErrorMessages();
         getCurrentProviderVersionForFundingStream(fundingStreamId).then((providerVersionResult) => {
             const providerVersion = providerVersionResult.data;
             if (providerVersion != null) {
