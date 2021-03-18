@@ -1,0 +1,37 @@
+name: $(date:yyyyMMdd)$(rev:.r)
+
+pool:
+  vmImage: windows-2019
+
+trigger: none
+
+variables:
+- name: BuildConfiguration
+  value: 'release'
+- name: BuildPlatform 
+  value: 'any cpu'
+
+steps:
+- task: Npm@1
+  displayName: 'npm install'
+  inputs:
+    workingDir: 'CalculateFunding.Web/calculatefunding-web'
+    verbose: false
+
+- powershell: |
+   # Write your PowerShell commands here.
+   
+   cd CalculateFunding.Web/calculatefunding-web
+   dir;
+   ($env:CI = “true”)
+   Write-host "============================================ npm test"
+   npm test;
+   Write-host "============================================  Finished tests"
+  displayName: 'PowerShell Script'
+
+- task: PublishTestResults@2
+  displayName: 'Publish Test Results test-report.xml'
+  inputs:
+    testResultsFiles: 'test-report.xml'
+    searchFolder: '$(System.DefaultWorkingDirectory)\CalculateFunding.Web\calculatefunding-web'
+    testRunTitle: 'React Test _$(Build.BuildNumber)'
