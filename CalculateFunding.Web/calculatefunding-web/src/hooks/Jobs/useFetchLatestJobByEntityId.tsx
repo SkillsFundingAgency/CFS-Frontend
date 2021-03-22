@@ -1,5 +1,5 @@
 import {AxiosError} from "axios";
-import {JobDetails, JobResponse} from "../../types/jobDetails";
+import {JobDetails} from "../../types/jobDetails";
 import {useQuery} from "react-query";
 import {getLatestJobByEntityId} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
@@ -20,7 +20,8 @@ export const useFetchLatestJobByEntityId =(
 
     const checkJob = async () : Promise<JobDetails | undefined> => {
         const response = await getLatestJobByEntityId(specificationId, entityId);
-        const result = response.data;
+        const result = response.data?.jobId != undefined && response.data?.jobId !== "" ? response.data : undefined;
+
         return result ? getJobDetailsFromJobResponse(result) : undefined;
     }
 

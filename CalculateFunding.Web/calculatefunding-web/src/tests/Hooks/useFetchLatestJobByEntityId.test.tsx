@@ -44,7 +44,7 @@ describe("useFetchLatestJobByEntityId tests ", () => {
         const mock = new MockAdapter(axios);
         const specificationId: string = "SPEC123";
         const entityId: string = "ENTITY123";
-        const mockQueuedJobResult1: JobDetails = {
+        const mockValidQueuedJobResult: JobDetails = {
             failures: [],
             isActive: false,
             isComplete: false,
@@ -58,16 +58,30 @@ describe("useFetchLatestJobByEntityId tests ", () => {
             created: new Date(Date.UTC(2001, 1, 15))
         }
 
-        beforeAll(() => {
-            mock.onGet(`/api/jobs/latest-by-entity-id/${specificationId}/${entityId}`)
-                .replyOnce(200, mockQueuedJobResult1);
-        });
+        const mockAnInvalidJobResult: JobDetails = {
+            failures: [],
+            isActive: false,
+            isComplete: false,
+            isFailed: false,
+            isSuccessful: false,
+            jobDescription: "test job",
+            jobId: "",
+            runningStatus: RunningStatus.Completed,
+            statusDescription: "",
+            lastUpdated: new Date(Date.UTC(2001, 1, 15)),
+            created: new Date(Date.UTC(2001, 1, 15))
+        }
+
         afterAll(() => {
             mock.reset();
             jest.resetAllMocks()
         });
 
         it("returns correct latest job", async () => {
+
+            mock.onGet(`/api/jobs/latest-by-entity-id/${specificationId}/${entityId}`)
+                .replyOnce(200, mockValidQueuedJobResult);
+
             const {result, waitForNextUpdate} =
                 renderHook(() =>
                         useFetchLatestJobByEntityId(specificationId, entityId),
@@ -79,15 +93,30 @@ describe("useFetchLatestJobByEntityId tests ", () => {
 
             expect(result.current.lastJob).not.toBeUndefined();
             if (result.current.lastJob) {
-                expect(result.current.lastJob.jobId).toEqual(mockQueuedJobResult1.jobId);
-                expect(result.current.lastJob.jobType).toEqual(mockQueuedJobResult1.jobType);
-                expect(result.current.lastJob.specificationId).toEqual(mockQueuedJobResult1.specificationId);
-                expect(result.current.lastJob.completionStatus).toEqual(mockQueuedJobResult1.completionStatus);
-                expect(result.current.lastJob.runningStatus).toEqual(mockQueuedJobResult1.runningStatus);
+                expect(result.current.lastJob.jobId).toEqual(mockValidQueuedJobResult.jobId);
+                expect(result.current.lastJob.jobType).toEqual(mockValidQueuedJobResult.jobType);
+                expect(result.current.lastJob.specificationId).toEqual(mockValidQueuedJobResult.specificationId);
+                expect(result.current.lastJob.completionStatus).toEqual(mockValidQueuedJobResult.completionStatus);
+                expect(result.current.lastJob.runningStatus).toEqual(mockValidQueuedJobResult.runningStatus);
                 expect(result.current.lastJob.lastUpdated).not.toBeUndefined();
                 expect(result.current.lastJob.created).not.toBeUndefined();
             }
         });
-    });
 
+        it("does not return a job given job is undefined", async () => {
+            mock.onGet(`/api/jobs/latest-by-entity-id/${specificationId}/${entityId}`)
+                .replyOnce(200, mockAnInvalidJobResult);
+
+            const {result, waitForNextUpdate} =
+                renderHook(() =>
+                        useFetchLatestJobByEntityId(specificationId, entityId),
+                    {wrapper: QueryClientProviderTestWrapper});
+
+            await act(async () => {
+                await waitForNextUpdate();
+            });
+
+            expect(result.current.lastJob).toBeUndefined();
+        });
+    });
 });
