@@ -446,9 +446,9 @@ export function CreateSpecification() {
                                 data-testid={"template-version-dropdown"}>
                             <option value="">Select template version</option>
                             {publishedFundingTemplates && publishedFundingTemplates
-                                .sort((a, b) => parseFloat(b.templateVersion) - parseFloat(a.templateVersion))
+                                .sort((a, b) => parseFloat(a.templateVersion) - parseFloat(b.templateVersion))
                                 .map((publishedFundingTemplate, index) =>
-                                    <option key={index} value={publishedFundingTemplate.templateVersion}>
+                                    <option key={index} value={publishedFundingTemplate.templateVersion} data-testid="templateVersion-option">
                                         {publishedFundingTemplate.templateVersion}
                                     </option>)}
                         </select>

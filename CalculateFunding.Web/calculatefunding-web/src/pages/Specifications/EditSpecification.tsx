@@ -461,10 +461,11 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                 onChange={handleTemplateVersionChange}>
                             <option value="">Select template version</option>
                             {templateVersionData
-                                .sort((a, b) => parseFloat(b.value) - parseFloat(a.value))
+                                .sort((a, b) => parseFloat(a.value) - parseFloat(b.value))
                                 .map((cp, index) =>
                                     <option key={`template-version-${index}`}
-                                            value={cp.value}>
+                                            value={cp.value}
+                                            data-testid="templateVersion-option">
                                         {cp.name}
                                     </option>)}
                         </select>

@@ -123,8 +123,8 @@ describe("<FundingLineResults/> tests", () => {
 
     describe('<FundingLineResults /> when providerId provided', () => {
         beforeEach(async () => {
-            jobMonitorSpy.mockImplementation(
-                () => (completedLatestJob));
+            jobMonitorSpy.mockImplementation(() => (completedLatestJob));
+
             const {getFundingLineStructureService} = require('../../../services/fundingStructuresService');
             const {getCalculationSummaryBySpecificationId} = require('../../../services/calculationService');
             const {getCalculationCircularDependencies} = require('../../../services/calculationService');

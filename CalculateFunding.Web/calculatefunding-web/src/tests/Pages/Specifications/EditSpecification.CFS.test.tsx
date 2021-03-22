@@ -158,6 +158,10 @@ describe("<EditSpecification />", () => {
 
                 const templateVersionSelect = screen.getByRole("combobox", {name: /Template version/});
                 expect(templateVersionSelect).toHaveLength(3);
+                expect(within(templateVersionSelect).getByRole("option", {name: /Select template version/}));
+                const templateVersionOptions = screen.getAllByTestId("templateVersion-option");
+                expect((templateVersionOptions[0] as HTMLOptionElement).value).toEqual("3.2");
+                expect((templateVersionOptions[1] as HTMLOptionElement).value).toEqual("9.9");
 
                 userEvent.selectOptions(templateVersionSelect, test.template1.templateVersion);
 
