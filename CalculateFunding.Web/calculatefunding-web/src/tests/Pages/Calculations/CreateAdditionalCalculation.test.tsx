@@ -7,15 +7,17 @@ import {act, cleanup, render, screen, within} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {CalculationCompilePreviewResponse, CalculationDataType, CompileErrorSeverity} from "../../../types/Calculations/CalculationCompilePreviewResponse";
+import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
+import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {createLocation} from "history";
-import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import * as specHook from "../../../hooks/useSpecificationSummary";
 import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import {ValueType} from "../../../types/ValueType";
+import {Permission} from "../../../types/Permission";
 
 function renderPage() {
     const {CreateAdditionalCalculation} = require("../../../pages/Calculations/CreateAdditionalCalculation");
@@ -95,7 +97,10 @@ describe("<CreateAdditionalCalculation> tests", () => {
 
         it("renders permissions warning", async () => {
             const permissionsWarning = await screen.findByTestId("permission-alert-message");
-            expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following action: Create Calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following actions/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Can approve calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Can edit calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Can approve any calculations/)).toBeInTheDocument();
 
             expect(screen.getByText(testSpec.name)).toBeInTheDocument();
         });
@@ -206,48 +211,36 @@ const mockSuccessfulBuildResponse: CalculationCompilePreviewResponse = {
         wasTemplateCalculation: false,
         calculationType: CalculationType.Template
     }
-
 };
-const specFullPermsResult: SpecificationPermissionsResult = {
-    canApproveFunding: false,
-    canCreateSpecification: false,
-    canEditCalculation: true,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canApproveCalculation: true,
+
+const fullPermissions: permissionsHook.SpecificationPermissionsResult = {
+    userId: "1234",
+    isPermissionsFetched: true,
+    hasPermission: () => true,
     hasMissingPermissions: false,
     isCheckingForPermissions: false,
-    isPermissionsFetched: true,
     missingPermissions: [],
-    canApproveAllCalculations: false,
-    canChooseFunding: false,
-    canCreateAdditionalCalculation: true
-}
-const specNoPermsResult: SpecificationPermissionsResult = {
-    canApproveFunding: false,
-    canCreateSpecification: false,
-    canEditCalculation: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canApproveCalculation: false,
-    canChooseFunding: false,
-    canApproveAllCalculations: false,
-    hasMissingPermissions: false,
-    isCheckingForPermissions: false,
+    permissionsDisabled: [],
+    permissionsEnabled: [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAllCalculations, Permission.CanApproveAnyCalculations],
+};
+
+const noPermissions: permissionsHook.SpecificationPermissionsResult = {
+    userId: "1234",
     isPermissionsFetched: true,
-    missingPermissions: ["Create Calculations"],
-    canCreateAdditionalCalculation: false
-}
+    hasPermission: () => false,
+    hasMissingPermissions: true,
+    isCheckingForPermissions: false,
+    missingPermissions: [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAllCalculations, Permission.CanApproveAnyCalculations],
+    permissionsDisabled: [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAllCalculations, Permission.CanApproveAnyCalculations],
+    permissionsEnabled: [],
+};
+
 const location = createLocation(matchMock.url);
 const mockOutMonacoEditor = () => jest.mock("../../../components/GdsMonacoEditor", () => <></>);
 const mockWithFullPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
-    .mockImplementation(() => (specFullPermsResult));
+    .mockImplementation(() => (fullPermissions));
 const mockWithNoPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
-    .mockImplementation(() => (specNoPermsResult));
+    .mockImplementation(() => (noPermissions));
 const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
     .mockImplementation(() => (specResult));
 const mockFailedBuild = () => {

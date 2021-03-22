@@ -16,10 +16,11 @@ import {cloneDeep} from "lodash";
 import {ApplyCustomProfileRequest, ProfilePeriodType} from "../../types/PublishedProvider/ApplyCustomProfileRequest";
 import {ProfileTotal} from "../../types/FundingLineProfile";
 import {ProfileHistoryPanel} from "./ProfileHistoryPanel";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useErrors} from "../../hooks/useErrors";
 import {BackLink} from "../../components/BackLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
+import {Permission} from "../../types/Permission";
 
 export interface ViewEditFundingLineProfileProps {
     editMode?: string;
@@ -89,8 +90,8 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
         setPageTitle(title);
     }, [isEditMode, fundingLineProfile]);
 
-    const {canApplyCustomProfilePattern, missingPermissions, isPermissionsFetched} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.CanApplyCustomProfilePattern]);
+    const {missingPermissions, hasMissingPermissions, isPermissionsFetched} =
+        useSpecificationPermissions(match.params.specificationId, [Permission.CanApplyCustomProfilePattern]);
 
     useConfirmLeavePage(isEditMode && !isSaving && isDirty, `Are you sure you want to leave without saving your changes?`);
 
@@ -403,7 +404,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                             <div className="govuk-grid-row">
                                 <div className="govuk-grid-column-two-thirds">
                                     <button className="govuk-button govuk-!-margin-right-1"
-                                            disabled={!canApplyCustomProfilePattern || !canEditCustomProfile}
+                                            disabled={hasMissingPermissions || !canEditCustomProfile}
                                             onClick={handleEditProfileClick}>
                                         {isEditMode ? "Apply profile" : "Edit profile"}
                                     </button>

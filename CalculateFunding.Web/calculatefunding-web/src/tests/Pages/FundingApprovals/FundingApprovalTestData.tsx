@@ -289,6 +289,17 @@ export function FundingApprovalTestData() {
                 </Provider>
             </QueryClientProvider>
         </MemoryRouter>)
+    };
+    const loadPage = async () => {
+        const {SpecificationFundingApproval} = require('../../../pages/FundingApprovals/SpecificationFundingApproval');
+        store.dispatch = jest.fn();
+        render(<MemoryRouter>
+            <QueryClientProvider client={new QueryClient()}>
+                <Provider store={store}>
+                    <SpecificationFundingApproval location={location} history={history} match={matchMock}/>
+                </Provider>
+            </QueryClientProvider>
+        </MemoryRouter>)
 
         await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
     };
@@ -343,6 +354,7 @@ export function FundingApprovalTestData() {
         hasProviderIds,
         hasSearchResults,
         hasSearchResultsWithProviderIds,
-        renderPage
+        renderPage,
+        loadPage
     }
 }

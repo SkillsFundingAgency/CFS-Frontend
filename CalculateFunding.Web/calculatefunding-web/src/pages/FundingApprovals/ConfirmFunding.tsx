@@ -5,7 +5,7 @@ import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
@@ -27,6 +27,7 @@ import {FundingConfirmationSummary} from "../../components/Funding/FundingConfir
 import {Footer} from "../../components/Footer";
 import * as publishedProviderService from "../../services/publishedProviderService";
 import {getSpecificationCalculationResultsMetadata} from "../../services/providerService";
+import {Permission} from "../../types/Permission";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 
 export interface ConfirmFundingRouteProps {
@@ -61,8 +62,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(match.params.specificationId,
             err => addError({error: err, description: `Error while loading specification`}));
-    const {canApproveFunding, canReleaseFunding, missingPermissions, isPermissionsFetched} =
-        useSpecificationPermissions(match.params.specificationId, [SpecificationPermissions.Approve, SpecificationPermissions.Release]);
+    const {missingPermissions, hasPermission, isPermissionsFetched} =
+        useSpecificationPermissions(match.params.specificationId, [Permission.CanApproveFunding, Permission.CanReleaseFunding]);
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(match.params.fundingStreamId, match.params.fundingPeriodId,
             err => addError({error: err, description: `Error while loading funding configuration`}));
@@ -74,9 +75,10 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         isConfirming ||
         specification === undefined ||
         fundingConfiguration === undefined || 
-        canApproveFunding === undefined ||
-        canReleaseFunding === undefined, [specification, fundingConfiguration, isConfirming, canApproveFunding, canReleaseFunding]);
+        !isPermissionsFetched, [specification, fundingConfiguration, isConfirming, isPermissionsFetched]);
     const isWaitingForJob = useMemo(() => isCheckingForJob || latestJob !== undefined && !latestJob.isComplete, [isCheckingForJob, latestJob]);
+    const hasPermissionToApprove = useMemo(() => hasPermission && hasPermission(Permission.CanApproveFunding), [isPermissionsFetched]);
+    const hasPermissionToRelease = useMemo(() => hasPermission && hasPermission(Permission.CanReleaseFunding), [isPermissionsFetched]);
     const [specificationLastUpdatedDate, setSpecificationLastUpdatedDate] = useState<Date>();
     useEffect(() => {
         getSpecificationCalculationResultsMetadata(match.params.specificationId).then((result) => {
@@ -245,7 +247,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 </dl>
                 }
                 
-                {fundingConfiguration && specification && canApproveFunding !== undefined && canReleaseFunding !== undefined &&
+                {fundingConfiguration && specification && hasPermissionToApprove !== undefined && hasPermissionToRelease !== undefined &&
                 <section data-testid="funding-summary-section">
                     <div className="govuk-grid-row govuk-!-margin-bottom-3">
                         <div className="govuk-grid-column-three-quarters">
@@ -264,8 +266,8 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                         approvalMode={fundingConfiguration.approvalMode}
                         specification={specification}
                         fundingSummary={fundingSummary}
-                        canApproveFunding={canApproveFunding}
-                        canReleaseFunding={canReleaseFunding}
+                        canApproveFunding={hasPermissionToApprove}
+                        canReleaseFunding={hasPermissionToRelease}
                         addError={addError}
                         isWaitingForJob={isWaitingForJob}
                     />

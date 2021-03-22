@@ -4,21 +4,28 @@ import {convertToPermissions} from "../helpers/permissionsHelper";
 import {Link} from "react-router-dom";
 
 export interface PermissionStatusProps {
-    requiredPermissions: Permission[] | string[],
+    requiredPermissions: Permission[] | string[] | undefined,
     hidden: boolean
 }
 
 export function PermissionStatus(props: PermissionStatusProps) {
-    const missingPermissions = useMemo<Permission[]>(() => 
-        (props.requiredPermissions as Permission[]).length > 0 ? props.requiredPermissions as Permission[]: convertToPermissions(props.requiredPermissions), 
+    const missingPermissions = useMemo<Permission[]>(() => {
+            if (!props.requiredPermissions) return [];
+            const perms = props.requiredPermissions as Permission[];
+            if (perms && perms.length > 0) {
+                return perms;
+            } else {
+                return convertToPermissions(props.requiredPermissions);
+            }
+        },
         [props.requiredPermissions])
 
-    if (props.hidden || props.requiredPermissions.length === 0) {
+    if (props.hidden || !props.requiredPermissions || props.requiredPermissions.length === 0) {
 
         return null;
 
     } else {
-        
+
         return missingPermissions.length > 0 ?
             <div className="govuk-notification-banner govuk-!-margin-top-1"
                  role="region"

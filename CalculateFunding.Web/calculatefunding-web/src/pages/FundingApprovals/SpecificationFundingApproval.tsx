@@ -1,5 +1,5 @@
 import {RouteComponentProps, useHistory} from "react-router";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -13,7 +13,7 @@ import {ApprovalMode} from "../../types/ApprovalMode";
 import {FundingSearchSelectionState} from "../../states/FundingSearchSelectionState";
 import {useDispatch, useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
@@ -33,6 +33,7 @@ import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {getLatestSuccessfulJob} from "../../services/jobService";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
+import {Permission} from "../../types/Permission";
 
 export interface SpecificationFundingApprovalRouteProps {
     fundingStreamId: string;
@@ -71,8 +72,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const {publishedProvidersWithErrors, isLoadingPublishedProviderErrors} =
         usePublishedProviderErrorSearch(specificationId, !isCheckingForJob && !(latestJob && latestJob.isActive),
             err => addErrorMessage(err.message, "Error while loading provider funding errors"));
-    const {canApproveFunding, canRefreshFunding, canReleaseFunding, missingPermissions, isPermissionsFetched} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.Refresh, SpecificationPermissions.Approve, SpecificationPermissions.Release]);
+    const {missingPermissions, hasPermission, isPermissionsFetched} =
+        useSpecificationPermissions(match.params.specificationId, [Permission.CanRefreshFunding, Permission.CanApproveFunding, Permission.CanReleaseFunding]);
     useQuery<JobDetails | undefined, AxiosError>(`last-spec-${specificationId}-refresh`,
         async () => getJobDetailsFromJobResponse((await getLatestSuccessfulJob(specificationId, JobType.RefreshFundingJob)).data),
         {
@@ -86,6 +87,9 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     const [jobId, setJobId] = useState<string>("");
     const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
     const {errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages} = useErrors();
+    const hasPermissionToRefresh = useMemo(() => hasPermission && hasPermission(Permission.CanRefreshFunding), [isPermissionsFetched]);
+    const hasPermissionToApprove = useMemo(() => hasPermission && hasPermission(Permission.CanApproveFunding), [isPermissionsFetched]);
+    const hasPermissionToRelease = useMemo(() => hasPermission && hasPermission(Permission.CanReleaseFunding), [isPermissionsFetched]);
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -111,7 +115,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }, [latestJob, jobId]);
 
     async function handleApprove() {
-        if (publishedProviderSearchResults && canApproveFunding && publishedProviderSearchResults.canApprove) {
+        if (publishedProviderSearchResults && hasPermissionToApprove && publishedProviderSearchResults.canApprove) {
             if (fundingConfiguration?.approvalMode === ApprovalMode.All && publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0) {
                 addErrorMessage("Funding cannot be approved as there are providers in error",
                     undefined,
@@ -125,7 +129,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
     }
 
     async function handleRelease() {
-        if (publishedProviderSearchResults && publishedProviderSearchResults.canPublish && canReleaseFunding) {
+        if (publishedProviderSearchResults && publishedProviderSearchResults.canPublish && hasPermissionToRelease) {
             if (fundingConfiguration?.approvalMode === ApprovalMode.All && publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0) {
                 addErrorMessage("Funding cannot be released as there are providers in error",
                     undefined,
@@ -231,8 +235,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     <Breadcrumb name={"Funding approval results"}/>
                 </Breadcrumbs>
 
-                <PermissionStatus requiredPermissions={missingPermissions}
-                                  hidden={!isPermissionsFetched}/>
+                <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
                 <MultipleErrorSummary errors={errors}/>
 
@@ -260,7 +263,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             }
                             <li>
                                 <button className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
-                                        disabled={(latestJob && latestJob.isActive) || !canRefreshFunding || isLoadingRefresh}
+                                        disabled={(latestJob && latestJob.isActive) || !hasPermissionToRefresh || isLoadingRefresh}
                                         onClick={handleRefresh}>
                                     Refresh funding
                                 </button>
@@ -298,9 +301,9 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             specCoreProviderVersionId={specification.providerVersionId}
                             enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
                             providerSearchResults={publishedProviderSearchResults}
-                            canRefreshFunding={canRefreshFunding}
-                            canApproveFunding={canApproveFunding}
-                            canReleaseFunding={canReleaseFunding}
+                            canRefreshFunding={hasPermissionToRefresh}
+                            canApproveFunding={hasPermissionToApprove}
+                            canReleaseFunding={hasPermissionToRelease}
                             totalResults={publishedProviderIds ? publishedProviderIds.length : publishedProviderSearchResults ? publishedProviderSearchResults.totalResults : 0}
                             allPublishedProviderIds={publishedProviderIds}
                             setIsLoadingRefresh={setIsLoadingRefresh}
@@ -315,13 +318,13 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     <div className="govuk-grid-column-full right-align">
                         <div className="right-align">
                             <button className="govuk-button govuk-!-margin-right-1"
-                                    disabled={(latestJob && latestJob.isActive) || !canRefreshFunding || isLoadingRefresh}
+                                    disabled={(latestJob && latestJob.isActive) || !hasPermissionToRefresh || isLoadingRefresh}
                                     onClick={handleRefresh}>Refresh funding
                             </button>
                             <button className="govuk-button"
                                     disabled={(latestJob && latestJob.isActive) ||
                                     !publishedProviderSearchResults?.canApprove ||
-                                    !canApproveFunding ||
+                                    !hasPermissionToApprove ||
                                     isLoadingRefresh ||
                                     blockActionBasedOnProviderErrors}
                                     onClick={handleApprove}>Approve funding
@@ -329,7 +332,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
                                     disabled={(latestJob && latestJob.isActive) || 
                                     !publishedProviderSearchResults?.canPublish || 
-                                    !canReleaseFunding || 
+                                    !hasPermissionToRelease || 
                                     isLoadingRefresh ||
                                     blockActionBasedOnProviderErrors}
                                     onClick={handleRelease}>Release funding

@@ -21,7 +21,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasProvidersWithErrors([]);
             test.hasSearchResults([test.provider1]);
 
-            test.renderPage();
+            test.loadPage();
         });
 
         it('renders Specification details', async () => {

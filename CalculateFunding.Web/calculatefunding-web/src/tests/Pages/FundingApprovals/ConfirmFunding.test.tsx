@@ -16,7 +16,6 @@ import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonit
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
-import * as providerIdsSearchHook from "../../../hooks/FundingApproval/usePublishedProviderIds";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import {PublishedProviderResult} from "../../../types/PublishedProvider/PublishedProviderSearchResults";
@@ -31,6 +30,7 @@ import {FundingActionType, PublishedProviderFundingCount} from "../../../types/P
 import {createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets} from "../../fakes/testFactories";
 import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
+import {Permission} from "../../../types/Permission";
 
 
 const history = createMemoryHistory();
@@ -133,23 +133,25 @@ const mockFundingConfigWithApprovalBatchMode: FundingConfigurationQueryResult = 
     isErrorLoadingFundingConfiguration: false,
     errorLoadingFundingConfiguration: "",
 };
-const fullPermissions: SpecificationPermissionsResult = {
-    canApplyCustomProfilePattern: false,
-    canApproveAllCalculations: false,
-    canChooseFunding: false,
-    canRefreshFunding: true,
-    canApproveFunding: true,
-    canReleaseFunding: true,
-    isPermissionsFetched: true,
-    hasMissingPermissions: false,
+const withoutPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
     isCheckingForPermissions: false,
+    hasPermission: () => false,
+    hasMissingPermissions: true,
+    isPermissionsFetched: true,
+    permissionsEnabled: [],
+    permissionsDisabled: [Permission.CanApproveFunding, Permission.CanRefreshFunding, Permission.CanReleaseFunding],
+    missingPermissions: [Permission.CanApproveFunding, Permission.CanRefreshFunding, Permission.CanReleaseFunding],
+};
+const withPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => true,
+    hasMissingPermissions: false,
+    isPermissionsFetched: true,
+    permissionsEnabled: [Permission.CanApproveFunding, Permission.CanRefreshFunding, Permission.CanReleaseFunding],
+    permissionsDisabled: [],
     missingPermissions: [],
-    canEditSpecification: false,
-    canCreateSpecification: false,
-    canMapDatasets: false,
-    canApproveCalculation: false,
-    canEditCalculation: false,
-    canCreateAdditionalCalculation: false
 };
 
 const provider1: PublishedProviderResult = {
@@ -199,7 +201,7 @@ describe("<ConfirmFunding />", () => {
                 hasSpecification();
                 hasMockPublishedProviderService();
                 hasFundingConfigWithApproveAllMode();
-                hasFullPermissions();
+                hasPermissions();
                 hasMockPublishService();
                 hasProviderService();
                 await renderPage();
@@ -245,7 +247,7 @@ describe("<ConfirmFunding />", () => {
                 hasMockPublishService();
                 hasProviderService();
                 hasMockPublishedProviderService();
-                hasFullPermissions();
+                hasPermissions();
 
                 await renderPage();
             });
@@ -301,7 +303,7 @@ describe("<ConfirmFunding />", () => {
                 hasNoActiveJobsRunning();
                 hasSpecification();
                 hasFundingConfigWithApproveBatchMode();
-                hasFullPermissions();
+                hasPermissions();
                 hasMockPublishService();
                 hasProviderService();
                 hasMockPublishedProviderService();
@@ -369,7 +371,7 @@ describe("<ConfirmFunding />", () => {
                 hasNoActiveJobsRunning();
                 hasSpecification();
                 hasFundingConfigWithApproveBatchMode();
-                hasFullPermissions();
+                hasPermissions();
                 hasMockPublishService();
                 hasProviderService();
                 hasMockPublishedProviderService();
@@ -447,7 +449,7 @@ const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecification
 const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));
 const hasFundingConfigWithApproveAllMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalAllMode));
 const hasFundingConfigWithApproveBatchMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalBatchMode));
-const hasFullPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullPermissions));
+const hasPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
 const mockFundingSummary: PublishedProviderFundingCount = {
     count: 2,
     fundingStreamsFundings: [{totalFunding: 534.53, fundingStreamId: fundingStream.id}],

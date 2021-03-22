@@ -8,9 +8,10 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 import {QueryClient, QueryClientProvider} from "react-query";
 import {hasSpecPermissions} from "../../fakes/testFactories";
-import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import userEvent from "@testing-library/user-event";
 import {ConfirmationModal} from "../../../components/ConfirmationModal";
+import {Permission} from "../../../types/Permission";
 
 describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
     afterEach(async () => {
@@ -36,7 +37,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
                     enableUserEditableRuleBasedProfiles: true
                 }
             });
-            hasSpecPermissions(minimalSpecPermissions);
+            hasSpecPermissions(withPermissions);
 
             await renderPage();
         });
@@ -199,7 +200,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
                     enableUserEditableRuleBasedProfiles: true
                 }
             });
-            hasSpecPermissions(noSpecPermissions);
+            hasSpecPermissions(withoutPermissions);
         });
 
         afterAll(() => {
@@ -324,43 +325,26 @@ jest.mock('../../../services/publishedProviderFundingLineService', () => ({
     applyCustomProfile: mockApplyCustomProfile
 }));
 
-export const minimalSpecPermissions: SpecificationPermissionsResult = {
-    canApproveFunding: false,
-    canCreateSpecification: false,
-    canEditCalculation: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canApproveCalculation: false,
-    canCreateAdditionalCalculation: false,
-    canApproveAllCalculations: false,
-    canChooseFunding: false,
-    hasMissingPermissions: false,
+const withoutPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
     isCheckingForPermissions: false,
+    hasPermission: () => false,
+    hasMissingPermissions: true,
     isPermissionsFetched: true,
-    canApplyCustomProfilePattern: true,
-    missingPermissions: []
-}
-export const noSpecPermissions: SpecificationPermissionsResult = {
-    canApproveFunding: false,
-    canCreateSpecification: false,
-    canEditCalculation: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canApproveCalculation: false,
-    canCreateAdditionalCalculation: false,
-    canApproveAllCalculations: false,
-    canChooseFunding: false,
-    hasMissingPermissions: false,
+    permissionsEnabled: [],
+    permissionsDisabled: [Permission.CanApplyCustomProfilePattern],
+    missingPermissions: [Permission.CanApplyCustomProfilePattern],
+};
+const withPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
     isCheckingForPermissions: false,
+    hasPermission: () => true,
+    hasMissingPermissions: false,
     isPermissionsFetched: true,
-    canApplyCustomProfilePattern: false,
-    missingPermissions: [SpecificationPermissions.CanApplyCustomProfilePattern]
-}
-
+    permissionsEnabled: [Permission.CanApplyCustomProfilePattern],
+    permissionsDisabled: [],
+    missingPermissions: [],
+};
 const testFundingLineProfile = {
     fundingLineCode: "fl123",
     fundingLineName: "My Funding Line",

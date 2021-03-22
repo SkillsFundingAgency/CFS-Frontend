@@ -10,7 +10,7 @@ import {PublishStatus, PublishStatusModel} from "../../types/PublishStatusModel"
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {CalculationResultsLink} from "../../components/Calculations/CalculationResultsLink";
 import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {CircularReferenceErrorSummary} from "../../components/CircularReferenceErrorSummary";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
@@ -19,7 +19,7 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useCalculation} from "../../hooks/Calculations/useCalculation";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
 import {ValueType} from "../../types/ValueType";
@@ -28,6 +28,7 @@ import {ConfirmationPanel} from "../../components/ConfirmationPanel";
 import {QueryClient, useMutation} from "react-query";
 import {AxiosError} from "axios";
 import {CalculationDetails} from "../../types/CalculationDetails";
+import {Permission} from "../../types/Permission";
 
 export interface EditorProps {
     excludeMonacoEditor?: boolean
@@ -43,10 +44,18 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
     const [specificationId, setSpecificationId] = useState<string>("");
     const [calculation, setCalculation] = useState<CalculationDetails | undefined>();
     const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
-    const {canEditCalculation, canApproveCalculation, missingPermissions, isPermissionsFetched} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.EditCalculations, SpecificationPermissions.ApproveCalculations]);
+    const {userId, hasPermission, missingPermissions, isPermissionsFetched} =
+        useSpecificationPermissions(specificationId, [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAnyCalculations]);
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
+
+    const canCreateAdditionalCalculation = useMemo(() => hasPermission && hasPermission(Permission.CanEditCalculations),
+        [isPermissionsFetched]);
+    const canApproveCalculation = useMemo(() => hasPermission && calculation &&
+        (hasPermission(Permission.CanApproveAnyCalculations) || 
+            (hasPermission(Permission.CanApproveCalculations) && calculation.author?.id !== userId)),
+    [isPermissionsFetched, calculation]);
+    
     const queryClient = new QueryClient();
     const updateCalculation =
         useMutation((request: UpdateCalculationRequest) =>
@@ -244,7 +253,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     <div className="govuk-grid-column-two-thirds">
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onSaveCalculation}
-                                disabled={!calculationState || !calculationState.calculationBuild.hasCodeBuiltSuccessfully || updateCalculation.isLoading || !canEditCalculation}>
+                                disabled={!calculationState || !calculationState.calculationBuild.hasCodeBuiltSuccessfully || updateCalculation.isLoading || !canCreateAdditionalCalculation}>
                             Save and continue
                         </button>
 

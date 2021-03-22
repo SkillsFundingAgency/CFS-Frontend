@@ -1,4 +1,4 @@
-﻿import {screen, waitFor} from "@testing-library/react";
+﻿import {screen, waitFor, within} from "@testing-library/react";
 import {SpecificationTestData} from "./SpecificationTestData";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
@@ -23,8 +23,9 @@ describe("<EditSpecification /> ", () => {
             afterEach(() => jest.clearAllMocks());
 
             it("renders default warning", async () => {
-                expect(screen.getByTestId("permission-alert-message")).toBeInTheDocument();
-                expect(screen.getByText(/You do not have permissions to perform the following action: Edit/)).toBeInTheDocument();
+                const permissionsWarning = await screen.findByTestId("permission-alert-message");
+                expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following action/)).toBeInTheDocument();
+                expect(within(permissionsWarning).getByText(/Can edit specifications/)).toBeInTheDocument();
             });
         });
     });

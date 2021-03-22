@@ -24,7 +24,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasProviderIds([test.providerWithError1.publishedProviderVersionId]);
             test.hasSearchResults([test.providerWithError1]);
 
-            await test.renderPage();
+            await test.loadPage();
         });
 
         it('renders error summary', async () => {
@@ -61,7 +61,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasProvidersWithErrors(["Error: missing something"]);
             test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
 
-            await test.renderPage();
+            await test.loadPage();
         });
 
         it('renders error summary', async () => {

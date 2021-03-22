@@ -3,14 +3,15 @@ import React from "react";
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
-import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
+import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {CalculationSearchResult, CalculationType} from "../../../types/CalculationSearchResponse";
 import {ValueType} from "../../../types/ValueType";
 import {PublishStatus} from "../../../types/PublishStatusModel";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {QueryClient, QueryClientProvider} from "react-query";
+import {Permission} from "../../../types/Permission";
 
 describe('<AdditionalCalculations /> tests', () => {
     beforeAll(() => {
@@ -253,41 +254,25 @@ const noCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
 }
 
 const fullPermissions: permissionsHook.SpecificationPermissionsResult = {
-    canApproveAllCalculations: false,
-    canChooseFunding: false,
-    canRefreshFunding: true,
-    canApproveFunding: true,
-    canReleaseFunding: true,
     isPermissionsFetched: true,
+    userId: "123",
+    hasPermission: () => true,
     hasMissingPermissions: false,
     isCheckingForPermissions: false,
     missingPermissions: [],
-    canEditSpecification: false,
-    canCreateSpecification: false,
-    canMapDatasets: false,
-    canApproveCalculation: false,
-    canEditCalculation: false,
-    canCreateAdditionalCalculation: true,
-    canApplyCustomProfilePattern: false
+    permissionsDisabled: [],
+    permissionsEnabled: [Permission.CanEditCalculations],
 };
 
 const noPermissions: permissionsHook.SpecificationPermissionsResult = {
-    canApproveAllCalculations: false,
-    canChooseFunding: false,
-    canRefreshFunding: true,
-    canApproveFunding: true,
-    canReleaseFunding: true,
     isPermissionsFetched: true,
-    hasMissingPermissions: false,
+    userId: "123",
+    hasPermission: () => false,
+    hasMissingPermissions: true,
     isCheckingForPermissions: false,
-    missingPermissions: [],
-    canEditSpecification: false,
-    canCreateSpecification: false,
-    canMapDatasets: false,
-    canApproveCalculation: false,
-    canEditCalculation: false,
-    canCreateAdditionalCalculation: false,
-    canApplyCustomProfilePattern: false
+    missingPermissions: [Permission.CanEditCalculations],
+    permissionsDisabled: [Permission.CanEditCalculations],
+    permissionsEnabled: [],
 };
 
 const mockCircularReferenceErrors = jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies');

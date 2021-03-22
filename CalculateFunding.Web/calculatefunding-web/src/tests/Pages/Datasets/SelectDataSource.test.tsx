@@ -5,10 +5,9 @@ import {SelectDataSourceRouteProps} from "../../../pages/Datasets/SelectDataSour
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
-import * as useLatestEntityJobWithMonitoringHook
-    from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as useLatestEntityJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {
     LatestSpecificationJobWithMonitoringResult,
     useLatestEntityJobWithMonitoring
@@ -22,6 +21,7 @@ import {RunningStatus} from "../../../types/RunningStatus";
 import {RelationshipDataQueryResult} from "../../../hooks/useRelationshipData";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 import {QueryClient, QueryClientProvider} from "react-query";
+import {Permission} from "../../../types/Permission";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
 
@@ -94,38 +94,24 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
     isMonitoring: true
 };
 const withoutPermissions: SpecificationPermissionsResult = {
-    canApproveAllCalculations: false, 
-    canApproveCalculation: false, 
-    canChooseFunding: false, 
-    canCreateAdditionalCalculation: false, 
-    canEditCalculation: false,
+    userId: "3456",
     isCheckingForPermissions: false,
+    hasPermission: () => false,
     hasMissingPermissions: true,
     isPermissionsFetched: true,
-    missingPermissions: [SpecificationPermissions.MapDatasets],
-    canMapDatasets: false,
-    canApproveFunding: false,
-    canCreateSpecification: false,
-    canEditSpecification: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false
+    permissionsEnabled: [],
+    permissionsDisabled: [Permission.CanMapDatasets],
+    missingPermissions: [Permission.CanMapDatasets],
 };
 const withPermissions: SpecificationPermissionsResult = {
-    canApproveAllCalculations: false,
-    canApproveCalculation: false,
-    canChooseFunding: false,
-    canCreateAdditionalCalculation: false,
-    canEditCalculation: false,
+    userId: "3456",
     isCheckingForPermissions: false,
+    hasPermission: () => true,
     hasMissingPermissions: false,
     isPermissionsFetched: true,
+    permissionsEnabled: [Permission.CanMapDatasets],
+    permissionsDisabled: [],
     missingPermissions: [],
-    canMapDatasets: true,
-    canApproveFunding: false,
-    canCreateSpecification: false,
-    canEditSpecification: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false
 };
 
 const renderPage = () => {

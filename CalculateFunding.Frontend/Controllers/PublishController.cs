@@ -330,7 +330,6 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
             }
-
             if (providers.PublishedProviderIds.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(providers.PublishedProviderIds), "Missing " + nameof(providers.PublishedProviderIds));

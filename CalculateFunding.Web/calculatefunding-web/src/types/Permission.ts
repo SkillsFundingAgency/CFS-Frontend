@@ -23,9 +23,9 @@
     CanDeleteProfilePattern = "Can delete profile pattern",
     CanAssignProfilePattern = "Can assign profile pattern",
     CanApplyCustomProfilePattern = "Can apply custom profile pattern",
-    CanApproveCalculations = "Can approve calculations",
-    CanApproveAnyCalculations = "Can approve any calculations",
-    CanApproveAllCalculations = "Can approve all calculations",
+    CanApproveCalculations = "Can approve calculations", // only if user is not the last editor
+    CanApproveAnyCalculations = "Can approve any calculations", // even if user is the last editor
+    CanApproveAllCalculations = "Can approve all calculations", // only as a batch of all calcs
     CanRefreshPublishedQa = "Can push CFS data into SQL for QA",
     CanUploadDataSourceFiles = "Can upload data source files"
 }

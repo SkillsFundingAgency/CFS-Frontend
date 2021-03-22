@@ -8,6 +8,7 @@ import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonit
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {QueryClient, QueryClientProvider} from "react-query";
+import {fullSpecPermissions} from "../../fakes/testFactories";
 
 export function ViewSpecificationTestData() {
 
@@ -37,7 +38,7 @@ export function ViewSpecificationTestData() {
 
     function mockSpecificationPermissions(expectedSpecificationPermissionsResult?: SpecificationPermissionsResult) {
         jest.spyOn(specPermsHook, 'useSpecificationPermissions')
-            .mockImplementation(() => (expectedSpecificationPermissionsResult ? expectedSpecificationPermissionsResult : specWithAllPermissions));
+            .mockImplementation(() => (expectedSpecificationPermissionsResult ? expectedSpecificationPermissionsResult : fullSpecPermissions));
     }
 
     const renderViewSpecificationPage = async () => {
@@ -69,25 +70,6 @@ export function ViewSpecificationTestData() {
         });
         return component;
     };
-
-    const specWithAllPermissions: SpecificationPermissionsResult = {
-        canApproveFunding: true,
-        canCreateSpecification: true,
-        canEditCalculation: true,
-        canEditSpecification: true,
-        canMapDatasets: true,
-        canRefreshFunding: true,
-        canReleaseFunding: true,
-        canApproveCalculation: true,
-        canApproveAllCalculations: true,
-        canChooseFunding: true,
-        canApplyCustomProfilePattern: true,
-        hasMissingPermissions: true,
-        isCheckingForPermissions: true,
-        isPermissionsFetched: true,
-        missingPermissions: [],
-        canCreateAdditionalCalculation: true
-    }
 
     const mockPublishService = () => {
         jest.mock("../../../services/publishService", () => {

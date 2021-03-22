@@ -19,7 +19,8 @@ import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as redux from "react-redux";
 import {buildPermissions} from "../../fakes/testFactories";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import {SpecificationPermissions, SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import {Permission} from "../../../types/Permission";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -359,48 +360,32 @@ export function SpecificationTestData() {
         useSelectorSpy.mockReturnValue(permissions);
     }
 
-    const withoutSpecPermissions: SpecificationPermissionsResult = {
+    const withoutPermissions: SpecificationPermissionsResult = {
+        userId: "3456",
         isCheckingForPermissions: false,
-        isPermissionsFetched: true,
+        hasPermission: () => false,
         hasMissingPermissions: true,
-        missingPermissions: [SpecificationPermissions.Edit],
-        canApplyCustomProfilePattern: false,
-        canApproveAllCalculations: false,
-        canApproveCalculation: false,
-        canChooseFunding: false,
-        canCreateAdditionalCalculation: false,
-        canEditCalculation: false,
-        canMapDatasets: false,
-        canApproveFunding: false,
-        canCreateSpecification: false,
-        canEditSpecification: false,
-        canRefreshFunding: false,
-        canReleaseFunding: false
-    };
-    const withSpecPermissions: SpecificationPermissionsResult = {
-        isCheckingForPermissions: false,
         isPermissionsFetched: true,
+        permissionsEnabled: [],
+        permissionsDisabled: [Permission.CanEditSpecification],
+        missingPermissions: [Permission.CanEditSpecification],
+    };
+    const withPermissions: SpecificationPermissionsResult = {
+        userId: "3456",
+        isCheckingForPermissions: false,
+        hasPermission: () => true,
         hasMissingPermissions: false,
+        isPermissionsFetched: true,
+        permissionsEnabled: [Permission.CanEditSpecification],
+        permissionsDisabled: [],
         missingPermissions: [],
-        canApplyCustomProfilePattern: false,
-        canApproveAllCalculations: false,
-        canApproveCalculation: false,
-        canChooseFunding: false,
-        canCreateAdditionalCalculation: false,
-        canEditCalculation: false,
-        canMapDatasets: false,
-        canApproveFunding: false,
-        canCreateSpecification: false,
-        canEditSpecification: true,
-        canRefreshFunding: false,
-        canReleaseFunding: false
     };
     const hasMissingPermissionToEdit = () => {
-        jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutSpecPermissions));
+        jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutPermissions));
     }
 
     const hasEditPermissions = () => {
-        jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withSpecPermissions));
+        jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
     }
 
 

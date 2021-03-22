@@ -19,7 +19,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasFundingConfigurationWithApproveAll();
             test.hasProvidersWithErrors([]);
             test.hasSearchResults([test.provider1]);
-            await test.renderPage();
+            await test.loadPage();
         });
         afterEach(() => {
             jest.clearAllMocks();

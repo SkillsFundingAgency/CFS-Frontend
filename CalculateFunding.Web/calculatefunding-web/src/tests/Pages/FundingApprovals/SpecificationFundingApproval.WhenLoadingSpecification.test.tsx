@@ -15,7 +15,7 @@ describe("<SpecificationFundingApproval />", () => {
             useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
             test.hasNoActiveJobsRunning();
             test.hasLastRefreshJob();
-            test.renderPage();
+            await test.renderPage();
             expect(await screen.getByText("Loading specification...")).toBeInTheDocument();
         });
     });
@@ -31,7 +31,7 @@ describe("<SpecificationFundingApproval />", () => {
             test.hasProvidersWithErrors([]);
             test.hasSearchResults([test.provider1]);
 
-            await test.renderPage();
+            await test.loadPage();
         });
 
         it('renders Specification details', async () => {

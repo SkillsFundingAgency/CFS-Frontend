@@ -1,10 +1,11 @@
 import React from "react";
-import {render, screen, waitFor} from "@testing-library/react";
+import {screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
 import {RunningStatus} from "../../../types/RunningStatus";
+import {Permission} from "../../../types/Permission";
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
@@ -97,25 +98,17 @@ describe('<ViewSpecification /> ', () => {
 
     describe("without ApproveAllCalculations permission ", () => {
         it("shows permission message when approve all calculations button is clicked", async () => {
-            const permission: SpecificationPermissionsResult = {
-                canApproveFunding: true,
-                canCreateSpecification: true,
-                canEditCalculation: true,
-                canEditSpecification: true,
-                canMapDatasets: true,
-                canRefreshFunding: true,
-                canReleaseFunding: true,
-                canApproveCalculation: true,
-                canApproveAllCalculations: false,
-                canChooseFunding: true,
+            const withoutPermissions: SpecificationPermissionsResult = {
+                userId: "3456",
+                isCheckingForPermissions: false,
+                hasPermission: (perm: Permission) => false,
                 hasMissingPermissions: true,
-                isCheckingForPermissions: true,
                 isPermissionsFetched: true,
-                missingPermissions: [],
-                canCreateAdditionalCalculation: true,
-                canApplyCustomProfilePattern: false
-            }
-            testData.mockSpecificationPermissions(permission);
+                permissionsEnabled: [],
+                permissionsDisabled: [Permission.CanApproveAllCalculations],
+                missingPermissions: [Permission.CanApproveAllCalculations],
+            };
+            testData.mockSpecificationPermissions(withoutPermissions);
             testData.mockSpecificationService();
             testData.mockFundingLineStructureService();
             testData.mockDatasetBySpecificationIdService();

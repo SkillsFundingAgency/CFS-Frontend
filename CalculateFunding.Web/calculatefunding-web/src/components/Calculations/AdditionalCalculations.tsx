@@ -13,6 +13,7 @@ import {ErrorProps} from "../../hooks/useErrors";
 import {formatNumber, NumberType} from "../FormattedNumber";
 import {cloneDeep} from "lodash";
 import {ValueType} from "../../types/ValueType";
+import {Permission} from "../../types/Permission";
 
 export interface AdditionalCalculationsProps {
     specificationId: string,
@@ -28,8 +29,8 @@ export function AdditionalCalculations({
     const [additionalCalculationsSearchTerm, setAdditionalCalculationSearchTerm] = useState('');
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(false);
     const [statusFilter] = useState("");
-    const {canCreateAdditionalCalculation} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
+    const {isPermissionsFetched, hasMissingPermissions} =
+        useSpecificationPermissions(specificationId, [Permission.CanEditCalculations]);
     const {circularReferenceErrors, isLoadingCircularDependencies} =
         useCalculationCircularDependencies(specificationId,
             err => addError({error: err, description: "Error while checking for circular reference errors"}));
@@ -187,7 +188,7 @@ export function AdditionalCalculations({
                         <strong className="govuk-warning-text__text">
                             <span className="govuk-warning-text__assistive">Warning</span>
                     No additional calculations available. &nbsp;
-                    {canCreateAdditionalCalculation && showCreateButton &&
+                    {isPermissionsFetched && !hasMissingPermissions && showCreateButton &&
                                 <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`}>
                                     Create a calculation
                         </Link>
@@ -195,7 +196,7 @@ export function AdditionalCalculations({
                         </strong>
                     </div>
                 }
-                {additionalCalculations.calculations.length > 0 && canCreateAdditionalCalculation && showCreateButton &&
+                {additionalCalculations.calculations.length > 0 && isPermissionsFetched && !hasMissingPermissions && showCreateButton &&
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
                             <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`}

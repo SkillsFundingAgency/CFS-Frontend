@@ -7,6 +7,7 @@ import {SpecificationPermissionsResult} from "../../hooks/Permissions/useSpecifi
 import * as specPermsHook from "../../hooks/Permissions/useSpecificationPermissions";
 import * as permissionsHook from "../../hooks/Permissions/useSpecificationPermissions";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
+import {Permission} from "../../types/Permission";
 
 export const defaultFacets = [
     {name: PublishedProviderSearchFacet.HasErrors, facetValues: [{"name": "True", "count": 1}, {"name": "False", "count": 0}]},
@@ -16,24 +17,30 @@ export const defaultFacets = [
     {name: PublishedProviderSearchFacet.ProviderType, facetValues: []}
 ];
 
-export const fullSpecPermissions: SpecificationPermissionsResult = {
-    canApproveFunding: true,
-    canCreateSpecification: true,
-    canEditCalculation: true,
-    canEditSpecification: true,
-    canMapDatasets: true,
-    canRefreshFunding: true,
-    canReleaseFunding: true,
-    canApproveCalculation: true,
-    canApproveAllCalculations: true,
-    canChooseFunding: true,
+export const allPermissions = () => Object.keys(Permission).map(p => (<any>Permission)[p] as Permission);
+
+export const noSpecPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => false,
     hasMissingPermissions: true,
-    isCheckingForPermissions: true,
     isPermissionsFetched: true,
-    canApplyCustomProfilePattern: true,
+    permissionsEnabled: [],
+    permissionsDisabled: allPermissions(),
+    missingPermissions: allPermissions(),
+};
+
+export const fullSpecPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => true,
+    hasMissingPermissions: false,
+    isPermissionsFetched: true,
+    permissionsEnabled: allPermissions(),
+    permissionsDisabled: [],
     missingPermissions: [],
-    canCreateAdditionalCalculation: true
-}
+};
+
 export const hasFullSpecPermissions = () => jest.spyOn(permissionsHook, 'useSpecificationPermissions').mockImplementation(() => (fullSpecPermissions));
 export const hasSpecPermissions = (expectedSpecificationPermissionsResult: SpecificationPermissionsResult) => {
     jest.spyOn(specPermsHook, 'useSpecificationPermissions')

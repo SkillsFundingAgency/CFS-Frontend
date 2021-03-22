@@ -1,14 +1,11 @@
 import {RouteComponentProps, useHistory, useLocation} from "react-router";
 import {Header} from "../../components/Header";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
 import {Details} from "../../components/Details";
-import {
-    getSpecificationsSelectedForFundingByPeriodAndStreamService,
-    getSpecificationSummaryService
-} from "../../services/specificationService";
+import {getSpecificationsSelectedForFundingByPeriodAndStreamService, getSpecificationSummaryService} from "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
@@ -30,7 +27,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {CalculationType} from "../../types/CalculationSearchResponse";
 import {CalculationSummary} from "../../types/CalculationDetails";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {refreshSpecificationFundingService} from "../../services/publishService";
 import {approveAllCalculationsService, getCalculationSummaryBySpecificationId} from "../../services/calculationService";
@@ -39,6 +36,7 @@ import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLates
 import {JobType} from "../../types/jobType";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
 import {RunningStatus} from "../../types/RunningStatus";
+import {Permission} from "../../types/Permission";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -77,9 +75,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [displayApproveAllJobStatus, setDisplayApproveAllJobStatus] = useState<boolean>(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
-    const {canApproveAllCalculations, canChooseFunding, missingPermissions, isPermissionsFetched} =
-        useSpecificationPermissions(specificationId,
-            [SpecificationPermissions.ApproveAllCalculations, SpecificationPermissions.ChooseFunding]);
+    const {missingPermissions, hasPermission, isPermissionsFetched} =
+        useSpecificationPermissions(match.params.specificationId, [Permission.CanApproveSpecification, Permission.CanChooseFunding, Permission.CanApproveAllCalculations]);
+    const canApproveAllCalculations: boolean = useMemo(() => 
+        (hasPermission !== undefined && hasPermission(Permission.CanApproveAllCalculations)) === true, [isPermissionsFetched]);
+    const canApproveSpecifications: boolean = useMemo(() => 
+        hasPermission(Permission.CanApproveSpecification) === true, [isPermissionsFetched]);
+    const canChooseForFunding: boolean = useMemo(() => 
+        hasPermission(Permission.CanChooseFunding) === true, [isPermissionsFetched]);
     const [initiatedRefreshFundingJobId, setInitiatedRefreshFundingJobId] = useState<string>("");
     const history = useHistory();
     const location = useLocation();
@@ -217,7 +220,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }
 
     async function isUserAllowedToChooseSpecification(specificationId: string) {
-        if (!canChooseFunding) {
+        if (!canChooseForFunding) {
             addErrorMessage("You do not have permissions to choose this specification for funding");
             return false;
         }
@@ -273,8 +276,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name} />
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions}
-                hidden={!isPermissionsFetched} />
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
 
             <MultipleErrorSummary errors={errors} />
 
@@ -351,7 +353,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                     clearErrorMessages={clearErrorMessages}
                                     setStatusToApproved={setApprovalStatusToApproved}
                                     refreshFundingLines={approveAllCalculationsJob?.isSuccessful}
-                                    showApproveButton={true}
+                                    showApproveButton={canApproveSpecifications}
                                     useCalcEngine={true}
                                     jobTypes={[JobType.AssignTemplateCalculationsJob]} />
                             </Tabs.Panel>

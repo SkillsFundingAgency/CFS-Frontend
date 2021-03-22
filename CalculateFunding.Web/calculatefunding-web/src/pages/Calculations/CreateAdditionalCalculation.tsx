@@ -16,7 +16,8 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {InlineError} from "../../components/InlineError";
 import {CalculationSourceCode, CalculationSourceCodeState} from "../../components/Calculations/CalculationSourceCode";
 import { CalculationDataType } from "../../types/Calculations/CalculationCompilePreviewResponse";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {Permission} from "../../types/Permission";
 
 export interface CreateAdditionalCalculationProps {
     excludeMonacoEditor?: boolean
@@ -29,8 +30,8 @@ export interface CreateAdditionalCalculationRouteProps {
 export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteComponentProps<CreateAdditionalCalculationRouteProps> & CreateAdditionalCalculationProps) {
     const specificationId = match.params.specificationId;
     const {errors, addError, addErrorMessage, clearErrorMessages} = useErrors();
-    const {canCreateAdditionalCalculation, missingPermissions, isPermissionsFetched} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.CreateAdditionalCalculations]);
+    const {isPermissionsFetched, hasMissingPermissions, missingPermissions} =
+        useSpecificationPermissions(specificationId, [Permission.CanEditCalculations]);
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
     const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
@@ -94,8 +95,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                 <Breadcrumb name={"Create additional calculation"}/>
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} 
-                              hidden={!isPermissionsFetched}/>
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
             {(isLoadingSpecification || isSaving) &&
             <LoadingStatus title={loadingTitle} subTitle={loadingSubtitle}/>
@@ -158,7 +158,7 @@ export function CreateAdditionalCalculation({match, excludeMonacoEditor}: RouteC
                     <div className="govuk-grid-column-two-thirds">
                         <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
                                 onClick={onSaveCalculation}
-                                disabled={!calculationState || (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) || isSaving || !canCreateAdditionalCalculation}>
+                                disabled={!calculationState || (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) || isSaving || hasMissingPermissions}>
                             Save and continue
                         </button>
 

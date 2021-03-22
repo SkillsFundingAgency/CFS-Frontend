@@ -15,8 +15,8 @@ export function initialiseAxios() {
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
         axios.interceptors.response.use(
-            async response => response,
-            async (error) => {
+            response => response,
+            (error) => {
                 if (!configuration.handlerEnabled) {
                     return Promise.reject(error);
                 }

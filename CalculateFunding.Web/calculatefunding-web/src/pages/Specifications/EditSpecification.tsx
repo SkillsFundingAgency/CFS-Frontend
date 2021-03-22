@@ -23,7 +23,8 @@ import {Footer} from "../../components/Footer";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {PermissionStatus} from "../../components/PermissionStatus";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {Permission} from "../../types/Permission";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -45,7 +46,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     const [enableTrackProviderData, setEnableTrackProviderData] = useState<ProviderDataTrackingMode | undefined>();
 
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.Edit]);
+        useSpecificationPermissions(specificationId, [Permission.CanEditSpecification]);
     
     const {specification, isLoadingSpecification, clearSpecificationFromCache} =
         useSpecificationSummary(specificationId, err => addError({

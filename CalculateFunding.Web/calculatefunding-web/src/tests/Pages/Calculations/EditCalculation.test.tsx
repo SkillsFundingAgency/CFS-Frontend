@@ -100,8 +100,9 @@ describe("<EditCalculation> tests ", () => {
         it("renders permissions warning", async () => {
             const permissionsWarning = await screen.findByTestId("permission-alert-message");
             expect(within(permissionsWarning).getByText(/You do not have permissions to perform the following actions:/)).toBeInTheDocument();
-            expect(within(permissionsWarning).getByText(/Approve Calculations/)).toBeInTheDocument();
-            expect(within(permissionsWarning).getByText(/Edit Calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Can approve calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Can edit calculations/)).toBeInTheDocument();
+            expect(within(permissionsWarning).getByText(/Can approve any calculations/)).toBeInTheDocument();
 
             expect(screen.getByText(testData.specData.name)).toBeInTheDocument();
         });

@@ -10,10 +10,8 @@ import {assignDataSourceService} from "../../services/datasetService";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
-import {
-    useLatestEntityJobWithMonitoring
-} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useLatestEntityJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
@@ -21,6 +19,7 @@ import {Dataset} from "../../types/Datasets/RelationshipData";
 import {DatasetVersionSelection} from "../../components/DatasetMapping/DatasetVersionSelection";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
+import {Permission} from "../../types/Permission";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
@@ -42,7 +41,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
         useSpecificationSummary(specificationId, err => addErrorMessage(err.message, "Error while loading specification"));
 
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
-        useSpecificationPermissions(specificationId, [SpecificationPermissions.MapDatasets]);
+        useSpecificationPermissions(specificationId, [Permission.CanMapDatasets]);
 
     const {hasJob, latestJob, isCheckingForJob} =
         useLatestEntityJobWithMonitoring(specificationId,

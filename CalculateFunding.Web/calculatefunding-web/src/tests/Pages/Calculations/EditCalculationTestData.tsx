@@ -23,6 +23,8 @@ import {
 import {CalculationDetails} from "../../../types/CalculationDetails";
 import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
+import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
+import {Permission} from "../../../types/Permission";
 
 const history = createMemoryHistory();
 
@@ -39,10 +41,8 @@ export function EditCalculationTestData() {
                         match={matchMock}/>
                 </QueryClientProviderTestWrapper>
             </MemoryRouter>);
-        
-        await waitFor(() => {
-            expect(screen.queryAllByText(/Loading/)).toHaveLength(0);
-        });
+
+        await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
 
         return component;
     }
@@ -253,48 +253,34 @@ export function EditCalculationTestData() {
         },
         calculation: mockSuccessfulCalcData
     };
-    const specFullPermsResult: SpecificationPermissionsResult = {
-        canApplyCustomProfilePattern: false,
-        canApproveFunding: false,
-        canCreateSpecification: false,
-        canEditCalculation: true,
-        canEditSpecification: false,
-        canMapDatasets: false,
-        canRefreshFunding: false,
-        canReleaseFunding: false,
-        canApproveCalculation: true,
+
+    const fullPermissions: permissionsHook.SpecificationPermissionsResult = {
+        isPermissionsFetched: true,
+        userId: "1234",
+        hasPermission: () => true,
         hasMissingPermissions: false,
         isCheckingForPermissions: false,
-        isPermissionsFetched: true,
         missingPermissions: [],
-        canCreateAdditionalCalculation: true,
-        canApproveAllCalculations: true,
-        canChooseFunding: true
-    }
-    const specNoPermsResult: SpecificationPermissionsResult = {
-        canApplyCustomProfilePattern: false,
-        canApproveFunding: false,
-        canCreateSpecification: false,
-        canEditCalculation: false,
-        canEditSpecification: false,
-        canMapDatasets: false,
-        canRefreshFunding: false,
-        canReleaseFunding: false,
-        canApproveCalculation: false,
-        hasMissingPermissions: false,
-        isCheckingForPermissions: false,
+        permissionsDisabled: [],
+        permissionsEnabled: [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAllCalculations, Permission.CanApproveAnyCalculations],
+    };
+
+    const noPermissions: permissionsHook.SpecificationPermissionsResult = {
         isPermissionsFetched: true,
-        missingPermissions: ["Edit Calculations", "Approve Calculations",],
-        canCreateAdditionalCalculation: false,
-        canChooseFunding: false,
-        canApproveAllCalculations: false
-    }
+        userId: "1234",
+        hasPermission: () => false,
+        hasMissingPermissions: true,
+        isCheckingForPermissions: false,
+        missingPermissions: [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAllCalculations, Permission.CanApproveAnyCalculations],
+        permissionsDisabled: [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAllCalculations, Permission.CanApproveAnyCalculations],
+        permissionsEnabled: [],
+    };
     const location = createLocation(matchMock.url);
     const mockOutMonacoEditor = () => jest.mock("../../../components/GdsMonacoEditor", () => <></>);
     const mockWithFullPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
-        .mockImplementation(() => (specFullPermsResult));
+        .mockImplementation(() => (fullPermissions));
     const mockWithNoPermissions = () => jest.spyOn(specPermsHook, 'useSpecificationPermissions')
-        .mockImplementation(() => (specNoPermsResult));
+        .mockImplementation(() => (noPermissions));
     const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
         .mockImplementation(() => (specResult));
     const mockCircularRefErrors = () => jest.spyOn(circularRefErrorsHook, 'useCalculationCircularDependencies')
