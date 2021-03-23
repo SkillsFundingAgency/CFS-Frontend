@@ -9,5 +9,9 @@ namespace CalculateFunding.Frontend.ViewModels.ObsoleteItems
         
         [JsonProperty("name")]
         public string Name { get; set; }
+        
+        [JsonProperty("isAdditionalCalculation")]
+        public bool IsAdditionalCalculation { get; set; }
+        
     }
 }

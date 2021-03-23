@@ -71,7 +71,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             IEnumerable<ObsoleteItemViewModel> viewModels = result?.Value as IEnumerable<ObsoleteItemViewModel>;
 
-            ObsoleteItemViewModel[] expectedViewModels = AsViewModels(obsoleteItems, calculations.ToDictionary(_ => _.Id, _ => _.Name));
+            ObsoleteItemViewModel[] expectedViewModels = AsViewModels(obsoleteItems, calculations.ToDictionary(_ => _.Id));
 
             viewModels
                 .Should()
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
         
         private ObsoleteItemViewModel[] AsViewModels(IEnumerable<ObsoleteItem> obsoleteItems,
-            IDictionary<string, string> calculationNames)
+            IDictionary<string, Calculation> calculations)
             => obsoleteItems.Select(_ => new ObsoleteItemViewModel
             {
                 Id = _.Id,
@@ -90,15 +90,16 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 FundingLineId = _.FundingLineId,
                 FundingStreamId = _.FundingStreamId,
                 TemplateCalculationId = _.TemplateCalculationId,
-                Calculations = AsCalculationSummaries(_.CalculationIds, calculationNames)
+                Calculations = AsCalculationSummaries(_.CalculationIds, calculations)
             }).ToArray();
 
         private IEnumerable<CalculationSummaryViewModel> AsCalculationSummaries(IEnumerable<string> calculationIds,
-            IDictionary<string, string> calculationNames)
+            IDictionary<string, Calculation> calculationNames)
             => calculationIds.Select(_ => new CalculationSummaryViewModel
             {
                 Id = _,
-                Name = calculationNames.TryGetValue(_, out string name) ? name : null
+                Name = calculationNames.TryGetValue(_, out Calculation calculation) ? calculation.Name : null,
+                IsAdditionalCalculation = (calculationNames.TryGetValue(_, out calculation) ? calculation : null)?.CalculationType == CalculationType.Additional
             });
 
         private void GivenTheCalculations(string specificationId,

@@ -51,15 +51,15 @@ namespace CalculateFunding.Frontend.Controllers
             IEnumerable<ObsoleteItem> obsoleteItems = obsoleteItemsResponse.Content ?? ArraySegment<ObsoleteItem>.Empty;
             IEnumerable<Calculation> calculations = calculationsResponse.Content ?? ArraySegment<Calculation>.Empty;
 
-            IDictionary<string, string> calculationNames = calculations.ToDictionary(_ => _.Id, _ => _.Name);
+            IDictionary<string, Calculation> calculationLookup = calculations.ToDictionary(_ => _.Id);
 
-            IEnumerable<ObsoleteItemViewModel> obsoleteItemViewModels = AsViewModels(obsoleteItems, calculationNames);
+            IEnumerable<ObsoleteItemViewModel> obsoleteItemViewModels = AsViewModels(obsoleteItems, calculationLookup);
 
             return Ok(obsoleteItemViewModels);
         }
 
         private IEnumerable<ObsoleteItemViewModel> AsViewModels(IEnumerable<ObsoleteItem> obsoleteItems,
-            IDictionary<string, string> calculationNames)
+            IDictionary<string, Calculation> calculationNames)
             => obsoleteItems.Select(_ => new ObsoleteItemViewModel
             {
                 Id = _.Id,
@@ -74,11 +74,20 @@ namespace CalculateFunding.Frontend.Controllers
             });
 
         private IEnumerable<CalculationSummaryViewModel> AsCalculationSummaries(IEnumerable<string> calculationIds,
-            IDictionary<string, string> calculationNames)
-            => calculationIds.Select(_ => new CalculationSummaryViewModel
+            IDictionary<string, Calculation> calculations)
+            => calculationIds.Select(_ => AsCalculationSummary(calculations, _));
+
+        private static CalculationSummaryViewModel AsCalculationSummary(IDictionary<string, Calculation> calculations,
+            string id)
+        {
+            Calculation calculation = calculations.ContainsKey(id) ? calculations[id] : null;
+            
+            return new CalculationSummaryViewModel
             {
-                Id = _,
-                Name = calculationNames.TryGetValue(_, out string name) ? name : null
-            });
+                Id = id,
+                Name = calculation?.Name,
+                IsAdditionalCalculation = calculation?.CalculationType == CalculationType.Additional
+            };
+        }
     }
 }
