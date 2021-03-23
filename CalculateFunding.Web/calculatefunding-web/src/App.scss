@@ -459,7 +459,7 @@ input:disabled{
     display: inline-block;
   }
   .collapsible-step-header-description {
-    width: 720px;
+    width: 590px;
     display: inline-block;
   }
   .collapsible-step-header-status {
@@ -467,7 +467,7 @@ input:disabled{
     display: inline-block;
   }
   .collapsible-step-header-value-container, .collapsible-step-header-updated-date {
-    display: none;
+    display: inline-block;
   }
   .collapsible-step-header-with-calculation-value .collapsible-step-header-description {
     width: 485px;

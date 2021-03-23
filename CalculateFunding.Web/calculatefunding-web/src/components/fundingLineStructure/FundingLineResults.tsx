@@ -234,7 +234,7 @@ export function FundingLineResults({
                 if (templateCalculationResult) {
                     node.errorMessage = getCalculationErrorMessage(node.calculationId, templateCalculationResult.exceptionMessage);
                     node.value = templateCalculationResult.value !== null ?
-                        renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat) : "";
+                        renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat) : "Excluded";
                 }
             } else {
                 node.errorMessage = getCalculationErrorMessage(node.calculationId, '');

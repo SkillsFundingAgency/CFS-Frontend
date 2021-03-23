@@ -54,8 +54,7 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                 key={"step" + listKey}
                 className="collapsible-step step-is-shown">
                 <div key={listKey + "header"}
-                    className={`collapsible-step-header-container 
-                     ${props.value != null && props.value !== "" ? " collapsible-step-header-with-calculation-value" : ""}
+                    className={`collapsible-step-header-container collapsible-step-header-with-calculation-value
                      ${props.lastUpdatedDate != null ? " collapsible-step-header-with-updated-date" : ""}`}>
                     <h2 className={props.step === "1" ? "govuk-heading-s first-step-title" : "govuk-heading-s"}>
                         <span className="collapsible-step-circle collapsible-step-circle-number" hidden={props.step === ""}>
@@ -83,17 +82,14 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                             {hasError ? <span className="govuk-error-message">Error</span> : props.status}
                         </span>
                         <span className="collapsible-step-header-value-container">
-                            {props.value != null && props.value !== "" ?
-                                <span>
-                                    <span className="collapsible-step-header-value-type">
-                                        {props.calculationType ? props.calculationType.replace(/([A-Z])/g, ' $1').trim() : ""}
-                                    </span>
-                                    <span className="collapsible-step-header-value">
-                                        {props.value}
-                                    </span>
+                            <span>
+                                <span className="collapsible-step-header-value-type">
+                                    {props.calculationType ? props.calculationType.replace(/([A-Z])/g, ' $1').trim() : ""}
                                 </span>
-                                : null
-                            }
+                                <span className="collapsible-step-header-value">
+                                    {props.value && props.value.length > 0 ? props.value : "Excluded" }
+                                </span>
+                            </span>
                         </span>
                         <span className="collapsible-step-header-updated-date">
                             <DateTimeFormatter date={props.lastUpdatedDate as Date} />
