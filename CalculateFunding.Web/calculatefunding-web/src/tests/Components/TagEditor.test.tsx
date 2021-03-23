@@ -2,6 +2,10 @@ import React from "react";
 import { mount } from "enzyme";
 import { TagEditor } from "../../components/TagEditor";
 
+
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 describe('<TagEditor />', () => {
     it("renders specified tags without showing error message", async () => {
         const wrapper = mount(<TagEditor

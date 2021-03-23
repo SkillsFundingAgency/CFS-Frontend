@@ -7,6 +7,10 @@ import {act} from "react-test-renderer";
 import {JobDetails} from "../../types/jobDetails";
 import {RunningStatus} from "../../types/RunningStatus";
 
+
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 describe("useFetchLatestJobByEntityId tests ", () => {
 
     describe(" handles invalid inputs correctly ", () => {

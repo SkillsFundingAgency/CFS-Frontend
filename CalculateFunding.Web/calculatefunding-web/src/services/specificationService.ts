@@ -9,6 +9,7 @@ import {SpecificationSummary} from "../types/SpecificationSummary";
 import {FundingPeriod, Specification} from "../types/viewFundingTypes";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
 import {CalculationSearchResponse} from "../types/CalculationSearchResponse";
+import {SpecificationListResults} from "../types/Specifications/SpecificationListResults";
 
 const baseURL = "/api/specs";
 
@@ -71,15 +72,14 @@ export async function getSpecificationsByFundingPeriodAndStreamIdWithResultsServ
     });
 }
 
-export async function getAllSpecificationsService(searchRequest: SpecificationSearchRequestViewModel) {
+export async function getAllSpecificationsService(searchRequest: SpecificationSearchRequestViewModel):
+    Promise<AxiosResponse<SpecificationListResults>> {
     const queryString = require("query-string");
     const stringSearchRequest = queryString.stringify(searchRequest);
 
     return axios(`${baseURL}/get-all-specifications/?${stringSearchRequest}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     });
 }
 

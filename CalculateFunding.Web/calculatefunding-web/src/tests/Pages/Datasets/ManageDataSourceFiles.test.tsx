@@ -3,6 +3,10 @@ import {mount} from "enzyme";
 import {MemoryRouter} from "react-router";
 import {ManageDataSourceFiles} from "../../../pages/Datasets/ManageDataSourceFiles";
 
+
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
 enzyme.configure({adapter: new Adapter()});

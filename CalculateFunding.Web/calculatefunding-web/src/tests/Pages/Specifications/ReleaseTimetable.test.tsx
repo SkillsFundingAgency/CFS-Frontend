@@ -3,7 +3,6 @@ import {cleanup, render, waitFor, screen, fireEvent} from "@testing-library/reac
 import {ReleaseTimetableSummary} from "../../../types/ReleaseTimetableSummary";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
-import {datasourceToTemplateFundingLines} from "../../../services/templateBuilderDatasourceService";
 
 const testDate = "2050-01-01T00:00:00+00:00";
 const dateInPast = "2000-01-01T00:00:00+00:00"

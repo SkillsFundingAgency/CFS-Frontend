@@ -6,6 +6,11 @@ import {ProviderSummary} from "../../../types/ProviderSummary";
 import {ProviderVersionQueryResult} from "../../../hooks/Providers/useProviderVersion";
 import {render} from "@testing-library/react";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
+
+
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
 enzyme.configure({adapter: new Adapter()});

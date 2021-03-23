@@ -4,6 +4,10 @@ import {match, MemoryRouter} from "react-router";
 import {createLocation, createMemoryHistory} from "history";
 import {DataRelationships, DataRelationshipsRouteProps} from "../../../pages/Datasets/DataRelationships";
 
+
+// ToDo: These tests need sorting properly so no errors occur
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
 enzyme.configure({adapter: new Adapter()});
