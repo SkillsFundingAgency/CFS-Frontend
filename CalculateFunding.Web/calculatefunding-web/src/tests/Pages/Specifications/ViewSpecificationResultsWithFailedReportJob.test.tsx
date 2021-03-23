@@ -1,8 +1,7 @@
 import React from "react";
 import {MemoryRouter} from "react-router";
-import {render, screen} from "@testing-library/react";
+import {render, screen, waitFor} from "@testing-library/react";
 import {Route, Switch} from "react-router-dom";
-import {waitFor} from "@testing-library/dom";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {testSpec} from "../../Hooks/useSpecificationSummary.test";
 import {QueryClient, QueryClientProvider} from "react-query";
@@ -33,40 +32,13 @@ const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
     }));
 
 
-describe("<ViewSpecificationResults />  ", () => {
-    beforeEach(() => {
+describe("<ViewSpecificationResults /> with failed CSV Generate job  ", () => {
+    it("renders error notification badge", async () => {
         mockSpecification();
-    })
-
-    afterEach(jest.clearAllMocks);
-
-    it("renders the page with the correct breadcrumbs", async () => {
-        const {container} = renderViewSpecificationResults();
-
-        await waitFor(() => expect(container.querySelectorAll(".govuk-breadcrumbs__list-item").length).toBe(4));
-    });
-
-    it("shows the header with text from the service call", async () => {
-        const {container} = renderViewSpecificationResults();
-        await waitFor(() => expect(container.querySelector("h1")?.textContent).toContain("Wizard Training"));
-    });
-
-    it("shows the sub-heading with text from the service call", async () => {
-        const {container} = renderViewSpecificationResults();
-        await waitFor(() => expect(container.querySelector("h2.govuk-caption-xl")?.textContent).toContain("2019-20"));
-    });
-
-    it("shows the tabs with the correct text", async () => {
-        const {getByTestId} = renderViewSpecificationResults();
-        await waitFor(() => expect(getByTestId("tab-fundingline-structure").textContent).toContain("Funding line structure"));
-        await waitFor(() => expect(getByTestId("tab-additional-calculations").textContent).toContain("Additional Calculations"));
-        await waitFor(() => expect(getByTestId("tab-downloadable-reports").textContent).toContain("Downloadable Reports"));
-    });
-
-    it("does not show error notification badge give job has not failed", async () => {
         renderViewSpecificationResults();
+
         await waitFor(() => {
-            expect(screen.queryByTestId(`notification-badge`) as HTMLSpanElement).not.toBeInTheDocument()
+            expect(screen.queryByTestId(`notification-badge`) as HTMLSpanElement).toBeInTheDocument()
         });
     });
 });
@@ -85,7 +57,7 @@ const completedLatestJob: LatestSpecificationJobWithMonitoringResult = {
         runningStatus: RunningStatus.Completed,
         failures: [],
         isSuccessful: true,
-        isFailed: false,
+        isFailed: true,
         isActive: false
     },
 };

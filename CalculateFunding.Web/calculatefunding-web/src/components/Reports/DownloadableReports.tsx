@@ -14,7 +14,7 @@ import {ReportCategory} from "../../types/Specifications/ReportCategory";
 
 export function DownloadableReports(props: {
     specificationId: string,
-    fundingPeriodId: string,
+    fundingPeriodId: string
 }) {
 
     const [downloadableReports, setDownloadableReports] = useState<ReportMetadataViewModel[]>([]);
@@ -58,6 +58,8 @@ export function DownloadableReports(props: {
                 && (latestReportJob?.runningStatus !== RunningStatus.Completed ||
                     latestReportJob?.parentJobId !== undefined))) {
             setLiveReportStatusMessage("Live report refresh in progress, please wait.");
+        } else if (latestReportJob?.isFailed) {
+            addLiveReportErrors(`The live report refresh failed - try again`)
         } else {
             setLiveReportStatusMessage("");
         }
@@ -105,11 +107,6 @@ export function DownloadableReports(props: {
                 <div hidden={!downloadableReports.some(dr => dr.category === ReportCategory.Live)}>
                     <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
                     <div className={`govuk-form-group ${liveReportErrors.length > 0 ? "govuk-form-group--error" : ""}`}>
-                        {liveReportErrors.length > 0 ? <span className="govuk-error-message">
-                                                        <span className="govuk-visually-hidden">Error:</span> Live reports couldn't refresh, please try again.
-                                                        </span>
-                            : null
-                        }
                         {downloadableReports.filter(dr => dr.category === "Live").map((dlr, index) => <div>
                                 <div className="attachment__thumbnail" key={index}>
                                     <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}
@@ -201,16 +198,21 @@ export function DownloadableReports(props: {
                                 }
                             </h4>
                         </div>
-                        <div className="govuk-grid-row govuk-!-margin-top-3">
-                            <div className="govuk-grid-column-full">
-                                <button data-testid="refresh-button" className="govuk-button"
-                                        type="button"
-                                        aria-label="Refresh"
-                                        disabled={isRefreshingReports}
-                                        onClick={submitRefresh}>
-                                    Refresh
-                                </button>
-                            </div>
+                        {liveReportErrors.length > 0 ? <span className="govuk-error-message">
+                                                        <span className="govuk-visually-hidden">Error:</span> Live reports couldn't refresh, please try again.
+                                                        </span>
+                            : null
+                        }
+                    </div>
+                    <div className="govuk-grid-row govuk-!-margin-top-3">
+                        <div className="govuk-grid-column-full">
+                            <button data-testid="refresh-button" className="govuk-button"
+                                    type="button"
+                                    aria-label="Refresh"
+                                    disabled={isRefreshingReports}
+                                    onClick={submitRefresh}>
+                                Refresh
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -14,6 +14,8 @@ import {DownloadableReports} from "../../components/Reports/DownloadableReports"
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import { JobType } from "../../types/jobType";
+import {useEffect, useState} from "react";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
@@ -25,6 +27,10 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
     const { specification, isLoadingSpecification } =
         useSpecificationSummary(specificationId, err =>
             addErrorMessage(err.message, "Error while loading specification"));
+    const {latestJob: latestReportJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.GenerateCalcCsvResultsJob],
+            err => addErrorMessage("Error while checking for latest CSV generation job"));
 
     return <div>
         <Header location={Section.Results}/>
@@ -51,7 +57,10 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                             <ul className="govuk-tabs__list">
                                 <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                                 <Tabs.Tab label="additional-calculations">Additional Calculations</Tabs.Tab>
-                                <Tabs.Tab label="downloadable-reports">Downloadable Reports</Tabs.Tab>
+                                <Tabs.Tab label="downloadable-reports">Downloadable Reports&nbsp;
+                                    { (latestReportJob?.isFailed) &&
+                                        <span className="notification-badge" data-testid="notification-badge" aria-label="contains 1 error">1</span>
+                                    }</Tabs.Tab>
                             </ul>
                             <Tabs.Panel label="fundingline-structure">
                                 {specification !== undefined && specification.fundingStreams.length > 0 ?
