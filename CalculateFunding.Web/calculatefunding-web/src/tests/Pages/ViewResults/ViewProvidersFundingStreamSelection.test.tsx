@@ -48,10 +48,10 @@ const renderPage = async () => {
 const getFundingStreamsServiceSpy = jest.spyOn(policyService, 'getFundingStreamsService');
 getFundingStreamsServiceSpy.mockResolvedValue({
     data: [
-        {"shortName": "1416", "id": "1416", "name": "14-16"},
-        {"shortName": "1619", "id": "1619", "name": "16-19"},
-        {"shortName": "GAG", "id": "GAG", "name": "Academies General Annual Grant"},
-        {"shortName": "DSG", "id": "DSG", "name": "Dedicated Schools Grant"}
+        {"id": "1416", "name": "14-16"},
+        {"id": "1619", "name": "16-19"},
+        {"id": "GAG", "name": "Academies General Annual Grant"},
+        {"id": "DSG", "name": "Dedicated Schools Grant"}
     ],
     status: 200,
     statusText: "",

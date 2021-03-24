@@ -42,6 +42,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const dispatch = useDispatch();
 
     const previousPage: HistoryPage =
+        history?.location?.state &&
         (history.location.state as any) &&
         (history.location.state as any).previousPage as HistoryPage ?
             (history.location.state as any).previousPage :
@@ -131,7 +132,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
 
     useEffect(() => {
         const handleActionJobComplete = () => {
-            if (isConfirming && jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
+            if (isConfirming && jobId && jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
                 setIsConfirming(false);
                 if (latestJob.isComplete && latestJob.isSuccessful) {
                     clearFundingSearchSelection();
@@ -141,7 +142,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         };
 
         handleActionJobComplete()
-    }, [latestJob]);
+    }, [latestJob?.jobId, jobId]);
 
     const clearFundingSearchSelection = useCallback(() => {
         dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
@@ -274,7 +275,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 </section>
                 }
 
-                {jobId.length > 0 && latestJob && latestJob.isComplete ?
+                {jobId && jobId.length > 0 && latestJob && latestJob.isComplete ?
                     <div className="govuk-grid-row govuk-!-margin-top-6">
                         <div className="govuk-grid-column-full">
                             <Link className="govuk-button govuk-button--secondary"
