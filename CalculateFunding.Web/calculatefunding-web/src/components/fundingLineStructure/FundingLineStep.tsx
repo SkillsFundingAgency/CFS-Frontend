@@ -7,7 +7,8 @@ export interface FundingLineStepProps {
     showResults: boolean,
     expanded: boolean,
     fundingStructureItem: FundingStructureItemViewModel,
-    callback: any
+    callback: any,
+    providerId?: string,
 }
 
 export function FundingLineStep(props: FundingLineStepProps) {
@@ -51,7 +52,8 @@ export function FundingLineStep(props: FundingLineStepProps) {
                         hasChildren={item.fundingStructureItems != null && item.fundingStructureItems.length > 0}
                         lastUpdatedDate={item.lastUpdatedDate}
                         callback={collapsibleStepsChanged}
-                        calculationErrorMessage={item.errorMessage}>
+                        calculationErrorMessage={item.errorMessage}
+                        providerId={props.providerId}>
                         {
                             item.fundingStructureItems &&
                                 <FundingLineStep

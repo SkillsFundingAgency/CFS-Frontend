@@ -22,6 +22,7 @@ interface ICollapsibleStepsProps {
     lastUpdatedDate?: Date;
     callback: any;
     calculationErrorMessage?: string;
+    providerId?: string;
 }
 
 export interface ICollapsibleStepsAllStepsStatus {
@@ -87,7 +88,7 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                                     {props.calculationType ? props.calculationType.replace(/([A-Z])/g, ' $1').trim() : ""}
                                 </span>
                                 <span className="collapsible-step-header-value">
-                                    {props.value && props.value.length > 0 ? props.value : "Excluded" }
+                                    {props.value && props.value.length > 0 ? (props.value) : (props.providerId ? "Excluded" : "") }
                                 </span>
                             </span>
                         </span>

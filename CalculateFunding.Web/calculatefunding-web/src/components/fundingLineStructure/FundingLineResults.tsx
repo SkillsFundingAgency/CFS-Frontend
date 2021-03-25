@@ -234,7 +234,7 @@ export function FundingLineResults({
                 if (templateCalculationResult) {
                     node.errorMessage = getCalculationErrorMessage(node.calculationId, templateCalculationResult.exceptionMessage);
                     node.value = templateCalculationResult.value !== null ?
-                        renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat) : "Excluded";
+                        renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat) : (providerId ? "Excluded" : "");
                 }
             } else {
                 node.errorMessage = getCalculationErrorMessage(node.calculationId, '');
@@ -349,13 +349,15 @@ export function FundingLineResults({
                                         link={linkValue}
                                         hasChildren={f.fundingStructureItems != null}
                                         callback={collapsibleStepsChanged}
-                                        calculationErrorMessage={f.errorMessage}>
+                                        calculationErrorMessage={f.errorMessage}
+                                        providerId={providerId}>
                                         <FundingLineStep
                                             key={f.name.replace(" ", "") + index}
                                             showResults={!showApproveButton}
                                             expanded={fundingLinesExpandedStatus}
                                             fundingStructureItem={f}
-                                            callback={collapsibleStepsChanged} />
+                                            callback={collapsibleStepsChanged}
+                                            providerId={providerId} />
                                     </CollapsibleSteps>
                                 </li>
                             })}
