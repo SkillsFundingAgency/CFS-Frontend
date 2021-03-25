@@ -32,6 +32,7 @@ import {RunningStatus} from "../../types/RunningStatus";
 import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
 import {DateFormatter} from "../../components/DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
+import {DatasetEmptyFieldEvaluationOptions} from "../../types/Datasets/DatasetEmptyFieldEvaluationOptions";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -54,6 +55,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [isLoading, setIsLoading] = useState(false);
     const [isCheckingForJob, setIsCheckingForJob] = useState(false);
     const [updateType, setUpdateType] = useState<string>("");
+    const [datasetEmptyFieldEvaluationOptions, setDatasetEmptyFieldEvaluationOptions]
+        = useState<DatasetEmptyFieldEvaluationOptions>(DatasetEmptyFieldEvaluationOptions.NA);
     const [uploadFileName, setUploadFileName] = useState<string>("");
     const [uploadFile, setUploadFile] = useState<File>();
     const [uploadFileExtension, setUploadFileExtension] = useState<string>("");
@@ -64,7 +67,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [validation, setValidation] = useState({
         fileValid: true,
         changeNoteValid: true,
-        updateTypeValid: true
+        updateTypeValid: true,
+        mergeConfirmationValid: true
     });
     const [mergeResults, setMergeResults] = useState<MergeDatasetViewModel>();
     const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
@@ -180,7 +184,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         request.version.toString(),
                         request.mergeExisting,
                         description,
-                        changeNote).then((validateDatasetResponse) => {
+                        changeNote,
+                        datasetEmptyFieldEvaluationOptions).then((validateDatasetResponse) => {
                         const validateOperationId: any = validateDatasetResponse.data.operationId;
                         if (!validateOperationId) {
                             addError({error: "Unable to locate dataset validate operationId"});
@@ -239,7 +244,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             return {
                 ...prevState,
                 changeNoteValid: true,
-                fileValid: true
+                fileValid: true,
+                updateTypeValid: true,
+                mergeConfirmationValid: true
             }
         });
 
@@ -283,6 +290,17 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 return {
                     ...prevState,
                     updateTypeValid: false
+                }
+            });
+            isValid = false;
+        }
+
+        if (updateType === "merge" && datasetEmptyFieldEvaluationOptions === DatasetEmptyFieldEvaluationOptions.NA)
+        {
+            setValidation(prevState => {
+                return {
+                    ...prevState,
+                    mergeConfirmationValid: false
                 }
             });
             isValid = false;
@@ -372,6 +390,40 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         </div>
                     </div>
                 </div>
+                {(updateType === "merge") &&
+                <div data-testid="update-type-merge-confirmation"
+                     className={"govuk-form-group" + (!validation.mergeConfirmationValid ? " govuk-form-group--error" : "")}>
+                    <div className="govuk-radios">
+                        <label className="govuk-label govuk-!-margin-bottom-5" htmlFor="update-type-radios">
+                            Do you want to treat empty cells as values when updating providers?
+                        </label>
+                        <div className="govuk-radios__item">
+                            <input className="govuk-radios__input" id="update-datasource-merge-blank-yes" name="update-merge-confirmation"
+                                   type="radio" data-testid="update-datasource-merge-blank-yes" value="merge"
+                                   onClick={() =>
+                                       setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.AsNull)}/>
+                            <label className="govuk-label govuk-radios__label" htmlFor="update-datasource-merge-blank-yes">
+                                Yes
+                            </label>
+                            <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
+                                Allow an empty cell to replace an existing previous value
+                            </div>
+                        </div>
+                        <div className="govuk-radios__item">
+                            <input className="govuk-radios__input" id="update-datasource-merge-blank-no" name="update-merge-confirmation"
+                                   type="radio" value="new" data-testid="update-datasource-merge-blank-no"
+                                   onClick={() =>
+                                       setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.Ignore)}/>
+                            <label className="govuk-label govuk-radios__label" htmlFor="update-datasource-merge-blank-no">
+                                No
+                            </label>
+                            <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
+                                Ignore any empty cells in the file upload
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                }
                 <div id="select-data-source"
                      className={"govuk-form-group" + (!validation.fileValid ? " govuk-form-group--error" : "")}>
                     <label className="govuk-label" htmlFor="file-upload-data-source">

@@ -146,6 +146,28 @@ describe("<UpdateDataSourceFile />", () => {
             });
         })
 
+        it("merge confirmation is not displayed on page render ", async () => {
+            expect(screen.queryByText("Do you want to treat empty cells as values when updating providers?")).not.toBeInTheDocument();
+        })
+
+        it("selecting merge displays confirmation selection ", async () => {
+            const merge = await screen.findByTestId(`update-datasource-merge`) as HTMLInputElement;
+
+            userEvent.click(merge);
+
+            expect(screen.queryByText("Do you want to treat empty cells as values when updating providers?")).toBeInTheDocument();
+        })
+
+        it("validation error is displayed given merge options are not selected ", async () => {
+            const merge = await screen.findByTestId(`update-datasource-merge`) as HTMLInputElement;
+            userEvent.click(merge);
+
+            await testData.submitForm();
+
+            const mergeConfirmation = await screen.findByTestId(`update-type-merge-confirmation`) as HTMLDivElement;
+            expect(mergeConfirmation.className).toContain("govuk-form-group--error");
+        })
+
     });
 });
 

@@ -150,7 +150,8 @@ namespace CalculateFunding.Frontend.Controllers
                     Description = vm.Description,
                     Comment = vm.Comment,
                     FundingStreamId = vm.FundingStreamId,
-                    MergeExistingVersion = vm.MergeExistingVersion
+                    MergeExistingVersion = vm.MergeExistingVersion,
+                    EmptyFieldEvaluationOption = vm.EmptyFieldEvaluationOption
                 });
 
             if (apiResponse == null)

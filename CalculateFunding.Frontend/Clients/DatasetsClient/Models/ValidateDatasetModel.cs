@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
+﻿using CalculateFunding.Common.ApiClient.DataSets.Models;
+
+namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 {
     public class ValidateDatasetModel
     {
@@ -15,5 +17,7 @@
         public string Comment { get; set; }
         
         public bool MergeExistingVersion { get; set; }
+
+        public DatasetEmptyFieldEvaluationOptions EmptyFieldEvaluationOption { get; set; }
     }
 }

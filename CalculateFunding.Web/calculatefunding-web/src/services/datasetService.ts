@@ -8,6 +8,7 @@ import {UpdateNewDatasetVersionResponseViewModel} from "../types/Datasets/Update
 import {DataschemaDetailsViewModel} from "../types/Datasets/DataschemaDetailsViewModel";
 import {AssignDatasetSchemaRequest} from "../types/Datasets/AssignDatasetSchemaRequest";
 import {DatasetDefinition} from "../types/Datasets/DatasetDefinitionResponseViewModel";
+import {DatasetEmptyFieldEvaluationOptions} from "../types/Datasets/DatasetEmptyFieldEvaluationOptions";
 
 const baseUrl = "/api/datasets";
 
@@ -128,7 +129,15 @@ export async function uploadDatasetVersionService(request: UpdateNewDatasetVersi
     })
 }
 
-export async function validateDatasetService(datasetId: string, fundingStreamId: string, filename: string, version: string, mergeExisting: boolean, description: string, changeNote: string) {
+export async function validateDatasetService(
+    datasetId: string,
+    fundingStreamId: string,
+    filename: string,
+    version: string,
+    mergeExisting: boolean,
+    description: string,
+    changeNote: string,
+    datasetEmptyFieldEvaluationOptions: DatasetEmptyFieldEvaluationOptions) {
     return axios(`${baseUrl}/validate-dataset`, {
         method: 'POST',
         headers: {
@@ -141,7 +150,8 @@ export async function validateDatasetService(datasetId: string, fundingStreamId:
             version: version,
             description: description,
             mergeExistingVersion: mergeExisting,
-            comment: changeNote
+            comment: changeNote,
+            emptyFieldEvaluationOption: datasetEmptyFieldEvaluationOptions
         }
     })
 }
