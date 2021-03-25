@@ -75,7 +75,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const isLoading = useMemo(() =>
         isConfirming ||
         specification === undefined ||
-        fundingConfiguration === undefined || 
+        fundingConfiguration === undefined ||
         !isPermissionsFetched, [specification, fundingConfiguration, isConfirming, isPermissionsFetched]);
     const isWaitingForJob = useMemo(() => isCheckingForJob || latestJob !== undefined && !latestJob.isComplete, [isCheckingForJob, latestJob]);
     const hasPermissionToApprove = useMemo(() => hasPermission && hasPermission(Permission.CanApproveFunding), [isPermissionsFetched]);
@@ -90,7 +90,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 description: `Error while getting specification calculation results metadata for specification Id: ${match.params.specificationId}`
             })
         });
-    },[match.params.specificationId]);
+    }, [match.params.specificationId]);
 
     useEffect(() => {
         if (!fundingConfiguration || fundingSummary) return;
@@ -132,8 +132,10 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
 
     useEffect(() => {
         const handleActionJobComplete = () => {
-            if (isConfirming && jobId && jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
-                setIsConfirming(false);
+            if (jobId && jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
+                if (isConfirming) {
+                    setIsConfirming(false);
+                }
                 if (latestJob.isComplete && latestJob.isSuccessful) {
                     clearFundingSearchSelection();
                     history.push(`/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`);
@@ -142,7 +144,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         };
 
         handleActionJobComplete()
-    }, [latestJob?.jobId, jobId]);
+    }, [latestJob, jobId]);
 
     const clearFundingSearchSelection = useCallback(() => {
         dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
@@ -247,7 +249,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                     </div>
                 </dl>
                 }
-                
+
                 {fundingConfiguration && specification && hasPermissionToApprove !== undefined && hasPermissionToRelease !== undefined &&
                 <section data-testid="funding-summary-section">
                     <div className="govuk-grid-row govuk-!-margin-bottom-3">
