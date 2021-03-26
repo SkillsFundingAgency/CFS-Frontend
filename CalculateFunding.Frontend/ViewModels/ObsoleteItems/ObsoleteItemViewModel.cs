@@ -13,8 +13,11 @@ namespace CalculateFunding.Frontend.ViewModels.ObsoleteItems
         [JsonProperty("specificationId")]
         public string SpecificationId { get; set; }
 
+        [JsonProperty("title")]
+        public string Title { get; set; }
+
         [JsonProperty("itemType")]
-        [JsonConverter(typeof (StringEnumConverter))]
+        [JsonConverter(typeof(StringEnumConverter))]
         public ObsoleteItemType ItemType { get; set; }
 
         [JsonProperty("enumValueName")]
@@ -32,7 +35,10 @@ namespace CalculateFunding.Frontend.ViewModels.ObsoleteItems
         [JsonProperty("codeReference")]
         public string CodeReference { get; set; }
 
-        [JsonProperty("calculations")]
-        public IEnumerable<CalculationSummaryViewModel> Calculations { get; set; }
+        [JsonProperty("templateCalculations")]
+        public IEnumerable<CalculationSummaryViewModel> TemplateCalculations { get; set; }
+
+        [JsonProperty("additionalCalculations")]
+        public IEnumerable<CalculationSummaryViewModel> AdditionalCalculations { get; set; }
     }
 }

@@ -4,6 +4,11 @@ import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
+import {CalculationErrorQueryResult, ObsoleteItemType} from "../../../types/Calculations/CalculationError";
+import {CalculationType} from "../../../types/CalculationSearchResponse";
+import {CalculationValueType} from "../../../types/CalculationDetails";
+import {PublishStatus} from "../../../types/PublishStatusModel";
+import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
@@ -11,6 +16,36 @@ jest.mock("react-redux", () => ({
         releaseTimetableVisible: false
     }))
 }));
+const calculationErrorsResult: CalculationErrorQueryResult = {
+    clearCalculationErrorsFromCache(): Promise<void> {
+        return Promise.resolve(undefined);
+    },
+    errorCheckingForCalculationErrors: null,
+    calculationErrors: [{
+        calculations: [{
+            calculationType: CalculationType.Additional,
+            calculationValueType: CalculationValueType.Number,
+            id: "Calc123",
+            name: "Test Calc 1",
+            status: PublishStatus.Approved,
+            version: 1
+        }],
+        codeReference: "",
+        enumValueName: "",
+        fundingLineId: "",
+        fundingStreamId: "",
+        id: "",
+        itemType: ObsoleteItemType.Calculation,
+        specificationId: "Spec123",
+        templateCalculationId: "Temp123"
+    }],
+    isLoadingCalculationErrors: false,
+    haveErrorCheckingForCalculationErrors: false,
+    areCalculationErrorsFetched: false,
+    isFetchingCalculationErrors: false
+}
+
+jest.spyOn(useCalculationErrorsHook, 'useCalculationErrors').mockImplementation(() => (calculationErrorsResult));
 
 const testData = ViewSpecificationTestData();
 

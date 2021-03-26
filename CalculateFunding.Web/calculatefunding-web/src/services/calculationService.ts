@@ -13,6 +13,7 @@ import {CalculationDetails, CalculationSummary} from "../types/CalculationDetail
 import {AdditionalCalculationSearchResultViewModel} from "../types/Calculations/AdditionalCalculation";
 import {CalculationVersionHistorySummary} from "../types/Calculations/CalculationVersionHistorySummary";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
+import {CalculationError} from "../types/Calculations/CalculationError";
 
 export async function searchForCalculationsService(calculationSearchRequestViewModel: CalculationSearchRequestViewModel):
     Promise<AxiosResponse<CalculationSearchResponse>> {
@@ -168,5 +169,16 @@ export async function runGenerateCalculationCsvResultsJob(specificationId: strin
     return axios(`/api/calcs/specifications/${specificationId}/generate-calculation-csv-results`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
+    });
+}
+
+
+export async function getCalculationErrorsBySpecificationId(specificationId: string) {
+    return axios(`/api/specification/${specificationId}/obsoleteitems`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+        params: {
+            specificationId,
+        }
     });
 }
