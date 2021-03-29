@@ -37,6 +37,7 @@ import {getCurrentProviderVersionForFundingStream} from "../../services/provider
 import {usePermittedFundingStreams} from "../../hooks/Permissions/usePermittedFundingStreams";
 import {DateFormatter} from "../../components/DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
+import {DatasetEmptyFieldEvaluationOptions} from "../../types/Datasets/DatasetEmptyFieldEvaluationOptions";
 
 export function LoadNewDataSource() {
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
@@ -214,7 +215,8 @@ export function LoadNewDataSource() {
                         request.version.toString(),
                         false,
                         description,
-                        "").then((validateDatasetResponse) => {
+                        "",
+                        DatasetEmptyFieldEvaluationOptions.NA).then((validateDatasetResponse) => {
                         const validateOperationId: any = validateDatasetResponse.data.operationId;
                         if (!validateOperationId) {
                             addError({error: "Unable to locate dataset validate operationId"})
