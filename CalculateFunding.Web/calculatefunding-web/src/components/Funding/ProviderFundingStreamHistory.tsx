@@ -21,6 +21,9 @@ return <section className="govuk-tabs__panel" id="funding-stream-history">
                 className="govuk-table__header govuk-table__header--numeric">Date/time of change
             </th>
             <th scope="col"
+                className="govuk-table__header govuk-table__header--numeric">Variation reason
+            </th>
+            <th scope="col"
                 className="govuk-table__header govuk-table__header--numeric">Funding stream value
             </th>
         </tr>
@@ -36,6 +39,9 @@ return <section className="govuk-tabs__panel" id="funding-stream-history">
                 <th scope="row" className="govuk-table__header">{fsh.status}</th>
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.author}</td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.dateChanged}</td>
+                <td className="govuk-table__cell govuk-table__cell--numeric">
+                    {fsh.variationReasons.map(vr => <span key={vr}>{vr.replace(/([A-Z])/g, ' $1').trim()}<br /></span>)}
+                </td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.fundingStreamValue}</td>
             </tr>)}
         </tbody>

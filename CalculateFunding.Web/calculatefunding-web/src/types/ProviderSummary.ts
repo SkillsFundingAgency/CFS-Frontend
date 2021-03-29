@@ -83,6 +83,7 @@ export interface Result {
     author: string;
     dateChanged: string;
     fundingStreamValue: string;
+    variationReasons: string[];
 }
 
 

@@ -25,7 +25,19 @@ jest.mock('../../../services/fundingLineDetailsService', () => ({
 
 jest.mock('../../../services/providerService', () => ({
     getProviderTransactionsService: jest.fn(() => Promise.resolve({
-        data: {},
+        data: {
+            "results": [
+                {
+                    "status": "Draft",
+                    "author": "Robert SPARKS",
+                    "dateChanged": "22 March 2021 at 7:51 PM",
+                    "fundingStreamValue": "£92,540,428.00",
+                    "variationReasons": ["FundingUpdated", "ProfilingUpdated"]
+                }
+            ],
+            "fundingTotal": "£92,540,428.00",
+            "latestStatus": "Draft"
+        },
         status: 200
     })),
     getReleasedProfileTotalsService: jest.fn(() => Promise.resolve({
@@ -169,8 +181,8 @@ const renderPage = () => {
         <MemoryRouter>
             <QueryClientProvider client={new QueryClient()}>
                 <Provider store={store}>
-                <ProviderFundingOverview location={location} history={history} match={matchMock}/>
-            </Provider>
+                    <ProviderFundingOverview location={location} history={history} match={matchMock} />
+                </Provider>
             </QueryClientProvider>
         </MemoryRouter>
     );
@@ -193,16 +205,16 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible false", () => 
 
         renderPage();
     });
-    
+
     it("does not render any errors", async () => {
         expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
     });
-    
+
     it("renders the specification name", async () => {
         expect(screen.getByText("Specification")).toBeInTheDocument();
         expect(screen.getByText(testSpec.name)).toBeInTheDocument();
     });
-    
+
     it("renders the funding stream and period name", async () => {
         expect(screen.getByText(testSpec.fundingStreams[0].name + " for " + testSpec.fundingPeriod.name)).toBeInTheDocument();
     });
@@ -253,7 +265,7 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible true", () => {
 
         renderPage();
     });
-    
+
     it("does not render any errors", async () => {
         expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
     });
@@ -262,6 +274,8 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible true", () => {
         expect(screen.getByTestId(`tab-funding-stream-history`)).toBeInTheDocument();
         expect(within(screen.getByTestId(`tab-funding-stream-history`)).getByText(/funding stream history/i)).toBeInTheDocument();
         expect(screen.getByTestId(`tab-panel-funding-stream-history`)).toBeInTheDocument();
+        expect(screen.getByText(/Funding Updated/)).toBeInTheDocument();
+        expect(screen.getByText(/Profiling Updated/)).toBeInTheDocument();
     });
 
     it('renders profiling patterns tab as inactive', () => {

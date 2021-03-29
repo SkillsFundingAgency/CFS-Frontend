@@ -123,8 +123,8 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<IEnumerable<string>> response =
                 await _publishingApiClient.ValidateSpecificationForRefresh(specificationId);
 
-            return response.Handle(nameof(Specification), 
-                onSuccess: x => Ok(), 
+            return response.Handle(nameof(Specification),
+                onSuccess: x => Ok(),
                 treatNoContentAsSuccess: true);
         }
 
@@ -149,9 +149,9 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return new PreconditionFailedResult("Preconditions for this approval have not been met.");
             }
-            
-            return response.Handle("Release Funding", 
-                onSuccess: x => x.Content.JobId != null ? (IActionResult) Ok(new {jobId = x.Content.JobId}) : BadRequest());
+
+            return response.Handle("Release Funding",
+                onSuccess: x => x.Content.JobId != null ? (IActionResult)Ok(new { jobId = x.Content.JobId }) : BadRequest());
         }
 
         [Route("api/specs/{specificationId}/release")]
@@ -171,8 +171,8 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<JobCreationResponse> response =
                 await _publishingApiClient.PublishFundingForSpecification(specificationId);
 
-            return response.Handle("Release Funding", 
-                onSuccess: x => x.Content.JobId != null ? (IActionResult) Ok(x.Content.JobId) : BadRequest());
+            return response.Handle("Release Funding",
+                onSuccess: x => x.Content.JobId != null ? (IActionResult)Ok(x.Content.JobId) : BadRequest());
         }
 
         [Route("api/specs/{specificationId}/fundingSummary")]
@@ -206,7 +206,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new NotFoundObjectResult(Content("Error. Not Found."));
 
             ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel
-                {Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>()};
+            { Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>() };
 
             foreach (PublishedProviderTransaction item in result.Content)
             {
@@ -215,7 +215,8 @@ namespace CalculateFunding.Frontend.Controllers
                     Status = item.Status.ToString(),
                     Author = item.Author.Name,
                     DateChanged = $"{item.Date:M} {item.Date.Year} at {item.Date.DateTime:h:mm tt}",
-                    FundingStreamValue = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : ""
+                    FundingStreamValue = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : "",
+                    VariationReasons = item.VariationReasons
                 });
             }
 
@@ -239,7 +240,7 @@ namespace CalculateFunding.Frontend.Controllers
                 await _publishingApiClient.SearchPublishedProviderLocalAuthorities(searchText, fundingStreamId,
                     fundingPeriodId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -260,7 +261,7 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingPeriodId,
                     providerId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(MapToProfilingViewModel(x.Content)));
         }
 
@@ -273,8 +274,8 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
             ApiResponse<IEnumerable<ProfileTotal>> response = await _publishingApiClient.GetProfileHistory(fundingStreamId, fundingPeriodId, providerId);
-            
-            return response.Handle(nameof(Specification), 
+
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -295,7 +296,7 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingPeriodId,
                     providerId);
 
-            return response.Handle(nameof(PublishedProviderVersion), 
+            return response.Handle(nameof(PublishedProviderVersion),
                 onSuccess: x => Ok(MapToArchiveViewModel(x.Content)));
         }
 
@@ -319,7 +320,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<PublishedProviderFundingCount> response = await _publishingApiClient.GetProviderBatchForReleaseCount(providers, specificationId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -342,7 +343,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<PublishedProviderFundingCount> response = await _publishingApiClient.GetProviderBatchForApprovalCount(providers, specificationId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -366,7 +367,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.ApproveFundingForBatchProviders(specificationId, providers);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -390,7 +391,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.PublishFundingForBatchProviders(specificationId, providers);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -411,7 +412,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetPublishedProviderErrors(specificationId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content?.Where(err => err != null).ToList()));
         }
 
@@ -432,7 +433,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -446,7 +447,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<LatestPublishedDate> response = await _publishingApiClient.GetLatestPublishedDate(fundingStreamId, fundingPeriodId);
 
-            return response.Handle(nameof(Specification), 
+            return response.Handle(nameof(Specification),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -463,7 +464,7 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<PublishedProviderVersion> response =
                 await _publishingApiClient.GetCurrentPublishedProviderVersion(specificationId, fundingStreamId, providerId);
 
-            return response.Handle(nameof(PublishedProviderVersion), 
+            return response.Handle(nameof(PublishedProviderVersion),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -483,8 +484,8 @@ namespace CalculateFunding.Frontend.Controllers
                 {
                     Stream = stream.ToArray()
                 });
-                
-                return response.Handle(nameof(PublishedProviderVersion), 
+
+                return response.Handle(nameof(PublishedProviderVersion),
                     onSuccess: x => Ok(x.Content));
             }
         }
@@ -502,7 +503,7 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingStreamId = request.FundingStreamId
             });
 
-            return response.Handle(nameof(PublishedProviderVersion), 
+            return response.Handle(nameof(PublishedProviderVersion),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -514,7 +515,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(request, nameof(request));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<PublishedProviderDataDownload> response = 
+            ApiResponse<PublishedProviderDataDownload> response =
                 await _publishingApiClient.GenerateCsvForBatchPublishedProvidersForApproval(request, specificationId);
 
             return response.Handle(nameof(PublishedProviderDataDownload),
@@ -569,7 +570,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetBatchPublishedProviderIds(batchId);
 
-            return response.Handle(nameof(PublishedProviderVersion), 
+            return response.Handle(nameof(PublishedProviderVersion),
                 onSuccess: x => Ok(x.Content));
         }
 
@@ -586,8 +587,8 @@ namespace CalculateFunding.Frontend.Controllers
             ValidatedApiResponse<JobCreationResponse> response =
                 await _publishingApiClient.RefreshFundingForSpecification(specificationId);
 
-            return response.Handle("Refresh Funding", 
-                onSuccess: x => x.Content.JobId != null ? (IActionResult) Ok(x.Content.JobId) : BadRequest());
+            return response.Handle("Refresh Funding",
+                onSuccess: x => x.Content.JobId != null ? (IActionResult)Ok(x.Content.JobId) : BadRequest());
         }
 
         private static ProfilingViewModel MapToProfilingViewModel(IDictionary<int, ProfilingVersion> profilingVersions)
