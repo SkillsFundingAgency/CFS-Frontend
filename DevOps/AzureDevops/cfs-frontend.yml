@@ -1,0 +1,86 @@
+name: $(Rev:r)
+
+pool:
+  vmImage: windows-2019
+
+resources:
+  repositories:
+  - repository: self
+  - repository: funding-blocks
+    type: github
+    name: SkillsFundingAgency/funding-platform-building-blocks
+    ref: refs/heads/master
+    endpoint: 'Github (ESFA)'
+
+trigger:
+  branches:
+    include:
+    - master
+    - providers
+    - fdps
+
+variables:
+- name: BuildConfiguration
+  value: release
+- name: BuildPlatform
+  value: 'any cpu'
+- name: DOTNET_SKIP_FIRST_TIME_EXPERIENCE
+  value: '1'
+- name: 'projectFolder'
+  value: 'CalculateFunding.Web/calculatefunding-web'
+- name: vstsFeed
+  value: 'ecf37bc0-472b-47bf-91e3-6774809fd194' 
+- group: 'Dotnet Core SDK Version'
+
+steps:
+- template: azure-pipelines-templates/cfs/build-frontend-react-spa.yml@funding-blocks
+  parameters:
+    projectFolder: $(projectFolder)
+    DotnetCoreSdkVersion: $(DotnetCoreSdkVersion)
+    
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersion)'
+  inputs:
+    version: '$(DotnetCoreSdkVersion)'
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '**/*.csproj'
+    vstsFeed: '$(vstsFeed)'
+
+- task: DotNetCoreCLI@2
+  displayName: Test
+  inputs:
+    command: test
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) /p:AssemblyVersion=$(Build.BuildNumber)'
+
+- task: CopyFiles@2
+  displayName: 'Copy DevOps Files to: $(build.artifactstagingdirectory)/DevOps'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  inputs:
+    SourceFolder: DevOps
+    Contents: '**/*.*'
+    TargetFolder: '$(build.artifactstagingdirectory)/DevOps'
+
+- task: CopyFiles@2
+  displayName: 'Copy Azure Template Files to: $(build.artifactstagingdirectory)/azure'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  inputs:
+    SourceFolder: azure
+    Contents: '**/*.*'
+    TargetFolder: '$(build.artifactstagingdirectory)/azure'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
