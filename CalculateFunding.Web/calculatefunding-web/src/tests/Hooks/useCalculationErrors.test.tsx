@@ -59,6 +59,7 @@ describe("useCalculationErrors hook ", () => {
         expect(result.current.errorCheckingForCalculationErrors).toBeNull();
         expect(result.current.isFetchingCalculationErrors).toBe(false);
         expect(result.current.areCalculationErrorsFetched).toBe(true);
+        expect(result.current.calculationErrorCount).toBe(1);
     });
 
     it('should return no calculation errors successfully', async () => {
@@ -75,5 +76,6 @@ describe("useCalculationErrors hook ", () => {
         expect(result.current.errorCheckingForCalculationErrors).toBeNull();
         expect(result.current.isFetchingCalculationErrors).toBe(false);
         expect(result.current.areCalculationErrorsFetched).toBe(true);
+        expect(result.current.calculationErrorCount).toBe(0);
     });
 });

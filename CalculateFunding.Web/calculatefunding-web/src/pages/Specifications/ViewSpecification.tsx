@@ -103,6 +103,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const {
         calculationErrors,
         isLoadingCalculationErrors,
+        calculationErrorCount
     } = useCalculationErrors(specificationId, err => {addError({error:err, description: "Error while checking for calculation errors"})})
 
     useEffect(() => {
@@ -351,7 +352,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
-                            {isLoadingCalculationErrors ? "" : <Tabs.Tab label="calculation-errors">Calculations errors<Badge errorCount={calculationErrors?.length.toString()}/></Tabs.Tab>}
+                            {isLoadingCalculationErrors || calculationErrorCount === 0 ? "" : <Tabs.Tab label="calculation-errors">Calculations errors<Badge errorCount={calculationErrorCount} /></Tabs.Tab>}
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                             <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
                             <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variations-tab"}

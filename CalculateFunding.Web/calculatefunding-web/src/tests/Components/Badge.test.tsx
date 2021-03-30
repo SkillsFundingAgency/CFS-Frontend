@@ -4,7 +4,7 @@ import {Badge} from "../../components/Badge";
 
 describe("<Badge> ", () => {
     it("shows the correct number of errors", () => {
-        render(<Badge errorCount={"100"}/>);
+        render(<Badge errorCount={100}/>);
         expect(screen.getByText(100));
     })
 });

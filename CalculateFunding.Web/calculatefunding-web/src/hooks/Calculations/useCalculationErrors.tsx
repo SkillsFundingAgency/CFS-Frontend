@@ -37,6 +37,7 @@ export const useCalculationErrors = (specificationId: string,
         errorCheckingForCalculationErrors: error,
         isFetchingCalculationErrors: isFetching,
         areCalculationErrorsFetched: isFetched,
+        calculationErrorCount: data?.length ?? 0,
         clearCalculationErrorsFromCache: clearCalculationErrorsFromCache
     };
 };

@@ -16,6 +16,7 @@ export interface CalculationError{
 
 export interface CalculationErrorQueryResult {
     calculationErrors: CalculationError[] | undefined,
+    calculationErrorCount: number,
     isLoadingCalculationErrors: boolean,
     errorCheckingForCalculationErrors: AxiosError | null,
     haveErrorCheckingForCalculationErrors: boolean,
