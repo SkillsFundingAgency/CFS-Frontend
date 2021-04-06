@@ -7,8 +7,12 @@ import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
+import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {fullSpecPermissions} from "../../fakes/testFactories";
+import {FundingConfiguration} from "../../../types/FundingConfiguration";
+import {ApprovalMode} from "../../../types/ApprovalMode";
+import {ProviderSource} from "../../../types/CoreProviderSummary";
 
 export function ViewSpecificationTestData() {
 
@@ -39,6 +43,25 @@ export function ViewSpecificationTestData() {
     function mockSpecificationPermissions(expectedSpecificationPermissionsResult?: SpecificationPermissionsResult) {
         jest.spyOn(specPermsHook, 'useSpecificationPermissions')
             .mockImplementation(() => (expectedSpecificationPermissionsResult ? expectedSpecificationPermissionsResult : fullSpecPermissions));
+    }
+
+    const mockFundingConfiguration: FundingConfiguration = {
+        fundingStreamId: "",
+        fundingPeriodId: "",
+        approvalMode: ApprovalMode.All,
+        providerSource: ProviderSource.CFS,
+        defaultTemplateVersion: "",
+        enableConverterDataMerge: true
+    }
+
+    function fundingConfigurationSpy() {
+        jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration')
+            .mockImplementation(() => ({
+                fundingConfiguration: mockFundingConfiguration,
+                isLoadingFundingConfiguration: false,
+                isErrorLoadingFundingConfiguration: false,
+                errorLoadingFundingConfiguration: ""
+            }));
     }
 
     const renderViewSpecificationPage = async () => {
@@ -223,6 +246,7 @@ export function ViewSpecificationTestData() {
     return {
         sendFailedJobNotification,
         jobMonitorSpy,
+        fundingConfigurationSpy,
         mockSpecificationPermissions,
         renderViewSpecificationPage,
         renderViewApprovedSpecificationPage,

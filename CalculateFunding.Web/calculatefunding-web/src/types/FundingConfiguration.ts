@@ -7,4 +7,5 @@ export interface FundingConfiguration {
     approvalMode: ApprovalMode;
     providerSource: ProviderSource;
     defaultTemplateVersion: string;
+    enableConverterDataMerge: boolean;
 }

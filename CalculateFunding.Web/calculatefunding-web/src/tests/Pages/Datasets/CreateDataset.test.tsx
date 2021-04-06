@@ -131,14 +131,16 @@ const createDatasetTestSetup = () => {
         providerSource: ProviderSource.CFS,
         defaultTemplateVersion: "1.1",
         fundingPeriodId: fundingPeriod.id,
-        fundingStreamId: fundingStream.id
+        fundingStreamId: fundingStream.id,
+        enableConverterDataMerge: false
     }
     const mockFdzFundingConfiguration: FundingConfiguration = {
         approvalMode: ApprovalMode.All,
         providerSource: ProviderSource.FDZ,
         defaultTemplateVersion: "1.1",
         fundingPeriodId: fundingPeriod.id,
-        fundingStreamId: fundingStream.id
+        fundingStreamId: fundingStream.id,
+        enableConverterDataMerge: false
     }
     const testSpec: SpecificationSummary = {
         name: "test spec name",

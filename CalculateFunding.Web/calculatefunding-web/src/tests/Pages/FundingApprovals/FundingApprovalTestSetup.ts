@@ -78,7 +78,8 @@ export const FundingApprovalTestSetup = () => {
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod2.id,
-            fundingStreamId: fundingStream2.id
+            fundingStreamId: fundingStream2.id,
+            enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -90,7 +91,8 @@ export const FundingApprovalTestSetup = () => {
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod1.id,
-            fundingStreamId: fundingStream1.id
+            fundingStreamId: fundingStream1.id,
+            enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,

@@ -429,7 +429,8 @@ function setupTestConfig() {
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
-            fundingStreamId: fundingStream.id
+            fundingStreamId: fundingStream.id,
+            enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -441,7 +442,8 @@ function setupTestConfig() {
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
-            fundingStreamId: fundingStream.id
+            fundingStreamId: fundingStream.id,
+            enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,

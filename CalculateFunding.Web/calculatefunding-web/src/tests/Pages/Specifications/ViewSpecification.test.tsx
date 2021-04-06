@@ -63,6 +63,7 @@ describe('<ViewSpecification /> ', () => {
             testData.mockDatasetBySpecificationIdService();
             testData.mockCalculationService();
             testData.mockPublishService();
+            testData.fundingConfigurationSpy();
             testData.jobMonitorSpy.mockImplementation(() => {
                 return {
                     hasJob: false,
@@ -112,6 +113,12 @@ describe('<ViewSpecification /> ', () => {
             it('shows Variations tab given specification is not chosen for funding', async () => {
                 await waitFor(() => {
                     expect(screen.getByText('Variations')).toBeVisible()
+                });
+            });
+
+            it('shows that the specification is converter wizard enabled', async () => {
+                await waitFor(() => {
+                    expect(screen.getByText('In year opener enabled')).toBeVisible()
                 });
             });
         });

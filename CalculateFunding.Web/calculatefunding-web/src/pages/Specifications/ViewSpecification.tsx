@@ -40,6 +40,7 @@ import {Permission} from "../../types/Permission";
 import {Badge} from "../../components/Badge";
 import {CalculationErrors} from "../../components/Calculations/CalculationErrors";
 import {useCalculationErrors} from "../../hooks/Calculations/useCalculationErrors";
+import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -74,7 +75,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
     const [isApprovingAllCalculations, setIsApprovingAllCalculations] = useState(false);
     const [isRefreshFundingInProgress, setIsRefreshFundingInProgress] = useState(false);
-
     const [displayApproveAllJobStatus, setDisplayApproveAllJobStatus] = useState<boolean>(false);
     const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
     const [initialTab, setInitialTab] = useState<string>("");
@@ -105,6 +105,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         isLoadingCalculationErrors,
         calculationErrorCount
     } = useCalculationErrors(specificationId, err => {addError({error:err, description: "Error while checking for calculation errors"})})
+
+    const {fundingConfiguration} =
+        useFundingConfiguration(specification.fundingStreams[0].id, specification.fundingPeriod.id,
+            err => addError({error: err, description: `Error while loading funding configuration`}));
 
     useEffect(() => {
         if (!refreshFundingJob || refreshFundingJob.jobId !== initiatedRefreshFundingJobId) return;
@@ -145,7 +149,6 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const fetchData = async () => {
         try {
             const spec: SpecificationSummary = (await getSpecificationSummaryService(specificationId)).data;
-
             setSpecification(spec);
 
             if (spec.isSelectedForFunding) {
@@ -309,6 +312,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         className="govuk-caption-l">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
                     {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
                     <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+                    }
+                    {fundingConfiguration && fundingConfiguration.enableConverterDataMerge &&
+                    <p className="govuk-body govuk-!-margin-top-2">
+                        <strong className="govuk-tag govuk-tag--green">In year opener enabled</strong>
+                    </p>
                     }
                 </div>
                 <div className="govuk-grid-column-two-thirds">

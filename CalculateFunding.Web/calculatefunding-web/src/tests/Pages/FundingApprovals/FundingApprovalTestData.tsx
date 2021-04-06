@@ -125,7 +125,8 @@ export function FundingApprovalTestData() {
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
-            fundingStreamId: fundingStream.id
+            fundingStreamId: fundingStream.id,
+            enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -137,7 +138,8 @@ export function FundingApprovalTestData() {
             providerSource: ProviderSource.CFS,
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
-            fundingStreamId: fundingStream.id
+            fundingStreamId: fundingStream.id,
+            enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
