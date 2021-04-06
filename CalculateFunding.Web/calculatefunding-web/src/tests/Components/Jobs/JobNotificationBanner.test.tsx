@@ -224,8 +224,8 @@ const mockCompletedJobWithNoOutcomeTypeResult: JobDetails = getJobDetailsFromJob
     specificationId: "spec 574",
     runningStatus: RunningStatus.Completed,
     completionStatus: CompletionStatus.Succeeded,
-    lastUpdated: new Date(Date.UTC(2020, 3, 2, 23, 0, 0)),
-    created: new Date(Date.UTC(2020, 3, 1, 23, 0, 0)),
+    lastUpdated: new Date(Date.UTC(2020, 3, 2, 22, 0, 0)),
+    created: new Date(Date.UTC(2020, 3, 1, 22, 0, 0)),
     invokerUserDisplayName: "a valid invoker user",
     trigger: emptyTrigger,
     outcomes: []
@@ -237,8 +237,8 @@ const mockFailedJobResult: JobDetails = getJobDetailsFromJobResponse({
     specificationId: "spec 684",
     runningStatus: RunningStatus.Completed,
     completionStatus: CompletionStatus.Failed,
-    lastUpdated: new Date(Date.UTC(2020, 4, 2, 6, 0, 0)),
-    created: new Date(Date.UTC(2020, 4, 1, 6, 0, 0)),
+    lastUpdated: new Date(Date.UTC(2020, 4, 2, 5, 0, 0)),
+    created: new Date(Date.UTC(2020, 4, 1, 5, 0, 0)),
     invokerUserDisplayName: "a valid invoker user",
     trigger: emptyTrigger,
     outcomes: [{

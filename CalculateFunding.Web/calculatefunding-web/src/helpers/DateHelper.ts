@@ -3,14 +3,14 @@ import {DateTime} from "luxon";
 
 export function formatDateTime(date?: Date) {
     if (!date) return "";
-    const luxonDate : DateTime = DateTime.fromJSDate(new Date(date)).toUTC();
+    const luxonDate : DateTime = DateTime.fromJSDate(new Date(date));
 
-    return luxonDate.toUTC().toFormat("d MMMM yyyy HH:mm");
+    return luxonDate.setZone("Europe/London").toFormat("d MMMM yyyy HH:mm");
 }
 
 export function formatDate(date?: Date) {
     if (!date) return "";
-    const luxonDate : DateTime = DateTime.fromJSDate(new Date(date)).toUTC();
+    const luxonDate : DateTime = DateTime.fromJSDate(new Date(date));
 
-    return luxonDate.toFormat("d MMMM yyyy");
+    return luxonDate.setZone("Europe/London").toFormat("d MMMM yyyy");
 }
