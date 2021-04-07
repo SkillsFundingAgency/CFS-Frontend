@@ -47,14 +47,14 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
         useSpecificationPermissions(specificationId, [Permission.CanEditSpecification]);
-    
+
     const {specification, isLoadingSpecification, clearSpecificationFromCache} =
         useSpecificationSummary(specificationId, err => addError({
             error: err,
             description: "Error while loading specification"
         }));
 
-    const fundingStreamId = specification && specification.fundingStreams[0].id
+    const fundingStreamId = specification && specification?.fundingStreams[0].id
     const fundingPeriodId = specification && specification.fundingPeriod.id;
 
     const {fundingConfiguration, isLoadingFundingConfiguration} =
@@ -319,9 +319,9 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
                 <PermissionStatus requiredPermissions={missingPermissions}
                                   hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}/>
-                
+
                 <MultipleErrorSummary errors={errors}/>
-                
+
                 {(isLoading || isUpdating || (hasJob && !latestJob?.isComplete)) &&
                 <LoadingStatus title={isUpdating ? "Updating Specification" :
                     `Loading ${
