@@ -83,7 +83,7 @@ namespace CalculateFunding.Frontend.Controllers
             tasks.Add(distictTemplateContentsRequest);
             tasks.Add(templateMappingRequest);
 
-            Task<ApiResponse<Common.ApiClient.Results.Models.ProviderResultResponse>> calculationEngineResultsRequest = null;
+            Task<ApiResponse<ProviderResultResponse>> calculationEngineResultsRequest = null;
             Task<ApiResponse<Common.ApiClient.Publishing.Models.PublishedProviderVersion>> publishProviderResultsRequest = null;
 
             if (useCalcEngine)

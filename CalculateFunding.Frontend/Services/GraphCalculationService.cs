@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.Services
             IActionResult errorResult = getCircularDependenciesApiResponse.IsSuccessOrReturnFailureResult(
                 $"Get Circular Dependencies by specification ID:{specificationId}");
 
-            if(errorResult != null)
+            if (errorResult != null)
             {
                 return errorResult;
             }
