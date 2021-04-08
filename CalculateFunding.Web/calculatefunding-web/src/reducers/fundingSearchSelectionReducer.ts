@@ -40,25 +40,21 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
             case FundingSearchSelectionActionEvent.UPDATE_PROVIDER_TYPE_FILTERS:
                 return {
                     ...state,
-                    selectedProviderIds: [],
                     searchCriteria: {...filters, providerType: applyFilterChange(filters.providerType, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_STATUS_FILTERS:
                 return {
                     ...state,
-                    selectedProviderIds: [],
                     searchCriteria: {...filters, status: applyFilterChange(filters.status, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_LOCAL_AUTHORITY_FILTERS:
                 return {
                     ...state,
-                    selectedProviderIds: [],
                     searchCriteria: {...filters, localAuthority: applyFilterChange(filters.localAuthority, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_PROVIDER_SUB_TYPE_FILTERS:
                 return {
                     ...state,
-                    selectedProviderIds: [],
                     searchCriteria: {...filters, providerSubType: applyFilterChange(filters.providerSubType, action.payload), pageNumber: 1}
                 };
             case FundingSearchSelectionActionEvent.UPDATE_PAGE:
@@ -69,7 +65,6 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
             case FundingSearchSelectionActionEvent.UPDATE_SEARCH_TEXT_FILTER:
                 return {
                     ...state,
-                    selectedProviderIds: [],
                     searchCriteria: {
                         ...filters,
                         searchFields: action.payload.searchFields,
@@ -80,7 +75,6 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
             case FundingSearchSelectionActionEvent.HAS_ERRORS:
                 return {
                     ...state,
-                    selectedProviderIds: [],
                     searchCriteria: {...filters, hasErrors: action.payload, pageNumber: 1}
                 };
             default:

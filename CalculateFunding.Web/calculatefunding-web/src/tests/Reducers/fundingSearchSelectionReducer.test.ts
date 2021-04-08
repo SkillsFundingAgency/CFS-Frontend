@@ -101,7 +101,10 @@ describe("fundingSearchSelectionReducer tests", () => {
                         fundingPeriodId: "34572345",
                         errorToggle: "",
                     },
-                    selectedProviderIds: []
+                    selectedProviderIds: [
+                        "356tytw345t",
+                        "retyw4358",
+                    ]
                 });
         });
     });
