@@ -30,6 +30,8 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         public string FundingStreamId { get; set; }
 
         public string FundingPeriodId { get; set; }
+        
+        public string Indicative { get; set; }
 
         public bool HasErrors { get; set; }
 

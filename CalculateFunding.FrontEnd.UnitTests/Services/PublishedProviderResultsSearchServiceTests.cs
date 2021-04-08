@@ -41,19 +41,31 @@ namespace CalculateFunding.Frontend.UnitTests.Services
         }
 
         [TestMethod]
-        public async Task PerformSearch_GivenResultsWithoutErrors_ReturnsExpected()
+        [DataRow("Only indicative allocations", true, "Only indicative allocations")]
+        [DataRow("Hide indicative allocations", false, "Hide indicative allocations")]
+        [DataRow("Show all allocation types", null, null)]
+        [DataRow(null, null, null)]
+        public async Task PerformSearch_GivenResultsWithoutErrors_ReturnsExpected(string indicativeFilter,
+            bool? isIndicativeQueryFlag,
+            string expectedSearchRequestIndicativeFilter)
         {
             int numberOfItems = 25;
 
             SearchResults<PublishedProviderSearchItem> searchResults = GenerateSearchResults(numberOfItems);
 
             _publishingClient
-                .Setup(x => x.SearchPublishedProvider(It.IsAny<SearchModel>()))
+                .Setup(x => x.SearchPublishedProvider(It.Is<SearchModel>(search =>
+                    WithIndicativeFilter(search, expectedSearchRequestIndicativeFilter))))
                 .ReturnsAsync(new ApiResponse<SearchResults<PublishedProviderSearchItem>>(HttpStatusCode.OK, searchResults));
 
+            //these constraints are checking nothing really??
             var providerStats = new ProviderFundingStreamStatusResponse {ProviderApprovedCount = 0, TotalFunding = 1234, ProviderDraftCount = numberOfItems};
             _publishingClient
-                .Setup(x => x.GetProviderStatusCounts(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Setup(x => x.GetProviderStatusCounts(It.IsAny<string>(), 
+                    It.IsAny<string>(), 
+                    It.IsAny<string>(), 
+                    It.IsAny<string>(),
+                    isIndicativeQueryFlag))
                 .ReturnsAsync(new ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>>(HttpStatusCode.OK, new []
                 {
                     providerStats
@@ -73,7 +85,14 @@ namespace CalculateFunding.Frontend.UnitTests.Services
 
             _service = new PublishedProviderSearchService(_publishingClient.Object, _policiesApiClient.Object, _logger, _mapper);
             
-            SearchRequestViewModel request = new SearchRequestViewModel { PageSize = 12 };
+            SearchRequestViewModel request = new SearchRequestViewModel
+            {
+                PageSize = 12,
+                Filters = new Dictionary<string, string[]>
+                {
+                    {"indicative", new [] { indicativeFilter }}
+                }
+            };
             
             PublishProviderSearchResultViewModel result = await _service.PerformSearch(request);
 
@@ -100,7 +119,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             return new SearchResults<PublishedProviderSearchItem>
             {
                 Results = items.AsEnumerable(),
-                Facets = new SearchFacet[]
+                Facets = new[]
                 {
                     new SearchFacet { Name = "providerType", FacetValues = new List<SearchFacetValue>()},
                     new SearchFacet { Name = "localAuthority", FacetValues = new List<SearchFacetValue>()},
@@ -109,6 +128,24 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 TotalCount = numberOfItems,
                 TotalErrorCount = 0
             };
+        }
+
+        private bool WithIndicativeFilter(SearchModel searchRequestModel,
+            string expectedIndicativeFilter)
+        {
+            IDictionary<string,string[]> requestFilters = searchRequestModel.Filters;
+            
+            if (expectedIndicativeFilter == null)
+            {
+                return !requestFilters.ContainsKey("indicative");
+            }
+
+            return requestFilters != null &&
+                   requestFilters.TryGetValue("indicative", out string[] indicativeFilters) &&
+                   indicativeFilters.SequenceEqual(new[]
+                   {
+                       expectedIndicativeFilter
+                   });
         }
     }
 }

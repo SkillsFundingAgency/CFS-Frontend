@@ -42,6 +42,8 @@ namespace CalculateFunding.Frontend.Services
         public async Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request.PageSize, "PageSize");
+            
+            RemoveShowAllAllocationTypesIndicativeFilter(request.Filters);
 
             SearchModel requestOptions = new SearchModel
             {
@@ -106,15 +108,17 @@ namespace CalculateFunding.Frontend.Services
                 string[] providerTypes = request.Filters.GetValueOrDefault("providerType") ?? new string[0];
                 string[] localAuthorities = request.Filters.GetValueOrDefault("localAuthority") ?? new string[0];
                 string[] fundingStatuses = request.Filters.GetValueOrDefault("fundingStatus") ?? new string[0];
+                bool? isIndicative = GetIsIndicativeFlagFromFilters(request.Filters);
                 ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts =
                     await _publishingApiClient.GetProviderStatusCounts(
                         result.Providers.First().SpecificationId,
                         providerTypes.FirstOrDefault(),
                         localAuthorities.FirstOrDefault(),
-                        fundingStatuses.FirstOrDefault()
+                        fundingStatuses.FirstOrDefault(),
+                        isIndicative
                     );
 
-                foreach (var providerStats in providerStatusCounts.Content)
+                foreach (ProviderFundingStreamStatusResponse providerStats in providerStatusCounts.Content)
                 {
                     if (isBatchModeEnabled && providerStats.ProviderApprovedCount > 0)
                     {
@@ -145,6 +149,48 @@ namespace CalculateFunding.Frontend.Services
             }
 
             return result;
+        }
+
+        private void RemoveShowAllAllocationTypesIndicativeFilter(IDictionary<string, string[]> filters)
+        {
+            string indicativeFilter = GetIndicativeFilter(filters);
+
+            if (indicativeFilter != "Show all allocation types" &&
+                indicativeFilter != null)
+            {
+                return;
+            }
+            
+            filters.Remove("indicative");
+        }
+        
+        private bool? GetIsIndicativeFlagFromFilters(IDictionary<string, string[]> filters)
+        {
+            string filter = GetIndicativeFilter(filters);
+
+            if (filter == "Only indicative allocations")
+            {
+                return true;
+            }
+
+            if (filter == "Hide indicative allocations")
+            {
+                return false;
+            }
+
+            return null;
+        }
+
+        private string GetIndicativeFilter(IDictionary<string, string[]> filters)
+        {
+            string[] indicativeFilters = filters.GetValueOrDefault("indicative") ?? new string[0];
+
+            if (indicativeFilters.Length > 1)
+            {
+                throw new ArgumentOutOfRangeException("indicative", @"You may only filter on a single indicative state at a time");
+            }
+
+            return indicativeFilters.SingleOrDefault();
         }
     }
 }
