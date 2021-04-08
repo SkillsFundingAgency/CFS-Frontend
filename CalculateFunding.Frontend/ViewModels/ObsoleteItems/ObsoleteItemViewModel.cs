@@ -26,6 +26,9 @@ namespace CalculateFunding.Frontend.ViewModels.ObsoleteItems
         [JsonProperty("fundingLineId")]
         public uint? FundingLineId { get; set; }
 
+        [JsonProperty("fundingLineName")]
+        public string FundingLineName { get; set; }
+
         [JsonProperty("fundingStreamId")]
         public string FundingStreamId { get; set; }
 

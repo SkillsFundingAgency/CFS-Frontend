@@ -102,6 +102,7 @@ namespace CalculateFunding.Frontend.Controllers
                 SpecificationId = _.SpecificationId,
                 EnumValueName = _.EnumValueName,
                 FundingLineId = _.FundingLineId,
+                FundingLineName = _.FundingLineName,
                 FundingStreamId = _.FundingStreamId,
                 TemplateCalculationId = _.TemplateCalculationId,
                 TemplateCalculations = AsCalculationSummaries(_.CalculationIds.Intersect(templateCalculations.Keys), templateCalculations),
@@ -119,7 +120,7 @@ namespace CalculateFunding.Frontend.Controllers
 
                     return $"{obsoleteItem.EnumValueName} in {calcInTemplate.Name} is not valid";
                 case ObsoleteItemType.FundingLine:
-                    return $"Missing funding line - {obsoleteItem.FundingLineId}";
+                    return $"Missing funding line - ID: {obsoleteItem.FundingLineId} Name: {obsoleteItem.FundingLineName}";
                 default:
                     throw new InvalidOperationException($"Unknown obsolete item type {obsoleteItem.ItemType}");
             }

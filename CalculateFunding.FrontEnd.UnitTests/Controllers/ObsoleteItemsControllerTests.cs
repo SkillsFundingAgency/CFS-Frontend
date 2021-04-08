@@ -97,6 +97,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 SpecificationId = _.SpecificationId,
                 EnumValueName = _.EnumValueName,
                 FundingLineId = _.FundingLineId,
+                FundingLineName = _.FundingLineName,
                 FundingStreamId = _.FundingStreamId,
                 TemplateCalculationId = _.TemplateCalculationId,
                 TemplateCalculations = AsCalculationSummaries(_.CalculationIds, calculations),
@@ -131,7 +132,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 CalculationType = calculationType,
             };
 
-        private ObsoleteItem NewObsoleteItem(string specificationId,
+        private ObsoleteItem NewObsoleteItem(
+            string specificationId,
             params string[] calculationIds) => new ObsoleteItem
             {
                 Id = NewRandomString(),
