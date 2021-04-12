@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
 using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
@@ -29,7 +27,6 @@ namespace CalculateFunding.Frontend.Helpers
         private readonly IAuthorizationService _authorizationService;
         private readonly IUsersApiClient _usersClient;
         private readonly IPoliciesApiClient _policyClient;
-        private readonly IMapper _mapper;
         private readonly ILogger _logger;
         private readonly PermissionOptions _permissionOptions;
 
@@ -37,20 +34,17 @@ namespace CalculateFunding.Frontend.Helpers
             IAuthorizationService authorizationService,
             IUsersApiClient usersClient,
             IPoliciesApiClient policyClient,
-            IMapper mapper,
             ILogger logger,
             IOptions<PermissionOptions> permissionOptions)
         {
             Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
             Guard.ArgumentNotNull(usersClient, nameof(usersClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(permissionOptions, nameof(permissionOptions));
 
             _authorizationService = authorizationService;
             _usersClient = usersClient;
             _policyClient = policyClient;
-            _mapper = mapper;
             _logger = logger;
             _permissionOptions = permissionOptions.Value;
         }

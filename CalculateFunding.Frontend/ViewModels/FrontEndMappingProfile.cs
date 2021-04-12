@@ -53,6 +53,8 @@ namespace CalculateFunding.Frontend.ViewModels
         {
             CreateMap<FundingStreamPermission, FundingStreamPermissionModel>()
                 .ForMember(m => m.FundingStreamName, opt => opt.Ignore());
+
+            CreateMap<FundingStreamPermissionCurrentDownloadModel, FundingStreamPermissionCurrentDownloadViewModel>();
         }
 
         private void MapGraph()

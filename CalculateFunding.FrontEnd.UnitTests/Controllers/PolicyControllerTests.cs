@@ -11,7 +11,6 @@ using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Controllers;
-using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;

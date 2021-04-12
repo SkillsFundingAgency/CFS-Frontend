@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Frontend.ViewModels.Users;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Helpers

@@ -78,7 +78,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             IPoliciesApiClient policyClient = Substitute.For<IPoliciesApiClient>();
             policyClient.GetFundingStreams().Returns(streamsResponse);
             
-            return new AuthorizationHelper(authorizationService, usersClient, policyClient, CreateMapper(), logger, permissionOptions);
+            return new AuthorizationHelper(authorizationService, usersClient, policyClient, logger, permissionOptions);
         }
         private static IMapper CreateMapper()
         {

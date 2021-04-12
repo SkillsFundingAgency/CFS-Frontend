@@ -10,7 +10,6 @@ using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
 using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
