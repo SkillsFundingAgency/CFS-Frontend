@@ -1,4 +1,5 @@
 import {ReportCategory} from "./ReportCategory";
+import React from "react";
 
 export interface ReportMetadataViewModel {
     specificationReportIdentifier: string;
@@ -7,5 +8,39 @@ export interface ReportMetadataViewModel {
     lastModified: Date;
     format: string;
     size: string;
+    grouping: ReportGrouping,
+    groupingLevel: ReportGroupingLevel
+    reportType: JobType
+    expanded?: boolean,
+    customRef?: React.MutableRefObject<null>,
+}
+
+export enum ReportGrouping {
+    Undefined = "Undefined",
+    Live = "Live",
+    Provider = "Provider",
+    Group = "Group",
+    Profiling = "Profiling",
+}
+
+export enum ReportGroupingLevel {
+    Undefined = "Undefined",
+    Current = "Current",
+    All = "All",
+    Released = "Released"
+}
+
+export enum JobType {
+    Undefined,
+    CurrentState,
+    Released,
+    History,
+    HistoryProfileValues,
+    CurrentProfileValues,
+    CurrentOrganisationGroupValues,
+    HistoryOrganisationGroupValues,
+    HistoryPublishedProviderEstate,
+    CalcResult,
+    PublishedGroups
 }
 

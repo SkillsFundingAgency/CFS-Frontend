@@ -540,6 +540,11 @@ input:disabled{
   }
 }
 
+.attachment__container, .attachment__container:last-child {
+  clear:left;
+  margin-bottom: 35px;
+}
+
 .attachment__thumbnail {
   position: relative;
   width: auto;

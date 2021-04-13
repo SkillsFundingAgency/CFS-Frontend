@@ -1,29 +1,39 @@
 import {MultipleErrorSummary} from "../MultipleErrorSummary";
-import {DateTimeFormatter} from "../DateTimeFormatter";
 import {RunningStatus} from "../../types/RunningStatus";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {getDownloadableReportsService} from "../../services/specificationService";
-import {ReportMetadataViewModel} from "../../types/Specifications/ReportMetadataViewModel";
+import {
+    ReportGrouping,
+    ReportGroupingLevel,
+    ReportMetadataViewModel
+} from "../../types/Specifications/ReportMetadataViewModel";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
 import {useErrors} from "../../hooks/useErrors";
 import {runGenerateCalculationCsvResultsJob} from "../../services/calculationService";
 import {ReportCategory} from "../../types/Specifications/ReportCategory";
+import {AccordianPanel} from "../AccordianPanel";
+import {InputSearch} from "../InputSearch";
+import {DownloadableReportItem} from "./DownloadableReportItem";
 
 export function DownloadableReports(props: {
     specificationId: string,
     fundingPeriodId: string
 }) {
-
+    const [allExpanded, setAllExpanded] = useState<boolean>(false);
+    const [reportsSearchSuggestions, setReportsSearchSuggestions] = useState<string[]>([]);
     const [downloadableReports, setDownloadableReports] = useState<ReportMetadataViewModel[]>([]);
+    const [downloadableReportsGrouping, setDownloadableReportsGrouping] = useState<ReportGrouping[]>([]);
+    const [reportsRenderInternalState, setReportsRenderInternalState] = useState<boolean>();
+    const reportAccordionReactRef = useRef(null);
+    const nullReactRef = useRef(null);
     const {
         errors: liveReportErrors,
         addErrorMessage: addLiveReportErrors,
         clearErrorMessages: clearLiveReportErrorMessages
     } = useErrors();
-
     const {hasJob: hasCalculationJob, latestJob: latestCalculationJob, isCheckingForJob: isCheckingForCalculationJob} =
         useLatestSpecificationJobWithMonitoring(props.specificationId,
             [JobType.CreateInstructAllocationJob,
@@ -39,6 +49,35 @@ export function DownloadableReports(props: {
         );
     const [isRefreshingReports, setIsRefreshingReports] = useState<boolean>(false);
     const [liveReportStatusMessage, setLiveReportStatusMessage] = useState<string>("");
+
+    useEffect(() => {
+        jobStatusReport();
+    }, [hasCalculationJob, hasReportJob]);
+
+    useEffect(() => {
+        getDownloadableReportsService(props.specificationId, props.fundingPeriodId)
+            .then((result) => {
+                const response = result.data as ReportMetadataViewModel[];
+                setDownloadableReports(response);
+                setInitialExpandedStatus(response, false);
+                setDownloadableReportsGrouping(
+                    [...new Set(response.filter(r => r.grouping !== ReportGrouping.Live).map(p => p.grouping))]);
+                setReportsSearchSuggestions([...getDistinctPublishedReports(response)]);
+            }).catch((err) => {
+            addLiveReportErrors(`Error fetching downloadable reports. ${err}`);
+        });
+    }, [props.specificationId]);
+
+    useEffect(() => {
+        if (!reportsRenderInternalState) {
+            return
+        }
+        if (reportAccordionReactRef !== null && reportAccordionReactRef.current !== null) {
+            // @ts-ignore
+            reportAccordionReactRef.current.scrollIntoView({behavior: 'smooth', block: 'start'})
+        }
+        setReportsRenderInternalState(false);
+    }, [reportsRenderInternalState]);
 
     function jobStatusReport() {
         if (!latestCalculationJob && !latestReportJob) return;
@@ -65,19 +104,58 @@ export function DownloadableReports(props: {
         }
     }
 
-    useEffect(() => {
-        jobStatusReport();
-    }, [hasCalculationJob, hasReportJob]);
-
-    useEffect(() => {
-        getDownloadableReportsService(props.specificationId, props.fundingPeriodId)
-            .then((result) => {
-                const response = result.data as ReportMetadataViewModel[];
-                setDownloadableReports(response);
-            }).catch((err) => {
-            addLiveReportErrors(`Error fetching downloadable reports. ${err}`);
+    function setInitialExpandedStatus(reports: ReportMetadataViewModel[], expanded: boolean) {
+        reports.map((fundingStructureItem: ReportMetadataViewModel) => {
+            fundingStructureItem.expanded = expanded;
         });
-    }, [props.specificationId]);
+    }
+
+    function getDistinctPublishedReports(reports: ReportMetadataViewModel[]) {
+        const reportNames: string[] = [];
+        reports.filter((report) => report.category === ReportCategory.History).map((reportMetadataViewModel: ReportMetadataViewModel) => {
+            reportNames.push(reportMetadataViewModel.name);
+        });
+
+        return new Set(reportNames.sort((a, b) => a.localeCompare(b)));
+    }
+
+    function searchReports(reportName: string) {
+        const downloadableReportsCopy: ReportMetadataViewModel[] = downloadableReports as ReportMetadataViewModel[];
+        expandReportByName(downloadableReportsCopy, reportName, reportAccordionReactRef, nullReactRef);
+        setDownloadableReports(downloadableReportsCopy);
+        setReportsRenderInternalState(true);
+    }
+
+    function openCloseAllReports(isOpen: boolean) {
+        setAllExpanded(isOpen);
+        updateDownloadableReportsExpandStatus(downloadableReports, isOpen);
+    }
+
+    function updateDownloadableReportsExpandStatus(downloadableReports: ReportMetadataViewModel[], expandedStatus: boolean) {
+        downloadableReports.map((downloadableReport: ReportMetadataViewModel) => {
+            downloadableReport.expanded = expandedStatus;
+        });
+    }
+
+    function expandReportByName(reportsToFilter: ReportMetadataViewModel[], keyword: string,
+                                customRef: React.MutableRefObject<null>, nullRef: React.MutableRefObject<null>) {
+        reportsToFilter.map((report: ReportMetadataViewModel) => {
+            report.customRef = nullRef;
+            report.expanded = false;
+        });
+
+        let isRefAlreadyAssigned = false;
+        reportsToFilter.map((report: ReportMetadataViewModel) => {
+                if (report.name.toLowerCase() === keyword.toLowerCase()) {
+                    report.expanded = true;
+                    if (!isRefAlreadyAssigned) {
+                        report.customRef = customRef;
+                        isRefAlreadyAssigned = true;
+                    }
+                }
+            }
+        );
+    }
 
     function submitRefresh() {
         clearLiveReportErrorMessages();
@@ -95,6 +173,10 @@ export function DownloadableReports(props: {
         }
     }
 
+    const handleExpandClick = () => {
+        setAllExpanded(!allExpanded);
+    }
+
     return <section className="govuk-tabs__panel" id="downloadable-reports">
         <h2 className="govuk-heading-l">Downloadable reports</h2>
         <MultipleErrorSummary errors={liveReportErrors}/>
@@ -104,52 +186,13 @@ export function DownloadableReports(props: {
                     There are no reports available for this Specification
                 </div>
 
-                <div hidden={!downloadableReports.some(dr => dr.category === ReportCategory.Live)}>
-                    <h3 className="govuk-heading-m govuk-!-margin-top-5">Live reports</h3>
+                <div hidden={!downloadableReports.some(dr => dr.grouping === ReportGrouping.Live)}>
+                    <h3 className="govuk-heading-m govuk-!-margin-top-5" data-testid={"live-report"}>Live reports</h3>
                     <div className={`govuk-form-group ${liveReportErrors.length > 0 ? "govuk-form-group--error" : ""}`}>
-                        {downloadableReports.filter(dr => dr.category === "Live").map((dlr, index) => <div>
-                                <div className="attachment__thumbnail" key={index}>
-                                    <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}
-                                       className="govuk-link" target="_self"
-                                       aria-hidden="true">
-                                        <svg
-                                            className="attachment__thumbnail-image thumbnail-image-small "
-                                            version="1.1" viewBox="0 0 99 140" width="99"
-                                            height="140"
-                                            aria-hidden="true">
-                                            <path
-                                                d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
-                                            ></path>
-                                            <path
-                                                d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
-                                            ></path>
-                                            <path
-                                                d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
-                                                fill="none" stroke-width="2"></path>
-                                        </svg>
-                                    </a>
-                                </div>
-                                <div className="attachment__details">
-                                    <h4 className="govuk-heading-s">
-                                        <a className="govuk-link" target="_self"
-                                           href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
-                                        {
-                                            downloadableReports.some(dr => dr.specificationReportIdentifier === dlr.specificationReportIdentifier
-                                                && dr.lastModified > dlr.lastModified) ? <strong
-                                                    className="govuk-tag govuk-!-margin-left-2 govuk-tag--green ">
-                                                    New version available
-                                                </strong>
-                                                : null
-                                        }
-                                    </h4>
-                                    <p className="govuk-body-s">
-                                        <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateTimeFormatter
-                                        date={dlr.lastModified}/></span>
-                                    </p>
-                                </div>
-                                <div className="govuk-clearfix"></div>
-                            </div>
-                        )}
+                        {downloadableReports.filter(dr => dr.grouping === ReportGrouping.Live)
+                            .map((dlr, index) =>
+                                    <DownloadableReportItem key={`live-report-${index}`} itemKey={`live-report-${index}`} reportMetadataViewModel={dlr} />
+                            )}
                         <div className="attachment__thumbnail">
                             <a className="govuk-link" target="_self"
                                aria-hidden="true" href="">
@@ -172,7 +215,6 @@ export function DownloadableReports(props: {
                         </div>
                         <div className="attachment__details">
                             <h4 className="govuk-heading-s">
-
                                 <p hidden={downloadableReports.some(dr => dr.category === ReportCategory.Live
                                     && latestReportJob?.runningStatus === RunningStatus.InProgress
                                     && latestCalculationJob?.runningStatus === RunningStatus.InProgress)}
@@ -218,43 +260,69 @@ export function DownloadableReports(props: {
                 </div>
                 <div hidden={!downloadableReports.some(dr => dr.category === ReportCategory.History)}>
                     <h3 className="govuk-heading-m govuk-!-margin-top-5">Published reports</h3>
-                    {downloadableReports.filter(dr => dr.category === ReportCategory.History).map((dlr, index) =>
-                        <div key={index}>
-                            <div className="attachment__thumbnail">
-                                <a href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}
-                                   className="govuk-link" target="_self"
-                                   aria-hidden="true">
-                                    <svg
-                                        className="attachment__thumbnail-image thumbnail-image-small "
-                                        version="1.1" viewBox="0 0 99 140" width="99"
-                                        height="140"
-                                        aria-hidden="true">
-                                        <path
-                                            d="M12 12h75v27H12zm0 47h18.75v63H12zm55 2v59H51V61h16m2-2H49v63h20V59z"
-                                            stroke-width="0"></path>
-                                        <path
-                                            d="M49 61.05V120H32.8V61.05H49m2-2H30.75v63H51V59zm34 2V120H69.05V61.05H85m2-2H67v63h20V59z"
-                                            stroke-width="0"></path>
-                                        <path
-                                            d="M30 68.5h56.5M30 77.34h56.5M30 112.7h56.5M30 95.02h56.5M30 86.18h56.5M30 103.86h56.5"
-                                            fill="none" stroke-miterlimit="10"
-                                            stroke-width="2"></path>
-                                    </svg>
-                                </a>
-                            </div>
-                            <div className="attachment__details">
-                                <h4 className="govuk-heading-s">
-                                    <a className="govuk-link" target="_self"
-                                       href={`/api/specs/${dlr.specificationReportIdentifier}/download-report`}>{dlr.name}</a>
-                                </h4>
-                                <p className="govuk-body-s">
-                                    <span>{dlr.format}</span>, <span>{dlr.size}</span>, Updated: <span><DateTimeFormatter
-                                    date={dlr.lastModified}/></span>
-                                </p>
-                            </div>
-                            <div className="govuk-clearfix"></div>
+
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-one-third">
                         </div>
-                    )}
+                        <div className="govuk-grid-column-two-thirds">
+                            <div className="govuk-form-group search-container">
+                                <label className="govuk-label">
+                                    Search for a published report
+                                </label>
+                                {<InputSearch id={"input-auto-complete"} suggestions={reportsSearchSuggestions}
+                                              callback={searchReports}/>}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+                        <div className="govuk-accordion__controls">
+                            <button type="button" onClick={handleExpandClick} className="govuk-accordion__open-all"
+                                    data-testid={"open-close"}
+                                    aria-expanded={allExpanded ? "true" : "false"}>
+                                {allExpanded ? "Close" : "Open"} all<span
+                                className="govuk-visually-hidden"> sections</span>
+                            </button>
+                        </div>
+                        {
+                            downloadableReportsGrouping
+                                .map((group, groupIndex) => {
+                                    return <AccordianPanel title={`${group} level reports`}
+                                                           key={`panel-group-${groupIndex}`} id={`panel-${groupIndex}`}
+                                                           boldSubtitle={""} subtitle={""}
+                                                           expanded={downloadableReports.some((r) =>
+                                                               r.expanded && r.grouping === group)}
+                                                           autoExpand={allExpanded}>
+                                        {
+                                            [...new Set(downloadableReports.filter(dr => dr.grouping === group)
+                                                .map(p => p.groupingLevel))]
+                                                .map((groupLevel, groupLevelIndex) => {
+                                                        return <div key={groupLevelIndex} id="accordion-default-content-1"
+                                                                    className="govuk-accordion__section-content"
+                                                                    aria-labelledby="accordion-default-heading-1">
+                                                            <h1 className="govuk-heading-s govuk-!-margin-bottom-3">
+                                                                {
+                                                                    groupLevel === ReportGroupingLevel.All ? "All versions " :
+                                                                        groupLevel === ReportGroupingLevel.Current ? "Current state " :
+                                                                            groupLevel === ReportGroupingLevel.Released ? "Released only " : ""
+                                                                }
+                                                                {group.toLowerCase()} level funding line reports
+                                                            </h1>
+                                                            {
+                                                                downloadableReports.filter(dlr => dlr.grouping === group && dlr.groupingLevel === groupLevel)
+                                                                    .map((dlr, dlrIndex) => {
+                                                                        return <DownloadableReportItem
+                                                                            key={`published-report-${dlrIndex}`}
+                                                                            itemKey={groupLevel}
+                                                                            reportMetadataViewModel={dlr}/>
+                                                                    })}
+                                                        </div>
+                                                    }
+                                                )}
+                                    </AccordianPanel>
+                                })
+                        }
+                    </div>
                 </div>
             </div>
         </div>

@@ -11,9 +11,13 @@ export function AccordianPanel(props: {
         setPanelExpanded(props.autoExpand);
     }, [props.autoExpand]);
 
+    useEffect(() => {
+        setPanelExpanded(props.expanded);
+    }, [props.expanded]);
+
     return (
         <div className={"govuk-accordion__section" + (panelExpanded ? " govuk-accordion__section--expanded" : "")}
-            id={props.id} role="region">
+            id={props.id} role="region" data-testid="accordian-panel">
             <div className="govuk-accordion__section-header">
                 <h2 className="govuk-accordion__section-heading">
                     <button type="button" id={"accordion-default-heading-" + props.id}
