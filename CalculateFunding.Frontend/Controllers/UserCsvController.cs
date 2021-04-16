@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CalculateFunding.Common.ApiClient.Interfaces;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.ViewModels.Users;

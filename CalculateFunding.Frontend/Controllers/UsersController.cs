@@ -5,6 +5,7 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
@@ -19,14 +20,16 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
+        private readonly IUsersApiClient _usersApiClient;
 
-        public UsersController(IAuthorizationHelper authorizationHelper, IPoliciesApiClient policiesApiClient, IMapper mapper)
+        public UsersController(IAuthorizationHelper authorizationHelper, IPoliciesApiClient policiesApiClient, IMapper mapper, IUsersApiClient usersApiClient)
         {
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
 
             _authorizationHelper = authorizationHelper;
             _policiesApiClient = policiesApiClient;
             _mapper = mapper;
+            _usersApiClient = usersApiClient;
         }
 
         [HttpGet]
@@ -64,6 +67,21 @@ namespace CalculateFunding.Frontend.Controllers
             return results;
         }
 
+        [Route("api/users/{userId}/permissions/{fundingStreamId}")]
+        [HttpPut]
+        [Produces(typeof(FundingStreamPermission))]
+        public async Task<FundingStreamPermission> RunUpdatePermissionForUser([FromRoute]string userId, [FromRoute]string fundingStreamId, [FromBody] FundingStreamPermission fundingStreamPermission)
+        {
+            return  await _authorizationHelper.UpdateFundingStreamPermission(User, userId, fundingStreamId, fundingStreamPermission);
+        }
 
+        [Route("api/users/{userId}/permissions/{fundingStreamId}")]
+        [HttpDelete]
+        [Produces(typeof(FundingStreamPermission))]
+        public async Task<FundingStreamPermission> RemoveUserPermissions([FromRoute]string userId, [FromRoute]string fundingStreamId)
+        {
+            FundingStreamPermission fundingStreamPermission = new FundingStreamPermission() { UserId = userId, FundingStreamId = fundingStreamId }.SetAllBooleansTo(false);
+            return await _authorizationHelper.UpdateFundingStreamPermission(User, userId, fundingStreamId, fundingStreamPermission);
+        }
     }
 }

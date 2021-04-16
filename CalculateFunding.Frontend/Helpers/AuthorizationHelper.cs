@@ -4,10 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using CalculateFunding.Common.ApiClient.Interfaces;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
@@ -29,22 +30,26 @@ namespace CalculateFunding.Frontend.Helpers
         private readonly IPoliciesApiClient _policyClient;
         private readonly ILogger _logger;
         private readonly PermissionOptions _permissionOptions;
+        private readonly IMapper _mapper;
 
         public AuthorizationHelper(
             IAuthorizationService authorizationService,
             IUsersApiClient usersClient,
             IPoliciesApiClient policyClient,
+            IMapper mapper,
             ILogger logger,
             IOptions<PermissionOptions> permissionOptions)
         {
             Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
             Guard.ArgumentNotNull(usersClient, nameof(usersClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(permissionOptions, nameof(permissionOptions));
 
             _authorizationService = authorizationService;
             _usersClient = usersClient;
             _policyClient = policyClient;
+            _mapper = mapper;
             _logger = logger;
             _permissionOptions = permissionOptions.Value;
         }
@@ -189,6 +194,33 @@ namespace CalculateFunding.Frontend.Helpers
             return specifications.Where(specificationSummary => SpecificationDoesNotHaveAllowedFundingStreams(specificationSummary, allowedFundingStreamIds));
         }
 
+        public async Task<FundingStreamPermission> UpdateFundingStreamPermission(ClaimsPrincipal user, string userId, string fundingStreamId, FundingStreamPermission permissions)
+        {
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(permissions, nameof(permissions));
+
+            FundingStreamPermission userFundingStreamPermission = await GetUserFundingStreamPermissions(user, fundingStreamId);
+
+            if (!userFundingStreamPermission.CanAdministerFundingStream)
+            {
+                string message = $"{user?.Identity?.Name} Not allowed to update the funding stream permissions for {userId}";
+                _logger.Error(message);
+                throw new Exception(message);
+            }
+
+            FundingStreamPermissionUpdateModel fundingStreamPermissionUpdateModel = _mapper.Map<FundingStreamPermissionUpdateModel>(permissions);
+            ApiResponse<FundingStreamPermission> apiResponse = await _usersClient.UpdateFundingStreamPermission(userId, fundingStreamId, fundingStreamPermissionUpdateModel);
+
+            if(apiResponse.StatusCode != HttpStatusCode.OK || apiResponse.Content == null)
+            {
+                string message = $"Failed to update funding stream permissions for user ({userId}) - {apiResponse.StatusCode}";
+                _logger.Error(message);
+                throw new Exception(message);
+            }
+
+            return apiResponse.Content;
+        }
         private static bool SpecificationDoesNotHaveAllowedFundingStreams(
             SpecificationSummary specificationSummary, IEnumerable<string> allowedFundingStreamIds)
         {

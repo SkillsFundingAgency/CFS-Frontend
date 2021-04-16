@@ -87,5 +87,16 @@ namespace CalculateFunding.Frontend.Helpers
                 UserId = user.GetUserProfile()?.Id,
             }.SetAllBooleansTo(true));
         }
+
+        public async Task<FundingStreamPermission> UpdateFundingStreamPermission(ClaimsPrincipal user, string userId, string fundingStreamId, FundingStreamPermission permissions)
+        {
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(permissions, nameof(permissions));
+
+            permissions.UserId = userId;
+            permissions.FundingStreamId = fundingStreamId;
+            return await Task.FromResult(permissions);
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using CalculateFunding.Common.ApiClient.Interfaces;
+using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
@@ -78,7 +78,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             IPoliciesApiClient policyClient = Substitute.For<IPoliciesApiClient>();
             policyClient.GetFundingStreams().Returns(streamsResponse);
             
-            return new AuthorizationHelper(authorizationService, usersClient, policyClient, logger, permissionOptions);
+            return new AuthorizationHelper(authorizationService, usersClient, policyClient, CreateMapper(), logger, permissionOptions);
         }
         private static IMapper CreateMapper()
         {
@@ -799,6 +799,45 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 
             // Assert
             results.Should().BeEmpty();
+        }
+
+        [TestMethod]
+        public async Task UpdateFundingStreamPermission_WhenUsersApiUpdateUserPermissions_ReturnsSuccess()
+        {
+            // Arrange
+            string executingUserId = "usr1";
+            ClaimsPrincipal user = BuildClaimsPrincipal(executingUserId);
+            string userId = "usr2";
+            string fundingStreamId = "fs1";
+
+            FundingStreamPermission executingUserfundingStreamPermission = new FundingStreamPermission { UserId = executingUserId, FundingStreamId = fundingStreamId, CanAdministerFundingStream = true };
+            FundingStreamPermission fundingStreamPermission = new FundingStreamPermission { UserId = userId, FundingStreamId = fundingStreamId, CanApproveAllCalculations = true };
+
+            IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+            IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+            usersClient
+                .GetFundingStreamPermissionsForUser(executingUserId)
+                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new[] { executingUserfundingStreamPermission }));
+
+            usersClient
+                .UpdateFundingStreamPermission(userId, fundingStreamId, Arg.Is<FundingStreamPermissionUpdateModel>(m => m.CanApproveAllCalculations == true))
+                .Returns(new ValidatedApiResponse<FundingStreamPermission>(HttpStatusCode.OK, fundingStreamPermission));
+
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+            // Act
+            FundingStreamPermission resultPermissions = await authHelper.UpdateFundingStreamPermission(user, userId, fundingStreamId, fundingStreamPermission);
+
+            // Assert
+            resultPermissions.Should().NotBeNull();
+
+            await usersClient
+                .Received(1)
+                .GetFundingStreamPermissionsForUser(executingUserId);
+
+            await usersClient
+                .Received(1)
+                .UpdateFundingStreamPermission(userId, fundingStreamId, Arg.Is<FundingStreamPermissionUpdateModel>(m => m.CanApproveAllCalculations == true));
         }
 
         private static ClaimsPrincipal BuildClaimsPrincipal(string userId, bool addAdminGroupClaim = false)
