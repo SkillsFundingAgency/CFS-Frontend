@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -88,12 +89,14 @@ namespace CalculateFunding.Frontend.Controllers
             return new OkObjectResult(viewModel);
         }
 
-        private async Task<SpecificationDatasetRelationshipsViewModel> PopulateViewModel(SpecificationSummary specification)
+        private async Task<SpecificationDatasetRelationshipsViewModel> PopulateViewModel(
+            SpecificationSummary specification)
         {
             SpecificationSummaryViewModel vm = _mapper.Map<SpecificationSummaryViewModel>(specification);
-            SpecificationDatasetRelationshipsViewModel viewModel = new SpecificationDatasetRelationshipsViewModel(vm);
+            SpecificationDatasetRelationshipsViewModel viewModel =
+                new SpecificationDatasetRelationshipsViewModel(vm);
 
-            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> apiResponse = 
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> apiResponse =
                 await _datasetsApiClient.GetRelationshipsBySpecificationId(specification.Id);
 
             if (apiResponse.StatusCode != HttpStatusCode.OK || apiResponse.Content == null)
@@ -101,24 +104,51 @@ namespace CalculateFunding.Frontend.Controllers
                 return null;
             }
 
-            viewModel.Items = apiResponse.Content.Select(m => new SpecificationDatasetRelationshipItemViewModel
-            {
-                DatasetId = m.DatasetId,
-                DatasetName = m.DatasetName,
-                DefinitionName = m.Definition != null ? m.Definition.Name : string.Empty,
-                DefinitionId = m.Definition != null ? m.Definition.Id : string.Empty,
-                DefinitionDescription = m.Definition?.Description ?? string.Empty,
-                DatasetVersion = m.Version ?? 0,
-                RelationName = m.Name,
-                RelationshipId = m.Id,
-                RelationshipDescription = m.RelationshipDescription,
-                IsProviderData = m.IsProviderData,
-                IsLatestVersion = m.IsLatestVersion,
-                LastUpdatedDate = m.LastUpdatedDate,
-                LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name) ? "Unknown" : m.LastUpdatedAuthor.Name,
-            }).OrderBy(_ => _.RelationName);
+
+            IEnumerable<Task<SpecificationDatasetRelationshipItemViewModel>> viewModelItems =
+                apiResponse.Content.Select(async m => new SpecificationDatasetRelationshipItemViewModel
+                {
+                    DatasetId = m.DatasetId,
+                    DatasetName = m.DatasetName,
+                    DefinitionName = m.Definition != null ? m.Definition.Name : string.Empty,
+                    DefinitionId = m.Definition != null ? m.Definition.Id : string.Empty,
+                    DefinitionDescription = m.Definition?.Description ?? string.Empty,
+                    DatasetVersion = m.Version ?? 0,
+                    RelationName = m.Name,
+                    RelationshipId = m.Id,
+                    RelationshipDescription = m.RelationshipDescription,
+                    IsProviderData = m.IsProviderData,
+                    IsLatestVersion = m.IsLatestVersion,
+                    LastUpdatedDate = m.LastUpdatedDate,
+                    LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name)
+                        ? "Unknown"
+                        : m.LastUpdatedAuthor.Name,
+                    HasDataSourceFileToMap = string.IsNullOrWhiteSpace(m.DatasetName)
+                                             && await GetDataSourceFiles(m.Id)
+                });
+
+            SpecificationDatasetRelationshipItemViewModel[]
+                items = await Task.WhenAll(viewModelItems.ToArraySafe());
+
+            viewModel.Items = items.OrderBy(_ => _.RelationName);
 
             return viewModel;
+        }
+
+        private async Task<bool> GetDataSourceFiles(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return false;
+
+            ApiResponse<SelectDatasourceModel> result =
+                await _datasetsApiClient.GetDataSourcesByRelationshipId(id);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                return result.Content.Datasets != null && result.Content.Datasets.Any(); 
+            }
+
+            return false;
         }
     }
 }

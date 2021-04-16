@@ -22,6 +22,7 @@ export interface SpecificationDatasetRelationshipsViewModelItem {
     linkPhrase: string;
     isLatestVersion: boolean,
     lastUpdatedDate: Date,
-    lastUpdatedAuthorName: string
+    lastUpdatedAuthorName: string,
+    hasDataSourceFileToMap: boolean
 }
 

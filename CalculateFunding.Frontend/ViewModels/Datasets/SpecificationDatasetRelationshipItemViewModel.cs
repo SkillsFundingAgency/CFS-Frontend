@@ -56,5 +56,7 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
         public DateTimeOffset? LastUpdatedDate { get; set; }
         
         public string LastUpdatedAuthorName { get; set; }
+
+        public bool HasDataSourceFileToMap { get; set; }
     }
 }

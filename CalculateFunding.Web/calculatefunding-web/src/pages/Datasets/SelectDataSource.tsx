@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -26,6 +26,7 @@ export interface SelectDataSourceRouteProps {
 }
 
 export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRouteProps>) {
+    const [datasetRelationshipId, setDatasetRelationshipId] = useState<string>(match.params.datasetRelationshipId);
     const [newVersionNumber, setNewVersionNumber] = useState<number | undefined>();
     const [newDataset, setNewDataset] = useState<Dataset>();
     const [missingVersion, setMissingVersion] = useState<boolean>(false);
@@ -34,7 +35,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const {errors, addErrorMessage, addError} = useErrors();
     const history = useHistory();
 
-    const {relationshipData, isLoadingRelationshipData} = useRelationshipData(match.params.datasetRelationshipId);
+    const {relationshipData, isLoadingRelationshipData} = useRelationshipData(datasetRelationshipId);
 
     const specificationId = relationshipData && relationshipData.specificationId ? relationshipData.specificationId : "";
     const {specification, isLoadingSpecification} = 

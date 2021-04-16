@@ -1,8 +1,7 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {RouteComponentProps} from "react-router";
 import {BackToTop} from "../../components/BackToTop";
 import {Link} from "react-router-dom";
@@ -62,7 +61,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const {errors, addError} = useErrors();
 
-    useEffectOnce(() => {
+    useEffect(() => {
         setIsLoading(true);
         searchDatasetRelationships(match.params.specificationId).then((result) => {
             setDatasetRelationships(result.data as SpecificationDatasetRelationshipsViewModel);
@@ -71,7 +70,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
         }).finally(() => {
             setIsLoading(false);
         });
-    });
+    },[match.params.specificationId]);
 
     return (<div>
         <Header location={Section.Datasets} />
@@ -109,7 +108,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                     <LoadingStatus title={"Loading datasets"} hidden={!isLoading} />
-                    <table id="datarelationship-table" className="govuk-table" hidden={datasetRelationships.items.length === 0 || isLoading}>
+                    <table id="datarelationship-table" data-testid={"datarelationship-table"} className="govuk-table" hidden={datasetRelationships.items.length === 0 || isLoading}>
                         <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
                                 <th scope="col" className="govuk-table__header govuk-!-width-one-half">
@@ -121,7 +120,6 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                         </thead>
                         <tbody className="govuk-table__body">
                             {datasetRelationships.items.map((sdr, index) =>
-
                                 <tr key={index} className="govuk-table__row">
                                     <th scope="row" className="govuk-table__header">
                                         {sdr.relationName}
@@ -130,7 +128,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                             <summary className="govuk-details__summary">
                                                 <span className="govuk-details__summary-text">
                                                     Dataset details
-            </span>
+                                                </span>
                                             </summary>
                                             <div className="govuk-details__text">
                                                 <p className="govuk-body">
@@ -148,9 +146,14 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                             </div>
                                         </details>
                                     </th>
-                                    <td className="govuk-table__cell">{sdr.datasetPhrase}</td>
+                                    <td className="govuk-table__cell">{
+                                        sdr.hasDataSourceFileToMap? sdr.datasetPhrase : "No data source files uploaded to map to"
+                                    }</td>
                                     <td className="govuk-table__cell">
-                                        <Link to={`/Datasets/SelectDataSource/${sdr.relationshipId}`} className="govuk-link">{sdr.linkPhrase}</Link>
+                                        {sdr.hasDataSourceFileToMap &&
+                                        <Link to={`/Datasets/SelectDataSource/${sdr.relationshipId}`}
+                                              className="govuk-link">{sdr.linkPhrase}</Link>
+                                        }
                                     </td>
                                 </tr>
                             )}
