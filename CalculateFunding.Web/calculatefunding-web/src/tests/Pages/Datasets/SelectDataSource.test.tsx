@@ -8,9 +8,10 @@ import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/use
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
 import * as useLatestEntityJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {
     LatestSpecificationJobWithMonitoringResult,
-    useLatestEntityJobWithMonitoring
+    useLatestEntityJobWithMonitoring, useLatestSpecificationJobWithMonitoring
 } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
@@ -77,6 +78,21 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isFetched: true,
     isFetching: false,
     isMonitoring: true,
+};
+const activeRunConverterDatasetMergeJob: LatestSpecificationJobWithMonitoringResult = {
+    hasJob: true,
+    isCheckingForJob: false,
+    latestJob: getJobDetailsFromJobResponse({
+        jobId: "kdfghjboer",
+        jobType: JobType.RunConverterDatasetMergeJob,
+        invokerUserDisplayName: "test user",
+        runningStatus: RunningStatus.InProgress,
+        created: new Date(),
+        lastUpdated: new Date()
+    }),
+    isFetched: true,
+    isFetching: false,
+    isMonitoring: true
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
@@ -250,6 +266,7 @@ describe("<SelectDataSource/>", () => {
                     relationshipData: {}
                 } as RelationshipDataQueryResult));
             jest.spyOn(useLatestEntityJobWithMonitoringHook, 'useLatestEntityJobWithMonitoring').mockImplementation(() => (activeJob));
+            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(()=> noJob);
             renderPage();
         });
 
@@ -273,6 +290,57 @@ describe("<SelectDataSource/>", () => {
         it("cancel button is hidden", () => {
             const button = screen.queryByRole('button', {name: /cancelButton/}) as HTMLButtonElement;
             expect(button).not.toBeInTheDocument();
+        });
+    });
+
+    describe("when background converter wizard job is running", () => {
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(() => (relationshipResult));jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({
+                    isLoadingRelationshipData: false,
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
+            jest.spyOn(useLatestEntityJobWithMonitoringHook, 'useLatestEntityJobWithMonitoring').mockImplementation(() => (noJob));
+            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeRunConverterDatasetMergeJob));
+            renderPage();
+        });
+
+        it("renders correct title", async () => {
+            expect(screen.getByText("Job in progress: Running Converter Wizard")).toBeInTheDocument();
+        });
+
+        it("displays converter wizard running warning", async () => {
+            expect(screen.getByText("Mapping of this dataset is disabled until converter wizard completes.")).toBeInTheDocument();
+        });
+
+        it("save button is disabled", () => {
+            const button = screen.getByRole('button', {name: /saveButton/}) as HTMLButtonElement;
+            expect(button).toBeInTheDocument();
+            expect(button).toBeDisabled();
+        });
+    });
+
+    describe("when background converter wizard job is not running", () => {
+        beforeEach(() => {
+            jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+            jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(() => (relationshipResult));jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
+                () => ({
+                    isLoadingRelationshipData: false,
+                    isErrorLoadingRelationshipData: false,
+                    relationshipData: {}
+                } as RelationshipDataQueryResult));
+            jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(()=> noJob);
+            renderPage();
+        });
+
+        it("does not show job in progress title", async () => {
+            expect(await screen.queryByText("Job in progress: Running Converter Wizard")).not.toBeInTheDocument();
+        });
+
+        it("does not display converter wizard running warning", async () => {
+            expect(await screen.queryByText("Mapping of this dataset is disabled until converter wizard completes.")).not.toBeInTheDocument();
         });
     });
 });

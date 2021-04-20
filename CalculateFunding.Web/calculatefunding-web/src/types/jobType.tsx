@@ -40,5 +40,7 @@
     ApproveAllCalculationsJob = "ApproveAllCalculationsJob",
     RunSqlImportJob = "RunSqlImportJob",
     GenerateCalcCsvResultsJob = "GenerateCalcCsvResultsJob",
-    BatchPublishedProviderValidationJob = "BatchPublishedProviderValidationJob"
+    BatchPublishedProviderValidationJob = "BatchPublishedProviderValidationJob",
+    DetectObsoleteFundingLinesJob = "DetectObsoleteFundingLinesJob",
+    RunConverterDatasetMergeJob = "RunConverterDatasetMergeJob",
 }
