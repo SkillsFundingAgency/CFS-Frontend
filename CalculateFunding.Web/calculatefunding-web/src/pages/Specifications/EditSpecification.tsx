@@ -25,6 +25,7 @@ import {JobType} from "../../types/jobType";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../types/Permission";
+import {BackLink} from "../../components/BackLink";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -498,13 +499,9 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     </div>
                 </fieldset>
                 }
-                {isUpdating &&
+                {!isUpdating &&
                 <div className="govuk-form-group">
-                    <Link id="cancel-update-specification" to={`/ViewSpecification/${specificationId}`}
-                          className="govuk-button govuk-button--secondary"
-                          data-module="govuk-button">
-                        Back
-                    </Link>
+                    <BackLink to={`/ViewSpecification/${specificationId}`} />
                 </div>
                 }
             </div>
