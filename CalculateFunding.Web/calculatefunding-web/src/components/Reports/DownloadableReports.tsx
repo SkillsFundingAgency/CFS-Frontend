@@ -17,6 +17,7 @@ import {ReportCategory} from "../../types/Specifications/ReportCategory";
 import {AccordianPanel} from "../AccordianPanel";
 import {InputSearch} from "../InputSearch";
 import {DownloadableReportItem} from "./DownloadableReportItem";
+import {BackToTop} from "../BackToTop";
 
 export function DownloadableReports(props: {
     specificationId: string,
@@ -326,5 +327,6 @@ export function DownloadableReports(props: {
                 </div>
             </div>
         </div>
+        <BackToTop id={"downloadable-reports"} hidden={downloadableReports.length === 0} />
     </section>
 }
