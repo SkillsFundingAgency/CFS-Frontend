@@ -131,15 +131,11 @@ namespace CalculateFunding.Frontend.Controllers
             => calculationIds.Select(_ => AsCalculationSummary(calculations, _));
 
         private static CalculationSummaryViewModel AsCalculationSummary(IDictionary<string, Calculation> calculations,
-            string id)
-        {
-            Calculation calculation = calculations.ContainsKey(id) ? calculations[id] : null;
-
-            return new CalculationSummaryViewModel
+            string id) =>
+            new CalculationSummaryViewModel
             {
                 Id = id,
-                Name = calculation?.Name,
+                Name = calculations.TryGetValue(id, out Calculation calculation) ? calculation.Name : null,
             };
-        }
     }
 }

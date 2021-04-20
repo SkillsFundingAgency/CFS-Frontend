@@ -2,12 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.ViewModels.ObsoleteItems;
 using FluentAssertions;
@@ -22,7 +26,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     {
         private Mock<ICalculationsApiClient> _calculations;
         private Mock<IPoliciesApiClient> _policies;
-        private Mock<ISpecificationsApiClient> _specs;
+        private Mock<ISpecificationsApiClient> _specifications;
         private ObsoleteItemsController _controller;
 
         [TestInitialize]
@@ -30,19 +34,22 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             _calculations = new Mock<ICalculationsApiClient>();
             _policies = new Mock<IPoliciesApiClient>();
-            _specs = new Mock<ISpecificationsApiClient>();
+            _specifications = new Mock<ISpecificationsApiClient>();
 
             _controller = new ObsoleteItemsController(
                 _calculations.Object,
                 _policies.Object,
-                _specs.Object);
+                _specifications.Object);
         }
 
         [TestMethod]
-        [Ignore]
         public async Task QueriesCalculationsAndObsoleteItemsToBuildResponseBySpecificationId()
         {
+            string fundingStreamId = NewRandomString();
+            string fundingPeriodId = NewRandomString();
+            
             string specificationId = NewRandomString();
+            string templateId = NewRandomString();
 
             string calculationIdOne = NewRandomString();
             string calculationIdTwo = NewRandomString();
@@ -73,8 +80,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 NewCalculation(calculationIdFive, calculationNameFive, CalculationType.Additional),
             };
 
+            SpecificationSummary specificationSummary = NewSpecificationSummary(fundingStreamId,
+                fundingPeriodId,
+                templateId);
+
             GivenTheCalculations(specificationId, calculations);
             AndTheObsoleteItems(specificationId, obsoleteItems);
+            AndTheSpecificationSummary(specificationId, specificationSummary);
+            AndTheTemplateMetadataContents(fundingStreamId, fundingPeriodId, templateId, new TemplateMetadataDistinctContents());
 
             OkObjectResult result = await _controller.GetObsoleteItemsForSpecification(specificationId) as OkObjectResult;
 
@@ -84,7 +97,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             viewModels
                 .Should()
-                .BeEquivalentTo<ObsoleteItemViewModel>(expectedViewModels);
+                .BeEquivalentTo(expectedViewModels,
+                    opt => opt.Excluding(_ => _.Title)
+                        .Excluding(_ => _.AdditionalCalculations)
+                        .Excluding(_ => _.TemplateCalculations));
         }
 
         private ObsoleteItemViewModel[] AsViewModels(IEnumerable<ObsoleteItem> obsoleteItems,
@@ -121,10 +137,23 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             => _calculations.Setup(_ => _.GetObsoleteItemsForSpecification(specificationId))
                 .ReturnsAsync(new ApiResponse<IEnumerable<ObsoleteItem>>(HttpStatusCode.OK, obsoleteItems));
 
+        private void AndTheSpecificationSummary(string specificationId,
+            SpecificationSummary specificationSummary)
+            => _specifications.Setup(_ => _.GetSpecificationSummaryById(specificationId))
+                .ReturnsAsync(new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, specificationSummary));
+
+        private void AndTheTemplateMetadataContents(string fundingStreamId,
+            string fundingPeriodId,
+            string templateId,
+            TemplateMetadataDistinctContents metadataDistinctContents)
+            => _policies.Setup(_ => _.GetDistinctTemplateMetadataContents(fundingStreamId,
+                    fundingPeriodId,
+                    templateId))
+                .ReturnsAsync(new ApiResponse<TemplateMetadataDistinctContents>(HttpStatusCode.OK, metadataDistinctContents));
+
         private Calculation NewCalculation(string id,
             string name,
-            CalculationType calculationType,
-            uint? templateCalculationId = null)
+            CalculationType calculationType)
             => new Calculation
             {
                 Id = id,
@@ -132,13 +161,35 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 CalculationType = calculationType,
             };
 
+        private Reference NewReference(string id = null)
+            => new Reference
+            {
+                Id = id ?? NewRandomString()
+            };
+
+        private SpecificationSummary NewSpecificationSummary(string fundingStreamId,
+            string fundingPeriodId,
+            string templateId)
+        => new SpecificationSummary
+        {
+            FundingStreams = new []
+            {
+                NewReference(fundingStreamId)
+            },
+            FundingPeriod = NewReference(fundingPeriodId),
+            TemplateIds = new Dictionary<string, string>
+            {
+                {fundingStreamId, templateId}
+            }
+        };
+        
         private ObsoleteItem NewObsoleteItem(
             string specificationId,
             params string[] calculationIds) => new ObsoleteItem
             {
                 Id = NewRandomString(),
                 CodeReference = NewRandomString(),
-                ItemType = NewRandomObsoleteItemType(),
+                ItemType = ObsoleteItemType.FundingLine,
                 EnumValueName = NewRandomString(),
                 TemplateCalculationId = NewRandomUint(),
                 SpecificationId = specificationId,
@@ -150,14 +201,5 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private static uint NewRandomUint() => (uint)new Random().Next(int.MaxValue);
 
         private string NewRandomString() => Guid.NewGuid().ToString();
-
-        private ObsoleteItemType NewRandomObsoleteItemType()
-        {
-            ObsoleteItemType[] possibleValues = Enum.GetValues(typeof(ObsoleteItemType))
-                .Cast<ObsoleteItemType>()
-                .ToArray();
-
-            return possibleValues[new Random().Next(possibleValues.Length - 1)];
-        }
     }
 }
