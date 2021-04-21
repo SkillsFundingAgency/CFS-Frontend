@@ -16,6 +16,7 @@ using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Serilog;
+using static CalculateFunding.Frontend.Extensions.DateRangeExtensions;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -67,6 +68,9 @@ namespace CalculateFunding.Frontend.Services
             Task<ApiResponse<FundingConfiguration>> fundingConfigTask = 
                 _policiesApiClient.GetFundingConfiguration(request.FundingStreamId, request.FundingPeriodId);
 
+            Task<HashSet<string>> currentFundingPeriodMonthsTask =
+                GetCurrentFundingPeriodsMonths(request.FundingPeriodId);
+
             ApiResponse<SearchResults<PublishedProviderSearchItem>> searchResponse = await searchTask;
             if (searchResponse == null)
             {
@@ -74,6 +78,8 @@ namespace CalculateFunding.Frontend.Services
                 return null;
             }
 
+            HashSet<string> currentFundingPeriodMonths = await currentFundingPeriodMonthsTask;
+            
             PublishProviderSearchResultViewModel result = new PublishProviderSearchResultViewModel
             {
                 TotalResults = searchResponse.Content?.TotalCount ?? 0,
@@ -84,6 +90,8 @@ namespace CalculateFunding.Frontend.Services
                 FilteredFundingAmount = searchResponse.Content?.Results?.Sum(x => x.FundingValue) ?? 0
             };
 
+            RemoveMonthYearFacetsOutsideOfCurrentFundingPeriod(currentFundingPeriodMonths, result);
+            
             int totalPages = (int) Math.Ceiling((double) result.TotalResults / (double) request.PageSize.Value);
             result.PagerState = new PagerState(requestOptions.PageNumber, totalPages, 4);
 
@@ -102,20 +110,22 @@ namespace CalculateFunding.Frontend.Services
             }
 
             bool isBatchModeEnabled = fundingConfigurationResponse.Content.ApprovalMode == ApprovalMode.Batches;
-
+            
             if (result.Providers != null && result.Providers.Any())
             {
                 string[] providerTypes = request.Filters.GetValueOrDefault("providerType") ?? new string[0];
                 string[] localAuthorities = request.Filters.GetValueOrDefault("localAuthority") ?? new string[0];
                 string[] fundingStatuses = request.Filters.GetValueOrDefault("fundingStatus") ?? new string[0];
                 bool? isIndicative = GetIsIndicativeFlagFromFilters(request.Filters);
+                string[] monthYearOpened = request.Filters.GetValueOrDefault("monthYearOpened") ?? new string[0];
                 ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>> providerStatusCounts =
                     await _publishingApiClient.GetProviderStatusCounts(
                         result.Providers.First().SpecificationId,
                         providerTypes.FirstOrDefault(),
                         localAuthorities.FirstOrDefault(),
                         fundingStatuses.FirstOrDefault(),
-                        isIndicative
+                        isIndicative,
+                        monthYearOpened.FirstOrDefault()
                     );
 
                 foreach (ProviderFundingStreamStatusResponse providerStats in providerStatusCounts.Content)
@@ -149,6 +159,37 @@ namespace CalculateFunding.Frontend.Services
             }
 
             return result;
+        }
+
+        private async Task<HashSet<string>> GetCurrentFundingPeriodsMonths(string fundingPeriodId)
+        {
+            FundingPeriod fundingPeriod = (await _policiesApiClient.GetFundingPeriodById(fundingPeriodId))?.Content;
+
+            if (fundingPeriod == null)
+            {
+                _logger.Error($"Request failed to find funding funding period {fundingPeriodId}");
+
+                return null;
+            }
+
+            return new HashSet<string>(GetMonthsBetween(fundingPeriod.StartDate, fundingPeriod.EndDate));
+        }
+
+        private void RemoveMonthYearFacetsOutsideOfCurrentFundingPeriod(HashSet<string> currentYear,
+            PublishProviderSearchResultViewModel searchResultViewModel)
+        {
+            SearchFacetViewModel monthYearFacet = searchResultViewModel?
+                .Facets
+                .SingleOrDefault(_ => _.Name == "monthYearOpened");
+
+            if (monthYearFacet == null)
+            {
+                return;
+            }
+
+            monthYearFacet.FacetValues = monthYearFacet.FacetValues?
+                .Where(_ => currentYear.Contains(_.Name))
+                .ToArray();
         }
 
         private void RemoveShowAllAllocationTypesIndicativeFilter(IDictionary<string, string[]> filters)

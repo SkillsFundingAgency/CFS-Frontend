@@ -3,7 +3,7 @@ using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.ViewModels.Common
 {
-    public class SearchPublishedProvidersRequest : IFilterPublishedProviders
+    public class SearchPublishedProvidersRequest : PublishedProviderFilters
     {
         public int? PageNumber { get; set; }
 
@@ -12,22 +12,6 @@ namespace CalculateFunding.Frontend.ViewModels.Common
         public string ErrorToggle { get; set; }
 
         public bool IncludeFacets { get; set; }
-
-        public string SpecificationId { get; set; }
-
-        public string FundingPeriodId { get; set; }
-
-        public string FundingStreamId { get; set; }
-
-        public string[] ProviderType { get; set; }
-
-        public string[] ProviderSubType { get; set; }
-
-        public string[] LocalAuthority { get; set; }
-        
-        public bool? HasErrors { get; set; }
-
-        public string[] Status { get; set; }
 
         public int? PageSize { get; set; }
 

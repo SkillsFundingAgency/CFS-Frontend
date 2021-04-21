@@ -5,6 +5,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
@@ -106,17 +107,17 @@ namespace CalculateFunding.Frontend.Controllers
                 destination.Add("fundingStreamId", new[] {source.FundingStreamId});
             }
 
-            if (source.ProviderType != null && source.ProviderType.Length > 0)
+            if (source.ProviderType?.Any() == true)
             {
                 destination.Add("providerType", source.ProviderType);
             }
 
-            if (source.Status != null && source.Status.Length > 0)
+            if (source.Status?.Any() == true)
             {
                 destination.Add("fundingStatus", source.Status);
             }
 
-            if (source.ProviderSubType != null && source.ProviderSubType.Length > 0)
+            if (source.ProviderSubType?.Any() == true)
             {
                 destination.Add("providerSubType", source.ProviderSubType);
             }
@@ -124,6 +125,16 @@ namespace CalculateFunding.Frontend.Controllers
             if (source.HasErrors.HasValue)
             {
                 destination.Add("hasErrors", new [] {source.HasErrors.Value ? "true" : "false"});
+            }
+
+            if (source.MonthYearOpened?.Any() == true)
+            {
+                destination.Add("monthYearOpened", source.MonthYearOpened);    
+            }
+
+            if (source.Indicative?.Any() == true)
+            {
+                destination.Add("indicative", source.Indicative);
             }
             
             return destination;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -49,6 +50,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             bool? isIndicativeQueryFlag,
             string expectedSearchRequestIndicativeFilter)
         {
+            string monthYearOpened = Guid.NewGuid().ToString();
+            
             int numberOfItems = 25;
 
             SearchResults<PublishedProviderSearchItem> searchResults = GenerateSearchResults(numberOfItems);
@@ -65,7 +68,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     It.IsAny<string>(), 
                     It.IsAny<string>(), 
                     It.IsAny<string>(),
-                    isIndicativeQueryFlag))
+                    isIndicativeQueryFlag,
+                    monthYearOpened))
                 .ReturnsAsync(new ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>>(HttpStatusCode.OK, new []
                 {
                     providerStats
@@ -90,7 +94,8 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 PageSize = 12,
                 Filters = new Dictionary<string, string[]>
                 {
-                    {"indicative", new [] { indicativeFilter }}
+                    {"indicative", new [] { indicativeFilter }},
+                    {"monthYearOpened", new [] { monthYearOpened }}
                 }
             };
             

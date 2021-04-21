@@ -79,15 +79,15 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             result.Should().BeOfType<OkObjectResult>();
         }
 
-        private ViewModels.Common.SearchPublishedProvidersRequest GetSearchRequest()
-        {
-            return new SearchPublishedProvidersRequest
+        private SearchPublishedProvidersRequest GetSearchRequest() =>
+            new SearchPublishedProvidersRequest
             {
                 SearchTerm = "",
                 Status = new string[] { },
                 ProviderType = new string[] { },
                 ProviderSubType = new string[] { },
                 LocalAuthority = new string[] { },
+                Indicative = new string [] {},
                 FundingStreamId = _fundingStreamId,
                 SpecificationId = _specificationId,
                 SearchMode = Common.Models.Search.SearchMode.All,
@@ -99,6 +99,5 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 ErrorToggle = "",
                 SearchFields = new string[] { }
             };
-        }
     }
 }
