@@ -99,10 +99,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
         }
     }, [match, isSearchCriteriaInitialised]);
-    
+
     useEffect(() => {
         if (!latestJob || !latestJob.isComplete) return;
-        
+
         if (latestJob.jobType === JobType.RefreshFundingJob) {
             setIsLoadingRefresh(false);
             setLastRefresh(latestJob?.lastUpdated);
@@ -218,10 +218,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             isCheckingForJob ? "Searching for any running jobs" :
                 (latestJob && latestJob.isActive) ? "Monitoring job progress. Please wait, this could take several minutes" :
                     "";
-    
+
     const haveAnyProviderErrors = isLoadingPublishedProviderErrors ||
         (publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0);
-    
+
     const blockActionBasedOnProviderErrors = fundingConfiguration?.approvalMode === ApprovalMode.All && haveAnyProviderErrors;
 
     return (
@@ -255,12 +255,18 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                         <ul className="govuk-list right-align">
                             {fundingConfiguration && fundingConfiguration.approvalMode === ApprovalMode.Batches &&
                             <li>
-                                <Link className="govuk-link govuk-link--no-visited-state" 
+                                <Link className="govuk-link govuk-link--no-visited-state"
                                       to={`/Approvals/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}>
                                     Upload batch file of providers
                                 </Link>
                             </li>
                             }
+                            <li>
+                                <Link className="govuk-link govuk-link--no-visited-state"
+                                      to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}>
+                                    Specification reports
+                                </Link>
+                            </li>
                             <li>
                                 <button className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
                                         disabled={(latestJob && latestJob.isActive) || !hasPermissionToRefresh || isLoadingRefresh}
@@ -330,9 +336,9 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                     onClick={handleApprove}>Approve funding
                             </button>
                             <button className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                                    disabled={(latestJob && latestJob.isActive) || 
-                                    !publishedProviderSearchResults?.canPublish || 
-                                    !hasPermissionToRelease || 
+                                    disabled={(latestJob && latestJob.isActive) ||
+                                    !publishedProviderSearchResults?.canPublish ||
+                                    !hasPermissionToRelease ||
                                     isLoadingRefresh ||
                                     blockActionBasedOnProviderErrors}
                                     onClick={handleRelease}>Release funding

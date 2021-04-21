@@ -2,7 +2,7 @@ import * as React from "react"
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
 import {Tabs} from "../../components/Tabs";
-import {RouteComponentProps} from "react-router";
+import {RouteComponentProps, useLocation} from "react-router";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
@@ -21,7 +21,13 @@ export interface ViewSpecificationResultsRoute {
     specificationId: string
 }
 
+function useParamQuery(){
+    return new URLSearchParams(useLocation().search);
+}
+
 export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecificationResultsRoute>) {
+    const [initialTab, setInitialTab] = useState<string>("");
+    let query = useParamQuery();
     const {errors, addErrorMessage, addError, clearErrorMessages} = useErrors();
     const specificationId = match.params.specificationId;
     const { specification, isLoadingSpecification } =
@@ -31,6 +37,15 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.GenerateCalcCsvResultsJob],
             err => addErrorMessage("Error while checking for latest CSV generation job"));
+
+    useEffect(() => {
+        if (query.get('initialTab')) {
+            const tabParam = query.get('initialTab') ?? "";
+            setInitialTab(tabParam);
+        } else {
+            setInitialTab("fundingline-structure")
+        }
+    }, [query]);
 
     return <div>
         <Header location={Section.Results}/>
@@ -51,15 +66,17 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                         <h2 className="govuk-caption-xl">{specification !== undefined ? specification.fundingPeriod.name : ""}</h2>
                     </div>
                 </div>
+                {initialTab.length > 0 &&
                 <div className="govuk-grid-row govuk-!-padding-top-5">
                     <div className="govuk-grid-column-full" hidden={isLoadingSpecification}>
-                        <Tabs initialTab="fundingline-structure">
+                        <Tabs initialTab={initialTab}>
                             <ul className="govuk-tabs__list">
                                 <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                                 <Tabs.Tab label="additional-calculations">Additional Calculations</Tabs.Tab>
                                 <Tabs.Tab label="downloadable-reports">Downloadable Reports&nbsp;
-                                    { (latestReportJob?.isFailed) &&
-                                        <span className="notification-badge" data-testid="notification-badge" aria-label="contains 1 error">1</span>
+                                    {(latestReportJob?.isFailed) &&
+                                    <span className="notification-badge" data-testid="notification-badge"
+                                          aria-label="contains 1 error">1</span>
                                     }</Tabs.Tab>
                             </ul>
                             <Tabs.Panel label="fundingline-structure">
@@ -73,13 +90,13 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                         clearErrorMessages={clearErrorMessages}
                                         showApproveButton={false}
                                         useCalcEngine={true}
-                                        jobTypes={[JobType.AssignTemplateCalculationsJob]} /> : ""}
+                                        jobTypes={[JobType.AssignTemplateCalculationsJob]}/> : ""}
                             </Tabs.Panel>
                             <Tabs.Panel label="additional-calculations">
                                 <AdditionalCalculations
                                     specificationId={specificationId}
                                     addError={addErrorMessage}
-                                    showCreateButton={false} />
+                                    showCreateButton={false}/>
                             </Tabs.Panel>
                             <Tabs.Panel label="downloadable-reports">
                                 <DownloadableReports
@@ -90,6 +107,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                         </Tabs>
                     </div>
                 </div>
+                }
             </div>
         </div>
         <Footer/>
