@@ -6,7 +6,7 @@
   "dependencies": {
     "@dabeng/react-orgchart": "^1.0.0",
     "@microsoft/applicationinsights-web": "^2.5.11",
-    "@microsoft/signalr": "^3.1.13",
+    "@microsoft/signalr": "^5.0.5",
     "@types/axios": "^0.14.0",
     "@types/enzyme": "^3.10.5",
     "@types/enzyme-adapter-react-16": "^1.0.6",
