@@ -5,18 +5,20 @@ import {render, screen, waitFor} from "@testing-library/react";
 import * as errorHook from "../../../hooks/useErrors";
 import {Route, Switch} from "react-router-dom";
 import {QueryClient, QueryClientProvider} from "react-query";
+import * as useFetchAllLatestSpecificationJobsHook from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
+import {JobType} from "../../../types/jobType";
+import {RunningStatus} from "../../../types/RunningStatus";
 describe("<DataRelationships />", () => {
-
-    beforeEach(async () => {
-        mockDatasetrelationships();
-        await renderPage();
-    });
-
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
-
     describe("service call checks ", () => {
+        beforeEach(async () => {
+            mockDatasetrelationships();
+            await renderPage();
+        });
+
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
         it("calls the correct services on initial page load", async () => {
             const {searchDatasetRelationships} = require('../../../services/datasetRelationshipsService');
             await waitFor(() => expect(searchDatasetRelationships).toBeCalledTimes(1));
@@ -24,6 +26,15 @@ describe("<DataRelationships />", () => {
     });
 
     describe("render page ", () => {
+        beforeEach(async () => {
+            mockDatasetrelationships();
+            await renderPage();
+        });
+
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
         it("displays dataset relationship items", async () => {
             const listTable = screen.getByTestId("datarelationship-table") as HTMLTableElement;
             expect(listTable.rows.length).toBe(3);
@@ -38,7 +49,49 @@ describe("<DataRelationships />", () => {
             expect(screen.getByText("No data source files uploaded to map to")).toBeInTheDocument();
         })
     });
+
+    describe("when background converter wizard job is running", () => {
+        beforeEach(async () => {
+            mockDatasetrelationships();
+            jest.spyOn(useFetchAllLatestSpecificationJobsHook, 'useFetchAllLatestSpecificationJobs').mockImplementation(() => (activeJob));
+            await renderPage();
+        });
+
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
+        it("renders converter wizard running text", async () => {
+            expect(screen.getByText("Converter wizard running. Please wait.")).toBeInTheDocument();
+        });
+    });
 });
+
+const activeJob = {
+    allJobs: [{
+        jobId: "",
+        jobType: JobType.RunConverterDatasetMergeJob,
+        specificationId: "",
+        statusDescription: "",
+        jobDescription: "",
+        runningStatus: RunningStatus.InProgress,
+        failures: [],
+        isSuccessful: true,
+        isFailed: false,
+        isActive: true,
+        isComplete: false,
+        trigger: {
+            entityId: "relationshipId2",
+            entityType: "",
+            message: ""
+        }
+    }],
+    isCheckingForJobs: true,
+    errorCheckingForJobs: false,
+    haveErrorCheckingForJobs: false,
+    isFetching: false,
+    isFetched: true,
+}
 
 const mockErrorHook = jest.spyOn(errorHook, 'useErrors');
 mockErrorHook.mockImplementation(() => {
@@ -55,14 +108,14 @@ const mockSpecificationDatasetRelationshipsViewModel = {
     items: [
         {
             definitionId: "",
-            definitionName: "definitionName 1",
+            definitionName: "definitionName1",
             definitionDescription: "definitionDescription 1",
             datasetName: "",
             relationshipDescription: "",
             datasetVersion: 0,
             datasetId: "",
-            relationshipId: "",
-            relationName: "relationName 1",
+            relationshipId: "relationshipId1",
+            relationName: "relationName1",
             isProviderData: false,
             datasetPhrase: "",
             linkPhrase: "",
@@ -73,14 +126,14 @@ const mockSpecificationDatasetRelationshipsViewModel = {
         },
         {
             definitionId: "",
-            definitionName: "definitionName 2",
-            definitionDescription: "definitionDescription 2",
+            definitionName: "definitionName2",
+            definitionDescription: "definitionDescription2",
             datasetName: "",
             relationshipDescription: "",
             datasetVersion: 0,
             datasetId: "",
-            relationshipId: "2",
-            relationName: "relationName 2",
+            relationshipId: "relationshipId2",
+            relationName: "relationName2",
             isProviderData: false,
             datasetPhrase: "",
             linkPhrase: "Map data source file",

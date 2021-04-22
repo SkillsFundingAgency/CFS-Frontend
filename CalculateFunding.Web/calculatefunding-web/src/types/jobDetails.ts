@@ -43,7 +43,8 @@ export interface JobDetails {
     invokerUserId?: string,
     invokerUserDisplayName?: string,
     lastUpdated?: Date,
-    created?: Date
+    created?: Date,
+    trigger?: JobTrigger
 }
 
 export enum JobOutcomeType {

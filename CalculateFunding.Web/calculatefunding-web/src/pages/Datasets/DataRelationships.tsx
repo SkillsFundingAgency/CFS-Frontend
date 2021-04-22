@@ -13,13 +13,15 @@ import {Footer} from "../../components/Footer";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
+import {JobType} from "../../types/jobType";
+import {useFetchAllLatestSpecificationJobs} from "../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
+import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 
 export interface DataRelationshipsRouteProps {
     specificationId: string
 }
 
 export function DataRelationships({match}: RouteComponentProps<DataRelationshipsRouteProps>) {
-
     const [datasetRelationships, setDatasetRelationships] = useState<SpecificationDatasetRelationshipsViewModel>({
         items: [],
         specification: {
@@ -61,6 +63,20 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const {errors, addError} = useErrors();
 
+    const {allJobs: converterWizardJobs} =
+        useFetchAllLatestSpecificationJobs(match.params.specificationId,
+            [JobType.RunConverterDatasetMergeJob],
+            err => addError({error: err, description: "Error while checking for converter wizard running jobs"}));
+
+    const checkConverterWizardForDatasets = ()=>{
+        if (!datasetRelationships || datasetRelationships.items?.length === 0 || !converterWizardJobs)
+            return
+
+        datasetRelationships.items.map((item) => {
+            item.hasConverterWizardRunning = converterWizardJobs?.some((job)=>job.trigger?.entityId === item.relationshipId)
+        });
+    };
+
     useEffect(() => {
         setIsLoading(true);
         searchDatasetRelationships(match.params.specificationId).then((result) => {
@@ -71,6 +87,11 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
             setIsLoading(false);
         });
     },[match.params.specificationId]);
+
+    useEffect(()=> {
+        checkConverterWizardForDatasets();
+    }, [converterWizardJobs, datasetRelationships])
+
 
     return (<div>
         <Header location={Section.Datasets} />
@@ -147,10 +168,11 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                                         </details>
                                     </th>
                                     <td className="govuk-table__cell">{
+                                        sdr.hasConverterWizardRunning? <LoadingFieldStatus title={"Converter wizard running. Please wait."} /> :
                                         sdr.hasDataSourceFileToMap? sdr.datasetPhrase : "No data source files uploaded to map to"
                                     }</td>
                                     <td className="govuk-table__cell">
-                                        {sdr.hasDataSourceFileToMap &&
+                                        {sdr.hasDataSourceFileToMap && !sdr.hasConverterWizardRunning &&
                                         <Link to={`/Datasets/SelectDataSource/${sdr.relationshipId}`}
                                               className="govuk-link">{sdr.linkPhrase}</Link>
                                         }
