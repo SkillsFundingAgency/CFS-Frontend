@@ -80,6 +80,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             
             return new AuthorizationHelper(authorizationService, usersClient, policyClient, CreateMapper(), logger, permissionOptions);
         }
+
         private static IMapper CreateMapper()
         {
             MapperConfiguration mapperConfig = new MapperConfiguration(c =>
@@ -838,6 +839,40 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
             await usersClient
                 .Received(1)
                 .UpdateFundingStreamPermission(userId, fundingStreamId, Arg.Is<FundingStreamPermissionUpdateModel>(m => m.CanApproveAllCalculations == true));
+        }
+
+        [TestMethod]
+        public async Task GetAdminUsersForFundingStream_WhenUsersApiUpdateUserPermissions_ReturnsSuccess()
+        {
+            // Arrange
+            string fundingStreamId = "fs1";
+
+            string executingUserId = "usr1";
+            ClaimsPrincipal user = BuildClaimsPrincipal(executingUserId);
+
+            IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+            IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+
+            IEnumerable<User> expectedAdminUsers = new List<User>
+            {
+                new User()
+            };
+
+            usersClient
+                .GetAdminUsersForFundingStream(fundingStreamId)
+                .Returns(new ApiResponse<IEnumerable<User>>(HttpStatusCode.OK, expectedAdminUsers));
+
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+            // Act
+            IEnumerable<User> adminUsers = await authHelper.GetAdminUsersForFundingStream(user, fundingStreamId);
+
+            // Assert
+            adminUsers.Should().NotBeNull();
+
+            await usersClient
+                .Received(1)
+                .GetAdminUsersForFundingStream(fundingStreamId);
         }
 
         private static ClaimsPrincipal BuildClaimsPrincipal(string userId, bool addAdminGroupClaim = false)

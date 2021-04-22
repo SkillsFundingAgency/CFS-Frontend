@@ -304,6 +304,15 @@ namespace CalculateFunding.Frontend.Helpers
             return response.Content;
         }
 
+        public async Task<IEnumerable<User>> GetAdminUsersForFundingStream(ClaimsPrincipal user, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            ApiResponse<IEnumerable<User>> response = await _usersClient.GetAdminUsersForFundingStream(fundingStreamId);
+
+            return response.Content;
+        }
+
         private bool IsAdminUser(ClaimsPrincipal user)
         {
             return user.HasClaim(c =>

@@ -98,5 +98,18 @@ namespace CalculateFunding.Frontend.Helpers
             permissions.FundingStreamId = fundingStreamId;
             return await Task.FromResult(permissions);
         }
+
+        public async Task<IEnumerable<User>> GetAdminUsersForFundingStream(ClaimsPrincipal user, string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            return await Task.FromResult(new List<User> 
+            {
+                new User
+                {
+                    Username = user.GetUserProfile().AsUserName(),
+                }
+            });
+        }
     }
 }

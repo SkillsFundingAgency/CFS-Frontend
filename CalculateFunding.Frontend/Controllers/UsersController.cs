@@ -20,7 +20,6 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IPoliciesApiClient _policiesApiClient;
         private readonly IMapper _mapper;
-        private readonly IUsersApiClient _usersApiClient;
 
         public UsersController(IAuthorizationHelper authorizationHelper, IPoliciesApiClient policiesApiClient, IMapper mapper, IUsersApiClient usersApiClient)
         {
@@ -29,7 +28,6 @@ namespace CalculateFunding.Frontend.Controllers
             _authorizationHelper = authorizationHelper;
             _policiesApiClient = policiesApiClient;
             _mapper = mapper;
-            _usersApiClient = usersApiClient;
         }
 
         [HttpGet]
@@ -82,6 +80,14 @@ namespace CalculateFunding.Frontend.Controllers
         {
             FundingStreamPermission fundingStreamPermission = new FundingStreamPermission() { UserId = userId, FundingStreamId = fundingStreamId }.SetAllBooleansTo(false);
             return await _authorizationHelper.UpdateFundingStreamPermission(User, userId, fundingStreamId, fundingStreamPermission);
+        }
+
+        [Route("api/users/permissions/{fundingStreamId}/admin")]
+        [HttpGet]
+        [Produces(typeof(IEnumerable<User>))]
+        public async Task<IEnumerable<User>> GetAdminUsersForFundingStream([FromRoute] string fundingStreamId)
+        {
+            return await _authorizationHelper.GetAdminUsersForFundingStream(User, fundingStreamId);
         }
     }
 }
