@@ -7,6 +7,7 @@ export interface Dataset {
    lastUpdatedDisplay: string;
    version: number;
    changeNote: string;
+   changeType: string;
    lastUpdatedByName: string;
    definitionName: string;
    fundingStreamId: string;

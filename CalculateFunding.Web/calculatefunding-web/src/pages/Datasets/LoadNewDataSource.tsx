@@ -195,28 +195,38 @@ export function LoadNewDataSource() {
     }
 
 
-    async function uploadFileToServer(request: NewDatasetVersionResponseViewModel) {
-        if (uploadFile) {
-            await uploadDataSourceService(
-                request.blobUrl,
-                uploadFile,
-                request.datasetId,
-                request.fundingStreamId,
-                request.author.name,
-                request.author.id,
-                selectedDataSchema,
-                datasetSourceFileName,
-                description)
-                .then(() => {
-                    validateDatasetService(
-                        request.datasetId,
-                        request.fundingStreamId,
-                        request.filename,
-                        request.version.toString(),
-                        false,
-                        description,
-                        "",
-                        DatasetEmptyFieldEvaluationOptions.NA).then((validateDatasetResponse) => {
+    async function uploadFileToBlob(request: NewDatasetVersionResponseViewModel) {
+        if (!uploadFile) {
+            setValidateForm(prevState => {
+                return {
+                    ...prevState,
+                    fileValid: false
+                }
+            });
+            return;
+        }
+
+        await uploadDataSourceService(
+            request.blobUrl,
+            uploadFile,
+            request.datasetId,
+            request.fundingStreamId,
+            request.author.name,
+            request.author.id,
+            selectedDataSchema,
+            datasetSourceFileName,
+            description)
+            .then(() => {
+                validateDatasetService(
+                    request.datasetId,
+                    request.fundingStreamId,
+                    request.filename,
+                    request.version.toString(),
+                    false,
+                    description,
+                    "",
+                    DatasetEmptyFieldEvaluationOptions.NA)
+                    .then((validateDatasetResponse) => {
                         const validateOperationId: any = validateDatasetResponse.data.operationId;
                         if (!validateOperationId) {
                             addError({error: "Unable to locate dataset validate operationId"})
@@ -225,30 +235,24 @@ export function LoadNewDataSource() {
                         }
                         setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
                         setIsLoading(true);
-                    }).catch(() => {
+                    })
+                    .catch(() => {
                         addError({error: "Unable to validate dataset"})
                         setIsLoading(false);
                         return;
                     })
-                }).catch(() => {
-                    addError({
-                        error: "Unable to upload file",
-                        suggestion: "Please check the file is valid and not locked"
-                    })
-                    setIsLoading(false);
-                    return;
-                });
-        } else {
-            setValidateForm(prevState => {
-                return {
-                    ...prevState,
-                    fileValid: false
-                }
+            }).catch(() => {
+                addError({
+                    error: "Unable to upload file",
+                    suggestion: "Please check the file is valid and not locked"
+                })
+                setIsLoading(false);
+                return;
             });
-        }
+
     }
 
-    function createDataset() {
+    async function createDatasetAndSaveToBlob() {
         clearErrorMessages();
         const request: CreateDatasetRequestViewModel = {
             name: datasetSourceFileName,
@@ -258,7 +262,7 @@ export function LoadNewDataSource() {
             fundingStreamId: selectedFundingStream !== undefined ? selectedFundingStream.id : ""
         };
 
-        if (request.name !== "" && request.filename !== "" && request.description !== "" && request.dataDefinitionId !== "" && request.fundingStreamId !== "") {
+        if (validateRequest(request)) {
             setValidateForm(prevState => {
                 return {
                     ...prevState,
@@ -269,41 +273,53 @@ export function LoadNewDataSource() {
                 }
             });
             setIsLoading(true);
-            createDatasetService(request)
-                .then((result) => {
-                    const response = result.data as NewDatasetVersionResponseViewModel;
-                    uploadFileToServer(response);
-                })
-                .catch((error: AxiosError) => {
-                    if (error.response !== undefined) {
-                        const errorResponse = error.response.data as NewDatasetVersionResponseErrorModel;
-                        if (errorResponse) {
-                            if (errorResponse.Name && errorResponse.Name.length > 0) {
-                                addError({error: "Unable to upload file", suggestion: errorResponse.Name[0]})
-                                if (errorResponse.Name[0] === "Use a descriptive unique name other users can understand") {
-                                    setValidateForm(prevState => {
-                                        return {
-                                            ...prevState,
-                                            fileNameValid: false
-                                        }
-                                    })
-                                }
+            try {
+                const result = await createDatasetService(request)
+                await uploadFileToBlob(result.data);
+            } catch (error) {
+                if (!!error?.response) {
+                    const errorResponse = error.response.data as NewDatasetVersionResponseErrorModel;
+                    if (errorResponse) {
+                        if (errorResponse.Name && errorResponse.Name.length > 0) {
+                            addError({error: "Unable to upload file", suggestion: errorResponse.Name[0]})
+                            if (errorResponse.Name[0] === "Use a descriptive unique name other users can understand") {
+                                setValidateForm(prevState => {
+                                    return {
+                                        ...prevState,
+                                        fileNameValid: false
+                                    }
+                                })
                             }
-                            if (errorResponse.DefinitionId && errorResponse.DefinitionId.length > 0) {
-                                addError({error: "Unable to upload file", suggestion: errorResponse.DefinitionId})
-                            }
-                        } else {
-                            addError({
-                                error: "Unable to upload file",
-                                suggestion: "Please check the file is valid and not locked"
-                            })
                         }
+                        if (errorResponse.DefinitionId && errorResponse.DefinitionId.length > 0) {
+                            addError({error: "Unable to upload file", suggestion: errorResponse.DefinitionId})
+                        }
+                    } else {
+                        addError({
+                            error: "Unable to upload file",
+                            suggestion: "Please check the file is valid and not locked"
+                        })
                     }
-                    else {
-                        addError({error: "Unable to create dataset"})
-                    }
-                    setIsLoading(false);
-                });
+                } else {
+                    addError({error: "Unable to create dataset"})
+                }
+                setIsLoading(false);
+            }
+        }
+    }
+
+    function validateRequest(request: CreateDatasetRequestViewModel) {
+        if (request.name !== "" && request.filename !== "" && request.description !== "" && request.dataDefinitionId !== "" && request.fundingStreamId !== "") {
+            setValidateForm(prevState => {
+                return {
+                    ...prevState,
+                    fileNameValid: true,
+                    fileValid: true,
+                    descriptionValid: true,
+                    dataDefinitionIdValid: true
+                }
+            });
+            return true;
         } else {
             if (request.name === "") {
                 setValidateForm(prevState => {
@@ -346,6 +362,7 @@ export function LoadNewDataSource() {
                     }
                 })
             }
+            return false;
         }
     }
 
@@ -478,7 +495,7 @@ export function LoadNewDataSource() {
         const isDisabled = permittedFundingStreams.length === 0;
         return (
             <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={createDataset} disabled={isDisabled} data-testid="create-button">
+                    onClick={createDatasetAndSaveToBlob} disabled={isDisabled} data-testid="create-button">
                 Create data source
             </button>
         );
@@ -543,8 +560,9 @@ export function LoadNewDataSource() {
                                     <dt className="govuk-summary-list__key">
                                         Core provider data version to upload against
                                     </dt>
-                                    <dd className="govuk-summary-list__value" data-testid="provider-target-date"><DateFormatter
-                                        date={coreProviderTargetDate}/>
+                                    <dd className="govuk-summary-list__value" data-testid="provider-target-date">
+                                        <DateFormatter
+                                            date={coreProviderTargetDate}/>
                                     </dd>
                                 </div>
                             </dl>

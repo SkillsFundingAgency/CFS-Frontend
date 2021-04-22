@@ -9,6 +9,9 @@ import {DataschemaDetailsViewModel} from "../types/Datasets/DataschemaDetailsVie
 import {AssignDatasetSchemaRequest} from "../types/Datasets/AssignDatasetSchemaRequest";
 import {DatasetDefinition} from "../types/Datasets/DatasetDefinitionResponseViewModel";
 import {DatasetEmptyFieldEvaluationOptions} from "../types/Datasets/DatasetEmptyFieldEvaluationOptions";
+import {NewDatasetVersionResponseViewModel} from "../types/Datasets/NewDatasetVersionResponseViewModel";
+import {DatasetSearchResponseViewModel} from "../types/Datasets/DatasetSearchResponseViewModel";
+import {DatasetVersionHistoryViewModel} from "../types/Datasets/DatasetVersionHistoryViewModel";
 
 const baseUrl = "/api/datasets";
 
@@ -52,12 +55,12 @@ export async function searchDatasetDefinitionsService(request: DatasetDefinition
     })
 }
 
-export async function getDatasetHistoryService(datasetId: string, pageNumber: number, pageSize: number) {
+export async function getDatasetHistoryService(datasetId: string, pageNumber: number, pageSize: number):
+    Promise<AxiosResponse<DatasetVersionHistoryViewModel>> {
+
     return axios(`${baseUrl}/getdatasetversions/${datasetId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         params: {
             pageNumber: pageNumber,
             pageSize: pageSize
@@ -65,12 +68,11 @@ export async function getDatasetHistoryService(datasetId: string, pageNumber: nu
     })
 }
 
-export async function createDatasetService(request: CreateDatasetRequestViewModel) {
+export async function createDatasetService(request: CreateDatasetRequestViewModel):
+    Promise<AxiosResponse<NewDatasetVersionResponseViewModel>> {
     return axios(`${baseUrl}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         data: {
             name: request.name,
             description: request.description,
@@ -111,7 +113,8 @@ export async function uploadDataSourceService(blobUrl: string, file: File, datas
     })
 }
 
-export async function uploadDatasetVersionService(request: UpdateNewDatasetVersionResponseViewModel, file: File) {
+export async function uploadDatasetVersionService(request: UpdateNewDatasetVersionResponseViewModel, file: File):
+    Promise<AxiosResponse<UpdateNewDatasetVersionResponseViewModel>> {
     return axios(`${request.blobUrl}`, {
         method: 'PUT',
         headers: {
@@ -140,9 +143,7 @@ export async function validateDatasetService(
     datasetEmptyFieldEvaluationOptions: DatasetEmptyFieldEvaluationOptions) {
     return axios(`${baseUrl}/validate-dataset`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         data: {
             datasetId: datasetId,
             fundingStreamId: fundingStreamId,
@@ -165,7 +166,8 @@ export async function getDatasetValidateStatusService(operationId: string) {
     })
 }
 
-export async function searchDatasetService(request: DatasetSearchRequestViewModel) {
+export async function searchDatasetService(request: DatasetSearchRequestViewModel):
+    Promise<AxiosResponse<DatasetSearchResponseViewModel>> {
     return axios(`${baseUrl}/search`, {
         method: 'POST',
         headers: {

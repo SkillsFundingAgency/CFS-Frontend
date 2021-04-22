@@ -52,7 +52,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/datasets")]
-        public async Task<IActionResult> SaveDataset([FromBody] CreateDatasetViewModel vm)
+        public async Task<IActionResult> CreateNewDataset([FromBody] CreateDatasetViewModel vm)
         {
             Guard.IsNullOrWhiteSpace(vm.Name, nameof(vm.Name));
             Guard.IsNullOrWhiteSpace(vm.Description, nameof(vm.Description));
@@ -69,26 +69,9 @@ namespace CalculateFunding.Frontend.Controllers
                     Filename = vm.Filename,
                     FundingStreamId = vm.FundingStreamId
                 });
-
-            if (response.IsBadRequest(out BadRequestObjectResult badRequest))
-            {
-                _logger.Warning("Invalid model provided");
-
-                return badRequest;
-            }
-            else
-            {
-                if (!response.StatusCode.IsSuccess())
-                {
-                    int statusCode = (int) response.StatusCode;
-
-                    _logger.Error($"Error when posting data set with status code: {statusCode}");
-
-                    return new StatusCodeResult(statusCode);
-                }
-            }
-
-            return new OkObjectResult(response.Content);
+            
+            return response.Handle(nameof(CreateNewDatasetModel),
+                onSuccess: x => Ok(x.Content));
         }
 
         [HttpPut]

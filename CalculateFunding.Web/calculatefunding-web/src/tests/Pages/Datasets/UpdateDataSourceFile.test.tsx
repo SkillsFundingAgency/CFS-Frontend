@@ -15,7 +15,7 @@ describe("<UpdateDataSourceFile />", () => {
     beforeEach(async () => {
         testData.mockDatasetService();
         testData.mockProviderService();
-        await testData.renderUpdateDataSourceFile();
+        await testData.renderPage();
     });
 
     afterEach(() => {
@@ -119,7 +119,7 @@ describe("<UpdateDataSourceFile />", () => {
             await testData.givenFormIsCompleted();
 
             await testData.submitForm();
-            await testData.sendANewJobNotification();
+            await testData.hasJobValidationFailure();
 
             await waitFor(() => expect(downloadValidateDatasetValidationErrorSasUrl).toBeCalledTimes(1));
         })
@@ -128,7 +128,7 @@ describe("<UpdateDataSourceFile />", () => {
             await testData.givenFormIsCompleted();
 
             await testData.submitForm();
-            await testData.sendANewJobNotification();
+            await testData.hasJobValidationFailure();
 
             await waitFor(() => {
                 const errorReportLink = screen.queryByText(`error report`) as HTMLAnchorElement;
@@ -140,10 +140,8 @@ describe("<UpdateDataSourceFile />", () => {
         it("validation error is displayed given job failed with validation error information ", async () => {
             await testData.givenFormIsCompleted();
             await testData.submitForm();
-            await testData.sendANewJobNotificationWithErrorOutcome();
-            await waitFor(() => {
-                expect(screen.getByText("Some validation errors")).toBeInTheDocument();
-            });
+            await testData.hasJobFailure();
+            expect(await screen.findByText("Some errors")).toBeInTheDocument();
         })
 
         it("merge confirmation is not displayed on page render ", async () => {
@@ -170,4 +168,3 @@ describe("<UpdateDataSourceFile />", () => {
 
     });
 });
-

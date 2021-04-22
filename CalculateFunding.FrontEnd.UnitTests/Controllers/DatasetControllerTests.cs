@@ -15,6 +15,7 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Controllers;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using FluentAssertions;
@@ -51,7 +52,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public void SaveDataset_GivenViewModelIsNull_ThrowsArgumentNullException()
         {
             // Act
-            Func<Task> test = async () => await _controller.SaveDataset(null);
+            Func<Task> test = async () => await _controller.CreateNewDataset(null);
 
             // Assert
             test
@@ -106,20 +107,16 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(response);
 
             // Act
-            IActionResult result = await _controller.SaveDataset(viewModel);
+            IActionResult result = await _controller.CreateNewDataset(viewModel);
 
             // Assert
-            _logger
-                .Received(1)
-                .Warning(Arg.Is("Invalid model provided"));
-
             result
                 .Should()
                 .BeOfType<BadRequestObjectResult>();
         }
 
         [TestMethod]
-        public async Task SaveDataset_GivenResponseIsInternalServerError_ReturnsStatusCode500()
+        public async Task SaveDataset_GivenResponseIsInternalServerError_ReturnsInternalServerErrorResult()
         {
             // Arrange
             ValidatedApiResponse<NewDatasetVersionResponseModel> response = new ValidatedApiResponse<NewDatasetVersionResponseModel>(HttpStatusCode.InternalServerError);
@@ -138,23 +135,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(response);
 
             // Act
-            IActionResult result = await _controller.SaveDataset(viewModel);
+            IActionResult result = await _controller.CreateNewDataset(viewModel);
 
             // Assert
-            _logger
-                .Received(1)
-                .Error(Arg.Is("Error when posting data set with status code: 500"));
-
             result
                 .Should()
-                .BeOfType<StatusCodeResult>();
-
-            StatusCodeResult statusCodeResult = result as StatusCodeResult;
-
-            statusCodeResult
-                .StatusCode
-                .Should()
-                .Be(500);
+                .BeOfType<InternalServerErrorResult>();
         }
 
         [TestMethod]
@@ -182,7 +168,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(response);
 
             // Act
-            IActionResult result = await _controller.SaveDataset(viewModel);
+            IActionResult result = await _controller.CreateNewDataset(viewModel);
 
             // Assert
             result

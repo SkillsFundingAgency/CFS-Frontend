@@ -9,7 +9,7 @@ describe("<UpdateDataSourceFile /> with validation exception", () => {
     beforeEach(async () => {
         testData.mockDatasetServiceWithBadResult();
         testData.mockProviderService();
-        await testData.renderUpdateDataSourceFile();
+        await testData.renderPage();
     });
 
     afterEach(() => {
@@ -28,6 +28,3 @@ describe("<UpdateDataSourceFile /> with validation exception", () => {
         })
     });
 });
-
-
-

@@ -34,7 +34,7 @@ namespace CalculateFunding.Frontend.Controllers
         public void DownloadUrl_WithNullDatasetID_Then_ThrowsArgumentNullException()
         {
             //Act
-            Func<Task> result = async () => await _controller.Download(null);
+            Func<Task> result = async () => await _controller.DownloadDatasetFile(null);
 
             // Assert
             result
@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .Returns(response);
 
             //Act
-            IActionResult result = await _controller.Download(datasourceId);
+            IActionResult result = await _controller.DownloadDatasetFile(datasourceId);
 
             //Assert
             result
@@ -81,7 +81,7 @@ namespace CalculateFunding.Frontend.Controllers
            .DownloadDatasetFile(datasourceId)
            .Returns(response);
             //Act
-            IActionResult actionResult = await _controller.Download(datasourceId);
+            IActionResult actionResult = await _controller.DownloadDatasetFile(datasourceId);
 
             // Asserts
             actionResult

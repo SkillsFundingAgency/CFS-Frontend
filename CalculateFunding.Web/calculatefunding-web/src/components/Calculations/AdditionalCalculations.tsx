@@ -6,7 +6,7 @@ import * as React from "react";
 import {searchCalculationsForSpecification, searchForCalculationsByProviderService} from "../../services/calculationService";
 import {CalculationSearchResultResponse, CalculationType} from "../../types/CalculationSearchResponse";
 import {useEffect, useState} from "react";
-import {SpecificationPermissions, useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
 import {ErrorProps} from "../../hooks/useErrors";

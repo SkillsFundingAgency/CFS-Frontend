@@ -25,13 +25,31 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/datasets/download-dataset-file/{datasetid}/{datasetVersion?}")]
-        public async Task<IActionResult> Download(string datasetId, int? datasetVersion = null)
+        public async Task<IActionResult> DownloadDatasetFile(string datasetId, int? datasetVersion = null)
         {
             Guard.ArgumentNotNull(datasetId, nameof(datasetId));
 
             // DATA SOURCE NAME_VERSION number_STATUS.xl
 
             ApiResponse<DatasetDownloadModel> apiResponse = await _datasetApiClient.DownloadDatasetFile(datasetId, datasetVersion?.ToString());
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.Url))
+            {
+                return Redirect(apiResponse.Content.Url);
+            }
+
+            return new NotFoundResult();
+        }
+        
+        [HttpGet]
+        [Route("api/datasets/download-merge-file/{datasetid}/{datasetVersion?}")]
+        public async Task<IActionResult> DownloadMergeFile(string datasetId, int? datasetVersion = null)
+        {
+            Guard.ArgumentNotNull(datasetId, nameof(datasetId));
+
+            // DATA SOURCE NAME_VERSION number_STATUS.xl
+
+            ApiResponse<DatasetDownloadModel> apiResponse = await _datasetApiClient.DownloadDatasetMergeFile(datasetId, datasetVersion?.ToString());
 
             if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.Url))
             {

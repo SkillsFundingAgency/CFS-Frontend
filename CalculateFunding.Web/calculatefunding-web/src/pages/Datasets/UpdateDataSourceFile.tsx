@@ -5,20 +5,11 @@ import {RouteComponentProps, useHistory} from "react-router";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {DatasetVersionHistoryViewModel, Result} from "../../types/Datasets/DatasetVersionHistoryViewModel";
+import {DatasetChangeType, DatasetVersionHistoryViewModel, DatasetVersionHistoryItem} from "../../types/Datasets/DatasetVersionHistoryViewModel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
-import {
-    downloadValidateDatasetValidationErrorSasUrl,
-    getCurrentDatasetVersionByDatasetId,
-    getDatasetHistoryService,
-    updateDatasetService,
-    uploadDatasetVersionService,
-    validateDatasetService
-} from "../../services/datasetService";
+import * as datasetService from "../../services/datasetService";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
-import {
-    UpdateNewDatasetVersionResponseViewModel
-} from "../../types/Datasets/UpdateDatasetRequestViewModel";
+import {UpdateNewDatasetVersionResponseViewModel} from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import {Footer} from "../../components/Footer";
 import {UpdateStatus} from "../../types/Datasets/UpdateStatus";
 import {MergeSummary} from "./MergeSummary/MergeSummary";
@@ -29,7 +20,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {RunningStatus} from "../../types/RunningStatus";
-import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
+import * as providerService from "../../services/providerService";
 import {DateFormatter} from "../../components/DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
 import {DatasetEmptyFieldEvaluationOptions} from "../../types/Datasets/DatasetEmptyFieldEvaluationOptions";
@@ -40,7 +31,7 @@ export interface UpdateDataSourceFileRouteProps {
 }
 
 export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSourceFileRouteProps>) {
-    const [dataset, setDataset] = useState<Result>({
+    const [dataset, setDataset] = useState<DatasetVersionHistoryItem>({
         id: "",
         blobName: "",
         changeNote: "",
@@ -50,7 +41,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         lastUpdatedByName: "",
         lastUpdatedDate: new Date(),
         name: "",
-        version: 0
+        version: 0,
+        changeType: DatasetChangeType.Unknown
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isCheckingForJob, setIsCheckingForJob] = useState(false);
@@ -83,12 +75,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         isEnabled: isCheckingForJob
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
-    const isOutcomeValidationFailedWithReport = (outcome: string) => outcome === "ValidationFailed";
 
     useEffect(() => {
-        if (!newJob
-            || newJob.jobId !== validateDatasetJobId
-            || newJob.runningStatus !== RunningStatus.Completed) return;
+        if (newJob?.jobId !== validateDatasetJobId || newJob?.isActive) return;
 
         if (newJob.isSuccessful) {
             return onDatasetValidated(updateType);
@@ -101,52 +90,55 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     }, [newJob]);
 
     function onValidationJobFailed(newJob: JobDetails) {
-        if (newJob.outcome != undefined) {
-            if (isOutcomeValidationFailedWithReport(newJob.outcome)) {
-                displayFailedValidationReportFile();
+        if (!newJob.outcome) {
+            addError({error: "Unable to retrieve validation outcome", description: "Validation failed"});
+        } else {
+            if (newJob.outcome === "ValidationFailed") {
+                getFailedValidationReportFile();
             } else {
                 addError({error: newJob.outcome});
             }
-        } else {
-            addError({error: "Unable to retrieve validation outcome", description: "Validation failed"});
         }
     }
 
-    function displayFailedValidationReportFile() {
-        downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
-            const validationErrorFileUrl = result.data;
-            addValidationErrors({
-                validationErrors: {"blobUrl": [validationErrorFileUrl]},
-                message: "Validation failed"
-            });
-            setIsLoading(false);
-        }).catch((err) => {
+    function getFailedValidationReportFile() {
+        datasetService.downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId)
+            .then((result) => {
+                const validationErrorFileUrl = result.data;
+                addValidationErrors({
+                    validationErrors: {"blobUrl": [validationErrorFileUrl]},
+                    message: "Validation failed"
+                });
+                setIsLoading(false);
+            }).catch((err) => {
             addError({error: "Unable to retrieve validation report", description: "Validation failed"});
         });
     }
 
     useEffectOnce(() => {
         setIsLoading(true);
-        getDatasetHistoryService(match.params.datasetId, 1, 1).then((result) => {
-            const response = result.data as DatasetVersionHistoryViewModel;
-            setDataset(response.results[0]);
-            setDescription(response.results[0].description);
-            setChangeNote(response.results[0].changeNote);
-            getCurrentProviderVersionForFundingStream(match.params.fundingStreamId).then((providerVersionResult) => {
-                const providerVersion = providerVersionResult.data;
-                if (providerVersion != null) {
-                    setCoreProviderTargetDate(providerVersion.targetDate);
-                }
-            }).catch(err => addError({
-                error: err,
-                description: `Error while getting current provider version for funding stream ${match.params.fundingStreamId}`
-            }));
-        }).catch((err) => {
-            addError({
+        datasetService.getDatasetHistoryService(match.params.datasetId, 1, 1)
+            .then((result) => {
+                const response = result.data as DatasetVersionHistoryViewModel;
+                setDataset(response.results[0]);
+                setDescription(response.results[0].description);
+                setChangeNote(response.results[0].changeNote);
+                providerService.getCurrentProviderVersionForFundingStream(match.params.fundingStreamId)
+                    .then((providerVersionResult) => {
+                        const providerVersion = providerVersionResult.data;
+                        if (providerVersion != null) {
+                            setCoreProviderTargetDate(providerVersion.targetDate);
+                        }
+                    })
+                    .catch(err => addError({
+                        error: err,
+                        description: `Error while getting current provider version for funding stream ${match.params.fundingStreamId}`
+                    }));
+            }).catch((err) => addError({
                 error: err,
                 description: `Error while getting dataset ${match.params.datasetId}`
             })
-        }).finally(() => {
+        ).finally(() => {
             setIsLoading(false);
         });
     });
@@ -160,24 +152,23 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         clearErrorMessages();
         setIsLoading(true);
 
-        updateDatasetService(match.params.fundingStreamId, match.params.datasetId, uploadFileName).then((result) => {
-            const newDataset = result.data as UpdateNewDatasetVersionResponseViewModel;
-            newDataset.mergeExisting = updateType === "merge";
-            uploadFileToServer(newDataset);
-        }).catch((err) => {
-            addError({error: err, description: "Unable to update data source"});
-            setIsLoading(false);
-        });
+        datasetService.updateDatasetService(match.params.fundingStreamId, match.params.datasetId, uploadFileName)
+            .then((result) => {
+                const newDataset = result.data as UpdateNewDatasetVersionResponseViewModel;
+                newDataset.mergeExisting = updateType === "merge";
+                uploadFileToServer(newDataset);
+            })
+            .catch((err) => {
+                addError({error: err, description: "Unable to update data source"});
+                setIsLoading(false);
+            });
     }
 
     function uploadFileToServer(request: UpdateNewDatasetVersionResponseViewModel) {
-        if (uploadFile !== undefined) {
-            uploadDatasetVersionService(
-                request,
-                uploadFile
-            )
-                .then(() => {
-                    validateDatasetService(
+        if (!!uploadFile) {
+            datasetService.uploadDatasetVersionService(request, uploadFile)
+                .then(newDatasetUploadResponse => {
+                    datasetService.validateDatasetService(
                         request.datasetId,
                         request.fundingStreamId,
                         request.filename,
@@ -185,25 +176,31 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         request.mergeExisting,
                         description,
                         changeNote,
-                        datasetEmptyFieldEvaluationOptions).then((validateDatasetResponse) => {
-                        const validateOperationId: any = validateDatasetResponse.data.operationId;
-                        if (!validateOperationId) {
-                            addError({error: "Unable to locate dataset validate operationId"});
+                        datasetEmptyFieldEvaluationOptions)
+                        .then((validateDatasetResponse) => {
+                            const validateOperationId: any = validateDatasetResponse.data.operationId;
+                            if (!validateOperationId) {
+                                addError({error: "Unable to locate dataset validate operationId"});
+                                setIsLoading(false);
+                                return;
+                            }
+                            setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
+
+                            setIsCheckingForJob(true);
+                            setIsLoading(true);
+                        })
+                        .catch((error) => {
+                            if (error.response && error.response.data[""] !== undefined && error.response.data[""] !== "") {
+                                addError({error: error.response.data[""]});
+                            } else {
+                                addError({
+                                    error: "Unable to retrieve validation report",
+                                    description: "Validation failed"
+                                });
+                            }
                             setIsLoading(false);
                             return;
-                        }
-                        setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
-                        setIsCheckingForJob(true);
-                        setIsLoading(true);
-                    }).catch((error) => {
-                        if (error.response && error.response.data[""] !== undefined && error.response.data[""] !== "") {
-                            addError({error:  error.response.data[""]});
-                        } else {
-                            addError({error: "Unable to retrieve validation report", description: "Validation failed"});
-                        }
-                        setIsLoading(false);
-                        return;
-                    })
+                        })
                 })
                 .catch(() => {
                     addError({error: "Unable to upload file"});
@@ -218,8 +215,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
     function onDatasetValidated(updateType: string) {
         if (updateType === "merge") {
-            getCurrentDatasetVersionByDatasetId(match.params.datasetId).then
-            ((response) => {
+            datasetService.getCurrentDatasetVersionByDatasetId(match.params.datasetId)
+                .then((response) => {
                     const mergeDatasetResult = response.data as MergeDatasetViewModel;
 
                     if (mergeDatasetResult.amendedRowCount === 0 && mergeDatasetResult.newRowCount === 0) {
@@ -230,8 +227,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
                     setMergeResults(mergeDatasetResult);
                     setIsLoading(false);
-                }
-            );
+                });
             return;
         } else {
             history.push("/Datasets/ManageDataSourceFiles");
@@ -295,8 +291,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             isValid = false;
         }
 
-        if (updateType === "merge" && datasetEmptyFieldEvaluationOptions === DatasetEmptyFieldEvaluationOptions.NA)
-        {
+        if (updateType === "merge" && datasetEmptyFieldEvaluationOptions === DatasetEmptyFieldEvaluationOptions.NA) {
             setValidation(prevState => {
                 return {
                     ...prevState,
@@ -345,7 +340,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         <dt className="govuk-summary-list__key">
                             Last updated by
                         </dt>
-                        <dd className="govuk-summary-list__value" data-testid="update-datasource-author"> {dataset.lastUpdatedByName} <span
+                        <dd className="govuk-summary-list__value"
+                            data-testid="update-datasource-author"> {dataset.lastUpdatedByName} <span
                             className="govuk-!-margin-left-2">
                                 <DateTimeFormatter date={dataset.lastUpdatedDate}/>
                             </span>
@@ -398,11 +394,13 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             Do you want to treat empty cells as values when updating providers?
                         </label>
                         <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-datasource-merge-blank-yes" name="update-merge-confirmation"
+                            <input className="govuk-radios__input" id="update-datasource-merge-blank-yes"
+                                   name="update-merge-confirmation"
                                    type="radio" data-testid="update-datasource-merge-blank-yes" value="merge"
                                    onClick={() =>
                                        setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.AsNull)}/>
-                            <label className="govuk-label govuk-radios__label" htmlFor="update-datasource-merge-blank-yes">
+                            <label className="govuk-label govuk-radios__label"
+                                   htmlFor="update-datasource-merge-blank-yes">
                                 Yes
                             </label>
                             <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
@@ -410,11 +408,13 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             </div>
                         </div>
                         <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-datasource-merge-blank-no" name="update-merge-confirmation"
+                            <input className="govuk-radios__input" id="update-datasource-merge-blank-no"
+                                   name="update-merge-confirmation"
                                    type="radio" value="new" data-testid="update-datasource-merge-blank-no"
                                    onClick={() =>
                                        setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.Ignore)}/>
-                            <label className="govuk-label govuk-radios__label" htmlFor="update-datasource-merge-blank-no">
+                            <label className="govuk-label govuk-radios__label"
+                                   htmlFor="update-datasource-merge-blank-no">
                                 No
                             </label>
                             <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
