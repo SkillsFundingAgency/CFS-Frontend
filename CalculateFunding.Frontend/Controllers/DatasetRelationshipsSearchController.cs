@@ -123,8 +123,7 @@ namespace CalculateFunding.Frontend.Controllers
                     LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name)
                         ? "Unknown"
                         : m.LastUpdatedAuthor.Name,
-                    HasDataSourceFileToMap = string.IsNullOrWhiteSpace(m.DatasetName)
-                                             && await GetDataSourceFiles(m.Id)
+                    HasDataSourceFileToMap = await GetDataSourceFiles(m.Id)
                 });
 
             SpecificationDatasetRelationshipItemViewModel[]
