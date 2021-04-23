@@ -9,6 +9,7 @@ import {IStoreState} from "../../reducers/rootReducer";
 import * as actions from "../../actions/FundingSearchSelectionActions";
 import {FilterCheckboxFieldset} from "../Search/FilterCheckboxFieldset";
 import {FilterOptionProps} from "../Search/FilterCheckboxOption";
+import {FilterAllocationType} from "../Search/FilterAllocationType";
 
 export interface IPublishedProviderSearchFiltersProps {
     facets: Facet[],
@@ -83,6 +84,10 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         dispatch(actions.updateLocalAuthorityFilters({value, isSelected}));
     }
 
+    function setAllocationType(value:string){
+        dispatch(actions.updateAllocationTypeFilters(value));
+    }
+
     function changeErrorFilter(value: string, isSelected: boolean) {
         const withErrors = value === "with-errors" ? isSelected : filterWithErrors;
         const withoutErrors = value === "without-errors" ? isSelected : filterWithoutErrors;
@@ -90,7 +95,7 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         setFilterWithoutErrors(withoutErrors);
         setFilterWithErrors(withErrors);
     }
-    
+
     const providerTypeOptions: FilterOptionProps[] = providerTypeFacets.map((item, index) =>
         ({
             index,
@@ -175,7 +180,10 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
                 onChangeHandler={changeErrorFilter}
                 options={hasErrorOptions}/>
         </CollapsiblePanel>
-        <button id="clearFilters" 
+        <CollapsiblePanel title={"Filter by allocation type"} expanded={true}>
+            <FilterAllocationType callback={setAllocationType} />
+        </CollapsiblePanel>
+        <button id="clearFilters"
                 className="govuk-button right-align"
                 onClick={props.clearFundingSearchSelection}>
             Clear filters

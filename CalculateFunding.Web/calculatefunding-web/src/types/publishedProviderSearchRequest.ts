@@ -25,6 +25,7 @@ export interface PublishedProviderSearchRequest {
     facetCount: number,
     searchMode: SearchMode,
     searchFields: string[],
+    indicative: string[],
 }
 
 export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: string, fundingPeriodId: string, specificationId: string):
@@ -45,7 +46,8 @@ export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: stri
         facetCount: 0,
         fundingPeriodId: fundingPeriodId,
         errorToggle: "",
-        searchFields: []
+        searchFields: [],
+        indicative: []
     }
 };
 

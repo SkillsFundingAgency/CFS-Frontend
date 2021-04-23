@@ -77,6 +77,12 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
                     ...state,
                     searchCriteria: {...filters, hasErrors: action.payload, pageNumber: 1}
                 };
+            case FundingSearchSelectionActionEvent.UPDATE_ALLOCATION_TYPE_FILTERS:
+                return {
+                    ...state,
+                    searchCriteria: {...filters, indicative: [action.payload]}
+                };
+
             default:
                 return state;
         }
