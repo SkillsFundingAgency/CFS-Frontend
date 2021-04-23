@@ -235,6 +235,8 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.LastUpdated, opt => opt.MapFrom(src => src.LastUpdatedDate != null ? src.LastUpdatedDate.DateTime : DateTime.MinValue))
                 .AfterMap((DatasetIndex source, DatasetSearchResultItemViewModel destination) => { destination.LastUpdatedDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString); });
 
+            CreateMap<UserIndex, UserSearchResultItemViewModel>();
+
             CreateMap<DatasetDefinitionIndex, DatasetDefinitionSearchResultItemViewModel>()
                 .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore());
             CreateMap<DatasetVersionIndex, DatasetVersionSearchResultModel>();

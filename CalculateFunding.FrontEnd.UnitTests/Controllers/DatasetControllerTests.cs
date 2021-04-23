@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
