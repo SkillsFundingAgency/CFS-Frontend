@@ -3,7 +3,7 @@ import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {getDatasetHistoryService} from "../../services/datasetService";
 import {RouteComponentProps} from "react-router";
-import {DatasetChangeType, DatasetVersionHistoryViewModel, DatasetVersionHistoryItem} from "../../types/Datasets/DatasetVersionHistoryViewModel";
+import {DatasetChangeType, DatasetVersionHistoryItem, DatasetVersionHistoryViewModel} from "../../types/Datasets/DatasetVersionHistoryViewModel";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
@@ -104,7 +104,8 @@ export function DatasetHistory({match}: RouteComponentProps<DatasetHistoryRouteP
                                 </div>
                             </th>
                             <td className="govuk-table__cell">
-                                {version.changeType.replace(/([A-Z])/g, ' $1').trim()}
+                                {(version.changeType ? version.changeType : DatasetChangeType.NewVersion)
+                                    .replace(/([A-Z])/g, ' $1').trim()}
                             </td>
                             <td className="govuk-table__cell">
                                 <DateTimeFormatter date={version.lastUpdatedDate}/>
@@ -114,7 +115,7 @@ export function DatasetHistory({match}: RouteComponentProps<DatasetHistoryRouteP
                                 <p className="govuk-body govuk-!-margin-bottom-0">Updated data source</p>
                                 <a className="govuk-link" target="self" tabIndex={-1}
                                    href={`/api/datasets/download-dataset-file/${version.datasetId}/${version.version}`}>
-                                    {version.blobName.substring(version.blobName.lastIndexOf("/") + 1)}
+                                    {version.blobName && version.blobName.substring(version.blobName.lastIndexOf("/") + 1)}
                                 </a>
                                 {version.changeType === DatasetChangeType.Merge &&
                                 <>
