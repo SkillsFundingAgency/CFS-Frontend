@@ -4,6 +4,7 @@ import {getSpecificationSummaryService} from "../../../services/specificationSer
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import userEvent from "@testing-library/user-event";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
 
 const test = SpecificationTestData();
 
@@ -16,7 +17,7 @@ describe("<EditSpecification />", () => {
             test.mockSpecificationService(spec);
             test.mockProviderService();
             test.mockProviderVersionService();
-            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All);
+            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.ToLatest);
             test.haveSpecificationMonitorHookWithNoJob();
 
             await test.renderEditSpecificationPage(spec.id);

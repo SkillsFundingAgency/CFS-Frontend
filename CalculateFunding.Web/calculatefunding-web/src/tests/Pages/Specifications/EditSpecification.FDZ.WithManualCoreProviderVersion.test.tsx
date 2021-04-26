@@ -17,7 +17,7 @@ describe("<EditSpecification />", () => {
             test.mockSpecificationService(spec);
             test.mockProviderService();
             test.mockProviderVersionService();
-            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.ToLatest);
+            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
             test.haveSpecificationMonitorHookWithNoJob();
 
             await test.renderEditSpecificationPage(spec.id);
@@ -96,17 +96,6 @@ describe("<EditSpecification />", () => {
                 expect(screen.getByRole("heading", {name: spec.fundingPeriod.name}));
             });
 
-            it("renders the provider tracking options correctly", async () => {
-                const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
-                await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
-
-                const trackingSelect = screen.getByRole("radiogroup", {name: /Track latest core provider data?/}) as HTMLInputElement;
-                const optionYes = within(trackingSelect).getByRole("radio", {name: /Yes/}) as HTMLInputElement;
-                expect(optionYes).not.toBeChecked();
-                const optionNo = within(trackingSelect).getByRole("radio", {name: /No/}) as HTMLInputElement;
-                expect(optionNo).toBeChecked();
-            });
-
             it("renders the Core provider options", async () => {
                 const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
                 await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
@@ -182,11 +171,6 @@ describe("<EditSpecification />", () => {
             it("it submits form given all fields are provided", async () => {
                 await waitForPageToLoad();
 
-                const trackingSelect = screen.getByRole("radiogroup", {name: /Track latest core provider data?/}) as HTMLInputElement;
-                const optionYes = within(trackingSelect).getByRole("radio", {name: /Yes/}) as HTMLInputElement;
-
-                userEvent.click(optionYes);
-
                 const templateVersionSelect = screen.getByRole("combobox", {name: /Template version/});
                 expect(templateVersionSelect).toHaveLength(3);
 
@@ -208,9 +192,9 @@ describe("<EditSpecification />", () => {
                             fundingPeriodId: test.fundingPeriod.id,
                             fundingStreamId: test.fundingStream.id,
                             name: spec.name,
-                            providerSnapshotId: undefined,
+                            providerSnapshotId: test.providerSnapshot2.providerSnapshotId,
                             providerVersionId: undefined,
-                            coreProviderVersionUpdates: "UseLatest"
+                            coreProviderVersionUpdates: "Manual"
                         }, spec.id
                     );
 

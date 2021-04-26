@@ -21,6 +21,7 @@ import {buildPermissions} from "../../fakes/testFactories";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../../types/Permission";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -162,7 +163,7 @@ export function SpecificationTestData() {
     const mockGetPublishedTemplatesByStreamAndPeriodCall = jest.fn(() => Promise.resolve({
         data: [mockTemplate1, mockTemplate2]
     }))
-    const mockGetFundingConfigurationCall = (mockProviderSource: ProviderSource, mockApprovalMode: ApprovalMode) =>
+    const mockGetFundingConfigurationCall = (mockProviderSource: ProviderSource, mockApprovalMode: ApprovalMode, mockUpdateCoreProviderVersion: UpdateCoreProviderVersion) =>
         jest.fn(() => Promise.resolve({
             data:
                 {
@@ -170,10 +171,11 @@ export function SpecificationTestData() {
                     fundingPeriodId: mockFundingPeriod.id,
                     approvalMode: mockApprovalMode,
                     providerSource: mockProviderSource,
-                    defaultTemplateVersion: mockTemplate2.templateVersion
+                    defaultTemplateVersion: mockTemplate2.templateVersion,
+                    updateCoreProviderVersion: mockUpdateCoreProviderVersion
                 }
         }))
-    const mockPolicyService = (mockProviderSource: ProviderSource, mockApprovalMode: ApprovalMode) => {
+    const mockPolicyService = (mockProviderSource: ProviderSource, mockApprovalMode: ApprovalMode, mockUpdateCoreProviderVersion: UpdateCoreProviderVersion) => {
         jest.mock("../../../services/policyService", () => {
             const service = jest.requireActual("../../../services/policyService");
 
@@ -181,7 +183,7 @@ export function SpecificationTestData() {
                 ...service,
                 getFundingStreamsService: mockGetFundingStreamsCall,
                 getPublishedTemplatesByStreamAndPeriod: mockGetPublishedTemplatesByStreamAndPeriodCall,
-                getFundingConfiguration: mockGetFundingConfigurationCall(mockProviderSource, mockApprovalMode)
+                getFundingConfiguration: mockGetFundingConfigurationCall(mockProviderSource, mockApprovalMode, mockUpdateCoreProviderVersion)
             }
         });
     }

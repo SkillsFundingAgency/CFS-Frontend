@@ -26,6 +26,7 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../types/Permission";
 import {BackLink} from "../../components/BackLink";
+import {UpdateCoreProviderVersion} from "../../types/Provider/UpdateCoreProviderVersion";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -55,7 +56,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             description: "Error while loading specification"
         }));
 
-    const fundingStreamId = specification && specification?.fundingStreams[0]?.id
+    const fundingStreamId = specification && specification?.fundingStreams?.length > 0 && specification?.fundingStreams[0]?.id
     const fundingPeriodId = specification && specification.fundingPeriod.id;
 
     const {fundingConfiguration, isLoadingFundingConfiguration} =
@@ -371,7 +372,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             id="funding-period">{specification && specification.fundingPeriod.name}</h3>
                     </div>
 
-                    {providerSource === ProviderSource.FDZ &&
+                    {(providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused))) &&
                     <div
                         className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <fieldset className="govuk-fieldset" id="trackProviderData"
