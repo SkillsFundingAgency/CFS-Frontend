@@ -24,10 +24,10 @@ export function SubHeader({showSecondaryNav = true}: SubHeaderProps) {
                 </p>
             </div>
             <div className="govuk-grid-column-one-third">
-                {showSecondaryNav && 
+                {showSecondaryNav &&
                 <nav className="right-align">
                     <span className="govuk-body-s govuk-!-margin-right-2">
-                        <Link className="govuk-link" to="/Account/Permissions">My user permissions</Link>
+                        <Link className="govuk-link" to="/Permissions/MyPermissions">My user permissions</Link>
                     </span>
                 </nav>}
             </div>

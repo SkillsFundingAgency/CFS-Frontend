@@ -41,7 +41,7 @@ export function PermissionStatus(props: PermissionStatusProps) {
                     <span className="govuk-notification-banner__heading govuk-!-width-full" data-testid="permission-alert-message">
                         You do not have permissions to perform the following {missingPermissions.length === 1 ? "action" : "actions"}: {' '}
                         {missingPermissions.length > 0 ? missingPermissions.join(', ') : props.requiredPermissions.join(', ')}. {' '}
-                        <Link to="/Account/Permissions">View my user permissions</Link>
+                        <Link to="/Permissions/MyPermissions">View my user permissions</Link>
                     </span>
                 </div>
             </div> : null

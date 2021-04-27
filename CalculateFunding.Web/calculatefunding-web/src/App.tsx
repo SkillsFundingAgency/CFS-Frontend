@@ -44,7 +44,7 @@ import {DataRelationships} from "./pages/Datasets/DataRelationships";
 import {SelectDataSource} from "./pages/Datasets/SelectDataSource";
 import {SelectDataSourceExpanded} from "./pages/Datasets/SelectDataSourceExpanded";
 import {ViewProviderResults} from "./pages/ViewResults/ViewProviderResults";
-import {Permissions} from "./pages/Account/Permissions";
+import {MyPermissions} from "./pages/Permissions/MyPermissions";
 import {ConfirmationModal} from "./components/ConfirmationModal";
 import {ConfirmSkills} from "./pages/ConfirmSkills";
 import {LoadingStatus} from "./components/LoadingStatus";
@@ -160,7 +160,7 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Specifications/EditVariationPoints/:specificationId/:fundingLineId" component={EditVariationPoints}/>
                         <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
                         <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
-                        <Route path="/Account/Permissions" component={Permissions}/>
+                        <Route path="/Permissions/MyPermissions" component={MyPermissions}/>
                         <Route path="*">
                             <NoMatch/>
                         </Route>

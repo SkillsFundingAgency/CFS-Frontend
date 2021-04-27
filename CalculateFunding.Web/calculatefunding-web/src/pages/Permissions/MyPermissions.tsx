@@ -10,7 +10,7 @@ import {useFundingStreamPermissions} from "../../hooks/Permissions/useFundingStr
 import {Permission} from "../../types/Permission";
 import {getPermissionDescription} from "../../helpers/permissionsHelper";
 
-export function Permissions() {
+export function MyPermissions() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const pageTitle = document.title = "My user permissions";
     const [currentFundingStream, setCurrentFundingStreamId] = useState<FundingStreamPermissions>();
@@ -19,7 +19,7 @@ export function Permissions() {
         const excludedPermissions = [Permission.CanCreateQaTests, Permission.CanEditQaTests, Permission.CanDeleteQaTests, Permission.CanDeleteCalculations, Permission.CanDeleteTemplates, Permission.CanDeleteSpecification, Permission.CanDeleteProfilePattern];
         return Object.values(Permission).filter(p => !excludedPermissions.includes(p))
     }, []);
-    
+
     function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {
         setCurrentFundingStreamId(permissions.find(p => p.fundingStreamId === e.target.value));
     }
@@ -38,7 +38,7 @@ export function Permissions() {
             </div>
         );
     }
-    
+
 
     return (
         <Main location={Section.Home}>
@@ -105,7 +105,7 @@ export function Permissions() {
                             <tbody className="govuk-table__body">
                             {permissionsToShow
                                 .sort((a, b) => a.localeCompare(b))
-                                .map((p, index) => 
+                                .map((p, index) =>
                                 <tr key={index} className="govuk-table__row">
                                     <th scope="row" className="govuk-table__header">
                                         {p}

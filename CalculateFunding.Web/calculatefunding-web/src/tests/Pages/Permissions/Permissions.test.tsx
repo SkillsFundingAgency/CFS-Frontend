@@ -2,25 +2,25 @@
 import {MemoryRouter} from "react-router";
 import {QueryClient, QueryClientProvider} from "react-query";
 import React from "react";
-import {Permissions} from "../../../pages/Account/Permissions";
+import {MyPermissions} from "../../../pages/Permissions/MyPermissions";
 import * as redux from "react-redux";
 import {buildPermissions} from "../../fakes/testFactories";
 import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 
 const renderPage = () => {
-    const {Permissions} = require("../../../pages/Account/Permissions");
+    const {MyPermissions} = require("../../../pages/Permissions/MyPermissions");
     return render(
         <MemoryRouter>
             <QueryClientProvider client={new QueryClient()}>
-                <Permissions/>
+                <MyPermissions/>
             </QueryClientProvider>
         </MemoryRouter>);
 };
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 
 
-describe("<Permissions/>", () => {
+describe("<MyPermissions/>", () => {
     describe("when no permissions defined at all", () => {
         beforeEach(() => {
             useSelectorSpy.mockReturnValue([]);
@@ -36,7 +36,7 @@ describe("<Permissions/>", () => {
             expect(screen.getByText(/You have read only access for all funding streams/)).toBeInTheDocument();
         });
     });
-    
+
     describe("when permissions defined but all disabled", () => {
         beforeEach(() => {
             const permissions = [buildPermissions({fundingStreamId: "DSG", fundingStreamName: "Direct School Grant", setAllPermsEnabled: false})];
@@ -67,7 +67,7 @@ describe("<Permissions/>", () => {
             expect(noCells.length).toBeGreaterThanOrEqual(1);
         });
     });
-    
+
     describe("when permissions defined and user has one permission enabled", () => {
         beforeEach(() => {
             const permissions = [buildPermissions({fundingStreamId: "DSG", fundingStreamName: "Direct School Grant", setAllPermsEnabled: false, actions: [p => p.canCreateSpecification = true]})];
@@ -92,9 +92,9 @@ describe("<Permissions/>", () => {
         it("renders funding stream selections", async () => {
             const combobox = screen.getByRole("combobox", {name: /Select funding stream/i});
             expect(within(combobox).getByRole("option", {name: /Direct School Grant/})).toBeInTheDocument();
-            
+
             userEvent.selectOptions(combobox, "DSG");
-            
+
             expect(screen.getByRole("table", {name: /Calculate Funding Service permissions/}));
             expect(screen.getByRole("heading", {name: /You have these permissions for the Direct School Grant funding stream in the Calculate Funding Service/}));
             const rowHeader = screen.getByRole("rowheader", {name: /Can create specifications/});
