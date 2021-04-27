@@ -107,7 +107,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             setIsLoadingRefresh(false);
             setLastRefresh(latestJob?.lastUpdated);
         }
-        if (isLoadingRefresh && jobId !== "" && latestJob.jobId === jobId) {
+        if (jobId !== "" && latestJob.jobId === jobId) {
             setIsLoadingRefresh(false);
             setJobId("");
             refetchSearchResults();
