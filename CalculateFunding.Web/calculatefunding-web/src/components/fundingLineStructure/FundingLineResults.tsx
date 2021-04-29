@@ -247,7 +247,7 @@ export function FundingLineResults({
             if (fundingLineResult) {
                 node.errorMessage = fundingLineResult.exceptionMessage !== null ? fundingLineResult.exceptionMessage : undefined;
                 node.value = fundingLineResult.value !== null ?
-                    renderValue(fundingLineResult.value, ValueFormatType.Currency) : "";
+                    renderValue(fundingLineResult.value, ValueFormatType.Currency) : (providerId ? "Excluded" : "");
             }
         }
     }
