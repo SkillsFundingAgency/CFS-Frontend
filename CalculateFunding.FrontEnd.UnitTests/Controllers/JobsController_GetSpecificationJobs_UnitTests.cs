@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -30,10 +31,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task When_GetSpecificationJobs_has_Valid_JobTypes_Returns_Jobs()
         {
-            IEnumerable<JobSummary> expected = new List<JobSummary> {new JobSummary {JobId = "ABC123", RunningStatus = RunningStatus.Queued}};
+            IDictionary<string, JobSummary> expected = new Dictionary<string, JobSummary> { { "", new JobSummary { JobId = "ABC123", RunningStatus = RunningStatus.Queued } } };
             _mockJobsApiClient
-                .Setup(x => x.GetLatestJobsForSpecification("ABC123", new[] {"Published"}))
-                .ReturnsAsync(new ApiResponse<IEnumerable<JobSummary>>(HttpStatusCode.OK, expected));
+                .Setup(x => x.GetLatestJobsForSpecification("ABC123", It.Is<string[]>(_ => _.FirstOrDefault() == "Published") ))
+                .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.OK, expected));
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
             IActionResult result = await _sut.GetSpecificationJobs("ABC123", "Published");
@@ -49,8 +50,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task When_GetSpecificationJobs_has_no_jobs_Returns_OK()
         {
             _mockJobsApiClient
-                .Setup(x => x.GetLatestJobsForSpecification("ABC123", new[] {"XXX", "YYY"}))
-                .ReturnsAsync(new ApiResponse<IEnumerable<JobSummary>>(HttpStatusCode.NoContent, null));
+                .Setup(x => x.GetLatestJobsForSpecification(
+                    "ABC123", 
+                    It.Is<string[]>(_ => 
+                        _.FirstOrDefault() == "XXX" &&
+                        _.LastOrDefault() == "YYY")))
+                .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.NoContent, null));
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
             IActionResult result = await _sut.GetSpecificationJobs("ABC123", "XXX,YYY");

@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             string[] jobTypesArray = jobTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-            ApiResponse<IEnumerable<JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypesArray);
+            ApiResponse<IDictionary<string, JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypesArray);
 
             IActionResult errorResult = response.IsSuccessOrReturnFailureResult("GetLatestJobsForSpecification", treatNoContentAsSuccess: true);
 
@@ -51,7 +51,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return Ok(jobTypesArray.Select(x => (string)null));
             }
 
-            IEnumerable<JobSummaryViewModel> jobs = _mapper.Map<IEnumerable<JobSummaryViewModel>>(response.Content);
+            IEnumerable<JobSummaryViewModel> jobs = _mapper.Map<IEnumerable<JobSummaryViewModel>>(response.Content.Values);
 
             return Ok(jobs);
         }
