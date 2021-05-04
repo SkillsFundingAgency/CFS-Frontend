@@ -43,7 +43,6 @@ describe("<LoadNewDataSource />", () => {
             const {getDatasetDefinitionsService} = require('../../../services/datasetService');
             const {getFundingStreamsService} = require('../../../services/policyService');
             await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
-            await waitFor(() => expect(getDatasetDefinitionsService).toBeCalledTimes(1));
         })
     });
 

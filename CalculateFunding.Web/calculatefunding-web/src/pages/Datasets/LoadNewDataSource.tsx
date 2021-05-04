@@ -164,10 +164,8 @@ export function LoadNewDataSource() {
                 }))
                 .finally(() => setDataSchemaIsLoading(false));
         } else {
-            getDatasetDefinitionsService()
-                .then((result) => setDataSchemaSuggestions(result.data))
-                .catch(err => addError({error: err, description: `Error while getting dataset definitions`}))
-                .finally(() => setDataSchemaIsLoading(false));
+            setDataSchemaSuggestions([])
+            setDataSchemaIsLoading(false)
         }
     }
 
