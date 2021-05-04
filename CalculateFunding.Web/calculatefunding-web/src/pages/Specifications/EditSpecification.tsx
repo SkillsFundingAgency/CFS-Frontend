@@ -57,7 +57,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         }));
 
     const fundingStreamId = specification && specification?.fundingStreams?.length > 0 && specification?.fundingStreams[0]?.id
-    const fundingPeriodId = specification && specification.fundingPeriod.id;
+    const fundingPeriodId = specification && specification?.fundingPeriod?.id;
 
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
@@ -369,7 +369,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             Funding period
                         </label>
                         <h3 className="govuk-heading-m"
-                            id="funding-period">{specification && specification.fundingPeriod.name}</h3>
+                            id="funding-period">{specification && specification?.fundingPeriod?.name}</h3>
                     </div>
 
                     {(providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused))) &&
