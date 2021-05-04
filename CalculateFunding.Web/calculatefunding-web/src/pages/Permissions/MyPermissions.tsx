@@ -1,5 +1,5 @@
 ﻿import {Section} from "../../types/Sections";
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
@@ -9,19 +9,41 @@ import {WarningText} from "../../components/WarningText";
 import {useFundingStreamPermissions} from "../../hooks/Permissions/useFundingStreamPermissions";
 import {Permission} from "../../types/Permission";
 import {getPermissionDescription} from "../../helpers/permissionsHelper";
+import {getAdminUsersForFundingStream} from "../../services/userService";
+import {useErrors} from "../../hooks/useErrors";
+import {User} from "../../types/User";
+import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export function MyPermissions() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const pageTitle = document.title = "My user permissions";
     const [currentFundingStream, setCurrentFundingStreamId] = useState<FundingStreamPermissions>();
+    const [adminUsers, setAdminUsers] = useState<User[]>();
     const permitted = useFundingStreamPermissions(currentFundingStream);
     const permissionsToShow: Permission[] = useMemo(() => {
         const excludedPermissions = [Permission.CanCreateQaTests, Permission.CanEditQaTests, Permission.CanDeleteQaTests, Permission.CanDeleteCalculations, Permission.CanDeleteTemplates, Permission.CanDeleteSpecification, Permission.CanDeleteProfilePattern];
         return Object.values(Permission).filter(p => !excludedPermissions.includes(p))
     }, []);
+    const {errors, addError} = useErrors();
+    const hasFundingStreamAdmins = adminUsers?.some(user => user.username.trim() !== "")
+    useEffect(()=>{
+        if (!currentFundingStream?.fundingStreamId)
+            return;
+        loadFundingStreamAdmins(currentFundingStream?.fundingStreamId)
+    }, [currentFundingStream])
 
     function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {
         setCurrentFundingStreamId(permissions.find(p => p.fundingStreamId === e.target.value));
+    }
+
+    function loadFundingStreamAdmins(fundingStreamId: string)
+    {
+        getAdminUsersForFundingStream(fundingStreamId)
+            .then((result) => {
+                setAdminUsers(result.data);
+            }).catch(() => {
+            addError({error: `Unable to retrieve users for funding stream ${fundingStreamId}`});
+        });
     }
 
     function RequestExtraPermission() {
@@ -31,8 +53,27 @@ export function MyPermissions() {
                     <div className="form-group">
                         <h2 className="govuk-heading-l">Requesting Permissions</h2>
                         <p className="govuk-body">
-                            If you require further permissions to be enabled, please raise a service desk request noting the CFS environment and permission or permissions you require.
+                            An administrator for your funding stream can provide you with permissions. Contact a system
+                            administrator if there are none listed.
                         </p>
+                        {
+                            hasFundingStreamAdmins &&
+                            <p className="govuk-body">
+                            Administrators for the ${currentFundingStream?.fundingStreamName} funding stream are:
+                            </p>
+                        }
+                        {
+                            hasFundingStreamAdmins &&
+                            <ul className="govuk-list govuk-list--bullet">
+                                {
+                                    adminUsers?.map((user, index) => {
+                                        return <li key={index}>
+                                            {user.username}
+                                        </li>
+                                    })
+                                }
+                            </ul>
+                        }
                     </div>
                 </div>
             </div>
@@ -46,6 +87,8 @@ export function MyPermissions() {
                    description="View my user permissions for a funding stream"
                    includeBackLink={true}
             />
+
+            <MultipleErrorSummary errors={errors}/>
 
             {permissions && permissions.length === 0 &&
             <WarningText
