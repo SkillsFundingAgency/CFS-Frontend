@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import {act, render, screen, waitFor, within} from "@testing-library/react";
+import {screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import * as redux from "react-redux";
 import {FundingApprovalTestData} from "./FundingApprovalTestData";
@@ -33,6 +33,14 @@ describe("<SpecificationFundingApproval />", () => {
             expect(screen.getByRole("checkbox", {name: "With errors"})).toBeInTheDocument();
             expect(screen.getByRole("checkbox", {name: "Without errors"})).toBeInTheDocument();
             expect(screen.getByRole("checkbox", {name: /East London/})).toBeInTheDocument();
+            expect(screen.getByRole("checkbox", {name: /January 2000/})).toBeInTheDocument();
+        });
+
+        it('renders month and year opened filters in correct order', async () => {
+            const dates = screen.getAllByTestId("openDate") as HTMLLabelElement[];
+            expect(dates[0].textContent).toBe("January 2000 (1)")
+            expect(dates[1].textContent).toBe("June 2015 (1)")
+            expect(dates[2].textContent).toBe("September 2016 (2)")
         });
     });
 });

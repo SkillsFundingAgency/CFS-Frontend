@@ -82,7 +82,11 @@ export const reduceFundingSearchSelectionState: Reducer<FundingSearchSelectionSt
                     ...state,
                     searchCriteria: {...filters, indicative: [action.payload]}
                 };
-
+            case FundingSearchSelectionActionEvent.UPDATE_MONTH_YEAR_OPENED_FILTERS:
+                return {
+                    ...state,
+                    searchCriteria: {...filters, monthYearOpened: applyFilterChange(filters.monthYearOpened, action.payload), pageNumber: 1}
+                };
             default:
                 return state;
         }

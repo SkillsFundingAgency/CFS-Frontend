@@ -26,7 +26,8 @@ export function FilterCheckboxOption({value, index, fieldId, isSelected, onChang
                    value={value}
                    onChange={() => onChangeHandler(value, !isSelected)}/>
             <label className="govuk-label govuk-checkboxes__label"
-                   htmlFor={id}>
+                   htmlFor={id}
+                   data-testid={fieldId}>
                 {labelText}
             </label>
         </div>)

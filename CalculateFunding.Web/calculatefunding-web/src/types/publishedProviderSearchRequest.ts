@@ -5,7 +5,8 @@ export enum PublishedProviderSearchFacet {
     ProviderType = "providerType",
     ProviderSubType = "providerSubType",
     LocalAuthority = "localAuthority",
-    FundingStatus = "fundingStatus"
+    FundingStatus = "fundingStatus",
+    MonthYearOpened = "monthYearOpened"
 }
 
 export interface PublishedProviderSearchRequest {
@@ -18,6 +19,7 @@ export interface PublishedProviderSearchRequest {
     fundingPeriodId: string,
     specificationId: string,
     localAuthority: string[],
+    monthYearOpened: string[],
     status: string[],
     providerType: string[],
     providerSubType: string[],
@@ -47,7 +49,8 @@ export const buildInitialPublishedProviderSearchRequest = (fundingStreamId: stri
         fundingPeriodId: fundingPeriodId,
         errorToggle: "",
         searchFields: [],
-        indicative: []
+        indicative: [],
+        monthYearOpened: []
     }
 };
 

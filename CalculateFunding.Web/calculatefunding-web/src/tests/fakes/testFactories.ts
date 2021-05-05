@@ -14,7 +14,8 @@ export const defaultFacets = [
     {name: PublishedProviderSearchFacet.ProviderType, facetValues: []},
     {name: PublishedProviderSearchFacet.ProviderSubType, facetValues: []},
     {name: PublishedProviderSearchFacet.LocalAuthority, facetValues: [{"name": "East London", "count": 1}]},
-    {name: PublishedProviderSearchFacet.ProviderType, facetValues: []}
+    {name: PublishedProviderSearchFacet.ProviderType, facetValues: []},
+    {name: PublishedProviderSearchFacet.MonthYearOpened, facetValues: [{"name": "January 2000", "count": 1}, {"name": "September 2016", "count": 2}, {"name": "June 2015", "count": 1}]}
 ];
 
 export const allPermissions = () => Object.keys(Permission).map(p => (<any>Permission)[p] as Permission);

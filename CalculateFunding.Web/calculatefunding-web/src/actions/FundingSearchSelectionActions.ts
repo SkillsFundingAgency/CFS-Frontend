@@ -15,6 +15,7 @@ export enum FundingSearchSelectionActionEvent {
     UPDATE_PROVIDER_SUB_TYPE_FILTERS = 'updateProviderSubTypeFilters',
     UPDATE_SEARCH_TEXT_FILTER = 'updateSearchTextFilter',
     UPDATE_ALLOCATION_TYPE_FILTERS = 'updateAllocationTypeFilters',
+    UPDATE_MONTH_YEAR_OPENED_FILTERS = 'updateMonthYearOpenedFilters',
 }
 
 export type IFundingSearchSelectionActions =
@@ -28,7 +29,8 @@ export type IFundingSearchSelectionActions =
     IUpdateProviderSubTypeFiltersAction |
     IUpdateSearchTextFilterAction |
     IRemoveProvidersFromFundingSelectionAction |
-IUpdateAllocationTypeFiltersAction;
+    IUpdateAllocationTypeFiltersAction |
+    IUpdateMonthYearOpenedFilters;
 
 export interface IInitialiseFundingSearchSelectionAction {
     type: FundingSearchSelectionActionEvent.INITIALISE;
@@ -83,6 +85,11 @@ export interface IUpdateSearchTextFilterAction {
 export interface IUpdateAllocationTypeFiltersAction {
     type: FundingSearchSelectionActionEvent.UPDATE_ALLOCATION_TYPE_FILTERS
     payload: string
+}
+
+export interface IUpdateMonthYearOpenedFilters {
+    type: FundingSearchSelectionActionEvent.UPDATE_MONTH_YEAR_OPENED_FILTERS;
+    payload: SearchFilter
 }
 
 export interface TextSearchModel {
@@ -207,4 +214,14 @@ export const updateAllocationTypeFilters : ActionCreator<ThunkAction<Promise<any
             payload: allocationType
         })
     }
-    }
+    };
+
+export const updateMonthYearOpenedFilters: ActionCreator<ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IUpdateMonthYearOpenedFilters>> =
+    (filterChange: SearchFilter) => {
+        return async (dispatch) => {
+            dispatch({
+                type: FundingSearchSelectionActionEvent.UPDATE_MONTH_YEAR_OPENED_FILTERS,
+                payload: filterChange
+            });
+        }
+    };

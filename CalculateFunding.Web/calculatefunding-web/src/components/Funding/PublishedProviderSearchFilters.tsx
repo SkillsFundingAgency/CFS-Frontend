@@ -29,9 +29,13 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
     const [providerTypeFacets, setProviderTypeFacets] = useState<FacetValue[]>([]);
     const [providerSubTypeFacets, setProviderSubTypeFacets] = useState<FacetValue[]>([]);
     const [localAuthorityFacets, setLocalAuthorityFacets] = useState<FacetValue[]>([]);
+    const [openDateFacets, setOpenDateFacets] = useState<FacetValue[]>([]);
     const [filterWithErrors, setFilterWithErrors] = useState<boolean>(searchCriteria && searchCriteria.hasErrors ? searchCriteria.hasErrors as boolean : false);
     const [filterWithoutErrors, setFilterWithoutErrors] = useState<boolean>(searchCriteria && searchCriteria ? !searchCriteria.hasErrors : false);
     const dispatch = useDispatch();
+
+    const sortFacetDateValues = (array: FacetValue[]) => array.sort((a: FacetValue, b: FacetValue) =>
+        new Date(a.name).getTime() - new Date(b.name).getTime());
 
     useEffect(() => {
         props.facets.forEach((facet) => {
@@ -47,6 +51,9 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
                     break;
                 case PublishedProviderSearchFacet.FundingStatus:
                     setStatusFacets(facet.facetValues);
+                    break;
+                case PublishedProviderSearchFacet.MonthYearOpened:
+                    setOpenDateFacets(sortFacetDateValues(facet.facetValues));
                     break;
             }
         });
@@ -96,6 +103,10 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         setFilterWithErrors(withErrors);
     }
 
+    function changeMonthYearOpenedFilter(value: string, isSelected: boolean) {
+        dispatch(actions.updateMonthYearOpenedFilters({value, isSelected}));
+    }
+
     const providerTypeOptions: FilterOptionProps[] = providerTypeFacets.map((item, index) =>
         ({
             index,
@@ -123,6 +134,13 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
             value: item.name,
             labelText: `${item.name} (${item.count})`,
             isSelected: searchCriteria.localAuthority.includes(item.name)
+        }));
+    const openDateOptions: FilterOptionProps[] = openDateFacets.map((item, index) =>
+        ({
+            index,
+            value: item.name,
+            labelText: `${item.name} (${item.count})`,
+            isSelected: searchCriteria.monthYearOpened?.includes(item.name)
         }));
     const hasErrorOptions: FilterOptionProps[] = [{
         index: 1,
@@ -182,6 +200,12 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
         </CollapsiblePanel>
         <CollapsiblePanel title={"Filter by allocation type"} expanded={true}>
             <FilterAllocationType callback={setAllocationType} />
+        </CollapsiblePanel>
+        <CollapsiblePanel title={"Filter by open date"} expanded={openDateFacets.length > 0}>
+            <FilterCheckboxFieldset
+                fieldId="openDate"
+                onChangeHandler={changeMonthYearOpenedFilter}
+                options={openDateOptions}/>
         </CollapsiblePanel>
         <button id="clearFilters"
                 className="govuk-button right-align"
