@@ -8,6 +8,7 @@ export const FilterAllocationType = (props: {callback:any}) =>{
                    name="set-allocation"
                    type="radio"
                    value="true"
+                   defaultChecked={true}
                    onChange={() => props.callback("Show all allocation types")}/>
             <label className="govuk-label govuk-radios__label"
                    htmlFor="set-allocation-show">
