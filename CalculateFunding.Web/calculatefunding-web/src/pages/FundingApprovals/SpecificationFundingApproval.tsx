@@ -249,7 +249,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 <div className="govuk-grid-row govuk-!-margin-bottom-5">
                     <div className="govuk-grid-column-two-thirds">
                         <h1 className="govuk-heading-xl govuk-!-margin-bottom-1" data-testid="specName"> {specification.name} </h1>
-                        <span className="govuk-caption-l" data-testid="fundingDetails">{specification.fundingStreams[0].name} for {specification.fundingPeriod.name}</span>
+                        <span className="govuk-caption-l" data-testid="fundingDetails">{specification && specification?.fundingStreams?.length > 0 && specification.fundingStreams[0].name} for {specification && specification.fundingPeriod.name}</span>
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <ul className="govuk-list right-align">
