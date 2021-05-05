@@ -34,7 +34,7 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
         props.providerSearchResults.providers.length > 0;
     const [selectAll, setSelectAll] = useState<boolean>(false);
     const dispatch = useDispatch();
-    
+
     useEffect(() => {
         if (selectAll && props.allPublishedProviderIds && props.allPublishedProviderIds.length === 0) {
             setSelectAll(false);
@@ -96,7 +96,7 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                 <th className="govuk-table__header govuk-body">Status</th>
                 <th className="govuk-table__header govuk-body">
                     Funding total<br/>
-                    <FormattedNumber value={props.providerSearchResults.totalFundingAmount}
+                    <FormattedNumber value={props.providerSearchResults.filteredFundingAmount}
                                      type={NumberType.FormattedMoney}/><br/>
                     <p className="govuk-body-s">of filtered providers</p>
                 </th>
