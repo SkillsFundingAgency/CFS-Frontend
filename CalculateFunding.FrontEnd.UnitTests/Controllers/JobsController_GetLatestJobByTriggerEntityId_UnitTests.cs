@@ -59,10 +59,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             _mockJobsApiClient.VerifyAll();
             result.Should().NotBeNull();
-            result.Should().BeAssignableTo<OkResult>();
-            var content = (result as OkResult);
+            result.Should().BeAssignableTo<OkObjectResult>();
+            var content = (result as OkObjectResult);
             content.Should().NotBeNull();
-            content.Should().BeOfType<OkResult>();
+            content.Should().BeOfType<OkObjectResult>();
         }
     }
 }

@@ -10,29 +10,51 @@ namespace CalculateFunding.Common.ApiClient.Models
     public static class ApiResponseExtensions
     {
         public static IActionResult Handle<T>(
-            this ValidatedApiResponse<T> apiResponse, 
-            string entityName, 
+            this ValidatedApiResponse<T> apiResponse,
+            string entityName,
             Func<ApiResponse<T>, IActionResult> onSuccess,
-            bool treatNoContentAsSuccess = false)
+            Func<ApiResponse<T>, IActionResult> onNotFound = null,
+            Func<ApiResponse<T>, IActionResult> onNoContent = null)
         {
-            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
+            if (onNotFound != null && apiResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return onNotFound(apiResponse);
+            }
+            if (onNoContent != null && apiResponse.StatusCode == HttpStatusCode.NoContent)
+            {
+                return onNoContent(apiResponse);
+            }
+            
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName);
+
             return errorResult ?? onSuccess(apiResponse);
         }
-        
-        
+
+
         public static IActionResult Handle<T>(
-            this ApiResponse<T> apiResponse, 
-            string entityName, 
+            this ApiResponse<T> apiResponse,
+            string entityName,
             Func<ApiResponse<T>, IActionResult> onSuccess,
-            bool treatNoContentAsSuccess = false)
+            Func<ApiResponse<T>, IActionResult> onNotFound = null,
+            Func<ApiResponse<T>, IActionResult> onNoContent = null)
         {
-            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
+            if (onNotFound != null && apiResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return onNotFound(apiResponse);
+            }
+            if (onNoContent != null && apiResponse.StatusCode == HttpStatusCode.NoContent)
+            {
+                return onNoContent(apiResponse);
+            }
+            
+            IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName);
+
             return errorResult ?? onSuccess(apiResponse);
         }
-        
+
         public static IActionResult IsSuccessOrReturnFailureResult<T>(
-            this ValidatedApiResponse<T> apiResponse, 
-            string entityName, 
+            this ValidatedApiResponse<T> apiResponse,
+            string entityName,
             bool treatNoContentAsSuccess = false)
         {
             if (apiResponse != null && apiResponse.IsBadRequest(out BadRequestObjectResult badRequestObject))
@@ -42,8 +64,12 @@ namespace CalculateFunding.Common.ApiClient.Models
 
             return (apiResponse as ApiResponse<T>).IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
         }
-        
-        public static IActionResult IsSuccessOrReturnFailureResult<T>(this ApiResponse<T> apiResponse, string entityName, bool treatNoContentAsSuccess = false)
+
+        public static IActionResult IsSuccessOrReturnFailureResult<T>(
+            this ApiResponse<T> apiResponse,
+            string entityName,
+            bool treatNoContentAsSuccess = false,
+            bool treatNotFoundAsSuccess = false)
         {
             Guard.IsNullOrWhiteSpace(entityName, nameof(entityName));
 
@@ -54,7 +80,7 @@ namespace CalculateFunding.Common.ApiClient.Models
 
             if (apiResponse.StatusCode == HttpStatusCode.NotFound)
             {
-                return new NotFoundObjectResult($"{entityName} not found.");
+                return treatNotFoundAsSuccess ? null : new NotFoundObjectResult($"{entityName} not found.");
             }
 
             if (treatNoContentAsSuccess && apiResponse.StatusCode == HttpStatusCode.NoContent)

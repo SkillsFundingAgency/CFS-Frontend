@@ -6,6 +6,7 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.ViewModels.Jobs;
 using FluentAssertions;
@@ -31,19 +32,38 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task When_GetSpecificationJobs_has_Valid_JobTypes_Returns_Jobs()
         {
-            IDictionary<string, JobSummary> expected = new Dictionary<string, JobSummary> { { "", new JobSummary { JobId = "ABC123", RunningStatus = RunningStatus.Queued } } };
+            IDictionary<string, JobSummary> expected = new Dictionary<string, JobSummary>
+            {
+                {
+                    "", new JobSummary
+                    {
+                        JobId = "ABC123",
+                        RunningStatus = RunningStatus.Queued
+                    }
+                }
+            };
+
             _mockJobsApiClient
-                .Setup(x => x.GetLatestJobsForSpecification("ABC123", It.Is<string[]>(_ => _.FirstOrDefault() == "Published") ))
+                .Setup(x => x.GetLatestJobsForSpecification("ABC123", It.Is<string[]>(_ => _.FirstOrDefault() == "Refresh")))
                 .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.OK, expected));
+
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
-            IActionResult result = await _sut.GetSpecificationJobs("ABC123", "Published");
+            IActionResult result = await _sut.GetSpecificationJobs(new[] { "Refresh" }, "ABC123");
 
-            result.Should().NotBeNull();
-            result.Should().BeAssignableTo<OkObjectResult>();
+            result.Should()
+                .NotBeNull();
+
+            result.Should()
+                .BeAssignableTo<OkObjectResult>();
+
             var content = (result as OkObjectResult).Value;
-            content.Should().NotBeNull();
-            content.Should().BeOfType<JobSummaryViewModel[]>();
+
+            content.Should()
+                .NotBeNull();
+
+            content.Should()
+                .BeOfType<JobSummaryViewModel[]>();
         }
 
         [TestMethod]
@@ -51,20 +71,32 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             _mockJobsApiClient
                 .Setup(x => x.GetLatestJobsForSpecification(
-                    "ABC123", 
-                    It.Is<string[]>(_ => 
-                        _.FirstOrDefault() == "XXX" &&
-                        _.LastOrDefault() == "YYY")))
+                    "ABC123",
+                    It.Is<string[]>(_ =>
+                        _.FirstOrDefault() == "Refresh" &&
+                        _.LastOrDefault() == "Publish")))
                 .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.NoContent, null));
+
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
-            IActionResult result = await _sut.GetSpecificationJobs("ABC123", "XXX,YYY");
+            IActionResult result = await _sut.GetSpecificationJobs(new[]
+            {
+                "Refresh",
+                "Publish"
+            }, "ABC123");
 
             _mockJobsApiClient.VerifyAll();
-            result.Should().NotBeNull();
-            result.Should().BeAssignableTo<OkObjectResult>();
+
+            result.Should()
+                .NotBeNull();
+
+            result.Should()
+                .BeAssignableTo<OkObjectResult>();
+
             var content = (result as OkObjectResult).Value;
-            content.Should().NotBeNull();
+
+            content.Should()
+                .NotBeNull();
         }
     }
 }

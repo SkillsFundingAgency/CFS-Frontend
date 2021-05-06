@@ -3,12 +3,11 @@ import {JobResponse} from "../types/jobDetails";
 
 const baseURL = "/api/jobs";
 
-export async function getJobStatusUpdatesForSpecification(specificationId: string, jobTypes: string): Promise<AxiosResponse<JobResponse[]>> {
-    return axios(`${baseURL}/${specificationId}/${jobTypes}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+export async function getJobStatusUpdatesForSpecification(specificationId: string, jobTypes: string[]): Promise<AxiosResponse<JobResponse[]>> {
+    return axios(`${baseURL}/${specificationId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: jobTypes
     });
 }
 

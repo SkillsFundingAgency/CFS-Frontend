@@ -48,7 +48,7 @@ export const useJobMonitor = ({filterBy, onError, isEnabled}: JobMonitorProps): 
             if (!hubRef.current) {
                 hubConnect = new HubConnectionBuilder()
                     .withUrl(`/api/notifications`)
-                    .withAutomaticReconnect()
+                    .withAutomaticReconnect([3, 5, 8, 13, 21, 34, 55])
                     .build();
                 hubConnect.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
                 hubConnect.serverTimeoutInMilliseconds = milliseconds.SixMinutes;

@@ -64,7 +64,7 @@ describe("useFetchLatestSpecificationJob tests", () => {
         const mock = new MockAdapter(axios);
 
         beforeAll(() => {
-            mock.onGet(`/api/jobs/${specificationId}/${JobType.RefreshFundingJob}`)
+            mock.onPost(`/api/jobs/${specificationId}`, [JobType.RefreshFundingJob.toString()])
                 .replyOnce(200, [{}, mockQueuedJobResult1, {}, mockQueuedJobResult2, {}]);
         });
         afterAll(() => {

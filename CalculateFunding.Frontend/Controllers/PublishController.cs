@@ -124,8 +124,8 @@ namespace CalculateFunding.Frontend.Controllers
                 await _publishingApiClient.ValidateSpecificationForRefresh(specificationId);
 
             return response.Handle(nameof(Specification),
-                onSuccess: x => Ok(),
-                treatNoContentAsSuccess: true);
+                onSuccess: Ok,
+                onNoContent: Ok);
         }
 
         [Route("api/specs/{specificationId}/approve")]

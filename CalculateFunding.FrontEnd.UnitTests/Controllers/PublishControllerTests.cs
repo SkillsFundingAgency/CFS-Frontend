@@ -137,7 +137,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             result
                 .Should()
-                .BeOfType<OkResult>();
+                .BeOfType<OkObjectResult>();
         }
 
         [TestMethod]

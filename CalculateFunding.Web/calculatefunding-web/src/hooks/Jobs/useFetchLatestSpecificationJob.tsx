@@ -15,14 +15,15 @@ export const useFetchLatestSpecificationJob = (
 
     const {data, error, isFetching, isLoading, isError, isFetched} =
         useQuery<JobDetails | undefined, AxiosError>(`specification-${specificationId}-jobs-` + jobTypeList,
-            async () => await checkForJob(specificationId, jobTypeList),
+            async () => await checkForJob(specificationId, jobTypes),
             {
                 enabled: (specificationId && specificationId.length > 0 && jobTypes.length > 0) === true,
                 onError: onError
             });
 
-    const checkForJob = async (specId: string, listOfJobTypes: string): Promise<JobDetails | undefined> => {
+    const checkForJob = async (specId: string, listOfJobTypes: string[]): Promise<JobDetails | undefined> => {
         const response = await getJobStatusUpdatesForSpecification(specId, listOfJobTypes);
+        if (!response.data || response.data.length === 0) return undefined;
         const results = response.data
             .filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated)
             .sort((a, b) => Number(new Date(b.lastUpdated)) - Number(new Date(a.lastUpdated)));

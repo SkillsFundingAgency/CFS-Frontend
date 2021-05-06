@@ -7,7 +7,6 @@ import {AutoComplete} from "../../components/AutoComplete";
 import {
     createDatasetService,
     downloadValidateDatasetValidationErrorSasUrl,
-    getDatasetDefinitionsService,
     getDatasetsForFundingStreamService,
     uploadDataSourceService,
     validateDatasetService
@@ -21,7 +20,6 @@ import {
     NewDatasetVersionResponseErrorModel,
     NewDatasetVersionResponseViewModel
 } from "../../types/Datasets/NewDatasetVersionResponseViewModel";
-import {AxiosError} from "axios";
 import {Link} from "react-router-dom";
 import {getFundingStreamsService} from "../../services/policyService";
 import {Footer} from "../../components/Footer";

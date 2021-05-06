@@ -27,33 +27,19 @@ namespace CalculateFunding.Frontend.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpPost]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        [Route("api/jobs/{specificationId}/{jobTypes}")]
-        public async Task<IActionResult> GetSpecificationJobs([FromRoute] string specificationId, [FromRoute] string jobTypes)
+        [Route("api/jobs/{specificationId}")]
+        public async Task<IActionResult> GetSpecificationJobs([FromBody] string[] jobTypes, [FromRoute] string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.IsNullOrWhiteSpace(jobTypes, nameof(jobTypes));
 
-            string[] jobTypesArray = jobTypes.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            ApiResponse<IDictionary<string, JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypes ?? Array.Empty<string>());
 
-            ApiResponse<IDictionary<string, JobSummary>> response = await _jobsApiClient.GetLatestJobsForSpecification(specificationId, jobTypesArray);
-
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("GetLatestJobsForSpecification", treatNoContentAsSuccess: true);
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            if (response.StatusCode == HttpStatusCode.NoContent)
-            {
-                return Ok(jobTypesArray.Select(x => (string)null));
-            }
-
-            IEnumerable<JobSummaryViewModel> jobs = _mapper.Map<IEnumerable<JobSummaryViewModel>>(response.Content.Values);
-
-            return Ok(jobs);
+            return response.Handle(nameof(JobSummary),
+                onNotFound: Ok,
+                onNoContent: Ok,
+                onSuccess: _ => Ok(_mapper.Map<JobSummaryViewModel[]>(response.Content.Values)));
         }
 
         [HttpGet]
@@ -66,21 +52,10 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<JobSummary> response = await _jobsApiClient.GetLatestSuccessfulJobForSpecification(specificationId, jobDefinitionId);
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return Ok();
-            }
-
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary");
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            JobSummaryViewModel jobs = _mapper.Map<JobSummaryViewModel>(response.Content);
-
-            return Ok(jobs);
+            return response.Handle(nameof(JobSummary),
+                onNotFound: Ok,
+                onNoContent: Ok,
+                onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content)));
         }
 
         [HttpGet]
@@ -93,21 +68,10 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<JobSummary> response = await _jobsApiClient.GetLatestJobByTriggerEntityId(specificationId, entityId);
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return Ok();
-            }
-
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("JobSummary");
-
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            JobSummaryViewModel jobs = _mapper.Map<JobSummaryViewModel>(response.Content);
-
-            return Ok(jobs);
+            return response.Handle(nameof(JobSummary),
+                onNotFound: Ok,
+                onNoContent: Ok,
+                onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content)));
         }
     }
 }

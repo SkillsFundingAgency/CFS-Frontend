@@ -40,7 +40,7 @@ export const useMonitorForNewSpecificationJob = (
             if (!hubRef.current) {
                 hubConnect = new HubConnectionBuilder()
                     .withUrl(`/api/notifications`)
-                    .withAutomaticReconnect()
+                    .withAutomaticReconnect([3, 5, 8, 13, 21, 34, 55])
                     .build();
                 hubConnect.keepAliveIntervalInMilliseconds = 1000 * 60 * 3;
                 hubConnect.serverTimeoutInMilliseconds = 1000 * 60 * 6;
