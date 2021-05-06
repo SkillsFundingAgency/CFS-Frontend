@@ -108,10 +108,10 @@ describe("<ConfirmFunding />", () => {
                 });
 
                 const lastRefresh = screen.getByTestId("last-refresh") as HTMLElement;
-                expect(lastRefresh.textContent).toContain("1 January 2020 10:30 by testUser");
+                expect(lastRefresh.textContent).toContain("1 January 2020 10:30 AM by testUser");
 
                 const lastCalculation = screen.getByTestId("last-calculation-results") as HTMLElement;
-                expect(lastCalculation.textContent).toContain("1 January 2021 10:30");
+                expect(lastCalculation.textContent).toContain("1 January 2021 10:30 AM");
             });
         });
 
@@ -241,7 +241,7 @@ describe("<ConfirmFunding />", () => {
                 expect(button).toBeEnabled();
             });
         });
-        
+
         describe("<ConfirmFunding /> when user confirms approval of batch funding", () => {
             beforeEach(async () => {
                 useSelectorSpy.mockReturnValue(config.selectedProviders);
@@ -262,7 +262,7 @@ describe("<ConfirmFunding />", () => {
                 const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
-                
+
                 userEvent.click(button);
 
                 const {approveProvidersFundingService} = require('../../../services/publishService');
@@ -270,13 +270,13 @@ describe("<ConfirmFunding />", () => {
                     expect(approveProvidersFundingService).toBeCalledTimes(1);
                 });
             });
-            
+
             it('displays back button instead of confirm button', async () => {
                 await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
                 const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
-                
+
                 userEvent.click(button);
 
                 const {approveProvidersFundingService} = require('../../../services/publishService');
@@ -291,7 +291,7 @@ describe("<ConfirmFunding />", () => {
                 const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
-                
+
                 userEvent.click(button);
 
                 const {approveProvidersFundingService} = require('../../../services/publishService');
