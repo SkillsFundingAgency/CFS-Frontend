@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {screen, waitFor, within} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {SpecificationTestData} from "./SpecificationTestData";
@@ -6,16 +6,16 @@ import userEvent from "@testing-library/user-event";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {CreateSpecificationModel} from "../../../types/Specifications/CreateSpecificationModel";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 import { UpdateCoreProviderVersion } from '../../../types/Provider/UpdateCoreProviderVersion';
 
 const test = SpecificationTestData();
 
 describe("<CreateSpecification />", () => {
-
-    describe("<CreateSpecification /> with CFS provider source", () => {
+    describe("<CreateSpecification /> with FDZ provider source", () => {
         beforeEach(async () => {
-            test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
             test.hasCreatePermissions();
+            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
             test.mockSpecificationService();
             test.mockProviderService();
             test.mockProviderVersionService();
@@ -46,7 +46,6 @@ describe("<CreateSpecification />", () => {
                 expect((await screen.findAllByText(/Create specification/))[1]).toHaveClass("govuk-fieldset__heading");
             });
         });
-
         describe("form submission checks ", () => {
 
             it("it displays correct errors given nothing entered before submitting", async () => {
@@ -99,13 +98,14 @@ describe("<CreateSpecification />", () => {
                 expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
                 expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
                 expect(screen.getByText(/Missing funding period/)).toBeInTheDocument();
+                expect(screen.queryByText(/Missing core provider version/)).not.toBeInTheDocument();
                 expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing description/)).toBeInTheDocument();
             });
 
             it("it displays correct errors given provider is not selected", async () => {
                 const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
-                const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
+                const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
                 expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
                 const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
@@ -125,7 +125,8 @@ describe("<CreateSpecification />", () => {
                 userEvent.selectOptions(fundingPeriodSelect, test.fundingPeriod.name);
 
                 await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
-                await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
+
+                await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
                 const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
                 expect(coreProviderSelect).toHaveLength(3);
 
@@ -146,14 +147,13 @@ describe("<CreateSpecification />", () => {
                 expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
                 expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
                 expect(screen.queryByText(/Missing funding period/)).not.toBeInTheDocument();
-                expect(screen.getByText(/Missing core provider version/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing description/)).toBeInTheDocument();
             });
 
             it("it displays correct errors given template version is not selected", async () => {
                 const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
-                const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
+                const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
                 expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
                 const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
@@ -178,11 +178,9 @@ describe("<CreateSpecification />", () => {
                 const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
                 expect(templateVersionSelect).toHaveLength(3);
 
-                await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
+                await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
                 const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
                 expect(coreProviderSelect).toHaveLength(3);
-
-                userEvent.selectOptions(coreProviderSelect, test.coreProvider2.name);
 
                 const button = screen.getByRole("button", {name: /Save and continue/});
                 userEvent.click(button);
@@ -191,14 +189,14 @@ describe("<CreateSpecification />", () => {
                 expect(screen.queryByText(/Invalid specification name/)).not.toBeInTheDocument();
                 expect(screen.queryByText(/Missing funding stream/)).not.toBeInTheDocument();
                 expect(screen.queryByText(/Missing funding period/)).not.toBeInTheDocument();
-                expect(screen.queryByText(/Missing core provider version/)).not.toBeInTheDocument();
+                expect(screen.queryByText(/Missing core provider version/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing template version/)).toBeInTheDocument();
                 expect(screen.getByText(/Missing description/)).toBeInTheDocument();
             });
 
             it("it displays error given description missing", async () => {
                 const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
-                const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
+                const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
                 expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
                 const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
@@ -219,11 +217,10 @@ describe("<CreateSpecification />", () => {
 
                 await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
 
-                await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
+                await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
                 const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
                 expect(coreProviderSelect).toHaveLength(3);
-
-                userEvent.selectOptions(coreProviderSelect, test.coreProvider2.name);
+                userEvent.selectOptions(coreProviderSelect, test.providerSnapshot1.name);
 
                 await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
                 const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
@@ -245,9 +242,8 @@ describe("<CreateSpecification />", () => {
 
         it("it submits create specification given all fields are provided", async () => {
             const {createSpecificationService} = require('../../../services/specificationService');
-
             const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
-            const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
+            const {getProviderSnapshotsByFundingStream} = require('../../../services/providerService');
             expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 
             const specificationField = await screen.findByTestId(`specification-name-input`) as HTMLInputElement;
@@ -268,11 +264,10 @@ describe("<CreateSpecification />", () => {
 
             await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
 
-            await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
+            await waitFor(() => expect(getProviderSnapshotsByFundingStream).toBeCalledTimes(1));
             const coreProviderSelect = await screen.findByTestId(`core-provider-dropdown`);
             expect(coreProviderSelect).toHaveLength(3);
-
-            userEvent.selectOptions(coreProviderSelect, test.coreProvider2.name);
+            userEvent.selectOptions(coreProviderSelect, test.providerSnapshot1.name);
 
             await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
             const templateVersionSelect = await screen.findByTestId(`template-version-dropdown`);
@@ -293,9 +288,9 @@ describe("<CreateSpecification />", () => {
                 description: "test description",
                 fundingPeriodId: test.fundingPeriod.id,
                 fundingStreamId: test.fundingStream.id,
-                providerVersionId: test.coreProvider2.providerVersionId,
+                providerVersionId: undefined,
                 coreProviderVersionUpdates: undefined,
-                providerSnapshotId: undefined
+                providerSnapshotId: test.providerSnapshot1.providerSnapshotId
             };
             await waitFor(() => expect(createSpecificationService).toHaveBeenCalledWith(expectedSaveModel));
 

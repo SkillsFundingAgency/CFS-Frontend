@@ -56,7 +56,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
             description: "Error while loading specification"
         }));
 
-    const fundingStreamId = specification && specification?.fundingStreams?.length > 0 && specification?.fundingStreams[0]?.id
+    const fundingStreamId = specification && specification?.fundingStreams?.length > 0 ? specification?.fundingStreams[0]?.id : null;
     const fundingPeriodId = specification && specification?.fundingPeriod?.id;
 
     const {fundingConfiguration, isLoadingFundingConfiguration} =
@@ -186,14 +186,14 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
                 isValid = false;
             }
-            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === undefined) {
+            if (providerSource === ProviderSource.FDZ && fundingConfiguration?.updateCoreProviderVersion !== UpdateCoreProviderVersion.Manual &&  enableTrackProviderData === undefined) {
                 addError({
                     error: "Please select whether you want to track latest core provider data",
                     fieldName: "trackProviderData"
                 });
                 isValid = false;
             }
-            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual &&
+            if (providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
                 (!selectedProviderSnapshotId || selectedProviderSnapshotId.length == 0)) {
                 addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
                 isValid = false;
@@ -372,7 +372,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                             id="funding-period">{specification && specification?.fundingPeriod?.name}</h3>
                     </div>
 
-                    {(providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused))) &&
+                    {providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused)) &&
                     <div
                         className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <fieldset className="govuk-fieldset" id="trackProviderData"
@@ -428,7 +428,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                     </div>
                     }
 
-                    {(providerSource === ProviderSource.CFS || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
+                    {(providerSource === ProviderSource.CFS || fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
                     <div
                         className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">

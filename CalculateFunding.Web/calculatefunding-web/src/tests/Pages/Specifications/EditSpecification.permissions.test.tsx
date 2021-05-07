@@ -2,6 +2,7 @@
 import {SpecificationTestData} from "./SpecificationTestData";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
+import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
 
 const test = SpecificationTestData();
 
@@ -14,7 +15,7 @@ describe("<EditSpecification /> ", () => {
                 test.mockSpecificationService(test.specificationCfs);
                 test.mockProviderService();
                 test.mockProviderVersionService();
-                test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
+                test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
                 test.haveNoJobRunning();
 
                 await test.renderEditSpecificationPage(test.specificationCfs.id);

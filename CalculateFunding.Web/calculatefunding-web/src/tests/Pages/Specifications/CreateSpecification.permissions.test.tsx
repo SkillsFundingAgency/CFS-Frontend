@@ -2,6 +2,7 @@
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {screen} from "@testing-library/react";
 import {SpecificationTestData} from "./SpecificationTestData";
+import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
 
 const test = SpecificationTestData();
 
@@ -10,7 +11,7 @@ describe("<CreateSpecification />", () => {
     describe("<CreateSpecification /> permissions tests", () => {
         describe("when no permissions defined at all", () => {
             beforeEach(async () => {
-                test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
+                test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
                 test.mockSpecificationService();
                 test.mockProviderService();
                 test.mockProviderVersionService();
@@ -30,7 +31,7 @@ describe("<CreateSpecification />", () => {
 
         describe("when user has permissions to create specification", () => {
             beforeEach(async () => {
-                test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
+                test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
                 test.mockSpecificationService();
                 test.mockProviderService();
                 test.mockProviderVersionService();

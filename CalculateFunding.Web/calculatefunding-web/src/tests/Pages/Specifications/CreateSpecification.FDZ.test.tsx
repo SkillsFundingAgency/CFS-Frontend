@@ -7,6 +7,7 @@ import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {CreateSpecificationModel} from "../../../types/Specifications/CreateSpecificationModel";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
+import { UpdateCoreProviderVersion } from '../../../types/Provider/UpdateCoreProviderVersion';
 
 const test = SpecificationTestData();
 
@@ -14,7 +15,7 @@ describe("<CreateSpecification />", () => {
     describe("<CreateSpecification /> with FDZ provider source", () => {
         beforeEach(async () => {
             test.hasCreatePermissions();
-            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All);
+            test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.ToLatest);
             test.mockSpecificationService();
             test.mockProviderService();
             test.mockProviderVersionService();

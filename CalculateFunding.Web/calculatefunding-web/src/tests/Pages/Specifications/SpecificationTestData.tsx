@@ -239,7 +239,7 @@ export function SpecificationTestData() {
         providerVersionId: mockCoreProvider2.providerVersionId,
         dataDefinitionRelationshipIds: [],
         templateIds: {"stream-547": mockTemplate2.templateVersion},
-        coreProviderVersionUpdates: undefined
+        coreProviderVersionUpdates: ProviderDataTrackingMode.Manual
     };
     const mockFdzSpecWithTrackingLatest: SpecificationSummary = {
         name: "Wizard Training With Tracking",

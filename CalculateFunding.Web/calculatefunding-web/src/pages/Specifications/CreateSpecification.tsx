@@ -28,6 +28,7 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {usePermittedFundingStreams} from "../../hooks/Permissions/usePermittedFundingStreams";
 import {UserPermission} from "../../types/UserPermission";
 import {Permission} from "../../types/Permission";
+import { UpdateCoreProviderVersion } from "../../types/Provider/UpdateCoreProviderVersion";
 
 export function CreateSpecification() {
     const {fundingStreams, isLoadingFundingStreams} = useFundingStreams(true);
@@ -199,11 +200,11 @@ export function CreateSpecification() {
                 addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
                 isValid = false;
             }
-            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === undefined) {
+            if (providerSource === ProviderSource.FDZ && fundingConfiguration?.updateCoreProviderVersion !== UpdateCoreProviderVersion.Manual && enableTrackProviderData === undefined) {
                 addError({error: "Please select whether you want to track latest core provider data", fieldName: "trackProviderData"});
                 isValid = false;
             }
-            if (providerSource === ProviderSource.FDZ && enableTrackProviderData === ProviderDataTrackingMode.Manual &&
+            if (providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
                 (!selectedProviderSnapshotId || selectedProviderSnapshotId.length == 0)) {
                 addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
                 isValid = false;
@@ -235,7 +236,7 @@ export function CreateSpecification() {
                 name: selectedName,
                 assignedTemplateIds: assignedTemplateIdsValue,
                 providerVersionId: providerSource === ProviderSource.CFS ? selectedProviderVersionId : undefined,
-                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderSnapshotId && enableTrackProviderData === ProviderDataTrackingMode.Manual ? parseInt(selectedProviderSnapshotId) : undefined,
+                providerSnapshotId: providerSource === ProviderSource.FDZ && selectedProviderSnapshotId && (fundingConfiguration?.updateCoreProviderVersion===UpdateCoreProviderVersion.Manual || enableTrackProviderData === ProviderDataTrackingMode.Manual) ? parseInt(selectedProviderSnapshotId) : undefined,
                 coreProviderVersionUpdates: providerSource === ProviderSource.FDZ ? enableTrackProviderData : undefined
             };
 
@@ -346,7 +347,7 @@ export function CreateSpecification() {
                         }
                     </div>
 
-                    {providerSource === ProviderSource.FDZ &&
+                    {providerSource === ProviderSource.FDZ && (fundingConfiguration?.updateCoreProviderVersion === (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused)) && 
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "trackProviderData").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <fieldset className="govuk-fieldset" id="trackProviderData" aria-describedby="trackProviderData-hint" role="radiogroup">
                             <legend className="govuk-label" id="trackProviderData-label">
@@ -398,7 +399,7 @@ export function CreateSpecification() {
                     </div>
                     }
 
-                    {(providerSource === ProviderSource.CFS || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
+                    {(providerSource === ProviderSource.CFS || fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual || enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
                     <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "selectCoreProvider").length > 0 ? 'govuk-form-group--error' : ''}`}>
                         <label className="govuk-label" htmlFor="selectCoreProvider">
                             Core provider data

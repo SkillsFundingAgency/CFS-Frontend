@@ -5,13 +5,14 @@ import {SpecificationTestData} from "./SpecificationTestData";
 import userEvent from "@testing-library/user-event";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
+import { UpdateCoreProviderVersion } from '../../../types/Provider/UpdateCoreProviderVersion';
 
 const test = SpecificationTestData();
 
 describe("<CreateSpecification /> with duplicated specification name", () => {
     beforeEach(async () => {
         test.hasCreatePermissions();
-        test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All);
+        test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
         test.mockSpecificationServiceWithDuplicateNameResponse();
         test.mockProviderService();
         test.mockProviderVersionService();
