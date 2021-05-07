@@ -100,6 +100,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             [JobType.RefreshFundingJob],
             err => addError({error: err, description: "Error while checking for refresh funding job"}));
 
+    const {latestJob: converterWizardJob, isCheckingForJob: isCheckingForConverterWizardJob, hasJob: hasConverterWizardJob} =
+        useLatestSpecificationJobWithMonitoring(specificationId,
+            [JobType.RunConverterDatasetMergeJob],
+            err => addError({error: err, description: "Error while checking for converter wizard running jobs"}));
+
     const {
         calculationErrors,
         isLoadingCalculationErrors,
@@ -298,11 +303,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                            subTitle={"Please wait, this could take several minutes"}
                            description={"Please do not refresh the page, you will be redirected automatically"}/>
 
-            {(isCheckingForJob || hasJob) &&
+            {(isCheckingForJob || hasJob || isCheckingForConverterWizardJob || hasConverterWizardJob) &&
             <div className="govuk-form-group">
                 <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
                 {hasJob && !isApprovingAllCalculations && <JobProgressNotificationBanner
                     job={approveAllCalculationsJob} displaySuccessfulJob={displayApproveAllJobStatus}/>}
+                {hasConverterWizardJob && <JobProgressNotificationBanner job={converterWizardJob} />}
             </div>}
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations || isRefreshFundingInProgress}>

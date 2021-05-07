@@ -168,4 +168,49 @@ describe('<ViewSpecification /> ', () => {
             await waitFor(() => expect(screen.getByText("You don't have permission to approve calculations")).toBeInTheDocument());
         });
     });
+
+    describe('with a specification job  ', () => {
+        beforeEach(async () => {
+            testData.mockSpecificationPermissions();
+            testData.mockSpecificationService();
+            testData.mockFundingLineStructureService();
+            testData.mockDatasetBySpecificationIdService();
+            testData.mockCalculationService();
+            testData.mockPublishService();
+            testData.fundingConfigurationSpy();
+            testData.jobMonitorSpy.mockImplementation(() => {
+                return {
+                    hasJob: true,
+                    isCheckingForJob: false,
+                    latestJob: {
+                        isComplete: true,
+                        jobId: "123",
+                        statusDescription: "string",
+                        jobDescription: "Converter Job",
+                        runningStatus: RunningStatus.InProgress,
+                        failures: [],
+                        isSuccessful: true,
+                        isFailed: true,
+                        isActive: false,
+                    },
+                    isFetched: true,
+                    isFetching: false,
+                    isMonitoring: false
+                }
+            });
+            await testData.renderViewSpecificationPage();
+
+        });
+
+        afterEach(() => {
+            jest.clearAllMocks();
+        });
+
+        it('shows job details', async () => {
+            await waitFor(() => {
+                expect((screen.getByTestId('job-notification-title') as HTMLSpanElement).textContent).toContain("Converter Job");
+            });
+
+        });
+    });
 });
