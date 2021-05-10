@@ -6,7 +6,10 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {Footer} from "../../components/Footer";
 import {getFundingLinePublishedProviderDetails, applyCustomProfile} from "../../services/publishedProviderFundingLineService";
-import {FundingLineProfile, FundingLineProfileViewModel} from "../../types/PublishedProvider/FundingLineProfile";
+import {
+    FundingLineProfile,
+    FundingLineProfileViewModel
+} from "../../types/PublishedProvider/FundingLineProfile";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
@@ -318,7 +321,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                             <th scope="col" className="govuk-table__header">Payment status</th>
                                             <th scope="col" className="govuk-table__header">Instalment number</th>
                                             <th scope="col" className="govuk-table__header">Per cent</th>
-                                            <th scope="col" className="govuk-table__header govuk-table__header--numeric">Value</th>
+                                            <th scope="col" className="govuk-table__header">Value</th>
                                         </tr>
                                         </thead>
                                         <tbody className="govuk-table__body">
@@ -355,7 +358,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                             <td className="govuk-table__cell"></td>
                                             <td className="govuk-table__cell"></td>
                                             <td className="govuk-table__cell"></td>
-                                            <td className="govuk-table__cell govuk-table__cell--numeric">
+                                            <td className="govuk-table__cell">
                                                 <strong data-testid="balance-carried-forward">
                                                     <FormattedNumber value={newCarryForwardAmount} type={NumberType.FormattedMoney}/>
                                                 </strong>
@@ -382,7 +385,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                                     </strong>
                                                 </div>
                                             </td>
-                                            <td className="govuk-table__cell govuk-table__cell--numeric" id="totalAllocation">
+                                            <td className="govuk-table__cell" id="totalAllocation">
                                                 <div className={`govuk-form-group ${errors.filter(e =>
                                                     e.fieldName === "totalAllocation").length > 0 ? 'govuk-form-group--error' : ''}`}>
                                                     {errors.filter(e => e.fieldName === "totalAllocation").length > 0 ?

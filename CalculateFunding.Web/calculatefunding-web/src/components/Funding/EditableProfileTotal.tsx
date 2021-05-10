@@ -133,13 +133,13 @@ export function EditableProfileTotal(
                                    onBlur={handlePercentBlur}
                                    aria-label="Enter the total percentage. Enter 0 if this does not apply"
                                    aria-describedby="percent"
-                                   className="govuk-input govuk-input--width-3"
+                                   className="govuk-input govuk-input--width-10"
                                    autoComplete="off"/>
                             <div className="govuk-input__suffix" aria-hidden="true" aria-label="Enter amount in percent">%</div>
                         </div>
                     </div>}
             </td>
-            <td className="govuk-table__cell govuk-table__cell--numeric" data-testid={`remaining-value-${index}`}>
+            <td className="govuk-table__cell" data-testid={`remaining-value-${index}`}>
                 {!isEditMode || isPaid ? <FormattedNumber value={profileTotal.value} type={NumberType.FormattedMoney}/> :
                     <div className={`govuk-form-group editable-field ${errors.filter(
                         e => e.fieldName === `value-${installmentNumber}`).length > 0 ? 'govuk-form-group--error' : ''}`}>
@@ -163,7 +163,7 @@ export function EditableProfileTotal(
                                    onBlur={handleValueBlur}
                                    aria-label="Enter the total value. Enter 0 if this does not apply"
                                    aria-describedby="value"
-                                   className="govuk-input input-prefix govuk-input--width-5 govuk-!-padding-left-1"
+                                   className="govuk-input input-prefix govuk-input--width-10 govuk-!-padding-left-1"
                                    autoComplete="off"/>
                         </div>
                     </div>}
