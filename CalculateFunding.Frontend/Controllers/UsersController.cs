@@ -10,6 +10,7 @@ using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Users;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -58,11 +59,19 @@ namespace CalculateFunding.Frontend.Controllers
                 string fundingStreamName = fundingStreamsResponse.Content.SingleOrDefault(_ => _.Id == fundingStreamPermission.FundingStreamId)?.Name;
 
                 permissionModel.FundingStreamName = string.IsNullOrWhiteSpace(fundingStreamName) ? fundingStreamPermission.FundingStreamId : fundingStreamName;
-                
+
                 results.Add(permissionModel);
             }
 
             return results;
+        }
+
+        [Route("api/users/{otherUserId}/permissions/{fundingStreamId}")]
+        [HttpGet]
+        [Produces(typeof(FundingStreamPermission))]
+        public async Task<FundingStreamPermission> GetFundingStreamPermissionForOtherUser([FromRoute]string otherUserId, [FromRoute]string fundingStreamId)
+        {
+            return  await _authorizationHelper.GetFundingStreamPermissionsForUser(User, otherUserId, fundingStreamId);
         }
 
         [Route("api/users/{userId}/permissions/{fundingStreamId}")]
@@ -78,7 +87,7 @@ namespace CalculateFunding.Frontend.Controllers
         [Produces(typeof(FundingStreamPermission))]
         public async Task<FundingStreamPermission> RemoveUserPermissions([FromRoute]string userId, [FromRoute]string fundingStreamId)
         {
-            FundingStreamPermission fundingStreamPermission = new FundingStreamPermission() { UserId = userId, FundingStreamId = fundingStreamId }.SetAllBooleansTo(false);
+            FundingStreamPermission fundingStreamPermission = new FundingStreamPermission { UserId = userId, FundingStreamId = fundingStreamId }.SetAllBooleansTo(false);
             return await _authorizationHelper.UpdateFundingStreamPermission(User, userId, fundingStreamId, fundingStreamPermission);
         }
 

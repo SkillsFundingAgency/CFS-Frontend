@@ -17,8 +17,9 @@ export function Title({title, description, includeBackLink = false}: TitleProps)
                 </div>
             </div>
             }
-            <div className="govuk-grid-row govuk-!-margin-top-3">
-                <hgroup className="govuk-grid-column-two-thirds">
+            <div className="govuk-grid-row govuk-!-margin-top-3"
+                 data-testid="page-title">
+                <hgroup className="govuk-grid-column-full">
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{title}</h1>
                     <p className="govuk-body">{description}</p>
                 </hgroup>

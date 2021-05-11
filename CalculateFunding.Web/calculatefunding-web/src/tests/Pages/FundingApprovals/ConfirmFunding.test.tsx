@@ -65,6 +65,7 @@ const renderPage = async () => {
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 const useDispatchSpy = jest.spyOn(redux, 'useDispatch');
+jest.mock("../../../components/AdminNav");
 const config = setupTestConfig();
 
 describe("<ConfirmFunding />", () => {
@@ -73,7 +74,6 @@ describe("<ConfirmFunding />", () => {
 
         describe("when job is active", () => {
             beforeEach(async () => {
-                useSelectorSpy.mockReturnValue(config.noSelectedProviders);
                 config.hasActiveJobRunning();
                 config.hasSpecification();
                 config.hasMockPublishedProviderService();
@@ -352,8 +352,9 @@ describe("<ConfirmFunding />", () => {
     });
 });
 
-
 function setupTestConfig() {
+    // jest.mock("../../../components/AdminNav");
+
     const fundingStream: FundingStream = {
         id: "WIZ-123",
         name: "Wizard Training Scheme"

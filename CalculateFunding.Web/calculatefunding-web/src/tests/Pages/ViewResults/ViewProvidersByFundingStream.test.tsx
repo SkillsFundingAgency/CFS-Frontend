@@ -13,6 +13,7 @@ function renderComponent() {
         </Switch>
     </MemoryRouter>)
 }
+jest.mock("../../../components/AdminNav");
 
 function mockPolicyService() {
     const policyService = jest.requireActual('../../../services/policyService');
@@ -263,4 +264,3 @@ describe("<ViewProvidersByFundingStream /> ", () => {
         await waitFor(() => expect(container.querySelector("h1.govuk-heading-xl")?.textContent).toContain("View provider results"));
     });
 });
-

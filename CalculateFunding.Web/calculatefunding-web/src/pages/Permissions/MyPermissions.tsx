@@ -11,42 +11,39 @@ import {Permission} from "../../types/Permission";
 import {getPermissionDescription} from "../../helpers/permissionsHelper";
 import {getAdminUsersForFundingStream} from "../../services/userService";
 import {useErrors} from "../../hooks/useErrors";
-import {User} from "../../types/User";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 
 export function MyPermissions() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const pageTitle = document.title = "My user permissions";
     const [currentFundingStream, setCurrentFundingStreamId] = useState<FundingStreamPermissions>();
-    const [adminUsers, setAdminUsers] = useState<User[]>();
-    const permitted = useFundingStreamPermissions(currentFundingStream);
+    const [adminUsers, setAdminUsers] = useState<string[] | undefined>(undefined);
+    const permitted: Permission[] = useFundingStreamPermissions(currentFundingStream);
     const permissionsToShow: Permission[] = useMemo(() => {
         const excludedPermissions = [Permission.CanCreateQaTests, Permission.CanEditQaTests, Permission.CanDeleteQaTests, Permission.CanDeleteCalculations, Permission.CanDeleteTemplates, Permission.CanDeleteSpecification, Permission.CanDeleteProfilePattern];
         return Object.values(Permission).filter(p => !excludedPermissions.includes(p))
     }, []);
     const {errors, addError} = useErrors();
-    const hasFundingStreamAdmins = adminUsers?.some(user => user.username.trim() !== "")
-    useEffect(()=>{
-        if (!currentFundingStream?.fundingStreamId)
-            return;
-        loadFundingStreamAdmins(currentFundingStream?.fundingStreamId)
-    }, [currentFundingStream])
+    
 
     function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        setCurrentFundingStreamId(permissions.find(p => p.fundingStreamId === e.target.value));
+        const fundingStreamId = e.target.value;
+        loadFundingStreamAdmins(fundingStreamId);
+        setCurrentFundingStreamId(permissions.find(p => p.fundingStreamId === fundingStreamId));
     }
 
-    function loadFundingStreamAdmins(fundingStreamId: string)
-    {
+    function loadFundingStreamAdmins(fundingStreamId: string) {
         getAdminUsersForFundingStream(fundingStreamId)
-            .then((result) => {
-                setAdminUsers(result.data);
-            }).catch(() => {
-            addError({error: `Unable to retrieve users for funding stream ${fundingStreamId}`});
-        });
+            .then((result) =>
+                setAdminUsers(result.data ? result.data
+                    .map(u => u.username.trim())
+                    .filter(u => u !== "") : undefined))
+            .catch(() => addError({
+                error: `Unable to retrieve users for funding stream ${fundingStreamId}`
+            }));
     }
 
-    function RequestExtraPermission() {
+    const RequestExtraPermission = () => {
         return (
             <div className="govuk-grid-row govuk-!-margin-top-9">
                 <div className="govuk-grid-column-full">
@@ -56,23 +53,19 @@ export function MyPermissions() {
                             An administrator for your funding stream can provide you with permissions. Contact a system
                             administrator if there are none listed.
                         </p>
-                        {
-                            hasFundingStreamAdmins &&
+                        {adminUsers &&
+                        <>
                             <p className="govuk-body">
-                            Administrators for the ${currentFundingStream?.fundingStreamName} funding stream are:
+                                Administrators for the ${currentFundingStream?.fundingStreamName} funding stream are:
                             </p>
-                        }
-                        {
-                            hasFundingStreamAdmins &&
                             <ul className="govuk-list govuk-list--bullet">
-                                {
-                                    adminUsers?.map((user, index) => {
-                                        return <li key={index}>
-                                            {user.username}
-                                        </li>
-                                    })
+                                {adminUsers.map((user, index) =>
+                                    <li key={index}>
+                                        {user}
+                                    </li>)
                                 }
                             </ul>
+                        </>
                         }
                     </div>
                 </div>
@@ -112,7 +105,9 @@ export function MyPermissions() {
                             aria-label="select funding stream">
                             <option>{' '}</option>
                             {permissions
-                                .sort((a, b) => a.fundingStreamName.localeCompare(b.fundingStreamName))
+                                .sort((a, b) =>
+                                    (a.fundingStreamName ? a.fundingStreamName : a.fundingStreamId)
+                                        .localeCompare((b.fundingStreamName ? b.fundingStreamName : b.fundingStreamId)))
                                 .map(p =>
                                     <option key={p.fundingStreamId} value={p.fundingStreamId}>{p.fundingStreamName}</option>
                                 )}
@@ -149,24 +144,24 @@ export function MyPermissions() {
                             {permissionsToShow
                                 .sort((a, b) => a.localeCompare(b))
                                 .map((p, index) =>
-                                <tr key={index} className="govuk-table__row">
-                                    <th scope="row" className="govuk-table__header">
-                                        {p}
-                                    </th>
-                                    {permitted.includes(p) ?
-                                    <td className="govuk-table__cell center-align">
-                                        <span className="govuk-visually-hidden">Yes</span>&#x2714;
-                                    </td>
-                                        :
-                                        <td className="govuk-table__cell permissionsIcon">
-                                            <span className="govuk-visually-hidden">No</span>
+                                    <tr key={index} className="govuk-table__row">
+                                        <th scope="row" className="govuk-table__header">
+                                            {p}
+                                        </th>
+                                        {permitted.includes(p) ?
+                                            <td className="govuk-table__cell center-align">
+                                                <span className="govuk-visually-hidden">Yes</span>&#x2714;
+                                            </td>
+                                            :
+                                            <td className="govuk-table__cell permissionsIcon">
+                                                <span className="govuk-visually-hidden">No</span>
+                                            </td>
+                                        }
+                                        <td className="govuk-table__cell">
+                                            {getPermissionDescription(p)}
                                         </td>
-                                    }
-                                    <td className="govuk-table__cell">
-                                        {getPermissionDescription(p)}
-                                    </td>
-                                </tr>
-                            )}
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

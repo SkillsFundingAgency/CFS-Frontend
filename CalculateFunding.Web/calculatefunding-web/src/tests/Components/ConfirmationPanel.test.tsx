@@ -8,14 +8,14 @@ enzyme.configure({adapter: new Adapter()});
 
 describe('<ConfirmationPanel />', () => {
     it(' renders a panel with the title as expected', () => {
-        const wrapper = mount(<ConfirmationPanel title="Test title" body="Test body" hidden={false} />);
+        const wrapper = mount(<ConfirmationPanel title="Test title" children="Test body" hidden={false} />);
 
         const actual = wrapper.find('h1.govuk-panel__title');
 
         expect(actual.text()).toBe('Test title');
     });
     it(' renders a panel with the body as expected', () => {
-        const wrapper = mount(<ConfirmationPanel title="Test title" body="Test body" hidden={false} />);
+        const wrapper = mount(<ConfirmationPanel title="Test title" children="Test body" hidden={false} />);
 
         const actual = wrapper.find('div.govuk-panel__body');
 
@@ -23,7 +23,7 @@ describe('<ConfirmationPanel />', () => {
     });
 
     it(' hides itself when passed a true in hidden prop', () => {
-        const wrapper = mount(<ConfirmationPanel title="Test title" body="Test body" hidden={true} />);
+        const wrapper = mount(<ConfirmationPanel title="Test title" children="Test body" hidden={true} />);
 
         const actual = wrapper.find('div.govuk-panel');
 

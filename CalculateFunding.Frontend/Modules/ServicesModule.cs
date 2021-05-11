@@ -21,6 +21,7 @@
             services.AddScoped<ICalculationProviderResultsSearchService, CalculationProviderResultsSearchService>();
             services.AddScoped<ISpecificationSearchService, SpecificationSearchService>();
             services.AddScoped<IUserProfileService, UserProfileService>();
+            services.AddScoped<IUserSearchService, UserSearchService>();
             services.AddScoped<ITemplateMetadataContentsAssemblerService, TemplateMetadataContentsAssemblerService>();
             services.AddScoped<IPublishedProviderSearchService, PublishedProviderSearchService>();
             services.AddScoped<IGraphCalculationService, GraphCalculationService>();

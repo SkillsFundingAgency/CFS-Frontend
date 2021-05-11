@@ -1,4 +1,5 @@
-﻿using CalculateFunding.Common.Identity.Authentication;
+﻿using System;
+using CalculateFunding.Common.Identity.Authentication;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Frontend.Core.Ioc;
 using CalculateFunding.Frontend.Helpers;

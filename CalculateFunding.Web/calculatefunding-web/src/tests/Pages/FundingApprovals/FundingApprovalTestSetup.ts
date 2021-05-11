@@ -16,6 +16,7 @@ import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 import {JobOutcomeType} from "../../../types/jobDetails";
 
 export const FundingApprovalTestSetup = () => {
+    jest.mock("../../../components/AdminNav");
     const fundingStream1: FundingStream = {
         name: "WIZZ1",
         id: "Wizard Training Scheme"
@@ -229,7 +230,7 @@ export const FundingApprovalTestSetup = () => {
     const hasFundingConfigWithApproveBatchMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalBatchMode));
     const hasFundingConfigWithApproveAllMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalAllMode));
 
-    
+
     return {
         mockPublishedProviderService,
         mockCreateValidationJobService,

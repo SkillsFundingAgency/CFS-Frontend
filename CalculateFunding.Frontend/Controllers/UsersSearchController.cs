@@ -4,7 +4,6 @@ using CalculateFunding.Frontend.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Users;
 using Microsoft.AspNetCore.Mvc;
-using CalculateFunding.Common.Models.Search;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -18,23 +17,13 @@ namespace CalculateFunding.Frontend.Controllers
             _userSearchService = userSearchService;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/users/search")]
-        public async Task<IActionResult> SearchUsers(int pageNumber, bool includeFacets, int pageSize, string searchTerm = "")
+        public async Task<IActionResult> SearchUsers([FromBody] SearchRequestViewModel searchRequest)
         {
-            Guard.ArgumentNotNull(pageNumber, nameof(pageNumber));
-            Guard.ArgumentNotNull(pageSize, nameof(pageSize));
+            Guard.ArgumentNotNull(searchRequest, nameof(searchRequest));
 
-            var request = new SearchRequestViewModel
-            {
-                PageNumber = pageNumber,
-                IncludeFacets = includeFacets,
-                SearchTerm = searchTerm,
-                PageSize = pageSize,
-                SearchMode = SearchMode.All
-            };
-
-            UserSearchResultViewModel result = await _userSearchService.PerformSearch(request);
+            UserSearchResultViewModel result = await _userSearchService.PerformSearch(searchRequest);
 
             if (result != null)
             {

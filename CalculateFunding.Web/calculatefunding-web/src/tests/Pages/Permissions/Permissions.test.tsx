@@ -1,4 +1,4 @@
-﻿import {act, getByText, render, screen, waitFor, within} from "@testing-library/react";
+﻿import {render, screen, waitFor, within} from "@testing-library/react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import React from "react";
 import {MyPermissions} from "../../../pages/Permissions/MyPermissions";
@@ -11,7 +11,7 @@ describe("<MyPermissions/>", () => {
 
     describe("given there is an admin user for the selected funding stream ", () => {
         beforeEach(() => {
-            mockUserService();
+            hasAdminUser();
             const permissions = [buildPermissions({
                 fundingStreamId: "DSG",
                 fundingStreamName: "Direct School Grant",
@@ -31,16 +31,15 @@ describe("<MyPermissions/>", () => {
             const combobox = screen.getByRole("combobox", {name: /Select funding stream/i});
             expect(within(combobox).getByRole("option", {name: /Direct School Grant/})).toBeInTheDocument();
 
-            act(() => userEvent.selectOptions(combobox, "DSG"));
+            userEvent.selectOptions(combobox, "DSG");
 
-            await waitFor(() => {
-                expect(screen.getByText("test username")).toBeInTheDocument();
-            });
+            expect(await screen.findByText("Admin User")).toBeInTheDocument();
         });
     });
 
     describe("given there is no admin user for the selected funding stream ", () => {
         beforeEach(() => {
+            hasNoAdminUsers();
             const permissions = [buildPermissions({
                 fundingStreamId: "DSG",
                 fundingStreamName: "Direct School Grant",
@@ -57,21 +56,22 @@ describe("<MyPermissions/>", () => {
         });
 
         it("admin username is not rendered", async () => {
+            const {getAdminUsersForFundingStream} = require('../../../services/userService');
             const combobox = screen.getByRole("combobox", {name: /Select funding stream/i});
             expect(within(combobox).getByRole("option", {name: /Direct School Grant/})).toBeInTheDocument();
 
-            act(() => userEvent.selectOptions(combobox, "DSG"));
+            userEvent.selectOptions(combobox, "DSG");
 
-            await waitFor(() => {
-                expect(screen.queryByText("test username")).not.toBeInTheDocument();
-            });
+            expect(getAdminUsersForFundingStream).toBeCalled();
+
+            await waitFor(() => expect(screen.queryByText("Admin User")).not.toBeInTheDocument());
         });
     });
 
     describe("when no permissions defined at all", () => {
-        beforeEach(async () => {
+        beforeEach(() => {
             useSelectorSpy.mockReturnValue([]);
-            await renderPage();
+            renderPage();
         });
 
         afterAll(() => {
@@ -107,21 +107,20 @@ describe("<MyPermissions/>", () => {
             const combobox = screen.getByRole("combobox", {name: /Select funding stream/i});
             expect(within(combobox).getByRole("option", {name: /Direct School Grant/})).toBeInTheDocument();
 
-            act(() => userEvent.selectOptions(combobox, "DSG"));
-            await waitFor(() => {
-                expect(screen.getByRole("table", {name: /Calculate Funding Service permissions/}));
-                expect(screen.getByRole("heading", {name: /You have these permissions for the Direct School Grant funding stream in the Calculate Funding Service/}));
-                const yesCells = screen.queryAllByRole("cell", {name: /Yes/});
-                expect(yesCells).toHaveLength(0);
-                const noCells = screen.queryAllByRole("cell", {name: /No/});
-                expect(noCells.length).toBeGreaterThanOrEqual(1);
-            });
+            userEvent.selectOptions(combobox, "DSG");
+
+            expect(await screen.findByRole("table", {name: /Calculate Funding Service permissions/}));
+            expect(screen.getByRole("heading", {name: /You have these permissions for the Direct School Grant funding stream in the Calculate Funding Service/}));
+            const yesCells = screen.queryAllByRole("cell", {name: /Yes/});
+            expect(yesCells).toHaveLength(0);
+            const noCells = screen.queryAllByRole("cell", {name: /No/});
+            expect(noCells.length).toBeGreaterThanOrEqual(1);
         });
     });
 
     describe("when permissions defined and user has one permission enabled", () => {
         beforeEach(() => {
-            mockUserService();
+            hasAdminUser();
             const permissions = [buildPermissions({
                 fundingStreamId: "DSG",
                 fundingStreamName: "Direct School Grant",
@@ -144,25 +143,25 @@ describe("<MyPermissions/>", () => {
         it("renders funding stream selections", async () => {
             const combobox = screen.getByRole("combobox", {name: /Select funding stream/i});
             expect(within(combobox).getByRole("option", {name: /Direct School Grant/})).toBeInTheDocument();
-            act(() => userEvent.selectOptions(combobox, "DSG"));
-            await waitFor(() => {
-                expect(screen.getByRole("table", {name: /Calculate Funding Service permissions/}));
-                expect(screen.getByRole("heading", {name: /You have these permissions for the Direct School Grant funding stream in the Calculate Funding Service/}));
-                const rowHeader = screen.getByRole("rowheader", {name: /Can create specifications/});
-                const row = rowHeader.closest("tr") as HTMLTableRowElement;
-                expect(within(row).getByRole("cell", {name: /Yes/})).toBeInTheDocument();
 
-                const yesCells = screen.queryAllByRole("cell", {name: /Yes/});
-                expect(yesCells).toHaveLength(1);
-                const noCells = screen.queryAllByRole("cell", {name: /No/});
-                expect(noCells.length).toBeGreaterThanOrEqual(1);
-            });
+            userEvent.selectOptions(combobox, "DSG");
+
+            expect(await screen.findByRole("table", {name: /Calculate Funding Service permissions/}));
+            expect(screen.getByRole("heading", {name: /You have these permissions for the Direct School Grant funding stream in the Calculate Funding Service/}));
+            const rowHeader = screen.getByRole("rowheader", {name: /Can create specifications/});
+            const row = rowHeader.closest("tr") as HTMLTableRowElement;
+            expect(within(row).getByRole("cell", {name: /Yes/})).toBeInTheDocument();
+
+            const yesCells = screen.queryAllByRole("cell", {name: /Yes/});
+            expect(yesCells).toHaveLength(1);
+            const noCells = screen.queryAllByRole("cell", {name: /No/});
+            expect(noCells.length).toBeGreaterThanOrEqual(1);
         });
     });
 
 });
 
-const mockUserService = () => {
+const hasAdminUser = () => {
     jest.mock("../../../services/userService", () => {
         const service = jest.requireActual("../../../services/userService");
         return {
@@ -171,7 +170,7 @@ const mockUserService = () => {
                 status: 200,
                 data: [
                     {
-                        username: "test username",
+                        username: "Admin User",
                         hasConfirmedSkills: false
                     }
                 ]
@@ -179,8 +178,20 @@ const mockUserService = () => {
         }
     });
 }
+const hasNoAdminUsers = () => {
+    jest.mock("../../../services/userService", () => {
+        const service = jest.requireActual("../../../services/userService");
+        return {
+            ...service,
+            getAdminUsersForFundingStream: jest.fn(() => Promise.resolve({
+                status: 200,
+                data: []
+            }))
+        }
+    });
+}
 
-const renderPage = async () => {
+const renderPage = () => {
     const {MyPermissions} = require('../../../pages/Permissions/MyPermissions')
     return render(<MemoryRouter initialEntries={['/Permissions/MyPermissions']}>
         <Switch>

@@ -29,6 +29,7 @@ import {Permission} from "../../../types/Permission";
 const history = createMemoryHistory();
 
 export function EditCalculationTestData() {
+    jest.mock("../../../components/AdminNav");
     const renderEditCalculation = async () => {
         const {EditCalculation} = require("../../../pages/Calculations/EditCalculation");
         const component = render(

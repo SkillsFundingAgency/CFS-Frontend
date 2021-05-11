@@ -16,11 +16,14 @@ const renderComponent = (props: BackLinkProps) => {
     </MemoryRouter>);
 };
 const mockHistoryBack = jest.fn();
+const mockHistoryPush = jest.fn();
+const mockCallback = jest.fn();
 
 jest.mock('react-router', () => ({
     ...jest.requireActual('react-router'),
     useHistory: () => ({
         goBack: mockHistoryBack,
+        push: mockHistoryPush
     }),
 }));
 
@@ -40,10 +43,11 @@ describe('<BackLink />', () => {
             userEvent.click(link);
             
             expect(mockHistoryBack).not.toBeCalled();
+            expect(mockHistoryPush).toBeCalled();
         });
     });
     
-    describe('when clicking', () => {
+    describe('when there is a to address and user clicks', () => {
         it("click event handled correctly", () => {
             const inputs: BackLinkProps = {
                 to: "/test/blah"
@@ -55,6 +59,23 @@ describe('<BackLink />', () => {
             expect(link).toBeInTheDocument();
             expect(link).toHaveClass("govuk-back-link");
             userEvent.click(link);
+            expect(mockHistoryPush).toBeCalled();
+        });
+    });
+    
+    describe('when there is a callback and user clicks', () => {
+        it("click event handled correctly", () => {
+            const inputs: BackLinkProps = {
+                handleOnClick: mockCallback
+            }
+            renderComponent(inputs);
+
+            const link = screen.getByRole('link', {name: /Back/i}) as HTMLAnchorElement;
+
+            expect(link).toBeInTheDocument();
+            expect(link).toHaveClass("govuk-back-link");
+            userEvent.click(link);
+            expect(mockCallback).toBeCalled();
         });
     });
     

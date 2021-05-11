@@ -31,8 +31,11 @@ import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {FundingLineProfile, ProfileTotal} from "../../../types/FundingLineProfile";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 import {JobResponse} from "../../../types/jobDetails";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
 
 export function FundingApprovalTestData() {
+
+    jest.mock("../../../components/AdminNav");
 
     const fundingStream: FundingStream = {
         name: "FS123",
@@ -126,7 +129,8 @@ export function FundingApprovalTestData() {
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
             fundingStreamId: fundingStream.id,
-            enableConverterDataMerge: false
+            enableConverterDataMerge: false,
+            updateCoreProviderVersion: UpdateCoreProviderVersion.Manual
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -139,7 +143,8 @@ export function FundingApprovalTestData() {
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
             fundingStreamId: fundingStream.id,
-            enableConverterDataMerge: false
+            enableConverterDataMerge: false,
+            updateCoreProviderVersion: UpdateCoreProviderVersion.Manual
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -180,27 +185,27 @@ export function FundingApprovalTestData() {
         urn: "82096"
     };
     const profileTotal: ProfileTotal = {
-        distributionPeriodId: "", 
-        installmentNumber: 0, 
-        isPaid: false, 
-        occurrence: 0, 
-        periodType: "", 
-        typeValue: "", 
-        value: 0, 
+        distributionPeriodId: "",
+        installmentNumber: 0,
+        isPaid: false,
+        occurrence: 0,
+        periodType: "",
+        typeValue: "",
+        value: 0,
         year: 0
     }
     const fundingLineProfile1: FundingLineProfile = {
         amountAlreadyPaid: 53450,
-        fundingLineCode: "KNIT", 
-        fundingLineName: "Knitting", 
-        lastUpdatedUser: {name: "Bob", id: "1"}, 
-        profilePatternDescription: "A nice smooth lined knitting pattern", 
-        profilePatternKey: "pattern-key", 
-        profilePatternName: "Stockinette Stitch Pattern", 
-        profileTotalAmount: 5794330, 
-        profileTotals: [profileTotal], 
-        providerId: provider1.publishedProviderVersionId, 
-        providerName: provider1.providerName, 
+        fundingLineCode: "KNIT",
+        fundingLineName: "Knitting",
+        lastUpdatedUser: {name: "Bob", id: "1"},
+        profilePatternDescription: "A nice smooth lined knitting pattern",
+        profilePatternKey: "pattern-key",
+        profilePatternName: "Stockinette Stitch Pattern",
+        profileTotalAmount: 5794330,
+        profileTotals: [profileTotal],
+        providerId: provider1.publishedProviderVersionId,
+        providerName: provider1.providerName,
         totalAllocation: 895436.74,
         ukprn: provider1.ukprn,
         errors: []
@@ -235,16 +240,16 @@ export function FundingApprovalTestData() {
 
     const fundingLineProfileWithMissingTotalAllocation: FundingLineProfile = {
         amountAlreadyPaid: 53450,
-        fundingLineCode: "KNIT", 
-        fundingLineName: "Knitting", 
-        lastUpdatedUser: {name: "Bob", id: "1"}, 
-        profilePatternDescription: "A nice smooth lined knitting pattern", 
-        profilePatternKey: "pattern-key", 
-        profilePatternName: "Stockinette Stitch Pattern", 
-        profileTotalAmount: undefined, 
-        profileTotals: [profileTotal], 
-        providerId: provider1.publishedProviderVersionId, 
-        providerName: provider1.providerName, 
+        fundingLineCode: "KNIT",
+        fundingLineName: "Knitting",
+        lastUpdatedUser: {name: "Bob", id: "1"},
+        profilePatternDescription: "A nice smooth lined knitting pattern",
+        profilePatternKey: "pattern-key",
+        profilePatternName: "Stockinette Stitch Pattern",
+        profileTotalAmount: undefined,
+        profileTotals: [profileTotal],
+        providerId: provider1.publishedProviderVersionId,
+        providerName: provider1.providerName,
         totalAllocation: undefined,
         ukprn: provider1.ukprn,
         errors: []
@@ -305,7 +310,7 @@ export function FundingApprovalTestData() {
 
         await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
     };
-    
+
     const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary').mockImplementation(() => (specResult));
     const hasNoActiveJobsRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (noJob));
     const hasActiveJobRunning = () => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (activeJob));

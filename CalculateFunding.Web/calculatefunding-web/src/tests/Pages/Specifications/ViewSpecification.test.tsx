@@ -50,6 +50,7 @@ const calculationErrorsResult: CalculationErrorQueryResult = {
 }
 
 jest.spyOn(useCalculationErrorsHook, 'useCalculationErrors').mockImplementation(() => (calculationErrorsResult))
+jest.mock("../../../components/AdminNav");
 
 
 const testData = ViewSpecificationTestData();

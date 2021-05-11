@@ -9,6 +9,8 @@ import {QueryClient, QueryClientProvider} from 'react-query';
 import * as specificationService from "../../../services/specificationService";
 import * as profilingService from "../../../services/profilingService";
 
+jest.mock("../../../components/AdminNav");
+
 describe("<EditVariationPoints />", () => {
     afterEach(() => {
         getProfileVariationPointersServiceSpy.mockReset();

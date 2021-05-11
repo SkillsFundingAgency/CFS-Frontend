@@ -1,11 +1,7 @@
 ﻿import React from "react";
-import {Link} from "react-router-dom";
+import {AdminNav} from "./AdminNav";
 
-export interface SubHeaderProps {
-    showSecondaryNav: boolean
-}
-
-export function SubHeader({showSecondaryNav = true}: SubHeaderProps) {
+export const SubHeader = React.memo(function () {
     return (
         <div className="govuk-grid-row govuk-phase-banner">
             <div className="govuk-grid-column-two-thirds">
@@ -23,14 +19,7 @@ export function SubHeader({showSecondaryNav = true}: SubHeaderProps) {
                     </span>
                 </p>
             </div>
-            <div className="govuk-grid-column-one-third">
-                {showSecondaryNav &&
-                <nav className="right-align">
-                    <span className="govuk-body-s govuk-!-margin-right-2">
-                        <Link className="govuk-link" to="/Permissions/MyPermissions">My user permissions</Link>
-                    </span>
-                </nav>}
-            </div>
+            <AdminNav />
         </div>
     );
-}
+});

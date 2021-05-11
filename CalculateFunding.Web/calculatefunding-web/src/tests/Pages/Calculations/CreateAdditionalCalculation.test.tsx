@@ -29,6 +29,7 @@ function renderPage() {
             match={matchMock}/>
     </MemoryRouter>);
 }
+jest.mock("../../../components/AdminNav");
 
 
 describe("<CreateAdditionalCalculation> tests", () => {
@@ -84,7 +85,7 @@ describe("<CreateAdditionalCalculation> tests", () => {
             expect(screen.getByText(/Value type/)).toBeInTheDocument();
         });
     });
-    
+
     describe("<CreateAdditionalCalculation> with no permissions", () => {
         beforeEach(() => {
             mockOutMonacoEditor();
@@ -110,7 +111,7 @@ describe("<CreateAdditionalCalculation> tests", () => {
             expect(button).toBeDisabled();
         });
     });
-    
+
 });
 
 

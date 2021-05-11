@@ -27,6 +27,7 @@ const latestSpecJobMonitorResult: LatestSpecificationJobWithMonitoringResult = {
 };
 jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(
     () => (latestSpecJobMonitorResult));
+jest.mock("../../components/AdminNav");
 
 const renderViewCalculationResultsPage = () => {
     const {ViewCalculationResults} = require('../../pages/ViewCalculationResults');
@@ -423,4 +424,3 @@ function mockCalculationService() {
         }))
     }
 }
-

@@ -77,6 +77,7 @@ const renderPage = () => {
     );
 };
 const hasProvider = () => jest.spyOn(providerVersionHook, 'useProviderVersion').mockImplementation(() => (providerResult));
+jest.mock("../../../components/AdminNav");
 
 describe("<ViewProviderResults />", () => {
     it('will render the correct number of breadcrumbs', () => {

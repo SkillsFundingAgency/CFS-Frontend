@@ -2,5 +2,5 @@
 
 export interface FundingStreamPermissions extends UserPermissions {
     fundingStreamId: string;
-    fundingStreamName: string;
+    fundingStreamName?: string;
 }

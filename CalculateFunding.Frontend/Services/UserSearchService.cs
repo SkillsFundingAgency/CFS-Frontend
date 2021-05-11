@@ -36,9 +36,9 @@ namespace CalculateFunding.Frontend.Services
 		{
             Guard.ArgumentNotNull(request, nameof(request));
 
-			int pageNumber = Math.Max(1, request.PageNumber.GetValueOrDefault(1));
-			int pageSize = request.PageSize.GetValueOrDefault(50);
-			
+			int pageNumber = Math.Max(1, request.PageNumber ?? 1);
+			int pageSize = request.PageSize ?? 50;
+
 			SearchModel requestOptions = new SearchModel
 			{
 				PageNumber = pageNumber,
@@ -50,7 +50,7 @@ namespace CalculateFunding.Frontend.Services
             };
 
 			ApiResponse<SearchResults<UserIndex>> searchRequestResult = await _usersClient.SearchUsers(requestOptions);
-			
+
 			if (searchRequestResult == null)
 			{
 				_logger.Error("Find users HTTP request failed");
@@ -106,4 +106,3 @@ namespace CalculateFunding.Frontend.Services
 		}
     }
 }
-

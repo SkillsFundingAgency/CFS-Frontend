@@ -6,6 +6,7 @@ import {MemoryRouter} from "react-router";
 
 // ToDo: These tests need sorting properly so no errors occur
 jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+jest.mock("../../../components/AdminNav");
 
 describe('<MapDataSourceFiles />', () => {
     it("renders the page top level div", () => {

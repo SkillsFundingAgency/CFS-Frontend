@@ -15,6 +15,7 @@ import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 
 export function ViewSpecificationTestData() {
+    jest.mock("../../../components/AdminNav");
 
     const sendFailedJobNotification = async() => {
         jobMonitorSpy.mockReturnValue({

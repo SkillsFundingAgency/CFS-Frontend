@@ -31,6 +31,7 @@ const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
         isFetchingSpecification: false,
         isSpecificationFetched: true
     }));
+jest.mock("../../../components/AdminNav");
 
 
 describe("<ViewSpecificationResults />  ", () => {

@@ -8,6 +8,9 @@ import {QueryClient, QueryClientProvider} from "react-query";
 import * as useFetchAllLatestSpecificationJobsHook from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
+
+jest.mock("../../../components/AdminNav");
+
 describe("<DataRelationships />", () => {
     describe("service call checks ", () => {
         beforeEach(async () => {

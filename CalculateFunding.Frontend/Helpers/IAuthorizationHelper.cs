@@ -13,17 +13,23 @@ namespace CalculateFunding.Frontend.Helpers
         Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired);
 
         Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId);
-        
+
+        Task<IEnumerable<FundingStreamPermission>> GetOtherUsersFundingStreamPermissions(string userId);
+
         Task<IEnumerable<FundingStreamPermission>> GetUserFundingStreamPermissions(ClaimsPrincipal user);
 
         Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<PolicyModels.FundingStream> fundingStreams, FundingStreamActionTypes permissionRequired);
-        
+
         Task<IEnumerable<SpecificationSummary>> SecurityTrimList(ClaimsPrincipal user, IEnumerable<SpecificationSummary> specifications, SpecificationActionTypes permissionRequired);
 
         Task<EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId);
 
-        Task<FundingStreamPermission> UpdateFundingStreamPermission(ClaimsPrincipal user, string userId, string fundingStreamId, FundingStreamPermission permissions);
+        Task<FundingStreamPermission> UpdateFundingStreamPermission(ClaimsPrincipal requestedBy, string userId, string fundingStreamId, FundingStreamPermission permissions);
 
         Task<IEnumerable<User>> GetAdminUsersForFundingStream(ClaimsPrincipal user, string fundingStreamId);
+
+        Task<bool> HasAdminPermissionForFundingStream(ClaimsPrincipal user, string fundingStreamId);
+
+        Task<FundingStreamPermission> GetFundingStreamPermissionsForUser(ClaimsPrincipal requestedBy, string otherUserId, string fundingStreamId);
     }
 }

@@ -52,10 +52,10 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
     const canCreateAdditionalCalculation = useMemo(() => hasPermission && hasPermission(Permission.CanEditCalculations),
         [isPermissionsFetched]);
     const canApproveCalculation = useMemo(() => hasPermission && calculation &&
-        (hasPermission(Permission.CanApproveAnyCalculations) || 
+        (hasPermission(Permission.CanApproveAnyCalculations) ||
             (hasPermission(Permission.CanApproveCalculations) && calculation.author?.id !== userId)),
     [isPermissionsFetched, calculation]);
-    
+
     const queryClient = new QueryClient();
     const updateCalculation =
         useMutation((request: UpdateCalculationRequest) =>
@@ -68,7 +68,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                     queryClient.setQueryData(`calculation-${calc.id}`, calc);
                 }
             });
-    const {} = useCalculation(calculationId, 
+    const {} = useCalculation(calculationId,
                 err => addErrorMessage(err.message, "Error while loading calculation"),
             data => setCalculation(data));
     const {circularReferenceErrors, isLoadingCircularDependencies} =
@@ -162,7 +162,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
             }
 
             <MultipleErrorSummary errors={errors}/>
-            <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"}
+            <ConfirmationPanel title={"Save successful"} children={"Your changes have been saved"}
                                hidden={!updateCalculation.isSuccess || isApproving}/>
 
             <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>

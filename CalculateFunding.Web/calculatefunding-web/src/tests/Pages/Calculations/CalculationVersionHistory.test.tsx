@@ -18,6 +18,7 @@ import {CalculationDataType} from "../../../types/Calculations/CalculationCompil
 
 const history = createBrowserHistory();
 const location = createLocation("", "", "", {search: "", pathname: "", hash: "", key: "", state: ""});
+jest.mock("../../../components/AdminNav");
 
 function renderPage() {
     const {CalculationVersionHistory} = require("../../../pages/Calculations/CalculationVersionHistory");
@@ -70,7 +71,7 @@ describe("<CalculationVersionHistory> tests", () => {
 
     it('renders the calculation versions correctly', async () => {
         await waitFor(() => expect(mockCalcVersionCall).toHaveBeenCalledWith(testCalc.id));
-        
+
         const resultsTableBody = screen.getByTestId("calc-versions");
         expect(resultsTableBody).toBeInTheDocument();
         mockTestCalcVersions.map(calcVersion => {

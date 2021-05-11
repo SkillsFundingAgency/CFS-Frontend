@@ -15,8 +15,8 @@ export function Main({location, className, children}: MainProps) {
         <>
             <TopHeader location={location}/>
             <div className="govuk-width-container">
-                <SubHeader showSecondaryNav={true}/>
-                <main className={`govuk-main-wrapper govuk-main-wrapper--auto-spacing ${className}`} id="main-content" role="main">
+                <SubHeader/>
+                <main className={`govuk-main-wrapper govuk-main-wrapper--auto-spacing ${className ? className : ""}`} id="main-content" role="main">
                     {children}
                 </main>
             </div>

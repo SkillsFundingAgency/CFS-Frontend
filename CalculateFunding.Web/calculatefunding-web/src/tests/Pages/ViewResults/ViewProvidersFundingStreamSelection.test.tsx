@@ -5,6 +5,8 @@ import * as policyService from "../../../services/policyService";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom';
 
+jest.mock("../../../components/AdminNav");
+
 describe("<ViewProvidersFundingStreamSelection />", () => {
     it('renders funding streams in autocomplete drop-down', async () => {
         await renderPage();

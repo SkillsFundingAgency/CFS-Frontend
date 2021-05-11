@@ -25,6 +25,7 @@ import {QueryClient, QueryClientProvider} from "react-query";
 import {Permission} from "../../../types/Permission";
 
 jest.spyOn(global.console, 'info').mockImplementation(() => jest.fn());
+jest.mock("../../../components/AdminNav");
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
@@ -147,7 +148,7 @@ describe("<SelectDataSource/>", () => {
             jest.spyOn(useSpecificationSummaryHook, 'useSpecificationSummary').mockImplementation(() => (specificationResult));
             jest.spyOn(useRelationshipDataHook, 'useRelationshipData').mockImplementation(
                 () => ({
-                    isLoadingRelationshipData: false, 
+                    isLoadingRelationshipData: false,
                     isErrorLoadingRelationshipData: false,
                     relationshipData: {}
                 } as RelationshipDataQueryResult));

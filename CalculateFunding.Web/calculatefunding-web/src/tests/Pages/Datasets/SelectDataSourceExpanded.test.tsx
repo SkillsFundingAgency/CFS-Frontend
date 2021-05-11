@@ -21,6 +21,7 @@ const matchMock: match<SelectDataSourceRouteProps> = {
     path: "",
     isExact: true,
 };
+jest.mock("../../../components/AdminNav");
 
 describe("<SelectDataSourceExpanded />", () => {
     it('will have the correct breadcrumbs', () => {

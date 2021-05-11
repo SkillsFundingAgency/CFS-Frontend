@@ -177,7 +177,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
             </Breadcrumbs>
 
             <ConfirmationPanel title={"Dataset created"}
-                               body={`Dataset ${updateRequest?.name} has been created.`}
+                               children={`Dataset ${updateRequest?.name} has been created.`}
                                hidden={!isSuccess}/>
 
             <MultipleErrorSummary errors={errors}/>

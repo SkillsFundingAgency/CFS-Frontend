@@ -9,6 +9,7 @@ import '@testing-library/jest-dom';
 import {FundingLineChangeViewModel} from "../../../types/PublishedProvider/FundingLineProfile";
 
 const useQuerySpy = jest.spyOn(ReactQuery, 'useQuery');
+jest.mock("../../../components/AdminNav");
 
 describe("<ProfileHistory />", () => {
     afterAll(() => {

@@ -10,6 +10,8 @@ import {UpdateNewDatasetVersionResponseViewModel} from "../../../types/Datasets/
 
 export function UpdateDataSourceFileTestData() {
 
+    jest.mock("../../../components/AdminNav");
+
     const givenFormIsCompleted = async () => {
         const createNewVersionButton = await screen.findByTestId(`update-datasource-new`);
         userEvent.click(createNewVersionButton);

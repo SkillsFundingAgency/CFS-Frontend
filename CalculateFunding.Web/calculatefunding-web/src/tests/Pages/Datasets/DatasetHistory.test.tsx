@@ -16,6 +16,7 @@ const mockRoute: match<DatasetHistoryRouteProps> = {
     path: "",
     isExact: true,
 };
+jest.mock("../../../components/AdminNav");
 const renderPage = () => {
     const {DatasetHistory} = require('../../../pages/Datasets/DatasetHistory');
     return render(
@@ -65,7 +66,6 @@ describe("<DatasetHistory />", () => {
         it('when merge type, renders version file and merge file download link', async () => {
             const table = screen.getByRole("table", {name: /Dataset Versions/});
             const mergeVersionRow = within(table).getByRole("row", {name: /Version 4/});
-            screen.debug(mergeVersionRow)
             const versionLink = within(mergeVersionRow).getByRole("link", {name: /version4/});
             expect(versionLink).toBeInTheDocument();
             expect(versionLink).toHaveAttribute('href', '/api/datasets/download-dataset-file/4/4');

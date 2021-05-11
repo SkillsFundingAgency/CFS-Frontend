@@ -63,6 +63,9 @@ import {RefreshSql} from "./pages/Datasets/RefreshSql";
 import {UploadBatch} from "./pages/FundingApprovals/UploadBatch";
 import {initialiseAppInsights, setAppInsightsAuthenticatedUser} from "./services/appInsightsService";
 import {useEffectOnce} from "./hooks/useEffectOnce";
+import {Admin} from "./pages/Permissions/Admin";
+import {IndividualPermissionsAdmin} from "./pages/Permissions/IndividualPermissionsAdmin";
+import {FundingStreamPermissionsAdmin} from "./pages/Permissions/FundingStreamPermissionsAdmin";
 
 const queryClient = new QueryClient();
 
@@ -161,6 +164,9 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
                         <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
                         <Route path="/Permissions/MyPermissions" component={MyPermissions}/>
+                        <Route path="/Permissions/Admin" component={Admin}/>
+                        <Route path="/Permissions/Individual" component={IndividualPermissionsAdmin}/>
+                        <Route path="/Permissions/FundingStream" component={FundingStreamPermissionsAdmin}/>
                         <Route path="*">
                             <NoMatch/>
                         </Route>

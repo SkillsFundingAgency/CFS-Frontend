@@ -12,6 +12,7 @@ import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {DataschemaDetailsViewModel} from "../../../types/Datasets/DataschemaDetailsViewModel";
 import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
 import {QueryClient, QueryClientProvider} from "react-query";
+import * as redux from "react-redux";
 
 // ToDo: These tests need sorting properly so no errors occur
 jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
@@ -45,23 +46,23 @@ describe("<CreateDataset />", () => {
         it('does not render loading spinner', async () => {
             expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
         });
-        
+
         it('renders Specification name in the form heading', async () => {
             expect(await screen.findByRole("heading", {name: testing.testSpec.name})).toBeInTheDocument();
         });
-        
+
         it('does not render Set as provider data for FDZ', async () => {
             expect(await screen.queryByRole("heading", {name: /Set as provider data/})).not.toBeInTheDocument();
         });
-        
+
         it('renders data schema selections', async () => {
             expect(await screen.findByText(/Select data schema/)).toBeInTheDocument();
         });
-        
+
         it('renders dataset name input', async () => {
             expect(await screen.findByLabelText(/Dataset name/)).toBeInTheDocument();
         });
-        
+
         it('renders dataset description input', async () => {
             expect(await screen.findByLabelText(/Description/)).toBeInTheDocument();
         });
@@ -94,23 +95,23 @@ describe("<CreateDataset />", () => {
         it('does not render loading spinner', async () => {
             expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
         });
-        
+
         it('renders Specification name in the form heading', async () => {
             expect(await screen.findByRole("heading", {name: testing.testSpec.name})).toBeInTheDocument();
         });
-        
+
         it('renders Set as provider data', async () => {
             expect(await screen.findByRole("heading", {name: /Set as provider data/})).toBeInTheDocument();
         });
-        
+
         it('renders data schema selections', async () => {
             expect(await screen.findByText(/Select data schema/)).toBeInTheDocument();
         });
-        
+
         it('renders dataset name input', async () => {
             expect(await screen.findByLabelText(/Dataset name/)).toBeInTheDocument();
         });
-        
+
         it('renders dataset description input', async () => {
             expect(await screen.findByLabelText(/Description/)).toBeInTheDocument();
         });
@@ -118,6 +119,8 @@ describe("<CreateDataset />", () => {
 });
 
 const createDatasetTestSetup = () => {
+    const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+    useSelectorSpy.mockReturnValue([]);
     const fundingStream: FundingStream = {
         name: "FS123",
         id: "Wizard Training Scheme"
@@ -187,7 +190,7 @@ const createDatasetTestSetup = () => {
             }))
         }
     };
-    
+
     const mockPolicyApi = (config: FundingConfiguration) => {
         const service = jest.requireActual('../../../services/policyService');
         return {
@@ -228,4 +231,3 @@ const createDatasetTestSetup = () => {
 }
 
 const testing = createDatasetTestSetup();
-

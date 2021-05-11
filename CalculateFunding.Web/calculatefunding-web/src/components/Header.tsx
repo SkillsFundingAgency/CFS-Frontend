@@ -1,10 +1,10 @@
 import React from "react";
 import {Section} from "../types/Sections";
 import {TopHeader} from "./TopHeader";
-import {Link} from "react-router-dom";
+import {AdminNav} from "./AdminNav";
 
-export function Header(props: { location: Section }) {
-    return <>
+export const Header = React.memo(function (props: { location: Section }) {
+    return (<>
         <TopHeader {...props} />
         <div className="govuk-width-container">
             <div className="govuk-grid-row govuk-phase-banner">
@@ -23,14 +23,8 @@ export function Header(props: { location: Section }) {
                     </span>
                     </p>
                 </div>
-                <div className="govuk-grid-column-one-third">
-                    <nav className="right-align">
-                        <span className="govuk-body-s govuk-!-margin-right-2">
-                        <Link className="govuk-link" to="/Account/Permissions">My user permissions</Link>
-                    </span>
-                    </nav>
-                </div>
+                <AdminNav/>
             </div>
         </div>
-    </>
-}
+    </>);
+});

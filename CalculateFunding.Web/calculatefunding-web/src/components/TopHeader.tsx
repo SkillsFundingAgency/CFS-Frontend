@@ -2,7 +2,7 @@
 import {Link} from "react-router-dom";
 import React from "react";
 
-export function TopHeader(props: { location: Section }) {
+export const TopHeader = React.memo(function (props: { location: Section }) {
 
     const windowLocation = window.location.href;
     let environment = "";
@@ -84,4 +84,4 @@ export function TopHeader(props: { location: Section }) {
             </div>
         </header>
     );
-}
+});

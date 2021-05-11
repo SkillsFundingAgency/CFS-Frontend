@@ -162,7 +162,7 @@ export function ReleaseTimetable({specificationId, addErrorMessage, clearErrorMe
             </div>
         </div>
         <LoadingStatus title={"Saving Release Timetable"} description={"Please wait whilst we save your changes"} hidden={!isSavingReleaseTimetable} />
-        <ConfirmationPanel title={"Save successful"} body={"Your changes have been saved"} hidden={!saveSuccessful} />
+        <ConfirmationPanel title={"Save successful"} children={"Your changes have been saved"} hidden={!saveSuccessful} />
         <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "release-timetable-funding").length > 0 ? 'govuk-form-group--error' : ''}`} hidden={isSavingReleaseTimetable}>
             <fieldset className="govuk-fieldset" role="group"
                 aria-describedby="passport-issued-hint">

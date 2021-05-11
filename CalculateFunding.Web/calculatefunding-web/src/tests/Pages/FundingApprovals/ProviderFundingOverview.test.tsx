@@ -19,6 +19,8 @@ import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
+jest.mock("../../../components/AdminNav");
+
 jest.mock('../../../services/fundingLineDetailsService', () => ({
     getCurrentProfileConfigService: jest.fn()
 }));
@@ -285,4 +287,3 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible true", () => {
         expect(screen.queryByTestId(`tab-panel-profiling`)).not.toBeInTheDocument();
     });
 });
-

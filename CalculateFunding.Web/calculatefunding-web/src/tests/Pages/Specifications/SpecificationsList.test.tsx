@@ -7,6 +7,7 @@ import {SpecificationListResults} from "../../../types/Specifications/Specificat
 
 // ToDo: These tests need sorting properly so no errors occur
 jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+jest.mock("../../../components/AdminNav");
 
 const mockSpecSearchResult: SpecificationListResults = {
     items: [{
@@ -66,7 +67,7 @@ describe("<SpecificationsList />", () => {
     afterEach(async () => {
         jest.clearAllMocks();
     });
-    
+
     it('renders the breadcrumbs', async () => {
         await renderPage();
         expect(screen.getAllByTestId("breadcrumb")).toHaveLength(2);
@@ -89,4 +90,3 @@ describe("<SpecificationsList />", () => {
         expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
     });
 });
-

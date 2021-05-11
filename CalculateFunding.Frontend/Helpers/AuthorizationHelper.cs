@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -12,10 +13,8 @@ using CalculateFunding.Common.ApiClient.Users;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
-using CalculateFunding.Frontend.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -23,14 +22,9 @@ using PolicyModels = CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Helpers
 {
-    public class AuthorizationHelper : IAuthorizationHelper
+    public class AuthorizationHelper : AuthorizationHelperBase, IAuthorizationHelper
     {
-        private readonly IAuthorizationService _authorizationService;
-        private readonly IUsersApiClient _usersClient;
-        private readonly IPoliciesApiClient _policyClient;
-        private readonly ILogger _logger;
-        private readonly PermissionOptions _permissionOptions;
-        private readonly IMapper _mapper;
+        protected readonly PermissionOptions _permissionOptions;
 
         public AuthorizationHelper(
             IAuthorizationService authorizationService,
@@ -38,27 +32,10 @@ namespace CalculateFunding.Frontend.Helpers
             IPoliciesApiClient policyClient,
             IMapper mapper,
             ILogger logger,
-            IOptions<PermissionOptions> permissionOptions)
+            IOptions<PermissionOptions> permissionOptions) :
+            base(authorizationService, usersClient, policyClient, mapper, logger)
         {
-            Guard.ArgumentNotNull(authorizationService, nameof(authorizationService));
-            Guard.ArgumentNotNull(usersClient, nameof(usersClient));
-            Guard.ArgumentNotNull(logger, nameof(logger));
-            Guard.ArgumentNotNull(mapper, nameof(mapper));
-            Guard.ArgumentNotNull(permissionOptions, nameof(permissionOptions));
-
-            _authorizationService = authorizationService;
-            _usersClient = usersClient;
-            _policyClient = policyClient;
-            _mapper = mapper;
-            _logger = logger;
             _permissionOptions = permissionOptions.Value;
-        }
-
-        public async Task<bool> DoesUserHavePermission(ClaimsPrincipal user, string specificationId, SpecificationActionTypes permissionRequired)
-        {
-            AuthorizationResult authorizationResult =
-                await _authorizationService.AuthorizeAsync(user, specificationId, new SpecificationRequirement(permissionRequired));
-            return authorizationResult.Succeeded;
         }
 
         public async Task<FundingStreamPermission> GetUserFundingStreamPermissions(ClaimsPrincipal user, string fundingStreamId)
@@ -81,7 +58,7 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 ApiResponse<IEnumerable<PolicyModels.FundingStream>> fundingStreamsResponse = await _policyClient.GetFundingStreams();
                 IEnumerable<PolicyModels.FundingStream> fundingStreams = fundingStreamsResponse.Content;
-                return fundingStreams.Select(fs => 
+                return fundingStreams.Select(fs =>
                     new FundingStreamPermission
                     {
                         UserId = userId,
@@ -90,25 +67,8 @@ namespace CalculateFunding.Frontend.Helpers
             }
             else
             {
-                return await GetFundingStreamPermissionsForUser(userId, user);
+                return await GetFundingStreamPermissionsForUser(userId);
             }
-        }
-
-        private async Task<IEnumerable<FundingStreamPermission>> GetFundingStreamPermissionsForUser(string userId, ClaimsPrincipal user)
-        {
-            ApiResponse<IEnumerable<FundingStreamPermission>> response =
-                await _usersClient.GetFundingStreamPermissionsForUser(userId);
-
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", user?.Identity?.Name,
-                    response.StatusCode);
-                {
-                    return new List<FundingStreamPermissionModel>();
-                }
-            }
-
-            return response.Content;
         }
 
         public async Task<IEnumerable<PolicyModels.FundingStream>> SecurityTrimList(ClaimsPrincipal user,
@@ -194,40 +154,37 @@ namespace CalculateFunding.Frontend.Helpers
             return specifications.Where(specificationSummary => SpecificationDoesNotHaveAllowedFundingStreams(specificationSummary, allowedFundingStreamIds));
         }
 
-        public async Task<FundingStreamPermission> UpdateFundingStreamPermission(ClaimsPrincipal user, string userId, string fundingStreamId, FundingStreamPermission permissions)
+        public async Task<FundingStreamPermission> GetFundingStreamPermissionsForUser(ClaimsPrincipal requestedBy, string otherUserId, string fundingStreamId)
         {
-            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
+            Guard.ArgumentNotNull(requestedBy, nameof(requestedBy));
+            Guard.IsNullOrWhiteSpace(otherUserId, nameof(otherUserId));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
-            Guard.ArgumentNotNull(permissions, nameof(permissions));
 
-            FundingStreamPermission userFundingStreamPermission = await GetUserFundingStreamPermissions(user, fundingStreamId);
-
-            if (!userFundingStreamPermission.CanAdministerFundingStream)
+            if (false == await HasAdminPermissionForFundingStream(requestedBy, fundingStreamId))
             {
-                string message = $"{user?.Identity?.Name} Not allowed to update the funding stream permissions for {userId}";
+                string message = $"{requestedBy?.Identity?.Name} not allowed to get another user's funding stream permissions for {fundingStreamId}";
                 _logger.Error(message);
-                throw new Exception(message);
+                throw new SecurityException(message);
             }
 
-            FundingStreamPermissionUpdateModel fundingStreamPermissionUpdateModel = _mapper.Map<FundingStreamPermissionUpdateModel>(permissions);
-            ApiResponse<FundingStreamPermission> apiResponse = await _usersClient.UpdateFundingStreamPermission(userId, fundingStreamId, fundingStreamPermissionUpdateModel);
+            ApiResponse<IEnumerable<FundingStreamPermission>> response = await _usersClient.GetFundingStreamPermissionsForUser(otherUserId);
 
-            if(apiResponse.StatusCode != HttpStatusCode.OK || apiResponse.Content == null)
+            if (response.StatusCode == HttpStatusCode.OK &&
+                response.Content.Any(p => p.FundingStreamId != fundingStreamId))
             {
-                string message = $"Failed to update funding stream permissions for user ({userId}) - {apiResponse.StatusCode}";
-                _logger.Error(message);
-                throw new Exception(message);
+                return response.Content.Single(x => x.FundingStreamId == fundingStreamId);
             }
 
-            return apiResponse.Content;
-        }
-        private static bool SpecificationDoesNotHaveAllowedFundingStreams(
-            SpecificationSummary specificationSummary, IEnumerable<string> allowedFundingStreamIds)
-        {
-            IEnumerable<Reference> specificationFundingStreams = specificationSummary.FundingStreams;
-            IEnumerable<string> specFundingStreamsExceptAllowedUserFundingStreams =
-                specificationFundingStreams.Select(fs => fs.Id).Except(allowedFundingStreamIds);
-            return !specFundingStreamsExceptAllowedUserFundingStreams.Any();
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", otherUserId, response.StatusCode);
+            }
+
+            return new FundingStreamPermission
+            {
+                FundingStreamId = fundingStreamId,
+                UserId = otherUserId,
+            }.SetAllBooleansTo(false);
         }
 
         public async Task<EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
@@ -239,30 +196,8 @@ namespace CalculateFunding.Frontend.Helpers
             {
                 return new EffectiveSpecificationPermission
                 {
-                    SpecificationId = specificationId,
-                    UserId = user.GetUserProfile()?.Id,
-                    CanAdministerFundingStream = true,
-                    CanApproveFunding = true,
-                    CanApproveSpecification = true,
-                    CanChooseFunding = true,
-                    CanCreateQaTests = true,
-                    CanCreateSpecification = true,
-                    CanEditCalculations = true,
-                    CanEditQaTests = true,
-                    CanEditSpecification = true,
-                    CanMapDatasets = true,
-                    CanReleaseFunding = true,
-                    CanRefreshFunding = true,
-                    CanDeleteCalculations = true,
-                    CanDeleteQaTests = true,
-                    CanDeleteSpecification = true,
-                    CanApplyCustomProfilePattern = true,
-                    CanApproveAnyCalculations = true,
-                    CanApproveCalculations = true,
-                    CanAssignProfilePattern = true,
-                    CanApproveAllCalculations = true,
-                    CanRefreshPublishedQa = true
-                };
+                    SpecificationId = specificationId, UserId = user.GetUserProfile()?.Id,
+                }.SetAllBooleansTo(true);
             }
 
             string userId = VerifyObjectIdentifierClaimTypePresent(user);
@@ -275,42 +210,50 @@ namespace CalculateFunding.Frontend.Helpers
 
                 return new EffectiveSpecificationPermission
                 {
-                    UserId = user.GetUserProfile()?.Id,
                     SpecificationId = specificationId,
-                    CanAdministerFundingStream = false,
-                    CanApproveFunding = false,
-                    CanApproveSpecification = false,
-                    CanChooseFunding = false,
-                    CanCreateQaTests = false,
-                    CanCreateSpecification = false,
-                    CanEditCalculations = false,
-                    CanEditQaTests = false,
-                    CanEditSpecification = false,
-                    CanMapDatasets = false,
-                    CanReleaseFunding = false,
-                    CanRefreshFunding = false,
-                    CanDeleteCalculations = false,
-                    CanDeleteQaTests = false,
-                    CanDeleteSpecification = false,
-                    CanApplyCustomProfilePattern = false,
-                    CanApproveAnyCalculations = false,
-                    CanApproveCalculations = false,
-                    CanAssignProfilePattern = false,
-                    CanApproveAllCalculations = false,
-                    CanRefreshPublishedQa = false
-                };
+                    UserId = user.GetUserProfile()?.Id,
+                }.SetAllBooleansTo(false);
             }
 
             return response.Content;
         }
 
-        public async Task<IEnumerable<User>> GetAdminUsersForFundingStream(ClaimsPrincipal user, string fundingStreamId)
+        public async Task<FundingStreamPermission> UpdateFundingStreamPermission(
+            ClaimsPrincipal requestedBy,
+            string userId,
+            string fundingStreamId,
+            FundingStreamPermission permissions)
         {
+            Guard.IsNullOrWhiteSpace(userId, nameof(userId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.ArgumentNotNull(permissions, nameof(permissions));
+
+            if (false == await HasAdminPermissionForFundingStream(requestedBy, fundingStreamId))
+            {
+                string message = $"{requestedBy?.Identity?.Name} not allowed to update the funding stream permissions for {fundingStreamId}";
+                _logger.Error(message);
+                throw new SecurityException(message);
+            }
+
+            return await base.UpdateFundingStreamPermission(userId, fundingStreamId, permissions);
+        }
+
+        public async Task<bool> HasAdminPermissionForFundingStream(ClaimsPrincipal user, string fundingStreamId)
+        {
+            Guard.ArgumentNotNull(user, nameof(user));
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<User>> response = await _usersClient.GetAdminUsersForFundingStream(fundingStreamId);
+            if (IsAdminUser(user))
+            {
+                return true;
+            }
 
-            return response.Content;
+            string userId = VerifyObjectIdentifierClaimTypePresent(user);
+            IEnumerable<FundingStreamPermission> fundingStreamPermissions = await GetFundingStreamPermissionsForUser(userId);
+
+            FundingStreamPermission permissions = fundingStreamPermissions.SingleOrDefault(x => x.FundingStreamId == fundingStreamId);
+
+            return permissions != null && permissions.CanAdministerFundingStream;
         }
 
         private bool IsAdminUser(ClaimsPrincipal user)
@@ -318,18 +261,6 @@ namespace CalculateFunding.Frontend.Helpers
             return user.HasClaim(c =>
                 c.Type == Common.Identity.Constants.GroupsClaimType &&
                 c.Value == _permissionOptions.AdminGroupId.ToString());
-        }
-
-        private static string VerifyObjectIdentifierClaimTypePresent(ClaimsPrincipal claimsPrincipal)
-        {
-            if (!claimsPrincipal.HasClaim(c => c.Type == Common.Identity.Constants.ObjectIdentifierClaimType))
-            {
-                throw new Exception("Cannot security trim a list when cannot identify the user");
-            }
-
-            Claim oidClaim = claimsPrincipal.FindFirst(Common.Identity.Constants.ObjectIdentifierClaimType);
-
-            return oidClaim.Value;
         }
     }
 }

@@ -10,6 +10,7 @@ jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
 const Adapter = require('enzyme-adapter-react-16');
 const enzyme = require('enzyme');
 enzyme.configure({adapter: new Adapter()});
+jest.mock("../../../components/AdminNav");
 
 describe("<ManageDataSourceFiles />", () => {
     it('will have the correct breadcrumbs', () => {
