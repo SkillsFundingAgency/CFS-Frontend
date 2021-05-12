@@ -44,7 +44,7 @@ describe("<UploadBatch />", () => {
         beforeEach(() => {
             testData.hasNoActiveJobsRunning();
             testData.hasFundingConfigWithApproveBatchMode();
-
+            testData.hasSpecification();
             renderPage();
         });
         afterEach(() => jest.clearAllMocks());
@@ -69,6 +69,10 @@ describe("<UploadBatch />", () => {
             const button = screen.getByRole("button", {name: /Release funding/});
             expect(button).toBeInTheDocument();
             expect(button).toBeDisabled();
+        });
+
+        it('renders selected specification name', async () => {
+            expect(screen.getByText("test spec name selected")).toBeInTheDocument();
         });
     });
 

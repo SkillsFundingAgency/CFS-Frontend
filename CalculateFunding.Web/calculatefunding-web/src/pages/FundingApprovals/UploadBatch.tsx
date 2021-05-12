@@ -20,6 +20,7 @@ import {FundingActionType} from "../../types/PublishedProvider/PublishedProvider
 import {useDispatch} from "react-redux";
 import * as actions from "../../actions/FundingSearchSelectionActions";
 import {HistoryPage} from "../../types/HistoryPage";
+import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 
 
 export interface UploadBatchRouteProps {
@@ -140,6 +141,10 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
         }
     }, [latestJob, publishedProviderIds]);
 
+    const {specification} =
+        useSpecificationSummary(specificationId,
+            err => addError({error: "Error while loading specification"}));
+
     const isBlocked = (isUpdating || isWaitingForJob || isUploadingBatchFile || isCreatingValidationJob || isCheckingForJob || isExtractingProviderIds ||
         (latestJob && latestJob.jobId === jobId && latestJob.isActive));
     const hasActiveJob = latestJob && latestJob.isActive;
@@ -174,7 +179,17 @@ export function UploadBatch({match}: RouteComponentProps<UploadBatchRouteProps>)
                                                 {currentPage.title}
                                             </h1>
                                         </legend>
-
+                                        {specification &&
+                                        <dl className="govuk-summary-list govuk-summary-list--no-border">
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    <h2 className="govuk-heading-s govuk-!-margin-bottom-1">
+                                                        {specification.name} selected
+                                                    </h2>
+                                                </dt>
+                                            </div>
+                                        </dl>
+                                        }
                                         {!isBlocked &&
                                         <ul className="govuk-list govuk-list--bullet">
                                             <li>The file is in xlsx format</li>

@@ -14,6 +14,7 @@ import {CompletionStatus} from "../../../types/CompletionStatus";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../../../types/SpecificationSelectedForFunding";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 import {JobOutcomeType} from "../../../types/jobDetails";
+import * as specHook from "../../../hooks/useSpecificationSummary";
 
 export const FundingApprovalTestSetup = () => {
     jest.mock("../../../components/AdminNav");
@@ -229,7 +230,29 @@ export const FundingApprovalTestSetup = () => {
     const hasLatestJob = (job: LatestSpecificationJobWithMonitoringResult) => jest.spyOn(jobHook, 'useLatestSpecificationJobWithMonitoring').mockImplementation(() => (job));
     const hasFundingConfigWithApproveBatchMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalBatchMode));
     const hasFundingConfigWithApproveAllMode = () => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration').mockImplementation(() => (mockFundingConfigWithApprovalAllMode));
-
+    const testSpec: SpecificationSummary = {
+        name: "test spec name",
+        id: "3567357",
+        approvalStatus: "Cal",
+        isSelectedForFunding: true,
+        description: "sgdsg",
+        providerVersionId: "sgds",
+        fundingStreams: [],
+        fundingPeriod: { id: "", name:""},
+        dataDefinitionRelationshipIds: [],
+        templateIds: {},
+        coreProviderVersionUpdates: undefined,
+        providerSnapshotId: undefined
+    };
+    const hasSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
+        .mockImplementation(() => ({
+            specification: testSpec,
+            isLoadingSpecification: false,
+            errorCheckingForSpecification: null,
+            haveErrorCheckingForSpecification: false,
+            isFetchingSpecification: false,
+            isSpecificationFetched: true
+        }));
 
     return {
         mockPublishedProviderService,
@@ -243,6 +266,7 @@ export const FundingApprovalTestSetup = () => {
         hasLatestJob,
         hasFundingConfigWithApproveBatchMode,
         hasFundingConfigWithApproveAllMode,
+        hasSpecification,
         failedValidationJob,
         successfulValidationJob,
         activeApprovalJob,
