@@ -168,7 +168,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                 </div>
                 <div className="govuk-grid-row" hidden={isLoadingProviderVersion || isLoadingProviderData}>
                     <div className="govuk-grid-column-full">
-                        <Tabs initialTab={"funding-line-structure"}>
+                        <Tabs initialTab={"funding-line-structure"} >
                             <ul className="govuk-tabs__list">
                                 <Tabs.Tab label="funding-line-structure">Funding line structure</Tabs.Tab>
                                 <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
@@ -256,6 +256,26 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
                                                     {providerDetails.previousEstablishmentNumber}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Predecessor UKPRN
+                                                </dt>
+                                                <dd className="govuk-summary-list__value" data-testid={"predecessors"}>
+                                                    {providerDetails.predecessors?.map((predecessor, index) => {
+                                                        return (index > 0)? `, ${predecessor}` : predecessor
+                                                    })}
+                                                </dd>
+                                            </div>
+                                            <div className="govuk-summary-list__row">
+                                                <dt className="govuk-summary-list__key">
+                                                    Successor UKPRN
+                                                </dt>
+                                                <dd className="govuk-summary-list__value" data-testid={"successors"}>
+                                                    {providerDetails.successors?.map((successors, index) => {
+                                                        return (index > 0)? `, ${successors}` : successors
+                                                    })}
                                                 </dd>
                                             </div>
                                         </dl>

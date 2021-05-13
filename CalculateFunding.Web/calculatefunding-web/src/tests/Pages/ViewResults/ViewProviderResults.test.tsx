@@ -1,28 +1,61 @@
 import React from 'react';
-import {match, MemoryRouter} from "react-router";
-import {createLocation, createMemoryHistory} from "history";
-import {ViewProviderResults, ViewProviderResultsRouteProps} from "../../../pages/ViewResults/ViewProviderResults";
+import {MemoryRouter, Route, Switch} from "react-router";
+import {ViewProviderResults} from "../../../pages/ViewResults/ViewProviderResults";
 import {ProviderSummary} from "../../../types/ProviderSummary";
 import {ProviderVersionQueryResult} from "../../../hooks/Providers/useProviderVersion";
-import {render} from "@testing-library/react";
+import {act, render, screen, waitFor} from "@testing-library/react";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
+import userEvent from "@testing-library/user-event";
 
+describe("<ViewProviderResults />", () => {
+    beforeEach(async () => {
+        mockProviderService();
+        mockSpecificationService();
+        await renderPage();
+    });
 
-// ToDo: These tests need sorting properly so no errors occur
-jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const history = createMemoryHistory();
-const location = createLocation("","","");
+    it("displays provider details", async () => {
+        expect(screen.getAllByText("Hogwarts School of Witchcraft and Wizardry").length).toBe(2);
+        expect(screen.getByText("ukprn test")).toBeInTheDocument()
+    })
+
+    it("displays provider data establishment details", async () => {
+        const providerDataTab= await screen.findByTestId("tab-provider-data") as HTMLLabelElement;
+        act(() => userEvent.click(providerDataTab));
+
+        expect(screen.getByText("establishmentNumberTest")).toBeInTheDocument()
+        expect((await screen.findByTestId("successors") as HTMLDListElement).textContent).toBe("successors1, successors2")
+        expect((await screen.findByTestId("predecessors") as HTMLDListElement).textContent).toBe("predecessors1, predecessors2")
+    });
+});
+
+const renderPage = async () => {
+    const {ViewProviderResults} = require('../../../pages/ViewResults/ViewProviderResults');
+    const page = render(<MemoryRouter initialEntries={['/ViewResults/ViewProviderResults/Hog/1619']}>
+        <Switch>
+            <Route path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId"
+                   component={ViewProviderResults}/>
+        </Switch>
+    </MemoryRouter>)
+
+    await waitFor(() => {
+        expect(screen.getByText("Loading provider details")).not.toBeVisible()
+    });
+
+    return page;
+}
+
 const testProvider: ProviderSummary = {
     authority: "",
     countryCode: "",
     countryName: "",
     crmAccountId: "",
     dfeEstablishmentNumber: "",
-    establishmentNumber: "",
+    establishmentNumber: "establishmentNumberTest",
     id: "Hog-1",
     laCode: "",
     legalName: "",
@@ -45,11 +78,50 @@ const testProvider: ProviderSummary = {
     trustCode: "",
     trustName: "",
     trustStatus: "",
-    ukprn: "",
+    ukprn: "ukprn test",
     upin: "",
     urn: "",
     paymentOrganisationId: "",
     paymentOrganisationName: "",
+    censusWardCode: "",
+    censusWardName: "",
+    companiesHouseNumber: "",
+    dateClosed: "",
+    dateOpened: "",
+    districtCode: "",
+    districtName: "",
+    governmentOfficeRegionCode: "",
+    governmentOfficeRegionName: "",
+    groupIdNumber: "",
+    localAuthorityName: "",
+    localGovernmentGroupTypeCode: "",
+    localGovernmentGroupTypeName: "",
+    middleSuperOutputAreaCode: "",
+    middleSuperOutputAreaName: "",
+    officialSixthFormCode: "",
+    officialSixthFormName: "",
+    parliamentaryConstituencyCode: "",
+    parliamentaryConstituencyName: "",
+    paymentOrganisationCompanyHouseNumber: "",
+    paymentOrganisationLaCode: "",
+    paymentOrganisationTrustCode: "",
+    paymentOrganisationType: "",
+    paymentOrganisationUkprn: "",
+    paymentOrganisationUpin: "",
+    paymentOrganisationUrn: "",
+    phaseOfEducationCode: "",
+    previousEstablishmentNumber: "",
+    previousLaCode: "",
+    previousLaName: "",
+    providerSubTypeCode: "",
+    providerTypeCode: "",
+    statusCode: "",
+    statutoryHighAge: "",
+    statutoryLowAge: "",
+    wardCode: "",
+    wardName: "",
+    predecessors: ["predecessors1", "predecessors2"],
+    successors: ["successors1", "successors2"]
 };
 const providerResult: ProviderVersionQueryResult = {
     providerVersion: testProvider,
@@ -58,31 +130,48 @@ const providerResult: ProviderVersionQueryResult = {
     isErrorLoadingProviderVersion: false,
     isFetchingProviderVersion: false,
 };
-const matchMock : match<ViewProviderResultsRouteProps> = {
-    params: {
-        providerId: "123",
-        fundingStreamId: "xyz"
-    },
-    path:"",
-    isExact: true,
-    url: ""
-};
-
-const renderPage = () => {
-    const {ViewProviderResults} = require('../../../pages/ViewResults/ViewProviderResults');
-    return render(
-        <MemoryRouter>
-                <ViewProviderResults location={location} history={history} match={matchMock}/>
-        </MemoryRouter>
-    );
-};
-const hasProvider = () => jest.spyOn(providerVersionHook, 'useProviderVersion').mockImplementation(() => (providerResult));
+jest.spyOn(providerVersionHook, 'useProviderVersion').mockImplementation(() => (providerResult));
+jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
 jest.mock("../../../components/AdminNav");
 
-describe("<ViewProviderResults />", () => {
-    it('will render the correct number of breadcrumbs', () => {
-        hasProvider();
-        const {container} = renderPage();
-        expect(container.getElementsByClassName('govuk-breadcrumbs__list-item')).toHaveLength(5);
+const mockProviderService = () => {
+    jest.mock("../../../services/providerService", () => {
+        const service = jest.requireActual("../../../services/providerService");
+        return {
+            ...service,
+            getProviderResultsService: jest.fn(() => Promise.resolve({
+                data: {
+                    id: "1",
+                    name: "privider name",
+                    lastEditDate: new Date(),
+                    fundingPeriod: "funding period",
+                    fundingStreamIds: ["1619"],
+                    fundingPeriodEnd: new Date()
+                }
+            }))
+        }
     });
-});
+}
+
+const mockSpecificationService = () => {
+    jest.mock("../../../services/specificationService", () => {
+        const service = jest.requireActual("../../../services/specificationService");
+        return {
+            ...service,
+            getSpecificationSummaryService: jest.fn(() => Promise.resolve({
+                data: {
+                    name: "test spec",
+                    id: "test spec id",
+                    approvalStatus: "",
+                    isSelectedForFunding: true,
+                    description: "",
+                    fundingPeriod: "funding period",
+                    fundingStreamIds: ["1619"],
+                    providerSnapshotId: 11,
+                    templateIds: {[""]: ""},
+                    dataDefinitionRelationshipIds: []
+                }
+            }))
+        }
+    });
+}

@@ -69,6 +69,8 @@ export interface ProviderSummary {
     paymentOrganisationCompanyHouseNumber: string;
     paymentOrganisationType: string;
     paymentOrganisationUkprn: string;
+    predecessors: string[];
+    successors: string[];
 }
 
 export interface ProviderTransactionSummary {
@@ -85,6 +87,5 @@ export interface Result {
     fundingStreamValue: string;
     variationReasons: string[];
 }
-
 
 
