@@ -56,7 +56,7 @@ export function MyPermissions() {
                         {adminUsers &&
                         <>
                             <p className="govuk-body">
-                                Administrators for the ${currentFundingStream?.fundingStreamName} funding stream are:
+                                Administrators for the {currentFundingStream?.fundingStreamName} funding stream are:
                             </p>
                             <ul className="govuk-list govuk-list--bullet">
                                 {adminUsers.map((user, index) =>
