@@ -22,6 +22,11 @@ import {getPermissionDescription} from "../../helpers/permissionsHelper";
 import {BackLink} from "../../components/BackLink";
 import {convertToSlug} from "../../helpers/stringHelper";
 import {milliseconds} from "../../helpers/TimeInMs";
+import {NotificationBanner} from "../../components/NotificationBanner";
+import {useConfirmLeavePage} from "../../hooks/useConfirmLeavePage";
+import _ from "lodash";
+import {buildPermissions} from "../../tests/fakes/testFactories";
+import {ConfirmationModal} from "../../components/ConfirmationModal";
 
 export function IndividualPermissionsAdmin() {
     const pageTitle = document.title = "Set and view user permissions";
@@ -60,17 +65,22 @@ export function IndividualPermissionsAdmin() {
     const [isLoadingUserPermissions, setIsLoadingUserPermissions] = useState<boolean>(false);
     const [isSaving, setIsSaving] = useState<boolean>(false);
     const [isRemoving, setIsRemoving] = useState<boolean>(false);
+    const [notification, setNotification] = useState<any | undefined>();
     const [user, setUser] = useState<UserSearchResultItem>();
     const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream>();
     const [selectedUserFundingStreamPermissions, setSelectedUserFundingStreamPermissions] = useState<FundingStreamPermissions>();
-    const [selectedUsersEnabledPermissions, setSelectedUsersEnabledPermissions] = useState<Permission[]>();
+    const [originalPermissions, setOriginalPermissions] = useState<Permission[]>();
+    const [editedPermissions, setEditedPermissions] = useState<Permission[]>();
     const history = useHistory();
+    useConfirmLeavePage(!_.isEqual(originalPermissions, editedPermissions))
 
 
     const onUserSelected = (name: string) => {
         clearErrorMessages();
+        setNotification(undefined);
         setUser(undefined);
-        setSelectedUsersEnabledPermissions(undefined);
+        setEditedPermissions(undefined);
+        setOriginalPermissions(undefined);
         if (!usersSearchResult?.users) return;
 
         const match = usersSearchResult.users.find(x => x.name === name);
@@ -79,22 +89,27 @@ export function IndividualPermissionsAdmin() {
 
     const onFundingStreamSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         clearErrorMessages();
-        setSelectedUsersEnabledPermissions(undefined);
+        setNotification(undefined);
+        setEditedPermissions(undefined);
+        setOriginalPermissions(undefined);
         setSelectedFundingStream(fundingStreamsForAdmin.find(fs => fs.id === e.target.value));
     }
 
     const onSubmitCriteria = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         clearErrorMessages();
+        setNotification(undefined);
 
         if (!user) {
             addError({error: "Select a user", fieldName: "user-select"})
-            setSelectedUsersEnabledPermissions(undefined);
+            setEditedPermissions(undefined);
+            setOriginalPermissions(undefined);
             return;
         }
         if (!selectedFundingStream) {
             addError({error: "Select a funding stream", fieldName: "fundingStream"})
-            setSelectedUsersEnabledPermissions(undefined);
+            setEditedPermissions(undefined);
+            setOriginalPermissions(undefined);
             return;
         }
 
@@ -104,10 +119,12 @@ export function IndividualPermissionsAdmin() {
             const permissions = response.data;
             setSelectedUserFundingStreamPermissions(permissions);
             const enabledPermissions: Permission[] = getEnabledPermissions(permissions);
-            setSelectedUsersEnabledPermissions(enabledPermissions);
+            setEditedPermissions(enabledPermissions);
+            setOriginalPermissions(enabledPermissions);
         } catch (e) {
             addError({error: e, description: "Error while fetching user's permissions"})
-            setSelectedUsersEnabledPermissions(undefined);
+            setEditedPermissions(undefined);
+            setOriginalPermissions(undefined);
         } finally {
             setIsLoadingUserPermissions(false);
         }
@@ -115,17 +132,18 @@ export function IndividualPermissionsAdmin() {
 
     const onChangePermission = (e: React.ChangeEvent<HTMLInputElement>) => {
         clearErrorMessages();
-        if (!selectedUsersEnabledPermissions || !selectedUserFundingStreamPermissions) return;
+        setNotification(undefined);
+        if (!editedPermissions || !selectedUserFundingStreamPermissions) return;
 
         const permissionName = e.target.value;
         const permission: Permission | undefined = permissionsToShow.find(p => p.toString() == permissionName);
         if (!permission) return;
 
-        const enabledBefore = selectedUsersEnabledPermissions.includes(permission);
+        const enabledBefore = editedPermissions.includes(permission);
         if (enabledBefore) {
-            setSelectedUsersEnabledPermissions(selectedUsersEnabledPermissions.filter(p => p !== permission));
+            setEditedPermissions(editedPermissions.filter(p => p !== permission));
         } else {
-            setSelectedUsersEnabledPermissions([...selectedUsersEnabledPermissions, permission]);
+            setEditedPermissions([...editedPermissions, permission]);
         }
         const updated = applyPermission(selectedUserFundingStreamPermissions, permission, !enabledBefore);
         setSelectedUserFundingStreamPermissions(updated);
@@ -133,32 +151,73 @@ export function IndividualPermissionsAdmin() {
 
     const onRemoveUserPermissions = async () => {
         clearErrorMessages();
+        setNotification(undefined);
+        if (isSaving || isRemoving || !user || !selectedFundingStream) return;
+
+        ConfirmationModal(<div className="govuk-row govuk-!-width-full">
+                Are you sure you want to remove all user permissions for {user.name} 
+                and delete them from the {selectedFundingStream.name} funding stream?
+            </div>,
+            removeUserPermissions,
+            "Yes, remove user permissions",
+            "No, stay on this page");
+    }
+
+    const removeUserPermissions = async () => {
         if (isSaving || isRemoving || !user || !selectedFundingStream) return;
 
         setIsRemoving(true);
 
         try {
             await userService.removeOtherUserFromFundingStream(user.id, selectedFundingStream.id);
+            setOriginalPermissions([]);
+            setEditedPermissions([]);
+            setSelectedUserFundingStreamPermissions(
+                buildPermissions({
+                    fundingStreamId: selectedFundingStream.id,
+                    fundingStreamName: selectedFundingStream.name,
+                    setAllPermsEnabled: false
+                })
+            );
+            setNotification(<>Removed <span id="user">{user.name}</span> from {selectedFundingStream.name} funding stream</>);
+            resetForm();
         } catch (e) {
             addError({error: e, description: "Error removing user's permissions, try again"})
         } finally {
             setIsRemoving(false);
         }
-    }
+        window.scrollTo(0, 0);
+    };
 
-    const onCancelEdit = async (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+
+    const onCancelEdit = (event: MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
         !!event && event.preventDefault();
         clearErrorMessages();
+        setNotification(undefined);
+
+        if (!_.isEqual(originalPermissions, editedPermissions)) {
+            ConfirmationModal(<div className="govuk-row govuk-!-width-full">
+                    Are you sure you want to leave without saving your changes?
+                </div>,
+                resetForm,
+                "Leave this page",
+                "Stay on this page");
+        } else {
+            resetForm();
+        }
+    };
+    
+    const resetForm = () => {
         setUser(undefined);
         setSelectedFundingStream(undefined);
-        setSelectedUsersEnabledPermissions(undefined)
-        setSelectedUserFundingStreamPermissions(undefined)
-    }
+        setEditedPermissions(undefined);
+        setSelectedUserFundingStreamPermissions(undefined);
+    };
 
     const onSaveUserPermissions = async () => {
         clearErrorMessages();
 
-        if (isSaving || isRemoving || !user || !selectedFundingStream || !selectedUsersEnabledPermissions || !selectedUserFundingStreamPermissions) return;
+        if (isSaving || isRemoving || !user || !selectedFundingStream || !editedPermissions || !selectedUserFundingStreamPermissions) return;
 
         setIsSaving(true);
 
@@ -166,12 +225,14 @@ export function IndividualPermissionsAdmin() {
             const response = await userService.updateOtherUsersPermissionsForFundingStream(selectedUserFundingStreamPermissions);
 
             setSelectedUserFundingStreamPermissions(response.data);
-            setSelectedUsersEnabledPermissions(getEnabledPermissions(response.data));
+            setEditedPermissions(getEnabledPermissions(response.data));
+            setNotification(<>Permissions updated for <span id="user">{user.name}</span> for {selectedFundingStream.name} funding stream</>)
         } catch (e) {
             addError({error: e, description: "Error saving changes, try again"})
         } finally {
             setIsSaving(false);
         }
+        window.scrollTo(0, 0);
     };
 
     const FundingStreamSelection = (props: {
@@ -253,6 +314,9 @@ export function IndividualPermissionsAdmin() {
                 </div>
             </div>
             }
+
+            {notification && <NotificationBanner title="Success" children={notification}/>}
+
             {fundingStreamsForAdmin?.length === 0 &&
             <WarningText
                 text="You don't have any admin permissions"
@@ -317,7 +381,7 @@ export function IndividualPermissionsAdmin() {
                                     <UserPermissionDisplay
                                         key={index}
                                         permission={p}
-                                        enabledPermissions={selectedUsersEnabledPermissions}
+                                        enabledPermissions={editedPermissions}
                                     />
                                 )}
                             </fieldset>

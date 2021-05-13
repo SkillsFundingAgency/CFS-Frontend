@@ -46,7 +46,7 @@ describe("<IndividualPermissionsAdmin/>", () => {
         });
 
         describe("when I select a user", () => {
-            
+
             beforeEach(() => {
                 const userSearchbox = screen.getByTestId("input-auto-complete");
 
@@ -67,7 +67,7 @@ describe("<IndividualPermissionsAdmin/>", () => {
             });
 
             describe("and when I select a funding stream and click Continue", () => {
-                
+
                 beforeEach(async () => {
                     const combobox = screen.getByRole("combobox", {name: /Select funding stream/i});
                     userEvent.selectOptions(combobox, mockFundingStream.name);
@@ -114,10 +114,8 @@ describe("<IndividualPermissionsAdmin/>", () => {
                 });
 
                 describe("and when I change a permission and click to save it", () => {
-                    
-                    it("calls the api correctly to save the updated permissions", async () => {
-                        const {updateOtherUsersPermissionsForFundingStream} = require('../../../services/userService');
-                        
+
+                    beforeEach(async () => {
                         const checkbox1 = screen.getByRole("checkbox", {name: Permission.CanCreateTemplates.toString()});
                         expect(checkbox1).toBeInTheDocument();
                         expect(checkbox1).toBeChecked();
@@ -134,29 +132,61 @@ describe("<IndividualPermissionsAdmin/>", () => {
                         expect(button).toBeEnabled();
 
                         await waitFor(() => userEvent.click(button));
-                        
-                        const expectedUpdate = buildPermissions({
-                            fundingStreamId: mockFundingStream.id,
-                            fundingStreamName: mockFundingStream.name,
-                            userId: mockUser.id,
-                            setAllPermsEnabled: false,
-                            actions: [p => p.canMapDatasets = true]
-                        });
-                        expect(updateOtherUsersPermissionsForFundingStream).toBeCalledWith(expectedUpdate);
                     });
+
+                    it("calls the api correctly to save the updated permissions and displays notification",
+                        async () => {
+                            const {updateOtherUsersPermissionsForFundingStream} = require('../../../services/userService');
+
+                            const expectedUpdate = buildPermissions({
+                                fundingStreamId: mockFundingStream.id,
+                                fundingStreamName: mockFundingStream.name,
+                                userId: mockUser.id,
+                                setAllPermsEnabled: false,
+                                actions: [p => p.canMapDatasets = true]
+                            });
+                            expect(updateOtherUsersPermissionsForFundingStream).toBeCalledWith(expectedUpdate);
+                            
+                            const banner = await screen.findByTestId("notification-banner");
+                            expect(banner).toBeInTheDocument();
+                            expect(within(banner).getByRole("heading", {name: "Success"})).toBeInTheDocument();
+                            expect(within(banner).getByText(/Permissions updated for/)).toBeInTheDocument();
+                            expect(within(banner).getByText(/user 537/)).toBeInTheDocument();
+                            expect(within(banner).getByText(/for Lalala funding stream/)).toBeInTheDocument();
+                        });
                 });
 
                 describe("and when I click to remove all of a user's permissions", () => {
-                    
-                    it("calls the api correctly to save the updated permissions", async () => {
-                        const {removeOtherUserFromFundingStream} = require('../../../services/userService');
 
+                    beforeEach(async () => {
                         const button = screen.getByRole("button", {name: /Remove user permissions/});
                         expect(button).toBeEnabled();
 
                         await waitFor(() => userEvent.click(button));
+                    });
+
+                    it("calls the api correctly to save the updated permissions and displays notification", async () => {
+                        const modal = await screen.findByTestId("modal-confirmation-placeholder");
+                        expect(modal).toBeInTheDocument();
+                        expect(within(modal).getByText(/Are you sure you want to remove all user permissions for/)).toBeInTheDocument();
+                        expect(within(modal).getByText(/user 537/)).toBeInTheDocument();
+                        expect(within(modal).getByText(/and delete them from the Lalala funding stream?/)).toBeInTheDocument();
+                        expect(within(modal).getByRole("button", {name: /No, stay on this page/})).toBeInTheDocument();
                         
+                        const button = screen.getByRole("button", {name: /Yes, remove user permissions/});
+                        expect(button).toBeEnabled();
+
+                        await waitFor(() => userEvent.click(button));
+
+                        const {removeOtherUserFromFundingStream} = require('../../../services/userService');
                         expect(removeOtherUserFromFundingStream).toBeCalledWith(mockUser.id, mockFundingStream.id);
+
+                        const banner = await screen.findByTestId("notification-banner");
+                        expect(banner).toBeInTheDocument();
+                        expect(within(banner).getByRole("heading", {name: "Success"})).toBeInTheDocument();
+                        expect(within(banner).getByText(/Removed/)).toBeInTheDocument();
+                        expect(within(banner).getByText(/user 537/)).toBeInTheDocument();
+                        expect(within(banner).getByText(/from Lalala funding stream/)).toBeInTheDocument();
                     });
                 });
             });
