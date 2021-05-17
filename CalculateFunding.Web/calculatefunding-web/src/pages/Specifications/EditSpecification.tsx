@@ -51,10 +51,13 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         useSpecificationPermissions(specificationId, [Permission.CanEditSpecification]);
 
     const {specification, isLoadingSpecification, clearSpecificationFromCache} =
-        useSpecificationSummary(specificationId, err => addError({
+    useSpecificationSummary(
+        specificationId,
+        err => addError({
             error: err,
             description: "Error while loading specification"
-        }));
+        }),
+        0);
 
     const fundingStreamId = specification && specification?.fundingStreams?.length > 0 ? specification?.fundingStreams[0]?.id : null;
     const fundingPeriodId = specification && specification?.fundingPeriod?.id;
@@ -353,7 +356,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                name="name"
                                aria-describedby="name-description"
                                type="text"
-                               value={selectedName}
+                               value={selectedName || ''}
                                onChange={handleSpecificationNameChange}/>
                     </div>
 
