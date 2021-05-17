@@ -498,6 +498,22 @@ namespace CalculateFunding.Frontend.Controllers
             return new NotFoundResult();
         }
 
+        [HttpGet]
+        [Route("api/datasets/reports/{specificationId}/report-metadata")]
+        public async Task<IActionResult> DownloadConverterWizardReportFile([FromRoute] string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<DatasetDownloadModel> apiResponse = await _datasetApiClient.DownloadConverterWizardReportFile(specificationId);
+
+            if (apiResponse.StatusCode == HttpStatusCode.OK && !string.IsNullOrWhiteSpace(apiResponse.Content?.Url))
+            {
+                return Redirect(apiResponse.Content.Url);
+            }
+
+            return new NotFoundResult();
+        }
+
         private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)
         {
             SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel

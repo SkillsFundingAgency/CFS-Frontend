@@ -185,6 +185,35 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task DownloadConverterWizardReportFile_GivenResponseIsSuccess_ReturnsSuccess()
+        {
+            // Arrange
+            string specificationId = "123";
+            DatasetDownloadModel responseModel = new DatasetDownloadModel
+            {
+                Url = "dataset-converter-wizard-report-url"
+            };
+
+            ApiResponse<DatasetDownloadModel> response = new ApiResponse<DatasetDownloadModel>(HttpStatusCode.OK, responseModel);
+
+            _apiClient
+                .DownloadConverterWizardReportFile(specificationId)
+                .Returns(response);
+
+            // Act
+            IActionResult result = await _controller.DownloadConverterWizardReportFile(specificationId);
+
+            // Assert
+            result
+                .Should()
+                .BeOfType<RedirectResult>()
+                .Subject
+                .Url
+                .Should()
+                .Be(responseModel.Url);
+        }
+
+        [TestMethod]
         public void ValidateDataset_GivenViewModelIsNull_ThrowsArgumentNullException()
         {
             // Act
