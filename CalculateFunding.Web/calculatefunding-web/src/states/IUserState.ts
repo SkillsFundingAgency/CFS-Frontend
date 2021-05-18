@@ -1,4 +1,5 @@
-import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
+import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
+
 
 export interface IUserState {
     isLoggedIn: boolean,

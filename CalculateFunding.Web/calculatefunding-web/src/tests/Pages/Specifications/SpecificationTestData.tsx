@@ -1,6 +1,6 @@
 import React from 'react';
 import {createStore, Store} from "redux";
-import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
+// import * as reduxState from "../../../reducers/rootReducer";
 import {render, screen, waitFor} from "@testing-library/react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import '@testing-library/jest-dom/extend-expect';
@@ -12,16 +12,22 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 import * as monitorHook from "../../../hooks/Jobs/useJobMonitor";
-import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as useLatestSpecificationJobWithMonitoringHook
+    from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobDetails} from "../../../types/jobDetails";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
-import * as redux from "react-redux";
 import {buildPermissions} from "../../fakes/testFactories";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../../types/Permission";
 import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
+import {Provider} from "react-redux";
+import {JobType} from "../../../types/jobType";
+import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
+import {JobMonitoringFilter} from "../../../hooks/Jobs/useJobMonitor";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
+import * as redux from "react-redux";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -37,9 +43,11 @@ export function SpecificationTestData() {
         const {CreateSpecification} = require('../../../pages/Specifications/CreateSpecification');
         const component = render(<MemoryRouter initialEntries={['/Specifications/CreateSpecification']}>
             <QueryClientProviderTestWrapper>
-                <Switch>
-                    <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
-                </Switch>
+                <Provider store={store}>
+                    <Switch>
+                        <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
+                    </Switch>
+                </Provider>
             </QueryClientProviderTestWrapper>
         </MemoryRouter>);
 
@@ -53,9 +61,11 @@ export function SpecificationTestData() {
         const {EditSpecification} = require('../../../pages/Specifications/EditSpecification');
         return render(<MemoryRouter initialEntries={[`/Specifications/EditSpecification/${mockSpecId}`]}>
             <QueryClientProviderTestWrapper>
-                <Switch>
-                    <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
-                </Switch>
+                <Provider store={store}>
+                    <Switch>
+                        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
+                    </Switch>
+                </Provider>
             </QueryClientProviderTestWrapper>
         </MemoryRouter>);
     };
@@ -64,9 +74,11 @@ export function SpecificationTestData() {
         const {EditSpecification} = require('../../../pages/Specifications/EditSpecification');
         const component = render(<MemoryRouter initialEntries={[`/Specifications/EditSpecification/${mockSpecId}`]}>
             <QueryClientProviderTestWrapper>
-                <Switch>
-                    <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
-                </Switch>
+                <Provider store={store}>
+                    <Switch>
+                        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
+                    </Switch>
+                </Provider>
             </QueryClientProviderTestWrapper>
         </MemoryRouter>);
 
@@ -345,23 +357,22 @@ export function SpecificationTestData() {
         });
     }
 
-    const hasMissingPermissionToCreate = () => {
-        const permissions = [buildPermissions({
-            fundingStreamId: mockFundingStream.id,
-            fundingStreamName: mockFundingStream.name,
-            setAllPermsEnabled: false
-        })];
-        useSelectorSpy.mockReturnValue(permissions);
+    const withJobMonitoringState: JobMonitoringFilter = {
+        jobTypes: [JobType.RefreshFundingJob],
+        specificationId: "1234"
     }
-    const hasCreatePermissions = () => {
-        const permissions = [buildPermissions({
-            fundingStreamId: mockFundingStream.id,
-            fundingStreamName: mockFundingStream.name,
-            setAllPermsEnabled: false,
-            actions: [p => p.canCreateSpecification = true]
-        })];
-        useSelectorSpy.mockReturnValue(permissions);
-    }
+
+    const withNoPermissions: FundingStreamPermissions[] = [buildPermissions({
+        fundingStreamId: mockFundingStream.id,
+        fundingStreamName: mockFundingStream.name,
+        setAllPermsEnabled: false
+    })];
+    const withCreatePermissions: FundingStreamPermissions[] = [buildPermissions({
+        fundingStreamId: mockFundingStream.id,
+        fundingStreamName: mockFundingStream.name,
+        setAllPermsEnabled: false,
+        actions: [p => p.canCreateSpecification = true]
+    })];
 
     const withoutPermissions: SpecificationPermissionsResult = {
         userId: "3456",
@@ -391,6 +402,30 @@ export function SpecificationTestData() {
         jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
     }
 
+    const hasReduxState = (mocks: {
+        permissions: FundingStreamPermissions[],
+        jobMonitorFilter?: JobMonitoringFilter
+    }) => {
+        const state: IStoreState = {
+            featureFlags: {
+                templateBuilderVisible: false,
+                releaseTimetableVisible: false,
+                enableReactQueryDevTool: false,
+                profilingPatternVisible: undefined
+            },
+            fundingSearchSelection: {searchCriteria: undefined, selectedProviderIds: []},
+            userState: {
+                isLoggedIn: true,
+                userName: "test-user",
+                hasConfirmedSkills: true,
+                fundingStreamPermissions: mocks.permissions
+            },
+            jobObserverState: {jobFilter: mocks.jobMonitorFilter}
+        }
+        useSelectorSpy.mockImplementation(callback => {
+            return callback(state);
+        });
+    }
 
     async function waitForPageToLoad() {
         const {getSpecificationSummaryService} = require('../../../services/specificationService');
@@ -428,13 +463,15 @@ export function SpecificationTestData() {
         coreProvider2: mockCoreProvider2,
         providerSnapshot1: mockProviderSnapshot1,
         providerSnapshot2: mockProviderSnapshot2,
-        hasCreatePermissions,
+        withCreatePermissions,
         hasEditPermissions,
-        hasMissingPermissionToCreate,
+        withNoPermissions,
         hasMissingPermissionToEdit,
         mockGetFundingConfigurationCall,
         mockGetFundingStreamsCall,
         mockGetPublishedTemplatesByStreamAndPeriodCall,
-        waitForPageToLoad
+        waitForPageToLoad,
+        withJobMonitoringState,
+        hasReduxState
     }
 }

@@ -5,9 +5,6 @@ import '@testing-library/jest-dom/extend-expect';
 import userEvent from "@testing-library/user-event";
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
 import {CalculationErrorQueryResult, ObsoleteItemType} from "../../../types/Calculations/CalculationError";
-import {CalculationType} from "../../../types/CalculationSearchResponse";
-import {CalculationValueType} from "../../../types/CalculationDetails";
-import {PublishStatus} from "../../../types/PublishStatusModel";
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 
 jest.mock("react-redux", () => ({
@@ -20,24 +17,20 @@ const calculationErrorsResult: CalculationErrorQueryResult = {
     clearCalculationErrorsFromCache(): Promise<void> {
         return Promise.resolve(undefined);
     },
+    calculationErrorCount: 0,
     errorCheckingForCalculationErrors: null,
     calculationErrors: [{
-        calculations: [{
-            calculationType: CalculationType.Additional,
-            calculationValueType: CalculationValueType.Number,
-            id: "Calc123",
-            name: "Test Calc 1",
-            status: PublishStatus.Approved,
-            version: 1
-        }],
+        title: 'title',
+        templateCalculations: [],
         codeReference: "",
         enumValueName: "",
-        fundingLineId: "",
+        fundingLineId: 1,
+        additionalCalculations: [],
         fundingStreamId: "",
         id: "",
         itemType: ObsoleteItemType.Calculation,
         specificationId: "Spec123",
-        templateCalculationId: "Temp123"
+        templateCalculationId: 1
     }],
     isLoadingCalculationErrors: false,
     haveErrorCheckingForCalculationErrors: false,
@@ -52,6 +45,7 @@ const testData = ViewSpecificationTestData();
 describe('<ViewSpecification /> ', () => {
     describe('choosing approved specification for funding ', () => {
         beforeEach(async () => {
+            testData.hasNoJobObserverState();
             testData.mockSpecificationPermissions();
             testData.mockApprovedSpecificationService();
             testData.mockFundingLineStructureService();

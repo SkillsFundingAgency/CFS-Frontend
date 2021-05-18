@@ -14,7 +14,10 @@ const test = SpecificationTestData();
 describe("<CreateSpecification />", () => {
     describe("<CreateSpecification /> with FDZ provider source", () => {
         beforeEach(async () => {
-            test.hasCreatePermissions();
+            test.hasReduxState({
+                permissions: test.withCreatePermissions,
+                jobMonitorFilter: undefined
+            });
             test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.ToLatest);
             test.mockSpecificationService();
             test.mockProviderService();

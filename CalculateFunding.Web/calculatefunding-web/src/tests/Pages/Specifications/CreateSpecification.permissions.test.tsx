@@ -11,12 +11,15 @@ describe("<CreateSpecification />", () => {
     describe("<CreateSpecification /> permissions tests", () => {
         describe("when no permissions defined at all", () => {
             beforeEach(async () => {
+                test.hasReduxState({
+                    permissions: test.withNoPermissions,
+                    jobMonitorFilter: undefined
+                });
                 test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
                 test.mockSpecificationService();
                 test.mockProviderService();
                 test.mockProviderVersionService();
                 test.haveNoJobRunning();
-                test.hasMissingPermissionToCreate();
 
                 await test.renderCreateSpecificationPage();
             });
@@ -31,12 +34,15 @@ describe("<CreateSpecification />", () => {
 
         describe("when user has permissions to create specification", () => {
             beforeEach(async () => {
+                test.hasReduxState({
+                    permissions: test.withCreatePermissions,
+                    jobMonitorFilter: undefined
+                });
                 test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
                 test.mockSpecificationService();
                 test.mockProviderService();
                 test.mockProviderVersionService();
                 test.haveNoJobRunning();
-                test.hasCreatePermissions();
 
                 await test.renderCreateSpecificationPage();
             });

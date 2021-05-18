@@ -5,13 +5,16 @@ import {SpecificationTestData} from "./SpecificationTestData";
 import userEvent from "@testing-library/user-event";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
-import { UpdateCoreProviderVersion } from '../../../types/Provider/UpdateCoreProviderVersion';
+import {UpdateCoreProviderVersion} from '../../../types/Provider/UpdateCoreProviderVersion';
 
 const test = SpecificationTestData();
 
 describe("<CreateSpecification /> with duplicated specification name", () => {
     beforeEach(async () => {
-        test.hasCreatePermissions();
+        test.hasReduxState({
+            permissions: test.withCreatePermissions,
+            jobMonitorFilter: undefined
+        });
         test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
         test.mockSpecificationServiceWithDuplicateNameResponse();
         test.mockProviderService();
@@ -24,8 +27,11 @@ describe("<CreateSpecification /> with duplicated specification name", () => {
 
     it("displays error response", async () => {
         const {createSpecificationService} = require('../../../services/specificationService');
-
-        const {getFundingStreamsService, getFundingConfiguration, getPublishedTemplatesByStreamAndPeriod} = require('../../../services/policyService');
+        const {
+            getFundingStreamsService,
+            getFundingConfiguration,
+            getPublishedTemplatesByStreamAndPeriod
+        } = require('../../../services/policyService');
         const {getCoreProvidersByFundingStream} = require('../../../services/providerVersionService');
         expect(screen.queryByTestId("error-summary")).not.toBeInTheDocument();
 

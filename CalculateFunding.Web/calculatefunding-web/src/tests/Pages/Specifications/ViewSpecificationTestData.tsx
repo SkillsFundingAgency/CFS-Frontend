@@ -5,19 +5,34 @@ import '@testing-library/jest-dom/extend-expect';
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {fullSpecPermissions} from "../../fakes/testFactories";
 import {FundingConfiguration} from "../../../types/FundingConfiguration";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
+import * as redux from "react-redux";
+import {Provider} from "react-redux";
+import {JobObserverState} from "../../../states/JobObserverState";
+import {JobType} from "../../../types/jobType";
+import {testSpec} from "../../Hooks/useSpecificationSummary.test";
+import {createStore, Store} from "redux";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
+
+const store: Store<IStoreState> = createStore(
+    rootReducer
+);
+
+store.dispatch = jest.fn();
 
 export function ViewSpecificationTestData() {
+    const useSelectorSpy = jest.spyOn(redux, 'useSelector');
     jest.mock("../../../components/AdminNav");
 
-    const sendFailedJobNotification = async() => {
+    const sendFailedJobNotification = async () => {
         jobMonitorSpy.mockReturnValue({
             hasJob: true,
             isCheckingForJob: false,
@@ -52,7 +67,8 @@ export function ViewSpecificationTestData() {
         approvalMode: ApprovalMode.All,
         providerSource: ProviderSource.CFS,
         defaultTemplateVersion: "",
-        enableConverterDataMerge: true
+        enableConverterDataMerge: true,
+        updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
     }
 
     function fundingConfigurationSpy() {
@@ -69,9 +85,11 @@ export function ViewSpecificationTestData() {
         const {ViewSpecification} = require('../../../pages/Specifications/ViewSpecification');
         const component = render(<MemoryRouter initialEntries={['/ViewSpecification/SPEC123']}>
             <QueryClientProvider client={new QueryClient()}>
-                <Switch>
-                    <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
-                </Switch>
+                <Provider store={store}>
+                    <Switch>
+                        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
+                    </Switch>
+                </Provider>
             </QueryClientProvider>
         </MemoryRouter>);
         await waitFor(() => {
@@ -84,9 +102,11 @@ export function ViewSpecificationTestData() {
         const {ViewSpecification} = require('../../../pages/Specifications/ViewSpecification');
         const component = render(<MemoryRouter initialEntries={['/ViewSpecification/SPEC123']}>
             <QueryClientProvider client={new QueryClient()}>
-                <Switch>
-                    <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
-                </Switch>
+                <Provider store={store}>
+                    <Switch>
+                        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
+                    </Switch>
+                </Provider>
             </QueryClientProvider>
         </MemoryRouter>);
         await waitFor(() => {
@@ -94,6 +114,19 @@ export function ViewSpecificationTestData() {
         });
         return component;
     };
+
+    const mockJobObserverState: JobObserverState = {
+        jobFilter: {
+            jobTypes: [JobType.RefreshFundingJob],
+            specificationId: testSpec.id
+        }
+    }
+    const mockNoJobObserverState: JobObserverState = {
+        jobFilter: undefined
+    }
+    const hasNoJobObserverState = () => {
+        useSelectorSpy.mockReturnValue(mockNoJobObserverState);
+    }
 
     const mockPublishService = () => {
         jest.mock("../../../services/publishService", () => {
@@ -256,6 +289,7 @@ export function ViewSpecificationTestData() {
         mockApprovedSpecificationService,
         mockFundingLineStructureService,
         mockDatasetBySpecificationIdService,
-        mockCalculationService
+        mockCalculationService,
+        hasNoJobObserverState
     }
 }

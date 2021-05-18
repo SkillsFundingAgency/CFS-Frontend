@@ -14,8 +14,11 @@ describe("<CreateSpecification />", () => {
 
     describe("<CreateSpecification /> with CFS provider source", () => {
         beforeEach(async () => {
+            test.hasReduxState({
+                permissions: test.withCreatePermissions,
+                jobMonitorFilter: undefined
+            });
             test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-            test.hasCreatePermissions();
             test.mockSpecificationService();
             test.mockProviderService();
             test.mockProviderVersionService();

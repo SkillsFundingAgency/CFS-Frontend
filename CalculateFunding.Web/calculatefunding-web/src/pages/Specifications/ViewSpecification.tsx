@@ -5,7 +5,7 @@ import {useEffect, useMemo, useState} from "react";
 import {Footer} from "../../components/Footer";
 import {Tabs} from "../../components/Tabs";
 import {Details} from "../../components/Details";
-import {getSpecificationsSelectedForFundingByPeriodAndStreamService, getSpecificationSummaryService} from "../../services/specificationService";
+import * as specificationService from  "../../services/specificationService";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {Section} from "../../types/Sections";
 import {Link} from "react-router-dom";
@@ -13,7 +13,7 @@ import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import {FeatureFlagsState} from "../../states/FeatureFlagsState";
 import {IStoreState} from "../../reducers/rootReducer";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {ConfirmationModal} from "../../components/ConfirmationModal";
 import * as QueryString from "query-string";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
@@ -41,6 +41,9 @@ import {Badge} from "../../components/Badge";
 import {CalculationErrors} from "../../components/Calculations/CalculationErrors";
 import {useCalculationErrors} from "../../hooks/Calculations/useCalculationErrors";
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
+import {JobMonitoringFilter, useJobMonitor} from '../../hooks/Jobs/useJobMonitor';
+import {JobObserverState} from '../../states/JobObserverState';
+import * as action from "../../actions/jobObserverActions";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -48,6 +51,7 @@ export interface ViewSpecificationRoute {
 
 export function ViewSpecification({match}: RouteComponentProps<ViewSpecificationRoute>) {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
+    const jobObserverState: JobObserverState = useSelector<IStoreState, JobObserverState>(state => state.jobObserverState);
     const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
     const initialSpecification: SpecificationSummary = {
         coreProviderVersionUpdates: undefined,
@@ -80,15 +84,23 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [initialTab, setInitialTab] = useState<string>("");
     const {missingPermissions, hasPermission, isPermissionsFetched} =
         useSpecificationPermissions(match.params.specificationId, [Permission.CanApproveSpecification, Permission.CanChooseFunding, Permission.CanApproveAllCalculations]);
-    const canApproveAllCalculations: boolean = useMemo(() => 
-        (hasPermission !== undefined && hasPermission(Permission.CanApproveAllCalculations)) === true, [isPermissionsFetched]);
-    const canApproveSpecifications: boolean = useMemo(() => 
+    const canApproveAllCalculations: boolean = useMemo(() =>
+        !!(hasPermission && hasPermission(Permission.CanApproveAllCalculations)), [isPermissionsFetched]);
+    const canApproveSpecifications: boolean = useMemo(() =>
         hasPermission(Permission.CanApproveSpecification) === true, [isPermissionsFetched]);
-    const canChooseForFunding: boolean = useMemo(() => 
+    const canChooseForFunding: boolean = useMemo(() =>
         hasPermission(Permission.CanChooseFunding) === true, [isPermissionsFetched]);
     const [initiatedRefreshFundingJobId, setInitiatedRefreshFundingJobId] = useState<string>("");
     const history = useHistory();
+    const dispatch = useDispatch();
     const location = useLocation();
+
+    const {newJob: observedJob} =
+        useJobMonitor({
+        filterBy: jobObserverState.jobFilter as JobMonitoringFilter,
+        isEnabled: !!jobObserverState.jobFilter,
+        onError: e => addError({error: e, description: "Error while trying to monitor background jobs"})
+    })
 
     const {hasJob, latestJob: approveAllCalculationsJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
@@ -100,7 +112,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             [JobType.RefreshFundingJob],
             err => addError({error: err, description: "Error while checking for refresh funding job"}));
 
-    const {latestJob: converterWizardJob, isCheckingForJob: isCheckingForConverterWizardJob, hasJob: hasConverterWizardJob} =
+    const {
+        latestJob: converterWizardJob,
+        isCheckingForJob: isCheckingForConverterWizardJob,
+        hasJob: hasConverterWizardJob
+    } =
         useLatestSpecificationJobWithMonitoring(specificationId,
             [JobType.RunConverterDatasetMergeJob],
             err => addError({error: err, description: "Error while checking for converter wizard running jobs"}));
@@ -109,7 +125,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         calculationErrors,
         isLoadingCalculationErrors,
         calculationErrorCount
-    } = useCalculationErrors(specificationId, err => {addError({error:err, description: "Error while checking for calculation errors"})})
+    } = useCalculationErrors(specificationId, err => {
+        addError({error: err, description: "Error while checking for calculation errors"})
+    })
 
     const {fundingConfiguration} =
         useFundingConfiguration(specification.fundingStreams[0].id, specification.fundingPeriod.id,
@@ -144,6 +162,18 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     useEffect(() => {
         setReleaseTimetableIsEnabled(featureFlagsState.releaseTimetableVisible);
     }, [featureFlagsState.releaseTimetableVisible]);
+    useEffect(() => {
+        if (!observedJob || observedJob.isActive) return;
+        if (observedJob.isComplete) {
+            if (observedJob.isFailed) {
+                addError({
+                    error: observedJob.outcome ?? 'An unknown error occurred',
+                    description: 'A background job failed'
+                })
+            }
+            dispatch(action.clearJobObserverState());
+        }
+    }, [observedJob]);
 
     useEffect(() => {
         document.title = "Specification Results - Calculate funding";
@@ -153,14 +183,15 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     const fetchData = async () => {
         try {
-            const spec: SpecificationSummary = (await getSpecificationSummaryService(specificationId)).data;
+            const spec: SpecificationSummary = (await specificationService.getSpecificationSummaryService(specificationId)).data;
             setSpecification(spec);
 
             if (spec.isSelectedForFunding) {
                 setSelectedForFundingSpecId(spec.id);
             } else {
                 await spec.fundingStreams.some(async (stream) => {
-                    const result = await getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id);
+                    const result = await specificationService
+                        .getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id);
                     const selectedSpecs = result.data;
                     const hasAnySelectedForFunding = selectedSpecs !== null && selectedSpecs.length > 0;
                     if (hasAnySelectedForFunding) {
@@ -294,7 +325,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <Breadcrumb name={specification.name}/>
             </Breadcrumbs>
 
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+            <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
             <MultipleErrorSummary errors={errors}/>
 
@@ -308,7 +339,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob}/>
                 {hasJob && !isApprovingAllCalculations && <JobProgressNotificationBanner
                     job={approveAllCalculationsJob} displaySuccessfulJob={displayApproveAllJobStatus}/>}
-                {hasConverterWizardJob && <JobProgressNotificationBanner job={converterWizardJob} />}
+                {hasConverterWizardJob && <JobProgressNotificationBanner job={converterWizardJob}/>}
             </div>}
 
             <div className="govuk-grid-row" hidden={isApprovingAllCalculations || isRefreshFundingInProgress}>
@@ -366,7 +397,9 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <ul className="govuk-tabs__list">
                             <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
                             <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
-                            {isLoadingCalculationErrors || calculationErrorCount === 0 ? "" : <Tabs.Tab label="calculation-errors">Calculations errors<Badge errorCount={calculationErrorCount} /></Tabs.Tab>}
+                            {isLoadingCalculationErrors || calculationErrorCount === 0 ? "" :
+                                <Tabs.Tab label="calculation-errors">Calculations errors<Badge
+                                    errorCount={calculationErrorCount}/></Tabs.Tab>}
                             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
                             <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
                             <Tabs.Tab hidden={!specification.isSelectedForFunding} data-testid={"variations-tab"}

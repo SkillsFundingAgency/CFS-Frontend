@@ -6,7 +6,6 @@ import userEvent from "@testing-library/user-event";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {CreateSpecificationModel} from "../../../types/Specifications/CreateSpecificationModel";
-import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 import { UpdateCoreProviderVersion } from '../../../types/Provider/UpdateCoreProviderVersion';
 
 const test = SpecificationTestData();
@@ -14,7 +13,10 @@ const test = SpecificationTestData();
 describe("<CreateSpecification />", () => {
     describe("<CreateSpecification /> with FDZ provider source", () => {
         beforeEach(async () => {
-            test.hasCreatePermissions();
+            test.hasReduxState({
+                permissions: test.withCreatePermissions,
+                jobMonitorFilter: undefined
+            });
             test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
             test.mockSpecificationService();
             test.mockProviderService();

@@ -15,8 +15,20 @@ import {FundingStreamWithSpecificationSelectedForFunding} from "../../../types/S
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 import {JobOutcomeType} from "../../../types/jobDetails";
 import * as specHook from "../../../hooks/useSpecificationSummary";
+import {JobObserverState} from "../../../states/JobObserverState";
+import * as redux from "react-redux";
+import {createStore, Store} from "redux";
+import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
+
+const store: Store<IStoreState> = createStore(
+    rootReducer
+);
+
+store.dispatch = jest.fn();
 
 export const FundingApprovalTestSetup = () => {
+    const useSelectorSpy = jest.spyOn(redux, 'useSelector');
     jest.mock("../../../components/AdminNav");
     const fundingStream1: FundingStream = {
         name: "WIZZ1",
@@ -60,7 +72,9 @@ export const FundingApprovalTestSetup = () => {
         isSelectedForFunding: true,
         providerVersionId: "",
         dataDefinitionRelationshipIds: [],
-        templateIds: {}
+        templateIds: {},
+        coreProviderVersionUpdates: undefined,
+        providerSnapshotId: 34
     };
     const testSpec2: SpecificationSummary = {
         name: "Dark Arts",
@@ -72,7 +86,9 @@ export const FundingApprovalTestSetup = () => {
         isSelectedForFunding: true,
         providerVersionId: "",
         dataDefinitionRelationshipIds: [],
-        templateIds: {}
+        templateIds: {},
+        coreProviderVersionUpdates: undefined,
+        providerSnapshotId: 42
     };
     const mockFundingConfigWithApprovalBatchMode: FundingConfigurationQueryResult = {
         fundingConfiguration: {
@@ -81,7 +97,8 @@ export const FundingApprovalTestSetup = () => {
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod2.id,
             fundingStreamId: fundingStream2.id,
-            enableConverterDataMerge: false
+            enableConverterDataMerge: false,
+            updateCoreProviderVersion: UpdateCoreProviderVersion.Manual
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -94,7 +111,8 @@ export const FundingApprovalTestSetup = () => {
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod1.id,
             fundingStreamId: fundingStream1.id,
-            enableConverterDataMerge: false
+            enableConverterDataMerge: false,
+            updateCoreProviderVersion: UpdateCoreProviderVersion.Manual
         },
         isLoadingFundingConfiguration: false,
         isErrorLoadingFundingConfiguration: false,
@@ -213,6 +231,13 @@ export const FundingApprovalTestSetup = () => {
         isFetching: false,
         isMonitoring: true
     };
+
+    const mockNoJobObserverState: JobObserverState = {
+        jobFilter: undefined
+    }
+    const hasNoJobObserverState = () => {
+        useSelectorSpy.mockReturnValue(mockNoJobObserverState);
+    }
     const mockPublishedProviderService = () => {
         jest.mock("../../../services/publishedProviderService", () => {
             const mockService = jest.requireActual("../../../services/publishedProviderService");
@@ -251,7 +276,8 @@ export const FundingApprovalTestSetup = () => {
             errorCheckingForSpecification: null,
             haveErrorCheckingForSpecification: false,
             isFetchingSpecification: false,
-            isSpecificationFetched: true
+            isSpecificationFetched: true,
+            clearSpecificationFromCache: () => Promise.resolve(),
         }));
 
     return {

@@ -4,7 +4,9 @@ import {IStoreState} from "../../reducers/rootReducer";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 
 export const usePermittedFundingStreams = (forPermission: UserPermission): string[] => {
-    const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
+    const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => {
+        return state.userState.fundingStreamPermissions
+    });
 
     const permittedStreams = (requiredPermission: keyof typeof UserPermission): string[] => {
         return permissions

@@ -27,6 +27,9 @@ import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificat
 import {Permission} from "../../types/Permission";
 import {BackLink} from "../../components/BackLink";
 import {UpdateCoreProviderVersion} from "../../types/Provider/UpdateCoreProviderVersion";
+import {useDispatch} from 'react-redux';
+import * as action from "../../actions/jobObserverActions";
+import {JobMonitoringFilter} from '../../hooks/Jobs/useJobMonitor';
 
 export interface EditSpecificationRouteProps {
     specificationId: string;
@@ -54,8 +57,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     useSpecificationSummary(
         specificationId,
         err => addError({
-            error: err,
-            description: "Error while loading specification"
+                error: err,
+                description: "Error while loading specification"
         }));
 
     const fundingStreamId = specification && specification?.fundingStreams?.length > 0 ? specification?.fundingStreams[0]?.id : null;
@@ -111,7 +114,10 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
     );
 
     const [templateVersionData, setTemplateVersionData] = useState<NameValuePair[]>([]);
-    const {data: publishedFundingTemplates, isLoading: isLoadingPublishedFundingTemplates} = useQuery<PublishedFundingTemplate[], AxiosError>(
+    const {
+        data: publishedFundingTemplates,
+        isLoading: isLoadingPublishedFundingTemplates
+    } = useQuery<PublishedFundingTemplate[], AxiosError>(
         `published-funding-templates-for-${fundingStreamId}-${fundingPeriodId}`,
         async () => (await policyService.getPublishedTemplatesByStreamAndPeriod(fundingStreamId as string, fundingPeriodId as string)).data,
         {
@@ -132,6 +138,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
 
     const [isUpdating, setIsUpdating] = useState(false);
     const history = useHistory();
+    const dispatch = useDispatch();
     const {errors, addError, clearErrorMessages} = useErrors();
     const errorSuggestion = <p>If the problem persists please contact the <a
         href="https://dfe.service-now.com/serviceportal" className="govuk-link">helpdesk</a></p>;
@@ -188,7 +195,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 addError({error: "Missing core provider version", fieldName: "selectCoreProvider"});
                 isValid = false;
             }
-            if (providerSource === ProviderSource.FDZ && fundingConfiguration?.updateCoreProviderVersion !== UpdateCoreProviderVersion.Manual &&  enableTrackProviderData === undefined) {
+            if (providerSource === ProviderSource.FDZ && fundingConfiguration?.updateCoreProviderVersion !== UpdateCoreProviderVersion.Manual && enableTrackProviderData === undefined) {
                 addError({
                     error: "Please select whether you want to track latest core provider data",
                     fieldName: "trackProviderData"
@@ -233,6 +240,13 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 await specificationService.updateSpecificationService(updateSpecificationViewModel, specificationId);
                 setIsUpdating(false);
                 await clearSpecificationFromCache();
+                const jobMonitoringFilter: JobMonitoringFilter = {
+                    specificationId: specificationId,
+                    jobTypes: [JobType.AssignTemplateCalculationsJob, JobType.ProviderSnapshotDataLoadJob],
+                    includeChildJobs: false,
+                    jobId: undefined
+                }
+                dispatch(action.upsertJobObserverState(jobMonitoringFilter));
                 history.push(`/ViewSpecification/${specificationId}`);
             } catch (error) {
                 if (error.response && error.response.data["Name"] !== undefined) {
@@ -339,7 +353,8 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                                description={isUpdating ? "This can take a few minutes" : ""}/>
                 }
                 {!isLoading && !isUpdating && (!hasJob || latestJob?.isComplete) &&
-                <fieldset className="govuk-fieldset" id="update-specification-fieldset" data-testid="edit-specification-form">
+                <fieldset className="govuk-fieldset" id="update-specification-fieldset"
+                          data-testid="edit-specification-form">
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                         <h1 className="govuk-fieldset__heading">
                             Edit specification
@@ -504,7 +519,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 }
                 {!isUpdating &&
                 <div className="govuk-form-group">
-                    <BackLink to={`/ViewSpecification/${specificationId}`} />
+                    <BackLink to={`/ViewSpecification/${specificationId}`}/>
                 </div>
                 }
             </div>

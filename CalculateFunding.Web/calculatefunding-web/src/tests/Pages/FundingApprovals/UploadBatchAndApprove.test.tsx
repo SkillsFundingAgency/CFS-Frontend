@@ -37,7 +37,6 @@ const renderPage = () => {
         </QueryClientProvider>
     </MemoryRouter>);
 };
-const useSelectorSpy = jest.spyOn(redux, 'useSelector');
 const useDispatchSpy = jest.spyOn(redux, 'useDispatch');
 
 describe("<UploadBatch />", () => {
