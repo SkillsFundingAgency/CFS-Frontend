@@ -42,18 +42,13 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
 
         return (
             <>
-                <div className="govuk-grid-row govuk-!-margin-left-1 govuk-!-margin-right-1">
-                    <div className="govuk-grid-column-full">
-                        <BackLink to={`/Approvals/SpecificationFundingApproval/${props.routingParams.fundingStreamId}/${props.routingParams.fundingPeriodId}/${props.specification.id}`}/>
-                    </div>
-                </div>
-                <div className="govuk-grid-row  govuk-!-margin-bottom-4">
+                <div className="govuk-grid-row">
                     <div className="govuk-grid-column-three-quarters">
                         <table className="govuk-table" aria-label="funding-summary-table">
+                            <caption className="govuk-table__caption">Funding approval information</caption>
                             <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
-                                <th scope="col" className="govuk-table__header">
-                                </th>
+                                <th scope="col" className="govuk-table__header">Description</th>
                                 <th scope="col" className="govuk-table__header">Summary</th>
                                 <th scope="col" className="govuk-table__header govuk-table__header--numeric">Amount</th>
                             </tr>
@@ -102,7 +97,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                 </div>
 
                 {props.approvalMode === ApprovalMode.Batches && !props.isWaitingForJob &&
-                <div className="govuk-grid-row govuk-!-margin-bottom-9">
+                <div className="govuk-grid-row govuk-!-margin-bottom-7">
                     <div className="govuk-grid-column-three-quarters">
                         <Link to={`/Approvals/SpecificationFundingApproval/${props.routingParams.fundingStreamId}/${props.routingParams.fundingPeriodId}/${props.specification.id}`}
                               className="govuk-link govuk-link--no-visited-state right-align">

@@ -80,6 +80,7 @@ describe("<UploadBatch />", () => {
         beforeEach(async () => {
             testData.hasNoActiveJobsRunning();
             testData.hasFundingConfigWithApproveBatchMode();
+            testData.hasSpecification();
             const file = new File(['hello'], 'hello.png', {type: 'image/png'})
 
             renderPage();

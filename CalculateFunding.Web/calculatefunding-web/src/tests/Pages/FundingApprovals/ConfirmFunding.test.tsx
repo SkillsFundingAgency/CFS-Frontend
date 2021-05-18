@@ -92,7 +92,7 @@ describe("<ConfirmFunding />", () => {
             });
 
             it('renders warning message', async () => {
-                expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+                expect(screen.getByText("The provider amount shown might not be up to date")).toBeInTheDocument();
             });
 
             it('renders approve button as disabled', async () => {
@@ -143,7 +143,7 @@ describe("<ConfirmFunding />", () => {
             });
 
             it('renders warning message', async () => {
-                expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+                expect(screen.getByText("The provider amount shown might not be up to date")).toBeInTheDocument();
             });
 
             it('renders funding summary section', async () => {
@@ -210,9 +210,7 @@ describe("<ConfirmFunding />", () => {
 
             it('renders warning message', async () => {
                 await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
-                const fundingSummarySection = screen.getByTestId("funding-summary-section");
-                expect(within(fundingSummarySection)
-                    .getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+                expect(screen.getByText("The provider amount shown might not be up to date")).toBeInTheDocument();
             });
 
             it('renders funding summary table', async () => {
@@ -257,12 +255,14 @@ describe("<ConfirmFunding />", () => {
             });
             afterEach(() => jest.clearAllMocks());
 
-            it('calls api to approve the batch', async () => {
+            it('calls api to approve the batch given use has ticked acknowledgement box', async () => {
                 await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
                 const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
+                const acknowledgementCheckbox = screen.getByTestId("acknowledgementCheckbox") as HTMLInputElement;
 
+                userEvent.click(acknowledgementCheckbox);
                 userEvent.click(button);
 
                 const {approveProvidersFundingService} = require('../../../services/publishService');
@@ -271,12 +271,27 @@ describe("<ConfirmFunding />", () => {
                 });
             });
 
-            it('displays back button instead of confirm button', async () => {
+            it('displays error given use has not ticked acknowledgement box', async () => {
                 await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
                 const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
 
+                userEvent.click(button);
+
+                await waitFor(() => {
+                    expect(screen.getByText("You must acknowledge that you understand the provider amount shown might not be up to date")).toBeInTheDocument();
+                });
+            });
+
+            it('displays back button instead of confirm button', async () => {
+                await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
+                const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
+                expect(button).toBeInTheDocument();
+                expect(button).toBeEnabled();
+                const acknowledgementCheckbox = screen.getByTestId("acknowledgementCheckbox") as HTMLInputElement;
+
+                userEvent.click(acknowledgementCheckbox);
                 userEvent.click(button);
 
                 const {approveProvidersFundingService} = require('../../../services/publishService');
@@ -291,7 +306,9 @@ describe("<ConfirmFunding />", () => {
                 const button = screen.queryByRole("button", {name: /Confirm approval/}) as HTMLButtonElement;
                 expect(button).toBeInTheDocument();
                 expect(button).toBeEnabled();
+                const acknowledgementCheckbox = screen.getByTestId("acknowledgementCheckbox") as HTMLInputElement;
 
+                userEvent.click(acknowledgementCheckbox);
                 userEvent.click(button);
 
                 const {approveProvidersFundingService} = require('../../../services/publishService');
@@ -336,7 +353,7 @@ describe("<ConfirmFunding />", () => {
             });
 
             it('renders warning message', async () => {
-                expect(screen.getByText("Approved funding values can change when data or calculations are altered. If the funding values change, their status will become ‘updated’ and they will need to be approved again.")).toBeInTheDocument();
+                expect(screen.getByText("The provider amount shown might not be up to date")).toBeInTheDocument();
             });
 
             it('does not render funding summary table', async () => {

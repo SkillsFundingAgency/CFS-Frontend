@@ -49,6 +49,7 @@ describe("<UploadBatch />", () => {
             testData.hasFundingConfigWithApproveBatchMode();
             testData.mockPublishedProviderService();
             testData.hasLatestJob(testData.successfulValidationJob);
+            testData.hasSpecification();
 
             renderPage();
 

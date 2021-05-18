@@ -68,10 +68,11 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(match.params.fundingStreamId, match.params.fundingPeriodId,
             err => addError({error: err, description: `Error while loading funding configuration`}));
-    const {errors, addError} = useErrors();
+    const {errors, addError, clearErrorMessages} = useErrors();
     const [fundingSummary, setFundingSummary] = useState<PublishedProviderFundingCount>();
     const [jobId, setJobId] = useState<string>("");
     const [isConfirming, setIsConfirming] = useState<boolean>(false);
+    const [acknowledge, setAcknowledge] = useState<boolean>(false);
     const isLoading = useMemo(() =>
         isConfirming ||
         specification === undefined ||
@@ -150,7 +151,16 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
         dispatch(initialiseFundingSearchSelection(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId));
     }, [match.params]);
 
+    const handleAcknowledge = async () => {
+        setAcknowledge(!acknowledge)
+    }
     const handleConfirm = async () => {
+        clearErrorMessages();
+        if (!acknowledge)
+        {
+            addError({fieldName: "acknowledge", error: "You must acknowledge that you understand the provider amount shown might not be up to date"});
+            return;
+        }
         if (!fundingConfiguration) {
             return;
         }
@@ -175,7 +185,6 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
             setIsConfirming(false);
         }
     }
-
 
     return (
         <div>
@@ -226,44 +235,11 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 </div>
                 }
 
-                {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
-                && latestJob.lastUpdated < specificationLastUpdatedDate &&
-                <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
-                    <div className="govuk-summary-list__row">
-                        <dt className="govuk-summary-list__key">
-                            Last refresh
-                        </dt>
-                        <dd className="govuk-summary-list__value" data-testid="last-refresh">
-                            <DateTimeFormatter date={latestJob.lastUpdated}/>
-                            <span> by {latestJob.invokerUserDisplayName}</span>
-                        </dd>
-                    </div>
-                    <div className="govuk-summary-list__row">
-                        <dt className="govuk-summary-list__key">
-                            Last calculation results update
-                        </dt>
-                        <dd className="govuk-summary-list__value" data-testid="last-calculation-results"><DateTimeFormatter
-                            date={specificationLastUpdatedDate}
-                        />
-                        </dd>
-                    </div>
-                </dl>
-                }
 
-                {fundingConfiguration && specification && hasPermissionToApprove !== undefined && hasPermissionToRelease !== undefined &&
+
+                {fundingConfiguration && specification && hasPermissionToApprove !== undefined
+                && hasPermissionToRelease !== undefined &&
                 <section data-testid="funding-summary-section">
-                    <div className="govuk-grid-row govuk-!-margin-bottom-3">
-                        <div className="govuk-grid-column-three-quarters">
-                            <div className="govuk-warning-text">
-                                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                <strong className="govuk-warning-text__text">
-                                    <span className="govuk-warning-text__assistive">Warning</span>
-                                    Approved funding values can change when data or calculations are altered. If the funding values change, their
-                                    status will become ‘updated’ and they will need to be approved again.
-                                </strong>
-                            </div>
-                        </div>
-                    </div>
                     <FundingConfirmationSummary
                         routingParams={match.params}
                         approvalMode={fundingConfiguration.approvalMode}
@@ -288,20 +264,62 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                         </div>
                     </div>
                     :
-                    <div className="govuk-grid-row govuk-!-margin-right-0">
-                        <div className="govuk-grid-column-three-quarters">
-                            <button data-prevent-double-click="true"
-                                    className="govuk-button govuk-!-margin-right-1"
-                                    data-module="govuk-button"
-                                    disabled={isLoading || isWaitingForJob || !fundingSummary}
-                                    onClick={handleConfirm}>
-                                Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
-                            </button>
-                            <a className="govuk-button govuk-button--secondary"
-                               data-module="govuk-button"
-                               onClick={() => history.goBack()}>
-                                Cancel
-                            </a>
+                    <div className="govuk-grid-row">
+                        <div className="govuk-grid-column-full">
+                                <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "acknowledge").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                                    <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
+                                        <legend className="govuk-fieldset__legend">
+                                            <div className="govuk-warning-text">
+                                                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                                <strong className="govuk-warning-text__text">
+                                                    <span className="govuk-warning-text__assistive">Warning</span>
+                                                    The provider amount shown might not be up to date
+                                                </strong>
+                                            </div>
+                                        </legend>
+                                        <ul className="govuk-list govuk-list--bullet">
+                                            {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
+                                            && latestJob.lastUpdated < specificationLastUpdatedDate &&
+                                            <li data-testid="last-refresh">
+                                                Providers were last refreshed <DateTimeFormatter date={latestJob.lastUpdated}/> by {latestJob.invokerUserDisplayName}</li>
+                                            }
+                                            {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
+                                            && latestJob.lastUpdated < specificationLastUpdatedDate &&
+                                            <li data-testid="last-calculation-results">Total provider amount was last calculated <DateTimeFormatter
+                                                date={specificationLastUpdatedDate}/></li>
+                                            }
+                                            <li>Selected providers may not appear in the provider count due to; provider
+                                                record missing from funding data, providers currently in error state or
+                                                providers already set as approved or released
+                                            </li>
+                                        </ul>
+                                        <div className="govuk-checkboxes">
+                                            <div className="govuk-checkboxes__item">
+                                                <input className="govuk-checkboxes__input"
+                                                       name="acknowledgementCheckbox" type="checkbox"
+                                                       data-testid="acknowledgementCheckbox"
+                                                       checked={acknowledge} onChange={handleAcknowledge} />
+                                                    <label className="govuk-label govuk-checkboxes__label"
+                                                           htmlFor="acknowledgementCheckbox">
+                                                        I acknowledge that the total provider amount shown may not be up to date
+                                                    </label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+
+                                <button data-prevent-double-click="true"
+                                        className="govuk-button govuk-!-margin-right-1"
+                                        data-module="govuk-button"
+                                        disabled={isLoading || isWaitingForJob || !fundingSummary}
+                                        onClick={handleConfirm}>
+                                    Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
+                                </button>
+                                <a className="govuk-button govuk-button--secondary"
+                                   data-module="govuk-button"
+                                   onClick={() => history.goBack()}>
+                                    Cancel
+                                </a>
                         </div>
                     </div>
                 }
