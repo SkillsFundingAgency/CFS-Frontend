@@ -155,7 +155,10 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
             window.scrollTo(0, 0);
             const axiosError = error as AxiosError;
             if (axiosError && axiosError.response && axiosError.response.status === 400) {
-                addValidationErrors({validationErrors: axiosError.response.data, message: "Error trying to refresh funding"});
+                addValidationErrors({
+                    validationErrors: axiosError.response.data,
+                    message: "Error trying to refresh funding"
+                });
             } else {
                 addError({error: error, description: `Error trying to refresh funding`});
             }
@@ -248,8 +251,16 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 {!isLoadingSpecification && specification &&
                 <div className="govuk-grid-row govuk-!-margin-bottom-5">
                     <div className="govuk-grid-column-two-thirds">
-                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1" data-testid="specName"> {specification.name} </h1>
-                        <span className="govuk-caption-l" data-testid="fundingDetails">{specification && specification?.fundingStreams?.length > 0 && specification.fundingStreams[0].name} for {specification && specification.fundingPeriod.name}</span>
+                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1" data-testid="specName">
+                            {specification.name}
+                        </h1>
+                        {specification?.fundingStreams?.length > 0 && specification?.fundingPeriod?.name &&
+                            <span className="govuk-caption-l"
+                                  data-testid="fundingDetails">
+                                {specification.fundingStreams[0].name} {' '}
+                                for {specification && specification.fundingPeriod.name}
+                            </span>
+                        }
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <ul className="govuk-list right-align">
@@ -276,7 +287,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                             </li>
                             {lastRefresh &&
                             <p className="govuk-body-s govuk-!-margin-bottom-0">
-                                Last refresh <DateTimeFormatter date={lastRefresh as Date} />
+                                Last refresh <DateTimeFormatter date={lastRefresh as Date}/>
                             </p>
                             }
                         </ul>
@@ -285,7 +296,8 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                 }
 
                 <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-one-third" hidden={(latestJob && latestJob.isActive) || isCheckingForJob || isLoadingRefresh}>
+                    <div className="govuk-grid-column-one-third"
+                         hidden={(latestJob && latestJob.isActive) || isCheckingForJob || isLoadingRefresh}>
                         <PublishedProviderSearchFilters
                             facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
                             numberOfProvidersWithErrors={0}

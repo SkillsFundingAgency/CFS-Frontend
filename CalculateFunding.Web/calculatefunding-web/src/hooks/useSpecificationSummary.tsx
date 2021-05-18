@@ -16,7 +16,7 @@ export type SpecificationSummaryQueryResult = {
 
 export const useSpecificationSummary = (specificationId: string,
                                         onError: (err: AxiosError) => void,
-                                        staleTime: number = milliseconds.OneHour)
+                                        staleTime: number = 0)
     : SpecificationSummaryQueryResult => {
 
     const config: UseQueryOptions<SpecificationSummary, AxiosError> = {

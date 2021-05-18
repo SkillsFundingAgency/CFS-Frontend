@@ -56,8 +56,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
         err => addError({
             error: err,
             description: "Error while loading specification"
-        }),
-        0);
+        }));
 
     const fundingStreamId = specification && specification?.fundingStreams?.length > 0 ? specification?.fundingStreams[0]?.id : null;
     const fundingPeriodId = specification && specification?.fundingPeriod?.id;
