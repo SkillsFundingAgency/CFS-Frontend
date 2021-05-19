@@ -8,9 +8,6 @@ import {RunningStatus} from "../../../types/RunningStatus";
 import {Permission} from "../../../types/Permission";
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 import {CalculationErrorQueryResult, ObsoleteItemType} from "../../../types/Calculations/CalculationError";
-import {CalculationType} from "../../../types/CalculationSearchResponse";
-import {CalculationValueType} from "../../../types/CalculationDetails";
-import {PublishStatus} from "../../../types/PublishStatusModel";
 
 jest.mock("react-redux", () => ({
     ...jest.requireActual("react-redux"),
@@ -25,28 +22,23 @@ const calculationErrorsResult: CalculationErrorQueryResult = {
     },
     errorCheckingForCalculationErrors: null,
     calculationErrors: [{
-        calculations: [{
-            calculationType: CalculationType.Additional,
-            calculationValueType: CalculationValueType.Number,
-            id: "Calc123",
-            name: "Test Calc 1",
-            status: PublishStatus.Approved,
-            version: 1
-        }],
         codeReference: "",
         enumValueName: "",
-        fundingLineId: "",
+        fundingLineId: undefined,
         fundingStreamId: "",
         id: "",
         itemType: ObsoleteItemType.Calculation,
         specificationId: "Spec123",
-        templateCalculationId: "Temp123"
+        additionalCalculations: [],
+        templateCalculations:[],
+        title: "",
+        templateCalculationId: 1
     }],
     isLoadingCalculationErrors: false,
     haveErrorCheckingForCalculationErrors: false,
     areCalculationErrorsFetched: false,
-    isFetchingCalculationErrors: false
-
+    isFetchingCalculationErrors: false,
+    calculationErrorCount: 1
 }
 
 jest.spyOn(useCalculationErrorsHook, 'useCalculationErrors').mockImplementation(() => (calculationErrorsResult))

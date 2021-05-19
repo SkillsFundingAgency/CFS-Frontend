@@ -1,4 +1,4 @@
- import React from "react";
+import React from "react";
 import {screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import '@testing-library/jest-dom/extend-expect';
@@ -43,7 +43,7 @@ jest.spyOn(useCalculationErrorsHook, 'useCalculationErrors').mockImplementation(
 const testData = ViewSpecificationTestData();
 
 describe('<ViewSpecification /> ', () => {
-    describe('choosing approved specification for funding ', () => {
+    describe('approving all calcs', () => {
         beforeEach(async () => {
             testData.hasNoJobObserverState();
             testData.mockSpecificationPermissions();
@@ -69,31 +69,16 @@ describe('<ViewSpecification /> ', () => {
             jest.clearAllMocks();
         });
 
-        it("calls refresh specification service given user is allowed to choose specification", async () => {
-            const {refreshSpecificationFundingService} = require("../../../services/publishService");
-            const chooseForFundingButton = await screen.findByTestId(`choose-for-funding`);
-            userEvent.click(chooseForFundingButton);
-            const modalContinueButton = await screen.findByTestId(`confirm-modal-continue-button`) as HTMLButtonElement;
-
+        it("shows error given all calculations already approved", async () => {
+            const {getCalculationSummaryBySpecificationId} = require("../../../services/calculationService");
+            const approveAllCalculationsButton = await screen.findByTestId(`approve-calculations`);
+            userEvent.click(approveAllCalculationsButton);
+            
             await waitFor(() => {
-                userEvent.click(modalContinueButton);
-                expect(refreshSpecificationFundingService).toBeCalledTimes(1);
-            });
-        });
-
-        it("shows error given refresh job is not successful", async () => {
-            const {refreshSpecificationFundingService} = require("../../../services/publishService");
-            const chooseForFundingButton = await screen.findByTestId(`choose-for-funding`);
-            userEvent.click(chooseForFundingButton);
-            const modalContinueButton = await screen.findByTestId(`confirm-modal-continue-button`) as HTMLButtonElement;
-
-            await waitFor(() => {
-                userEvent.click(modalContinueButton);
-                expect(refreshSpecificationFundingService).toBeCalledTimes(1);
-                testData.sendFailedJobNotification();
+                expect(getCalculationSummaryBySpecificationId).toBeCalledTimes(2);
             });
 
-            expect(screen.getByText(`Error while choosing specification for funding`)).toBeInTheDocument();
+            expect(screen.getByText(`All calculations have already been approved`)).toBeInTheDocument();
         });
     });
 });

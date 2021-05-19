@@ -298,8 +298,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }
         try {
             const calcs: CalculationSummary[] = (await getCalculationSummaryBySpecificationId(specificationId)).data;
-            if (!calcs.some(calc => calc.calculationType === CalculationType.Template
-                && calc.status !== PublishStatus.Approved)) {
+            if (!calcs.some(calc => calc.status !== PublishStatus.Approved)) {
                 addErrorMessage("All calculations have already been approved");
                 return false;
             }

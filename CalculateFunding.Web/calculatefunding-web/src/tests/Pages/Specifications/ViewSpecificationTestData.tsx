@@ -277,6 +277,24 @@ export function ViewSpecificationTestData() {
         });
     }
 
+    const mockCalculationWithDraftCalculationsService = () => {
+        jest.mock("../../../services/calculationService", () => {
+            const calculationService = jest.requireActual('../../../services/calculationService');
+            return {
+                ...calculationService,
+                getCalculationSummaryBySpecificationId: jest.fn(() => Promise.resolve({
+                    data: [{
+                        calculationType: "Additional",
+                        status: "Draft"
+                    }]
+                })),
+                getCalculationCircularDependencies: jest.fn(() => Promise.resolve({
+                    data: []
+                }))
+            }
+        });
+    }
+
     return {
         sendFailedJobNotification,
         jobMonitorSpy,
@@ -290,6 +308,7 @@ export function ViewSpecificationTestData() {
         mockFundingLineStructureService,
         mockDatasetBySpecificationIdService,
         mockCalculationService,
+        mockCalculationWithDraftCalculationsService,
         hasNoJobObserverState
     }
 }
