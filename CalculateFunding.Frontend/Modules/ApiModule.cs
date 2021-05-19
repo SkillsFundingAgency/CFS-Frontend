@@ -17,7 +17,6 @@ using CalculateFunding.Common.Config.ApiClient.Results;
 using CalculateFunding.Common.Config.ApiClient.Specifications;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
-using CalculateFunding.Frontend.Clients.ScenariosClient;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient;
 using CalculateFunding.Frontend.Clients.TestEngineClient;
 using CalculateFunding.Frontend.Core.Ioc;
@@ -104,9 +103,6 @@ namespace CalculateFunding.Frontend.Modules
 
             services
                 .AddSingleton<ITemplateBuilderApiClient, TemplateBuilderApiClient>();
-
-            services
-                .AddSingleton<IScenariosApiClient, ScenariosApiClient>();
 
             services
                .AddSingleton<ITestEngineApiClient, TestEngineApiClient>();

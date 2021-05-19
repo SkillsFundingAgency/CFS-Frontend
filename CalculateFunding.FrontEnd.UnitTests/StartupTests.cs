@@ -13,7 +13,6 @@ using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
-using CalculateFunding.Frontend.Clients.ScenariosClient;
 using CalculateFunding.Frontend.Clients.TestEngineClient;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Interfaces.ApiClient;
@@ -72,13 +71,9 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<DownloadDatasourceController>(serviceProvider).Should().NotBeNull(nameof(DownloadDatasourceController));
             ResolveType<ProviderSearchController>(serviceProvider).Should().NotBeNull(nameof(ProviderSearchController));
             ResolveType<PublishController>(serviceProvider).Should().NotBeNull(nameof(PublishController));
-            ResolveType<ScenarioController>(serviceProvider).Should().NotBeNull(nameof(ScenarioController));
-            ResolveType<ScenarioSearchController>(serviceProvider).Should().NotBeNull(nameof(ScenarioSearchController));
             ResolveType<SpecificationController>(serviceProvider).Should().NotBeNull(nameof(SpecificationController));
             ResolveType<SpecificationSearchController>(serviceProvider).Should().NotBeNull(nameof(SpecificationSearchController));
             ResolveType<TestEngineController>(serviceProvider).Should().NotBeNull(nameof(TestEngineController));
-            ResolveType<TestScenarioResultController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioResultController));
-            ResolveType<TestScenarioSearchController>(serviceProvider).Should().NotBeNull(nameof(TestScenarioSearchController));
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
             ResolveType<ProviderController>(serviceProvider).Should().NotBeNull(nameof(ProviderController));
             ResolveType<ProfilingController>(serviceProvider).Should().NotBeNull(nameof(ProfilingController));
@@ -94,7 +89,6 @@ namespace CalculateFunding.Frontend.UnitTests
             serviceProvider.GetService<IFundingDataZoneApiClient>().Should().NotBeNull(nameof(FundingDataZoneApiClient));
             serviceProvider.GetService<IProfilingApiClient>().Should().NotBeNull(nameof(ProfilingApiClient));
 
-            serviceProvider.GetService<IScenariosApiClient>().Should().NotBeNull(nameof(ScenariosApiClient));
             serviceProvider.GetService<ITestEngineApiClient>().Should().NotBeNull(nameof(TestEngineApiClient));
             serviceProvider.GetService<IUsersApiClient>().Should().NotBeNull(nameof(UsersApiClient));
             serviceProvider.GetService<IPublishingApiClient>().Should().NotBeNull(nameof(PublishingApiClient));

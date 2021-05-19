@@ -15,7 +15,6 @@ using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.ScenariosClient.Models;
 using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
@@ -24,7 +23,6 @@ using CalculateFunding.Frontend.ViewModels.Datasets;
 using CalculateFunding.Frontend.ViewModels.Graph;
 using CalculateFunding.Frontend.ViewModels.Jobs;
 using CalculateFunding.Frontend.ViewModels.Results;
-using CalculateFunding.Frontend.ViewModels.Scenarios;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.TestEngine;
 using CalculateFunding.Frontend.ViewModels.Users;
@@ -43,7 +41,6 @@ namespace CalculateFunding.Frontend.ViewModels
             MapResults();
             MapSpecs();
             MapCalcs();
-            MapScenario();
             MapTestEngine();
             MapGraph();
             MapUserPermissions();
@@ -94,16 +91,6 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.DateClosed, opt => opt.Ignore());
 
             CreateMap<TestScenarioResultCounts, TestScenarioResultCountsViewModel>();
-
-            CreateMap<ScenarioSearchResultViewModel, TestScenarioResultViewModel>()
-                .ForMember(m => m.TestResults, opt => opt.MapFrom(s => s.Scenarios))
-                .ForMember(m => m.Specifications, opt => opt.Ignore())
-                .ForMember(m => m.FundingPeriodId, opt => opt.Ignore());
-
-            CreateMap<ScenarioSearchResultItemViewModel, TestScenarioResultItemViewModel>()
-                .ForMember(m => m.Passes, opt => opt.MapFrom(v => 0))
-                .ForMember(m => m.Failures, opt => opt.MapFrom(v => 0))
-                .ForMember(m => m.Ignored, opt => opt.MapFrom(v => 0));
 
             CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
                 .ForMember(d => d.CalculationResultDisplay, opt => opt.Ignore());
@@ -281,21 +268,6 @@ namespace CalculateFunding.Frontend.ViewModels
                 });
 
             CreateMap<ResultCounts, ResultCountsViewModel>();
-        }
-
-        private void MapScenario()
-        {
-            CreateMap<ScenarioSearchResultItem, ScenarioSearchResultItemViewModel>()
-                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
-                .AfterMap((ScenarioSearchResultItem source, ScenarioSearchResultItemViewModel destination) => { destination.LastUpdatedDateDisplay = source.LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString); });
-
-            CreateMap<ScenarioCreateViewModel, CreateScenarioModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
-            CreateMap<ScenarioEditViewModel, TestScenarioUpdateModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
-                .ForMember(m => m.Scenario, opt => opt.MapFrom(p => p.Gherkin))
-                .ForMember(m => m.Id, opt => opt.Ignore());
         }
 
         private void MapCommon()

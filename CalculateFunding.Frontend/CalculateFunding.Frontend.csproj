@@ -185,10 +185,6 @@
     <_ContentIncludedByDefault Remove="Pages\Results\CalculationProviderResults.cshtml" />
     <_ContentIncludedByDefault Remove="Pages\Results\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Pages\Results\TestScenarioResults.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Scenarios\CreateTestScenario.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Scenarios\EditTestScenario.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Scenarios\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Pages\Scenarios\ViewProviderTestResults.cshtml" />
     <_ContentIncludedByDefault Remove="Pages\Specs\EditSpecification.cshtml" />
     <_ContentIncludedByDefault Remove="wwwroot\assetsjs\bootstrap-multiselect-e2feb10e12.js" />
     <_ContentIncludedByDefault Remove="wwwroot\assetsjs\main-0a2b261fb0.js" />

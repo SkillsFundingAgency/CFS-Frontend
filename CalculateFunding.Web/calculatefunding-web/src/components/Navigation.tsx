@@ -8,7 +8,6 @@ export enum NavigationLevel {
     Home,
     Specification,
     ManageData,
-    QualityTests,
     ViewResult,
     FundingApproval,
     Templates
@@ -36,11 +35,7 @@ export class Navigation extends React.Component<INavigationLevel, {}> {
                     <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/datasets"
                        data-topnav="Components">Manage Data</a>
                 </li>
-
-                <li className={this.props.currentNavigationLevel === NavigationLevel.QualityTests ? (normalStyle + activeStyle) : (normalStyle)}>
-                    <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/scenarios"
-                       data-topnav="Patterns">Quality assurance tests</a>
-                </li>
+                
                 <li className={this.props.currentNavigationLevel === NavigationLevel.ViewResult ? (normalStyle + activeStyle) : (normalStyle)}>
                     <a className="govuk-link govuk-link--no-visited-state app-navigation__link" href="/results"
                        data-topnav="Community">View results</a>
