@@ -169,22 +169,16 @@ namespace CalculateFunding.Frontend.Helpers
 
             ApiResponse<IEnumerable<FundingStreamPermission>> response = await _usersClient.GetFundingStreamPermissionsForUser(otherUserId);
 
-            if (response.StatusCode == HttpStatusCode.OK &&
-                response.Content.Any(p => p.FundingStreamId != fundingStreamId))
-            {
-                return response.Content.Single(x => x.FundingStreamId == fundingStreamId);
-            }
-
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", otherUserId, response.StatusCode);
             }
 
-            return new FundingStreamPermission
+            return response.Content.DefaultIfEmpty(new FundingStreamPermission
             {
                 FundingStreamId = fundingStreamId,
                 UserId = otherUserId,
-            }.SetAllBooleansTo(false);
+            }).SingleOrDefault(x => x.FundingStreamId == fundingStreamId);
         }
 
         public async Task<EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
