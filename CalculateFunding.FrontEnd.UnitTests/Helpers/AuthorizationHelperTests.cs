@@ -458,7 +458,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         }
 
         [TestMethod]
-        public async Task Specifications_GetFundingStreamPermissionsForUser_WhenUserDoesNotHaveAccessToFundingStream_ThenReturnsNoFundingPermission()
+        public async Task Specifications_GetFundingStreamPermissionsForUser_WhenUserDoesNotHaveAccessToAnyFundingStreams_ThenReturnsFundingPermission()
         {
             string executingUserId = "usr1";
             ClaimsPrincipal user = BuildClaimsPrincipal(executingUserId);
@@ -475,7 +475,36 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 
             usersClient
                 .GetFundingStreamPermissionsForUser(userId)
-                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new FundingStreamPermission[0]));
+                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, null));
+
+            AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
+
+            // Act
+            FundingStreamPermission resultPermissions = await authHelper.GetFundingStreamPermissionsForUser(user, userId, fundingStreamId);
+
+            resultPermissions.CanApproveAllCalculations.Should().BeFalse();
+        }
+
+        [TestMethod]
+        public async Task Specifications_GetFundingStreamPermissionsForUser_WhenUserDoesNotHaveAccessToFundingStream_ThenReturnsNoFundingPermission()
+        {
+            string executingUserId = "usr1";
+            ClaimsPrincipal user = BuildClaimsPrincipal(executingUserId);
+            string userId = "usr2";
+            string fundingStreamId = "fs1";
+
+            FundingStreamPermission executingUserfundingStreamPermission = new FundingStreamPermission { UserId = executingUserId, FundingStreamId = fundingStreamId, CanAdministerFundingStream = true };
+            FundingStreamPermission fundingStreamPermission = new FundingStreamPermission { UserId = executingUserId, FundingStreamId = "fs2", CanAdministerFundingStream = true };
+
+            IAuthorizationService authorizationService = Substitute.For<IAuthorizationService>();
+            IUsersApiClient usersClient = Substitute.For<IUsersApiClient>();
+            usersClient
+                .GetFundingStreamPermissionsForUser(executingUserId)
+                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new[] { executingUserfundingStreamPermission }));
+
+            usersClient
+                .GetFundingStreamPermissionsForUser(userId)
+                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, new[] { fundingStreamPermission }));
 
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 

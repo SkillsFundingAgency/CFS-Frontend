@@ -174,11 +174,11 @@ namespace CalculateFunding.Frontend.Helpers
                 _logger.Error("Failed to get funding stream permissions for user ({user}) - {statuscode}", otherUserId, response.StatusCode);
             }
 
-            return response.Content.DefaultIfEmpty(new FundingStreamPermission
+            return response.Content?.SingleOrDefault(x => x.FundingStreamId == fundingStreamId) ?? new FundingStreamPermission
             {
                 FundingStreamId = fundingStreamId,
                 UserId = otherUserId,
-            }).SingleOrDefault(x => x.FundingStreamId == fundingStreamId);
+            };
         }
 
         public async Task<EffectiveSpecificationPermission> GetEffectivePermissionsForUser(ClaimsPrincipal user, string specificationId)
