@@ -282,8 +282,46 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.JobType,
                     opt => opt.MapFrom(src => src.JobDefinitionId));
             CreateMap<JobSummary, JobSummaryViewModel>();
+            CreateMap<JobViewModel, JobSummaryViewModel>()
+                .ForMember(dest => dest.EntityId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.LastUpdated,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.OverallItemsProcessed,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.OverallItemsSucceeded,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.OverallItemsFailed,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.OutcomeType,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.JobId,
+                    opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.JobType,
+                    opt => opt.MapFrom(src => src.JobDefinitionId))
+                .ForMember(dest => dest.Outcomes,
+                    opt => opt.MapFrom(src => Map(src)));
             CreateMap<Trigger, TriggerViewModel>();
             CreateMap<PublishedProviderSearchItem, PublishedProviderSearchResultItemViewModel>();
+        }
+
+        private IEnumerable<JobOutcomeViewModel> Map(JobViewModel job)
+        {
+            return job.ChildJobs.Select(x => new JobOutcomeViewModel
+            {
+                Description = x.Outcome,
+                JobType = x.JobDefinitionId,
+                Type = x.CompletionStatus
+                    switch
+                    {
+                        CompletionStatus.Failed => OutcomeType.Failed,
+                        CompletionStatus.Succeeded => OutcomeType.Succeeded,
+                        CompletionStatus.Superseded => OutcomeType.Succeeded,
+                        CompletionStatus.TimedOut => OutcomeType.Failed,
+                        CompletionStatus.Cancelled => OutcomeType.Inconclusive,
+                        _ => OutcomeType.Inconclusive
+                    }
+            });
         }
     }
 }

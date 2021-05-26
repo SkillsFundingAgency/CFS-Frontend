@@ -12,6 +12,9 @@ import * as publishService from "../../../services/publishService";
 import * as jobService from "../../../services/jobService";
 import {createMockAxiosError} from "../../fakes/fakeAxios";
 import {QueryClient, QueryClientProvider} from "react-query";
+import {FetchLatestSpecificationJobProps} from "../../../hooks/Jobs/useFetchLatestSpecificationJob";
+import * as useFetchAllLatestSpecificationJobsHook from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
+import {FetchAllLatestSpecificationJobResult} from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 
 const latestPublishedDate = "2020-11-23T17:35:01.1080915+00:00";
 
@@ -35,7 +38,18 @@ describe("<ChangeProfileType /> ", () => {
 
     describe("when no previous sql job exists", () => {
         beforeAll(() => {
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
+                return {
+                    allJobs: undefined,
+                    errorCheckingForJobs: "",
+                    haveErrorCheckingForJobs: false,
+                    isCheckingForJobs: false,
+                    isFetched: true,
+                    isFetching: false
+                } as FetchAllLatestSpecificationJobResult
+            });
+            /*useFetchAllLatestSpecificationJobsSpy.mockImplementation(() => {
                 return {
                     allJobs: undefined,
                     isCheckingForJobs: false,
@@ -44,7 +58,7 @@ describe("<ChangeProfileType /> ", () => {
                     isFetching: false,
                     isFetched: true
                 }
-            });
+            });*/
             jobServiceSpy.mockResolvedValue({
                 data: undefined,
                 status: 200,
@@ -59,7 +73,7 @@ describe("<ChangeProfileType /> ", () => {
         })
 
         afterAll(() => {
-            useFetchLatestSpecificationJobSpy.mockReset();
+            useFetchAllLatestSpecificationJobsSpy.mockReset();
             jobServiceSpy.mockReset();
         });
 
@@ -183,7 +197,7 @@ describe("<ChangeProfileType /> ", () => {
         it("does not show sql job status panel when push data button clicked when endpoint returns null job id", async () => {
             runSqlImportJobSpy.mockResolvedValue({
                 data: {
-                    jobId: null
+                    jobId: ''
                 },
                 status: 200,
                 statusText: "",
@@ -207,7 +221,7 @@ describe("<ChangeProfileType /> ", () => {
         it("does not show sql job status panel when push data button clicked when endpoint returns no job id", async () => {
             runSqlImportJobSpy.mockResolvedValue({
                 data: {
-                    jobId: undefined
+                    jobId: ''
                 },
                 status: 200,
                 statusText: "",
@@ -231,7 +245,7 @@ describe("<ChangeProfileType /> ", () => {
 
     describe("when a previous sql job exists", () => {
         afterEach(() => {
-            useFetchLatestSpecificationJobSpy.mockReset();
+            useFetchAllLatestSpecificationJobsSpy.mockReset();
             jobServiceSpy.mockReset();
         });
 
@@ -255,34 +269,35 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
-                return {
-                    allJobs: [{
-                        jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
-                        jobType: "RunSqlImportJob",
-                        specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
-                        statusDescription: "",
-                        jobDescription: "",
-                        outcome: "",
-                        runningStatus: RunningStatus.Completed,
-                        completionStatus: CompletionStatus.Succeeded,
-                        isSuccessful: true,
-                        isFailed: false,
-                        isActive: false,
-                        isComplete: true,
-                        invokerUserId: "testid",
-                        invokerUserDisplayName: "test",
-                        parentJobId: "",
-                        lastUpdated: new Date("2020-11-19T14:36:34.324284+00:00"),
-                        created: new Date("2020-11-24T14:36:16.3435836+00:00")
-                    }],
-                    isCheckingForJobs: false,
-                    errorCheckingForJobs: "",
-                    haveErrorCheckingForJobs: false,
-                    isFetching: false,
-                    isFetched: true
-                }
-            });
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
+                    return {
+                        allJobs: [{
+                            jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
+                            jobType: "RunSqlImportJob",
+                            specificationId: "4aeb22b6-50e1-48b6-9f53-613234b78a55",
+                            statusDescription: "",
+                            jobDescription: "",
+                            outcome: "",
+                            runningStatus: RunningStatus.Completed,
+                            completionStatus: CompletionStatus.Succeeded,
+                            isSuccessful: true,
+                            isFailed: false,
+                            isActive: false,
+                            isComplete: true,
+                            invokerUserId: "testid",
+                            invokerUserDisplayName: "test",
+                            parentJobId: "",
+                            lastUpdated: new Date("2020-11-19T14:36:34.324284+00:00"),
+                            created: new Date("2020-11-24T14:36:16.3435836+00:00")
+                        }],
+                        errorCheckingForJobs: "",
+                        haveErrorCheckingForJobs: false,
+                        isCheckingForJobs: false,
+                        isFetched: true,
+                        isFetching: false
+                    } as FetchAllLatestSpecificationJobResult
+                });
+            
             await renderPage();
 
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
@@ -316,7 +331,8 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
                 return {
                     allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
@@ -337,13 +353,14 @@ describe("<ChangeProfileType /> ", () => {
                         lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
                     }],
-                    isCheckingForJobs: false,
                     errorCheckingForJobs: "",
                     haveErrorCheckingForJobs: false,
-                    isFetching: false,
-                    isFetched: true
-                }
+                    isCheckingForJobs: false,
+                    isFetched: true,
+                    isFetching: false
+                } as FetchAllLatestSpecificationJobResult
             });
+
             await renderPage();
 
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
@@ -359,7 +376,8 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("push button is disabled when funding job in progress", async () => {
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
                 return {
                     allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
@@ -380,12 +398,12 @@ describe("<ChangeProfileType /> ", () => {
                         lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
                     }],
-                    isCheckingForJobs: false,
                     errorCheckingForJobs: "",
                     haveErrorCheckingForJobs: false,
-                    isFetching: false,
-                    isFetched: true
-                }
+                    isCheckingForJobs: false,
+                    isFetched: true,
+                    isFetching: false
+                } as FetchAllLatestSpecificationJobResult
             });
 
             await renderPage();
@@ -417,7 +435,8 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
                 return {
                     allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
@@ -438,12 +457,12 @@ describe("<ChangeProfileType /> ", () => {
                         lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
                     }],
-                    isCheckingForJobs: false,
                     errorCheckingForJobs: "",
                     haveErrorCheckingForJobs: false,
-                    isFetching: false,
-                    isFetched: true
-                }
+                    isCheckingForJobs: false,
+                    isFetched: true,
+                    isFetching: false
+                } as FetchAllLatestSpecificationJobResult
             });
 
             await renderPage();
@@ -475,7 +494,8 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
                 return {
                     allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
@@ -496,12 +516,12 @@ describe("<ChangeProfileType /> ", () => {
                         lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
                     }],
-                    isCheckingForJobs: false,
                     errorCheckingForJobs: "",
                     haveErrorCheckingForJobs: false,
-                    isFetching: false,
-                    isFetched: true
-                }
+                    isCheckingForJobs: false,
+                    isFetched: true,
+                    isFetching: false
+                } as FetchAllLatestSpecificationJobResult
             });
 
             await renderPage();
@@ -536,7 +556,8 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
-            useFetchLatestSpecificationJobSpy.mockImplementation(() => {
+
+            useFetchAllLatestSpecificationJobsSpy.mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
                 return {
                     allJobs: [{
                         jobId: "b1dbd087-e404-4861-a2bd-edfdddc8e76d",
@@ -557,12 +578,12 @@ describe("<ChangeProfileType /> ", () => {
                         lastUpdated: new Date("2020-11-24T14:36:34.324284+00:00"),
                         created: new Date("2020-11-23T14:36:16.3435836+00:00")
                     }],
-                    isCheckingForJobs: false,
                     errorCheckingForJobs: "",
                     haveErrorCheckingForJobs: false,
-                    isFetching: false,
-                    isFetched: true
-                }
+                    isCheckingForJobs: false,
+                    isFetched: true,
+                    isFetching: false
+                } as FetchAllLatestSpecificationJobResult
             });
 
             await renderPage();
@@ -632,7 +653,7 @@ jest.mock('../../../services/specificationService', () => ({
 const jobServiceSpy = jest.spyOn(jobService, 'getLatestSuccessfulJob');
 const runSqlImportJobSpy = jest.spyOn(publishService, 'runSqlImportJob');
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
-const useFetchLatestSpecificationJobSpy = jest.spyOn(fetchLatestSpecificationJobs, 'useFetchAllLatestSpecificationJobs');
+const useFetchAllLatestSpecificationJobsSpy = jest.spyOn(fetchLatestSpecificationJobs, 'useFetchAllLatestSpecificationJobs');
 
 const getLatestPublishedDateSpy = jest.spyOn(publishService, 'getLatestPublishedDate');
 getLatestPublishedDateSpy.mockResolvedValue({

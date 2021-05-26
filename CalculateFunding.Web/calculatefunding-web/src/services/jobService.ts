@@ -11,6 +11,13 @@ export async function getJobStatusUpdatesForSpecification(specificationId: strin
     });
 }
 
+export async function getJob(jobId: string): Promise<AxiosResponse<JobResponse | undefined>> {
+    return axios(`${baseURL}/${jobId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    });
+}
+
 export async function getLatestSuccessfulJob(specificationId: string, jobType: string): Promise<AxiosResponse<JobResponse | undefined>> {
     return axios(`${baseURL}/latest-success/${specificationId}/${jobType}`, {
         method: 'GET',

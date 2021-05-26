@@ -4,6 +4,8 @@ import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {AxiosError} from "axios";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
+import {JobMonitoringFilter} from "./useJobMonitor";
+import {FetchLatestSpecificationJobProps} from "./useFetchLatestSpecificationJob";
 
 export type FetchAllLatestSpecificationJobResult = {
     allJobs: JobDetails[] | undefined,
@@ -15,23 +17,26 @@ export type FetchAllLatestSpecificationJobResult = {
 }
 
 export const useFetchAllLatestSpecificationJobs = (
-    specificationId: string,
-    jobTypes: JobType[],
-    onError?: (err: AxiosError | Error) => void)
+    {
+        jobFilter,
+        onError
+    }: FetchLatestSpecificationJobProps)
     : FetchAllLatestSpecificationJobResult => {
-    const jobTypeList = jobTypes.join(",");
+    const jobTypeList = jobFilter.jobTypes ? jobFilter.jobTypes.join(',') : '';
 
     const {data, error, isFetching, isLoading, isError, isFetched} =
-        useQuery<JobDetails[] | undefined, AxiosError>(`specification-${specificationId}-all-jobs-` + jobTypeList,
-            async () => await checkForJobs(specificationId, jobTypeList),
+        useQuery<JobDetails[] | undefined, AxiosError>(`specification-${jobFilter.specificationId}-all-jobs-` + jobTypeList,
+            async () => await checkForJobs(jobFilter),
             {
                 refetchOnWindowFocus: false,
-                enabled: (specificationId && specificationId.length > 0 && jobTypes.length > 0) === true,
+                enabled: (jobFilter.specificationId && jobFilter.specificationId.length > 0 &&
+                    jobFilter.jobTypes && jobFilter.jobTypes.length > 0) === true,
                 onError: onError
             });
 
-    const checkForJobs = async (specId: string, listOfJobTypes: string): Promise<JobDetails[] | undefined> => {
-        const response = await getJobStatusUpdatesForSpecification(specId, listOfJobTypes);
+    const checkForJobs = async (jobFilter: JobMonitoringFilter): Promise<JobDetails[] | undefined> => {
+        if (!jobFilter.specificationId || !jobFilter.jobTypes) return;
+        const response = await getJobStatusUpdatesForSpecification(jobFilter.specificationId, jobFilter.jobTypes);
         const results = response.data.filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated);
         return results && results.length > 0 ? results.map(r => getJobDetailsFromJobResponse(r) as JobDetails) : undefined;
     };

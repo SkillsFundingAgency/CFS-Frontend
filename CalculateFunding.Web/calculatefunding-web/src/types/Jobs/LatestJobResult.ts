@@ -1,6 +1,6 @@
 import {JobDetails} from "../jobDetails";
 
-export type FetchLatestSpecificationJobResult = {
+export type LatestJobResult = {
     lastJob: JobDetails | undefined,
     isCheckingForJob: boolean,
     errorCheckingForJob: string,

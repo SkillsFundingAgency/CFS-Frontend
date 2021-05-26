@@ -2,11 +2,13 @@ import {MemoryRouter, Route, Switch} from "react-router";
 import {render, screen, waitFor} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import React from "react";
-import * as monitor from "../../../hooks/Jobs/useJobMonitor";
+import * as monitor from "../../../hooks/Jobs/useJobSubscription";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
 import userEvent from "@testing-library/user-event";
 import {UpdateNewDatasetVersionResponseViewModel} from "../../../types/Datasets/UpdateDatasetRequestViewModel";
+import {AddJobSubscription, JobNotification, JobSubscription} from "../../../hooks/Jobs/useJobSubscription";
+import {DateTime} from "luxon";
 
 export function UpdateDataSourceFileTestData() {
 
@@ -20,9 +22,26 @@ export function UpdateDataSourceFileTestData() {
         userEvent.upload(input, file);
     }
 
-    const hasJobSuccessful = async () => {
-        jobMonitorSpy.mockReturnValue({
-            newJob: {
+    const submitForm = async () => {
+        const saveButton = await screen.findByTestId(`update-datasource-save`);
+        userEvent.click(saveButton);
+    }
+
+    let notification: JobNotification | undefined;
+    let subscription: JobSubscription | undefined = {
+        filterBy: {
+            jobId: 'jobId',
+            jobTypes: [],
+        },
+        id: "sertdhw4e5t",
+        onError: () => {},
+        startDate: DateTime.now()
+    };
+    
+    const hasJobSuccessful = () => {
+        notification = {
+            subscription: subscription as JobSubscription,
+            latestJob: {
                 jobId: "aValidJobId",
                 statusDescription: "",
                 jobDescription: "",
@@ -35,12 +54,12 @@ export function UpdateDataSourceFileTestData() {
                 completionStatus: CompletionStatus.Succeeded,
                 outcome: "Success"
             }
-        });
+        };
     }
-
-    const hasJobFailure = async () => {
-        jobMonitorSpy.mockReturnValue({
-            newJob: {
+    const hasJobFailure = () => {
+        notification = {
+            subscription: subscription as JobSubscription,
+            latestJob: {
                 jobId: "aValidJobId",
                 statusDescription: "",
                 jobDescription: "",
@@ -53,12 +72,12 @@ export function UpdateDataSourceFileTestData() {
                 completionStatus: CompletionStatus.Failed,
                 outcome: "Some errors"
             }
-        });
+        };
     }
-
-    const hasJobValidationFailure = async () => {
-        jobMonitorSpy.mockReturnValue({
-            newJob: {
+    const hasJobValidationFailure = () => {
+        notification = {
+            subscription: subscription as JobSubscription,
+            latestJob: {
                 jobId: "aValidJobId",
                 statusDescription: "",
                 jobDescription: "",
@@ -71,18 +90,25 @@ export function UpdateDataSourceFileTestData() {
                 completionStatus: CompletionStatus.Failed,
                 outcome: "ValidationFailed"
             }
-        });
+        };
     }
 
-    const submitForm = async () => {
-        const saveButton = await screen.findByTestId(`update-datasource-save`);
-        userEvent.click(saveButton);
-    }
-
-    const jobMonitorSpy = jest.spyOn(monitor, 'useJobMonitor');
-    jobMonitorSpy.mockImplementation(() => {
+    const jobSubscriptionSpy = jest.spyOn(monitor, 'useJobSubscription');
+    jobSubscriptionSpy.mockImplementation(() => {
         return {
-            newJob: undefined
+            addSub: (request: AddJobSubscription) => {
+                const sub: JobSubscription = {
+                    filterBy: request.filterBy,
+                    id: "sertdhw4e5t",
+                    onError: request.onError,
+                    startDate: DateTime.now()
+                }
+                subscription = sub;
+                return sub;
+            },
+            removeSub: (request) => {},
+            removeAllSubs: () => {},
+            results: notification ? [notification] : []
         }
     });
 

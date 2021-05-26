@@ -3,13 +3,13 @@ import {JobDetails} from "../../types/jobDetails";
 import {useQuery} from "react-query";
 import {getLatestJobByEntityId} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
-import {FetchLatestSpecificationJobResult} from "../../types/Jobs/FetchLatestSpecificationJobResult";
+import {LatestJobResult} from "../../types/Jobs/LatestJobResult";
 
 export const useFetchLatestJobByEntityId =(
     specificationId:string,
     entityId:string,
     onError?:(err:AxiosError | Error) => void)
-    : FetchLatestSpecificationJobResult => {
+    : LatestJobResult => {
 
     const {data, error, isFetching, isLoading, isError, isFetched} =
     useQuery<JobDetails | undefined, AxiosError>(`specification=${specificationId}-${entityId}-job`,

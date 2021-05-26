@@ -97,10 +97,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     const {newJob: observedJob} =
         useJobMonitor({
-        filterBy: jobObserverState.jobFilter as JobMonitoringFilter,
-        isEnabled: !!jobObserverState.jobFilter,
-        onError: e => addError({error: e, description: "Error while trying to monitor background jobs"})
-    })
+                filterBy: jobObserverState.jobFilter as JobMonitoringFilter,
+                isEnabled: !!jobObserverState.jobFilter,
+                onError: e => addError({error: e, description: "Error while trying to monitor background jobs"})
+            });
 
     const {hasJob, latestJob: approveAllCalculationsJob, isCheckingForJob} =
         useLatestSpecificationJobWithMonitoring(specificationId,
@@ -164,6 +164,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     }, [featureFlagsState.releaseTimetableVisible]);
     useEffect(() => {
         if (!observedJob || observedJob.isActive) return;
+        
         if (observedJob.isComplete) {
             if (observedJob.isFailed) {
                 addError({

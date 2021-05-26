@@ -1,28 +1,39 @@
-﻿import {JobType} from "../../types/jobType";
-import {useQuery} from "react-query";
+﻿import {useQuery} from "react-query";
 import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {AxiosError} from "axios";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
-import {FetchLatestSpecificationJobResult} from "../../types/Jobs/FetchLatestSpecificationJobResult";
+import {LatestJobResult} from "../../types/Jobs/LatestJobResult";
+import {milliseconds} from "../../helpers/TimeInMs";
+import {JobMonitoringFilter} from "./useJobMonitor";
+
+export interface FetchLatestSpecificationJobProps {
+    jobFilter: JobMonitoringFilter,
+    onError?: (err: AxiosError | Error) => void,
+    enablePoling?: boolean | undefined
+}
 
 export const useFetchLatestSpecificationJob = (
-    specificationId: string,
-    jobTypes: JobType[],
-    onError?: (err: AxiosError | Error) => void)
-    : FetchLatestSpecificationJobResult => {
-    const jobTypeList = jobTypes.join(",");
+    {
+        jobFilter,
+        onError
+    }: FetchLatestSpecificationJobProps)
+    : LatestJobResult => {
+
+    const jobTypeList = jobFilter.jobTypes ? jobFilter.jobTypes.join(',') : '';
 
     const {data, error, isFetching, isLoading, isError, isFetched} =
-        useQuery<JobDetails | undefined, AxiosError>(`specification-${specificationId}-jobs-` + jobTypeList,
-            async () => await checkForJob(specificationId, jobTypes),
+        useQuery<JobDetails | undefined, AxiosError>(`specification-${jobFilter.specificationId}-jobs-` + jobTypeList,
+            async () => await checkForJob(jobFilter),
             {
-                enabled: (specificationId && specificationId.length > 0 && jobTypes.length > 0) === true,
+                enabled: (jobFilter.specificationId && jobFilter.specificationId.length > 0 &&
+                    jobFilter.jobTypes && jobFilter.jobTypes.length > 0) === true,
                 onError: onError
             });
 
-    const checkForJob = async (specId: string, listOfJobTypes: string[]): Promise<JobDetails | undefined> => {
-        const response = await getJobStatusUpdatesForSpecification(specId, listOfJobTypes);
+    const checkForJob = async (jobFilter: JobMonitoringFilter): Promise<JobDetails | undefined> => {
+        if (!jobFilter.specificationId || !jobFilter.jobTypes) return;
+        const response = await getJobStatusUpdatesForSpecification(jobFilter.specificationId, jobFilter.jobTypes);
         if (!response.data || response.data.length === 0) return undefined;
         const results = response.data
             .filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated)
@@ -31,9 +42,23 @@ export const useFetchLatestSpecificationJob = (
     };
 
     if (isError) {
-        return {lastJob: undefined, isCheckingForJob: isLoading, errorCheckingForJob: error?.response?.data, haveErrorCheckingForJob: isError, isFetching, isFetched};
+        return {
+            lastJob: undefined,
+            isCheckingForJob: isLoading,
+            errorCheckingForJob: error?.response?.data,
+            haveErrorCheckingForJob: isError,
+            isFetching,
+            isFetched
+        };
     }
 
-    return {lastJob: data, isCheckingForJob: isLoading, errorCheckingForJob: "", haveErrorCheckingForJob: false, isFetching, isFetched};
+    return {
+        lastJob: data,
+        isCheckingForJob: isLoading,
+        errorCheckingForJob: "",
+        haveErrorCheckingForJob: false,
+        isFetching,
+        isFetched
+    };
 };
 

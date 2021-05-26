@@ -15,15 +15,14 @@ import {UpdateStatus} from "../../types/Datasets/UpdateStatus";
 import {MergeSummary} from "./MergeSummary/MergeSummary";
 import {MergeMatch} from "./MergeSummary/MergeMatch";
 import {MergeDatasetViewModel} from "../../types/Datasets/MergeDatasetViewModel";
-import {JobType} from "../../types/jobType";
 import {useErrors} from "../../hooks/useErrors";
-import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {RunningStatus} from "../../types/RunningStatus";
 import * as providerService from "../../services/providerService";
 import {DateFormatter} from "../../components/DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
 import {DatasetEmptyFieldEvaluationOptions} from "../../types/Datasets/DatasetEmptyFieldEvaluationOptions";
+import {RunningStatus} from "../../types/RunningStatus";
+import {JobSubscription, MonitorFallback, MonitorMode, useJobSubscription} from "../../hooks/Jobs/useJobSubscription";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -66,18 +65,22 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const [updateStatus, setUpdateStatus] = useState<UpdateStatus>(UpdateStatus.Unset);
     const history = useHistory();
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
-    const {newJob} = useJobMonitor({
-        filterBy: {jobTypes: [JobType.ValidateDatasetJob]},
-        onError: err => {
-            addError({error: err, description: "An error occurred while monitoring the running jobs"});
-            setIsLoading(false);
-        },
-        isEnabled: isCheckingForJob
+    const [jobSubscription, setJobSubscription] = useState<JobSubscription>();
+    const {addSub, removeSub, results: jobNotifications} = useJobSubscription({
+        onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
 
     useEffect(() => {
-        if (newJob?.jobId !== validateDatasetJobId || newJob?.isActive) return;
+        if (jobNotifications.length === 0) return;
+
+        const notification = jobNotifications.find(n => n.subscription.id === jobSubscription?.id);
+        const newJob = notification?.latestJob;
+
+        if (!notification || !newJob || newJob.runningStatus !== RunningStatus.Completed) return;
+
+        removeSub(notification.subscription.id);
+        setJobSubscription(undefined);
 
         if (newJob.isSuccessful) {
             return onDatasetValidated(updateType);
@@ -86,8 +89,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         }
         clearErrorMessages();
         setIsLoading(false);
-        setIsCheckingForJob(false);
-    }, [newJob]);
+    }, [jobNotifications]);
 
     function onValidationJobFailed(newJob: JobDetails) {
         if (!newJob.outcome) {
@@ -184,8 +186,18 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 setIsLoading(false);
                                 return;
                             }
-                            setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
-
+                            const validationJobId = validateDatasetResponse.data.validateDatasetJobId;
+                            setValidateDatasetJobId(validationJobId); // todo: redundant?
+                            const subscription = addSub({
+                                filterBy: {jobId: validationJobId},
+                                monitorMode: MonitorMode.SignalR,
+                                monitorFallback: MonitorFallback.Polling,
+                                onError: err => addError({
+                                    error: err,
+                                    description: "An error occurred while monitoring the running jobs"
+                                })
+                            });
+                            setJobSubscription(subscription);
                             setIsCheckingForJob(true);
                             setIsLoading(true);
                         })

@@ -103,10 +103,10 @@ export function SpecificationTestData() {
     };
 
     const mockJobMonitorHookWithSuccessfulJob = () => jest.spyOn(monitorHook, 'useJobMonitor')
-        .mockImplementation(() => ({newJob: jobMonitorResult}));
+        .mockImplementation(() => ({newJob: jobMonitorResult, isMonitoring: true}));
 
     const mockJobMonitorHookWithNoJob = () => jest.spyOn(monitorHook, 'useJobMonitor')
-        .mockImplementation(() => ({newJob: undefined}));
+        .mockImplementation(() => ({newJob: undefined, isMonitoring: false}));
 
     const mockLatestSpecJobMonitorHookWithNoJob = () =>
         jest.spyOn(useLatestSpecificationJobWithMonitoringHook, 'useLatestSpecificationJobWithMonitoring')

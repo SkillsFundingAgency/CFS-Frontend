@@ -73,5 +73,20 @@ namespace CalculateFunding.Frontend.Controllers
                 onNoContent: Ok,
                 onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content)));
         }
+
+        [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [Route("api/jobs/{jobId}")]
+        public async Task<IActionResult> GetJobByJobId([FromRoute] string jobId)
+        {
+            Guard.IsNullOrWhiteSpace(jobId, nameof(jobId));
+
+            ApiResponse<JobViewModel> response = await _jobsApiClient.GetJobById(jobId);
+
+            return response.Handle(nameof(JobSummary),
+                onNotFound: NotFound,
+                onNoContent: NotFound,
+                onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content)));
+        }
     }
 }

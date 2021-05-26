@@ -30,7 +30,7 @@ import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 
 export function RefreshSql() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
-    const {errors, addErrorMessage} = useErrors();
+    const {errors, addError} = useErrors();
     const history = useHistory();
     const [sqlJobStatusMessage, setSqlJobStatusMessage] = useState<string>('Data push queued');
     const [fundingStatusMessage, setFundingStatusMessage] = useState<string>('Funding job running');
@@ -49,27 +49,33 @@ export function RefreshSql() {
     const {newJob} = useMonitorForNewSpecificationJob(
         specificationId,
         [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob, JobType.ApproveAllProviderFundingJob,
-        JobType.RefreshFundingJob, JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
-        JobType.ReIndexPublishedProvidersJob],
-        err => addErrorMessage("An error occurred while monitoring the running jobs.")
+            JobType.RefreshFundingJob, JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
+            JobType.ReIndexPublishedProvidersJob],
+        err => addError({error: err, description: "An error occurred while monitoring the running jobs."})
     );
-    const {allJobs, isCheckingForJobs} = useFetchAllLatestSpecificationJobs(
-        specificationId,
-        [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob, JobType.ApproveAllProviderFundingJob,
-        JobType.RefreshFundingJob, JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
-        JobType.ReIndexPublishedProvidersJob],
-        err => addErrorMessage("An error occurred while fetching the latest jobs.")
-    );
+    const {allJobs, isCheckingForJobs} = useFetchAllLatestSpecificationJobs({
+        jobFilter: {
+            specificationId: specificationId,
+            jobTypes: [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob,
+                JobType.ApproveAllProviderFundingJob, JobType.RefreshFundingJob,
+                JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
+                JobType.ReIndexPublishedProvidersJob]
+        },
+        onError: err => addError({error: err, description: "An error occurred while fetching the latest jobs."})
+    });
     const fundingStreamId = selectedFundingStream ? selectedFundingStream.id : "";
     const fundingPeriodId = selectedFundingPeriod ? selectedFundingPeriod.id : "";
 
-    const {data: lastSqlJob, isLoading: isCheckingForLatestSqlJob} = useQuery<JobDetails | undefined, AxiosError>(`last-successful-sql-job-${specificationId}-runsqljob`,
+    const {
+        data: lastSqlJob,
+        isLoading: isCheckingForLatestSqlJob
+    } = useQuery<JobDetails | undefined, AxiosError>(`last-successful-sql-job-${specificationId}-runsqljob`,
         async () => getJobDetailsFromJobResponse((await getLatestSuccessfulJob(specificationId, JobType.RunSqlImportJob)).data),
         {
             cacheTime: 0,
             refetchOnWindowFocus: false,
             enabled: specificationId !== undefined && specificationId.length > 0,
-            onError: err => addErrorMessage(err.message, "Error while loading last successful sql job")
+            onError: err => addError({error: err, description: "Error while loading last successful sql job"})
         });
 
     const hasRunningFundingJobs: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
@@ -95,7 +101,7 @@ export function RefreshSql() {
         useQuery<LatestPublishedDate, AxiosError>(`latest-published-date-${fundingStreamId}-${fundingPeriodId}`,
             fetchLatestPublishedDate,
             {
-                onError: err => addErrorMessage(err.message, "Error while loading latest published date."),
+                onError: err => addError({error: err, description: "Error while loading latest published date."}),
                 cacheTime: 0,
                 refetchOnWindowFocus: false,
                 enabled: false
@@ -116,7 +122,7 @@ export function RefreshSql() {
 
     useEffect(() => {
         if (errorCheckingForOptions.length > 0) {
-            addErrorMessage(errorCheckingForOptions);
+            addError({error: errorCheckingForOptions});
         }
     }, [errorCheckingForOptions]);
 
@@ -159,7 +165,7 @@ export function RefreshSql() {
             if (newJob.isSuccessful) {
                 setShowSuccess(true);
             } else {
-                addErrorMessage("Refresh sql job failed: " + newJob.outcome);
+                addError({error: "Refresh sql job failed: " + newJob.outcome});
             }
         }
     }
@@ -211,12 +217,12 @@ export function RefreshSql() {
             try {
                 setIsRefreshing(true);
                 const jobId = (await runSqlImportJob(specificationId, selectedFundingStream.id)).data.jobId;
-                if (jobId === undefined || jobId === null) {
+                if (!jobId || jobId?.length === 0) {
                     throw new Error("No job ID was returned");
                 }
                 setRefreshJobId(jobId);
             } catch (error) {
-                addErrorMessage("The refresh sql import job could not be started: " + error.message);
+                addError({error: "The refresh sql import job could not be started: " + error.message});
                 setIsRefreshing(false);
             }
         }

@@ -11,10 +11,7 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
 import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
-import {
-    useLatestEntityJobWithMonitoring,
-    useLatestSpecificationJobWithMonitoring
-} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
@@ -25,7 +22,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {Permission} from "../../types/Permission";
 import {WarningText} from "../../components/WarningText";
 import {JobType} from "../../types/jobType";
-import {RunningStatus} from "../../types/RunningStatus";
+import {useLatestEntityJobWithMonitoring} from "../../hooks/Jobs/useLatestEntityJobWithMonitoring";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string

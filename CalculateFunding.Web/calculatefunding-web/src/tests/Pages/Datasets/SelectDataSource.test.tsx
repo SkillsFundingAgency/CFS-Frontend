@@ -7,11 +7,11 @@ import '@testing-library/jest-dom/extend-expect';
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
-import * as useLatestEntityJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as useLatestEntityJobWithMonitoringHook from "../../../hooks/Jobs/useLatestEntityJobWithMonitoring";
 import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {
-    LatestSpecificationJobWithMonitoringResult,
-    useLatestEntityJobWithMonitoring, useLatestSpecificationJobWithMonitoring
+    LatestSpecificationJobWithMonitoringResult, 
+    useLatestSpecificationJobWithMonitoring
 } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
@@ -77,8 +77,7 @@ const noJob: LatestSpecificationJobWithMonitoringResult = {
     isCheckingForJob: false,
     latestJob: undefined,
     isFetched: true,
-    isFetching: false,
-    isMonitoring: true,
+    isFetching: false
 };
 const activeRunConverterDatasetMergeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
@@ -92,8 +91,7 @@ const activeRunConverterDatasetMergeJob: LatestSpecificationJobWithMonitoringRes
         lastUpdated: new Date()
     }),
     isFetched: true,
-    isFetching: false,
-    isMonitoring: true
+    isFetching: false
 };
 const activeJob: LatestSpecificationJobWithMonitoringResult = {
     hasJob: true,
@@ -107,8 +105,7 @@ const activeJob: LatestSpecificationJobWithMonitoringResult = {
         lastUpdated: new Date()
     }),
     isFetched: true,
-    isFetching: false,
-    isMonitoring: true
+    isFetching: false
 };
 const withoutPermissions: SpecificationPermissionsResult = {
     userId: "3456",

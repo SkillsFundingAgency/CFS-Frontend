@@ -14,7 +14,6 @@ import {
 import {CreateDatasetRequestViewModel} from "../../types/Datasets/CreateDatasetRequestViewModel";
 import {useHistory} from "react-router";
 import {FundingStream} from "../../types/viewFundingTypes";
-import {useEffectOnce} from "../../hooks/useEffectOnce";
 import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {
     NewDatasetVersionResponseErrorModel,
@@ -27,15 +26,19 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {DataschemaDetailsViewModel} from "../../types/Datasets/DataschemaDetailsViewModel";
 import {UserPermission} from "../../types/UserPermission";
 import {useErrors} from "../../hooks/useErrors";
-import {useJobMonitor} from "../../hooks/Jobs/useJobMonitor";
-import {JobType} from "../../types/jobType";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
-import {RunningStatus} from "../../types/RunningStatus";
 import {getCurrentProviderVersionForFundingStream} from "../../services/providerService";
 import {usePermittedFundingStreams} from "../../hooks/Permissions/usePermittedFundingStreams";
 import {DateFormatter} from "../../components/DateFormatter";
 import {JobDetails} from "../../types/jobDetails";
 import {DatasetEmptyFieldEvaluationOptions} from "../../types/Datasets/DatasetEmptyFieldEvaluationOptions";
+import {
+    JobSubscription,
+    MonitorFallback,
+    MonitorMode,
+    useJobSubscription
+} from "../../hooks/Jobs/useJobSubscription";
+import {RunningStatus} from "../../types/RunningStatus";
 
 export function LoadNewDataSource() {
     const [fundingStreamSuggestions, setFundingStreamSuggestions] = useState<FundingStream[]>([]);
@@ -62,32 +65,16 @@ export function LoadNewDataSource() {
     const requiredPermission = UserPermission.CanUploadDataSourceFiles;
     const permittedFundingStreams = usePermittedFundingStreams(requiredPermission);
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
-    const {newJob} = useJobMonitor({
-        filterBy: {jobTypes: [JobType.ValidateDatasetJob]},
+    const {addSub, removeSub, results: jobNotifications} = useJobSubscription({
         onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
+    const [jobSubscription, setJobSubscription] = useState<JobSubscription>();
     const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
-    const validExtensions = [".csv", ".xls", ".xlsx"];
     const isOutcomeValidationFailedWithReport = (outcome: string) => outcome === "ValidationFailed";
 
-    useEffect(() => {
-        filterFundingStreamsByPermittedStreams();
-    }, [permittedFundingStreams]);
 
-    useEffect(() => {
-        if (!newJob
-            || newJob.jobId !== validateDatasetJobId
-            || newJob.runningStatus !== RunningStatus.Completed) return;
-        if (newJob.isSuccessful) {
-            return onDatasetValidated(newJob);
-        } else {
-            onValidationJobFailed(newJob);
-        }
-        setIsLoading(false);
-    }, [newJob]);
-
-    function onDatasetValidated(newJob: JobDetails) {
+    function onDatasetValidated() {
         history.push("/Datasets/ManageDataSourceFiles");
     }
 
@@ -104,23 +91,17 @@ export function LoadNewDataSource() {
     }
 
     function displayFailedValidationReportFile() {
-        downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId).then((result) => {
-            const validationErrorFileUrl = result.data;
-            addValidationErrors({
-                validationErrors: {"blobUrl": [validationErrorFileUrl]},
-                message: "Validation failed"
-            });
-        }).catch((err) => {
+        downloadValidateDatasetValidationErrorSasUrl(validateDatasetJobId)
+            .then((result) => {
+                const validationErrorFileUrl = result.data;
+                addValidationErrors({
+                    validationErrors: {"blobUrl": [validationErrorFileUrl]},
+                    message: "Validation failed"
+                });
+            }).catch((err) => {
             addError({error: "Unable to retrieve validation report", description: "Validation failed"});
         });
     }
-
-    useEffect(() => {
-        if (fundingStreams.length > 0 && !fundingStreamsIsFiltered) {
-            filterFundingStreamsByPermittedStreams();
-            setFundingStreamsIsFiltered(true);
-        }
-    }, [fundingStreams]);
 
     function filterFundingStreamsByPermittedStreams() {
         const permittedStreams = fundingStreams.filter(fs => permittedFundingStreams.some(permitted => permitted === fs.id));
@@ -169,12 +150,13 @@ export function LoadNewDataSource() {
 
     function populateCoreProvider(fundingStreamId: string) {
         clearErrorMessages();
-        getCurrentProviderVersionForFundingStream(fundingStreamId).then((providerVersionResult) => {
-            const providerVersion = providerVersionResult.data;
-            if (providerVersion != null) {
-                setCoreProviderTargetDate(providerVersion.targetDate);
-            }
-        }).catch(err => addError({
+        getCurrentProviderVersionForFundingStream(fundingStreamId)
+            .then((providerVersionResult) => {
+                const providerVersion = providerVersionResult.data;
+                if (providerVersion != null) {
+                    setCoreProviderTargetDate(providerVersion.targetDate);
+                }
+            }).catch(err => addError({
             error: err,
             description: `Error while getting current provider version for funding stream ${fundingStreamId}`
         }));
@@ -189,7 +171,6 @@ export function LoadNewDataSource() {
             .catch(err => addError({error: err, description: `Error while getting funding streams`}))
             .finally(() => setFundingStreamIsLoading(false));
     }
-
 
     async function uploadFileToBlob(request: NewDatasetVersionResponseViewModel) {
         if (!uploadFile) {
@@ -229,7 +210,18 @@ export function LoadNewDataSource() {
                             setIsLoading(false);
                             return;
                         }
-                        setValidateDatasetJobId(validateDatasetResponse.data.validateDatasetJobId);
+                        const validationJobId = validateDatasetResponse.data.validateDatasetJobId;
+                        setValidateDatasetJobId(validationJobId);
+                        const subscription = addSub({
+                            filterBy: {jobId: validationJobId},
+                            monitorMode: MonitorMode.SignalR,
+                            monitorFallback: MonitorFallback.Polling,
+                            onError: err => addError({
+                                error: err,
+                                description: "An error occurred while monitoring the running jobs"
+                            })
+                        });
+                        setJobSubscription(subscription);
                         setIsLoading(true);
                     })
                     .catch(() => {
@@ -245,7 +237,6 @@ export function LoadNewDataSource() {
                 setIsLoading(false);
                 return;
             });
-
     }
 
     async function createDatasetAndSaveToBlob() {
@@ -362,10 +353,71 @@ export function LoadNewDataSource() {
         }
     }
 
-    useEffectOnce(() => {
+
+    function storeFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        if (e.target.files !== null) {
+            const file: File = e.target.files[0];
+            const fileExtension = file?.name?.split('.')?.pop();
+            if (!fileExtension || !['csv', 'xls', 'xlsx'].includes(fileExtension)) {
+                setValidateForm(prevState => {
+                    return {
+                        ...prevState,
+                        fileValid: false
+                    }
+                });
+                addError({error: "Please check the file is valid, upload a CSV, XLS or XLSX file"});
+                return;
+            }
+            setUploadFileName(file.name);
+            setUploadFile(file);
+        }
+    }
+
+    function CreateDataSourceButton() {
+        const isDisabled = permittedFundingStreams.length === 0;
+        return (
+            <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
+                    onClick={createDatasetAndSaveToBlob} disabled={isDisabled} data-testid="create-button">
+                Create data source
+            </button>
+        );
+    }
+
+
+    useEffect(() => {
         populateFundingStreamSuggestions();
         populateDataSchemaSuggestions();
-    });
+    }, []);
+    
+    useEffect(() => {
+        if (jobNotifications.length === 0) return;
+        
+        const notification = jobNotifications.find(n => n.subscription.id === jobSubscription?.id);
+        const newJob = notification?.latestJob;
+        
+        if (!notification || !newJob || newJob.runningStatus !== RunningStatus.Completed) return;
+        
+        removeSub(notification.subscription.id);
+        setJobSubscription(undefined);
+        
+        if (newJob.isSuccessful) {
+            return onDatasetValidated();
+        } else {
+            onValidationJobFailed(newJob);
+        }
+        setIsLoading(false);
+    }, [jobNotifications]);
+    
+    useEffect(() => {
+        filterFundingStreamsByPermittedStreams();
+    }, [permittedFundingStreams]);
+
+    useEffect(() => {
+        if (fundingStreams.length > 0 && !fundingStreamsIsFiltered) {
+            filterFundingStreamsByPermittedStreams();
+            setFundingStreamsIsFiltered(true);
+        }
+    }, [fundingStreams]);
 
     useEffect(() => {
         if (fundingStreamSuggestions.length > 0) {
@@ -467,35 +519,6 @@ export function LoadNewDataSource() {
             }
         }
     }, [selectedFundingStream]);
-
-    function storeFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-        if (e.target.files !== null) {
-            const file: File = e.target.files[0];
-            const fileExtention = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
-            if (validExtensions.indexOf(fileExtention) < 0) {
-                setValidateForm(prevState => {
-                    return {
-                        ...prevState,
-                        fileValid: false
-                    }
-                });
-                addError({error: "Please check the file is valid, upload a CSV, XLS or XLSX file"});
-                return;
-            }
-            setUploadFileName(file.name);
-            setUploadFile(file);
-        }
-    }
-
-    function CreateDataSourceButton() {
-        const isDisabled = permittedFundingStreams.length === 0;
-        return (
-            <button className="govuk-button govuk-!-margin-right-1" data-module="govuk-button"
-                    onClick={createDatasetAndSaveToBlob} disabled={isDisabled} data-testid="create-button">
-                Create data source
-            </button>
-        );
-    }
 
     return (<div>
             <Header location={Section.Datasets}/>

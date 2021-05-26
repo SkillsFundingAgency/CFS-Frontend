@@ -8,6 +8,8 @@ import {QueryClient, QueryClientProvider} from "react-query";
 import * as useFetchAllLatestSpecificationJobsHook from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
+import {FetchLatestSpecificationJobProps} from "../../../hooks/Jobs/useFetchLatestSpecificationJob";
+import {FetchAllLatestSpecificationJobResult} from "../../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 
 jest.mock("../../../components/AdminNav");
 
@@ -56,7 +58,17 @@ describe("<DataRelationships />", () => {
     describe("when background converter wizard job is running", () => {
         beforeEach(async () => {
             mockDatasetrelationships();
-            jest.spyOn(useFetchAllLatestSpecificationJobsHook, 'useFetchAllLatestSpecificationJobs').mockImplementation(() => (activeJob));
+            jest.spyOn(useFetchAllLatestSpecificationJobsHook, 'useFetchAllLatestSpecificationJobs')
+                .mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
+                    return {
+                        allJobs: activeJobs,
+                        errorCheckingForJobs: "",
+                        haveErrorCheckingForJobs: false,
+                        isCheckingForJobs: false,
+                        isFetched: true,
+                        isFetching: false
+                    } as FetchAllLatestSpecificationJobResult
+                });
             await renderPage();
         });
 
@@ -70,8 +82,7 @@ describe("<DataRelationships />", () => {
     });
 });
 
-const activeJob = {
-    allJobs: [{
+const activeJobs = [{
         jobId: "",
         jobType: JobType.RunConverterDatasetMergeJob,
         specificationId: "",
@@ -88,13 +99,7 @@ const activeJob = {
             entityType: "",
             message: ""
         }
-    }],
-    isCheckingForJobs: true,
-    errorCheckingForJobs: false,
-    haveErrorCheckingForJobs: false,
-    isFetching: false,
-    isFetched: true,
-}
+    }];
 
 const mockErrorHook = jest.spyOn(errorHook, 'useErrors');
 mockErrorHook.mockImplementation(() => {

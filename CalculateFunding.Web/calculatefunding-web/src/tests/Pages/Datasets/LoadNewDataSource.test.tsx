@@ -11,9 +11,11 @@ import {
     uploadDataSourceService, validateDatasetService
 } from "../../../services/datasetService";
 import userEvent from "@testing-library/user-event";
-import * as monitor from "../../../hooks/Jobs/useJobMonitor";
+import * as monitor from "../../../hooks/Jobs/useJobSubscription";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {CompletionStatus} from "../../../types/CompletionStatus";
+import {AddJobSubscription, JobNotification, JobSubscription} from "../../../hooks/Jobs/useJobSubscription";
+import {DateTime} from "luxon";
 
 describe("<LoadNewDataSource />", () => {
     beforeEach(async () => {
@@ -102,6 +104,7 @@ describe("<LoadNewDataSource />", () => {
 
         it("submits new dataset given form is valid ", async () => {
             const {createDatasetService, uploadDataSourceService,validateDatasetService} = require('../../../services/datasetService');
+            haveNoJobNotification();
             await givenFormIsCompleted();
 
             await submitForm();
@@ -115,19 +118,21 @@ describe("<LoadNewDataSource />", () => {
 
         it("validation report url is retrieved given file fail validation ", async () => {
             const {downloadValidateDatasetValidationErrorSasUrl} = require('../../../services/datasetService');
+            haveNoJobNotification();
             await givenFormIsCompleted();
 
             await submitForm();
-            await sendANewJobNotification();
+            haveFailedJobNotification();
 
             await waitFor(() => expect(downloadValidateDatasetValidationErrorSasUrl).toBeCalledTimes(1));
         })
 
         it("validation report url is displayed given a validation error file url is retrieved ", async () => {
+            haveNoJobNotification();
             await givenFormIsCompleted();
 
             await submitForm();
-            await sendANewJobNotification();
+            haveFailedJobNotification();
 
             await waitFor(() => {
                 expect(screen.queryByText(`Validation failed`)).toBeInTheDocument();
@@ -137,9 +142,10 @@ describe("<LoadNewDataSource />", () => {
         })
 
         it("validation error is displayed given job failed with validation error information ", async () => {
+            haveNoJobNotification();
             await givenFormIsCompleted();
             await submitForm();
-            await sendANewJobNotificationWithErrorOutcome();
+            await haveFailedJobWithValidationErrors();
             await waitFor(() => {
                 expect(screen.getByText("Some validation errors")).toBeInTheDocument();
             });
@@ -176,41 +182,6 @@ const submitForm = async() => {
     userEvent.click(createButton);
 }
 
-const sendANewJobNotification = async() => {
-    jobMonitorSpy.mockReturnValue({
-        newJob: {
-            jobId: "aValidJobId",
-            statusDescription: "",
-            jobDescription: "",
-            runningStatus: RunningStatus.Completed,
-            failures: [],
-            isSuccessful: false,
-            isFailed: false,
-            isActive: false,
-            isComplete: true,
-            completionStatus: CompletionStatus.Failed,
-            outcome: "ValidationFailed"
-        }
-    });
-}
-
-const sendANewJobNotificationWithErrorOutcome = async() => {
-    jobMonitorSpy.mockReturnValue({
-        newJob: {
-            jobId: "aValidJobId",
-            statusDescription: "",
-            jobDescription: "",
-            runningStatus: RunningStatus.Completed,
-            failures: [],
-            isSuccessful: false,
-            isFailed: false,
-            isActive: false,
-            isComplete: true,
-            completionStatus: CompletionStatus.Failed,
-            outcome: "Some validation errors"
-        }
-    });
-}
 
 const renderPage = async () => {
     const {LoadNewDataSource} = require("../../../pages/Datasets/LoadNewDataSource");
@@ -786,9 +757,72 @@ jest.mock('react-router', () => ({
     }),
 }));
 
-const jobMonitorSpy = jest.spyOn(monitor, 'useJobMonitor');
-jobMonitorSpy.mockImplementation(() => {
+let notification: JobNotification | undefined;
+let subscription: JobSubscription | undefined = {
+    filterBy: {
+        jobId: 'jobId',
+        jobTypes: [],
+    },
+    id: "sertdhw4e5t",
+    onError: () => {},
+    startDate: DateTime.now()
+};
+
+const haveNoJobNotification = () => {
+    notification = undefined;
+}
+const haveFailedJobNotification = () => {
+    notification = {
+        subscription: subscription as JobSubscription,
+        latestJob: {
+            jobId: "aValidJobId",
+            statusDescription: "",
+            jobDescription: "",
+            runningStatus: RunningStatus.Completed,
+            failures: [],
+            isSuccessful: false,
+            isFailed: false,
+            isActive: false,
+            isComplete: true,
+            completionStatus: CompletionStatus.Failed,
+            outcome: "ValidationFailed"
+        }
+    };
+}
+const haveFailedJobWithValidationErrors = () => {
+    notification = {
+        subscription: subscription as JobSubscription,
+        latestJob: {
+            jobId: "aValidJobId",
+            statusDescription: "",
+            jobDescription: "",
+            runningStatus: RunningStatus.Completed,
+            failures: [],
+            isSuccessful: false,
+            isFailed: false,
+            isActive: false,
+            isComplete: true,
+            completionStatus: CompletionStatus.Failed,
+            outcome: "Some validation errors"
+        }
+    };
+}
+
+const jobSubscriptionSpy = jest.spyOn(monitor, 'useJobSubscription');
+jobSubscriptionSpy.mockImplementation(() => {
     return {
-        newJob: undefined
+        addSub: (request: AddJobSubscription) => {
+            const sub: JobSubscription = {
+                filterBy: request.filterBy, 
+                id: "sertdhw4e5t", 
+                onError: request.onError, 
+                startDate: DateTime.now()
+            }
+            subscription = sub;
+            return sub;
+        },
+        removeSub: (request) => {},
+        removeAllSubs: () => {},
+        results: notification ? [notification] : []
     }
 });

@@ -64,9 +64,16 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
     const {errors, addError} = useErrors();
 
     const {allJobs: converterWizardJobs} =
-        useFetchAllLatestSpecificationJobs(match.params.specificationId,
-            [JobType.RunConverterDatasetMergeJob],
-            err => addError({error: err, description: "Error while checking for converter wizard running jobs"}));
+        useFetchAllLatestSpecificationJobs({
+            jobFilter: {
+                specificationId: match.params.specificationId,
+                jobTypes: [JobType.RunConverterDatasetMergeJob]
+            },
+            onError: err => addError({
+                error: err,
+                description: "Error while checking for converter wizard running jobs"
+            })
+        });
 
     const checkConverterWizardForDatasets = ()=>{
         if (!datasetRelationships || datasetRelationships.items?.length === 0 || !converterWizardJobs)

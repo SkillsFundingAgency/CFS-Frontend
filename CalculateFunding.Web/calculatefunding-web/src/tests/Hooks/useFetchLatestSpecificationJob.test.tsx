@@ -35,7 +35,11 @@ describe("useFetchLatestSpecificationJob tests", () => {
     describe("Handles invalid inputs correctly", () => {
         it("when specification id is null", async () => {
             const {result} =
-                renderHook(() =>  useFetchLatestSpecificationJob("", [JobType.RefreshFundingJob]),
+                renderHook(() =>  useFetchLatestSpecificationJob({
+                        jobFilter: {
+                            jobTypes: [JobType.RefreshFundingJob],
+                            specificationId: ""
+                        }}),
                     {wrapper: QueryClientProviderTestWrapper});
             expect(result.current.lastJob).toBe(undefined);
             expect(result.current.isCheckingForJob).toBe(false);
@@ -47,8 +51,11 @@ describe("useFetchLatestSpecificationJob tests", () => {
         });
         it("when no job types supplied", async () => {
             const {result} =
-                renderHook(() =>
-                    useFetchLatestSpecificationJob(specificationId, []),
+                renderHook(() =>  useFetchLatestSpecificationJob({
+                    jobFilter: {
+                        jobTypes: [],
+                        specificationId
+                    }}),
                     {wrapper: QueryClientProviderTestWrapper});
             expect(result.current.lastJob).toBe(undefined);
             expect(result.current.isCheckingForJob).toBe(false);
@@ -74,9 +81,12 @@ describe("useFetchLatestSpecificationJob tests", () => {
 
         it("returns correct latest job", async () => {
             const {result, waitForNextUpdate} =
-                renderHook(() =>
-                    useFetchLatestSpecificationJob(specificationId, [JobType.RefreshFundingJob]),
-                    {wrapper: QueryClientProviderTestWrapper});
+                renderHook(() =>  useFetchLatestSpecificationJob({
+                    jobFilter: {
+                        jobTypes: [JobType.RefreshFundingJob],
+                        specificationId: specificationId
+                    }}),
+                {wrapper: QueryClientProviderTestWrapper});
 
             await act(async () => {
                 await waitForNextUpdate();
