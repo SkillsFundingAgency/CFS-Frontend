@@ -105,6 +105,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             result.Providers.Should().HaveCount(numberOfItems);
             result.TotalErrorResults.Should().Be(0);
             result.TotalProvidersToApprove.Should().Be(numberOfItems);
+            result.Facets.Count().Should().Be(4);
         }
         SearchResults<PublishedProviderSearchItem> GenerateSearchResults(int numberOfItems)
         {
@@ -129,6 +130,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                     new SearchFacet { Name = "providerType", FacetValues = new List<SearchFacetValue>()},
                     new SearchFacet { Name = "localAuthority", FacetValues = new List<SearchFacetValue>()},
                     new SearchFacet { Name = "fundingStatus", FacetValues = new List<SearchFacetValue>()},
+                    new SearchFacet { Name = "monthYearOpened", FacetValues = new List<SearchFacetValue>()}
                 },
                 TotalCount = numberOfItems,
                 TotalErrorCount = 0

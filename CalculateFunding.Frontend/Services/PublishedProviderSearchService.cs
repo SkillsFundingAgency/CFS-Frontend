@@ -16,7 +16,6 @@ using CalculateFunding.Frontend.Interfaces.Services;
 using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Results;
 using Serilog;
-using static CalculateFunding.Frontend.Extensions.DateRangeExtensions;
 
 namespace CalculateFunding.Frontend.Services
 {
@@ -68,17 +67,12 @@ namespace CalculateFunding.Frontend.Services
             Task<ApiResponse<FundingConfiguration>> fundingConfigTask = 
                 _policiesApiClient.GetFundingConfiguration(request.FundingStreamId, request.FundingPeriodId);
 
-            Task<HashSet<string>> currentFundingPeriodMonthsTask =
-                GetCurrentFundingPeriodsMonths(request.FundingPeriodId);
-
             ApiResponse<SearchResults<PublishedProviderSearchItem>> searchResponse = await searchTask;
             if (searchResponse == null)
             {
                 _logger.Error("Find providers HTTP request failed");
                 return null;
             }
-
-            HashSet<string> currentFundingPeriodMonths = await currentFundingPeriodMonthsTask;
             
             PublishProviderSearchResultViewModel result = new PublishProviderSearchResultViewModel
             {
@@ -89,8 +83,6 @@ namespace CalculateFunding.Frontend.Services
                 Providers = searchResponse.Content?.Results?.Select(provider => _mapper.Map<PublishedProviderSearchResultItemViewModel>(provider)),
                 FilteredFundingAmount = searchResponse.Content?.Results?.Sum(x => x.FundingValue) ?? 0
             };
-
-            RemoveMonthYearFacetsOutsideOfCurrentFundingPeriod(currentFundingPeriodMonths, result);
             
             int totalPages = (int) Math.Ceiling((double) result.TotalResults / (double) request.PageSize.Value);
             result.PagerState = new PagerState(requestOptions.PageNumber, totalPages, 4);
@@ -159,37 +151,6 @@ namespace CalculateFunding.Frontend.Services
             }
 
             return result;
-        }
-
-        private async Task<HashSet<string>> GetCurrentFundingPeriodsMonths(string fundingPeriodId)
-        {
-            FundingPeriod fundingPeriod = (await _policiesApiClient.GetFundingPeriodById(fundingPeriodId))?.Content;
-
-            if (fundingPeriod == null)
-            {
-                _logger.Error($"Request failed to find funding funding period {fundingPeriodId}");
-
-                return null;
-            }
-
-            return new HashSet<string>(GetMonthsBetween(fundingPeriod.StartDate, fundingPeriod.EndDate));
-        }
-
-        private void RemoveMonthYearFacetsOutsideOfCurrentFundingPeriod(HashSet<string> currentYear,
-            PublishProviderSearchResultViewModel searchResultViewModel)
-        {
-            SearchFacetViewModel monthYearFacet = searchResultViewModel?
-                .Facets
-                .SingleOrDefault(_ => _.Name == "monthYearOpened");
-
-            if (monthYearFacet == null)
-            {
-                return;
-            }
-
-            monthYearFacet.FacetValues = monthYearFacet.FacetValues?
-                .Where(_ => currentYear.Contains(_.Name))
-                .ToArray();
         }
 
         private void RemoveShowAllAllocationTypesIndicativeFilter(IDictionary<string, string[]> filters)
