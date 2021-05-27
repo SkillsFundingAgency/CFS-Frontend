@@ -7,28 +7,32 @@ import {milliseconds} from "../../helpers/TimeInMs";
 import {JobNotification, JobSubscription, MonitorMode} from "./useJobSubscription";
 import {JobMonitoringFilter} from "./useJobMonitor";
 
-export interface MultipleJobMonitorProps {
+export interface SignalRJobMonitorProps {
     subscriptions: JobSubscription[],
     onError: (err: AxiosError | Error | string) => void,
     isEnabled?: boolean,
-    onClose?: () => void
+    onReconnecting?: () => void,
+    onReconnection?: () => void,
+    onClose?: () => void,
     onFail?: (error: string) => void
 }
 
-export interface MultipleJobMonitorResult {
+export interface SignalRJobMonitorResult {
     results: JobNotification[],
     state: HubConnectionState | undefined,
     isMonitoring: boolean
 }
 
 // N.B.: initially this is watching all jobs and not using the specification specific endpoint
-export const useMultipleJobMonitor = ({
+export const useSignalRJobMonitor = ({
                                           subscriptions,
                                           onError,
                                           isEnabled,
+                                          onReconnecting,
+                                          onReconnection,
                                           onFail,
                                           onClose
-                                      }: MultipleJobMonitorProps): MultipleJobMonitorResult => {
+                                      }: SignalRJobMonitorProps): SignalRJobMonitorResult => {
     const [notifications, setNotifications] = useState<JobNotification[]>([]);
     const [hubConnection, setHubConnection] = useState<HubConnection>();
     const hubRef = useRef<HubConnection>();
@@ -107,6 +111,14 @@ export const useMultipleJobMonitor = ({
         }
     }
     
+    const notifyReconnection = () => {
+        onReconnection && onReconnection();
+    }
+    
+    const notifyReconnecting = () => {
+        onReconnecting && onReconnecting();
+    }
+    
     const monitorJobNotifications = async () => {
         try {
             if (!hubRef.current) {
@@ -115,9 +127,9 @@ export const useMultipleJobMonitor = ({
                     .withAutomaticReconnect([5, 8, 13])
                     .configureLogging(LogLevel.Information)
                     .build();
-                hubConnect.keepAliveIntervalInMilliseconds = milliseconds.SixMinutes;
-                hubConnect.serverTimeoutInMilliseconds = milliseconds.ThirtySeconds;
-
+                hubConnect.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
+                hubConnect.serverTimeoutInMilliseconds = milliseconds.SixMinutes;
+                
                 // register listeners before calling start
                 hubConnect.on('NotificationEvent', (job: JobResponse) => {
                     if (isThisJobValid(job)) {
@@ -135,7 +147,15 @@ export const useMultipleJobMonitor = ({
 
                 hubConnect.onclose(error => {
                     notifyDisconnection(error);
-                })
+                });
+
+                hubConnect.onreconnecting(x => {
+                    notifyReconnecting();
+                });
+                
+                hubConnect.onreconnected(x => {
+                    notifyReconnection();
+                });
 
                 await hubConnect.start();
 

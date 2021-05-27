@@ -4,22 +4,21 @@ import * as React from "react";
 import {v4 as uuidv4} from 'uuid';
 import {DateTime} from "luxon";
 import {JobDetails} from "../../types/jobDetails";
-import {useMultipleJobMonitor} from "./useMultipleJobMonitor";
+import {useSignalRJobMonitor} from "./useSignalRJobMonitor";
 import {getJob} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {useInterval} from "../useInterval";
 import {milliseconds} from "../../helpers/TimeInMs";
-import {uniq} from "ramda";
 import {useEffect} from "react";
 
 export enum MonitorMode {
-    SignalR,
-    Polling
+    SignalR = 'SignalR',
+    Polling = 'Polling'
 }
 
 export enum MonitorFallback {
-    None,
-    Polling
+    None = 'None',
+    Polling = 'Polling'
 }
 
 export interface AddJobSubscription {
@@ -65,29 +64,6 @@ export const useJobSubscription = ({
     const [jobPollingInterval, setJobPollingInterval] = React.useState<number>(0);
     const [isSignalREnabled, setIsSignalREnabled] = React.useState<boolean>(isEnabled);
 
-    const onSignalRFail = (error: string) => {
-        if (error && error.length > 0) console.error(error);
-        setIsSignalREnabled(false);
-        if (subs.length === 0) return;
-        if (subs.some(s => s.monitorFallback === MonitorFallback.Polling)) {
-            setJobPollingInterval(milliseconds.TenSeconds);
-        } else { // try to kickstart signalR after a second
-            setInterval(() => setIsSignalREnabled(true), 1000);
-        }
-    };
-    const onSignalRClose = () => {
-        setIsSignalREnabled(false);
-    };
-
-    const {results: monitoringResults, state, isMonitoring} =
-        useMultipleJobMonitor({
-            onError,
-            isEnabled: isEnabled && isSignalREnabled,
-            subscriptions: subs,
-            onFail: onSignalRFail,
-            onClose: onSignalRClose
-        });
-
     const addSub = (request: AddJobSubscription) => {
         const newSub: JobSubscription = {
             filterBy: request.filterBy,
@@ -100,7 +76,7 @@ export const useJobSubscription = ({
             startDate: DateTime.now(),
             lastUpdate: undefined
         };
-        
+
         if (subs.length === 0) {
             reset();
         }
@@ -109,30 +85,77 @@ export const useJobSubscription = ({
 
         return newSub;
     };
-    
+
     const reset = () => {
         setIsSignalREnabled(true);
         setNotifications([]);
         setJobPollingInterval(0);
-    }
-    
+    };
+
     const removeSub = (id: string) => {
         setSubs(existing => existing.filter(x => x.id !== id));
         setNotifications(existing => existing.filter(n => n.subscription.id === id));
     };
-    
+
     const removeAllSubs = () => {
         setSubs([]);
         setNotifications([]);
     };
-    
+
+    const onSignalRFail = (error: string) => {
+        if (error && error.length > 0) console.error(error);
+        
+        // signalR has failed, so get the hook to stop signalR
+        setIsSignalREnabled(false);
+        
+        if (subs.length === 0) return;
+        
+        if (anySubscriptionsWithPolling(subs)) {
+            setJobPollingInterval(milliseconds.TenSeconds);
+        }
+        
+        // try to kickstart signalR after a second
+        setInterval(() => setIsSignalREnabled(true), 1000);
+    };
+
+    const onSignalRClose = () => {
+        // trigger signalR shutdown
+        setIsSignalREnabled(false);
+    };
+
+    const onSignalRReconnected = async () => {
+        // cancel polling because we now have signalR working again
+        setJobPollingInterval(0);
+        
+        // try to find any job updates that were missed in the interim
+        await fetchLatestJobUpdatesForPollingSubscriptions();
+    };
+
+    const onSignalRReconnecting = () => {
+        // try to find any job updates that would otherwise be missed in the interim
+        if (anySubscriptionsWithPolling(subs)) {
+            setJobPollingInterval(milliseconds.TenSeconds);
+        }
+    };
+
+    const {results: signalRResults} =
+        useSignalRJobMonitor({
+            onError,
+            isEnabled: isEnabled && isSignalREnabled,
+            subscriptions: subs,
+            onReconnecting: onSignalRReconnecting,
+            onReconnection: onSignalRReconnected,
+            onClose: onSignalRClose,
+            onFail: onSignalRFail
+        });
+
     const checkForJobByJobId = async (jobId: string): Promise<JobDetails | undefined> => {
         if (!isJobIdValid(jobId)) return;
         const response = await getJob(jobId);
         if (!response.data) return undefined;
         return getJobDetailsFromJobResponse(response.data);
     };
-    
+
     const findMatchingSubs = (job: JobDetails): JobSubscription[] => {
         if (!subs || subs.length === 0) {
             return [];
@@ -145,40 +168,47 @@ export const useJobSubscription = ({
             && filterJobsBySpecification(job, s.filterBy));
 
         return matches ?? [];
-    }
+    };
 
     const filterJobsByType = (job: JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobTypes || (filterBy.jobTypes.length === 0 || filterBy.jobTypes.find(type => job.jobType === type.toString()));
-    }
+    };
     
     const filterJobsByIdOrParent = (job: JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobId || (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));
-    }
-    
+    };
+
     const filterJobsBySpecification = (job: JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.specificationId || job.specificationId === filterBy.specificationId;
-    }
+    };
     
-    const findUniqueJobIds = (subscriptions: JobSubscription[]) => {
-        return uniq(subscriptions
+    const findJobSubscriptionsWithPolling = (subscriptions: JobSubscription[]) => 
+        subscriptions
+            .filter(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
+
+    const anySubscriptionsWithPolling = (subscriptions: JobSubscription[]): boolean =>
+        subscriptions.some(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
+    
+    const extractJobIds = (subscriptions: JobSubscription[]): string[] => {
+        return subscriptions
             .filter(s => isJobIdValid(s?.filterBy?.jobId))
-            .map(s => s.filterBy.jobId)).values();
-    }
-    
+            .map(s => s.filterBy.jobId) as string[];
+    };
+
     const isJobIdValid = (jobId: string | undefined) => {
         return !!jobId && jobId.length > 1; // to catch edge case of 0 turned to string
-    }
-    
+    };
+
     const isJobValid = (job: JobDetails | undefined) => {
         return !!job && isJobIdValid(job.jobId);
-    }
+    };
 
     const shouldUpdateNotification = (a: JobNotification | undefined, b: JobNotification) => {
         if (!a?.subscription?.lastUpdate) return true;
         if (!b?.subscription?.lastUpdate) return false;
 
         return a.subscription.lastUpdate < b.subscription.lastUpdate;
-    }
+    };
 
     const mergeNotifications = (newNotifications: JobNotification[]) => {
         if (newNotifications.length === 0) return;
@@ -200,13 +230,21 @@ export const useJobSubscription = ({
         })
     };
 
-    useInterval(async () => {
-        if (jobPollingInterval <= 0) {
-            reset();
-            return;
+    const fetchLatestJobUpdatesForPollingSubscriptions = async () => {
+        await fetchLatestJobUpdates(findJobSubscriptionsWithPolling(subs));
+    };
+
+    const fetchLatestJobUpdates = async (subscriptions: JobSubscription[]) => {
+        // TODO: extend to cover when we don't know the job id, once the jobs api has been extended
+        const jobIds = extractJobIds(subscriptions);
+        if (jobIds && jobIds.length > 0) {
+            await fetchLatestJobUpdatesById(jobIds);
         }
+    };
+
+    const fetchLatestJobUpdatesById = async (jobIds: string[]) => {
         let newNotifications: JobNotification[] = [];
-        for (const jobId in findUniqueJobIds(subs)) {
+        for (const jobId of jobIds) {
             const job = await checkForJobByJobId(jobId);
             if (isJobValid(job)) {
                 const subsToNotify = findMatchingSubs(job as JobDetails);
@@ -219,12 +257,21 @@ export const useJobSubscription = ({
             }
         }
         mergeNotifications(newNotifications);
+    };
+
+    useInterval(async () => {
+        if (jobPollingInterval <= 0) {
+            reset();
+            return;
+        }
+
+        await fetchLatestJobUpdatesForPollingSubscriptions();
     }, jobPollingInterval);
-    
+
     useEffect(() => {
-        mergeNotifications(monitoringResults);
-    }, [monitoringResults])
-    
+        mergeNotifications(signalRResults);
+    }, [signalRResults]);
+
     useEffect(() => {
         if (!subs || subs.length === 0) {
             setIsSignalREnabled(false);
@@ -234,7 +281,7 @@ export const useJobSubscription = ({
                 setJobPollingInterval(milliseconds.TenSeconds);
             }
         }
-    }, [subs])
+    }, [subs]);
 
     return {
         addSub,
