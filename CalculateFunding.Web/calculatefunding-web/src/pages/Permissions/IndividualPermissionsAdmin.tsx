@@ -224,8 +224,11 @@ export function IndividualPermissionsAdmin() {
         try {
             const response = await userService.updateOtherUsersPermissionsForFundingStream(selectedUserFundingStreamPermissions);
 
-            setSelectedUserFundingStreamPermissions(response.data);
-            setEditedPermissions(getEnabledPermissions(response.data));
+            const permissions = response.data;
+            setSelectedUserFundingStreamPermissions(permissions);
+            const enabledPermissions: Permission[] = getEnabledPermissions(permissions);
+            setEditedPermissions(enabledPermissions);
+            setOriginalPermissions(enabledPermissions);
             setNotification(<>Permissions updated for <span id="user">{user.name}</span> for {selectedFundingStream.name} funding stream</>)
         } catch (e) {
             addError({error: e, description: "Error saving changes, try again"})

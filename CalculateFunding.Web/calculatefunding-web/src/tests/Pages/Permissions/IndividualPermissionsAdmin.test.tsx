@@ -113,7 +113,7 @@ describe("<IndividualPermissionsAdmin/>", () => {
                     });
                 });
 
-                describe("and when I change a permission and click to save it", () => {
+                describe("and when I change permissions and click to save it", () => {
 
                     beforeEach(async () => {
                         const checkbox1 = screen.getByRole("checkbox", {name: Permission.CanCreateTemplates.toString()});
@@ -154,6 +154,42 @@ describe("<IndividualPermissionsAdmin/>", () => {
                             expect(within(banner).getByText(/user 537/)).toBeInTheDocument();
                             expect(within(banner).getByText(/for Lalala funding stream/)).toBeInTheDocument();
                         });
+                });
+
+                describe("and when I change permissions, save and then navigate away", () => {
+
+                    beforeEach(async () => {
+                        const checkbox1 = screen.getByRole("checkbox", {name: Permission.CanEditCalculations.toString()});
+                        expect(checkbox1).toBeInTheDocument();
+                        expect(checkbox1).not.toBeChecked();
+                        userEvent.click(checkbox1);
+                        expect(checkbox1).toBeChecked();
+
+                        const button = screen.getByRole("button", {name: /Apply permissions/});
+                        expect(button).toBeEnabled();
+
+                        await waitFor(() => userEvent.click(button));
+                    });
+
+                    it("does not display the confirm leave page modal",
+                        async () => {
+                            const link = screen.getByRole("link", {name: /Home/});
+
+                            await waitFor(() => userEvent.click(link));
+
+                            expect(screen.queryByTestId("modal-confirmation-placeholder")).not.toBeInTheDocument();
+                    });
+                });
+
+                describe("and when I click away to another page without making any changes", () => {
+
+                    it("does not display the confirm leave page modal", async () => {
+                        const link = screen.getByRole("link", {name: /Home/});
+
+                        await waitFor(() => userEvent.click(link));
+                        
+                        expect(screen.queryByTestId("modal-confirmation-placeholder")).not.toBeInTheDocument();
+                    });
                 });
 
                 describe("and when I click to remove all of a user's permissions", () => {
