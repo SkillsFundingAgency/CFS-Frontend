@@ -67,7 +67,14 @@ import {Admin} from "./pages/Permissions/Admin";
 import {IndividualPermissionsAdmin} from "./pages/Permissions/IndividualPermissionsAdmin";
 import {FundingStreamPermissionsAdmin} from "./pages/Permissions/FundingStreamPermissionsAdmin";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnWindowFocus: false,
+            retry: false
+        },
+    },
+})
 
 const App: React.FunctionComponent = () => {
     const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);

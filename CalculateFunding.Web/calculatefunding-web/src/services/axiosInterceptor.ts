@@ -18,12 +18,18 @@ export function initialiseAxios() {
             response => response,
             (error) => {
                 if (!configuration.handlerEnabled) {
+                    console.error(`Axios error intercepted but not handled: ${error?.config?.url}: ${error?.response?.status}: ${error?.response?.statusText}}`)
+                    return Promise.reject(error);
+                }
+                
+                if (window.location.href.includes('.auth/login')) {
                     return Promise.reject(error);
                 }
 
                 // no authentication provided so need to login
                 if (error.response.status === 403) {
                     window.location.href = `${configuration.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
+                    return Promise.reject(error);
                 }
 
                 // api says user hasn't confirmed skills
