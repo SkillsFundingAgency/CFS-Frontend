@@ -1,6 +1,8 @@
 import React, {useLayoutEffect, useRef, useState} from "react";
 
-export function SearchBox(props: { timeout?: number, callback: any }) {
+export interface SearchBoxProps { timeout?: number, callback: any }
+
+export function SearchBox(props: SearchBoxProps) {
     const [searchQuery, setSearchQuery] = useState<string>("initialise");
     const didMount = useRef(false);
 

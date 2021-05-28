@@ -1,13 +1,14 @@
 import React from "react";
+import '../../src/App.scss';
 
 export interface WarningTextProps {
-    text: string, 
+    text: string,
     hidden?: boolean,
     className?: string,
 }
 
 export function WarningText({ text, className, hidden = false }: WarningTextProps) {
-    
+
     return (
         <div className={`govuk-warning-text ${className || ''}`} hidden={hidden}>
         <span className="govuk-warning-text__icon" aria-hidden="true">!</span>

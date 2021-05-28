@@ -2,6 +2,8 @@ import * as React from 'react';
 import {Link} from "react-router-dom";
 import {useHistory} from "react-router";
 
+export interface BreadcrumbProps { name: string, url?: string, legacy?:boolean, goBack?:boolean }
+
 export function Breadcrumbs(props: { children: any }) {
     return <div id="breadcrumbs" className="govuk-breadcrumbs govuk-!-margin-bottom-5">
         <ol className="govuk-breadcrumbs__list">
@@ -10,7 +12,7 @@ export function Breadcrumbs(props: { children: any }) {
     </div>
 }
 
-export function Breadcrumb(props: { name: string, url?: string, legacy?:boolean, goBack?:boolean }) {
+export function Breadcrumb(props: BreadcrumbProps) {
     const history = useHistory();
     if(props.legacy)
     {

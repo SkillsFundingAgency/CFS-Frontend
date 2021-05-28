@@ -1,6 +1,12 @@
 import React, {useEffect, useState} from 'react';
 
-export function TimeInput(props: { time: string, callback: any, inputName?: string }) {
+export interface TimeInputProps{
+    time: string,
+    callback: any,
+    inputName?: string
+}
+
+export function TimeInput(props : TimeInputProps) {
     const [localTime, setTime] = useState(props.time);
     const propTime = props.time;
     const inputId = props.inputName == null ? generateRandomId() : props.inputName;
