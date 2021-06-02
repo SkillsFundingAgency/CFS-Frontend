@@ -57,7 +57,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                             <tr className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header">Providers selected</th>
                                 <td className="govuk-table__cell">
-                                    {props.approvalMode === ApprovalMode.Batches &&
+                                    {props.approvalMode === ApprovalMode.Batches && batchSize > 0 &&
                                     <CsvDownloadPublishedProviders
                                         actionType={actionType}
                                         specificationId={props.specification.id}
