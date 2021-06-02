@@ -4,10 +4,11 @@ import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import MockAdapter from "axios-mock-adapter";
 import axios from "axios";
-import {waitFor} from "@testing-library/dom";
 import {QueryClientProviderTestWrapper} from "./QueryClientProviderTestWrapper";
+import {ProviderDataTrackingMode} from "../../types/Specifications/ProviderDataTrackingMode";
 
-export const testSpec: SpecificationSummary = {
+const testSpec: SpecificationSummary = {
+    coreProviderVersionUpdates: ProviderDataTrackingMode.Manual,
     name: "Wizard Training",
     approvalStatus: "",
     description: "",

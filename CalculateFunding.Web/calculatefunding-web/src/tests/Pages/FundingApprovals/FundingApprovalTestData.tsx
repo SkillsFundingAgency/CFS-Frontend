@@ -73,7 +73,6 @@ export function FundingApprovalTestData() {
         latestJob: undefined,
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const activeJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -88,7 +87,6 @@ export function FundingApprovalTestData() {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const failedJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -104,7 +102,6 @@ export function FundingApprovalTestData() {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const successfulCompletedJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -120,7 +117,6 @@ export function FundingApprovalTestData() {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const fundingConfigWithApproveAllResult: FundingConfigurationQueryResult = {
         fundingConfiguration: {

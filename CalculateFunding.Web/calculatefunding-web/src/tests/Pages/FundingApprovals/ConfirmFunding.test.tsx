@@ -408,7 +408,6 @@ function setupTestConfig() {
         latestJob: undefined,
         isFetched: true,
         isFetching: false,
-        isMonitoring: true,
     };
     const activeJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -423,7 +422,6 @@ function setupTestConfig() {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const completedJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -439,7 +437,6 @@ function setupTestConfig() {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const mockFundingConfigWithApprovalAllMode: FundingConfigurationQueryResult = {
         fundingConfiguration: {

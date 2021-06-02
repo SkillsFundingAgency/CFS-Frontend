@@ -8,7 +8,6 @@ import {QueryClient, QueryClientProvider} from "react-query";
 import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LatestSpecificationJobWithMonitoringResult} from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {RunningStatus} from "../../../types/RunningStatus";
-import '@testing-library/jest-dom/extend-expect';
 
 function renderViewSpecificationResults() {
     const {ViewSpecificationResults} = require('../../../pages/Specifications/ViewSpecificationResults');
@@ -23,6 +22,7 @@ function renderViewSpecificationResults() {
 
 const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
     .mockImplementation(() => ({
+        clearSpecificationFromCache: () => Promise.resolve(),
         specification: testSpec,
         isLoadingSpecification: false,
         errorCheckingForSpecification: null,

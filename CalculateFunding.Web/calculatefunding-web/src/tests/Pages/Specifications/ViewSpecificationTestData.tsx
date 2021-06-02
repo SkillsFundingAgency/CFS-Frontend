@@ -16,8 +16,6 @@ import {ProviderSource} from "../../../types/CoreProviderSummary";
 import * as redux from "react-redux";
 import {Provider} from "react-redux";
 import {JobObserverState} from "../../../states/JobObserverState";
-import {JobType} from "../../../types/jobType";
-import {testSpec} from "../../Hooks/useSpecificationSummary.test";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
@@ -38,7 +36,6 @@ export function ViewSpecificationTestData() {
             isCheckingForJob: false,
             isFetched: true,
             isFetching: false,
-            isMonitoring: false,
             latestJob: {
                 jobId: "jobId-generatedByRefresh",
                 statusDescription: "",
@@ -115,12 +112,6 @@ export function ViewSpecificationTestData() {
         return component;
     };
 
-    const mockJobObserverState: JobObserverState = {
-        jobFilter: {
-            jobTypes: [JobType.RefreshFundingJob],
-            specificationId: testSpec.id
-        }
-    }
     const mockNoJobObserverState: JobObserverState = {
         jobFilter: undefined
     }

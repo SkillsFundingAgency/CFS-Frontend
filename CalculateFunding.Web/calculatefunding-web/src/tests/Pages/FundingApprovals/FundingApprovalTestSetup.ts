@@ -140,7 +140,6 @@ export const FundingApprovalTestSetup = () => {
         latestJob: undefined,
         isFetched: true,
         isFetching: false,
-        isMonitoring: true,
     };
     const activeApprovalJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -161,7 +160,6 @@ export const FundingApprovalTestSetup = () => {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const activeValidationJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -183,7 +181,6 @@ export const FundingApprovalTestSetup = () => {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const successfulValidationJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -206,7 +203,6 @@ export const FundingApprovalTestSetup = () => {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
     const failedValidationJob: LatestSpecificationJobWithMonitoringResult = {
         hasJob: true,
@@ -229,7 +225,6 @@ export const FundingApprovalTestSetup = () => {
         }),
         isFetched: true,
         isFetching: false,
-        isMonitoring: true
     };
 
     const mockNoJobObserverState: JobObserverState = {

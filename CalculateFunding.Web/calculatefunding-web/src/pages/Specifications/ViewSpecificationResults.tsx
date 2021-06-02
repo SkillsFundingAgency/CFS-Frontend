@@ -16,6 +16,7 @@ import {LoadingStatus} from "../../components/LoadingStatus";
 import { JobType } from "../../types/jobType";
 import {useEffect, useState} from "react";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import {Link} from "react-router-dom";
 
 export interface ViewSpecificationResultsRoute {
     specificationId: string
@@ -61,9 +62,26 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
             <LoadingStatus title={"Loading specification"} hidden={!isLoadingSpecification} />
             <div className="govuk-main-wrapper" hidden={isLoadingSpecification}>
                 <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-full">
-                        <h1 className="govuk-heading-xl">{specification !== undefined ? specification.name : ""}</h1>
-                        <h2 className="govuk-caption-xl">{specification !== undefined ? specification.fundingPeriod.name : ""}</h2>
+                    <div className="govuk-grid-column-two-thirds">
+                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification !== undefined ? specification.name : ""}</h1>
+                        <span className="govuk-caption-l">{specification !== undefined ? specification.fundingPeriod.name : ""}</span>
+                        {specification && specification.isSelectedForFunding &&
+                        <p className="govuk-body govuk-!-margin-top-2">
+                            <strong className="govuk-tag">Chosen for funding</strong>
+                        </p>
+                        }
+                    </div>
+                    <div className="govuk-grid-column-one-third">
+                        {specification && specification.isSelectedForFunding &&
+                        <ul className="govuk-list right-align">
+                            <li>
+                                <Link className="govuk-link govuk-link--no-visited-state"
+                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>
+                                    View funding
+                                </Link>
+                            </li>
+                        </ul>
+                        }
                     </div>
                 </div>
                 {initialTab.length > 0 &&
