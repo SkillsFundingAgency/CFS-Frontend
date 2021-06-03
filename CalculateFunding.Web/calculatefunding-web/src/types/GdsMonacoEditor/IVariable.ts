@@ -9,4 +9,5 @@ export interface IVariable {
     description?: string;
     items?: IVariableContainer;
     isAggregable: boolean;
+    isObsolete: boolean;
 }

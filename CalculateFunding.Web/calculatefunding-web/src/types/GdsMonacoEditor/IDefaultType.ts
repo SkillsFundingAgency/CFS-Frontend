@@ -6,4 +6,6 @@ export interface IDefaultType {
     description?: string;
 
     items: IDefaultMemberTypeContainer;
+
+    isObsolete: boolean;
 }

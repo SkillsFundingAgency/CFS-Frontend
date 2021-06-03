@@ -1,11 +1,11 @@
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-import {IPosition} from 'monaco-editor/esm/vs/editor/editor.api'
+import {editor, IPosition, IRange, Position} from 'monaco-editor/esm/vs/editor/editor.api'
 import 'monaco-editor/esm/vs/language/css/monaco.contribution'
 import 'monaco-editor/esm/vs/language/html/monaco.contribution'
 import 'monaco-editor/esm/vs/language/json/monaco.contribution'
 import 'monaco-editor/esm/vs/language/typescript/monaco.contribution'
 import 'monaco-editor/esm/vs/basic-languages/monaco.contribution'
-import {createElement as create, useEffect, useRef} from 'react'
+import {createElement as create, useEffect, useRef, useState} from 'react'
 import {useEffectOnce} from "../hooks/useEffectOnce";
 import {getCodeContextService} from "../services/calculationService";
 import {ITypeInformationResponse} from "../types/Calculations/CodeContext";
@@ -19,20 +19,24 @@ import {IDefaultType} from "../types/GdsMonacoEditor/IDefaultType";
 import {IKeyword} from "../types/GdsMonacoEditor/IKeyword";
 import {
     checkAggregableFunctionDeclared,
+    checkForObsoleteVariable,
     convertClassToVariables,
     createCompletionItem,
     findDeclaredVariables,
-    findEnum, findEnumItems,
+    findEnum,
+    findEnumItems,
     getDefaultDataTypesCompletionItems,
     getHoverDescriptionForDefaultType,
     getHoverDescriptionForLocalFunction,
     getHoverDescriptionForVariable,
-    getKeywordsCompletionItems, getOptionsForPath,
+    getKeywordsCompletionItems, getObsoleteDefaultTypes, getObsoleteFunctions, getObsoleteVariables,
+    getOptionsForPath,
     getVariableForAggregatePath,
     getVariablesForPath,
     processSourceToRemoveComments
 } from "../services/IntellisenseProvider";
 import {FundingStream} from "../types/viewFundingTypes";
+import '../styles/Monaco.scss';
 
 export function GdsMonacoEditor(props: {
     calculationId?: string;
@@ -190,7 +194,8 @@ export function GdsMonacoEditor(props: {
                                         items: {},
                                         name: x.name,
                                         type: x.name,
-                                        variableType: monaco.languages.CompletionItemKind.EnumMember
+                                        variableType: monaco.languages.CompletionItemKind.EnumMember,
+                                        isObsolete: x.isObsolete
                                     }
                                 })
                             }
@@ -208,7 +213,8 @@ export function GdsMonacoEditor(props: {
                         const defaultType: IDefaultType = {
                             label: dataTypes[dt].name,
                             description: dataTypes[dt].description,
-                            items: {}
+                            items: {},
+                            isObsolete: dataTypes[dt].isObsolete
                         }
 
                         defaultTypes[dataTypes[dt].name.toLowerCase()] = defaultType;
@@ -242,6 +248,7 @@ export function GdsMonacoEditor(props: {
                             isAggregable: false,
                             type: x.name,
                             variableType: monaco.languages.CompletionItemKind.EnumMember,
+                            isObsolete: x.isObsolete
                         })
 
                         const option: IVariable = {
@@ -251,7 +258,8 @@ export function GdsMonacoEditor(props: {
                             isAggregable: false,
                             type: optionItem.type,
                             variableType: monaco.languages.CompletionItemKind.Enum,
-                            items: tempContainer
+                            items: tempContainer,
+                            isObsolete: optionItem.isObsolete
                         }
 
                         options[optionsList[ol].name.toLowerCase()] = option;
@@ -264,6 +272,18 @@ export function GdsMonacoEditor(props: {
                 const contextDefaultTypes = defaultTypes;
                 const contextKeywords = keywords;
                 const contextOptions = options;
+
+                let oldDecorations: string[] = [];
+
+                const obsoleteVariables = getObsoleteVariables(variables);
+                const obsoleteFunctions = getObsoleteFunctions(functions);
+                const obsoleteDefaultTypes = getObsoleteDefaultTypes(defaultTypes);
+
+                let obsoleteItems :string[]= [];
+
+                obsoleteItems = obsoleteItems.concat(obsoleteVariables);
+                obsoleteItems = obsoleteItems.concat(obsoleteFunctions);
+                obsoleteItems = obsoleteItems.concat(obsoleteDefaultTypes);
 
                 provider = monaco.languages.registerCompletionItemProvider('vb', {
                     triggerCharacters: [".", " ", "(", "="],
@@ -319,7 +339,8 @@ export function GdsMonacoEditor(props: {
                                                 kind: variable.variableType,
                                                 detail: variable.type,
                                                 insertText: variable.name,
-                                                range: editorRange
+                                                range: editorRange,
+
                                             };
 
                                             if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
@@ -365,7 +386,10 @@ export function GdsMonacoEditor(props: {
                                                 kind: variable.variableType,
                                                 detail: variable.type,
                                                 insertText: variable.name,
-                                                range: editorRange
+                                                range: editorRange,
+                                                options: {
+                                                    inlineClassName: 'obsolete-item'
+                                                }
                                             };
 
                                             if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
@@ -402,7 +426,7 @@ export function GdsMonacoEditor(props: {
                                     }
                                 }
                             }
-                         } else if (lastCharacterTyped === " " && lineContentsSoFar.trimEnd().charAt(lineContentsSoFar.trimEnd().length - 1) === "=") {
+                        } else if (lastCharacterTyped === " " && lineContentsSoFar.trimEnd().charAt(lineContentsSoFar.trimEnd().length - 1) === "=") {
                             let pathString = lineContentsSoFar.replace('=', '').replace('()', '').trimEnd();
 
                             const path = pathString.split(' ').splice(-1).toString().toLowerCase() + "options";
@@ -527,7 +551,8 @@ export function GdsMonacoEditor(props: {
                                         kind: monaco.languages.CompletionItemKind.Function,
                                         detail: localFunction.getFunctionAndParameterDescription(),
                                         insertText: localFunction.label,
-                                        range: editorRange
+                                        range: editorRange,
+                                        isObsolete: localFunction.isObsolete
                                     };
 
                                     let description = "";
@@ -589,6 +614,7 @@ export function GdsMonacoEditor(props: {
                                 }
                             }
                         }
+
                         return results;
                     }
                 });
@@ -628,9 +654,44 @@ export function GdsMonacoEditor(props: {
                     }
                 });
 
+                editor.current?.onDidChangeModelContent(e => {
+                    let ddArray: editor.IModelDeltaDecoration[] = [];
+                    const model = editor.current?.getModel();
+
+                    obsoleteItems.forEach(variableItem => {
+                        const match = editor.current?.getModel()?.findMatches(variableItem, false, false, true, ".", true, undefined);
+
+
+                        if (match && match.length > 0 && model) {
+                            match.forEach(itemMatch => {
+                                const position = new Position(itemMatch.range.startLineNumber, itemMatch.range.startColumn);
+                                const forwardTextForCurrentLine = model?.getValueInRange(itemMatch.range) ?? "";
+                                const variableIsObsolete = checkForObsoleteVariable(model, position, forwardTextForCurrentLine, contextVariables, itemMatch.range);
+
+                                if (variableIsObsolete) {
+                                    let dd: editor.IModelDeltaDecoration = {
+                                        range: itemMatch.range,
+                                        options: {
+                                            inlineClassName: "obsolete-item",
+                                            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+                                        }
+                                    }
+
+                                    ddArray.push(dd);
+                                }
+                            });
+                        }
+                    });
+
+                    const decorators = editor.current?.deltaDecorations(oldDecorations, ddArray);
+
+                    oldDecorations = decorators ?? [];
+                });
+
                 isLoading = true;
             });
     }
+
 
     if (isLoading) {
         return null;

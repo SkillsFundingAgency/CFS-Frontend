@@ -13,5 +13,7 @@ export interface ILocalFunction {
 
     isCustom: boolean;
 
+    isObsolete: boolean;
+
     getFunctionAndParameterDescription(): string;
 }

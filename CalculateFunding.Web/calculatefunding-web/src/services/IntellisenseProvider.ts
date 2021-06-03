@@ -10,6 +10,7 @@ import {ILocalFunctionContainer} from "../types/GdsMonacoEditor/ILocalFunctionCo
 import {ILocalFunction} from "../types/GdsMonacoEditor/ILocalFunction";
 import {IMethodInformationResponse, ITypeInformationResponse} from "../types/Calculations/CodeContext";
 import {ILocalMethod} from "../types/GdsMonacoEditor/IMethodContainer";
+import {IDefaultMemberTypeContainer} from "../types/GdsMonacoEditor/IDefaultMemberTypeContainer";
 
 export function convertMethodInformationResponseToVariable(method: IMethodInformationResponse, types: Array<ITypeInformationResponse>, level?: number) {
     const methodItem: ILocalMethod = {
@@ -603,7 +604,8 @@ export function convertClassToVariables(root: ITypeInformationResponse | undefin
             items: {},
             name: property.name,
             type: property.type,
-            variableType: languages.CompletionItemKind.Field
+            variableType: languages.CompletionItemKind.Field,
+            isObsolete: property.isObsolete
         };
 
         const subItem = result.find(p => p.name === property.type);
@@ -621,7 +623,8 @@ export function convertClassToVariables(root: ITypeInformationResponse | undefin
             items: {},
             name: method.name,
             type: method.returnType,
-            variableType: languages.CompletionItemKind.Method
+            variableType: languages.CompletionItemKind.Method,
+            isObsolete: method.isObsolete
         }
     });
 
@@ -634,7 +637,8 @@ export function findEnum(root: ITypeInformationResponse[] | undefined, entityId:
         isAggregable: false,
         name: "",
         type: "",
-        variableType: languages.CompletionItemKind.Enum
+        variableType: languages.CompletionItemKind.Enum,
+        isObsolete: false
     };
 
     if (!root) {
@@ -651,7 +655,8 @@ export function findEnum(root: ITypeInformationResponse[] | undefined, entityId:
                 items: {},
                 name: method.returnTypeClass,
                 type: method.returnTypeClass,
-                variableType: languages.CompletionItemKind.Enum
+                variableType: languages.CompletionItemKind.Enum,
+                isObsolete: method.isObsolete
             }
     })
 
@@ -664,4 +669,162 @@ export function findEnumItems(name: string, result: Array<ITypeInformationRespon
     if (response !== null) {
         return response;
     }
+}
+
+export function checkForObsoleteLocalFunction(model: monaco.editor.IReadOnlyModel, position: monaco.Position, forwardText: string, functions: ILocalFunctionContainer, range: any) {
+    let backwardsFunctionNameText = "";
+    if (position.column > 1) {
+        const backwardsText = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
+
+        const localFunctionNameRegexBack = new RegExp(/\b(([a-zA-Z_])([a-zA-Z0-9_]{0,254}))+/g);
+        let reversedTextRegexResult;
+
+        let result;
+
+        while (result = localFunctionNameRegexBack.exec(backwardsText)) {
+            if (!result) {
+                break;
+            }
+
+            reversedTextRegexResult = result;
+        }
+        if (reversedTextRegexResult) {
+            if (reversedTextRegexResult.length > 0) {
+                backwardsFunctionNameText = reversedTextRegexResult[0];
+            }
+        }
+    }
+
+    let forwardsLocalFunctionText = "";
+    if (forwardText) {
+        const variableDetectionRegex = new RegExp(/\b(([a-zA-Z_])([a-zA-Z0-9_]{0,254}))+/g);
+
+        const forwardsVariableResult = variableDetectionRegex.exec(forwardText);
+        if (forwardsVariableResult) {
+            forwardsLocalFunctionText = forwardsVariableResult[0];
+        }
+    }
+
+
+    const localFunctionText = (backwardsFunctionNameText + forwardsLocalFunctionText).trim();
+    if (localFunctionText) {
+
+        const localFunctionKey = localFunctionText.toLowerCase();
+
+        const foundLocalFunction: ILocalFunction = functions[localFunctionKey];
+        if (foundLocalFunction && foundLocalFunction.isObsolete) {
+return true;
+
+        }
+    }
+
+    return false;
+}
+
+export function checkForObsoleteVariable(model: monaco.editor.IReadOnlyModel, position: monaco.Position, forwardText: string, variables: IVariableContainer, range: any) {
+    let backwardsVariableText = "";
+    if (position.column > 1) {
+        const backwardsText = model.getValueInRange(new monaco.Range(position.lineNumber, 1, position.lineNumber, position.column));
+
+        const variableDetectionRegexBack = new RegExp(/\b(([a-zA-Z])([a-zA-Z0-9]{0,254})(\.)?)+/g);
+        let reversedTextRegexResult;
+
+        let result;
+        while (result = variableDetectionRegexBack.exec(backwardsText)) {
+            if (!result) {
+                break;
+            }
+
+            reversedTextRegexResult = result;
+        }
+        if (reversedTextRegexResult) {
+            if (reversedTextRegexResult.length > 0) {
+                backwardsVariableText = reversedTextRegexResult[0];
+            }
+        }
+    }
+
+    let forwardsVariableText = "";
+    if (forwardText) {
+        const variableDetectionRegex = new RegExp(/\b(([a-zA-Z])([a-zA-Z0-9]{0,254})+)/);
+
+        const forwardsVariableResult = variableDetectionRegex.exec(forwardText);
+        if (forwardsVariableResult) {
+            forwardsVariableText = forwardsVariableResult[0];
+        }
+    }
+
+    const variableText = (backwardsVariableText + forwardsVariableText).trim();
+    if (variableText) {
+
+        const foundVariable: IVariable = getVariableByPath(variableText, variables);
+        if (foundVariable && foundVariable.isObsolete) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function checkForObsoleteDefaultType(model: monaco.editor.IReadOnlyModel, position: monaco.Position, dataTypes: IDefaultTypeContainer, range: any) {
+
+    // @ts-ignore
+    const word = model.getWordAtPosition(position)?.word;
+
+    if (word && dataTypes[word.toLowerCase()]) {
+
+        const foundDefaultType = dataTypes[word.toLowerCase()];
+
+        if(foundDefaultType && foundDefaultType.isObsolete)
+        {
+            return true;
+        }
+    }
+
+    // @ts-ignore
+    return false;
+}
+
+export function getObsoleteVariables(variables: IVariableContainer){
+    let obsoleteItems :string[] = [];
+    for (const i in variables) {
+        const item = variables[i];
+        if (item.isObsolete) {
+            obsoleteItems.push(item.name)
+        }
+        if(item.items) {
+         const items =  getObsoleteVariables(item.items);
+
+         for(const i in items)
+         {
+             obsoleteItems.push(items[i])
+         }
+        }
+    }
+
+    return obsoleteItems;
+}
+
+export function getObsoleteFunctions(functions: ILocalFunctionContainer){
+    let obsoleteItems :string[] = [];
+    for (const i in functions) {
+        const item = functions[i];
+        if (item.isObsolete) {
+            obsoleteItems.push(item.label)
+        }
+    }
+
+    return obsoleteItems;
+};
+
+export function getObsoleteDefaultTypes(obsoleteDefaultTypes: IDefaultTypeContainer){
+    let obsoleteItems :string[] = [];
+    for (const i in obsoleteDefaultTypes) {
+        const item = obsoleteDefaultTypes[i];
+        if (item.isObsolete) {
+            obsoleteItems.push(item.label)
+        }
+    }
+
+    return obsoleteItems;
 }

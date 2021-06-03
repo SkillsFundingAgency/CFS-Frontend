@@ -43,9 +43,11 @@ export interface ITypeInformationResponse {
     methods: Array<IMethodInformationResponse>;
     properties: Array<IPropertyInformationResponse>;
     enumValues: Array<EnumItem>;
+    isObsolete: boolean;
 }
 
 export interface IMethodInformationResponse {
+    isObsolete: boolean;
     name: string;
     friendlyName: string;
     description: string;
@@ -64,6 +66,7 @@ export interface IParameterInformationResponse {
 }
 
 export interface IPropertyInformationResponse {
+    isObsolete: boolean;
     name: string;
     friendlyName: string;
     description: string;

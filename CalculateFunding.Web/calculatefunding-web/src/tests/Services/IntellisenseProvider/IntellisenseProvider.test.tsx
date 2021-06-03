@@ -1,29 +1,31 @@
 import {
-    checkAggregableFunctionDeclared,
+    checkAggregableFunctionDeclared, checkForObsoleteVariable,
     findDeclaredVariables,
     findEnumItems,
     getDefaultDataTypesCompletionItems,
     getKeywordsCompletionItems,
+    getObsoleteDefaultTypes, getObsoleteFunctions, getObsoleteVariables,
     getVariableForAggregatePath,
     getVariablesForPath
 } from "../../../services/IntellisenseProvider";
 import {CreateInformationTestData} from "./IntellisenseTestData";
 import {IVariableContainer} from "../../../types/GdsMonacoEditor/IVariableContainer";
+import {IDefaultTypeContainer} from "../../../types/GdsMonacoEditor/IDefaultTypeContainer";
+import {ILocalFunctionContainer} from "../../../types/GdsMonacoEditor/ILocalFunctionContainer";
+import {IVariable} from "../../../types/GdsMonacoEditor/IVariable";
 
 require('../../../services/IntellisenseProvider');
 
 describe("IntellisenseProvider service ", () => {
     it('should return Correct Enum Items', () => {
         const data = CreateInformationTestData();
-        let actual = findEnumItems("Scenario", data );
+        let actual = findEnumItems("Scenario", data);
 
         expect(actual?.name == "Scenario").toBeTruthy();
     });
-
 });
 
 describe("IntellisenseProvider - FindDeclaredVariables", () => {
-
     describe("when no variables are declared", () => {
         it("with empty string then no declared variables declared", () => {
             const variables = findDeclaredVariables("");
@@ -212,8 +214,8 @@ describe("IntellisenseProvider - FindDeclaredVariables", () => {
             const variables = getVariableForAggregatePath("Dim s = Sum(", container);
             expect(variables[0].name === "Providers").toBeFalsy();
             expect(variables[0].name === "Datasets").toBeTruthy();
-            
-            if(variables !== undefined) {
+
+            if (variables !== undefined) {
                 expect(variables[0]?.items["ds1"]).toBeTruthy();
                 expect(variables[0].items["ds1"].items.["f1"]).toBeTruthy();
                 expect(variables[0].items["ds1"].items.f2).toBeFalsy();
@@ -451,7 +453,7 @@ describe("IntellisenseProvider - FindDeclaredVariables", () => {
                 isAggregable: false,
                 type: "",
                 items: {
-                    
+
                     "urn": {
                         name: "URN", friendlyName: "URN", items: {}, type: "", isAggregable: false
                     }
@@ -545,10 +547,10 @@ describe("IntellisenseProvider - FindDeclaredVariables", () => {
         const range = {
             startLineNumber: 0,
             endLineNumber: 10,
-            startColumn:  0,
+            startColumn: 0,
             endColumn: 0
         };
-        
+
         const container = {
             "string": {label: "String", items: {}},
             "boolean": {label: "Boolean", items: {}},
@@ -564,10 +566,10 @@ describe("IntellisenseProvider - FindDeclaredVariables", () => {
         const range = {
             startLineNumber: 0,
             endLineNumber: 10,
-            startColumn:  0,
+            startColumn: 0,
             endColumn: 0
         };
-        
+
         const container = {
             "if": {label: "If"},
             "elseif": {label: "ElseIf"},
@@ -583,4 +585,144 @@ describe("IntellisenseProvider - FindDeclaredVariables", () => {
         });
     });
 
+    describe("check for obsolete default types ", () => {
+        it('and return correct count', () => {
+            let defaultContainer: IDefaultTypeContainer = {};
+
+            defaultContainer["first"] = {
+                description: "First default type",
+                label: "First default type",
+                items: {},
+                isObsolete: true
+            }
+
+            defaultContainer["second"] = {
+                description: "Second default type",
+                label: "Second default type",
+                items: {},
+                isObsolete: false
+            }
+
+            const actual = getObsoleteDefaultTypes(defaultContainer)
+
+            expect(actual.length).toBe(1);
+        });
+
+        it('and return correct count', () => {
+            let defaultContainer: IDefaultTypeContainer = {};
+
+            defaultContainer["first"] = {
+                description: "First default type",
+                label: "First default type",
+                items: {},
+                isObsolete: false
+            }
+
+            defaultContainer["second"] = {
+                description: "Second default type",
+                label: "Second default type",
+                items: {},
+                isObsolete: false
+            }
+
+            const actual = getObsoleteDefaultTypes(defaultContainer)
+
+            expect(actual.length).toBe(0);
+        });
+    });
+
+    describe("check for obsolete functions ", () => {
+        it('and return correct count for one function', () => {
+            let functionContainer: ILocalFunctionContainer = {};
+
+            functionContainer['firstFunction'] = {
+                returnType: "",
+                getFunctionAndParameterDescription(): string {
+                    return "";
+                },
+                description: "first function",
+                friendlyName: "first function",
+                isObsolete: true,
+                label: "first function",
+                isCustom: false,
+                parameters: []
+            }
+            functionContainer['secondFunction'] = {
+                returnType: "",
+                getFunctionAndParameterDescription(): string {
+                    return "";
+                },
+                description: "second function",
+                friendlyName: "second function",
+                isObsolete: false,
+                label: "second function",
+                isCustom: false,
+                parameters: []
+            }
+
+            const actual = getObsoleteFunctions(functionContainer);
+
+            expect(actual.length).toBe(1);
+        })
+        it('and return correct count for no matching functions', () => {
+            let functionContainer: ILocalFunctionContainer = {};
+
+            functionContainer['firstFunction'] = {
+                returnType: "",
+                getFunctionAndParameterDescription(): string {
+                    return "";
+                },
+                description: "first function",
+                friendlyName: "first function",
+                isObsolete: false,
+                label: "first function",
+                isCustom: false,
+                parameters: []
+            }
+            functionContainer['secondFunction'] = {
+                returnType: "",
+                getFunctionAndParameterDescription(): string {
+                    return "";
+                },
+                description: "second function",
+                friendlyName: "second function",
+                isObsolete: false,
+                label: "second function",
+                isCustom: false,
+                parameters: []
+            }
+
+            const actual = getObsoleteFunctions(functionContainer);
+
+            expect(actual.length).toBe(0);
+        })
+
+    });
+
+    describe("check for obsolete variables ", () => {
+        it('should return 0 when no variables are passed', () => {
+
+            let variableContainer: IVariableContainer = {}
+
+            const actual = getObsoleteVariables(variableContainer);
+
+            expect(actual.length).toBe(0);
+        });
+
+        it('should return 1 obsolete variable', () => {
+            let variableContainer: IVariableContainer = {}
+            variableContainer["firstVariable"] = {
+                friendlyName: "",
+                isAggregable: false,
+                isObsolete: true,
+                variableType: undefined,
+                name: "first variable",
+                type: "variable"
+
+            }
+            const actual = getObsoleteVariables(variableContainer);
+
+            expect(actual.length).toBe(1);
+        });
+    });
 });
