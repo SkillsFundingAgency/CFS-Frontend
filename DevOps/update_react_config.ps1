@@ -3,8 +3,6 @@ param(
     [Parameter(Mandatory=$true)]
     [string] $PathToZip,
     [Parameter(Mandatory=$true)]
-    [string] $HandlerEnabled,
-    [Parameter(Mandatory=$true)]
     [string] $BaseUrl,
     [Parameter(Mandatory=$true)]
     [string] $DebugOn,
@@ -23,14 +21,12 @@ function New-TemporaryDirectory {
 function Update-ConfigFile {
     param(
         [string] $ConfigJsonPath,
-        [string] $HandlerEnabled,
         [string] $BaseUrl,
         [string] $DebugOn,
         [string] $AppInsightsKey,
         [string] $TracingOn)
 
     $configObject = [ordered] @{
-        "handlerEnabled" = [boolean]::Parse($HandlerEnabled)
         "loginType" = "aad"
         "baseUrl" = $BaseUrl
         "debugOn" = [boolean]::Parse($DebugOn)
@@ -48,7 +44,7 @@ Write-Verbose "Expanding deployment package to $TempFolder"
 Expand-Archive -Path $PathToZip -DestinationPath $TempFolder
 
 Write-Verbose "Updating react app configuration file"
-Update-ConfigFile -ConfigJsonPath "$TempFolder\wwwroot\app\config.json" -BaseUrl $BaseUrl -DebugOn $DebugOn -TracingOn $TracingOn -HandlerEnabled $HandlerEnabled -AppInsightsKey $AppInsightsKey
+Update-ConfigFile -ConfigJsonPath "$TempFolder\wwwroot\app\config.json" -BaseUrl $BaseUrl -DebugOn $DebugOn -TracingOn $TracingOn -AppInsightsKey $AppInsightsKey
 
 Write-Verbose "Removing existing deployment package"
 Remove-Item -Path $PathToZip -Force

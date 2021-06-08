@@ -62,7 +62,6 @@ describe("AppInsightsService tests ", () => {
 });
 
 const expectedConfig = {
-    handlerEnabled: true,
     loginType: "",
     baseUrl: "",
     debugOn: true,

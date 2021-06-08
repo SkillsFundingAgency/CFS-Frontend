@@ -17,10 +17,6 @@ export function initialiseAxios() {
         axios.interceptors.response.use(
             response => response,
             (error) => {
-                if (!configuration.handlerEnabled) {
-                    console.error(`Axios error intercepted but not handled: ${error?.config?.url}: ${error?.response?.status}: ${error?.response?.statusText}}`)
-                    return Promise.reject(error);
-                }
                 
                 if (window.location.href.includes('.auth/login')) {
                     return Promise.reject(error);

@@ -1,5 +1,4 @@
 {
-    "handlerEnabled": false,
     "loginType": "aad",
     "baseUrl": "",
     "debugOn": true,

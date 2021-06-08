@@ -561,10 +561,6 @@
                                 "value": "[if(parameters('enablePlatformAuth'), 'True', 'False')]"
                             },
                             {
-                                "name": "HandlerEnabled",
-                                "value": "true"
-                            },
-                            {
                                 "name": "FrontendBaseUrl",
                                 "value": "[concat('https://', parameters('aadDomain'), '/')]"
                             },
