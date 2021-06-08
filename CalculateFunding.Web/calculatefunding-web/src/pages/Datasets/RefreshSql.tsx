@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {Footer} from "../../components/Footer";
 import {Header} from "../../components/Header";
@@ -18,8 +18,6 @@ import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";
 import {PermissionStatus} from "../../components/PermissionStatus";
-import {useMonitorForNewSpecificationJob} from "../../hooks/Jobs/useMonitorForNewSpecificationJob";
-import {useFetchAllLatestSpecificationJobs} from "../../hooks/Jobs/useFetchAllLatestSpecificationJobs";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useHistory} from "react-router";
 import {RunningStatus} from "../../types/RunningStatus";
@@ -27,6 +25,12 @@ import {CompletionStatus} from "../../types/CompletionStatus";
 import {getLatestSuccessfulJob} from "../../services/jobService";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
+import {
+    AddJobSubscription, JobNotification,
+    MonitorFallback,
+    MonitorMode,
+    useJobSubscription
+} from "../../hooks/Jobs/useJobSubscription";
 
 export function RefreshSql() {
     const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
@@ -46,22 +50,11 @@ export function RefreshSql() {
     const {fundingStreams, isLoadingOptions, errorCheckingForOptions, isErrorCheckingForOptions} = useOptionsForSpecificationsSelectedForFunding();
     const specificationId = selectedFundingPeriod ? selectedFundingPeriod.specifications[0].id : "";
     const specificationName = selectedFundingPeriod ? selectedFundingPeriod.specifications[0].name : "";
-    const {newJob} = useMonitorForNewSpecificationJob(
-        specificationId,
-        [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob, JobType.ApproveAllProviderFundingJob,
-            JobType.RefreshFundingJob, JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
-            JobType.ReIndexPublishedProvidersJob],
-        err => addError({error: err, description: "An error occurred while monitoring the running jobs."})
-    );
-    const {allJobs, isCheckingForJobs} = useFetchAllLatestSpecificationJobs({
-        jobFilter: {
-            specificationId: specificationId,
-            jobTypes: [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob,
-                JobType.ApproveAllProviderFundingJob, JobType.RefreshFundingJob,
-                JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
-                JobType.ReIndexPublishedProvidersJob]
-        },
-        onError: err => addError({error: err, description: "An error occurred while fetching the latest jobs."})
+    
+    const {addSub, removeSub, results: jobNotifications} = useJobSubscription({
+        isEnabled: !!specificationId && specificationId.length > 0,
+        onNewNotification: handleJobNotification,
+        onError: err => addError({error: err, description: "An error occurred while monitoring background jobs"})
     });
     const fundingStreamId = selectedFundingStream ? selectedFundingStream.id : "";
     const fundingPeriodId = selectedFundingPeriod ? selectedFundingPeriod.id : "";
@@ -72,24 +65,25 @@ export function RefreshSql() {
     } = useQuery<JobDetails | undefined, AxiosError>(`last-successful-sql-job-${specificationId}-runsqljob`,
         async () => getJobDetailsFromJobResponse((await getLatestSuccessfulJob(specificationId, JobType.RunSqlImportJob)).data),
         {
-            cacheTime: 0,
-            refetchOnWindowFocus: false,
             enabled: specificationId !== undefined && specificationId.length > 0,
             onError: err => addError({error: err, description: "Error while loading last successful sql job"})
         });
 
-    const hasRunningFundingJobs: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
-        && job.jobType !== JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed
-        && job.specificationId === specificationId).length > 0 || false;
-    const hasRunningSqlJob: boolean = allJobs && allJobs.filter(job => job.jobType !== undefined
-        && job.jobType === JobType.RunSqlImportJob && job.runningStatus !== RunningStatus.Completed
-        && job.specificationId === specificationId).length > 0 || false;
-    if (hasRunningSqlJob && !isAnotherUserRunningSqlJob) {
-        setIsAnotherUserRunningSqlJob(true);
-    }
-    if (!hasRunningSqlJob && isAnotherUserRunningSqlJob) {
-        setIsAnotherUserRunningSqlJob(false);
-    }
+    const hasRunningFundingJobs: boolean = useMemo(() =>
+            !!jobNotifications
+                .find(({latestJob: job}) => !!job?.jobType
+                    && job.jobType !== JobType.RunSqlImportJob
+                    && job.isActive
+                    && job.specificationId === specificationId),
+        [jobNotifications]);
+    const hasRunningSqlJob: boolean = useMemo(() =>
+            !!jobNotifications
+                .find(({latestJob: job}) => !!job?.jobType
+                    && job.jobType === JobType.RunSqlImportJob
+                    && job.isActive
+                    && job.specificationId === specificationId),
+        [jobNotifications]);
+
     const fetchLatestPublishedDate = async () => {
         if (!fundingStreamId || !fundingPeriodId) return {
             value: null
@@ -102,14 +96,21 @@ export function RefreshSql() {
             fetchLatestPublishedDate,
             {
                 onError: err => addError({error: err, description: "Error while loading latest published date."}),
-                cacheTime: 0,
-                refetchOnWindowFocus: false,
                 enabled: false
             });
 
     useEffect(() => {
         refetch();
     }, [selectedFundingPeriod]);
+    
+    useEffect(() => {
+        if (hasRunningSqlJob && !isAnotherUserRunningSqlJob) {
+            setIsAnotherUserRunningSqlJob(true);
+        }
+        if (!hasRunningSqlJob && isAnotherUserRunningSqlJob) {
+            setIsAnotherUserRunningSqlJob(false);
+        }
+    }, [hasRunningSqlJob, isAnotherUserRunningSqlJob]);
 
     useEffect(() => {
         setMissingPermissions([]);
@@ -127,19 +128,43 @@ export function RefreshSql() {
     }, [errorCheckingForOptions]);
 
     useEffect(() => {
-        if (!newJob || !newJob.jobType) return;
-        if (newJob.jobType === JobType.RunSqlImportJob) {
-            handleSqlImportJob(newJob);
-        } else {
-            handleOtherJobs(newJob);
-        }
-    }, [newJob]);
+        if (!specificationId) return;
+        
+        addSub([JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob,
+            JobType.ApproveAllProviderFundingJob, JobType.RefreshFundingJob,
+            JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
+            JobType.ReIndexPublishedProvidersJob]
+            .map(jobType => {
+                return {
+                    filterBy: {
+                        specificationId: specificationId,
+                        jobTypes: [jobType]
+                    },
+                    monitorMode: MonitorMode.SignalR,
+                    monitorFallback: MonitorFallback.Polling,
+                    onError: err => addError({
+                        error: err,
+                        description: "An error occurred while monitoring the running jobs"
+                    })
+                } as AddJobSubscription;
+            }));
+    }, [specificationId]);
 
-    function handleSqlImportJob(newJob: JobDetails) {
+    function handleJobNotification(notification: JobNotification) {
+        if (!notification.latestJob?.jobType) return;
+        if (notification.latestJob.jobType === JobType.RunSqlImportJob) {
+            handleSqlImportJob(notification);
+        } else {
+            handleOtherJobs(notification);
+        }
+    }
+    
+    function handleSqlImportJob(notification: JobNotification) {
+        if (!notification.latestJob) return;
         if (refreshJobId.length === 0 && !isAnotherUserRunningSqlJob) {
             setIsAnotherUserRunningSqlJob(true);
         }
-        switch (newJob.runningStatus) {
+        switch (notification.latestJob.runningStatus) {
             case RunningStatus.Queued:
             case RunningStatus.QueuedWithService:
                 setSqlJobStatusMessage("Data push queued");
@@ -153,28 +178,30 @@ export function RefreshSql() {
             case RunningStatus.Completed:
                 setSqlJobStatusMessage("Data push completed");
                 setIsAnotherUserRunningSqlJob(false);
-                if (newJob.isSuccessful) {
-                    setRefreshJobDateTime(newJob.lastUpdated);
+                if (notification.latestJob.isSuccessful) {
+                    setRefreshJobDateTime(notification.latestJob.lastUpdated);
                 } else {
                     setSqlJobStatusMessage("Data push failed");
                 }
                 break;
         }
-        if (refreshJobId.length > 0 && newJob.jobId === refreshJobId && newJob.isComplete) {
+        if (refreshJobId.length > 0 && notification.latestJob.jobId === refreshJobId && notification.latestJob.isComplete) {
             setIsRefreshing(false);
-            if (newJob.isSuccessful) {
+            if (notification.latestJob.isSuccessful) {
                 setShowSuccess(true);
             } else {
-                addError({error: "Refresh sql job failed: " + newJob.outcome});
+                addError({error: "Refresh sql job failed: " + notification.latestJob.outcome});
             }
+            removeSub(notification.subscription.id);
         }
     }
 
-    function handleOtherJobs(newJob: JobDetails) {
+    function handleOtherJobs(notification: JobNotification) {
+        if (!notification.latestJob) return;
         if (!isAnotherUserRunningFundingJob) {
             setIsAnotherUserRunningFundingJob(true);
         }
-        switch (newJob.runningStatus) {
+        switch (notification.latestJob.runningStatus) {
             case RunningStatus.Queued:
             case RunningStatus.QueuedWithService:
                 setFundingStatusMessage("Job queued");
@@ -186,6 +213,7 @@ export function RefreshSql() {
                 setFundingStatusMessage("Job completing");
                 break;
             case RunningStatus.Completed:
+                removeSub(notification.subscription.id);
                 setFundingStatusMessage("Job completed");
                 setIsAnotherUserRunningFundingJob(false);
                 refetch();
@@ -235,7 +263,7 @@ export function RefreshSql() {
     }
 
     function LastSqlUpdate() {
-        if (isCheckingForJobs || isCheckingForLatestSqlJob) {
+        if (isCheckingForLatestSqlJob) {
             return <LoadingFieldStatus title="Loading..." />
         }
         if (isAnotherUserRunningSqlJob) {
@@ -371,12 +399,12 @@ export function RefreshSql() {
 
     function RefreshButton() {
         const isDisabled = !(
-            (lastSqlJob === undefined || !lastSqlJob.lastUpdated || latestPublishedDate === undefined ||
-                latestPublishedDate.value === null || latestPublishedDate.value > lastSqlJob.lastUpdated ||
-                lastSqlJob.completionStatus === CompletionStatus.Failed ||
-                lastSqlJob.completionStatus === CompletionStatus.TimedOut)
+            (!lastSqlJob?.lastUpdated ||
+                !latestPublishedDate?.value ||
+                latestPublishedDate.value > lastSqlJob.lastUpdated ||
+                lastSqlJob.isFailed)
             && missingPermissions.length === 0 && !isLoadingOptions
-            && !isCheckingForJobs && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob
+            && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob
             && !hasRunningFundingJobs && !isCheckingForLatestSqlJob
         );
 

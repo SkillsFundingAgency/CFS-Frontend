@@ -220,7 +220,7 @@ export function LoadNewDataSource() {
                                 error: err,
                                 description: "An error occurred while monitoring the running jobs"
                             })
-                        });
+                        }) as JobSubscription;
                         setJobSubscription(subscription);
                         setIsLoading(true);
                     })
@@ -559,8 +559,8 @@ export function LoadNewDataSource() {
                                 Funding stream
                             </label>
                             <span className="govuk-hint">
-                            Select a funding stream you have permissions for
-                        </span>
+                                Select a funding stream you have permissions for
+                            </span>
                             {fundingStreamIsLoading ?
                                 <div className="loader-inline">
                                     <LoadingFieldStatus title={"loading funding streams"}/>
@@ -606,7 +606,7 @@ export function LoadNewDataSource() {
                                 Dataset source file name
                             </label>
                             <span id="event-name-hint" className="govuk-hint">
-                            Use a descriptive unique name other users can understand
+                                Use a descriptive unique name other users can understand
                             </span>
                             <input className="govuk-input" id="dataset-source-filename" name="dataset-source-filename"
                                    type="text"

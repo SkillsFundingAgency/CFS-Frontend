@@ -16,7 +16,7 @@ jest.mock("../../../components/AdminNav");
 describe("<DataRelationships />", () => {
     describe("service call checks ", () => {
         beforeEach(async () => {
-            mockDatasetrelationships();
+            mockDatasetRelationships();
             await renderPage();
         });
 
@@ -32,7 +32,7 @@ describe("<DataRelationships />", () => {
 
     describe("render page ", () => {
         beforeEach(async () => {
-            mockDatasetrelationships();
+            mockDatasetRelationships();
             await renderPage();
         });
 
@@ -57,7 +57,7 @@ describe("<DataRelationships />", () => {
 
     describe("when background converter wizard job is running", () => {
         beforeEach(async () => {
-            mockDatasetrelationships();
+            mockDatasetRelationships();
             jest.spyOn(useFetchAllLatestSpecificationJobsHook, 'useFetchAllLatestSpecificationJobs')
                 .mockImplementation((inputs: FetchLatestSpecificationJobProps) => {
                     return {
@@ -180,7 +180,7 @@ const mockSpecificationDatasetRelationshipsViewModel = {
     }
 }
 
-const mockDatasetrelationships = () => {
+const mockDatasetRelationships = () => {
     jest.mock("../../../services/datasetRelationshipsService", () => {
         const service = jest.requireActual("../../../services/datasetRelationshipsService");
         return {

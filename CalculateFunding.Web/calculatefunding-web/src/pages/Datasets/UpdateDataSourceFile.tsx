@@ -196,7 +196,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                     error: err,
                                     description: "An error occurred while monitoring the running jobs"
                                 })
-                            });
+                            }) as JobSubscription;
                             setJobSubscription(subscription);
                             setIsCheckingForJob(true);
                             setIsLoading(true);

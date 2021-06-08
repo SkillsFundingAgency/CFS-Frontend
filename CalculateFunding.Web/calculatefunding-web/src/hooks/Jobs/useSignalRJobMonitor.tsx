@@ -7,8 +7,14 @@ import {milliseconds} from "../../helpers/TimeInMs";
 import {JobNotification, JobSubscription, MonitorMode} from "./useJobSubscription";
 import {JobMonitoringFilter} from "./useJobMonitor";
 
+export enum JobMonitorMode {
+    WatchSingleSpecification,
+    WatchAllJobs
+}
+
 export interface SignalRJobMonitorProps {
     subscriptions: JobSubscription[],
+    mode: JobMonitorMode,
     onError: (err: AxiosError | Error | string) => void,
     isEnabled?: boolean,
     onReconnecting?: () => void,
@@ -23,56 +29,66 @@ export interface SignalRJobMonitorResult {
     isMonitoring: boolean
 }
 
-// N.B.: initially this is watching all jobs and not using the specification specific endpoint
+// N.B.: this is either watching all jobs or just the specification specific jobs
 export const useSignalRJobMonitor = ({
-                                          subscriptions,
-                                          onError,
-                                          isEnabled,
-                                          onReconnecting,
-                                          onReconnection,
-                                          onFail,
-                                          onClose
-                                      }: SignalRJobMonitorProps): SignalRJobMonitorResult => {
+                                         subscriptions,
+                                         mode,
+                                         onError,
+                                         isEnabled,
+                                         onReconnecting,
+                                         onReconnection,
+                                         onFail,
+                                         onClose
+                                     }: SignalRJobMonitorProps): SignalRJobMonitorResult => {
     const [notifications, setNotifications] = useState<JobNotification[]>([]);
     const [hubConnection, setHubConnection] = useState<HubConnection>();
     const hubRef = useRef<HubConnection>();
 
     const hasInitialised = () => !!hubConnection;
-    
+
     const hasDisconnected = () => hubConnection?.state == HubConnectionState.Disconnected;
-    
+
     const isInSubscriptions = (notification: JobNotification, subs: JobSubscription[]) => {
         return subs.some(s => s.id === notification.subscription.id);
     }
-    
+
     const excludeSubscriptionsFromNotifications = (notifications: JobNotification[], subs: JobSubscription[]) => {
         // given existing notifications, return those not matching the subscriptions provided
         return notifications.filter(n => !isInSubscriptions(n, subs));
     };
-    
+
     const createJobNotification = (job: JobDetails, sub: JobSubscription): JobNotification => {
         return {
             latestJob: job,
             subscription: sub
         }
     }
-    
+
     const stopSignalR = () => {
         hubConnection?.stop();
         hubRef?.current?.stop();
         setHubConnection(undefined);
     }
-    
+
     const hasEnabledSubscriptions = () => {
         return subscriptions.length > 0 &&
             (isEnabled === undefined || isEnabled)
             && subscriptions.some(s => s.isEnabled)
     }
-    
+
+    const findSingleSpecificationId = (subs: JobSubscription[]): string | undefined => {
+        let specId: string | undefined;
+        subs.forEach(({filterBy}) => {
+            if (!filterBy.specificationId || filterBy.specificationId === specId) return false;
+            specId = filterBy.specificationId;
+        });
+        return specId;
+    }
+
     const isThisJobValid = (job: JobResponse) => {
         return job && job.jobId && job.jobId.length > 1; // to catch edge case of 0 turned to string
     }
-    
+
     const findMatchingSubs = (job: JobResponse): JobSubscription[] => {
         if (!hasEnabledSubscriptions()) {
             return [];
@@ -86,19 +102,34 @@ export const useSignalRJobMonitor = ({
 
         return matches ?? [];
     }
-    
+
     const filterJobsByType = (job: JobResponse, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobTypes || (filterBy.jobTypes.length === 0 || filterBy.jobTypes.find(type => job.jobType === type.toString()));
     }
-    
+
     const filterJobsByIdOrParent = (job: JobResponse, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobId || (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));
     }
-    
+
     const filterJobsBySpecification = (job: JobResponse, filterBy: JobMonitoringFilter) => {
         return !filterBy.specificationId || job.specificationId === filterBy.specificationId;
     }
-    
+
+    const processMessage = (message: any) => {
+        const job = (message as JobResponse);
+        if (isThisJobValid(job)) {
+            const matchingSubscriptions = findMatchingSubs(job)
+            const jobDetails = getJobDetailsFromJobResponse(job);
+            if (matchingSubscriptions.length > 0 && jobDetails) {
+                const updated = matchingSubscriptions.map(sub => createJobNotification(jobDetails, sub));
+                setNotifications(existing => {
+                    const unchanged = excludeSubscriptionsFromNotifications(existing, subscriptions);
+                    return [...unchanged, ...updated]
+                });
+            }
+        }
+    }
+
     const notifyDisconnection = (error: Error | string | undefined) => {
         const realError = (error as Error);
         const errorMessage = !!realError ? `Error while monitoring jobs: ${realError.message}` : !!error ? error as string : null;
@@ -110,15 +141,15 @@ export const useSignalRJobMonitor = ({
             onError(errorMessage);
         }
     }
-    
+
     const notifyReconnection = () => {
         onReconnection && onReconnection();
     }
-    
+
     const notifyReconnecting = () => {
         onReconnecting && onReconnecting();
     }
-    
+
     const monitorJobNotifications = async () => {
         try {
             if (!hubRef.current) {
@@ -129,37 +160,20 @@ export const useSignalRJobMonitor = ({
                     .build();
                 hubConnect.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
                 hubConnect.serverTimeoutInMilliseconds = milliseconds.SixMinutes;
-                
-                // register listeners before calling start
-                hubConnect.on('NotificationEvent', (job: JobResponse) => {
-                    if (isThisJobValid(job)) {
-                        const matchingSubscriptions = findMatchingSubs(job)
-                        const jobDetails = getJobDetailsFromJobResponse(job);
-                        if (matchingSubscriptions.length > 0 && jobDetails) {
-                            const updated = matchingSubscriptions.map(sub => createJobNotification(jobDetails, sub));
-                            setNotifications(existing => {
-                                const unchanged = excludeSubscriptionsFromNotifications(existing, subscriptions);
-                                return [...unchanged, ...updated]
-                            });
-                        }
-                    }
-                });
-
-                hubConnect.onclose(error => {
-                    notifyDisconnection(error);
-                });
-
-                hubConnect.onreconnecting(x => {
-                    notifyReconnecting();
-                });
-                
-                hubConnect.onreconnected(x => {
-                    notifyReconnection();
-                });
+                hubConnect.on('NotificationEvent', processMessage);
+                hubConnect.onclose(notifyDisconnection);
+                hubConnect.onreconnecting(notifyReconnecting);
+                hubConnect.onreconnected(notifyReconnection);
 
                 await hubConnect.start();
 
-                await hubConnect.invoke("StartWatchingForAllNotifications");
+                // if all subs are linked to the SAME spec, then just follow that spec
+                const specId = findSingleSpecificationId(subscriptions);
+                if (mode === JobMonitorMode.WatchSingleSpecification && specId) {
+                    await hubConnect.invoke("StartWatchingForSpecificationNotifications", specId);
+                } else { // otherwise follow everything
+                    await hubConnect.invoke("StartWatchingForAllNotifications");
+                }
 
                 setHubConnection(hubConnect);
             }

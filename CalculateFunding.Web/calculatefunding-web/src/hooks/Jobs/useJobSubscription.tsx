@@ -1,17 +1,20 @@
 ﻿import {AxiosError} from "axios";
 import {JobMonitoringFilter} from "./useJobMonitor";
 import * as React from "react";
+import {useEffect} from "react";
 import {v4 as uuidv4} from 'uuid';
 import {DateTime} from "luxon";
 import {JobDetails} from "../../types/jobDetails";
-import {useSignalRJobMonitor} from "./useSignalRJobMonitor";
-import {getJob} from "../../services/jobService";
+import {JobMonitorMode, useSignalRJobMonitor} from "./useSignalRJobMonitor";
+import {getJob, getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {useInterval} from "../useInterval";
 import {milliseconds} from "../../helpers/TimeInMs";
-import {useEffect} from "react";
+import {append} from "ramda";
+import {JobType} from "../../types/jobType";
 
 export enum MonitorMode {
+    OneOff = 'OneOff',
     SignalR = 'SignalR',
     Polling = 'Polling'
 }
@@ -49,6 +52,7 @@ export interface JobNotification {
 
 export interface JobSubscriptionProps {
     onError: (err: AxiosError | Error | string) => void,
+    onNewNotification?: (notification: JobNotification) => void,
     isEnabled?: boolean,
 }
 
@@ -56,6 +60,7 @@ export interface JobSubscriptionProps {
 // limitation of the polling: only works when we know the jobId as there's no other suitable jobs api endpoint to use
 export const useJobSubscription = ({
                                        onError,
+                                       onNewNotification,
                                        isEnabled = true
                                    }: JobSubscriptionProps) => {
 
@@ -64,8 +69,25 @@ export const useJobSubscription = ({
     const [jobPollingInterval, setJobPollingInterval] = React.useState<number>(0);
     const [isSignalREnabled, setIsSignalREnabled] = React.useState<boolean>(isEnabled);
 
-    const addSub = (request: AddJobSubscription) => {
-        const newSub: JobSubscription = {
+    const addSub = (request: AddJobSubscription | AddJobSubscription[]) => {
+
+        if (subs.length === 0) {
+            reset();
+        }
+        
+        if (Array.isArray(request)) {
+            const newSubs = request.map(x => convert(x))
+            setSubs(existing => [...existing, ...newSubs]);
+            return newSubs;
+        } else {
+            const newSub = convert(request);
+            setSubs(existing => [...existing, newSub]);
+            return newSub;
+        }
+    };
+
+    const convert = (request: AddJobSubscription): JobSubscription => {
+        return {
             filterBy: request.filterBy,
             id: uuidv4(),
             isEnabled: isEnabled === true && (request.isEnabled ?? true),
@@ -76,15 +98,7 @@ export const useJobSubscription = ({
             startDate: DateTime.now(),
             lastUpdate: undefined
         };
-
-        if (subs.length === 0) {
-            reset();
-        }
-
-        setSubs(existing => [...existing, newSub]);
-
-        return newSub;
-    };
+    }
 
     const reset = () => {
         setIsSignalREnabled(true);
@@ -128,7 +142,7 @@ export const useJobSubscription = ({
         setJobPollingInterval(0);
         
         // try to find any job updates that were missed in the interim
-        await fetchLatestJobUpdatesForPollingSubscriptions();
+        await loadLatestJobUpdatesForPollingSubscriptions();
     };
 
     const onSignalRReconnecting = () => {
@@ -138,10 +152,20 @@ export const useJobSubscription = ({
         }
     };
 
+    const findSingleSpecificationId = (subs: JobSubscription[]): string | undefined => {
+        let specId: string | undefined;
+        subs.forEach(({filterBy}) => {
+            if (!filterBy.specificationId || filterBy.specificationId === specId) return false;
+            specId = filterBy.specificationId;
+        });
+        return specId;
+    }
+
     const {results: signalRResults} =
         useSignalRJobMonitor({
             onError,
-            isEnabled: isEnabled && isSignalREnabled,
+            mode: findSingleSpecificationId(subs) ? JobMonitorMode.WatchSingleSpecification : JobMonitorMode.WatchAllJobs,
+            isEnabled: isEnabled && isSignalREnabled && subs.length > 0,
             subscriptions: subs,
             onReconnecting: onSignalRReconnecting,
             onReconnection: onSignalRReconnected,
@@ -155,6 +179,17 @@ export const useJobSubscription = ({
         if (!response.data) return undefined;
         return getJobDetailsFromJobResponse(response.data);
     };
+
+    const checkForSpecificationJob = async (specId: string | undefined, jobTypes: JobType[] | undefined):
+        Promise<JobDetails[] | undefined> => {
+        if (!specId || !jobTypes || jobTypes.length === 0) {
+            console.error('Invalid arguments for checkForSpecificationJob');
+            return;
+        }
+        const response = await getJobStatusUpdatesForSpecification(specId, jobTypes);
+        const results = response.data.filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated);
+        return results && results.length > 0 ? results.map(r => getJobDetailsFromJobResponse(r) as JobDetails) : undefined;
+    }
 
     const findMatchingSubs = (job: JobDetails): JobSubscription[] => {
         if (!subs || subs.length === 0) {
@@ -188,12 +223,6 @@ export const useJobSubscription = ({
 
     const anySubscriptionsWithPolling = (subscriptions: JobSubscription[]): boolean =>
         subscriptions.some(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
-    
-    const extractJobIds = (subscriptions: JobSubscription[]): string[] => {
-        return subscriptions
-            .filter(s => isJobIdValid(s?.filterBy?.jobId))
-            .map(s => s.filterBy.jobId) as string[];
-    };
 
     const isJobIdValid = (jobId: string | undefined) => {
         return !!jobId && jobId.length > 1; // to catch edge case of 0 turned to string
@@ -212,6 +241,7 @@ export const useJobSubscription = ({
 
     const mergeNotifications = (newNotifications: JobNotification[]) => {
         if (newNotifications.length === 0) return;
+        let updates: JobNotification[] = [];
 
         setNotifications(existingOnes => {
             const existingNotificationSubIds = existingOnes.map(n => n.subscription.id);
@@ -224,28 +254,62 @@ export const useJobSubscription = ({
                 if (!!existingOne && shouldUpdateNotification(existingOne, matchingNewOne)) {
                     output = output.filter(n => n.subscription.id === existingOne.subscription.id);
                 }
+                append(matchingNewOne, updates);
                 output = [...output, matchingNewOne];
             });
             return output;
-        })
-    };
-
-    const fetchLatestJobUpdatesForPollingSubscriptions = async () => {
-        await fetchLatestJobUpdates(findJobSubscriptionsWithPolling(subs));
-    };
-
-    const fetchLatestJobUpdates = async (subscriptions: JobSubscription[]) => {
-        // TODO: extend to cover when we don't know the job id, once the jobs api has been extended
-        const jobIds = extractJobIds(subscriptions);
-        if (jobIds && jobIds.length > 0) {
-            await fetchLatestJobUpdatesById(jobIds);
+        });
+        if (!!onNewNotification) {
+            updates.forEach(onNewNotification);
         }
     };
 
-    const fetchLatestJobUpdatesById = async (jobIds: string[]) => {
+    const loadLatestJobUpdatesForPollingSubscriptions = async () => {
+        await loadLatestJobUpdates(findJobSubscriptionsWithPolling(subs));
+    };
+
+    // call api to get update on each active subscription
+    const loadLatestJobUpdates = async (subscriptions: JobSubscription[]) => {
+        subscriptions
+            .filter(s => s.isEnabled)
+            .map(async (sub) => {
+            if (!!sub.filterBy.jobId) {
+                await loadLatestJobUpdatesById([sub.filterBy.jobId]);
+            } else {
+                if (!!sub.filterBy.specificationId) {
+                    await loadLatestJobUpdatesBySpec(sub.filterBy);
+                } else {
+                    // todo: what to do if just looking for job types - no suitable api to call
+                }
+            }
+        })
+    };
+
+    const loadLatestJobUpdatesById = async (jobIds: string[]) => {
         let newNotifications: JobNotification[] = [];
         for (const jobId of jobIds) {
             const job = await checkForJobByJobId(jobId);
+            if (isJobValid(job)) {
+                const subsToNotify = findMatchingSubs(job as JobDetails);
+                subsToNotify.forEach(s => {
+                    newNotifications = [...notifications, {
+                        latestJob: job,
+                        subscription: s
+                    }];
+                });
+            }
+        }
+        mergeNotifications(newNotifications);
+    };
+
+    const loadLatestJobUpdatesBySpec = async (filter: JobMonitoringFilter) => {
+        let newNotifications: JobNotification[] = [];
+        
+        const jobs = await checkForSpecificationJob(filter.specificationId, filter.jobTypes);
+        
+        if (!jobs) return;
+        
+        for (const job of jobs) {
             if (isJobValid(job)) {
                 const subsToNotify = findMatchingSubs(job as JobDetails);
                 subsToNotify.forEach(s => {
@@ -265,7 +329,7 @@ export const useJobSubscription = ({
             return;
         }
 
-        await fetchLatestJobUpdatesForPollingSubscriptions();
+        await loadLatestJobUpdatesForPollingSubscriptions();
     }, jobPollingInterval);
 
     useEffect(() => {
@@ -287,6 +351,7 @@ export const useJobSubscription = ({
         addSub,
         removeSub,
         removeAllSubs,
+        subs,
         results: notifications
     }
 }
