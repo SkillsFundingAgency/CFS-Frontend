@@ -229,7 +229,8 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<DatasetVersionIndex, DatasetVersionSearchResultModel>();
 
             CreateMap<AssignDatasetSchemaViewModel, CreateDefinitionSpecificationRelationshipModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
+                .ForMember(m => m.SpecificationId, opt => opt.Ignore())
+                .ForMember(m => m.ConverterEnabled, opt => opt.Ignore());
             CreateMap<DatasetDefinition, DatasetSchemaViewModel>();
 
             CreateMap<ProviderVersionSearchResult, ProviderViewModel>()

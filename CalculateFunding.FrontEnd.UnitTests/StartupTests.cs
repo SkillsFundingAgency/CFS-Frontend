@@ -77,6 +77,7 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
             ResolveType<ProviderController>(serviceProvider).Should().NotBeNull(nameof(ProviderController));
             ResolveType<ProfilingController>(serviceProvider).Should().NotBeNull(nameof(ProfilingController));
+            ResolveType<DatasetSpecificationsController>(serviceProvider).Should().NotBeNull(nameof(DatasetSpecificationsController));
 
             serviceProvider.GetService<ICalculationsApiClient>().Should().NotBeNull(nameof(CalculationsApiClient));
             serviceProvider.GetService<IResultsApiClient>().Should().NotBeNull(nameof(ResultsApiClient));

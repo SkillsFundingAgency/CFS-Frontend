@@ -325,7 +325,7 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(fundingStreamId, nameof(fundingStreamId));
 
-            ApiResponse<IEnumerable<DatasetDefinationByFundingStream>> result =
+            ApiResponse<IEnumerable<DatasetDefinitionByFundingStream>> result =
                 await _datasetApiClient.GetDatasetDefinitionsByFundingStreamId(fundingStreamId);
 
             if (result.StatusCode == HttpStatusCode.OK)
