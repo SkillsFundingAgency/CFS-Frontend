@@ -308,3 +308,4 @@ test-report.xml
 
 # vscode
 .vscode/
+CalculateFunding.Web/calculatefunding-web/package-lock.json
