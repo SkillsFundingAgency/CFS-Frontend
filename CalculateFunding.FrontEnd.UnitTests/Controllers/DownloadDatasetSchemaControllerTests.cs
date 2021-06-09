@@ -3,13 +3,11 @@ using CalculateFunding.Common.ApiClient.DataSets.Models;
 
 namespace CalculateFunding.Frontend.UnitTests.Controllers
 {
-    using CalculateFunding.Frontend.Interfaces.ApiClient;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using NSubstitute;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using FluentAssertions;
-    using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
     using CalculateFunding.Common.ApiClient.Models;
     using System.Net;
     using System;

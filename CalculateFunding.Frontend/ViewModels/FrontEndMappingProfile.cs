@@ -8,14 +8,12 @@ using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
-using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
-using CalculateFunding.Frontend.Clients.TestEngineClient.Models;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
 using CalculateFunding.Frontend.ViewModels.Common;
@@ -24,11 +22,11 @@ using CalculateFunding.Frontend.ViewModels.Graph;
 using CalculateFunding.Frontend.ViewModels.Jobs;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Specs;
-using CalculateFunding.Frontend.ViewModels.TestEngine;
 using CalculateFunding.Frontend.ViewModels.Users;
 using IEnumerableExtensions = System.Linq.IEnumerableExtensions;
 using GraphApiModels = CalculateFunding.Common.ApiClient.Graph.Models;
 using Newtonsoft.Json.Linq;
+using CalculateFunding.Common.ApiClient.Results.Models;
 
 namespace CalculateFunding.Frontend.ViewModels
 {
@@ -41,7 +39,6 @@ namespace CalculateFunding.Frontend.ViewModels
             MapResults();
             MapSpecs();
             MapCalcs();
-            MapTestEngine();
             MapGraph();
             MapUserPermissions();
         }
@@ -83,14 +80,6 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.DateClosed, opt => opt.Ignore())
                 .ForMember(m => m.DateOpened, opt => opt.MapFrom(src => src.DateOpened != null ? src.DateOpened.Value.DateTime : DateTime.MinValue))
                 .ForMember(m => m.LocalAuthority, opt => opt.MapFrom(s => s.Authority));
-
-            CreateMap<ProviderTestSearchResultItem, ProviderTestSearchResultItemViewModel>()
-                .ForMember(m => m.ConvertDate, opt => opt.Ignore())
-                .ForMember(m => m.LocalAuthorityChangeDate, opt => opt.Ignore())
-                .ForMember(m => m.PreviousLocalAuthority, opt => opt.Ignore())
-                .ForMember(m => m.DateClosed, opt => opt.Ignore());
-
-            CreateMap<TestScenarioResultCounts, TestScenarioResultCountsViewModel>();
 
             CreateMap<CalculationProviderResultSearchResult, CalculationProviderResultSearchResultItemViewModel>()
                 .ForMember(d => d.CalculationResultDisplay, opt => opt.Ignore());
@@ -251,24 +240,6 @@ namespace CalculateFunding.Frontend.ViewModels
             CreateMap<DatasetValidationStatusModel, DatasetValidationStatusViewModel>();
             CreateMap<DatasetValidationStatus, DatasetValidationStatusOperationViewModel>();
             CreateMap<CreateDefinitionSpecificationRelationshipModel, AssignDatasetSchemaViewModel>();
-        }
-
-        private void MapTestEngine()
-        {
-            CreateMap<ScenarioCompileViewModel, ScenarioCompileModel>()
-                .ForMember(m => m.SpecificationId, opt => opt.Ignore());
-
-            CreateMap<TestScenarioSearchResultItem, TestScenarioSearchResultItemViewModel>()
-                .ForMember(m => m.LastUpdatedDateDisplay, opt => opt.Ignore())
-                .AfterMap((TestScenarioSearchResultItem source, TestScenarioSearchResultItemViewModel destination) =>
-                {
-                    if (source.LastUpdatedDate.HasValue)
-                    {
-                        destination.LastUpdatedDateDisplay = source.LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString);
-                    }
-                });
-
-            CreateMap<ResultCounts, ResultCountsViewModel>();
         }
 
         private void MapCommon()

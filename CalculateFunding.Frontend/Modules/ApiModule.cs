@@ -18,10 +18,8 @@ using CalculateFunding.Common.Config.ApiClient.Specifications;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient;
-using CalculateFunding.Frontend.Clients.TestEngineClient;
 using CalculateFunding.Frontend.Core.Ioc;
 using CalculateFunding.Frontend.Interfaces;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using CalculateFunding.Frontend.Interfaces.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,28 +48,6 @@ namespace CalculateFunding.Frontend.Modules
             services.AddGraphInterServiceClient(Configuration);
             services.AddFundingDataServiceInterServiceClient(Configuration);
             services.AddProfilingInterServiceClient(Configuration);
-
-            services.AddHttpClient(HttpClientKeys.Scenarios,
-                c =>
-                {
-                    ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("scenariosClient");
-
-                    SetDefaultApiClientConfigurationOptions(c, opts, services);
-                })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
-
-            services.AddHttpClient(HttpClientKeys.TestEngine,
-               c =>
-               {
-                   ApiClientConfigurationOptions opts = GetConfigurationOptions<ApiClientConfigurationOptions>("testEngineClient");
-
-                   SetDefaultApiClientConfigurationOptions(c, opts, services);
-               })
-                .ConfigurePrimaryHttpMessageHandler(() => new ApiClientHandler())
-                .AddTransientHttpErrorPolicy(c => c.WaitAndRetryAsync(retryTimeSpans))
-                .AddTransientHttpErrorPolicy(c => c.CircuitBreakerAsync(numberOfExceptionsBeforeCircuitBreaker, circuitBreakerFailurePeriod));
 
             services.AddHttpClient(HttpClientKeys.Users,
              c =>
@@ -103,9 +79,6 @@ namespace CalculateFunding.Frontend.Modules
 
             services
                 .AddSingleton<ITemplateBuilderApiClient, TemplateBuilderApiClient>();
-
-            services
-               .AddSingleton<ITestEngineApiClient, TestEngineApiClient>();
 
             services
               .AddSingleton<IUsersApiClient, UsersApiClient>();

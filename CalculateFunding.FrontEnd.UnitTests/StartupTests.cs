@@ -13,9 +13,7 @@ using CalculateFunding.Common.ApiClient.Providers;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Specifications;
-using CalculateFunding.Frontend.Clients.TestEngineClient;
 using CalculateFunding.Frontend.Controllers;
-using CalculateFunding.Frontend.Interfaces.ApiClient;
 using FluentAssertions;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Channel;
@@ -73,7 +71,6 @@ namespace CalculateFunding.Frontend.UnitTests
             ResolveType<PublishController>(serviceProvider).Should().NotBeNull(nameof(PublishController));
             ResolveType<SpecificationController>(serviceProvider).Should().NotBeNull(nameof(SpecificationController));
             ResolveType<SpecificationSearchController>(serviceProvider).Should().NotBeNull(nameof(SpecificationSearchController));
-            ResolveType<TestEngineController>(serviceProvider).Should().NotBeNull(nameof(TestEngineController));
             ResolveType<PolicyController>(serviceProvider).Should().NotBeNull(nameof(PolicyController));
             ResolveType<ProviderController>(serviceProvider).Should().NotBeNull(nameof(ProviderController));
             ResolveType<ProfilingController>(serviceProvider).Should().NotBeNull(nameof(ProfilingController));
@@ -90,7 +87,6 @@ namespace CalculateFunding.Frontend.UnitTests
             serviceProvider.GetService<IFundingDataZoneApiClient>().Should().NotBeNull(nameof(FundingDataZoneApiClient));
             serviceProvider.GetService<IProfilingApiClient>().Should().NotBeNull(nameof(ProfilingApiClient));
 
-            serviceProvider.GetService<ITestEngineApiClient>().Should().NotBeNull(nameof(TestEngineApiClient));
             serviceProvider.GetService<IUsersApiClient>().Should().NotBeNull(nameof(UsersApiClient));
             serviceProvider.GetService<IPublishingApiClient>().Should().NotBeNull(nameof(PublishingApiClient));
         }
@@ -122,10 +118,6 @@ namespace CalculateFunding.Frontend.UnitTests
                 { "graphClient:ApiKey", "Local" },
                 { "resultsClient:ApiEndpoint", "https://localhost:7005/api/results" },
                 { "resultsClient:ApiKey", "Local" },
-                { "scenariosClient:ApiEndpoint", "https://localhost:7006/api/scenarios" },
-                { "scenariosClient:ApiKey", "Local" },
-                { "testEngineClient:ApiEndpoint", "https://localhost:7007/api/tests" },
-                { "testEngineClient:ApiKey", "Local" },
                 { "usersClient:ApiEndpoint", "https://localhost:7008/api/users" },
                 { "usersClient:ApiKey", "Local" },
                 { "providersClient:ApiEndpoint", "https://localhost:7011/api/providers" },
