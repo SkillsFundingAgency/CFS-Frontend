@@ -43,7 +43,7 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
             description: "",
             approvalStatus: "",
             dataDefinitionRelationshipIds: [],
-            lastEditedDate: new Date()
+            lastEditedDate: new Date(),
         },
         specificationTrimmedViewModel: {
             description: "",

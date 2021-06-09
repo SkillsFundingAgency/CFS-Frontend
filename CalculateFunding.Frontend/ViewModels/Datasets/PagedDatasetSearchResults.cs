@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
-using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Frontend.ViewModels.Common;
 

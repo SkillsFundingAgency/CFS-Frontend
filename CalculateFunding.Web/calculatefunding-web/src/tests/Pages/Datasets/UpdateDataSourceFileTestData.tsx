@@ -35,7 +35,7 @@ export function UpdateDataSourceFileTestData() {
         },
         id: "sertdhw4e5t",
         onError: () => {},
-        startDate: DateTime.now()
+        startDate: DateTime.local()
     };
     
     const hasJobSuccessful = () => {
@@ -207,6 +207,7 @@ export function UpdateDataSourceFileTestData() {
         filename: "",
         fundingStreamId: "",
         mergeExisting: false,
+        converterEligible: false,
         name: "",
         version: 0
     }

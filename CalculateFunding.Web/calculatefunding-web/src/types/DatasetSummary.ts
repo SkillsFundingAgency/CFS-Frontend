@@ -11,6 +11,8 @@ export interface Definition {
 export interface Content {
     definition: Definition;
     relationshipDescription: string;
+    converterEligible: boolean;
+    converterEnabled: boolean;
     isProviderData: boolean;
     id: string;
     name: string;

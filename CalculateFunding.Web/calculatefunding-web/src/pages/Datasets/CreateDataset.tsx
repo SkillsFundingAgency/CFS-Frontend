@@ -37,7 +37,9 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
         useQuery(
             `data-schemas-for-stream-${fundingStreamId}`,
             () => getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")
-                .then((response) => response.data),
+                .then((response) => {
+                    return response.data;
+                }),
             {
                 enabled: fundingStreamId !== undefined,
                 onError: err => addError({error: err as AxiosError, description: "Error while loading available data schemas"})
@@ -57,6 +59,8 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
             });
     const [updateRequest, setUpdateRequest] = useState<AssignDatasetSchemaRequest>();
     const [isSetAsProviderData, setIsSetAsProviderData] = useState<boolean>(false);
+    const [converterEligible, setConverterEligible] = useState<boolean>(false);
+    const [converterEnabled, setConverterEnabled] = useState<boolean>(false);
     const [datasetName, setDatasetName] = useState({
         name: "",
         isValid: true
@@ -76,6 +80,13 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
 
     function changeDataSchema(e: React.ChangeEvent<HTMLSelectElement>) {
         const value = e.target.value.trim();
+
+        const selectedDefinition = dataSchemas?.filter(x => x.id === value)[0];
+
+        if (selectedDefinition !== null)
+        {
+            setConverterEligible(selectedDefinition?.converterEligible ?? false);
+        }
 
         setDatasetDataschema(prevState => {
             return {
@@ -116,7 +127,8 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                 datasetDefinitionId: datasetDataSchema.value,
                 specificationId,
                 isSetAsProviderData,
-                addAnotherAfter: continueAddingAfter
+                addAnotherAfter: continueAddingAfter,
+                converterEnabled: converterEnabled
             };
             setUpdateRequest(request);
         }
@@ -300,6 +312,42 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
                                 </fieldset>
                             </div>
                             }
+                            {converterEligible &&
+                            <div className="govuk-form-group">
+                                <fieldset className="govuk-fieldset ">
+                                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                                        <h3 className="govuk-heading-m">
+                                            Enable copy data for provider
+                                        </h3>
+                                    </legend>
+                                    <div className="govuk-radios govuk-radios--inline">
+                                        <div className="govuk-radios__item">
+                                            <input className="govuk-radios__input"
+                                                    id="set-converter-enabled-yes"
+                                                    name="set-converter-enabled"
+                                                    type="radio"
+                                                    value="true"
+                                                    onChange={() => setConverterEnabled(true)}/>
+                                            <label className="govuk-label govuk-radios__label"
+                                                    htmlFor="set-converter-enabled-yes">
+                                                Yes
+                                            </label>
+                                        </div>
+                                        <div className="govuk-radios__item">
+                                            <input className="govuk-radios__input"
+                                                    id="set-converter-enabled-no"
+                                                    name="set-converter-enabled"
+                                                    type="radio"
+                                                    value="false"
+                                                    onChange={() => setConverterEnabled(false)}/>
+                                            <label className="govuk-label govuk-radios__label"
+                                                    htmlFor="set-converter-enabled-no">
+                                                No
+                                            </label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>}
                         </fieldset>
                     </form>
                     <button className="govuk-button govuk-!-margin-right-1"

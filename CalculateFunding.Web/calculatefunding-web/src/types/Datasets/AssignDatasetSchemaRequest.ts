@@ -4,5 +4,6 @@
     datasetDefinitionId: string,
     specificationId: string,
     isSetAsProviderData: boolean,
-    addAnotherAfter: boolean
+    addAnotherAfter: boolean,
+    converterEnabled: boolean
 }

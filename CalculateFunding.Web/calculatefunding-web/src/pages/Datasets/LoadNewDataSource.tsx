@@ -47,6 +47,7 @@ export function LoadNewDataSource() {
     const [selectedDataSchema, setSelectedDataSchema] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
     const [description, setDescription] = useState<string>("");
+    const [converterEligible, setConverterEligible] = useState<boolean>(false);
     const [datasetSourceFileName, setDatasetSourceFileName] = useState<string>("");
     const [uploadFileName, setUploadFileName] = useState<string>("");
     const [uploadFile, setUploadFile] = useState<File>();

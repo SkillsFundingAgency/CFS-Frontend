@@ -12,6 +12,8 @@
 
         public DateTimeOffset? LastUpdatedDate { get; set; }
 
+        public bool ConverterEligible { get; set; }
+
         public string LastUpdatedDateDisplay
         {
             get { return LastUpdatedDate.HasValue ? LastUpdatedDate.Value.ToString(FormatStrings.DateTimeFormatString) : "Unknown"; }

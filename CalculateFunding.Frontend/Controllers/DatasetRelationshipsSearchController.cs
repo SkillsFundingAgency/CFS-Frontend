@@ -122,6 +122,7 @@ namespace CalculateFunding.Frontend.Controllers
                     LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name)
                         ? "Unknown"
                         : m.LastUpdatedAuthor.Name,
+                    ConverterEnabled = m.ConverterEnabled,
                     HasDataSourceFileToMap = await GetDataSourceFiles(m.Id)
                 });
 

@@ -1,8 +1,5 @@
 ﻿namespace CalculateFunding.Frontend.ViewModels.Datasets
 {
-    using System.ComponentModel.DataAnnotations;
-    using CalculateFunding.Frontend.Properties;
-
     public class AssignDatasetSchemaViewModel
     {
          public string DatasetDefinitionId { get; set; }

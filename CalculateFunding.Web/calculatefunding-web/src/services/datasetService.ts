@@ -12,6 +12,7 @@ import {DatasetEmptyFieldEvaluationOptions} from "../types/Datasets/DatasetEmpty
 import {NewDatasetVersionResponseViewModel} from "../types/Datasets/NewDatasetVersionResponseViewModel";
 import {DatasetSearchResponseViewModel} from "../types/Datasets/DatasetSearchResponseViewModel";
 import {DatasetVersionHistoryViewModel} from "../types/Datasets/DatasetVersionHistoryViewModel";
+import {ToggleDatasetSchemaRequest} from "../types/Datasets/ToggleDatasetSchemaRequest";
 
 const baseUrl = "/api/datasets";
 
@@ -43,6 +44,17 @@ export async function assignDatasetSchemaService(request: AssignDatasetSchemaReq
         },
         data: request
     });
+}
+
+export async function toggleDatasetRelaionshipService(request:ToggleDatasetSchemaRequest):
+    Promise<AxiosResponse<boolean>> {
+        return axios(`${baseUrl}/toggleDatasetRelationship/${request.relationshipId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: request.converterEnabled
+        });
 }
 
 export async function searchDatasetDefinitionsService(request: DatasetDefinitionRequestViewModel) {
@@ -126,7 +138,7 @@ export async function uploadDatasetVersionService(request: UpdateNewDatasetVersi
             "x-ms-meta-authorId": request.author.id,
             "x-ms-meta-filename": file.name,
             "x-ms-meta-name": request.name,
-            "x-ms-meta-version": request.version,
+            "x-ms-meta-version": request.version
         },
         data: file
     })

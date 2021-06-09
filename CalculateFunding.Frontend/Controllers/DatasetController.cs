@@ -69,9 +69,24 @@ namespace CalculateFunding.Frontend.Controllers
                     Filename = vm.Filename,
                     FundingStreamId = vm.FundingStreamId
                 });
-            
+
             return response.Handle(nameof(CreateNewDatasetModel),
                 onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpPut]
+        [Route("api/datasets/toggleDatasetRelationship/{relationshipId}")]
+        public async Task<IActionResult> ToggleDatasetRelationship([FromRoute] string relationshipId,
+            [FromBody] bool converterEnabled)
+        {
+            HttpStatusCode statusCode = await _datasetApiClient.ToggleDatasetRelationship(relationshipId, converterEnabled);
+
+            if (statusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(true);
+            }
+
+            return new StatusCodeResult(500);
         }
 
         [HttpPut]
@@ -305,7 +320,8 @@ namespace CalculateFunding.Frontend.Controllers
                     DatasetDefinitionId = viewModel.DatasetDefinitionId,
                     Description = viewModel.Description,
                     IsSetAsProviderData = viewModel.IsSetAsProviderData,
-                    UsedInDataAggregations = false
+                    UsedInDataAggregations = false,
+                    ConverterEnabled = viewModel.ConverterEnabled
                 };
 
             ApiResponse<DefinitionSpecificationRelationship> newAssignDatasetResponse =

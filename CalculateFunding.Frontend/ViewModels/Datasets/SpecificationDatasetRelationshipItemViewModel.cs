@@ -18,6 +18,8 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
 
         public string DatasetId { get; set; }
 
+        public bool ConverterEnabled { get; set; }
+
         public string RelationshipId { get; set; }
 
         public string RelationName { get; set; }

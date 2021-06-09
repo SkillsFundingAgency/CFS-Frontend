@@ -333,12 +333,12 @@ describe("<SelectDataSource/>", () => {
             renderPage();
         });
 
-        it("does not show job in progress title", async () => {
-            expect(await screen.queryByText("Job in progress: Running Converter Wizard")).not.toBeInTheDocument();
+        it("does not show job in progress title", () => {
+            expect(screen.queryByText("Job in progress: Running Converter Wizard")).not.toBeInTheDocument();
         });
 
-        it("does not display converter wizard running warning", async () => {
-            expect(await screen.queryByText("Mapping of this dataset is disabled until converter wizard completes.")).not.toBeInTheDocument();
+        it("does not display converter wizard running warning", () => {
+            expect(screen.queryByText("Mapping of this dataset is disabled until converter wizard completes.")).not.toBeInTheDocument();
         });
     });
 });

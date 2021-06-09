@@ -2,8 +2,11 @@ import * as React from "react";
 import {LoadingStatus} from "../LoadingStatus";
 import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {getDatasetBySpecificationIdService} from "../../services/datasetService";
+import {getDatasetBySpecificationIdService, toggleDatasetRelaionshipService} from "../../services/datasetService";
 import {DatasetSummary} from "../../types/DatasetSummary";
+import {ToggleDatasetSchemaRequest} from "../../types/Datasets/ToggleDatasetSchemaRequest";
+import {useErrors} from "../../hooks/useErrors";
+import { MultipleErrorSummary } from "../MultipleErrorSummary";
 
 export function Datasets(props: { specificationId: string }) {
     const [datasets, setDatasets] = useState<DatasetSummary>({
@@ -25,10 +28,24 @@ export function Datasets(props: { specificationId: string }) {
         });
     }, [props.specificationId]);
 
+    const {errors, addError} = useErrors();
+
+    const handleToggleConverter = async (e: React.ChangeEvent<HTMLInputElement>, relationshipId:string) => {
+        const request: ToggleDatasetSchemaRequest = {
+            relationshipId: relationshipId,
+            converterEnabled: e.target.value === "true" ? true : false
+        };
+        const response = await toggleDatasetRelaionshipService(request);
+        if (response.status !== 200) {
+            addError({error: `${response.statusText} ${response.data}`, description: "Error whilst setting enable copy data for provider", fieldName: "converter-enabled"});
+        }
+    };
+
     return <section className="govuk-tabs__panel" id="datasets">
         <LoadingStatus title={"Loading datasets"}
                        hidden={!isLoadingDatasets}
                        description={"Please wait whilst datasets are loading"}/>
+        <MultipleErrorSummary errors={errors}/>
         <div className="govuk-grid-row" hidden={isLoadingDatasets}>
             <div className="govuk-grid-column-two-thirds">
                 <h2 className="govuk-heading-l">Datasets</h2>
@@ -49,8 +66,9 @@ export function Datasets(props: { specificationId: string }) {
             <caption className="govuk-table__caption">Dataset and schemas</caption>
             <thead className="govuk-table__head">
             <tr className="govuk-table__row">
-                <th scope="col" className="govuk-table__header govuk-!-width-one-half">Dataset</th>
-                <th scope="col" className="govuk-table__header govuk-!-width-one-half">Data schema</th>
+                <th scope="col" className="govuk-table__header">Dataset</th>
+                <th scope="col" className="govuk-table__header">Data schema</th>
+                <th scope="col" className="govuk-table__header">Enable copy data for provider</th>
             </tr>
             </thead>
             <tbody className="govuk-table__body">
@@ -71,6 +89,35 @@ export function Datasets(props: { specificationId: string }) {
                         </div>
                     </td>
                     <td className="govuk-table__cell">{ds.definition.name}</td>
+                    <td className="govuk-table__cell">
+                        {ds.converterEligible &&
+                        <div className="govuk-form-group" data-testid={`converter-enabled-${ds.id}`}>
+                            <div className="govuk-radios govuk-radios--inline">
+                                <div className="govuk-radios__item">
+                                    <input className="govuk-radios__input"
+                                        id={`converter-enabled-${ds.id}.yes`}
+                                        name={`converter-enabled-${ds.id}`}
+                                        type="radio" value="true" defaultChecked={ds.converterEnabled}
+                                        onChange={(e) => handleToggleConverter(e, ds.id)}/>
+                                    <label className="govuk-label govuk-radios__label"
+                                        htmlFor={`converter-enabled-${ds.id}.yes`}>
+                                        Yes
+                                    </label>
+                                </div>
+                                <div className="govuk-radios__item">
+                                    <input className="govuk-radios__input"
+                                        id={`converter-enabled-${ds.id}.no`}
+                                        name={`converter-enabled-${ds.id}`}
+                                        type="radio" value="false" defaultChecked={!ds.converterEnabled}
+                                        onChange={(e) => handleToggleConverter(e, ds.id)}/>
+                                    <label className="govuk-label govuk-radios__label"
+                                        htmlFor={`converter-enabled-${ds.id}.no`}>
+                                        No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>}
+                    </td>
                 </tr>
             )}
             </tbody>

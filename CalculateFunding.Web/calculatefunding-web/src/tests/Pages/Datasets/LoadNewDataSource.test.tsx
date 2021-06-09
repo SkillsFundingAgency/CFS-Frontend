@@ -162,8 +162,8 @@ const givenFormIsCompleted = async() => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
     });
 
-    const dataSheme = await screen.getAllByTestId("input-auto-complete")[1];
-    fireEvent.change(dataSheme, {target: {value: "Early Years AP Census Year 1"}});
+    const dataScheme = await screen.getAllByTestId("input-auto-complete")[1];
+    fireEvent.change(dataScheme, {target: {value: "Early Years AP Census Year 1"}});
     fireEvent.click(await screen.getByTestId("Early Years AP Census Year 1"), {target: {innerText: 'Early Years AP Census Year 1'}});
 
     const dataSourceFileName = await screen.findByTestId(`new-datasource-filename`);
@@ -765,7 +765,7 @@ let subscription: JobSubscription | undefined = {
     },
     id: "sertdhw4e5t",
     onError: () => {},
-    startDate: DateTime.now()
+    startDate: DateTime.local()
 };
 
 const haveNoJobNotification = () => {

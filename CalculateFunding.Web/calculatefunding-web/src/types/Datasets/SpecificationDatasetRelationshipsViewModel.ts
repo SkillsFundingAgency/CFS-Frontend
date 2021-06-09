@@ -15,6 +15,8 @@ export interface SpecificationDatasetRelationshipsViewModelItem {
     relationshipDescription: string;
     datasetVersion: number;
     datasetId: string;
+    converterEnabled: boolean,
+    converterEligible: boolean,
     relationshipId: string;
     relationName: string;
     isProviderData: boolean;

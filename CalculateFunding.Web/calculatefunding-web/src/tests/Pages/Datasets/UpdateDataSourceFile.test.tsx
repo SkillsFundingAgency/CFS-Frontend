@@ -59,7 +59,7 @@ describe("<UpdateDataSourceFile />", () => {
 
         it("file error is displayed given no file has been selected ", async () => {
             await testData.submitForm();
-            expect(await screen.getByText("Upload a xls or xlsx file")).toBeInTheDocument();
+            expect(screen.getByText("Upload a xls or xlsx file")).toBeInTheDocument();
         })
 
         it("file error is displayed given an invalid file has been selected ", async () => {
@@ -69,7 +69,7 @@ describe("<UpdateDataSourceFile />", () => {
 
             await testData.submitForm();
 
-            expect(await screen.getByText("Upload a xls or xlsx file")).toBeInTheDocument();
+            expect(screen.getByText("Upload a xls or xlsx file")).toBeInTheDocument();
         })
 
         it("file error is not displayed given a file has been selected ", async () => {
@@ -119,7 +119,7 @@ describe("<UpdateDataSourceFile />", () => {
             await testData.givenFormIsCompleted();
 
             await testData.submitForm();
-            await testData.hasJobValidationFailure();
+            testData.hasJobValidationFailure();
 
             await waitFor(() => expect(downloadValidateDatasetValidationErrorSasUrl).toBeCalledTimes(1));
         })
@@ -128,7 +128,7 @@ describe("<UpdateDataSourceFile />", () => {
             await testData.givenFormIsCompleted();
 
             await testData.submitForm();
-            await testData.hasJobValidationFailure();
+            testData.hasJobValidationFailure();
 
             await waitFor(() => {
                 const errorReportLink = screen.queryByText(`error report`) as HTMLAnchorElement;
@@ -140,8 +140,10 @@ describe("<UpdateDataSourceFile />", () => {
         it("validation error is displayed given job failed with validation error information ", async () => {
             await testData.givenFormIsCompleted();
             await testData.submitForm();
-            await testData.hasJobFailure();
-            expect(await screen.findByText("Some errors")).toBeInTheDocument();
+            testData.hasJobFailure();
+            await waitFor(() => {
+                expect(screen.queryByText("Some errors")).toBeInTheDocument();
+            });
         })
 
         it("merge confirmation is not displayed on page render ", async () => {
