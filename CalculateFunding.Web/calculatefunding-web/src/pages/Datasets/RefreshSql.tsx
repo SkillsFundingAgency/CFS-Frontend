@@ -26,7 +26,8 @@ import {getLatestSuccessfulJob} from "../../services/jobService";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {
-    AddJobSubscription, JobNotification,
+    AddJobSubscription, 
+    JobNotification, 
     MonitorFallback,
     MonitorMode,
     useJobSubscription
@@ -51,7 +52,7 @@ export function RefreshSql() {
     const specificationId = selectedFundingPeriod ? selectedFundingPeriod.specifications[0].id : "";
     const specificationName = selectedFundingPeriod ? selectedFundingPeriod.specifications[0].name : "";
     
-    const {addSub, removeSub, results: jobNotifications} = useJobSubscription({
+    const {replaceSubs, removeSub, results: jobNotifications} = useJobSubscription({
         isEnabled: !!specificationId && specificationId.length > 0,
         onNewNotification: handleJobNotification,
         onError: err => addError({error: err, description: "An error occurred while monitoring background jobs"})
@@ -91,7 +92,7 @@ export function RefreshSql() {
         return (await getLatestPublishedDate(fundingStreamId, fundingPeriodId)).data;
     }
 
-    const {data: latestPublishedDate, isLoading: isLoadingLatestPublishedDate, refetch} =
+    const {data: latestPublishedDate, isLoading: isLoadingLatestPublishedDate, refetch: refetchLatestPubDate} =
         useQuery<LatestPublishedDate, AxiosError>(`latest-published-date-${fundingStreamId}-${fundingPeriodId}`,
             fetchLatestPublishedDate,
             {
@@ -100,7 +101,7 @@ export function RefreshSql() {
             });
 
     useEffect(() => {
-        refetch();
+        refetchLatestPubDate();
     }, [selectedFundingPeriod]);
     
     useEffect(() => {
@@ -129,8 +130,9 @@ export function RefreshSql() {
 
     useEffect(() => {
         if (!specificationId) return;
-        
-        addSub([JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob,
+
+        replaceSubs(
+            [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob,
             JobType.ApproveAllProviderFundingJob, JobType.RefreshFundingJob,
             JobType.PublishAllProviderFundingJob, JobType.PublishBatchProviderFundingJob,
             JobType.ReIndexPublishedProvidersJob]
@@ -183,16 +185,16 @@ export function RefreshSql() {
                 } else {
                     setSqlJobStatusMessage("Data push failed");
                 }
+                if (refreshJobId.length > 0 && notification.latestJob.jobId === refreshJobId) {
+                    setIsRefreshing(false);
+                    if (notification.latestJob.isSuccessful) {
+                        setShowSuccess(true);
+                    } else {
+                        addError({error: "Refresh sql job failed: " + notification.latestJob.outcome});
+                    }
+                    removeSub(notification.subscription.id);
+                }
                 break;
-        }
-        if (refreshJobId.length > 0 && notification.latestJob.jobId === refreshJobId && notification.latestJob.isComplete) {
-            setIsRefreshing(false);
-            if (notification.latestJob.isSuccessful) {
-                setShowSuccess(true);
-            } else {
-                addError({error: "Refresh sql job failed: " + notification.latestJob.outcome});
-            }
-            removeSub(notification.subscription.id);
         }
     }
 
@@ -216,7 +218,7 @@ export function RefreshSql() {
                 removeSub(notification.subscription.id);
                 setFundingStatusMessage("Job completed");
                 setIsAnotherUserRunningFundingJob(false);
-                refetch();
+                refetchLatestPubDate();
                 break;
         }
     }
@@ -246,6 +248,7 @@ export function RefreshSql() {
                 setIsRefreshing(true);
                 const jobId = (await runSqlImportJob(specificationId, selectedFundingStream.id)).data.jobId;
                 if (!jobId || jobId?.length === 0) {
+                    setIsRefreshing(false);
                     throw new Error("No job ID was returned");
                 }
                 setRefreshJobId(jobId);

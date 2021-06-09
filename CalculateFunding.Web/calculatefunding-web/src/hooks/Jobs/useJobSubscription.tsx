@@ -69,7 +69,15 @@ export const useJobSubscription = ({
     const [jobPollingInterval, setJobPollingInterval] = React.useState<number>(0);
     const [isSignalREnabled, setIsSignalREnabled] = React.useState<boolean>(isEnabled);
 
-    const addSub = (request: AddJobSubscription | AddJobSubscription[]) => {
+    const replaceSubs = (request: AddJobSubscription[]): JobSubscription[] => {
+        reset();
+        
+        const newSubs = request.map(x => convert(x))
+        setSubs(newSubs);
+        return newSubs;
+    };
+
+    const addSub = (request: AddJobSubscription | AddJobSubscription[]): JobSubscription | JobSubscription[] => {
 
         if (subs.length === 0) {
             reset();
@@ -117,8 +125,6 @@ export const useJobSubscription = ({
     };
 
     const onSignalRFail = (error: string) => {
-        if (error && error.length > 0) console.error(error);
-        
         // signalR has failed, so get the hook to stop signalR
         setIsSignalREnabled(false);
         
@@ -128,19 +134,28 @@ export const useJobSubscription = ({
             setJobPollingInterval(milliseconds.TenSeconds);
         }
         
-        // try to kickstart signalR after a second
-        setInterval(() => setIsSignalREnabled(true), 1000);
+        // try to kickstart signalR
+        setInterval(() => setIsSignalREnabled(true), milliseconds.TenSeconds);
     };
 
     const onSignalRClose = () => {
         // trigger signalR shutdown
         setIsSignalREnabled(false);
+
+        if (subs.length === 0) return;
+
+        if (anySubscriptionsWithPolling(subs)) {
+            setJobPollingInterval(milliseconds.TenSeconds);
+        }
+
+        // try to kickstart signalR
+        setInterval(() => setIsSignalREnabled(true), milliseconds.TenSeconds);
     };
 
     const onSignalRReconnected = async () => {
         // cancel polling because we now have signalR working again
         setJobPollingInterval(0);
-        
+
         // try to find any job updates that were missed in the interim
         await loadLatestJobUpdatesForPollingSubscriptions();
     };
@@ -275,12 +290,10 @@ export const useJobSubscription = ({
             .map(async (sub) => {
             if (!!sub.filterBy.jobId) {
                 await loadLatestJobUpdatesById([sub.filterBy.jobId]);
+            } else if (!!sub.filterBy.specificationId) {
+                await loadLatestJobUpdatesBySpec(sub.filterBy);
             } else {
-                if (!!sub.filterBy.specificationId) {
-                    await loadLatestJobUpdatesBySpec(sub.filterBy);
-                } else {
-                    // todo: what to do if just looking for job types - no suitable api to call
-                }
+                // todo: what to do if just looking for job types - no suitable api to call
             }
         })
     };
@@ -349,6 +362,7 @@ export const useJobSubscription = ({
 
     return {
         addSub,
+        replaceSubs,
         removeSub,
         removeAllSubs,
         subs,

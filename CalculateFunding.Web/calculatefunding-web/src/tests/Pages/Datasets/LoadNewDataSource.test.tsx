@@ -821,6 +821,16 @@ jobSubscriptionSpy.mockImplementation(() => {
             subscription = sub;
             return sub as JobSubscription | JobSubscription[];
         },
+        replaceSubs: (requests: AddJobSubscription[]) => {
+            const sub: JobSubscription = {
+                filterBy: {},
+                id: "sertdhw4e5t",
+                onError: () => null,
+                startDate: DateTime.now()
+            }
+            subscription = sub;
+            return [sub];
+        },
         removeSub: (request) => {},
         removeAllSubs: () => {},
         subs: [],

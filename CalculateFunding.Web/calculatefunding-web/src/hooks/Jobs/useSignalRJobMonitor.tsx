@@ -66,7 +66,12 @@ export const useSignalRJobMonitor = ({
 
     const stopSignalR = () => {
         hubConnection?.stop();
-        hubRef?.current?.stop();
+        
+        if (hubRef?.current) {
+            hubRef?.current?.stop();
+            hubRef.current = undefined;
+        }
+        
         setHubConnection(undefined);
     }
 
@@ -133,6 +138,7 @@ export const useSignalRJobMonitor = ({
     const notifyDisconnection = (error: Error | string | undefined) => {
         const realError = (error as Error);
         const errorMessage = !!realError ? `Error while monitoring jobs: ${realError.message}` : !!error ? error as string : null;
+        if (!!errorMessage) console.error(errorMessage);
         if (errorMessage && !!onFail) {
             onFail(errorMessage);
         } else if (!!onClose) {
@@ -146,7 +152,8 @@ export const useSignalRJobMonitor = ({
         onReconnection && onReconnection();
     }
 
-    const notifyReconnecting = () => {
+    const notifyReconnecting = (error: Error | string | undefined) => {
+        if (!!error) console.error(error);
         onReconnecting && onReconnecting();
     }
 
@@ -161,9 +168,9 @@ export const useSignalRJobMonitor = ({
                 hubConnect.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
                 hubConnect.serverTimeoutInMilliseconds = milliseconds.SixMinutes;
                 hubConnect.on('NotificationEvent', processMessage);
-                hubConnect.onclose(notifyDisconnection);
-                hubConnect.onreconnecting(notifyReconnecting);
-                hubConnect.onreconnected(notifyReconnection);
+                hubConnect.onclose(error => notifyDisconnection(error));
+                hubConnect.onreconnecting(error => notifyReconnecting(error));
+                hubConnect.onreconnected(connectionId => notifyReconnection());
 
                 await hubConnect.start();
 

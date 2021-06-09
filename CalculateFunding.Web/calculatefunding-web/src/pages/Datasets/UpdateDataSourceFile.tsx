@@ -187,7 +187,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 return;
                             }
                             const validationJobId = validateDatasetResponse.data.validateDatasetJobId;
-                            setValidateDatasetJobId(validationJobId); // todo: redundant?
+                            setValidateDatasetJobId(validationJobId);
                             const subscription = addSub({
                                 filterBy: {jobId: validationJobId},
                                 monitorMode: MonitorMode.SignalR,
