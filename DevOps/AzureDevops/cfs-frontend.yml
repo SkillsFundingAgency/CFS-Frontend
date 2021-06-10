@@ -9,7 +9,7 @@ resources:
   - repository: funding-blocks
     type: github
     name: SkillsFundingAgency/funding-platform-building-blocks
-    ref: refs/heads/ma/features/master-yarn
+    ref: refs/heads/master
     endpoint: 'Github (ESFA)'
 
 trigger:
@@ -33,7 +33,7 @@ variables:
 - group: 'Dotnet Core SDK Version'
 
 steps:
-- template: azure-pipelines-templates/cfs/build-frontend-react-spa-yarn.yml@funding-blocks
+- template: azure-pipelines-templates/cfs/build-frontend-react-spa.yml@funding-blocks
   parameters:
     projectFolder: $(projectFolder)
     DotnetCoreSdkVersion: $(DotnetCoreSdkVersion)
