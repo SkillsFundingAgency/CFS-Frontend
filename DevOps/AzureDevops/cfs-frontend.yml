@@ -3,15 +3,6 @@ name: $(Rev:r)
 pool:
   vmImage: windows-2019
 
-resources:
-  repositories:
-  - repository: self
-  - repository: funding-blocks
-    type: github
-    name: SkillsFundingAgency/funding-platform-building-blocks
-    ref: refs/heads/master
-    endpoint: 'Github (ESFA)'
-
 trigger:
   branches:
     include:
@@ -33,7 +24,7 @@ variables:
 - group: 'Dotnet Core SDK Version'
 
 steps:
-- template: azure-pipelines-templates/cfs/build-frontend-react-spa.yml@funding-blocks
+- template: templates\build-frontend-react-spa.yml
   parameters:
     projectFolder: $(projectFolder)
     DotnetCoreSdkVersion: $(DotnetCoreSdkVersion)
