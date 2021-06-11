@@ -27,7 +27,6 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
         parentJobId: job.parentJobId,
         specificationId: job.specificationId,
         trigger: job.trigger
-
     };
 
     if (job.outcomes && job.outcomes.length > 0) {

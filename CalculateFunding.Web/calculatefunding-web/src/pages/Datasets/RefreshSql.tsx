@@ -14,9 +14,6 @@ import {useQuery} from "react-query";
 import {LatestPublishedDate} from "../../types/PublishedProvider/LatestPublishedDate";
 import {AxiosError} from "axios";
 import {getLatestPublishedDate, runSqlImportJob} from "../../services/publishService";
-import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
-import {useSelector} from "react-redux";
-import {IStoreState} from "../../reducers/rootReducer";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {useHistory} from "react-router";
@@ -32,14 +29,14 @@ import {
     MonitorMode,
     useJobSubscription
 } from "../../hooks/Jobs/useJobSubscription";
+import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
+import {Permission} from "../../types/Permission";
 
 export function RefreshSql() {
-    const permissions: FundingStreamPermissions[] = useSelector((state: IStoreState) => state.userState.fundingStreamPermissions);
     const {errors, addError} = useErrors();
     const history = useHistory();
     const [sqlJobStatusMessage, setSqlJobStatusMessage] = useState<string>('Data push queued');
     const [fundingStatusMessage, setFundingStatusMessage] = useState<string>('Funding job running');
-    const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
     const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
     const [isAnotherUserRunningSqlJob, setIsAnotherUserRunningSqlJob] = useState<boolean>(false);
     const [isAnotherUserRunningFundingJob, setIsAnotherUserRunningFundingJob] = useState<boolean>(false);
@@ -51,8 +48,11 @@ export function RefreshSql() {
     const {fundingStreams, isLoadingOptions, errorCheckingForOptions, isErrorCheckingForOptions} = useOptionsForSpecificationsSelectedForFunding();
     const specificationId = selectedFundingPeriod ? selectedFundingPeriod.specifications[0].id : "";
     const specificationName = selectedFundingPeriod ? selectedFundingPeriod.specifications[0].name : "";
+
+    const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
+        useSpecificationPermissions(specificationId, [Permission.CanRefreshPublishedQa]);
     
-    const {replaceSubs, removeSub, results: jobNotifications} = useJobSubscription({
+    const {replaceSubs, removeAllSubs, results: jobNotifications} = useJobSubscription({
         isEnabled: !!specificationId && specificationId.length > 0,
         onNewNotification: handleJobNotification,
         onError: err => addError({error: err, description: "An error occurred while monitoring background jobs"})
@@ -114,15 +114,6 @@ export function RefreshSql() {
     }, [hasRunningSqlJob, isAnotherUserRunningSqlJob]);
 
     useEffect(() => {
-        setMissingPermissions([]);
-        if (!selectedFundingStream) return;
-        const fundingStreamPermission = permissions.find(p => p.fundingStreamId === selectedFundingStream.id);
-        if (!fundingStreamPermission || !fundingStreamPermission.canRefreshPublishedQa) {
-            setMissingPermissions([`refresh published QA for funding stream ${selectedFundingStream.name}`]);
-        }
-    }, [permissions, selectedFundingStream]);
-
-    useEffect(() => {
         if (errorCheckingForOptions.length > 0) {
             addError({error: errorCheckingForOptions});
         }
@@ -131,6 +122,7 @@ export function RefreshSql() {
     useEffect(() => {
         if (!specificationId) return;
 
+        // separate subscriptions because this is for monitoring other people's jobs and the current user's sql import job
         replaceSubs(
             [JobType.RunSqlImportJob, JobType.ApproveBatchProviderFundingJob,
             JobType.ApproveAllProviderFundingJob, JobType.RefreshFundingJob,
@@ -150,6 +142,9 @@ export function RefreshSql() {
                     })
                 } as AddJobSubscription;
             }));
+        return () => {
+            removeAllSubs();
+        };
     }, [specificationId]);
 
     function handleJobNotification(notification: JobNotification) {
@@ -166,6 +161,7 @@ export function RefreshSql() {
         if (refreshJobId.length === 0 && !isAnotherUserRunningSqlJob) {
             setIsAnotherUserRunningSqlJob(true);
         }
+        console.log(`SQL import job with id: ${notification.latestJob.jobId}, status: ${notification.latestJob.statusDescription}, type: ${notification.latestJob.jobType}, invoked by: ${notification.latestJob.invokerUserDisplayName}`);
         switch (notification.latestJob.runningStatus) {
             case RunningStatus.Queued:
             case RunningStatus.QueuedWithService:
@@ -192,7 +188,7 @@ export function RefreshSql() {
                     } else {
                         addError({error: "Refresh sql job failed: " + notification.latestJob.outcome});
                     }
-                    removeSub(notification.subscription.id);
+                    setRefreshJobId("");
                 }
                 break;
         }
@@ -203,6 +199,7 @@ export function RefreshSql() {
         if (!isAnotherUserRunningFundingJob) {
             setIsAnotherUserRunningFundingJob(true);
         }
+        console.log(`${notification.latestJob.jobDescription} job with id: ${notification.latestJob.jobId}, status: ${notification.latestJob.statusDescription}, type: ${notification.latestJob.jobType}, invoked by: ${notification.latestJob.invokerUserDisplayName}`);
         switch (notification.latestJob.runningStatus) {
             case RunningStatus.Queued:
             case RunningStatus.QueuedWithService:
@@ -215,7 +212,6 @@ export function RefreshSql() {
                 setFundingStatusMessage("Job completing");
                 break;
             case RunningStatus.Completed:
-                removeSub(notification.subscription.id);
                 setFundingStatusMessage("Job completed");
                 setIsAnotherUserRunningFundingJob(false);
                 refetchLatestPubDate();
@@ -251,6 +247,7 @@ export function RefreshSql() {
                     setIsRefreshing(false);
                     throw new Error("No job ID was returned");
                 }
+                console.log(`Refresh job queued with id ${jobId}`);
                 setRefreshJobId(jobId);
             } catch (error) {
                 addError({error: "The refresh sql import job could not be started: " + error.message});
@@ -273,11 +270,7 @@ export function RefreshSql() {
             return <LoadingFieldStatus title={sqlJobStatusMessage} />
         }
         if (refreshJobDateTime) {
-            return (
-                <DateTimeFormatter
-                    date={refreshJobDateTime}
-                    />
-            );
+            return <DateTimeFormatter date={refreshJobDateTime} />
         }
         if (!lastSqlJob || !lastSqlJob.lastUpdated) {
             return <span className="govuk-body">N/A</span>
@@ -401,18 +394,18 @@ export function RefreshSql() {
     }
 
     function RefreshButton() {
-        const isDisabled = !(
-            (!lastSqlJob?.lastUpdated ||
-                !latestPublishedDate?.value ||
-                latestPublishedDate.value > lastSqlJob.lastUpdated ||
-                lastSqlJob.isFailed)
-            && missingPermissions.length === 0 && !isLoadingOptions
+        const jobPreconditionsOk = !lastSqlJob?.lastUpdated ||
+            !latestPublishedDate?.value ||
+            latestPublishedDate.value > lastSqlJob.lastUpdated ||
+            lastSqlJob.isFailed;
+        const isEnabled = 
+            !isRefreshing && jobPreconditionsOk
+            && !isCheckingForPermissions && !hasMissingPermissions && !isLoadingOptions
             && !isLoadingLatestPublishedDate && !isAnotherUserRunningSqlJob
-            && !hasRunningFundingJobs && !isCheckingForLatestSqlJob
-        );
+            && !hasRunningFundingJobs && !isCheckingForLatestSqlJob;
 
         return (
-            <button className="govuk-button" onClick={handlePushData} disabled={isDisabled}>
+            <button className="govuk-button" onClick={handlePushData} disabled={!isEnabled}>
                 Push data
             </button>
         );
@@ -432,12 +425,14 @@ export function RefreshSql() {
                     <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
                     <Breadcrumb name={"Refresh SQL"} />
                 </Breadcrumbs>
+
                 <SqlJobStatusPanel />
                 <SuccessMessage />
                 {!isRefreshing && !showSuccess && <div className="govuk-main-wrapper">
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
-                            <PermissionStatus requiredPermissions={missingPermissions} hidden={permissions.length === 0} />
+                            <PermissionStatus requiredPermissions={missingPermissions} 
+                                              hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions} />
                         </div>
                     </div>
                     <div className="govuk-grid-row">

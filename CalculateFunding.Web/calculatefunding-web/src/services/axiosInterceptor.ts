@@ -8,6 +8,9 @@ const store = createStore(rootReducer);
 
 const configurationPromise: Promise<Config> = (window as any)['configuration'];
 
+const isAlreadyOnAuthPage = () => window.location.href.includes('.auth/');
+const isLocalDevEnv = () => process.env.NODE_ENV === 'development';
+
 export function initialiseAxios() {
     configurationPromise.then(response => {
         const configuration = response;
@@ -18,7 +21,7 @@ export function initialiseAxios() {
             response => response,
             (error) => {
                 
-                if (window.location.href.includes('.auth/login')) {
+                if (isAlreadyOnAuthPage() || isLocalDevEnv) {
                     return Promise.reject(error);
                 }
 

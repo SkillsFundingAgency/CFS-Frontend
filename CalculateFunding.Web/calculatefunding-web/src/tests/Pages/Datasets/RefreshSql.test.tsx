@@ -13,6 +13,9 @@ import {createMockAxiosError} from "../../fakes/fakeAxios";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {AddJobSubscription, JobNotification, JobSubscription} from "../../../hooks/Jobs/useJobSubscription";
 import {DateTime} from "luxon";
+import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import {Permission} from "../../../types/Permission";
+import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 
 const latestPublishedDate = "2020-11-23T17:35:01.1080915+00:00";
 
@@ -55,26 +58,28 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("does not show summary until funding stream and funding period selected", async () => {
+            hasPermissions();
             await renderPage();
 
             expect(screen.queryByText(/Last SQL update/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/Last funding data change/i)).not.toBeInTheDocument();
-            expect(screen.queryByText(/Push data/)).not.toBeInTheDocument();
+            expect(screen.queryByRole("button", {name: /Push data/})).not.toBeInTheDocument();
 
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
 
             expect(screen.queryByText(/Last SQL update/i)).not.toBeInTheDocument();
             expect(screen.queryByText(/Last funding data change/i)).not.toBeInTheDocument();
-            expect(screen.queryByText(/Push data/)).not.toBeInTheDocument();
+            expect(screen.queryByRole("button", {name: /Push data/})).not.toBeInTheDocument();
 
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
 
             expect(screen.getByText(/Last SQL update/i)).toBeInTheDocument();
             expect(screen.getByText(/Last funding data change/i)).toBeInTheDocument();
-            expect(screen.getByText(/Push data/)).toBeInTheDocument();
+            expect(screen.getByRole("button", {name: /Push data/})).toBeDisabled();
         });
 
         it("does not show a permissions message for funding stream where user has canRefreshPublishedQa permission", async () => {
+            hasPermissions();
             await renderPage();
 
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
@@ -83,54 +88,27 @@ describe("<ChangeProfileType /> ", () => {
         });
 
         it("shows a permissions message for funding stream where user does not have canRefreshPublishedQa permission", async () => {
+            hasMissingPermissions();
             await renderPage();
 
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
 
             expect(screen.getByText(/you do not have permissions/i)).toBeInTheDocument();
-        });
-
-        it("removes permissions message when funding stream changed to one where user has canRefreshPublishedQa permission", async () => {
-            await renderPage();
-
-            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
-            expect(screen.getByText(/you do not have permissions/i)).toBeInTheDocument();
-
-            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
-
-            await waitFor(() => {
-                expect(screen.queryByText(/you do not have permissions/i)).not.toBeInTheDocument();
-            });
         });
 
         it("push data button is disabled when user does not have canRefreshPublishedQa permission", async () => {
+            hasMissingPermissions();
             await renderPage();
+            
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "FY-2021"}});
+            
             await waitFor(() => {
                 expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
                 expect(screen.getByText("N/A")).toBeInTheDocument();
             });
-            expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
-        });
 
-        it("push data button is re-enabled when user chooses a funding stream where they have canRefreshPublishedQa permission", async () => {
-            await renderPage();
-
-            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
-            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "FY-2021"}});
-            await waitFor(() => {
-                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
-                expect(screen.getByText("N/A")).toBeInTheDocument();
-            });
-            expect(screen.getByText(/Push data/).closest("button")).toBeDisabled();
-            fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
-            fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
-            await waitFor(() => {
-                expect(screen.getByText(/Push data/).closest("button")).not.toBeDisabled();
-                expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
-                expect(screen.getByText("N/A")).toBeInTheDocument();
-            });
+            expect(screen.getByRole("button", {name: /Push data/})).toBeDisabled();
         });
 
         it("shows sql job status panel when push data button clicked", async () => {
@@ -144,6 +122,7 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
+            hasPermissions();
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
@@ -151,13 +130,17 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
                 expect(screen.getByText("N/A")).toBeInTheDocument();
             });
-            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            const button = screen.getByRole("button", {name: /Push data/});
+            expect(button).toBeEnabled();
+            fireEvent.click(button);
+            expect(button).not.toBeInTheDocument();
             expect(screen.getByText(/Please do not refresh the page, you will be redirected automatically/i)).toBeInTheDocument();
             await act(() => promise);
         });
 
         it("does not show sql job status panel when push data button clicked when endpoint returns server error", async () => {
             runSqlImportJobSpy.mockRejectedValue(createMockAxiosError({}, 500));
+            hasPermissions();
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
@@ -165,7 +148,9 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
                 expect(screen.getByText("N/A")).toBeInTheDocument();
             });
-            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            const button = screen.getByRole("button", {name: /Push data/});
+            expect(button).toBeEnabled();
+            fireEvent.click(button);
             await waitForElementToBeRemoved(screen.queryByText(/Please do not refresh the page, you will be redirected automatically/i));
             expect(screen.getByText(/There is a problem/i)).toBeInTheDocument();
             expect(screen.getByText(/The refresh sql import job could not be started/i)).toBeInTheDocument();
@@ -181,6 +166,7 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
+            hasPermissions();
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
@@ -188,7 +174,9 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
                 expect(screen.getByText("N/A")).toBeInTheDocument();
             });
-            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            const button = screen.getByRole("button", {name: /Push data/});
+            expect(button).toBeEnabled();
+            fireEvent.click(button);
             await waitForElementToBeRemoved(screen.queryByText(/Please do not refresh the page, you will be redirected automatically/i));
             expect(screen.getByText(/There is a problem/i)).toBeInTheDocument();
             expect(screen.getByText(/The refresh sql import job could not be started/i)).toBeInTheDocument();
@@ -205,6 +193,7 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
+            hasPermissions();
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
             fireEvent.change(screen.getByTestId("funding-period"), {target: {value: "AC-2122"}});
@@ -212,7 +201,9 @@ describe("<ChangeProfileType /> ", () => {
                 expect(screen.getByText(/23 November 2020/i)).toBeInTheDocument();
                 expect(screen.getByText("N/A")).toBeInTheDocument();
             });
-            fireEvent.click(screen.getByText(/Push data/).closest("button") as HTMLElement);
+            const button = screen.getByRole("button", {name: /Push data/});
+            expect(button).toBeEnabled();
+            fireEvent.click(button);
             await waitForElementToBeRemoved(screen.queryByText(/Please do not refresh the page, you will be redirected automatically/i));
             expect(screen.getByText(/There is a problem/i)).toBeInTheDocument();
             expect(screen.getByText(/The refresh sql import job could not be started/i)).toBeInTheDocument();
@@ -245,6 +236,7 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
+            hasPermissions();
             
             await renderPage();
 
@@ -280,6 +272,7 @@ describe("<ChangeProfileType /> ", () => {
                 config: {}
             });
 
+            hasPermissions();
             await renderPage();
 
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
@@ -297,7 +290,8 @@ describe("<ChangeProfileType /> ", () => {
         it("push button is disabled when funding job in progress", async () => {
 
             haveJobInProgressNotification();
-            
+            hasPermissions();
+
             await renderPage();
             
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "DSG"}});
@@ -313,6 +307,7 @@ describe("<ChangeProfileType /> ", () => {
         it("push button is disabled when sql job in progress", async () => {
             
             haveSqlJobInProgressNotification();
+            hasPermissions();
 
             jobServiceSpy.mockResolvedValue({
                 data: {
@@ -365,6 +360,7 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
+            hasPermissions();
 
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
@@ -398,7 +394,7 @@ describe("<ChangeProfileType /> ", () => {
                 headers: {},
                 config: {}
             });
-
+            hasPermissions();
 
             await renderPage();
             fireEvent.change(screen.getByTestId("funding-stream"), {target: {value: "GAG"}});
@@ -573,6 +569,35 @@ jobSubscriptionSpy.mockImplementation(() => {
         results: notification ? [notification] : []
     }
 });
+
+
+const withoutPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => false,
+    hasMissingPermissions: true,
+    isPermissionsFetched: true,
+    permissionsEnabled: [],
+    permissionsDisabled: [Permission.CanRefreshPublishedQa],
+    missingPermissions: [Permission.CanRefreshPublishedQa],
+};
+const withPermissions: SpecificationPermissionsResult = {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => true,
+    hasMissingPermissions: false,
+    isPermissionsFetched: true,
+    permissionsEnabled: [Permission.CanRefreshPublishedQa],
+    permissionsDisabled: [],
+    missingPermissions: [],
+};
+const hasMissingPermissions = () => {
+    jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withoutPermissions));
+}
+
+const hasPermissions = () => {
+    jest.spyOn(useSpecificationPermissionsHook, 'useSpecificationPermissions').mockImplementation(() => (withPermissions));
+}
 
 // Setup router mocks
 const mockHistoryPush = jest.fn();

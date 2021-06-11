@@ -1,4 +1,3 @@
-import {JobType} from "../../types/jobType";
 import {useQuery} from "react-query";
 import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {AxiosError} from "axios";

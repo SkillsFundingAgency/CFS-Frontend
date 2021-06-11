@@ -10,7 +10,6 @@ import {getJob, getJobStatusUpdatesForSpecification} from "../../services/jobSer
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {useInterval} from "../useInterval";
 import {milliseconds} from "../../helpers/TimeInMs";
-import {append} from "ramda";
 import {JobType} from "../../types/jobType";
 
 export enum MonitorMode {
@@ -130,7 +129,7 @@ export const useJobSubscription = ({
         
         if (subs.length === 0) return;
         
-        if (anySubscriptionsWithPolling(subs)) {
+        if (anySubsWithSignalROrFallbackPolling(subs)) {
             setJobPollingInterval(milliseconds.TenSeconds);
         }
         
@@ -144,7 +143,7 @@ export const useJobSubscription = ({
 
         if (subs.length === 0) return;
 
-        if (anySubscriptionsWithPolling(subs)) {
+        if (anySubsWithSignalROrFallbackPolling(subs)) {
             setJobPollingInterval(milliseconds.TenSeconds);
         }
 
@@ -162,7 +161,7 @@ export const useJobSubscription = ({
 
     const onSignalRReconnecting = () => {
         // try to find any job updates that would otherwise be missed in the interim
-        if (anySubscriptionsWithPolling(subs)) {
+        if (anySubsWithSignalROrFallbackPolling(subs)) {
             setJobPollingInterval(milliseconds.TenSeconds);
         }
     };
@@ -232,11 +231,11 @@ export const useJobSubscription = ({
         return !filterBy.specificationId || job.specificationId === filterBy.specificationId;
     };
     
-    const findJobSubscriptionsWithPolling = (subscriptions: JobSubscription[]) => 
+    const findSubsWithSignalROrFallbackPolling = (subscriptions: JobSubscription[]) => 
         subscriptions
             .filter(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
 
-    const anySubscriptionsWithPolling = (subscriptions: JobSubscription[]): boolean =>
+    const anySubsWithSignalROrFallbackPolling = (subscriptions: JobSubscription[]): boolean =>
         subscriptions.some(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
 
     const isJobIdValid = (jobId: string | undefined) => {
@@ -254,33 +253,42 @@ export const useJobSubscription = ({
         return a.subscription.lastUpdate < b.subscription.lastUpdate;
     };
 
+    const notify = (input: JobNotification | JobNotification[]) => {
+        if (!onNewNotification) return;
+
+        if (Array.isArray(input)) {
+            input.forEach(n => onNewNotification(n));
+        } else {
+            onNewNotification(input);
+        }
+    }
+
     const mergeNotifications = (newNotifications: JobNotification[]) => {
         if (newNotifications.length === 0) return;
-        let updates: JobNotification[] = [];
 
         setNotifications(existingOnes => {
             const existingNotificationSubIds = existingOnes.map(n => n.subscription.id);
             const matchingNewOnes = newNotifications.filter(n => existingNotificationSubIds.includes(n.subscription.id));
             const nonMatchingNewOnes = newNotifications.filter(n => !existingNotificationSubIds.includes(n.subscription.id));
+            notify(nonMatchingNewOnes);
             const nonMatchingExistingOnes = existingOnes.filter(n => !matchingNewOnes.some(x => x.subscription.id === n.subscription.id));
             let output: JobNotification[] = [...nonMatchingExistingOnes, ...nonMatchingNewOnes];
             matchingNewOnes.forEach((matchingNewOne) => {
                 const existingOne = existingOnes.find(n => n.subscription.id === matchingNewOne.subscription.id);
                 if (!!existingOne && shouldUpdateNotification(existingOne, matchingNewOne)) {
                     output = output.filter(n => n.subscription.id === existingOne.subscription.id);
+                    notify(matchingNewOne);
                 }
-                append(matchingNewOne, updates);
                 output = [...output, matchingNewOne];
             });
+
+            
             return output;
         });
-        if (!!onNewNotification) {
-            updates.forEach(onNewNotification);
-        }
     };
 
     const loadLatestJobUpdatesForPollingSubscriptions = async () => {
-        await loadLatestJobUpdates(findJobSubscriptionsWithPolling(subs));
+        await loadLatestJobUpdates(findSubsWithSignalROrFallbackPolling(subs));
     };
 
     // call api to get update on each active subscription
@@ -346,17 +354,20 @@ export const useJobSubscription = ({
     }, jobPollingInterval);
 
     useEffect(() => {
+        // if any new results from signalR then we can cancel polling
+        setJobPollingInterval(0);
+
         mergeNotifications(signalRResults);
     }, [signalRResults]);
 
     useEffect(() => {
         if (!subs || subs.length === 0) {
+            // no subs, deactivate signalR and polling
             setIsSignalREnabled(false);
             setJobPollingInterval(0);
-        } else {
-            if (!isSignalREnabled && subs.some(s => s.monitorFallback === MonitorFallback.Polling)) {
-                setJobPollingInterval(milliseconds.TenSeconds);
-            }
+        } else if (!isSignalREnabled && subs.some(s => s.monitorFallback === MonitorFallback.Polling)) {
+            // signalR is currently disabled & subs with fallback polling: make sure polling is enabled if applicable
+            setJobPollingInterval(milliseconds.TenSeconds);
         }
     }, [subs]);
 

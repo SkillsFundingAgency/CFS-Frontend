@@ -66,7 +66,7 @@ export function LoadNewDataSource() {
     const requiredPermission = UserPermission.CanUploadDataSourceFiles;
     const permittedFundingStreams = usePermittedFundingStreams(requiredPermission);
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
-    const {addSub, removeSub, results: jobNotifications} = useJobSubscription({
+    const {addSub, removeSub, removeAllSubs, results: jobNotifications} = useJobSubscription({
         onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
@@ -80,14 +80,14 @@ export function LoadNewDataSource() {
     }
 
     function onValidationJobFailed(newJob: JobDetails) {
-        if (newJob.outcome != undefined) {
+        if (newJob.outcome && newJob.outcome.length > 0) {
             if (isOutcomeValidationFailedWithReport(newJob.outcome)) {
                 displayFailedValidationReportFile();
             } else {
                 addError({error: newJob.outcome});
             }
         } else {
-            addError({error: "Unable to retrieve validation outcome", description: "Validation failed"});
+            addError({error: "Unable to retrieve validation outcome " + newJob.statusDescription, description: "Validation failed"});
         }
     }
 
@@ -388,6 +388,10 @@ export function LoadNewDataSource() {
     useEffect(() => {
         populateFundingStreamSuggestions();
         populateDataSchemaSuggestions();
+        
+        return () => {
+            removeAllSubs();
+        }
     }, []);
     
     useEffect(() => {

@@ -64,11 +64,11 @@ export const useSignalRJobMonitor = ({
         }
     }
 
-    const stopSignalR = () => {
+    const stopSignalR = async () => {
         hubConnection?.stop();
         
         if (hubRef?.current) {
-            hubRef?.current?.stop();
+            await hubRef?.current?.stop();
             hubRef.current = undefined;
         }
         
@@ -186,11 +186,11 @@ export const useSignalRJobMonitor = ({
             }
         } catch (err) {
             notifyDisconnection(err);
-            stopSignalR();
+            await stopSignalR();
         }
     }
-
-
+    
+    
     useEffect(() => {
         const shouldReconnect = isEnabled && hasDisconnected();
         if (shouldReconnect) {

@@ -66,7 +66,7 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     const history = useHistory();
     const {errors, addError, addValidationErrors, clearErrorMessages} = useErrors();
     const [jobSubscription, setJobSubscription] = useState<JobSubscription>();
-    const {addSub, removeSub, results: jobNotifications} = useJobSubscription({
+    const {addSub, removeSub, removeAllSubs, results: jobNotifications} = useJobSubscription({
         onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
@@ -143,6 +143,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         ).finally(() => {
             setIsLoading(false);
         });
+
+        return () => removeAllSubs();
     });
 
     function submitDataSourceFile() {
