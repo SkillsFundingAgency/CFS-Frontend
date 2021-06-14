@@ -15,8 +15,8 @@ export interface FundingConfirmationSummaryProps {
     approvalMode: ApprovalMode,
     specification: SpecificationSummary,
     fundingSummary: PublishedProviderFundingCount | undefined,
-    canReleaseFunding: boolean,
-    canApproveFunding: boolean,
+    canReleaseFunding: boolean | undefined,
+    canApproveFunding: boolean | undefined,
     addError: (props: ErrorProps) => void,
     isWaitingForJob: boolean
 }

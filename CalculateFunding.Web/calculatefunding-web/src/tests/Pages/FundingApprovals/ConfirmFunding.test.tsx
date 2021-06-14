@@ -26,13 +26,21 @@ import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
 import {FundingSearchSelectionState} from "../../../states/FundingSearchSelectionState";
 import {ConfirmFundingRouteProps} from "../../../pages/FundingApprovals/ConfirmFunding";
-import {FundingActionType, PublishedProviderFundingCount} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
-import {createPublishedProviderResult, createPublishedProviderSearchQueryResult, defaultFacets} from "../../fakes/testFactories";
+import {
+    FundingActionType,
+    PublishedProviderFundingCount
+} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import {
+    createPublishedProviderResult,
+    createPublishedProviderSearchQueryResult,
+    defaultFacets
+} from "../../fakes/testFactories";
 import {JobCreatedResponse} from "../../../types/JobCreatedResponse";
 import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
 import {Permission} from "../../../types/Permission";
 import userEvent from "@testing-library/user-event";
 import {CompletionStatus} from "../../../types/CompletionStatus";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
 
 
 const location = createLocation("", "", "");
@@ -445,6 +453,7 @@ function setupTestConfig() {
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
             fundingStreamId: fundingStream.id,
+            updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
             enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,
@@ -458,6 +467,7 @@ function setupTestConfig() {
             defaultTemplateVersion: "1.1",
             fundingPeriodId: fundingPeriod.id,
             fundingStreamId: fundingStream.id,
+            updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
             enableConverterDataMerge: false
         },
         isLoadingFundingConfiguration: false,

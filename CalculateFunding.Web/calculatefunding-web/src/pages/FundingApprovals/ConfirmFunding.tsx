@@ -107,7 +107,9 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
             const search = buildInitialPublishedProviderSearchRequest(match.params.fundingStreamId, match.params.fundingPeriodId, match.params.specificationId);
             const publishedProviderSearchResults = (await publishedProviderService.searchForPublishedProviderResults(search)).data;
             const funding: PublishedProviderFundingCount = {
-                count: match.params.mode === FundingActionType.Approve ? publishedProviderSearchResults.totalProvidersToApprove : publishedProviderSearchResults.totalProvidersToPublish,
+                count: match.params.mode === FundingActionType.Approve ? 
+                    publishedProviderSearchResults.totalProvidersToApprove : 
+                    publishedProviderSearchResults.totalProvidersToPublish,
                 fundingStreamsFundings: [],
                 localAuthorities: [],
                 localAuthoritiesCount: 0,
@@ -126,7 +128,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 loadBatchFundingSummary();
             }
             if (state.selectedProviderIds.length === 0) {
-                addError({error: "There are selected providers to " + match.params.mode.toLowerCase()});
+                addError({error: "There are no selected providers to " + match.params.mode.toLowerCase()});
             }
         }
     }, [fundingConfiguration, match.params]);
@@ -235,10 +237,7 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 </div>
                 }
 
-
-
-                {fundingConfiguration && specification && hasPermissionToApprove !== undefined
-                && hasPermissionToRelease !== undefined &&
+                {fundingConfiguration && specification && 
                 <section data-testid="funding-summary-section">
                     <FundingConfirmationSummary
                         routingParams={match.params}
