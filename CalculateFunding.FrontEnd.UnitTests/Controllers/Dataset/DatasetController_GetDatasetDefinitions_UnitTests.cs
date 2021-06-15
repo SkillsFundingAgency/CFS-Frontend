@@ -56,7 +56,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
 	    public void Should_GetDatasetDefinitions_BadRequest_Failure()
 	    {
 		    _mockDatasetApiClient.Setup(x => x.GetDatasetDefinitions()).ReturnsAsync(
-			    new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.BadRequest,null));
+			    new ApiResponse<IEnumerable<DatasetDefinition>>(HttpStatusCode.BadRequest, null, null));
 
 		    var actual = _sut.GetDatasetDefinitions();
 

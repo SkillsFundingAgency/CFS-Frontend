@@ -6,7 +6,6 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
-using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.ViewModels.Jobs;
 using FluentAssertions;
@@ -75,7 +74,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     It.Is<string[]>(_ =>
                         _.FirstOrDefault() == "Refresh" &&
                         _.LastOrDefault() == "Publish")))
-                .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.NoContent, null));
+                .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.NoContent, null, null));
 
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 

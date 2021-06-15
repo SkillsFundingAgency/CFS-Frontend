@@ -52,7 +52,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             _mockJobsApiClient
                 .Setup(x => x.GetLatestSuccessfulJobForSpecification("ABC123", "SomeJobDefinitionId"))
-                .ReturnsAsync(new ApiResponse<JobSummary>(HttpStatusCode.NotFound, null));
+                .ReturnsAsync(new ApiResponse<JobSummary>(HttpStatusCode.NotFound, null, null));
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
             IActionResult result = await _sut.GetSpecificationLatestSucessfulJob("ABC123", "SomeJobDefinitionId");

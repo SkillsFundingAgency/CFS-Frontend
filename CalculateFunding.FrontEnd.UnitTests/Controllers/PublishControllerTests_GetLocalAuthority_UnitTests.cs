@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetLocalAuthorities_Returns_BadRequestResult_Result_Given_InvalidFundingStream_InValidFundingPeriod_EmptySearchText()
         {
-            _publishingApiClient.SearchPublishedProviderLocalAuthorities("", "", "").Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest, null));
+            _publishingApiClient.SearchPublishedProviderLocalAuthorities("", "", "").Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest, null, null));
 
             IActionResult actual = await _publishController.GetLocalAuthorities("", "", "");
 

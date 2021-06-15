@@ -31,7 +31,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             policiesApiClient
                 .GetFundingConfigurationsByFundingStreamId(Arg.Is(fundingStreamId))
-                .Returns(new ApiResponse<IEnumerable<FundingConfiguration>>(System.Net.HttpStatusCode.BadRequest, null));
+                .Returns(new ApiResponse<IEnumerable<FundingConfiguration>>(System.Net.HttpStatusCode.BadRequest, null, null));
 
             PolicyController policyController = CreateController(policiesApiClient);
 
@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             policiesApiClient
                 .GetFundingPeriods()
-                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.BadRequest, null));
+                .Returns(new ApiResponse<IEnumerable<FundingPeriod>>(HttpStatusCode.BadRequest, null, null));
 
             PolicyController policyController = CreateController(policiesApiClient);
 
@@ -143,7 +143,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             IPoliciesApiClient policiesApiClient = CreatePoliciesApiClient();
             policiesApiClient
                 .GetFundingStreams()
-                .Returns(new ApiResponse<IEnumerable<FundingStream>>(System.Net.HttpStatusCode.BadRequest, null));
+                .Returns(new ApiResponse<IEnumerable<FundingStream>>(System.Net.HttpStatusCode.BadRequest, null, null));
 
             PolicyController policyController = CreateController(policiesApiClient);
 

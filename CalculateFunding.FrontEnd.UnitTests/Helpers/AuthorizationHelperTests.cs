@@ -475,7 +475,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
 
             usersClient
                 .GetFundingStreamPermissionsForUser(userId)
-                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, null));
+                .Returns(new ApiResponse<IEnumerable<FundingStreamPermission>>(HttpStatusCode.OK, null, null));
 
             AuthorizationHelper authHelper = CreateAuthenticationHelper(authorizationService, usersClient);
 

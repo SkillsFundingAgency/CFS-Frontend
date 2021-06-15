@@ -95,7 +95,7 @@ namespace CalculateFunding.Common.ApiClient.Models
 
             if (apiResponse.StatusCode != HttpStatusCode.OK)
             {
-                return new InternalServerErrorResult($"{entityName} API call did not return success, but instead '{apiResponse.StatusCode}'");
+                return new InternalServerErrorResult(apiResponse.Message ?? $"{entityName} API call did not return success, but instead '{apiResponse.StatusCode}'");
             }
 
             if (EqualityComparer<T>.Default.Equals(apiResponse.Content, default(T)))

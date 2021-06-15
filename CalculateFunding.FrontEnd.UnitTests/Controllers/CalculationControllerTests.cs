@@ -301,7 +301,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             calcsClient
                 .PreviewCompile(Arg.Any<PreviewRequest>())
-                .Returns(Task.FromResult(new ApiResponse<PreviewResponse>(HttpStatusCode.ServiceUnavailable, null)));
+                .Returns(Task.FromResult(new ApiResponse<PreviewResponse>(HttpStatusCode.ServiceUnavailable, null, null)));
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {

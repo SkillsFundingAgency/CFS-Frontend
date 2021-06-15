@@ -46,7 +46,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             string specificationId = "spec1";
             PublishedProviderIdsRequest publishedProviderIds = new PublishedProviderIdsRequest();
             _publishingApiClient.GetProviderBatchForReleaseCount(publishedProviderIds, specificationId)
-                .Returns(new ApiResponse<PublishedProviderFundingCount>(HttpStatusCode.BadRequest, null));
+                .Returns(new ApiResponse<PublishedProviderFundingCount>(HttpStatusCode.BadRequest, null, null));
 
             IActionResult actual = await _publishController.GetProviderBatchForReleaseCount(publishedProviderIds, specificationId);
 

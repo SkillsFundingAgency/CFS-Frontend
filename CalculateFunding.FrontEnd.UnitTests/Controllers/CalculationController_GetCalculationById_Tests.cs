@@ -37,7 +37,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 					new ApiResponse<Calculation>(HttpStatusCode.OK, Builder<Calculation>.CreateNew().Build()));
 			
 			_mockCalcClient.Setup(x => x.GetCalculationById("FooBar")).ReturnsAsync(
-					new ApiResponse<Calculation>(HttpStatusCode.BadRequest, null));
+					new ApiResponse<Calculation>(HttpStatusCode.BadRequest, null, null));
 
 
 			_sut = new CalculationController(_mockCalcClient.Object, _mockMapper.Object, _mockAuthorizationHelper.Object, _mockResultsApiClient.Object);

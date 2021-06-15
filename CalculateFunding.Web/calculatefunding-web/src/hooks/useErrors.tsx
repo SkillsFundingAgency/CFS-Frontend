@@ -47,9 +47,12 @@ export const useErrors = () => {
         if (axiosError && axiosError.isAxiosError) {
             errorMessage = axiosError.response && axiosError.response.data ? axiosError.response.data : `Server returned ${axiosError.response?.status} ${axiosError.response?.statusText}`;
         }
-        const err = error as Error;
-        if (err && err.message) {
-            errorMessage = err.message;
+        else
+        {
+            const err = error as Error;
+            if (err && err.message) {
+                errorMessage = err.message;
+            }
         }
         addErrorMessage(errorMessage.length > 0 ? errorMessage : error.toString(), description, fieldName, suggestion);
     };
