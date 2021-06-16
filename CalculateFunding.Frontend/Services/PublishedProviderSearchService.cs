@@ -10,6 +10,7 @@ using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
+using CalculateFunding.Common.Helpers;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Interfaces.Services;
@@ -39,49 +40,60 @@ namespace CalculateFunding.Frontend.Services
             _mapper = mapper;
         }
 
-        public async Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
+        public async Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request, double? filteredAmount = null)
         {
             Guard.ArgumentNotNull(request.PageSize, "PageSize");
+
+            List<Task> tasks = new List<Task>();
             
             RemoveShowAllAllocationTypesIndicativeFilter(request.Filters);
 
             SearchModel requestOptions = new SearchModel
             {
-                PageNumber = request.PageNumber ?? 1,
-                Top = request.PageSize.Value,
+                PageNumber = 1,
+                Top = int.MaxValue,
                 SearchTerm = request.SearchTerm,
-                IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
                 SearchMode = Common.Models.Search.SearchMode.All,
                 SearchFields = request.SearchFields
             };
+
+            Task<SearchResults<PublishedProviderSearchItem>> fundingTotalSearchTask = null;
+
+            if (!filteredAmount.HasValue)
+            {
+                fundingTotalSearchTask = PerformSearch(requestOptions);
+
+                tasks.Add(fundingTotalSearchTask);
+            }
+            
+            requestOptions.Top = request.PageSize.Value;
+            requestOptions.IncludeFacets = request.IncludeFacets;
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
             {
                 requestOptions.PageNumber = request.PageNumber.Value;
             }
 
-            Task<ApiResponse<SearchResults<PublishedProviderSearchItem>>> searchTask = 
-                _publishingApiClient.SearchPublishedProvider(requestOptions);
+            Task<SearchResults<PublishedProviderSearchItem>> searchTask = PerformSearch(requestOptions);
+            tasks.Add(searchTask);
 
-            Task<ApiResponse<FundingConfiguration>> fundingConfigTask = 
+            Task <ApiResponse<FundingConfiguration>> fundingConfigTask = 
                 _policiesApiClient.GetFundingConfiguration(request.FundingStreamId, request.FundingPeriodId);
+            tasks.Add(fundingConfigTask);
 
-            ApiResponse<SearchResults<PublishedProviderSearchItem>> searchResponse = await searchTask;
-            if (searchResponse == null)
-            {
-                _logger.Error("Find providers HTTP request failed");
-                return null;
-            }
+            await TaskHelper.WhenAllAndThrow(tasks.ToArray());
+
+            filteredAmount ??= fundingTotalSearchTask.Result.Results?.Sum(x => x.FundingValue) ?? 0;
             
             PublishProviderSearchResultViewModel result = new PublishProviderSearchResultViewModel
             {
-                TotalResults = searchResponse.Content?.TotalCount ?? 0,
-                TotalErrorResults = searchResponse.Content?.TotalErrorCount ?? 0,
+                TotalResults = searchTask.Result?.TotalCount ?? 0,
+                TotalErrorResults = searchTask.Result?.TotalErrorCount ?? 0,
                 CurrentPage = requestOptions.PageNumber,
-                Facets = searchResponse.Content?.Facets?.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)),
-                Providers = searchResponse.Content?.Results?.Select(provider => _mapper.Map<PublishedProviderSearchResultItemViewModel>(provider)),
-                FilteredFundingAmount = searchResponse.Content?.Results?.Sum(x => x.FundingValue) ?? 0
+                Facets = searchTask.Result?.Facets?.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)),
+                Providers = searchTask.Result?.Results?.Select(provider => _mapper.Map<PublishedProviderSearchResultItemViewModel>(provider)),
+                FilteredFundingAmount = filteredAmount.Value
             };
             
             int totalPages = (int) Math.Ceiling((double) result.TotalResults / (double) request.PageSize.Value);
@@ -94,14 +106,13 @@ namespace CalculateFunding.Frontend.Services
                 result.EndItemNumber = result.StartItemNumber + numberOfResultsInThisPage - 1;
             }
 
-            ApiResponse<FundingConfiguration> fundingConfigurationResponse = await fundingConfigTask;
-            if (fundingConfigurationResponse.StatusCode != HttpStatusCode.OK)
+            if (fundingConfigTask.Result.StatusCode != HttpStatusCode.OK)
             {
                 _logger.Error($"Request failed to find funding configuration for stream {request.FundingStreamId} and period {request.FundingPeriodId}");
                 return null;
             }
 
-            bool isBatchModeEnabled = fundingConfigurationResponse.Content.ApprovalMode == ApprovalMode.Batches;
+            bool isBatchModeEnabled = fundingConfigTask.Result.Content.ApprovalMode == ApprovalMode.Batches;
             
             if (result.Providers != null && result.Providers.Any())
             {
@@ -151,6 +162,18 @@ namespace CalculateFunding.Frontend.Services
             }
 
             return result;
+        }
+
+        private async Task<SearchResults<PublishedProviderSearchItem>> PerformSearch(SearchModel requestOptions)
+        {
+            ApiResponse<SearchResults<PublishedProviderSearchItem>> searchResponse = await _publishingApiClient.SearchPublishedProvider(requestOptions);
+            if (searchResponse == null)
+            {
+                _logger.Error("Find providers HTTP request failed");
+                return null;
+            }
+
+            return searchResponse.Content;
         }
 
         private void RemoveShowAllAllocationTypesIndicativeFilter(IDictionary<string, string[]> filters)

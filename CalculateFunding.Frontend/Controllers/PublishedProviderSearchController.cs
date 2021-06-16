@@ -10,6 +10,11 @@ using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
+using System.Text.Json;
+using CalculateFunding.Common.ApiClient.Jobs;
+using CalculateFunding.Common.ApiClient.Jobs.Models;
+using System;
+using Microsoft.AspNetCore.Http;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -17,15 +22,19 @@ namespace CalculateFunding.Frontend.Controllers
     {
         private readonly IPublishedProviderSearchService _publishedProviderSearchService;
         private readonly IPublishingApiClient _publishingApiClient;
+        private readonly IJobsApiClient _jobsApiClient;
 
         public PublishedProviderSearchController(IPublishedProviderSearchService publishedProviderSearchService,
-            IPublishingApiClient publishingApiClient)
+            IPublishingApiClient publishingApiClient,
+            IJobsApiClient jobsApiClient)
         {
             Guard.ArgumentNotNull(publishedProviderSearchService, nameof(publishedProviderSearchService));
             Guard.ArgumentNotNull(publishingApiClient, nameof(publishingApiClient));
+            Guard.ArgumentNotNull(jobsApiClient, nameof(jobsApiClient));
 
             _publishedProviderSearchService = publishedProviderSearchService;
             _publishingApiClient = publishingApiClient;
+            _jobsApiClient = jobsApiClient;
         }
 
         [HttpPost]
@@ -58,11 +67,15 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
+            IDictionary<string, string[]> filters = ExtractFilters(request);
+
+            bool fundingTotalUnchanged = false;
+
             SearchRequestViewModel searchModel = new SearchRequestViewModel
             {
                 SearchTerm = request.SearchTerm,
                 PageNumber = request.PageNumber,
-                Filters = ExtractFilters(request),
+                Filters = filters,
                 SearchMode = request.SearchMode,
                 ErrorToggle = request.ErrorToggle,
                 FacetCount = request.FacetCount,
@@ -73,7 +86,49 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingPeriodId = request.FundingPeriodId
             };
 
-            PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(searchModel);
+            if (HttpContext.Request?.Cookies[$"{request.SpecificationId}_SearchRequestViewModel"] != null)
+            {
+                DateTimeOffset dateTimeOffset = DateTimeOffset.MinValue;
+
+                ApiResponse<IDictionary<string, JobSummary>> latestJobsResponse = await _jobsApiClient.GetLatestJobsForSpecification(request.SpecificationId,
+                  "RefreshFundingJob",
+                  "ApproveAllProviderFundingJob",
+                  "ApproveBatchProviderFundingJob",
+                  "PublishAllProviderFundingJob",
+                  "PublishBatchProviderFundingJob");
+
+                if (latestJobsResponse?.Content != null)
+                {
+                    JobSummary latestJob = latestJobsResponse.Content.Values.OrderByDescending(_ => _.LastUpdated).FirstOrDefault(_ => _.CompletionStatus == CompletionStatus.Succeeded);
+
+                    if (latestJob != null)
+                    {
+                        dateTimeOffset = latestJob.LastUpdated;
+                    }
+                }
+
+                DateTimeOffset timeStamp = JsonSerializer.Deserialize<DateTimeOffset>(HttpContext.Request.Cookies[$"{request.SpecificationId}_TS"]);
+                SearchRequestViewModel currentViewModel = JsonSerializer.Deserialize<SearchRequestViewModel>(HttpContext.Request.Cookies[$"{request.SpecificationId}_SearchRequestViewModel"]);
+
+                fundingTotalUnchanged = timeStamp > dateTimeOffset;
+
+                if (fundingTotalUnchanged)
+                {
+                    fundingTotalUnchanged = currentViewModel.ErrorToggle == searchModel.ErrorToggle &&
+                        currentViewModel.SearchTerm == searchModel.SearchTerm &&
+                        currentViewModel.Filters.Count == filters.Count &&
+                        currentViewModel.Filters.Keys.All(_ => filters.ContainsKey(_) && currentViewModel.Filters[_].SequenceEqual(filters[_]));
+                }
+            }
+
+            PublishProviderSearchResultViewModel result = await _publishedProviderSearchService.PerformSearch(searchModel, fundingTotalUnchanged ? (double?)double.Parse(HttpContext.Request.Cookies[$"{request.SpecificationId}_FilteredFundingAmount"]) : null);
+
+            if (!fundingTotalUnchanged)
+            {
+                HttpContext.Response?.Cookies.Append($"{request.SpecificationId}_TS", JsonSerializer.Serialize(DateTimeOffset.Now), new CookieOptions { MaxAge = TimeSpan.FromMinutes(10)});
+                HttpContext.Response?.Cookies.Append($"{request.SpecificationId}_FilteredFundingAmount", result.FilteredFundingAmount.ToString(), new CookieOptions { MaxAge = TimeSpan.FromMinutes(10) });
+                HttpContext.Response?.Cookies.Append($"{request.SpecificationId}_SearchRequestViewModel", JsonSerializer.Serialize(searchModel), new CookieOptions { MaxAge = TimeSpan.FromMinutes(10) });
+            }
 
             if (result != null)
             {
