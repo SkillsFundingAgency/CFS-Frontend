@@ -16,11 +16,11 @@ steps:
    cd '${{ parameters.projectFolder }}'
    dir
    $env:CI = “true”
-   Write-host "============================================ Yarn test"
+   Write-host "========================= Yarn test ========================="
    yarn install
    yarn test
    
-   Write-host "============================================  Finished tests"
+   Write-host "========================= Finished tests ========================="
   displayName: 'Run Yarn Tests'
 
 - task: PublishTestResults@2
@@ -30,13 +30,13 @@ steps:
     searchFolder: '$(System.DefaultWorkingDirectory)\${{ parameters.projectFolder }}'
     testRunTitle: 'React Test _$(Build.BuildNumber)'
 
-- task: Npm@1
-  displayName: 'npm custom'
-  inputs:
-    command: custom
-    workingDir: '${{ parameters.projectFolder }}'
-    verbose: false
-    customCommand: 'run-script build'
+- powershell: |
+   cd '${{ parameters.projectFolder }}'
+   dir
+   Write-host "========================= Yarn custom ========================="
+   yarn install
+   yarn run build
+  displayName: 'Run Yarn Custom'
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: CalculateFunding.Frontend/wwwroot/app'
