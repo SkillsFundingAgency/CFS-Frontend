@@ -11,7 +11,10 @@ import {JobType} from "../../types/jobType";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {useErrors} from "../../hooks/useErrors";
-import {FundingActionType, PublishedProviderFundingCount} from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import {
+    FundingActionType,
+    PublishedProviderFundingCount
+} from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {JobNotificationBanner} from "../../components/Jobs/JobNotificationBanner";
 import {Link} from "react-router-dom";
@@ -158,9 +161,11 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
     }
     const handleConfirm = async () => {
         clearErrorMessages();
-        if (!acknowledge)
-        {
-            addError({fieldName: "acknowledge", error: "You must acknowledge that you understand the provider amount shown might not be up to date"});
+        if (!acknowledge) {
+            addError({
+                fieldName: "acknowledge",
+                error: "You must acknowledge that you understand the provider amount shown might not be up to date"
+            });
             return;
         }
         if (!fundingConfiguration) {
@@ -265,60 +270,67 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                     :
                     <div className="govuk-grid-row">
                         <div className="govuk-grid-column-full">
-                                <div className={`govuk-form-group ${errors.filter(e => e.fieldName === "acknowledge").length > 0 ? 'govuk-form-group--error' : ''}`}>
-                                    <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
-                                        <legend className="govuk-fieldset__legend">
-                                            <div className="govuk-warning-text">
-                                                <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
-                                                <strong className="govuk-warning-text__text">
-                                                    <span className="govuk-warning-text__assistive">Warning</span>
-                                                    The provider amount shown might not be up to date
-                                                </strong>
-                                            </div>
-                                        </legend>
-                                        <ul className="govuk-list govuk-list--bullet">
-                                            {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
-                                            && latestJob.lastUpdated < specificationLastUpdatedDate &&
-                                            <li data-testid="last-refresh">
-                                                Providers were last refreshed <DateTimeFormatter date={latestJob.lastUpdated}/> by {latestJob.invokerUserDisplayName}</li>
-                                            }
-                                            {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
-                                            && latestJob.lastUpdated < specificationLastUpdatedDate &&
-                                            <li data-testid="last-calculation-results">Total provider amount was last calculated <DateTimeFormatter
-                                                date={specificationLastUpdatedDate}/></li>
-                                            }
-                                            <li>Selected providers may not appear in the provider count due to; provider
-                                                record missing from funding data, providers currently in error state or
-                                                providers already set as approved or released
-                                            </li>
-                                        </ul>
-                                        <div className="govuk-checkboxes">
-                                            <div className="govuk-checkboxes__item">
-                                                <input className="govuk-checkboxes__input"
-                                                       name="acknowledgementCheckbox" type="checkbox"
-                                                       data-testid="acknowledgementCheckbox"
-                                                       checked={acknowledge} onChange={handleAcknowledge} />
-                                                    <label className="govuk-label govuk-checkboxes__label"
-                                                           htmlFor="acknowledgementCheckbox">
-                                                        I acknowledge that the total provider amount shown may not be up to date
-                                                    </label>
-                                            </div>
+                            <div
+                                className={`govuk-form-group ${errors.filter(e => e.fieldName === "acknowledge").length > 0 ? 'govuk-form-group--error' : ''}`}>
+                                <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
+                                    <legend className="govuk-fieldset__legend">
+                                        <div className="govuk-warning-text">
+                                            <span className="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                            <strong className="govuk-warning-text__text">
+                                                <span className="govuk-warning-text__assistive">Warning</span>
+                                                The provider amount shown might not be up to date
+                                            </strong>
                                         </div>
-                                    </fieldset>
-                                </div>
+                                    </legend>
+                                    <ul className="govuk-list govuk-list--bullet">
+                                        {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
+                                        && latestJob.lastUpdated < specificationLastUpdatedDate &&
+                                        <li data-testid="last-refresh">
+                                            Providers were last refreshed <DateTimeFormatter
+                                            date={latestJob.lastUpdated}/> by {latestJob.invokerUserDisplayName}</li>
+                                        }
+                                        {specificationLastUpdatedDate !== undefined && latestJob?.lastUpdated !== undefined
+                                        && latestJob.lastUpdated < specificationLastUpdatedDate &&
+                                        <li data-testid="last-calculation-results">Total provider amount was last
+                                            calculated <DateTimeFormatter
+                                                date={specificationLastUpdatedDate}/></li>
+                                        }
+                                        <li>Released funding values can change when data or calculations are altered. If
+                                            the funding values change, their status will become ‘updated’ and they will
+                                            need to be released again.
+                                        </li>
+                                        <li>Selected providers may not appear in the provider count due to; provider
+                                            record missing from funding data, providers currently in error state or
+                                            providers already set as approved or released
+                                        </li>
+                                    </ul>
+                                    <div className="govuk-checkboxes">
+                                        <div className="govuk-checkboxes__item">
+                                            <input className="govuk-checkboxes__input"
+                                                   name="acknowledgementCheckbox" type="checkbox"
+                                                   data-testid="acknowledgementCheckbox"
+                                                   checked={acknowledge} onChange={handleAcknowledge}/>
+                                            <label className="govuk-label govuk-checkboxes__label"
+                                                   htmlFor="acknowledgementCheckbox">
+                                                I acknowledge that the total provider amount shown may not be up to date
+                                            </label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
 
-                                <button data-prevent-double-click="true"
-                                        className="govuk-button govuk-!-margin-right-1"
-                                        data-module="govuk-button"
-                                        disabled={isLoading || isWaitingForJob || !fundingSummary}
-                                        onClick={handleConfirm}>
-                                    Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
-                                </button>
-                                <a className="govuk-button govuk-button--secondary"
-                                   data-module="govuk-button"
-                                   onClick={() => history.goBack()}>
-                                    Cancel
-                                </a>
+                            <button data-prevent-double-click="true"
+                                    className="govuk-button govuk-!-margin-right-1"
+                                    data-module="govuk-button"
+                                    disabled={isLoading || isWaitingForJob || !fundingSummary}
+                                    onClick={handleConfirm}>
+                                Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
+                            </button>
+                            <a className="govuk-button govuk-button--secondary"
+                               data-module="govuk-button"
+                               onClick={() => history.goBack()}>
+                                Cancel
+                            </a>
                         </div>
                     </div>
                 }
