@@ -185,6 +185,10 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     const handleChangeToRuleBasedProfileClick = () => {
         history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/change-profile-type`);
     }
+    
+    function toDecimal(amount: number, places: number) {
+        return +(amount).toFixed(places);
+    }
 
     function updateProfileTotal(instalmentNumber: number, newProfileTotal: ProfileTotal) {
         if (!editedFundingLineProfile) return;
@@ -202,7 +206,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
             .map(p => p.profileRemainingPercentage)
             .reduce((a, c) => (a !== undefined && c !== undefined ? a + c : 0), 0);
 
-        return totalPercentage || 0;
+        return toDecimal(totalPercentage || 0, 2);
     }
 
     function calculateTotalUnpaidAllocationAmount(): number {
@@ -212,7 +216,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
             .map(p => p.value)
             .reduce((a, c) => a + c, 0);
 
-        return totalAllocation || 0;
+        return toDecimal(totalAllocation || 0, 2);
     }
 
     function calculateTotalPaidAndUnpaidAllocationAmount(): number {
@@ -221,7 +225,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
             .map(p => p.value)
             .reduce((a, c) => a + c, 0);
 
-        return totalAllocation || 0;
+        return toDecimal(totalAllocation || 0, 2);
     }
 
     function calculateNewCarryForwardAmount(totalUnpaidAllocationAmount: number): number {

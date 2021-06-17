@@ -25,7 +25,6 @@ import {
     getReleasedProfileTotalsService,
     getProviderTransactionsService
 } from "../../services/providerService";
-import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useProviderVersion} from "../../hooks/Providers/useProviderVersion";
 import {ProviderSummarySection} from "../../components/Providers/ProviderSummarySection";
 import {useErrors} from "../../hooks/useErrors";
