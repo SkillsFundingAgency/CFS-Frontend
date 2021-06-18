@@ -5,6 +5,7 @@
     PublishBatchProviderFundingJob = "PublishBatchProviderFundingJob",
     PublishAllProviderFundingJob = "PublishAllProviderFundingJob",
     MapDatasetJob = "MapDatasetJob",
+    EditSpecificationJob = "EditSpecificationJob",
     AssignTemplateCalculationsJob = "AssignTemplateCalculationsJob",
     CreateAllocationJob = "CreateAllocationJob",
     CreateInstructAllocationJob = "CreateInstructAllocationJob",

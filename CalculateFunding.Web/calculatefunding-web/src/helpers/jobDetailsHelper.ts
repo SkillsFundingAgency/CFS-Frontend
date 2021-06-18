@@ -197,6 +197,8 @@ function getJobProgressMessage(jobTypeString: string) {
             return "Validating batch file";
         case JobType.RunConverterDatasetMergeJob:
             return "Running Converter Wizard";
+        case JobType.EditSpecificationJob:
+            return "Editing specification";
         case undefined:
             return "";
         default:

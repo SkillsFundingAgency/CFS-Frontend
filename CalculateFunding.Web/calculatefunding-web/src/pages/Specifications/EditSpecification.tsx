@@ -242,7 +242,7 @@ export function EditSpecification({match}: RouteComponentProps<EditSpecification
                 await clearSpecificationFromCache();
                 const jobMonitoringFilter: JobMonitoringFilter = {
                     specificationId: specificationId,
-                    jobTypes: [JobType.AssignTemplateCalculationsJob, JobType.ProviderSnapshotDataLoadJob],
+                    jobTypes: [JobType.EditSpecificationJob],
                     includeChildJobs: false,
                     jobId: undefined
                 }
