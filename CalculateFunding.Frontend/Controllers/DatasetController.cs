@@ -530,6 +530,18 @@ namespace CalculateFunding.Frontend.Controllers
             return new NotFoundResult();
         }
 
+        [Route("api/datasets/validate-definitionspecification-relationship")]
+        [HttpPost]
+        public async Task<IActionResult> ValidateDefinitionSpecificationRelationship([FromBody] ValidateDefinitionSpecificationRelationshipModel model)
+        {
+            Guard.IsNullOrWhiteSpace(model.Name, nameof(model.Name));
+            Guard.IsNullOrWhiteSpace(model.SpecificationId, nameof(model.SpecificationId));
+
+            HttpStatusCode httpStatusCode = await _datasetApiClient.ValidateDefinitionSpecificationRelationship(model);
+
+            return new StatusCodeResult((int)httpStatusCode);
+        }
+
         private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)
         {
             SelectDataSourceViewModel viewModel = new SelectDataSourceViewModel

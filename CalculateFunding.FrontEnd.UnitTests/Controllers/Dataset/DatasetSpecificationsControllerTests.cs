@@ -91,6 +91,67 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
                 .Be(1);
         }
 
+
+        [TestMethod]
+        public void GetPublishedSpecificationTemplateMetadata_GivenSpecificationIdIsNull_ThrowsArgumentNullException()
+        {
+            // Act
+            Func<Task> func =
+                async () => await _controller.GetPublishedSpecificationTemplateMetadata(null);
+
+            // Assert
+            func
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public async Task Should_GetPublishedSpecificationTemplateMetadata_ReturnsNotFound()
+        {
+            string specificationId = NewRandomString();
+
+            _mockDatasetApiClient
+                .Setup(_ => _.GetPublishedSpecificationTemplateMetadata(specificationId))
+                .ReturnsAsync(new ApiResponse<IEnumerable<PublishedSpecificationTemplateMetadata>>(HttpStatusCode.NotFound));
+
+            IActionResult actionResult =
+                await _controller.GetPublishedSpecificationTemplateMetadata(specificationId);
+
+            actionResult
+                .Should()
+                .BeOfType<NotFoundResult>();
+        }
+
+        [TestMethod]
+        public async Task Should_GetPublishedSpecificationTemplateMetadata_Successfully()
+        {
+            string specificationId = NewRandomString();
+
+            IEnumerable<PublishedSpecificationTemplateMetadata> metadata = new List<PublishedSpecificationTemplateMetadata>
+            {
+                new PublishedSpecificationTemplateMetadata()
+            };
+
+            _mockDatasetApiClient
+                .Setup(_ => _.GetPublishedSpecificationTemplateMetadata(specificationId))
+                .ReturnsAsync(new ApiResponse<IEnumerable<PublishedSpecificationTemplateMetadata>>(HttpStatusCode.OK, metadata));
+
+            IActionResult actionResult =
+                await _controller.GetPublishedSpecificationTemplateMetadata(specificationId);
+
+            actionResult
+                .Should()
+                .BeOfType<OkObjectResult>()
+                .Subject
+                .Value
+                .Should()
+                .BeOfType<List<PublishedSpecificationTemplateMetadata>>()
+                .Subject
+                .Count()
+                .Should()
+                .Be(1);
+        }
+
         private DatasetSpecificationsController CreateController(
             IDatasetsApiClient apiClient)
             => new DatasetSpecificationsController(apiClient);

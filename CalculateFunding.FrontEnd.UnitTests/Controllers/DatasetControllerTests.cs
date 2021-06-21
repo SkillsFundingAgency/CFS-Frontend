@@ -373,6 +373,67 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .BeEquivalentTo(resultViewModel);
         }
 
+        [TestMethod]
+        public void ValidateDefinitionSpecificationRelationship_GivenNameIsNull_ThrowsArgumentNullException()
+        {
+            //Arrange
+            ValidateDefinitionSpecificationRelationshipModel model = new ValidateDefinitionSpecificationRelationshipModel() { Name = "Somthing" };
+
+            // Act
+            Func<Task> func =
+                async () => await _controller.ValidateDefinitionSpecificationRelationship(model);
+
+            // Assert
+            func
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void ValidateDefinitionSpecificationRelationship_GivenSpecificationIdIsNull_ThrowsArgumentNullException()
+        {
+            //Arrange
+            ValidateDefinitionSpecificationRelationshipModel model = new ValidateDefinitionSpecificationRelationshipModel() { Name = "Somthing" };
+
+
+            // Act
+            Func<Task> func =
+                async () => await _controller.ValidateDefinitionSpecificationRelationship(model);
+
+            // Assert
+            func
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public async Task ValidateDefinitionSpecificationRelationship_GivenValidModel_ReturnsSuccessful()
+        {
+            //Arrange
+            ValidateDefinitionSpecificationRelationshipModel model = new ValidateDefinitionSpecificationRelationshipModel() 
+            { 
+                Name = "Somthing" ,
+                SpecificationId = "sp-1",
+                TargetSpecificationId = "sp-2"
+            };
+
+
+            _apiClient.ValidateDefinitionSpecificationRelationship(Arg.Is<ValidateDefinitionSpecificationRelationshipModel>(x => x.Name == model.Name))
+                .Returns(HttpStatusCode.OK);
+
+            // Act
+            IActionResult result = await _controller.ValidateDefinitionSpecificationRelationship(model);
+
+            // Assert
+            result
+               .Should()
+               .BeOfType<StatusCodeResult>()
+               .Which
+               .StatusCode
+               .Should()
+               .Be((int)HttpStatusCode.OK);
+        }
+
         private DatasetController CreateController(IDatasetsApiClient apiClient,
             ILogger logger)
             => new DatasetController(apiClient,

@@ -39,5 +39,18 @@ namespace CalculateFunding.Frontend.Controllers
             return response.Handle(nameof(EligibleSpecificationReference),
                 onSuccess: x => Ok(x.Content));
         }
+
+        [Route("api/specifications/{specificationId}/published-specification-template-metadata")]
+        [HttpGet]
+        public async Task<IActionResult> GetPublishedSpecificationTemplateMetadata(string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<IEnumerable<PublishedSpecificationTemplateMetadata>> apiResponse = await _datasetApiClient.GetPublishedSpecificationTemplateMetadata(specificationId);
+
+            return apiResponse.Handle(nameof(PublishedSpecificationTemplateMetadata),
+                            onNotFound: x => new NotFoundResult(),
+                            onSuccess: x => Ok(x.Content));
+        }
     }
 }
