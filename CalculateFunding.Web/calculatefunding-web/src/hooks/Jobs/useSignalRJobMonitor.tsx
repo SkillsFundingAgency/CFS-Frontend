@@ -78,7 +78,7 @@ export const useSignalRJobMonitor = ({
     const hasEnabledSubscriptions = () => {
         return subscriptions.length > 0 &&
             (isEnabled === undefined || isEnabled)
-            && subscriptions.some(s => s.isEnabled)
+            && subscriptions.some(s => s.isEnabled && s.monitorMode === MonitorMode.SignalR)
     }
 
     const findSingleSpecificationId = (subs: JobSubscription[]): string | undefined => {

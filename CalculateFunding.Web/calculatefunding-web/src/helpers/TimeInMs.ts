@@ -1,4 +1,5 @@
 ﻿export enum milliseconds {
+    HalfSecond = 500,
     TenSeconds = 1000 * 10,
     ThirtySeconds = 1000 * 30,
     OneMinute = 1000 * 60,

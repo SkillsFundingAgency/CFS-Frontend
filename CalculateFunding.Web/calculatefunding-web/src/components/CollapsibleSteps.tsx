@@ -5,6 +5,7 @@ import {Link} from "react-router-dom";
 import {DateTimeFormatter} from "./DateTimeFormatter";
 import {FundingStructureItemViewModel} from "../types/FundingStructureItem";
 import {PublishStatus} from "../types/PublishStatusModel";
+import {convertCamelCaseToSpaceDelimited} from "../helpers/stringHelper";
 
 interface ICollapsibleStepsProps {
     uniqueKey: string;
@@ -85,7 +86,7 @@ export function CollapsibleSteps(props: React.PropsWithChildren<ICollapsibleStep
                         <span className="collapsible-step-header-value-container">
                             <span>
                                 <span className="collapsible-step-header-value-type">
-                                    {props.calculationType ? props.calculationType.replace(/([A-Z])/g, ' $1').trim() : ""}
+                                    {props.calculationType ? convertCamelCaseToSpaceDelimited(props.calculationType) : ""}
                                 </span>
                                 <span className="collapsible-step-header-value">
                                     {props.value && props.value.length > 0 ? (props.value) : (props.providerId ? "Excluded" : "") }

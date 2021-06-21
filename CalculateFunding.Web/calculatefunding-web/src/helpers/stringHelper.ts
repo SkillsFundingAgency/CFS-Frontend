@@ -5,3 +5,8 @@
         .replace(/[^\w ]+/g,'')
         .replace(/ +/g,'-');
 }
+
+export function convertCamelCaseToSpaceDelimited(text: string)
+{
+    return text.replace(/([A-Z])/g, ' $1').trim();
+}

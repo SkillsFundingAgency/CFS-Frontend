@@ -811,7 +811,7 @@ const haveFailedJobWithValidationErrors = () => {
 const jobSubscriptionSpy = jest.spyOn(monitor, 'useJobSubscription');
 jobSubscriptionSpy.mockImplementation(() => {
     return {
-        addSub: (request: AddJobSubscription | AddJobSubscription[]) => {
+        addSub: (request: AddJobSubscription) => {
             const sub: JobSubscription = {
                 filterBy: {}, 
                 id: "sertdhw4e5t", 
@@ -819,7 +819,8 @@ jobSubscriptionSpy.mockImplementation(() => {
                 startDate: DateTime.now()
             }
             subscription = sub;
-            return sub as JobSubscription | JobSubscription[];
+            
+            return Promise.resolve(sub);
         },
         replaceSubs: (requests: AddJobSubscription[]) => {
             const sub: JobSubscription = {

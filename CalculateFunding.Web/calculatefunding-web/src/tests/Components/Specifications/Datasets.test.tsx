@@ -1,14 +1,13 @@
 import React from "react";
 import {MemoryRouter, Route, Switch} from "react-router";
-import {cleanup, render, waitFor, screen, act} from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
+import {cleanup, render, waitFor, screen} from "@testing-library/react";
 
 const renderDatasets = async() => {
     const {Datasets} = require('../../../components/Specifications/Datasets');
     const page = render(<MemoryRouter initialEntries={['/Datasets/SPEC123']}>
         <Switch>
             <Route path="/Datasets/:specificationId">
-                <Datasets specificationId={"SPEC123"} />
+                <Datasets specificationId={"SPEC123"} lastConverterWizardReportDate={new Date()} />
             </Route>
         </Switch>
     </MemoryRouter>)
@@ -89,5 +88,15 @@ describe("<Datasets /> ", () => {
         const button = await screen.findByRole("link", {name: /Create dataset/}) as HTMLAnchorElement;
         expect(button).toBeInTheDocument();
         expect(button.getAttribute("href")).toBe("/Datasets/CreateDataset/SPEC123");
+    });
+
+    it('renders the converter wizard report link correctly', async () => {
+        const button = await screen.findByRole("link", {name: /Converter wizard report/}) as HTMLAnchorElement;
+        expect(button).toBeInTheDocument();
+        expect(button.getAttribute("href")).toBe("/api/datasets/reports/SPEC123/download");
+    });
+
+    it('renders the converter wizard report date correctly', async () => {
+        expect(screen.getByText(/Converter wizard last run:/)).toBeInTheDocument();
     });
 });

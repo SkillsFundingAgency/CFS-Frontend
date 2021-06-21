@@ -515,7 +515,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/datasets/reports/{specificationId}/report-metadata")]
+        [Route("api/datasets/reports/{specificationId}/download")]
         public async Task<IActionResult> DownloadConverterWizardReportFile([FromRoute] string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));

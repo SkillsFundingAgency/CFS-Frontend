@@ -13,7 +13,7 @@ import {milliseconds} from "../../helpers/TimeInMs";
 import {JobType} from "../../types/jobType";
 
 export enum MonitorMode {
-    OneOff = 'OneOff',
+    Off = 'Off',
     SignalR = 'SignalR',
     Polling = 'Polling'
 }
@@ -24,6 +24,7 @@ export enum MonitorFallback {
 }
 
 export interface AddJobSubscription {
+    fetchPriorNotifications?: boolean,
     filterBy: JobMonitoringFilter,
     onError: (err: AxiosError | Error | string) => void,
     isEnabled?: boolean,
@@ -34,6 +35,7 @@ export interface AddJobSubscription {
 
 export interface JobSubscription {
     id: string,
+    fetchPriorNotifications?: boolean,
     filterBy: JobMonitoringFilter,
     onError: (err: AxiosError | Error | string) => void,
     isEnabled?: boolean,
@@ -76,25 +78,37 @@ export const useJobSubscription = ({
         return newSubs;
     };
 
-    const addSub = (request: AddJobSubscription | AddJobSubscription[]): JobSubscription | JobSubscription[] => {
-
+    const addSub = async (request: AddJobSubscription): Promise<JobSubscription> => {
         if (subs.length === 0) {
             reset();
         }
         
-        if (Array.isArray(request)) {
-            const newSubs = request.map(x => convert(x))
-            setSubs(existing => [...existing, ...newSubs]);
-            return newSubs;
-        } else {
-            const newSub = convert(request);
+        const newSub = convert(request);
+        const existing = haveExistingSubscription(newSub);
+        if (!existing) {
             setSubs(existing => [...existing, newSub]);
-            return newSub;
         }
+        if (!!newSub.fetchPriorNotifications) {
+            await loadLatestJobUpdates([newSub]);
+        }
+        return newSub;
+    };
+
+    const haveExistingSubscription = (newSub: AddJobSubscription): JobSubscription | undefined => {
+        return subs.find(s => s.isEnabled === newSub.isEnabled &&
+            s.fetchPriorNotifications === newSub.fetchPriorNotifications &&
+            s.monitorFallback === newSub.monitorFallback &&
+            s.monitorMode === newSub.monitorMode &&
+            s.filterBy.jobId === newSub.filterBy.jobId &&
+            s.filterBy.specificationId === newSub.filterBy.specificationId &&
+            s.filterBy.jobTypes === newSub.filterBy.jobTypes &&
+            s.filterBy.includeChildJobs === newSub.filterBy.includeChildJobs
+        );
     };
 
     const convert = (request: AddJobSubscription): JobSubscription => {
         return {
+            fetchPriorNotifications: request.fetchPriorNotifications,
             filterBy: request.filterBy,
             id: uuidv4(),
             isEnabled: isEnabled === true && (request.isEnabled ?? true),
@@ -293,17 +307,19 @@ export const useJobSubscription = ({
 
     // call api to get update on each active subscription
     const loadLatestJobUpdates = async (subscriptions: JobSubscription[]) => {
-        subscriptions
-            .filter(s => s.isEnabled)
-            .map(async (sub) => {
-            if (!!sub.filterBy.jobId) {
-                await loadLatestJobUpdatesById([sub.filterBy.jobId]);
-            } else if (!!sub.filterBy.specificationId) {
-                await loadLatestJobUpdatesBySpec(sub.filterBy);
-            } else {
-                // todo: what to do if just looking for job types - no suitable api to call
-            }
-        })
+        if (subscriptions.length > 0) {
+            subscriptions
+                .filter(s => s.isEnabled)
+                .map(async (sub) => {
+                    if (!!sub.filterBy.jobId) {
+                        await loadLatestJobUpdatesById([sub.filterBy.jobId]);
+                    } else if (!!sub.filterBy.specificationId) {
+                        await loadLatestJobUpdatesBySpec(sub.filterBy);
+                    } else {
+                        // todo: what to do if just looking for job types - no suitable api to call
+                    }
+                })
+        }
     };
 
     const loadLatestJobUpdatesById = async (jobIds: string[]) => {

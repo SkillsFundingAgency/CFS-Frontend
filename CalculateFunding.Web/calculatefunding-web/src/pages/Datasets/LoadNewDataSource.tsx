@@ -204,7 +204,7 @@ export function LoadNewDataSource() {
                     description,
                     "",
                     DatasetEmptyFieldEvaluationOptions.NA)
-                    .then((validateDatasetResponse) => {
+                    .then(async (validateDatasetResponse) => {
                         const validateOperationId: any = validateDatasetResponse.data.operationId;
                         if (!validateOperationId) {
                             addError({error: "Unable to locate dataset validate operationId"})
@@ -213,7 +213,7 @@ export function LoadNewDataSource() {
                         }
                         const validationJobId = validateDatasetResponse.data.validateDatasetJobId;
                         setValidateDatasetJobId(validationJobId);
-                        const subscription = addSub({
+                        const subscription = await addSub({
                             filterBy: {jobId: validationJobId},
                             monitorMode: MonitorMode.SignalR,
                             monitorFallback: MonitorFallback.Polling,

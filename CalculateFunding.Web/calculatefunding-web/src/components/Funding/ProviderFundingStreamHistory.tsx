@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import {ProviderTransactionSummary} from "../../types/ProviderSummary";
+import {convertCamelCaseToSpaceDelimited} from "../../helpers/stringHelper";
 
 
 export interface ProviderFundingStreamHistoryProps {
@@ -40,7 +41,7 @@ return <section className="govuk-tabs__panel" id="funding-stream-history">
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.author}</td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.dateChanged}</td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">
-                    {fsh.variationReasons.map(vr => <span key={vr}>{vr.replace(/([A-Z])/g, ' $1').trim()}<br /></span>)}
+                    {fsh.variationReasons.map(vr => <span key={vr}>{convertCamelCaseToSpaceDelimited(vr)}<br /></span>)}
                 </td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.fundingStreamValue}</td>
             </tr>)}

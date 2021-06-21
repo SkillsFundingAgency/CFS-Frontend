@@ -2,6 +2,7 @@
 import {RunningStatus} from "../types/RunningStatus";
 import {CompletionStatus} from "../types/CompletionStatus";
 import {JobDetails, JobFailure, JobOutcomeType, JobResponse} from "../types/jobDetails";
+import {convertCamelCaseToSpaceDelimited} from "./stringHelper";
 
 
 export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobDetails | undefined {
@@ -199,9 +200,21 @@ function getJobProgressMessage(jobTypeString: string) {
             return "Running Converter Wizard";
         case JobType.EditSpecificationJob:
             return "Editing specification";
+        case JobType.PublishDatasetsDataJob:
+            return "Publishing data sets";
+        case JobType.QueueConverterDatasetMergeJob:
+            return "Running queue converter dataset merge job";
+        case JobType.DetectObsoleteFundingLinesJob:
+            return "Detecting obsolete funding lines";
+        case JobType.ReIndexUsersJob:
+            return "Reindexing users";
+        case JobType.GenerateFundingStreamPermissionsCsvJob:
+            return "Generating Funding Stream permissions CSV";
+        case JobType.ConverterWizardActivityCsvGenerationJob:
+            return "Generating Converter Wizard Activity CSV";
         case undefined:
             return "";
         default:
-            return jobTypeString ? jobTypeString : "";
+            return jobTypeString ? convertCamelCaseToSpaceDelimited(jobTypeString) : "";
     }
 }

@@ -10,6 +10,7 @@ import {useErrors} from "../../hooks/useErrors";
 import Pagination from "../../components/Pagination";
 import {Title} from "../../components/Title";
 import {Main} from "../../components/Main";
+import {convertCamelCaseToSpaceDelimited} from "../../helpers/stringHelper";
 
 export interface DatasetHistoryRouteProps {
     datasetId: string
@@ -104,8 +105,7 @@ export function DatasetHistory({match}: RouteComponentProps<DatasetHistoryRouteP
                                 </div>
                             </th>
                             <td className="govuk-table__cell">
-                                {(version.changeType ? version.changeType : DatasetChangeType.NewVersion)
-                                    .replace(/([A-Z])/g, ' $1').trim()}
+                                {convertCamelCaseToSpaceDelimited(version.changeType ? version.changeType : DatasetChangeType.NewVersion)}
                             </td>
                             <td className="govuk-table__cell">
                                 <DateTimeFormatter date={version.lastUpdatedDate}/>

@@ -44,4 +44,9 @@
     BatchPublishedProviderValidationJob = "BatchPublishedProviderValidationJob",
     DetectObsoleteFundingLinesJob = "DetectObsoleteFundingLinesJob",
     RunConverterDatasetMergeJob = "RunConverterDatasetMergeJob",
+    PublishDatasetsDataJob = "PublishDatasetsDataJob",
+    QueueConverterDatasetMergeJob = "QueueConverterDatasetMergeJob",
+    ReIndexUsersJob = "ReIndexUsersJob",
+    GenerateFundingStreamPermissionsCsvJob = "GenerateFundingStreamPermissionsCsvJob",
+    ConverterWizardActivityCsvGenerationJob = "ConverterWizardActivityCsvGenerationJob",
 }

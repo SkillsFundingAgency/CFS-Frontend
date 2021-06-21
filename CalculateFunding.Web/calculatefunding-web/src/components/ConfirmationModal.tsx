@@ -14,9 +14,10 @@ export function ConfirmationModal(message: any,
     const handleCancel = () => {
         unmountComponentAtNode(container);
     }
-    const handleContinue = () => {
+    const handleContinue = async () => {
         unmountComponentAtNode(container);
-        callback(true);
+        const isAsync = callback.constructor.name === "AsyncFunction";
+        isAsync ? await callback(true) : callback(true);
     };
 
     return render(

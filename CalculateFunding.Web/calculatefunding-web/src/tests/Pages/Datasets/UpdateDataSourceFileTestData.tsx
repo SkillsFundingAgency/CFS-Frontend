@@ -96,7 +96,7 @@ export function UpdateDataSourceFileTestData() {
     const jobSubscriptionSpy = jest.spyOn(monitor, 'useJobSubscription');
     jobSubscriptionSpy.mockImplementation(() => {
         return {
-            addSub: (request: AddJobSubscription | AddJobSubscription[]) => {
+            addSub: (request: AddJobSubscription) => {
                 const sub: JobSubscription = {
                     filterBy: {},
                     id: "sertdhw4e5t",
@@ -104,7 +104,7 @@ export function UpdateDataSourceFileTestData() {
                     startDate: DateTime.now()
                 }
                 subscription = sub;
-                return sub as JobSubscription | JobSubscription[];
+                return Promise.resolve(sub as JobSubscription);
             },
             replaceSubs: (requests: AddJobSubscription[]) => {
                 const sub: JobSubscription = {
@@ -207,7 +207,6 @@ export function UpdateDataSourceFileTestData() {
         filename: "",
         fundingStreamId: "",
         mergeExisting: false,
-        converterEligible: false,
         name: "",
         version: 0
     }

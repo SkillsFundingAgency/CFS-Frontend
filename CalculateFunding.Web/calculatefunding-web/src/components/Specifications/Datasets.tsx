@@ -7,8 +7,9 @@ import {DatasetSummary} from "../../types/DatasetSummary";
 import {ToggleDatasetSchemaRequest} from "../../types/Datasets/ToggleDatasetSchemaRequest";
 import {useErrors} from "../../hooks/useErrors";
 import { MultipleErrorSummary } from "../MultipleErrorSummary";
+import {DateTimeFormatter} from "../DateTimeFormatter";
 
-export function Datasets(props: { specificationId: string }) {
+export function Datasets(props: { specificationId: string, lastConverterWizardReportDate: Date | undefined }) {
     const [datasets, setDatasets] = useState<DatasetSummary>({
         content: [],
         statusCode: 0
@@ -33,7 +34,7 @@ export function Datasets(props: { specificationId: string }) {
     const handleToggleConverter = async (e: React.ChangeEvent<HTMLInputElement>, relationshipId:string) => {
         const request: ToggleDatasetSchemaRequest = {
             relationshipId: relationshipId,
-            converterEnabled: e.target.value === "true" ? true : false
+            converterEnabled: e.target.value === "true"
         };
         const response = await toggleDatasetRelaionshipService(request);
         if (response.status !== 200) {
@@ -51,16 +52,31 @@ export function Datasets(props: { specificationId: string }) {
                 <h2 className="govuk-heading-l">Datasets</h2>
             </div>
             <div className="govuk-grid-column-one-third">
-                <div><Link role={"link"} to={`/Datasets/DataRelationships/${props.specificationId}`}
-                           id={"dataset-specification-relationship-button"}
-                           className="govuk-link" data-module="govuk-button">Map data source file to data set</Link>
+                <div>
+                    <Link role="link"
+                          to={`/Datasets/DataRelationships/${props.specificationId}`}
+                          id="dataset-specification-relationship-button"
+                          className="govuk-link" data-module="govuk-button">Map data source file to data set</Link>
                 </div>
                 <div>
-                    <Link role={"link"} to={`/Datasets/CreateDataset/${props.specificationId}`} className="govuk-link">Create
-                        dataset</Link>
+                    <Link role={"link"} className="govuk-link"
+                          to={`/Datasets/CreateDataset/${props.specificationId}`}>
+                        Create dataset
+                    </Link>
                 </div>
+                {props.lastConverterWizardReportDate &&
+                <div>
+                    <a className="govuk-link"
+                       href={`/api/datasets/reports/${props.specificationId}/download`}>
+                        Converter wizard report
+                    </a>
+                    <br/>
+                    <p className="govuk-body-s">
+                        Converter wizard last run: <DateTimeFormatter date={props.lastConverterWizardReportDate}/>
+                    </p>
+                </div>
+                }
             </div>
-
         </div>
         <table className="govuk-table" hidden={isLoadingDatasets}>
             <caption className="govuk-table__caption">Dataset and schemas</caption>

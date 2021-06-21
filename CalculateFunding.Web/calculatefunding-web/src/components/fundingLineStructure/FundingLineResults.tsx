@@ -31,6 +31,7 @@ import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCa
 import {ErrorProps} from "../../hooks/useErrors";
 import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {JobType} from "../../types/jobType";
+import {AddJobSubscription, JobSubscription} from "../../hooks/Jobs/useJobSubscription";
 
 export interface FundingLineResultsProps {
     specificationId: string,
@@ -98,6 +99,7 @@ export function FundingLineResults({
     };
 
     const refreshFundingLinesRef = React.useRef(false);
+    
     useEffect(() => {
         if (!refreshFundingLinesRef.current && refreshFundingLines) {
             fetchData();
