@@ -20,6 +20,7 @@ namespace CalculateFunding.Frontend.Controllers
 {
     public class PublishedProviderSearchController : Controller
     {
+        private const string ShowAllAllocationTypes = "Show all allocation types";
         private readonly IPublishedProviderSearchService _publishedProviderSearchService;
         private readonly IPublishingApiClient _publishingApiClient;
         private readonly IJobsApiClient _jobsApiClient;
@@ -187,7 +188,7 @@ namespace CalculateFunding.Frontend.Controllers
                 destination.Add("monthYearOpened", source.MonthYearOpened);    
             }
 
-            if (source.Indicative?.Any() == true)
+            if (source.Indicative?.Any(_ => _ != ShowAllAllocationTypes) == true)
             {
                 destination.Add("indicative", source.Indicative);
             }
