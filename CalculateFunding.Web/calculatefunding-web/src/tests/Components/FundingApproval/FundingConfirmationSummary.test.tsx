@@ -72,6 +72,17 @@ function setupTestConfig() {
         localAuthoritiesCount :0,
         providerTypes :undefined,
         providerTypesCount :0,
+        indicativeProviderCount :0,
+        totalFunding :0
+    };
+    const mockPublishedProviderFundingProviderCountWithIndicative: PublishedProviderFundingCount = {
+        count: 2,
+        fundingStreamsFundings :undefined,
+        localAuthorities :undefined,
+        localAuthoritiesCount :0,
+        providerTypes :undefined,
+        providerTypesCount :0,
+        indicativeProviderCount :1,
         totalFunding :0
     };
 
@@ -80,7 +91,8 @@ function setupTestConfig() {
         fundingPeriod,
         testSpec,
         mockConfirmApprovalRoute,
-        mockPublishedProviderFundingZeroCount
+        mockPublishedProviderFundingZeroCount,
+        mockPublishedProviderFundingProviderCountWithIndicative
     }
 }
 
@@ -93,6 +105,17 @@ describe('<FundingConfirmationSummary />', () => {
                 config.mockPublishedProviderFundingZeroCount,
                 FundingActionType.Release);
             expect(screen.queryByText(/Generating export of providers/)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('<FundingConfirmationSummary /> with the Release Type and 2 published providers selected with 1 indicative', () => {
+
+        test('link not rendered', async () => {
+            await renderComponent(config.testSpec, 
+                ApprovalMode.Batches,
+                config.mockPublishedProviderFundingProviderCountWithIndicative,
+                FundingActionType.Release);
+            expect(screen.queryByText(/Of which 1 is indicative/)).toBeInTheDocument();
         });
     });
 });

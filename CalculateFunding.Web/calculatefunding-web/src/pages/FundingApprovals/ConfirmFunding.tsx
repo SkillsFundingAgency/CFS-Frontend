@@ -113,12 +113,16 @@ export function ConfirmFunding({match}: RouteComponentProps<ConfirmFundingRouteP
                 count: match.params.mode === FundingActionType.Approve ? 
                     publishedProviderSearchResults.totalProvidersToApprove : 
                     publishedProviderSearchResults.totalProvidersToPublish,
+                indicativeProviderCount: 0,
+                paidProviderCount: 0,
                 fundingStreamsFundings: [],
                 localAuthorities: [],
                 localAuthoritiesCount: 0,
                 providerTypes: [],
                 providerTypesCount: 0,
-                totalFunding: publishedProviderSearchResults.totalFundingAmount
+                totalFunding: publishedProviderSearchResults.totalFundingAmount,
+                indicativeProviderTotalFunding: null,
+                paidProvidersTotalFunding: null
             }
             setFundingSummary(funding);
         }

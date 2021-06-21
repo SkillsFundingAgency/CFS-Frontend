@@ -7,12 +7,16 @@ export enum FundingActionType {
 
 export interface PublishedProviderFundingCount {
     count: number,
+    paidProviderCount: number,
+    indicativeProviderCount: number,
     providerTypes: ProviderTypeSubType[],
     providerTypesCount: number,
     localAuthorities: string[],
     localAuthoritiesCount: number,
     fundingStreamsFundings: PublishedProviderFundingStreamFunding[],
-    totalFunding: number | null
+    totalFunding: number | null,
+    paidProvidersTotalFunding: number | null,
+    indicativeProviderTotalFunding: number | null
 }
 
 export interface ProviderTypeSubType {

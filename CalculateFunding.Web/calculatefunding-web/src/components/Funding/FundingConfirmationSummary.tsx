@@ -39,6 +39,8 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
 
     } else {
         const batchSize = props.fundingSummary ? props.fundingSummary.count : 0;
+        const indicativeProviderCount = props.fundingSummary ? props.fundingSummary.indicativeProviderCount : 0;
+        const isAre = indicativeProviderCount == 1 ? "is" : "are";
 
         return (
             <>
@@ -66,7 +68,10 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                                     }
                                 </td>
                                 <td className="govuk-table__cell govuk-table__cell--numeric">
-                                    <p className="govuk-body">{batchSize}</p>
+                                    <p className="govuk-body govuk-!-margin-bottom-0">{batchSize}</p>
+                                    {indicativeProviderCount > 0 &&
+                                    <p className="govuk-body-s govuk-!-margin-bottom-0">Of which {indicativeProviderCount} {isAre} indicative</p>
+                                    }
                                 </td>
                             </tr>
                             <tr className="govuk-table__row">
