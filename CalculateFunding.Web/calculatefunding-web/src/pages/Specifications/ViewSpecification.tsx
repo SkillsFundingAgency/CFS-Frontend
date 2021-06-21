@@ -44,6 +44,7 @@ import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {JobMonitoringFilter, useJobMonitor} from '../../hooks/Jobs/useJobMonitor';
 import {JobObserverState} from '../../states/JobObserverState';
 import * as action from "../../actions/jobObserverActions";
+import {milliseconds} from "../../helpers/TimeInMs";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -124,10 +125,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const {
         calculationErrors,
         isLoadingCalculationErrors,
-        calculationErrorCount
+        calculationErrorCount,
+        clearCalculationErrorsFromCache
     } = useCalculationErrors(specificationId, err => {
         addError({error: err, description: "Error while checking for calculation errors"})
-    })
+    }, 0)
 
     const {fundingConfiguration} =
         useFundingConfiguration(specification.fundingStreams[0].id, specification.fundingPeriod.id,
