@@ -11,7 +11,7 @@ import {
     FundingLineProfileViewModel
 } from "../../types/PublishedProvider/FundingLineProfile";
 import {LoadingStatus} from "../../components/LoadingStatus";
-import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
+import {FormattedNumber, NumberType, toDecimal} from "../../components/FormattedNumber";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {PermissionStatus} from "../../components/PermissionStatus";
 import {EditableProfileTotal} from "../../components/Funding/EditableProfileTotal";
@@ -151,7 +151,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                     fundingLineCode: fundingLineId,
                     providerId: providerId,
                     customProfileName: `${providerId}-${fundingStreamId}-${fundingPeriodId}-${fundingLineId}`,
-                    carryOver: carryForwardValue > 0 ? carryForwardValue - originalCarryForwardAmount : null,
+                    carryOver: carryForwardValue > 0 ? carryForwardValue : null,
                     profilePeriods: editedFundingLineProfile ? editedFundingLineProfile.profileTotals.map(pt => ({
                         type: pt.periodType as ProfilePeriodType,
                         typeValue: pt.typeValue,
@@ -184,10 +184,6 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
 
     const handleChangeToRuleBasedProfileClick = () => {
         history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/change-profile-type`);
-    }
-    
-    function toDecimal(amount: number, places: number) {
-        return +(amount).toFixed(places);
     }
 
     function updateProfileTotal(instalmentNumber: number, newProfileTotal: ProfileTotal) {
@@ -229,7 +225,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     }
 
     function calculateNewCarryForwardAmount(totalUnpaidAllocationAmount: number): number {
-        return remainingAmount - totalUnpaidAllocationAmount;
+        return toDecimal(remainingAmount - totalUnpaidAllocationAmount || 0, 2);
     }
 
     function RowItem(props: { id: string, title: string, children: any }) {
@@ -247,8 +243,6 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     const remainingAmount = fundingLineProfile &&
     fundingLineProfile.remainingAmount !== undefined && fundingLineProfile.remainingAmount !== null ?
         fundingLineProfile.remainingAmount : 0;
-    const originalCarryForwardAmount = fundingLineProfile && fundingLineProfile.carryOverAmount !== null ?
-        fundingLineProfile.carryOverAmount : 0;
     const totalUnpaidAllocationAmount = calculateTotalUnpaidAllocationAmount();
     const totalUnpaidAllocationPercent = calculateUnpaidTotalAllocationPercent();
     const totalAllocationAmount = calculateTotalPaidAndUnpaidAllocationAmount();

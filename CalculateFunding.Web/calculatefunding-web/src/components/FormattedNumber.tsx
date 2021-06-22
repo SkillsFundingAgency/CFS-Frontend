@@ -6,6 +6,10 @@ export enum NumberType {
     FormattedPercentage
 }
 
+export function toDecimal(amount: number, places: number) {
+    return +(amount).toFixed(places);
+}
+
 export function formatNumber(value: number, type: NumberType, decimalPlaces: number) {
     const decimalPointedNumber = parseFloat(String(Math.round(value * 100) / 100)).toFixed(decimalPlaces);
 

@@ -1,6 +1,6 @@
 import "../../styles/EditableProfileTotal.scss";
 import React, {useState, useEffect, ChangeEvent} from "react";
-import {formatNumber, FormattedNumber, NumberType} from "../FormattedNumber";
+import {formatNumber, FormattedNumber, NumberType, toDecimal} from "../FormattedNumber";
 import {ProfileTotal} from "../../types/PublishedProvider/FundingLineProfile";
 import {clone} from "lodash";
 import {ErrorMessage} from "../../types/ErrorMessage";
@@ -65,8 +65,8 @@ export function EditableProfileTotal(
 
     function setValueAndPercent(value: number, percent: number) {
         const updatedProfileTotal = clone(profileTotal);
-        updatedProfileTotal.value = value;
-        updatedProfileTotal.profileRemainingPercentage = percent;
+        updatedProfileTotal.value = toDecimal(value, 2);
+        updatedProfileTotal.profileRemainingPercentage = toDecimal(percent, 2);
         setIsDirty(true);
         setProfileTotal(installmentNumber, updatedProfileTotal);
     }
