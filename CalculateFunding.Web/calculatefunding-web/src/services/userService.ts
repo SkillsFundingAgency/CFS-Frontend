@@ -67,6 +67,6 @@ export async function findUsers(searchText: string): Promise<AxiosResponse<UserS
     return axios(`${baseURL}/search`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        data: {searchTerm: searchText} as UserSearchRequest
+        data: {searchTerm: searchText, pageSize: 5000} as UserSearchRequest
     });
 }
