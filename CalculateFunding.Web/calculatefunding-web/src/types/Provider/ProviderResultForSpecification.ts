@@ -40,6 +40,7 @@ export enum LegacyCalculationType {
     PerPupilFunding = "PerPupilFunding",
     LumpSum = "LumpSum",
     ProviderLedFunding = "ProviderLedFunding",
+    Adjustment = "Adjustment",
     Number = "Number",
     Boolean = "Boolean",
     Enum = "Enum"

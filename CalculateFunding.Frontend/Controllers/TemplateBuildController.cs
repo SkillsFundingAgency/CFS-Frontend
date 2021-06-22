@@ -136,7 +136,7 @@ namespace CalculateFunding.Frontend.Controllers
                 Description = createModel.Description,
                 FundingStreamId = createModel.FundingStreamId,
                 FundingPeriodId = createModel.FundingPeriodId,
-                SchemaVersion = "1.1"
+                SchemaVersion = "1.2"
             });
 
             switch (result.StatusCode)

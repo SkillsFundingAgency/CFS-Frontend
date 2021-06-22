@@ -204,7 +204,6 @@ const completedLatestJob: LatestSpecificationJobWithMonitoringResult = {
     isCheckingForJob: false,
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
     latestJob: {
         isComplete: true,
         jobId: "123",
@@ -223,7 +222,6 @@ const runningLatestJob: LatestSpecificationJobWithMonitoringResult = {
     isCheckingForJob: false,
     isFetched: true,
     isFetching: false,
-    isMonitoring: true,
     latestJob: {
         isComplete: false,
         jobId: "123",

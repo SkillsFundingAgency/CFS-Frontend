@@ -4,7 +4,7 @@ import {Calculation, NodeType, CalculationType, AggregrationType, ValueFormatTyp
 import {waitFor} from "@testing-library/react";
 import React from "react";
 
-const calc: Calculation = {
+const cashCalc: Calculation = {
     id: "n1",
     name: "My Calc1",
     templateCalculationId: 1,
@@ -13,6 +13,17 @@ const calc: Calculation = {
     aggregationType: AggregrationType.None,
     formulaText: "123",
     valueFormat: ValueFormatType.Currency
+};
+
+const pupilNumberCalc: Calculation = {
+    id: "a1",
+    name: "Adjustment Calc",
+    templateCalculationId: 1,
+    kind: NodeType.Calculation,
+    type: CalculationType.PupilNumber,
+    aggregationType: AggregrationType.None,
+    formulaText: "123",
+    valueFormat: ValueFormatType.Number
 };
 
 const allCalcs: CalculationDictionaryItem[] = [
@@ -26,7 +37,7 @@ const allCalcs: CalculationDictionaryItem[] = [
 describe('<CalculationItem />', () => {
     it('renders aggregationType of None and valueFormat of String when type Enum selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -50,7 +61,7 @@ describe('<CalculationItem />', () => {
 
     it('renders allowedEnumTypeValues field when type Enum selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -70,7 +81,7 @@ describe('<CalculationItem />', () => {
 
     it('shows error when click save and allowedEnumTypeValues field is empty', async () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -91,7 +102,7 @@ describe('<CalculationItem />', () => {
 
     it('shows error when allowedEnumTypeValues field contains non-unique options', async () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -115,7 +126,7 @@ describe('<CalculationItem />', () => {
 
     it('does not show error when allowedEnumTypeValues field contains valid options', async () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -138,7 +149,7 @@ describe('<CalculationItem />', () => {
 
     it('renders valueFormat of Boolean when type Boolean selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -157,7 +168,7 @@ describe('<CalculationItem />', () => {
 
     it('renders numerator and denominator fields when aggregationType is GroupRate', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -179,7 +190,7 @@ describe('<CalculationItem />', () => {
 
     it('renders correct calculations for numerator and denominator drop-downs', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -205,7 +216,7 @@ describe('<CalculationItem />', () => {
 
     it('renders calculationA and calculationB fields when aggregationType is PercentageChangeBetweenAandB', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -227,7 +238,7 @@ describe('<CalculationItem />', () => {
 
     it('renders correct calculations for calculation A and calculation B drop-downs', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -254,7 +265,7 @@ describe('<CalculationItem />', () => {
     it("shows error if editing template calculation id and already in use", async () => {
 
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -276,7 +287,7 @@ describe('<CalculationItem />', () => {
     it("shows error if saving empty template calculation id", async () => {
 
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -299,7 +310,7 @@ describe('<CalculationItem />', () => {
         const refreshNextIdMock = jest.fn();
 
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -323,7 +334,7 @@ describe('<CalculationItem />', () => {
         const refreshNextIdMock = jest.fn();
 
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -344,7 +355,7 @@ describe('<CalculationItem />', () => {
 
     it('renders delete button if allowDelete is true', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -360,7 +371,7 @@ describe('<CalculationItem />', () => {
 
     it('does not render delete button if allowDelete is false', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -376,7 +387,7 @@ describe('<CalculationItem />', () => {
 
     it('renders valueFormat of String when type Enum selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -395,7 +406,26 @@ describe('<CalculationItem />', () => {
 
     it('renders valueFormat of Currency when type Cash selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={pupilNumberCalc}
+            calcs={allCalcs}
+            isEditMode={true}
+            updateNode={jest.fn()}
+            openSideBar={jest.fn()}
+            deleteNode={jest.fn()}
+            cloneCalculation={jest.fn()}
+            refreshNextId={jest.fn()}
+            allowDelete={true}
+        />);
+
+        wrapper.find('#calculation-type').simulate("change", {target: {value: "Adjustment"}});
+
+        expect(wrapper.find('#calculation-value-format').props().value).toBe("Currency");
+        expect(wrapper.find('#calculation-value-format').children().length).toBe(1);
+    });
+
+    it('renders valueFormat of Currency when type Adjustment selected', () => {
+        const wrapper = mount(<CalculationItem
+            node={pupilNumberCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -414,7 +444,7 @@ describe('<CalculationItem />', () => {
 
     it('restricts valueFormats when type Rate selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -436,7 +466,7 @@ describe('<CalculationItem />', () => {
 
     it('restricts valueFormats when type Number selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -455,7 +485,7 @@ describe('<CalculationItem />', () => {
 
     it('restricts valueFormats when type PupilNumber selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}
@@ -474,7 +504,7 @@ describe('<CalculationItem />', () => {
 
     it('restricts valueFormats when type Weighting selected', () => {
         const wrapper = mount(<CalculationItem
-            node={calc}
+            node={cashCalc}
             calcs={allCalcs}
             isEditMode={true}
             updateNode={jest.fn()}

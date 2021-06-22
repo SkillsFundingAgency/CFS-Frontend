@@ -17,6 +17,7 @@ export enum CalculationType {
     Number = "Number",
     Weighting = "Weighting",
     Boolean = "Boolean",
+    Adjustment = "Adjustment",
     Enum = "Enum"
 }
 

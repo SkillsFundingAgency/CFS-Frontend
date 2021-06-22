@@ -101,12 +101,11 @@ export function CalculationItem({
                 setValueFormat(ValueFormatType.String);
                 setAggregationType(AggregrationType.None);
                 break;
+            case CalculationType.Adjustment:
             case CalculationType.Cash:
                 setValueFormat(ValueFormatType.Currency);
                 break;
             case CalculationType.Number:
-                setValueFormat(ValueFormatType.Number);
-                break;
             case CalculationType.PupilNumber:
                 setValueFormat(ValueFormatType.Number);
                 break;
@@ -290,41 +289,45 @@ export function CalculationItem({
     };
 
     const renderValueFormatOptions = (): JSX.Element => {
-        if (type === CalculationType.Boolean) {
-            return <option value={ValueFormatType.Boolean}>Boolean</option>
+        switch (type) {
+            case CalculationType.Cash:
+            case CalculationType.Adjustment:
+                return <option value={ValueFormatType.Currency}>Currency</option>
+            
+            case CalculationType.Rate:
+                return <>
+                    <option value="">Please select</option>
+                    <option value={ValueFormatType.Percentage}>Percentage</option>
+                    <option value={ValueFormatType.Currency}>Currency</option>
+                </>
+            
+            case CalculationType.PupilNumber:
+            case CalculationType.Number:
+                return <option value={ValueFormatType.Number}>Number</option>
+            
+            case CalculationType.Weighting:
+                return <>
+                    <option value="">Please select</option>
+                    <option value={ValueFormatType.Number}>Number</option>
+                    <option value={ValueFormatType.Percentage}>Percentage</option>
+                </>
+            
+            case CalculationType.Boolean:
+                return <option value={ValueFormatType.Boolean}>Boolean</option>
+            
+            case CalculationType.Enum:
+                return <option value={ValueFormatType.String}>String</option>
+            
+            default:
+                return (
+                    <>
+                        <option value="">Please select</option>
+                        <option value={ValueFormatType.Number}>Number</option>
+                        <option value={ValueFormatType.Percentage}>Percentage</option>
+                        <option value={ValueFormatType.Currency}>Currency</option>
+                    </>
+                );
         }
-        if (type === CalculationType.Enum) {
-            return <option value={ValueFormatType.String}>String</option>
-        }
-        if (type === CalculationType.Cash) {
-            return <option value={ValueFormatType.Currency}>Currency</option>
-        }
-        if (type === CalculationType.Rate) {
-            return <>
-                <option value="">Please select</option>
-                <option value={ValueFormatType.Percentage}>Percentage</option>
-                <option value={ValueFormatType.Currency}>Currency</option>
-            </>
-        }
-        if (type === CalculationType.Weighting) {
-            return <>
-                <option value="">Please select</option>
-                <option value={ValueFormatType.Number}>Number</option>
-                <option value={ValueFormatType.Percentage}>Percentage</option>
-            </>
-        }
-        if (type === CalculationType.Number || type === CalculationType.PupilNumber) {
-            return <option value={ValueFormatType.Number}>Number</option>
-        }
-
-        return (
-            <>
-                <option value="">Please select</option>
-                <option value={ValueFormatType.Number}>Number</option>
-                <option value={ValueFormatType.Percentage}>Percentage</option>
-                <option value={ValueFormatType.Currency}>Currency</option>
-            </>
-        );
     };
 
     function addErrorMessage(errorMessage: string, fieldName: string) {
@@ -484,6 +487,7 @@ export function CalculationItem({
                         <>
                             <select className="govuk-select" id="calculation-type" name="calculation-type" value={type} onChange={handleTypeChange}>
                                 <option value={CalculationType.Cash}>Cash</option>
+                                <option value={CalculationType.Adjustment}>Adjustment</option>
                                 <option value={CalculationType.Rate}>Rate</option>
                                 <option value={CalculationType.PupilNumber}>Pupil Number</option>
                                 <option value={CalculationType.Number}>Number</option>
