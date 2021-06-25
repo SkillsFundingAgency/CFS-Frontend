@@ -258,6 +258,30 @@
             "metadata": {
                 "description": "HTTP Response time threshold"
             }
+        },
+        "addCerttoFrontendAppService": {
+            "type": "bool",
+            "metadata": {
+                "description": "Deploy Certificate"
+            }
+        },
+        "frontendAppCertName": {
+            "type": "string",
+            "metadata": {
+                "description": "Frontend Certificate name in KeyVault"
+            }
+        },    
+        "frontendAppHostName": {
+            "type": "string",
+            "metadata": {
+                "description": "Custom Domain name of Frontend App Service"
+            }
+        },
+        "frontendAppCertificateThumbprint": {
+            "type": "string",
+            "metadata": {
+                "description": "Thumbprint of Frontend App Certificate"
+            }
         }
     },
     "variables": {
@@ -265,6 +289,7 @@
         "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
         "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfsapi-', parameters('productVersion'))]",
         "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]",
+        "MicrosoftAzureWebSitesObjectID": "47d170a6-f297-43db-911b-e038c9eab0cd",
         "actionGroupName": "cfs-alerting",
         "alertRules": [
             {
@@ -589,6 +614,77 @@
             }
         },
         {
+            "condition": "[parameters('addCerttoFrontendAppService')]",
+            "apiVersion": "2017-05-10",
+            "name": "frontendAppServiceCert",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "Deploy_Frontend_App",
+                "Deploy_KeyVault_Policies"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-certificate.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "environmentTag": {
+                        "value": "[parameters('environmentTag')]"
+                    },
+                    "parentBusinessTag": {
+                        "value": "[parameters('parentBusinessTag')]"
+                    },
+                    "portfolioTag": {
+                        "value": "[parameters('portfolioTag')]"
+                    },
+                    "productTag": {
+                        "value": "[parameters('productTag')]"
+                    },
+                    "serviceLineTag": {
+                        "value": "[parameters('serviceLineTag')]"
+                    },
+                    "keyVaultCertificateName": {
+                        "value": "[parameters('frontendAppCertName')]"
+                    },
+                    "keyVaultName": {
+                        "value": "[parameters('sharedKeyVaultName')]"
+                    },
+                    "keyVaultResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    }
+                }
+            }
+        },
+        {
+            "condition": "[parameters('addCerttoFrontendAppService')]",
+            "apiVersion": "2017-05-10",
+            "name": "frontendAppServiceHostnameBindings",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "Deploy_Frontend_App",
+                "frontendAppServiceCert"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-hostname-bindings.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServiceName": {
+                        "value": "[variables('webSiteName')]"
+                    },
+                    "customHostName": {
+                        "value": "[parameters('frontendAppHostName')]"
+                    },
+                    "certificateThumbprint": {
+                        "value": "[parameters('frontendAppCertificateThumbprint')]"
+                    }
+                }
+            }
+        },
+        {
             "apiVersion": "2015-04-01",
             "name": "[concat(variables('webSiteName'),'/Microsoft.AspNetCore.AzureAppServices.SiteExtension')]",
             "type": "Microsoft.Web/sites/siteextensions",
@@ -683,6 +779,15 @@
                                 "objectId": "[reference('Deploy_Frontend_App').outputs.stagingManagedServiceIdentityId.value]",
                                 "permissions": {
                                     "secrets": "[parameters('secretsPermissions')]"
+                                }
+                            },
+                            {
+                                "tenantId": "[subscription().tenantId]",
+                                "objectId": "[variables('MicrosoftAzureWebSitesObjectID')]",
+                                "permissions": {
+                                    "secrets": [
+                                        "get"
+                                    ]
                                 }
                             }
                         ]
