@@ -44,7 +44,6 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         changeType: DatasetChangeType.Unknown
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [isCheckingForJob, setIsCheckingForJob] = useState(false);
     const [updateType, setUpdateType] = useState<string>("");
     const [datasetEmptyFieldEvaluationOptions, setDatasetEmptyFieldEvaluationOptions]
         = useState<DatasetEmptyFieldEvaluationOptions>(DatasetEmptyFieldEvaluationOptions.NA);
@@ -200,7 +199,6 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                                 })
                             }) as JobSubscription;
                             setJobSubscription(subscription);
-                            setIsCheckingForJob(true);
                             setIsLoading(true);
                         })
                         .catch((error) => {

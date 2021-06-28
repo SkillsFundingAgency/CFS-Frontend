@@ -4,8 +4,7 @@ import {AxiosError} from "axios";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {LatestJobResult} from "../../types/Jobs/LatestJobResult";
-import {milliseconds} from "../../helpers/TimeInMs";
-import {JobMonitoringFilter} from "./useJobMonitor";
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export interface FetchLatestSpecificationJobProps {
     jobFilter: JobMonitoringFilter,
@@ -13,6 +12,7 @@ export interface FetchLatestSpecificationJobProps {
     enablePoling?: boolean | undefined
 }
 
+/** @deprecated - pls use {@link useJobSubscription} instead */
 export const useFetchLatestSpecificationJob = (
     {
         jobFilter,

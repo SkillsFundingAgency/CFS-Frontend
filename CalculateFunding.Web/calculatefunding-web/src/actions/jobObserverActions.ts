@@ -1,7 +1,7 @@
-﻿import { JobMonitoringFilter } from '../hooks/Jobs/useJobMonitor';
-import { ActionCreator } from 'redux';
+﻿import { ActionCreator } from 'redux';
 import { ThunkAction } from 'redux-thunk';
 import { JobObserverState } from '../states/JobObserverState';
+import {JobMonitoringFilter} from "../types/Jobs/JobMonitoringFilter";
 
 export enum JobObserverActionEvent {
   UPSERT_JOB_FILTER = 'upsertJobFilter',

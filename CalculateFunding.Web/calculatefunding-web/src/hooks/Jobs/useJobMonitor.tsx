@@ -1,10 +1,10 @@
-﻿import {JobType} from "../../types/jobType";
-import {useEffect, useRef, useState} from "react";
+﻿import {useEffect, useRef, useState} from "react";
 import {HubConnection, HubConnectionBuilder} from "@microsoft/signalr";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {AxiosError} from "axios";
 import {JobDetails, JobResponse} from "../../types/jobDetails";
 import {milliseconds} from "../../helpers/TimeInMs";
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export interface JobMonitorProps {
     filterBy: JobMonitoringFilter,
@@ -16,13 +16,7 @@ export interface JobMonitorResult {
     newJob: JobDetails | undefined
 }
 
-export interface JobMonitoringFilter {
-    jobTypes?: JobType[],
-    jobId?: string | undefined,
-    includeChildJobs?: boolean | undefined,
-    specificationId?: string | undefined
-}
-
+/** @deprecated - pls use {@link useJobSubscription} instead */
 export const useJobMonitor = ({filterBy, onError, isEnabled}: JobMonitorProps): JobMonitorResult => {
     const [newJob, setNewJob] = useState<JobDetails>();
     const [hubConnection, setHubConnection] = useState<HubConnection>();

@@ -2,7 +2,8 @@
 import {useFetchLatestSpecificationJob} from "./useFetchLatestSpecificationJob";
 import {AxiosError} from "axios";
 import {JobDetails} from "../../types/jobDetails";
-import {JobMonitoringFilter, useJobMonitor} from "./useJobMonitor";
+import {useJobMonitor} from "./useJobMonitor";
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export type LatestSpecificationJobWithMonitoringResult = {
     latestJob: JobDetails | undefined,
@@ -12,6 +13,7 @@ export type LatestSpecificationJobWithMonitoringResult = {
     isCheckingForJob: boolean
 }
 
+/** @deprecated - pls use {@link useJobSubscription} instead */
 export const useLatestSpecificationJobWithMonitoring =
     (specificationId: string,
      jobTypes: JobType[] = [],

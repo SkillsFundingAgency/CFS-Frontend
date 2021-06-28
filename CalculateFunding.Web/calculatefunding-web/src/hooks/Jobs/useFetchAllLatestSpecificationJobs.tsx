@@ -3,8 +3,8 @@ import {getJobStatusUpdatesForSpecification} from "../../services/jobService";
 import {AxiosError} from "axios";
 import {JobDetails} from "../../types/jobDetails";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
-import {JobMonitoringFilter} from "./useJobMonitor";
 import {FetchLatestSpecificationJobProps} from "./useFetchLatestSpecificationJob";
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export type FetchAllLatestSpecificationJobResult = {
     allJobs: JobDetails[] | undefined,
@@ -15,6 +15,7 @@ export type FetchAllLatestSpecificationJobResult = {
     isFetched: boolean,
 }
 
+/** @deprecated - pls use {@link useJobSubscription} instead */
 export const useFetchAllLatestSpecificationJobs = (
     {
         jobFilter,

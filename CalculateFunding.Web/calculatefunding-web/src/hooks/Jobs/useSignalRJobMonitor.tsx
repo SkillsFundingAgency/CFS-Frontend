@@ -5,7 +5,7 @@ import {AxiosError} from "axios";
 import {JobDetails, JobResponse} from "../../types/jobDetails";
 import {milliseconds} from "../../helpers/TimeInMs";
 import {JobNotification, JobSubscription, MonitorMode} from "./useJobSubscription";
-import {JobMonitoringFilter} from "./useJobMonitor";
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export enum JobMonitorMode {
     WatchSingleSpecification,
@@ -102,6 +102,7 @@ export const useSignalRJobMonitor = ({
         const matches = subscriptions.filter(s => s.isEnabled
             && s.monitorMode === MonitorMode.SignalR
             && filterJobsByType(job, s.filterBy)
+            && filterJobsByTriggeringEntityId(job, s.filterBy)
             && filterJobsByIdOrParent(job, s.filterBy)
             && filterJobsBySpecification(job, s.filterBy));
 
@@ -111,6 +112,11 @@ export const useSignalRJobMonitor = ({
     const filterJobsByType = (job: JobResponse, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobTypes || (filterBy.jobTypes.length === 0 || filterBy.jobTypes.find(type => job.jobType === type.toString()));
     }
+
+    const filterJobsByTriggeringEntityId = (job: JobResponse, filterBy: JobMonitoringFilter) => {
+        return !filterBy.triggerByEntityId ||
+            job.trigger?.entityId === filterBy.triggerByEntityId;
+    };
 
     const filterJobsByIdOrParent = (job: JobResponse, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobId || (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));

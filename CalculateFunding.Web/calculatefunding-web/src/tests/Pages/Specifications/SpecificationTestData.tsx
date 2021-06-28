@@ -1,6 +1,5 @@
 import React from 'react';
 import {createStore, Store} from "redux";
-// import * as reduxState from "../../../reducers/rootReducer";
 import {render, screen, waitFor} from "@testing-library/react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import '@testing-library/jest-dom/extend-expect';
@@ -25,9 +24,9 @@ import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProvi
 import {Provider} from "react-redux";
 import {JobType} from "../../../types/jobType";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
-import {JobMonitoringFilter} from "../../../hooks/Jobs/useJobMonitor";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import * as redux from "react-redux";
+import {JobMonitoringFilter} from "../../../types/Jobs/JobMonitoringFilter";
 
 const store: Store<IStoreState> = createStore(
     rootReducer

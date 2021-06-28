@@ -27,6 +27,7 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
         jobType: job.jobType,
         parentJobId: job.parentJobId,
         specificationId: job.specificationId,
+        triggeredByEntityId: job.trigger?.entityId,
         trigger: job.trigger
     };
 

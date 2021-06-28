@@ -29,7 +29,7 @@ import {BackLink} from "../../components/BackLink";
 import {UpdateCoreProviderVersion} from "../../types/Provider/UpdateCoreProviderVersion";
 import {useDispatch} from 'react-redux';
 import * as action from "../../actions/jobObserverActions";
-import {JobMonitoringFilter} from '../../hooks/Jobs/useJobMonitor';
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export interface EditSpecificationRouteProps {
     specificationId: string;

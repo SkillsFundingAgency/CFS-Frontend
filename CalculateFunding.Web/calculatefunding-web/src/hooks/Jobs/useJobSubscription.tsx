@@ -1,16 +1,16 @@
 ﻿import {AxiosError} from "axios";
-import {JobMonitoringFilter} from "./useJobMonitor";
 import * as React from "react";
 import {useEffect} from "react";
 import {v4 as uuidv4} from 'uuid';
 import {DateTime} from "luxon";
 import {JobDetails} from "../../types/jobDetails";
 import {JobMonitorMode, useSignalRJobMonitor} from "./useSignalRJobMonitor";
-import {getJob, getJobStatusUpdatesForSpecification} from "../../services/jobService";
+import {getJob, getJobStatusUpdatesForSpecification, getLatestJobByEntityId} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {useInterval} from "../useInterval";
 import {milliseconds} from "../../helpers/TimeInMs";
 import {JobType} from "../../types/jobType";
+import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
 
 export enum MonitorMode {
     Off = 'Off',
@@ -100,6 +100,7 @@ export const useJobSubscription = ({
             s.monitorFallback === newSub.monitorFallback &&
             s.monitorMode === newSub.monitorMode &&
             s.filterBy.jobId === newSub.filterBy.jobId &&
+            s.filterBy.triggerByEntityId === newSub.filterBy.triggerByEntityId &&
             s.filterBy.specificationId === newSub.filterBy.specificationId &&
             s.filterBy.jobTypes === newSub.filterBy.jobTypes &&
             s.filterBy.includeChildJobs === newSub.filterBy.includeChildJobs
@@ -208,15 +209,26 @@ export const useJobSubscription = ({
         return getJobDetailsFromJobResponse(response.data);
     };
 
-    const checkForSpecificationJob = async (specId: string | undefined, jobTypes: JobType[] | undefined):
+    const checkForSpecificationJobByJobTypes = async (specId: string | undefined, jobTypes: JobType[] | undefined):
         Promise<JobDetails[] | undefined> => {
         if (!specId || !jobTypes || jobTypes.length === 0) {
-            console.error('Invalid arguments for checkForSpecificationJob');
+            console.error('Invalid arguments for checkForSpecificationJobByJobTypes');
             return;
         }
         const response = await getJobStatusUpdatesForSpecification(specId, jobTypes);
         const results = response.data.filter(item => item && item.jobId && item.jobId !== "" && item.lastUpdated);
-        return results && results.length > 0 ? results.map(r => getJobDetailsFromJobResponse(r) as JobDetails) : undefined;
+        return results && results.length > 0 ? results
+            .map(r => getJobDetailsFromJobResponse(r) as JobDetails) : undefined;
+    }
+
+    const checkForSpecificationJobTriggeredByEntity = async (specId: string | undefined, triggeredByEntityId: string | undefined):
+        Promise<JobDetails | undefined> => {
+        if (!specId || !triggeredByEntityId || triggeredByEntityId.length === 0) {
+            console.error('Invalid arguments for checkForSpecificationJobTriggeredByEntity');
+            return;
+        }
+        const {data: result} = await getLatestJobByEntityId(specId, triggeredByEntityId);
+        return result && result.jobId ? getJobDetailsFromJobResponse(result) : undefined;
     }
 
     const findMatchingSubs = (job: JobDetails): JobSubscription[] => {
@@ -227,6 +239,7 @@ export const useJobSubscription = ({
         const matches = subs.filter(s => s.isEnabled
             && s.monitorFallback === MonitorFallback.Polling
             && filterJobsByType(job, s.filterBy)
+            && filterJobsByTriggeringEntityId(job, s.filterBy)
             && filterJobsByIdOrParent(job, s.filterBy)
             && filterJobsBySpecification(job, s.filterBy));
 
@@ -238,7 +251,13 @@ export const useJobSubscription = ({
     };
     
     const filterJobsByIdOrParent = (job: JobDetails, filterBy: JobMonitoringFilter) => {
-        return !filterBy.jobId || (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));
+        return !filterBy.jobId || 
+            (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));
+    };
+    
+    const filterJobsByTriggeringEntityId = (job: JobDetails, filterBy: JobMonitoringFilter) => {
+        return !filterBy.triggerByEntityId || 
+            job.triggeredByEntityId === filterBy.triggerByEntityId;
     };
 
     const filterJobsBySpecification = (job: JobDetails, filterBy: JobMonitoringFilter) => {
@@ -341,10 +360,18 @@ export const useJobSubscription = ({
 
     const loadLatestJobUpdatesBySpec = async (filter: JobMonitoringFilter) => {
         let newNotifications: JobNotification[] = [];
+        let jobs: JobDetails[] | undefined = undefined;
         
-        const jobs = await checkForSpecificationJob(filter.specificationId, filter.jobTypes);
+        if (!filter.jobTypes || filter.jobTypes.length == 0) {
+            if (filter.specificationId && filter.triggerByEntityId) {
+                const job = await checkForSpecificationJobTriggeredByEntity(filter.specificationId, filter.triggerByEntityId);
+                jobs = job ? [job] : [];
+            }
+        } else {
+            jobs = await checkForSpecificationJobByJobTypes(filter.specificationId, filter.jobTypes);
+        }
         
-        if (!jobs) return;
+        if (!jobs || jobs.length === 0) return;
         
         for (const job of jobs) {
             if (isJobValid(job)) {

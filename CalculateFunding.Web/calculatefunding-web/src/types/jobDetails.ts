@@ -29,6 +29,7 @@ export interface JobDetails {
     jobId: string,
     jobType?: string,
     specificationId?: string,
+    triggeredByEntityId?: string,
     statusDescription: string,
     jobDescription: string,
     runningStatus: RunningStatus,

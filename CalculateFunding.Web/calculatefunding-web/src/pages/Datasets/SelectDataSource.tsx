@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
@@ -11,8 +11,6 @@ import {PermissionStatus} from "../../components/PermissionStatus";
 import {Footer} from "../../components/Footer";
 import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
 import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
-import {useLatestSpecificationJobWithMonitoring} from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
 import {Dataset} from "../../types/Datasets/RelationshipData";
@@ -21,15 +19,19 @@ import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
 import {Permission} from "../../types/Permission";
 import {WarningText} from "../../components/WarningText";
+import {
+    AddJobSubscription,
+    MonitorMode,
+    useJobSubscription
+} from "../../hooks/Jobs/useJobSubscription";
 import {JobType} from "../../types/jobType";
-import {useLatestEntityJobWithMonitoring} from "../../hooks/Jobs/useLatestEntityJobWithMonitoring";
 
 export interface SelectDataSourceRouteProps {
     datasetRelationshipId: string
 }
 
 export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRouteProps>) {
-    const [datasetRelationshipId, setDatasetRelationshipId] = useState<string>(match.params.datasetRelationshipId);
+    const datasetRelationshipId = match.params.datasetRelationshipId;
     const [newVersionNumber, setNewVersionNumber] = useState<number | undefined>();
     const [newDataset, setNewDataset] = useState<Dataset>();
     const [missingVersion, setMissingVersion] = useState<boolean>(false);
@@ -37,6 +39,9 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
     const {errors, addErrorMessage, addError} = useErrors();
     const history = useHistory();
+    const {addSub, removeAllSubs, subs, results: jobNotifications} = useJobSubscription({
+        onError: err => addError({error: err, description: "An error occurred while monitoring the running jobs"})
+    });
 
     const {relationshipData, isLoadingRelationshipData} = useRelationshipData(datasetRelationshipId);
 
@@ -47,16 +52,39 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
     const {isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions} =
         useSpecificationPermissions(specificationId, [Permission.CanMapDatasets]);
 
-    const {hasJob, latestJob, isCheckingForJob} =
-        useLatestEntityJobWithMonitoring(specificationId,
-            relationshipData?.relationshipId ?? "" ,
-                err => addError({error: err, description: "There has been data schema change since the last version of this data source file was uploaded. Retry uploading with the create new version option."}));
-
-    const {latestJob: converterWizardJob, isCheckingForJob: isCheckingForConverterWizardJob, hasJob: hasConverterWizardJob} =
-        useLatestSpecificationJobWithMonitoring(specificationId,
-            [JobType.RunConverterDatasetMergeJob],
-            err => addError({error: err, description: "Error while checking for converter wizard running jobs"}));
-
+    useEffect(() => {
+        if (!specificationId || !relationshipData?.relationshipId) return;
+        const entityId = relationshipData.relationshipId;
+        if (!subs || !subs.some(s => s.filterBy.triggerByEntityId === entityId)) {
+            addSub({
+                fetchPriorNotifications: true,
+                filterBy: {specificationId: specificationId, triggerByEntityId: entityId},
+                monitorMode: MonitorMode.SignalR,
+                onError: err => addError({
+                    error: err,
+                    description: "There has been data schema change since the last version of this data source file was uploaded. Retry uploading with the create new version option"
+                })
+            } as AddJobSubscription);
+        }
+    }, [specificationId, relationshipData?.relationshipId])
+    
+    useEffect(() => {
+        if (!specificationId) return;
+        if (!subs || !subs.some(s => s.filterBy.jobTypes?.includes(JobType.RunConverterDatasetMergeJob))) {
+            addSub({
+                fetchPriorNotifications: true,
+                filterBy: {specificationId: specificationId, jobTypes: [JobType.RunConverterDatasetMergeJob]},
+                monitorMode: MonitorMode.SignalR,
+                onError: err => addError({
+                    error: err,
+                    description: "Error while checking for converter wizard running jobs"
+                })
+            } as AddJobSubscription);
+        }
+        
+        return () => removeAllSubs();
+    }, [specificationId])
+    
     function getCurrentDataset() {
         return newDataset ? newDataset :
             relationshipData ? relationshipData.datasets.find(x => x.selectedVersion !== null) :
@@ -127,7 +155,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
             .finally(() => setIsUpdating(false));
     }
 
-    const specificationName = !isLoadingSpecification && specification && specification.name.length > 0 ? specification.name : "Specification";
+    const specificationName = !isLoadingSpecification && specification && specification.name?.length > 0 ? specification.name : "Specification";
 
     return (<div>
             <Header location={Section.Datasets}/>
@@ -165,11 +193,11 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                             {specification.name}
                             <span className="govuk-caption-xl govuk-!-margin-top-3">{specification.fundingPeriod.name}</span>
                         </h1>}
-                        {(isCheckingForJob || hasJob || isCheckingForConverterWizardJob || hasConverterWizardJob) &&
+                        {(jobNotifications.some(n => n.latestJob?.isActive)) &&
                         <div className="govuk-form-group">
-                            <LoadingFieldStatus title={"Checking for running jobs..."} hidden={!isCheckingForJob && !isCheckingForConverterWizardJob}/>
-                            {hasJob && <JobProgressNotificationBanner job={latestJob} />}
-                            {hasConverterWizardJob && <JobProgressNotificationBanner job={converterWizardJob} />}
+                            {jobNotifications
+                                .filter(n => n.latestJob?.isActive)
+                                .map((n, idx) => <JobProgressNotificationBanner key={idx} job={n.latestJob} />)}
                         </div>}
                         {!isCheckingForPermissions && !hasMissingPermissions &&
                         <div className="govuk-form-group">
@@ -186,7 +214,7 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                                               suggestion={"Please check your permissions or data."}/>
                             </div>
                         </div>}
-                        {!isCheckingForPermissions && !hasMissingPermissions && !(latestJob && latestJob.isActive) &&
+                        {!isCheckingForPermissions && !hasMissingPermissions && !jobNotifications.some(n => n.latestJob?.isActive) &&
                         <div className="govuk-form-group">
                             <fieldset className="govuk-fieldset">
                                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
@@ -248,23 +276,29 @@ export function SelectDataSource({match}: RouteComponentProps<SelectDataSourceRo
                         </div>
                         }
                         <div className="govuk-form-group">
-                            {(!(latestJob && latestJob.isActive)) &&
+                            {!jobNotifications.some(n => n.latestJob?.isActive) &&
                             <button className="govuk-button govuk-!-margin-right-1"
                                     name="saveButton"
-                                    aria-label="saveButton"
                                     onClick={changeSpecificationDataMapping}
-                                    disabled={!newVersionNumber || hasMissingPermissions || isCheckingForJob || (latestJob && latestJob.isActive) || isUpdating
-                                    || (converterWizardJob && converterWizardJob.isActive)}>
+                                    disabled={!newVersionNumber || hasMissingPermissions || isUpdating}>
                                 Save
                             </button>
                             }
-                            {(hasMissingPermissions || isUpdating || (latestJob && latestJob.isActive)) ?
-                                <button className="govuk-button govuk-button--secondary" name="backButton" aria-label="backButton" onClick={goBack}>Back</button>
+                            {(hasMissingPermissions || isUpdating || jobNotifications.some(n => n.latestJob?.isActive)) ?
+                                <button className="govuk-button govuk-button--secondary" 
+                                        name="backButton" 
+                                        onClick={goBack}>
+                                    Back
+                                </button>
                                 :
-                                <button className="govuk-button govuk-button--secondary" name="cancelButton" aria-label="cancelButton" onClick={goBack}>Cancel</button>
+                                <button className="govuk-button govuk-button--secondary" 
+                                        name="cancelButton" 
+                                        onClick={goBack}>
+                                    Cancel
+                                </button>
                             }
                         </div>
-                        {(converterWizardJob && converterWizardJob.isActive) &&
+                        {jobNotifications.some(n => n.latestJob?.isActive && n.latestJob.jobType === JobType.RunConverterDatasetMergeJob) &&
                             <WarningText text={`Mapping of this dataset is disabled until converter wizard completes.`}/>
                         }
                     </div>

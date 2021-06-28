@@ -5,6 +5,7 @@ import {getLatestJobByEntityId} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {LatestJobResult} from "../../types/Jobs/LatestJobResult";
 
+/** @deprecated - pls use {@link useJobSubscription} instead */
 export const useFetchLatestJobByEntityId =(
     specificationId:string,
     entityId:string,

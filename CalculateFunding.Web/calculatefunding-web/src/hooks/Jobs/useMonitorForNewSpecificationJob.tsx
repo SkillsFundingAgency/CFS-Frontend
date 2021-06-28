@@ -10,6 +10,7 @@ export type MonitorForNewSpecificationJobResult = {
     isMonitoring: boolean,
 }
 
+/** @deprecated - pls use {@link useJobSubscription} instead */
 export const useMonitorForNewSpecificationJob = (
     specificationId: string,
     jobTypes: JobType[],
