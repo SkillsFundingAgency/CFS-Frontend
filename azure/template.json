@@ -289,7 +289,7 @@
         "applicationInsightsName": "[concat('ai-', parameters('environmentKey'), '-cfs-', parameters('productVersion'))]",
         "hostingPlanName": "[concat('asp-', parameters('environmentKey'), '-cfsapi-', parameters('productVersion'))]",
         "webSiteName": "[concat('app-', parameters('environmentKey'), '-cfs01-', parameters('productVersion'))]",
-        "MicrosoftAzureWebSitesObjectID": "47d170a6-f297-43db-911b-e038c9eab0cd",
+        "MicrosoftAzureWebSitesObjectID": "abfa0a7c-a6b6-4736-8310-5855508787cd",
         "actionGroupName": "cfs-alerting",
         "alertRules": [
             {
