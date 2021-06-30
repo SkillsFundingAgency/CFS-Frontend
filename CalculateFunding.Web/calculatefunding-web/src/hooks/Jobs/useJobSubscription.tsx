@@ -1,7 +1,6 @@
 ﻿import {AxiosError} from "axios";
 import * as React from "react";
-import {useEffect} from "react";
-import {v4 as uuidv4} from 'uuid';
+import {useEffect, useMemo} from "react";
 import {DateTime} from "luxon";
 import {JobDetails} from "../../types/jobDetails";
 import {JobMonitorMode, useSignalRJobMonitor} from "./useSignalRJobMonitor";
@@ -11,6 +10,8 @@ import {useInterval} from "../useInterval";
 import {milliseconds} from "../../helpers/TimeInMs";
 import {JobType} from "../../types/jobType";
 import {JobMonitoringFilter} from "../../types/Jobs/JobMonitoringFilter";
+import jobSubscriptionUtilities from "../../helpers/jobSubscriptionUtilities";
+import {apply, assoc, identity, memoizeWith} from "ramda";
 
 export enum MonitorMode {
     Off = 'Off',
@@ -38,7 +39,7 @@ export interface JobSubscription {
     fetchPriorNotifications?: boolean,
     filterBy: JobMonitoringFilter,
     onError: (err: AxiosError | Error | string) => void,
-    isEnabled?: boolean,
+    isEnabled: boolean,
     onDisconnect?: () => void,
     monitorMode?: MonitorMode,
     monitorFallback?: MonitorFallback,
@@ -69,11 +70,12 @@ export const useJobSubscription = ({
     const [notifications, setNotifications] = React.useState<JobNotification[]>([]);
     const [jobPollingInterval, setJobPollingInterval] = React.useState<number>(0);
     const [isSignalREnabled, setIsSignalREnabled] = React.useState<boolean>(isEnabled);
+    const util = useMemo(jobSubscriptionUtilities, []);
 
     const replaceSubs = (request: AddJobSubscription[]): JobSubscription[] => {
         reset();
-        
-        const newSubs = request.map(x => convert(x))
+
+        const newSubs = request.map(x => util.convert(x))
         setSubs(newSubs);
         return newSubs;
     };
@@ -82,45 +84,17 @@ export const useJobSubscription = ({
         if (subs.length === 0) {
             reset();
         }
-        
-        const newSub = convert(request);
-        const existing = haveExistingSubscription(newSub);
+
+        const newSub = util.convert(request);
+        const existing = util.findExistingSubscription(subs, newSub);
         if (!existing) {
             setSubs(existing => [...existing, newSub]);
         }
         if (!!newSub.fetchPriorNotifications) {
-            await loadLatestJobUpdates([newSub]);
+            await loadLatestJobUpdate(newSub);
         }
         return newSub;
     };
-
-    const haveExistingSubscription = (newSub: AddJobSubscription): JobSubscription | undefined => {
-        return subs.find(s => s.isEnabled === newSub.isEnabled &&
-            s.fetchPriorNotifications === newSub.fetchPriorNotifications &&
-            s.monitorFallback === newSub.monitorFallback &&
-            s.monitorMode === newSub.monitorMode &&
-            s.filterBy.jobId === newSub.filterBy.jobId &&
-            s.filterBy.triggerByEntityId === newSub.filterBy.triggerByEntityId &&
-            s.filterBy.specificationId === newSub.filterBy.specificationId &&
-            s.filterBy.jobTypes === newSub.filterBy.jobTypes &&
-            s.filterBy.includeChildJobs === newSub.filterBy.includeChildJobs
-        );
-    };
-
-    const convert = (request: AddJobSubscription): JobSubscription => {
-        return {
-            fetchPriorNotifications: request.fetchPriorNotifications,
-            filterBy: request.filterBy,
-            id: uuidv4(),
-            isEnabled: isEnabled === true && (request.isEnabled ?? true),
-            monitorFallback: request.monitorFallback ?? MonitorFallback.None,
-            monitorMode: request.monitorMode ?? MonitorMode.SignalR,
-            onDisconnect: request.onDisconnect,
-            onError: request.onError ?? onError,
-            startDate: DateTime.now(),
-            lastUpdate: undefined
-        };
-    }
 
     const reset = () => {
         setIsSignalREnabled(true);
@@ -141,13 +115,13 @@ export const useJobSubscription = ({
     const onSignalRFail = (error: string) => {
         // signalR has failed, so get the hook to stop signalR
         setIsSignalREnabled(false);
-        
+
         if (subs.length === 0) return;
-        
-        if (anySubsWithSignalROrFallbackPolling(subs)) {
+
+        if (util.anySubsWithSignalROrFallbackPolling(subs)) {
             setJobPollingInterval(milliseconds.TenSeconds);
         }
-        
+
         // try to kickstart signalR
         setInterval(() => setIsSignalREnabled(true), milliseconds.TenSeconds);
     };
@@ -158,7 +132,7 @@ export const useJobSubscription = ({
 
         if (subs.length === 0) return;
 
-        if (anySubsWithSignalROrFallbackPolling(subs)) {
+        if (util.anySubsWithSignalROrFallbackPolling(subs)) {
             setJobPollingInterval(milliseconds.TenSeconds);
         }
 
@@ -176,24 +150,15 @@ export const useJobSubscription = ({
 
     const onSignalRReconnecting = () => {
         // try to find any job updates that would otherwise be missed in the interim
-        if (anySubsWithSignalROrFallbackPolling(subs)) {
+        if (util.anySubsWithSignalROrFallbackPolling(subs)) {
             setJobPollingInterval(milliseconds.TenSeconds);
         }
     };
 
-    const findSingleSpecificationId = (subs: JobSubscription[]): string | undefined => {
-        let specId: string | undefined;
-        subs.forEach(({filterBy}) => {
-            if (!filterBy.specificationId || filterBy.specificationId === specId) return false;
-            specId = filterBy.specificationId;
-        });
-        return specId;
-    }
-
     const {results: signalRResults} =
         useSignalRJobMonitor({
             onError,
-            mode: findSingleSpecificationId(subs) ? JobMonitorMode.WatchSingleSpecification : JobMonitorMode.WatchAllJobs,
+            mode: util.findUniqueSpecificationIdInSubscriptions(subs) ? JobMonitorMode.WatchSingleSpecification : JobMonitorMode.WatchAllJobs,
             isEnabled: isEnabled && isSignalREnabled && subs.length > 0,
             subscriptions: subs,
             onReconnecting: onSignalRReconnecting,
@@ -203,7 +168,7 @@ export const useJobSubscription = ({
         });
 
     const checkForJobByJobId = async (jobId: string): Promise<JobDetails | undefined> => {
-        if (!isJobIdValid(jobId)) return;
+        if (!util.isJobIdValid(jobId)) return;
         const response = await getJob(jobId);
         if (!response.data) return undefined;
         return getJobDetailsFromJobResponse(response.data);
@@ -231,61 +196,6 @@ export const useJobSubscription = ({
         return result && result.jobId ? getJobDetailsFromJobResponse(result) : undefined;
     }
 
-    const findMatchingSubs = (job: JobDetails): JobSubscription[] => {
-        if (!subs || subs.length === 0) {
-            return [];
-        }
-
-        const matches = subs.filter(s => s.isEnabled
-            && s.monitorFallback === MonitorFallback.Polling
-            && filterJobsByType(job, s.filterBy)
-            && filterJobsByTriggeringEntityId(job, s.filterBy)
-            && filterJobsByIdOrParent(job, s.filterBy)
-            && filterJobsBySpecification(job, s.filterBy));
-
-        return matches ?? [];
-    };
-
-    const filterJobsByType = (job: JobDetails, filterBy: JobMonitoringFilter) => {
-        return !filterBy.jobTypes || (filterBy.jobTypes.length === 0 || filterBy.jobTypes.find(type => job.jobType === type.toString()));
-    };
-    
-    const filterJobsByIdOrParent = (job: JobDetails, filterBy: JobMonitoringFilter) => {
-        return !filterBy.jobId || 
-            (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));
-    };
-    
-    const filterJobsByTriggeringEntityId = (job: JobDetails, filterBy: JobMonitoringFilter) => {
-        return !filterBy.triggerByEntityId || 
-            job.triggeredByEntityId === filterBy.triggerByEntityId;
-    };
-
-    const filterJobsBySpecification = (job: JobDetails, filterBy: JobMonitoringFilter) => {
-        return !filterBy.specificationId || job.specificationId === filterBy.specificationId;
-    };
-    
-    const findSubsWithSignalROrFallbackPolling = (subscriptions: JobSubscription[]) => 
-        subscriptions
-            .filter(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
-
-    const anySubsWithSignalROrFallbackPolling = (subscriptions: JobSubscription[]): boolean =>
-        subscriptions.some(s => s.monitorFallback === MonitorFallback.Polling || s.monitorMode === MonitorMode.SignalR);
-
-    const isJobIdValid = (jobId: string | undefined) => {
-        return !!jobId && jobId.length > 1; // to catch edge case of 0 turned to string
-    };
-
-    const isJobValid = (job: JobDetails | undefined) => {
-        return !!job && isJobIdValid(job.jobId);
-    };
-
-    const shouldUpdateNotification = (a: JobNotification | undefined, b: JobNotification) => {
-        if (!a?.subscription?.lastUpdate) return true;
-        if (!b?.subscription?.lastUpdate) return false;
-
-        return a.subscription.lastUpdate < b.subscription.lastUpdate;
-    };
-
     const notify = (input: JobNotification | JobNotification[]) => {
         if (!onNewNotification) return;
 
@@ -308,36 +218,36 @@ export const useJobSubscription = ({
             let output: JobNotification[] = [...nonMatchingExistingOnes, ...nonMatchingNewOnes];
             matchingNewOnes.forEach((matchingNewOne) => {
                 const existingOne = existingOnes.find(n => n.subscription.id === matchingNewOne.subscription.id);
-                if (!!existingOne && shouldUpdateNotification(existingOne, matchingNewOne)) {
+                if (!!existingOne && util.shouldUpdateNotification(existingOne, matchingNewOne)) {
                     output = output.filter(n => n.subscription.id === existingOne.subscription.id);
                     notify(matchingNewOne);
                 }
                 output = [...output, matchingNewOne];
             });
 
-            
+
             return output;
         });
     };
 
     const loadLatestJobUpdatesForPollingSubscriptions = async () => {
-        await loadLatestJobUpdates(findSubsWithSignalROrFallbackPolling(subs));
+        await loadLatestJobUpdates(util.findSubsWithSignalROrFallbackPolling(subs));
     };
 
     // call api to get update on each active subscription
     const loadLatestJobUpdates = async (subscriptions: JobSubscription[]) => {
-        if (subscriptions.length > 0) {
-            subscriptions
-                .filter(s => s.isEnabled)
-                .map(async (sub) => {
-                    if (!!sub.filterBy.jobId) {
-                        await loadLatestJobUpdatesById([sub.filterBy.jobId]);
-                    } else if (!!sub.filterBy.specificationId) {
-                        await loadLatestJobUpdatesBySpec(sub.filterBy);
-                    } else {
-                        // todo: what to do if just looking for job types - no suitable api to call
-                    }
-                })
+        subscriptions.forEach(s => loadLatestJobUpdate(s));
+    };
+
+    const loadLatestJobUpdate = async (sub: JobSubscription) => {
+        if (sub.isEnabled) {
+            if (!!sub.filterBy.jobId) {
+                await loadLatestJobUpdatesById([sub.filterBy.jobId]);
+            } else if (!!sub.filterBy.specificationId) {
+                await loadLatestJobUpdatesBySpec(sub.filterBy);
+            } else {
+                // todo: what to do if just looking for job types - no suitable api to call
+            }
         }
     };
 
@@ -345,8 +255,8 @@ export const useJobSubscription = ({
         let newNotifications: JobNotification[] = [];
         for (const jobId of jobIds) {
             const job = await checkForJobByJobId(jobId);
-            if (isJobValid(job)) {
-                const subsToNotify = findMatchingSubs(job as JobDetails);
+            if (util.isJobValid(job)) {
+                const subsToNotify = util.findMatchingSubs(subs, job as JobDetails);
                 subsToNotify.forEach(s => {
                     newNotifications = [...notifications, {
                         latestJob: job,
@@ -361,7 +271,7 @@ export const useJobSubscription = ({
     const loadLatestJobUpdatesBySpec = async (filter: JobMonitoringFilter) => {
         let newNotifications: JobNotification[] = [];
         let jobs: JobDetails[] | undefined = undefined;
-        
+
         if (!filter.jobTypes || filter.jobTypes.length == 0) {
             if (filter.specificationId && filter.triggerByEntityId) {
                 const job = await checkForSpecificationJobTriggeredByEntity(filter.specificationId, filter.triggerByEntityId);
@@ -370,12 +280,12 @@ export const useJobSubscription = ({
         } else {
             jobs = await checkForSpecificationJobByJobTypes(filter.specificationId, filter.jobTypes);
         }
-        
+
         if (!jobs || jobs.length === 0) return;
-        
+
         for (const job of jobs) {
-            if (isJobValid(job)) {
-                const subsToNotify = findMatchingSubs(job as JobDetails);
+            if (util.isJobValid(job)) {
+                const subsToNotify = util.findMatchingSubs(subs, job as JobDetails);
                 subsToNotify.forEach(s => {
                     newNotifications = [...notifications, {
                         latestJob: job,
@@ -386,6 +296,8 @@ export const useJobSubscription = ({
         }
         mergeNotifications(newNotifications);
     };
+
+    const clearOneOffFetch = assoc('fetchPriorNotifications', false);
 
     useInterval(async () => {
         if (jobPollingInterval <= 0) {
@@ -411,6 +323,17 @@ export const useJobSubscription = ({
         } else if (!isSignalREnabled && subs.some(s => s.monitorFallback === MonitorFallback.Polling)) {
             // signalR is currently disabled & subs with fallback polling: make sure polling is enabled if applicable
             setJobPollingInterval(milliseconds.TenSeconds);
+        } else {
+            // do one off fetches and then clear flag 
+            const oneOffs = subs.filter(s => s.fetchPriorNotifications);
+            if (oneOffs.length) {
+                oneOffs.forEach(async sub => {
+                    await loadLatestJobUpdate(sub);
+                });
+                setSubs(existing =>
+                    [...existing.filter(s => !oneOffs.some(o => o.id === s.id)),
+                        ...oneOffs.map(clearOneOffFetch)]);
+            }
         }
     }, [subs]);
 
