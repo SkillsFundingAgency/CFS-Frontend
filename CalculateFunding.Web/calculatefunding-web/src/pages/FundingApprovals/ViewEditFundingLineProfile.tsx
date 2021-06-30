@@ -58,7 +58,6 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
         profilePatternDescription: '',
         isCustomProfile: false,
         lastUpdatedUser: {id: '', name: '',},
-        profileTotalAmount: 0,
         profileTotals: []
     });
     const [editedFundingLineProfile, setEditedFundingLineProfile] = useState<FundingLineProfile>({
@@ -73,7 +72,6 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
         profilePatternDescription: '',
         isCustomProfile: false,
         lastUpdatedUser: {id: '', name: '',},
-        profileTotalAmount: 0,
         profileTotals: []
     });
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -247,7 +245,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     const totalUnpaidAllocationPercent = calculateUnpaidTotalAllocationPercent();
     const totalAllocationAmount = calculateTotalPaidAndUnpaidAllocationAmount();
     const newCarryForwardAmount = calculateNewCarryForwardAmount(totalUnpaidAllocationAmount);
-    
+
     return (
         <div>
             <Header location={Section.Approvals}/>
@@ -296,7 +294,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
                                         </RowItem>
 
                                         <RowItem id="total-allocation" title="Total allocation">
-                                            <FormattedNumber value={fundingLineProfile.totalAllocation || 0} type={NumberType.FormattedMoney}/>
+                                            <FormattedNumber value={fundingLineProfile.fundingLineAmount || 0} type={NumberType.FormattedMoney}/>
                                         </RowItem>
 
                                         <RowItem id="amount-already-paid" title="Instalments paid value">

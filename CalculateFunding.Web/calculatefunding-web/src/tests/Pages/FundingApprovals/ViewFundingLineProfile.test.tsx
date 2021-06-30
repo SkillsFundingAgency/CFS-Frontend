@@ -265,7 +265,7 @@ const testFundingLineProfile = {
     fundingLineCode: "fl123",
     fundingLineName: "My Funding Line",
     ukprn: "12345",
-    totalAllocation: 100,
+    fundingLineAmount: 100,
     amountAlreadyPaid: 40,
     remainingAmount: 60,
     carryOverAmount: 0,

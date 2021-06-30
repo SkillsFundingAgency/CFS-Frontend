@@ -1,8 +1,12 @@
+import {ProfileError} from "../FundingLineProfile";
+
 export interface FundingLineProfile {
   fundingLineCode: string,
   fundingLineName: string,
   ukprn: string,
-  totalAllocation?: number,
+  fundingLineAmount?:number,
+  profilePatternTotal?:number,
+  profilePatternTotalWithCarryOver?:number,
   amountAlreadyPaid: number,
   remainingAmount?: number,
   carryOverAmount: number | null,
@@ -13,7 +17,6 @@ export interface FundingLineProfile {
   isCustomProfile: boolean,
   lastUpdatedUser: Reference,
   lastUpdatedDate?: Date,
-  profileTotalAmount: number,
   profileTotals: ProfileTotal[]
 }
 

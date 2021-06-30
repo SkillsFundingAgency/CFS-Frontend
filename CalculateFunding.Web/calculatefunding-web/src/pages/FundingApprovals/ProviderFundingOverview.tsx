@@ -31,6 +31,7 @@ import {useErrors} from "../../hooks/useErrors";
 import {FundingLineResults} from "../../components/fundingLineStructure/FundingLineResults";
 import {PublishStatus} from "../../types/PublishStatusModel";
 import { JobType } from '../../types/jobType';
+import {BackLink} from "../../components/BackLink";
 
 export interface ProviderFundingOverviewRoute {
     specificationId: string;
@@ -57,7 +58,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
 
     const {providerVersion, isLoadingProviderVersion} = useProviderVersion(providerId, specCoreProviderVersionId ? specCoreProviderVersionId : "",
         (err: AxiosError) => addError({error: err, description: "Error while loading provider"}));
-    
+
     const {data: transactions, isLoading: isLoadingTransactions} =
         useQuery<ProviderTransactionSummary, AxiosError>(`provider-transactions-for-spec-${specificationId}-provider-${providerId}`,
             async () => (await getProviderTransactionsService(specificationId, providerId)).data,
@@ -158,7 +159,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                             }
                         </Tabs.Panel>
                         <Tabs.Panel label="calculations">
-                            <FundingLineResults specificationId={specificationId} 
+                            <FundingLineResults specificationId={specificationId}
                                                 fundingStreamId={fundingStreamId}
                                                 fundingPeriodId={fundingPeriodId}
                                                 status={PublishStatus.Approved}
@@ -175,7 +176,7 @@ export function ProviderFundingOverview({match}: RouteComponentProps<ProviderFun
                 </div>
             </div>}
             <div className="govuk-clearfix"></div>
-            <button type={"button"} className={"govuk-link"} onClick={history.goBack}>Back</button>
+            <BackLink />
         </div>
         <Footer/>
     </div>;

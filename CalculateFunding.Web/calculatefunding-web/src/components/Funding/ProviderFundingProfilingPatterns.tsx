@@ -52,15 +52,15 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                                         </div> : profile.fundingLineName}
                                     </th>
                                     <td className="govuk-table__cell">
-                                        {profile.totalAllocation !== undefined ? profile.profilePatternName : ""}
+                                        {profile.fundingLineAmount !== undefined ? profile.profilePatternName : ""}
                                     </td>
                                     <td className="govuk-table__cell">
-                                            {profile.totalAllocation !== undefined ?
-                                            <FormattedNumber value={profile.totalAllocation} type={NumberType.FormattedMoney}/>
+                                            {profile.fundingLineAmount !== undefined ?
+                                            <FormattedNumber value={profile.fundingLineAmount} type={NumberType.FormattedMoney}/>
                                             : "Excluded"}
                                     </td>
                                     <td className="govuk-table__cell">
-                                            {profile.totalAllocation !== undefined &&
+                                            {profile.fundingLineAmount !== undefined &&
                                         <>
                                             <Link className="govuk-link right-align"
                                                   to={`/Approvals/ProviderFundingOverview/${params.specificationId}/${params.providerId}/${params.specCoreProviderVersionId}/${params.fundingStreamId}/${params.fundingPeriodId}/${profile.fundingLineCode}/view`}>

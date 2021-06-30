@@ -102,10 +102,10 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
             userEvent.clear(profileInput);
             userEvent.type(profileInput, "11");
             userEvent.tab();
-            
+
             const cancelButton = await screen.findByRole("button", {name: /Cancel/});
             userEvent.click(cancelButton);
-            
+
             expect(mockHistoryBlock).toBeCalled();
         });
 
@@ -147,7 +147,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
         it("posts correct custom profile to api when carry over applies", async () => {
             const profileInput = screen.getByTestId("value-2");
             const profilePercent = screen.getByTestId("percent-2") as HTMLInputElement;
-            
+
             userEvent.clear(profileInput);
             userEvent.type(profileInput, "25");
             userEvent.tab();
@@ -349,7 +349,7 @@ const testFundingLineProfile = {
     fundingLineCode: "fl123",
     fundingLineName: "My Funding Line",
     ukprn: "12345",
-    totalAllocation: 100,
+    fundingLineAmount: 100,
     amountAlreadyPaid: 40,
     remainingAmount: 60,
     carryOverAmount: 0,

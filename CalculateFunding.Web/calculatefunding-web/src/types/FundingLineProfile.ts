@@ -26,7 +26,8 @@ export interface FundingLineProfile {
     lastUpdatedDate?: Date,
     profileTotalAmount?: number,
     profileTotals: ProfileTotal[],
-    errors: ProfileError[]
+    errors: ProfileError[],
+    fundingLineAmount?:number,
 }
 
 export interface ProfileTotal {

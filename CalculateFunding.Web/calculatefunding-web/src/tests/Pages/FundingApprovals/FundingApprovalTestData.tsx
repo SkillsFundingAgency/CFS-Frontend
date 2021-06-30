@@ -202,7 +202,7 @@ export function FundingApprovalTestData() {
         profileTotals: [profileTotal],
         providerId: provider1.publishedProviderVersionId,
         providerName: provider1.providerName,
-        totalAllocation: 895436.74,
+        fundingLineAmount: 895436.74,
         ukprn: provider1.ukprn,
         errors: []
     }
@@ -219,7 +219,7 @@ export function FundingApprovalTestData() {
         profileTotals: [profileTotal],
         providerId: provider1.publishedProviderVersionId,
         providerName: provider1.providerName,
-        totalAllocation: 895436.74,
+        fundingLineAmount: 895436.74,
         ukprn: provider1.ukprn,
         errors:[
             {
@@ -246,7 +246,7 @@ export function FundingApprovalTestData() {
         profileTotals: [profileTotal],
         providerId: provider1.publishedProviderVersionId,
         providerName: provider1.providerName,
-        totalAllocation: undefined,
+        fundingLineAmount: undefined,
         ukprn: provider1.ukprn,
         errors: []
     }
