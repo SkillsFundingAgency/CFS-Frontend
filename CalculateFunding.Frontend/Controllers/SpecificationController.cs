@@ -451,6 +451,14 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateSpecification([FromBody] EditSpecificationModel viewModel, [FromRoute] string specificationId)
         {
+            FundingStreamPermission fundingStreamPermission = await _authorizationHelper.GetUserFundingStreamPermissions(User, viewModel.FundingStreamId);
+            bool? canEditSpecification = fundingStreamPermission?.CanEditSpecification;
+
+            if (canEditSpecification != true)
+            {
+                return new ForbidResult();
+            }
+
             ValidatedApiResponse<SpecificationSummary> result = await _specificationsApiClient.UpdateSpecification(specificationId, viewModel);
 
             if (result.IsBadRequest(out BadRequestObjectResult badRequest))

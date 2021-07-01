@@ -9,7 +9,6 @@ using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
-using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.TemplateMetadata.Enums;
@@ -432,13 +431,48 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public async Task UpdateSpecification_ReturnsForbidResultWhenUserDoesNotHavePermissionOnGivenFundingStreamId()
+        {
+            string fundingStreamId = NewRandomString();
+            string forbidFundingStreamId = NewRandomString();
+
+            EditSpecificationModel editSpecificationModel = new EditSpecificationModel
+            {
+                FundingStreamId = forbidFundingStreamId
+            };
+
+            SetupFundingStreamPermissions(fundingStreamId, new FundingStreamPermissionModel
+            {
+                CanEditSpecification = true,
+                FundingStreamId = fundingStreamId
+            });
+
+            IActionResult actionResult = await _specificationController.UpdateSpecification(editSpecificationModel, NewRandomString());
+
+            actionResult
+                .Should()
+                .BeOfType<ForbidResult>();
+        }
+
+        [TestMethod]
         public async Task UpdateSpecification_ReturnsBadRequestObjectResultWhenApiResponseIsBadRequest()
         {
+            string fundingStreamId = NewRandomString();
+            EditSpecificationModel editSpecificationModel = new EditSpecificationModel
+            {
+                FundingStreamId = fundingStreamId
+            };
+
+            SetupFundingStreamPermissions(fundingStreamId, new FundingStreamPermissionModel
+            {
+                CanEditSpecification = true,
+                FundingStreamId = fundingStreamId
+            });
+
             _specificationsApiClient.UpdateSpecification(Arg.Any<string>(), Arg.Any<EditSpecificationModel>())
                 .Returns(new ValidatedApiResponse<SpecificationSummary>(HttpStatusCode.BadRequest));
 
-
-            IActionResult actionResult = await _specificationController.UpdateSpecification(new EditSpecificationModel(), NewRandomString());
+            IActionResult actionResult = await _specificationController.UpdateSpecification(editSpecificationModel, NewRandomString());
 
             actionResult
                 .Should()
@@ -458,6 +492,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             _authorizationHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>())
                 .Returns(fundingStreamPermissions);
+        }
+
+        private void SetupFundingStreamPermissions(string fundingStreamId, FundingStreamPermissionModel fundingStreamPermission)
+        {
+            _authorizationHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), fundingStreamId)
+                .Returns(fundingStreamPermission);
         }
 
         private static IEnumerable<ProfileVariationPointer> CreateTestProfileVariationPointers()
