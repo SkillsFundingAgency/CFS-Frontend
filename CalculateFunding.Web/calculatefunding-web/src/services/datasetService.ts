@@ -13,6 +13,7 @@ import {NewDatasetVersionResponseViewModel} from "../types/Datasets/NewDatasetVe
 import {DatasetSearchResponseViewModel} from "../types/Datasets/DatasetSearchResponseViewModel";
 import {DatasetVersionHistoryViewModel} from "../types/Datasets/DatasetVersionHistoryViewModel";
 import {ToggleDatasetSchemaRequest} from "../types/Datasets/ToggleDatasetSchemaRequest";
+import {EligibleSpecificationReferenceModel} from "../types/Datasets/EligibleSpecificationReferenceModel";
 
 const baseUrl = "/api/datasets";
 
@@ -26,7 +27,7 @@ export async function getDatasetBySpecificationIdService(specificationId: string
 }
 
 export async function getDatasetDefinitionsService():
-    Promise<AxiosResponse<DatasetDefinition[]>>{
+    Promise<AxiosResponse<DatasetDefinition[]>> {
     return axios(`${baseUrl}/get-dataset-definitions/`, {
         method: 'GET',
         headers: {
@@ -46,15 +47,15 @@ export async function assignDatasetSchemaService(request: AssignDatasetSchemaReq
     });
 }
 
-export async function toggleDatasetRelaionshipService(request:ToggleDatasetSchemaRequest):
+export async function toggleDatasetRelaionshipService(request: ToggleDatasetSchemaRequest):
     Promise<AxiosResponse<boolean>> {
-        return axios(`${baseUrl}/toggleDatasetRelationship/${request.relationshipId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: request.converterEnabled
-        });
+    return axios(`${baseUrl}/toggleDatasetRelationship/${request.relationshipId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: request.converterEnabled
+    });
 }
 
 export async function searchDatasetDefinitionsService(request: DatasetDefinitionRequestViewModel) {
@@ -84,7 +85,7 @@ export async function createDatasetService(request: CreateDatasetRequestViewMode
     Promise<AxiosResponse<NewDatasetVersionResponseViewModel>> {
     return axios(`${baseUrl}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         data: {
             name: request.name,
             description: request.description,
@@ -155,7 +156,7 @@ export async function validateDatasetService(
     datasetEmptyFieldEvaluationOptions: DatasetEmptyFieldEvaluationOptions) {
     return axios(`${baseUrl}/validate-dataset`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         data: {
             datasetId: datasetId,
             fundingStreamId: fundingStreamId,
@@ -239,6 +240,14 @@ export async function getExpandedDataSources(relationshipId: string, datasetId: 
             'Content-Type': 'application/json'
         },
         data: searchRequest
+    })
+}
+
+export async function getEligibleSpecificationDetailsForCreatingNewDataset(specificationId: string):
+    Promise<AxiosResponse<EligibleSpecificationReferenceModel[]>> {
+    return axios(`/api/dataset-specifications/${specificationId}/eligible-specification-references`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
     })
 }
 

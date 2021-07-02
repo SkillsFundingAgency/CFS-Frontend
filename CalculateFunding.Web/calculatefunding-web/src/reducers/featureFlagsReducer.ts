@@ -1,12 +1,13 @@
 import {FeatureFlagsState} from "../states/FeatureFlagsState";
 import {GetFeatureFlagsAction, FeatureFlagsActionTypes} from "../actions/FeatureFlagsActions";
-import { FeatureFlagKey, FeatureFlag } from "../types/FeatureFlag";
-import { Reducer } from "redux";
+import {FeatureFlagKey, FeatureFlag} from "../types/FeatureFlag";
+import {Reducer} from "redux";
 
 const initialState: FeatureFlagsState = {
     templateBuilderVisible: false,
     releaseTimetableVisible: false,
     enableReactQueryDevTool: false,
+    specToSpec: false,
     profilingPatternVisible: undefined
 };
 
@@ -23,7 +24,8 @@ export const reduceFeatureFlagsState: Reducer<FeatureFlagsState, GetFeatureFlags
                 templateBuilderVisible: isFeatureEnabled(action.payload, FeatureFlagKey.TemplateBuilderVisible),
                 releaseTimetableVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ReleaseTimetableVisible),
                 enableReactQueryDevTool: isFeatureEnabled(action.payload, FeatureFlagKey.EnableReactQueryDevTool),
-                profilingPatternVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ProfilingPatternVisible)
+                profilingPatternVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ProfilingPatternVisible),
+                specToSpec: isFeatureEnabled(action.payload, FeatureFlagKey.SpecToSpec)
             };
         default:
             return state;

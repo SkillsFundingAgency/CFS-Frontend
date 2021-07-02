@@ -41,7 +41,6 @@ import {useCalculationErrors} from "../../hooks/Calculations/useCalculationError
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {JobObserverState} from '../../states/JobObserverState';
 import * as action from "../../actions/jobObserverActions";
-import {milliseconds} from "../../helpers/TimeInMs";
 import {JobNotification, JobSubscription, MonitorMode, useJobSubscription} from "../../hooks/Jobs/useJobSubscription";
 import {JobDetails} from "../../types/jobDetails";
 

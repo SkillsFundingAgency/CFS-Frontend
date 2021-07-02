@@ -1,6 +1,11 @@
 import React from "react";
 import {MemoryRouter, Route, Switch} from "react-router";
 import {cleanup, render, waitFor, screen} from "@testing-library/react";
+import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
+import {JobMonitoringFilter} from "../../../hooks/Jobs/useJobMonitor";
+import {IStoreState} from "../../../reducers/rootReducer";
+import * as redux from "react-redux";
+import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
 
 const renderDatasets = async() => {
     const {Datasets} = require('../../../components/Specifications/Datasets');
@@ -66,6 +71,15 @@ afterEach(cleanup);
 
 describe("<Datasets /> ", () => {
     beforeEach(async() => {
+        hasReduxState({
+            featureFlags: {
+                specToSpec: false,
+                profilingPatternVisible: false,
+                enableReactQueryDevTool: false,
+                releaseTimetableVisible: false,
+                templateBuilderVisible: false,
+            }
+        });
         await renderDatasets();
     });
 
@@ -100,3 +114,31 @@ describe("<Datasets /> ", () => {
         expect(screen.getByText(/Converter wizard last run:/)).toBeInTheDocument();
     });
 });
+
+const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+const hasReduxState = (mocks: {
+    permissions?: FundingStreamPermissions[],
+    jobMonitorFilter?: JobMonitoringFilter
+    featureFlags?: FeatureFlagsState
+}) => {
+    const state: IStoreState = {
+        featureFlags: mocks.featureFlags ?? {
+            templateBuilderVisible: false,
+            releaseTimetableVisible: false,
+            enableReactQueryDevTool: false,
+            specToSpec: false,
+            profilingPatternVisible: undefined
+        },
+        fundingSearchSelection: {searchCriteria: undefined, selectedProviderIds: []},
+        userState: {
+            isLoggedIn: true,
+            userName: "test-user",
+            hasConfirmedSkills: true,
+            fundingStreamPermissions: mocks.permissions ?? []
+        },
+        jobObserverState: {jobFilter: mocks.jobMonitorFilter}
+    }
+    useSelectorSpy.mockImplementation(callback => {
+        return callback(state);
+    });
+}

@@ -119,7 +119,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
 
             actionResult
                 .Should()
-                .BeOfType<NotFoundResult>();
+                .BeOfType<NotFoundObjectResult>();
         }
 
         [TestMethod]

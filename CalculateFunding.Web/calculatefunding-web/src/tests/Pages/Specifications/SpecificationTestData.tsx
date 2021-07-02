@@ -410,6 +410,7 @@ export function SpecificationTestData() {
                 templateBuilderVisible: false,
                 releaseTimetableVisible: false,
                 enableReactQueryDevTool: false,
+                specToSpec: false,
                 profilingPatternVisible: undefined
             },
             fundingSearchSelection: {searchCriteria: undefined, selectedProviderIds: []},

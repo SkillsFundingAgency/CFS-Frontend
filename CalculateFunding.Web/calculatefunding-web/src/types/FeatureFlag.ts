@@ -2,7 +2,8 @@ export enum FeatureFlagKey {
     TemplateBuilderVisible = "TemplateBuilderVisible",
     ReleaseTimetableVisible = "ReleaseTimetableVisible",
     EnableReactQueryDevTool = "EnableReactQueryDevTool",
-    ProfilingPatternVisible = "ProfilingPatternVisible"
+    ProfilingPatternVisible = "ProfilingPatternVisible",
+    SpecToSpec = "SpecToSpec"
 }
 
 export interface FeatureFlag {

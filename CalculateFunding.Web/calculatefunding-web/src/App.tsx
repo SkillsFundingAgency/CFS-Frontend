@@ -66,6 +66,8 @@ import {useEffectOnce} from "./hooks/useEffectOnce";
 import {Admin} from "./pages/Permissions/Admin";
 import {IndividualPermissionsAdmin} from "./pages/Permissions/IndividualPermissionsAdmin";
 import {FundingStreamPermissionsAdmin} from "./pages/Permissions/FundingStreamPermissionsAdmin";
+import {SelectDatasetTypeToCreate} from "./pages/Datasets/SelectDatasetTypeToCreate";
+import {CreateDatasetFromReleased} from "./pages/Datasets/CreateDatasetFromReleased";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -174,6 +176,8 @@ const App: React.FunctionComponent = () => {
                         <Route path="/Permissions/Admin" component={Admin}/>
                         <Route path="/Permissions/Individual" component={IndividualPermissionsAdmin}/>
                         <Route path="/Permissions/FundingStream" component={FundingStreamPermissionsAdmin}/>
+                        {featureFlagsState.specToSpec && <Route path="/Datasets/SelectDatasetTypeToCreate/:specificationId" component={SelectDatasetTypeToCreate}/>}
+                        {featureFlagsState.specToSpec && <Route path="/Datasets/CreateDatasetFromReleased/:specificationId" component={CreateDatasetFromReleased}/>}
                         <Route path="*">
                             <NoMatch/>
                         </Route>

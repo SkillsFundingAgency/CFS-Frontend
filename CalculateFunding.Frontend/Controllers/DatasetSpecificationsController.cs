@@ -19,22 +19,15 @@ namespace CalculateFunding.Frontend.Controllers
             _datasetApiClient = datasetApiClient;
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("api/dataset-specifications/{specificationId}/eligible-specification-references")]
         public async Task<IActionResult> GetEligibleSpecificationsToReference(
             [FromRoute] string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<IEnumerable<EligibleSpecificationReference>> response = 
+            ApiResponse<IEnumerable<EligibleSpecificationReference>> response =
                 await _datasetApiClient.GetEligibleSpecificationsToReference(specificationId);
-
-            IActionResult errorResult =
-                response.IsSuccessOrReturnFailureResult(nameof(GetEligibleSpecificationsToReference));
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
 
             return response.Handle(nameof(EligibleSpecificationReference),
                 onSuccess: x => Ok(x.Content));
@@ -46,11 +39,11 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<IEnumerable<PublishedSpecificationTemplateMetadata>> apiResponse = await _datasetApiClient.GetPublishedSpecificationTemplateMetadata(specificationId);
+            ApiResponse<IEnumerable<PublishedSpecificationTemplateMetadata>> apiResponse =
+                await _datasetApiClient.GetPublishedSpecificationTemplateMetadata(specificationId);
 
             return apiResponse.Handle(nameof(PublishedSpecificationTemplateMetadata),
-                            onNotFound: x => new NotFoundResult(),
-                            onSuccess: x => Ok(x.Content));
+                onSuccess: x => Ok(x.Content));
         }
     }
 }

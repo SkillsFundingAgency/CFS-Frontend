@@ -8,8 +8,12 @@ import {ToggleDatasetSchemaRequest} from "../../types/Datasets/ToggleDatasetSche
 import {useErrors} from "../../hooks/useErrors";
 import { MultipleErrorSummary } from "../MultipleErrorSummary";
 import {DateTimeFormatter} from "../DateTimeFormatter";
+import {FeatureFlagsState} from "../../states/FeatureFlagsState";
+import {useSelector} from "react-redux";
+import {IStoreState} from "../../reducers/rootReducer";
 
 export function Datasets(props: { specificationId: string, lastConverterWizardReportDate: Date | undefined }) {
+    const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(state => state.featureFlags);
     const [datasets, setDatasets] = useState<DatasetSummary>({
         content: [],
         statusCode: 0
@@ -38,7 +42,10 @@ export function Datasets(props: { specificationId: string, lastConverterWizardRe
         };
         const response = await toggleDatasetRelaionshipService(request);
         if (response.status !== 200) {
-            addError({error: `${response.statusText} ${response.data}`, description: "Error whilst setting enable copy data for provider", fieldName: "converter-enabled"});
+            addError({
+                error: `${response.statusText} ${response.data}`, 
+                description: "Error whilst setting enable copy data for provider", 
+                fieldName: "converter-enabled"});
         }
     };
 
@@ -59,8 +66,9 @@ export function Datasets(props: { specificationId: string, lastConverterWizardRe
                           className="govuk-link" data-module="govuk-button">Map data source file to data set</Link>
                 </div>
                 <div>
-                    <Link role={"link"} className="govuk-link"
-                          to={`/Datasets/CreateDataset/${props.specificationId}`}>
+                    <Link className="govuk-link"
+                          to={featureFlagsState.specToSpec ? `/Datasets/SelectDatasetTypeToCreate/${props.specificationId}` :
+                              `/Datasets/CreateDataset/${props.specificationId}`}>
                         Create dataset
                     </Link>
                 </div>
