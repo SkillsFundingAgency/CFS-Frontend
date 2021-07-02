@@ -28,7 +28,7 @@ export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRout
     const {errors, addError, clearErrorMessages} = useErrors();
     const {specification, isLoadingSpecification} =
         useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
-    const fundingPeriodId = specification && specification.fundingPeriod.id;
+    const fundingPeriodId = specification && specification?.fundingPeriod?.id;
     const fundingStreamId = specification && specification.fundingStreams[0].id;
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
