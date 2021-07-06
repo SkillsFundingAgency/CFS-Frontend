@@ -149,7 +149,6 @@ export function GdsMonacoEditor(props: {
         }
     }, [props.value]);
 
-
     function loadIntellisenseContext() {
         getCodeContextService(specificationId)
             .then((result: Array<ITypeInformationResponse>) => {
@@ -284,6 +283,40 @@ export function GdsMonacoEditor(props: {
                 obsoleteItems = obsoleteItems.concat(obsoleteVariables);
                 obsoleteItems = obsoleteItems.concat(obsoleteFunctions);
                 obsoleteItems = obsoleteItems.concat(obsoleteDefaultTypes);
+
+                const findObsoleteItems = () => {
+                    let ddArray: editor.IModelDeltaDecoration[] = [];
+                    const model = editor.current?.getModel();
+
+                    obsoleteItems.forEach(variableItem => {
+                        const match = editor.current?.getModel()?.findMatches(variableItem, false, false, true, ".", true, undefined);
+
+
+                        if (match && match.length > 0 && model) {
+                            match.forEach(itemMatch => {
+                                const position = new Position(itemMatch.range.startLineNumber, itemMatch.range.startColumn);
+                                const forwardTextForCurrentLine = model?.getValueInRange(itemMatch.range) ?? "";
+                                const variableIsObsolete = checkForObsoleteVariable(model, position, forwardTextForCurrentLine, contextVariables, itemMatch.range);
+
+                                if (variableIsObsolete) {
+                                    let dd: editor.IModelDeltaDecoration = {
+                                        range: itemMatch.range,
+                                        options: {
+                                            inlineClassName: "obsolete-item",
+                                            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
+                                        }
+                                    }
+
+                                    ddArray.push(dd);
+                                }
+                            });
+                        }
+                    });
+
+                    const decorators = editor.current?.deltaDecorations(oldDecorations, ddArray);
+
+                    oldDecorations = decorators ?? [];
+                }
 
                 provider = monaco.languages.registerCompletionItemProvider('vb', {
                     triggerCharacters: [".", " ", "(", "="],
@@ -655,40 +688,12 @@ export function GdsMonacoEditor(props: {
                 });
 
                 editor.current?.onDidChangeModelContent(e => {
-                    let ddArray: editor.IModelDeltaDecoration[] = [];
-                    const model = editor.current?.getModel();
-
-                    obsoleteItems.forEach(variableItem => {
-                        const match = editor.current?.getModel()?.findMatches(variableItem, false, false, true, ".", true, undefined);
-
-
-                        if (match && match.length > 0 && model) {
-                            match.forEach(itemMatch => {
-                                const position = new Position(itemMatch.range.startLineNumber, itemMatch.range.startColumn);
-                                const forwardTextForCurrentLine = model?.getValueInRange(itemMatch.range) ?? "";
-                                const variableIsObsolete = checkForObsoleteVariable(model, position, forwardTextForCurrentLine, contextVariables, itemMatch.range);
-
-                                if (variableIsObsolete) {
-                                    let dd: editor.IModelDeltaDecoration = {
-                                        range: itemMatch.range,
-                                        options: {
-                                            inlineClassName: "obsolete-item",
-                                            stickiness: monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges
-                                        }
-                                    }
-
-                                    ddArray.push(dd);
-                                }
-                            });
-                        }
-                    });
-
-                    const decorators = editor.current?.deltaDecorations(oldDecorations, ddArray);
-
-                    oldDecorations = decorators ?? [];
+                    findObsoleteItems();
                 });
 
                 isLoading = true;
+
+                findObsoleteItems();
             });
     }
 
