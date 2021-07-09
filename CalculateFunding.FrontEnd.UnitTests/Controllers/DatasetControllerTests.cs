@@ -434,6 +434,80 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                .Be((int)HttpStatusCode.OK);
         }
 
+        [TestMethod]
+        public async Task UpdateDefinitionSpecificationRelationship_GivenBadRequestFromApi_ReturnsBadRequest()
+        {
+            ValidatedApiResponse<DefinitionSpecificationRelationshipVersion> response = new ValidatedApiResponse<DefinitionSpecificationRelationshipVersion>(HttpStatusCode.BadRequest);
+            string specificationId = "specificationId";
+            string relationshipId = "relationshipId";
+
+            _apiClient
+                .UpdateDefinitionSpecificationRelationship(Arg.Any<UpdateDefinitionSpecificationRelationshipModel>(),
+                    Arg.Any<string>(), Arg.Any<string>())
+                .Returns(response);
+
+            IActionResult result = await _controller.UpdateDefinitionSpecificationRelationship(
+                specificationId, relationshipId, new UpdateDefinitionSpecificationRelationshipModel());
+
+            result
+                .Should()
+                .BeOfType<BadRequestObjectResult>();
+        }
+
+        [TestMethod]
+        public void UpdateDefinitionSpecificationRelationship_GivenSpecificationIdIsNull_ThrowsArgumentNullException()
+        {
+            UpdateDefinitionSpecificationRelationshipModel model = new UpdateDefinitionSpecificationRelationshipModel();
+
+            Func<Task> func =
+                async () => await _controller.UpdateDefinitionSpecificationRelationship(null, "relationshipId", model);
+
+            func
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public void UpdateDefinitionSpecificationRelationship_GivenRelationshipIdIsNull_ThrowsArgumentNullException()
+        {
+            UpdateDefinitionSpecificationRelationshipModel model = new UpdateDefinitionSpecificationRelationshipModel();
+
+            Func<Task> func =
+                async () => await _controller.UpdateDefinitionSpecificationRelationship("specificationId", null, model);
+
+            func
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
+        [TestMethod]
+        public async Task GetAvailableFundingLinesCalculations_GivenBadRequestFromApi_ReturnsBadRequest()
+        {
+            ValidatedApiResponse<PublishedSpecificationConfiguration> response = new ValidatedApiResponse<PublishedSpecificationConfiguration>(HttpStatusCode.BadRequest);
+            string relationshipId = "relationshipId";
+
+            _apiClient
+                .GetFundingLinesCalculations(Arg.Any<string>())
+                .Returns(response);
+
+            IActionResult result = await _controller.GetFundingLinesCalculationsForRelationship(relationshipId);
+
+            result
+                .Should()
+                .BeOfType<BadRequestResult>();
+        }
+
+        [TestMethod]
+        public void GetAvailableFundingLinesCalculations_GivenRelationshipIdIsNull_ThrowsArgumentNullException()
+        {
+            Func<Task> func =
+                async () => await _controller.GetFundingLinesCalculationsForRelationship(null);
+
+            func
+                .Should()
+                .ThrowExactly<ArgumentNullException>();
+        }
+
         private DatasetController CreateController(IDatasetsApiClient apiClient,
             ILogger logger)
             => new DatasetController(apiClient,

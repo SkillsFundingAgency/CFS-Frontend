@@ -130,9 +130,9 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 return BadRequest(ModelState);
             }
-            
+
             FundingStreamPermission permissions = await _authorizationHelper.GetUserFundingStreamPermissions(User, vm.FundingStreamId);
-            
+
             if (permissions?.CanUploadDataSourceFiles != true)
             {
                 _logger.Error($"User [{User?.Identity?.Name}] has insufficient permissions to upload a dataset file for {vm.FundingStreamId}");
@@ -369,8 +369,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/datasets/assign-datasource-version-to-relationship/{specificationId}/{relationshipId}/{datasetVersionId}")]
-        public async Task<IActionResult> AssignDatasourceVersionToRelationship([FromRoute]string relationshipId, [FromRoute]string specificationId,
-            [FromRoute]string datasetVersionId)
+        public async Task<IActionResult> AssignDatasourceVersionToRelationship([FromRoute] string relationshipId, [FromRoute] string specificationId,
+            [FromRoute] string datasetVersionId)
         {
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -432,9 +432,9 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost]
         [Route("api/datasets/expanded-datasources/{relationshipId}/{datasetId}")]
         public async Task<IActionResult> GetExpandedDataSourcesSearch(
-            [FromRoute]string relationshipId,
-            [FromRoute]string datasetId,
-            [FromBody]SearchModel search)
+            [FromRoute] string relationshipId,
+            [FromRoute] string datasetId,
+            [FromBody] SearchModel search)
         {
             ApiResponse<SelectDatasourceModel> result =
                 await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
@@ -455,7 +455,7 @@ namespace CalculateFunding.Frontend.Controllers
                 {
                     endNumber = datasetVersions.Versions.Count();
                 }
-                
+
                 PagedDatasetSearchResults searchPagedResult = new PagedDatasetSearchResults
                 {
                     Name = datasetVersions.Name,
@@ -484,12 +484,12 @@ namespace CalculateFunding.Frontend.Controllers
         public async Task<IActionResult> GetCurrentDatasetVersionByDatasetId(string datasetId)
         {
             Guard.IsNullOrWhiteSpace(nameof(datasetId), datasetId);
-            
+
             ApiResponse<DatasetVersionResponseViewModel> result = await _datasetApiClient.GetCurrentDatasetVersionByDatasetId(datasetId);
 
             if (result.StatusCode == HttpStatusCode.OK)
                 return new OkObjectResult(result.Content);
-            
+
             return new InternalServerErrorResult(result.StatusCode.ToString());
         }
 
@@ -540,6 +540,54 @@ namespace CalculateFunding.Frontend.Controllers
             HttpStatusCode httpStatusCode = await _datasetApiClient.ValidateDefinitionSpecificationRelationship(model);
 
             return new StatusCodeResult((int)httpStatusCode);
+        }
+
+        [HttpPut]
+        [Route("api/specifications/{specificationId}/datasets/edit-definition-specification-relationship/{relationshipId}")]
+        public async Task<IActionResult> UpdateDefinitionSpecificationRelationship(
+            [FromRoute] string specificationId,
+            [FromRoute] string relationshipId,
+            [FromBody] UpdateDefinitionSpecificationRelationshipModel updateDefinitionSpecificationRelationshipModel)
+        {
+            Guard.ArgumentNotNull(updateDefinitionSpecificationRelationshipModel, nameof(updateDefinitionSpecificationRelationshipModel));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(relationshipId, nameof(relationshipId));
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ValidatedApiResponse<DefinitionSpecificationRelationshipVersion> response =
+                await _datasetApiClient.UpdateDefinitionSpecificationRelationship(updateDefinitionSpecificationRelationshipModel,
+                specificationId, relationshipId);
+
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult("UpdateDefinitionSpecificationRelationship");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return new OkObjectResult(response.Content);
+        }
+
+        [HttpGet]
+        [Route("api/datasets/definition-relationships/{relationshipId}/get-funding-line-calculations")]
+        public async Task<IActionResult> GetFundingLinesCalculationsForRelationship([FromRoute] string relationshipId)
+        {
+            Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
+
+            ApiResponse<PublishedSpecificationConfiguration> response = await _datasetApiClient.GetFundingLinesCalculations(relationshipId);
+
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult("GetFundingLinesCalculationsForRelationship");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(response.Content);
         }
 
         private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)
