@@ -240,7 +240,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
 
                 <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
-                <MultipleErrorSummary errors={errors}/>
+                <MultipleErrorSummary errors={errors} specificationId={specificationId}/>
 
                 {!isCheckingForJob && (latestJob && latestJob.isComplete) &&
                 <JobNotificationBanner
