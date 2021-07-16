@@ -201,9 +201,7 @@ export function EditCalculation({match, excludeMonacoEditor}: RouteComponentProp
                                         Calculation type
                                     </dt>
                                     <dd className="govuk-summary-list__value">
-                                        <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2 calc-status">
-                                            {convertCamelCaseToSpaceDelimited(calculation.templateCalculationType || "")}
-                                        </strong>
+                                        <span>{convertCamelCaseToSpaceDelimited(calculation.templateCalculationType || "")}</span>
                                     </dd>
                                 </div>}
 
