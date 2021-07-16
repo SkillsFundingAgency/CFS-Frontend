@@ -8,7 +8,6 @@ import '@testing-library/jest-dom/extend-expect';
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as circularRefErrorsHook from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {CalculationCircularDependenciesQueryResult} from "../../../hooks/Calculations/useCalculationCircularDependencies";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
@@ -25,6 +24,7 @@ import {CalculationType} from "../../../types/CalculationSearchResponse";
 import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
 import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../../types/Permission";
+import {CalculationType as TemplateCalculationType} from "../../../types/TemplateBuilderDefinitions";
 
 const history = createMemoryHistory();
 
@@ -92,7 +92,9 @@ export function EditCalculationTestData() {
         specificationId: mockSpecData.id,
         dataType: CalculationDataType.Decimal,
         valueType: ValueType.Currency,
-        wasTemplateCalculation: false
+        wasTemplateCalculation: false,
+        templateCalculationId: 100,
+        templateCalculationType: TemplateCalculationType.PupilNumber,
     }
 
     const matchMock: match<EditCalculationRouteProps> = {

@@ -57,8 +57,9 @@ describe("<EditCalculation> tests ", () => {
             expect(screen.getByText(testData.specData.name)).toBeInTheDocument();
         });
 
-        it("renders the calculation name", async () => {
-            expect(screen.getByText("Calculation name")).toBeInTheDocument();
+        it("renders the calculation summary", async () => {
+            expect(screen.getByText("Calculation ID: 100")).toBeInTheDocument();
+            expect(screen.getByText("Pupil Number")).toBeInTheDocument();
             expect(screen.getByText(testData.calcData.name)).toBeInTheDocument();
         });
 
@@ -128,7 +129,8 @@ describe("<EditCalculation> tests ", () => {
         });
 
         it("renders the calculation", async () => {
-            expect(screen.getByText("Calculation name")).toBeInTheDocument();
+            expect(screen.getByText("Calculation ID: 100")).toBeInTheDocument();
+            expect(screen.getByText("Pupil Number")).toBeInTheDocument();
             expect(screen.getByText(testData.calcData.publishStatus)).toBeInTheDocument();
         });
 
@@ -152,7 +154,8 @@ describe("<EditCalculation> tests ", () => {
         });
 
         it("renders the calculation", async () => {
-            expect(screen.getByText("Calculation name")).toBeInTheDocument();
+            expect(screen.getByText("Calculation ID: 100")).toBeInTheDocument();
+            expect(screen.getByText("Pupil Number")).toBeInTheDocument();
             expect(screen.getByText(testData.calcData.publishStatus)).toBeInTheDocument();
         });
 

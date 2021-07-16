@@ -2,7 +2,8 @@
 import {Author} from "./Calculations/Author";
 import {PublishStatus} from "./PublishStatusModel";
 import {CalculationType} from "./CalculationSearchResponse";
-import { CalculationDataType } from "./Calculations/CalculationCompilePreviewResponse";
+import {CalculationDataType} from "./Calculations/CalculationCompilePreviewResponse";
+import {CalculationType as TemplateCalculationType} from "./TemplateBuilderDefinitions";
 
 export interface CalculationDetails {
     author: Author | null;
@@ -21,6 +22,8 @@ export interface CalculationDetails {
     wasTemplateCalculation: boolean;
     valueType: ValueType;
     version?: number | undefined;
+    templateCalculationId?: number;
+    templateCalculationType?: TemplateCalculationType;
 }
 
 export interface CalculationSummary {
