@@ -202,7 +202,7 @@ export function FundingLineResults({
     function renderValue(value: number, calculationType: ValueFormatType): string {
         switch (calculationType) {
             case ValueFormatType.Currency:
-                return formatNumber(value, NumberType.FormattedMoney, 0);
+                return formatNumber(value, NumberType.FormattedMoney, 2);
             case ValueFormatType.Percentage:
                 return formatNumber(value, NumberType.FormattedPercentage, 0);
             case ValueFormatType.Number:
