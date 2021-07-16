@@ -26,19 +26,15 @@ namespace CalculateFunding.Frontend.Controllers
     using CalculateFunding.Common.ApiClient.Calcs.Models;
     using CalculateFunding.Common.ApiClient.Results;
     using CalculateFunding.Common.ApiClient.Specifications;
-    using ResultsJob = CalculateFunding.Common.ApiClient.Results.Models.Job;
+    using ResultsJob = Common.ApiClient.Results.Models.Job;
+    using CalculateFunding.Common.ApiClient.Policies;
 
     [TestClass]
     public class CalculationControllerTests
     {
-        private ISpecificationsApiClient specificationsApiClient;
+        private ISpecificationsApiClient specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
         private IResultsApiClient resultsApiClient = Substitute.For<IResultsApiClient>();
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            specificationsApiClient = Substitute.For<ISpecificationsApiClient>();
-        }
+        private IPoliciesApiClient policiesApiClient = Substitute.For<IPoliciesApiClient>();
 
         [TestMethod]
         public async Task SaveCalculation_OnSuccessfulSaveRequest_ThenResponseSentToClient()
@@ -51,7 +47,7 @@ namespace CalculateFunding.Frontend.Controllers
             string calculationId = "5";
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
@@ -103,7 +99,7 @@ namespace CalculateFunding.Frontend.Controllers
             string calculationId = "5";
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
@@ -132,7 +128,7 @@ namespace CalculateFunding.Frontend.Controllers
             string calculationId = "5";
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             calcsClient
                 .EditCalculation(specificationId, calculationId, Arg.Any<CalculationEditModel>())
@@ -178,7 +174,7 @@ namespace CalculateFunding.Frontend.Controllers
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanEditCalculations))
                 .Returns(false);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             CalculationUpdateViewModel updateViewModel = new CalculationUpdateViewModel()
             {
@@ -213,7 +209,7 @@ namespace CalculateFunding.Frontend.Controllers
             string specificationId = "65";
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             PreviewCompileRequestViewModel previewViewModel = new PreviewCompileRequestViewModel()
             {
@@ -259,7 +255,7 @@ namespace CalculateFunding.Frontend.Controllers
             string specificationId = "65";
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             PreviewCompileRequestViewModel previewViewModel = new PreviewCompileRequestViewModel()
             {
@@ -292,7 +288,7 @@ namespace CalculateFunding.Frontend.Controllers
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanEditCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             PreviewCompileRequestViewModel previewViewModel = new PreviewCompileRequestViewModel()
             {
@@ -344,7 +340,7 @@ namespace CalculateFunding.Frontend.Controllers
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveAnyCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             Func<Task> test = async () => await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -381,7 +377,7 @@ namespace CalculateFunding.Frontend.Controllers
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             IAuthorizationHelper authorizationHelper = TestAuthHelper.CreateAuthorizationHelperSubstitute(specificationId, SpecificationActionTypes.CanApproveAnyCalculations);
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
             
             IActionResult actionResult = await controller.ApproveCalculation(specificationId, calculationId, model);
 
@@ -403,7 +399,7 @@ namespace CalculateFunding.Frontend.Controllers
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
                 .Returns(false);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             IActionResult result = await controller.ApproveAllCalculations(specificationId);
@@ -429,7 +425,7 @@ namespace CalculateFunding.Frontend.Controllers
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             Action a = new Action(() =>
@@ -462,7 +458,7 @@ namespace CalculateFunding.Frontend.Controllers
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             IActionResult result = await controller.ApproveAllCalculations(specificationId);
@@ -505,7 +501,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .Returns(Task.FromResult(new Common.ApiClient.Users.Models.FundingStreamPermission()));
 
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -548,7 +544,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .Returns(Task.FromResult(new Common.ApiClient.Users.Models.FundingStreamPermission()));
 
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -590,7 +586,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -645,7 +641,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAnyCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
             IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -714,7 +710,7 @@ namespace CalculateFunding.Frontend.Controllers
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, user);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient, user);
 
             // Act
             IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -780,7 +776,7 @@ namespace CalculateFunding.Frontend.Controllers
             authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, user);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient, user);
 
             // Act
             IActionResult result = await controller.ApproveCalculation(specificationId, calculationId, model);
@@ -816,7 +812,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .RunGenerateCalculationCsvResultsJob(Arg.Is(specificationId))
                 .Returns(new ApiResponse<ResultsJob>(HttpStatusCode.OK, job));
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             IActionResult actual = await controller.RunGenerateCalculationCsvResultsJob(specificationId);
 
@@ -838,7 +834,7 @@ namespace CalculateFunding.Frontend.Controllers
                 .RunGenerateCalculationCsvResultsJob(Arg.Is(specificationId))
                 .Returns(new ApiResponse<ResultsJob>(HttpStatusCode.OK, (ResultsJob) null));
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             IActionResult actual = await controller.RunGenerateCalculationCsvResultsJob(specificationId);
 
@@ -850,9 +846,11 @@ namespace CalculateFunding.Frontend.Controllers
             IMapper mapper,
             IAuthorizationHelper authorizationHelper,
             IResultsApiClient resultsApiClient,
+            ISpecificationsApiClient specificationsApiClient,
+            IPoliciesApiClient policiesApiClient,
             ClaimsPrincipal user = null)
         {
-            var controller = new CalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient);
+            var controller = new CalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
             controller.ControllerContext = new ControllerContext() { HttpContext = new DefaultHttpContext() { User = user } };
             return controller;
         }

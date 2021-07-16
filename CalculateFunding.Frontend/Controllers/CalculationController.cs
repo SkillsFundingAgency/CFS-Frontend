@@ -19,12 +19,18 @@ using Microsoft.AspNetCore.Mvc;
 using CalculationType = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationType;
 using CalcsJob = CalculateFunding.Common.ApiClient.Calcs.Models.Job;
 using ResultsJob = CalculateFunding.Common.ApiClient.Results.Models.Job;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
     public class CalculationController : Controller
     {
         private ICalculationsApiClient _calcClient;
+        private ISpecificationsApiClient _specificationsApiClient;
+        private IPoliciesApiClient _policiesApiClient;
         private IMapper _mapper;
         private readonly IAuthorizationHelper _authorizationHelper;
         private readonly IResultsApiClient _resultsApiClient;
@@ -33,17 +39,23 @@ namespace CalculateFunding.Frontend.Controllers
             ICalculationsApiClient calcClient,
             IMapper mapper,
             IAuthorizationHelper authorizationHelper,
-            IResultsApiClient resultsApiClient)
+            IResultsApiClient resultsApiClient,
+            ISpecificationsApiClient specificationsApiClient,
+            IPoliciesApiClient policiesApiClient)
         {
             Guard.ArgumentNotNull(calcClient, nameof(calcClient));
             Guard.ArgumentNotNull(mapper, nameof(mapper));
             Guard.ArgumentNotNull(authorizationHelper, nameof(authorizationHelper));
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
+            Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
+            Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
 
             _calcClient = calcClient;
             _mapper = mapper;
             _authorizationHelper = authorizationHelper;
             _resultsApiClient = resultsApiClient;
+            _specificationsApiClient = specificationsApiClient;
+            _policiesApiClient = policiesApiClient;
         }
 
         [HttpPost]
@@ -362,16 +374,69 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
 
-            ApiResponse<Calculation> response = await _calcClient.GetCalculationById(calculationId);
+            ApiResponse<Calculation> calcResponse = await _calcClient.GetCalculationById(calculationId);
 
-            IActionResult errorResult =
-                response.IsSuccessOrReturnFailureResult("GetCalculationById");
-            if (errorResult != null)
+            IActionResult calcResponseError =
+                calcResponse.IsSuccessOrReturnFailureResult("GetCalculationById");
+            if (calcResponseError != null)
             {
-                return errorResult;
+                return calcResponseError;
             }
 
-            return Ok(response.Content);
+            CalculationByIdViewModel calculationByIdViewModel = _mapper.Map<CalculationByIdViewModel>(calcResponse.Content);
+
+            if (calcResponse.Content.CalculationType != CalculationType.Template)
+            {
+                return Ok(calculationByIdViewModel);
+            }
+
+            Guard.IsNullOrWhiteSpace(calculationByIdViewModel.SpecificationId, nameof(calculationByIdViewModel.SpecificationId));
+            Guard.IsNullOrWhiteSpace(calculationByIdViewModel.FundingStreamId, nameof(calculationByIdViewModel.FundingStreamId));
+
+            string fundingStreamId = calculationByIdViewModel.FundingStreamId;
+
+            ApiResponse<TemplateMapping> templateMappingResponse =
+                    await _calcClient.GetTemplateMapping(calculationByIdViewModel.SpecificationId, fundingStreamId);
+
+            IActionResult templateMappingResponseError =
+                templateMappingResponse.IsSuccessOrReturnFailureResult("GetTemplateMapping");
+            if (templateMappingResponseError != null)
+            {
+                return templateMappingResponseError;
+            }
+
+            ApiResponse<SpecificationSummary> specificationResponse =
+                await _specificationsApiClient.GetSpecificationSummaryById(calculationByIdViewModel.SpecificationId);
+
+            IActionResult specificationResponseError =
+                specificationResponse.IsSuccessOrReturnFailureResult("GetSpecificationSummaryById");
+            if (specificationResponseError != null)
+            {
+                return specificationResponseError;
+            }
+
+            TemplateMapping templateMapping = templateMappingResponse.Content;
+            SpecificationSummary specificationSummary = specificationResponse.Content;
+            string templateVersion = specificationSummary.TemplateIds[fundingStreamId];
+
+            ApiResponse<TemplateMetadataDistinctCalculationsContents> policiesResponse =
+                await _policiesApiClient.GetDistinctTemplateMetadataCalculationsContents(
+                    fundingStreamId, specificationSummary.FundingPeriod.Id, templateVersion);
+
+            IActionResult policiesResponseError =
+                policiesResponse.IsSuccessOrReturnFailureResult("GetDistinctTemplateMetadataCalculationsContents");
+            if (policiesResponseError != null)
+            {
+                return policiesResponseError;
+            }
+
+            TemplateMetadataDistinctCalculationsContents templateContents = policiesResponse.Content;
+            uint templateCalculationId = templateMapping.TemplateMappingItems.First(t => t.CalculationId == calculationId).TemplateId;
+
+            calculationByIdViewModel.TemplateCalculationId = templateCalculationId;
+            calculationByIdViewModel.TemplateCalculationType = templateContents.Calculations.First(c => c.TemplateCalculationId == templateCalculationId).Type;
+
+            return Ok(calculationByIdViewModel);
         }
 
         [HttpGet]

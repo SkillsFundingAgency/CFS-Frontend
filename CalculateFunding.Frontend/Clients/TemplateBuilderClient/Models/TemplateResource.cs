@@ -1,5 +1,4 @@
 ﻿using System;
-using CalculateFunding.Common.Models.Versioning;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 
 namespace CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models

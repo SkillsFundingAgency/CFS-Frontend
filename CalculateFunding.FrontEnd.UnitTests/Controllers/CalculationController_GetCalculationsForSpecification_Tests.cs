@@ -4,7 +4,9 @@ using AutoMapper;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
 using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Results;
+using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
 using FizzWare.NBuilder;
@@ -23,6 +25,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private Mock<IMapper> _mockMapper;
         private Mock<IAuthorizationHelper> _mockAuthorizationHelper;
         private Mock<IResultsApiClient> _mockResultsApiClient;
+        private Mock<ISpecificationsApiClient> _mockSpecificationsApiClient;
+        private Mock<IPoliciesApiClient> _mockPoliciesApiClient;
         
         [TestInitialize]
         public void Initialize()
@@ -30,7 +34,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _mockCalcClient = new Mock<ICalculationsApiClient>();
             _mockMapper = new Mock<IMapper>();
             _mockAuthorizationHelper = new Mock<IAuthorizationHelper>();
-            _mockResultsApiClient=new Mock<IResultsApiClient>();
+            _mockResultsApiClient = new Mock<IResultsApiClient>();
+            _mockSpecificationsApiClient = new Mock<ISpecificationsApiClient>();
+            _mockPoliciesApiClient = new Mock<IPoliciesApiClient>();
         }
 
         [TestMethod]
@@ -49,7 +55,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 			            Builder<SearchResults<CalculationSearchResult>>
 				            .CreateNew()
 				            .Build()));
-	        _sut = new CalculationController(_mockCalcClient.Object, _mockMapper.Object, _mockAuthorizationHelper.Object, _mockResultsApiClient.Object);
+	        _sut = new CalculationController(
+                _mockCalcClient.Object, _mockMapper.Object, _mockAuthorizationHelper.Object,
+                _mockResultsApiClient.Object, _mockSpecificationsApiClient.Object, _mockPoliciesApiClient.Object);
 
             var actual = await _sut.GetCalculationsForSpecification("ABC123", CalculationType.Additional, 1, null, "");
 
@@ -72,7 +80,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 			            Builder<SearchResults<CalculationSearchResult>>
 				            .CreateNew()
 				            .Build()));
-	        _sut = new CalculationController(_mockCalcClient.Object, _mockMapper.Object, _mockAuthorizationHelper.Object, _mockResultsApiClient.Object);
+	        _sut = new CalculationController(_mockCalcClient.Object, _mockMapper.Object, _mockAuthorizationHelper.Object,
+                _mockResultsApiClient.Object, _mockSpecificationsApiClient.Object, _mockPoliciesApiClient.Object);
 
             var actual = await _sut.GetCalculationsForSpecification("FooBar", CalculationType.Template, 1, null, "");
 

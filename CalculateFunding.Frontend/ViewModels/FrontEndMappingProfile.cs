@@ -120,6 +120,10 @@ namespace CalculateFunding.Frontend.ViewModels
                 ;
 
             CreateMap<CalculationSearchResult, CalculationSearchResultItemViewModel>();
+
+            CreateMap<Calculation, CalculationByIdViewModel>()
+                .ForMember(m => m.TemplateCalculationId, opt => opt.Ignore())
+                .ForMember(m => m.TemplateCalculationType, opt => opt.Ignore());
         }
 
         private void MapSpecs()
