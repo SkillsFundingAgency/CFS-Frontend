@@ -34,10 +34,10 @@ export function EditableProfileTotal(
     const [percent, setPercent] = useState<string>("");
 
     useEffect(() => {
-        const formattedNumber = formatNumber(profileTotal.value, NumberType.FormattedDecimalNumber, 2);
+        const formattedNumber = formatNumber(profileTotal.value, NumberType.FormattedDecimalNumber, 2, true);
         setValue(formattedNumber);
         const formattedPercent = formatNumber(profileTotal.profileRemainingPercentage ?
-            profileTotal.profileRemainingPercentage : 0, NumberType.FormattedDecimalNumber, 2);
+            profileTotal.profileRemainingPercentage : 0, NumberType.FormattedPercentage, 7, false);
         setPercent(formattedPercent);
     }, [profileTotal]);
 
@@ -66,7 +66,7 @@ export function EditableProfileTotal(
     function setValueAndPercent(value: number, percent: number) {
         const updatedProfileTotal = clone(profileTotal);
         updatedProfileTotal.value = toDecimal(value, 2);
-        updatedProfileTotal.profileRemainingPercentage = toDecimal(percent, 2);
+        updatedProfileTotal.profileRemainingPercentage = toDecimal(percent, 7);
         setIsDirty(true);
         setProfileTotal(installmentNumber, updatedProfileTotal);
     }
@@ -114,7 +114,7 @@ export function EditableProfileTotal(
     return (
         <>
             <td className="govuk-table__cell" data-testid={`remaining-percentage-${index}`}>
-                {!isEditMode || isPaid ? <FormattedNumber value={profileTotal.profileRemainingPercentage} type={NumberType.FormattedPercentage}/> :
+                {!isEditMode || isPaid ? <FormattedNumber value={profileTotal.profileRemainingPercentage} type={NumberType.FormattedPercentage}  /> :
                     <div className={`govuk-form-group editable-field ${errors.filter(
                         e => e.fieldName === `percent-${installmentNumber}`).length > 0 ? 'govuk-form-group--error' : ''}`}>
                         {errors.filter(e => e.fieldName === `percent-${installmentNumber}`).length > 0 ?

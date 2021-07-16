@@ -153,7 +153,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
             userEvent.tab();
 
             await waitFor(() => {
-                expect(profilePercent.value).toBe('41.67');
+                expect(profilePercent.value).toBe('41.6666667');
             });
 
             const saveButton = await screen.findByRole("button", {name: /Apply profile/});

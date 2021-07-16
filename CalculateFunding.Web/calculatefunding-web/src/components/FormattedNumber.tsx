@@ -1,4 +1,5 @@
 import React from "react";
+import {Decimal} from 'decimal.js';
 
 export enum NumberType {
     FormattedDecimalNumber,
@@ -10,28 +11,36 @@ export function toDecimal(amount: number, places: number) {
     return +(amount).toFixed(places);
 }
 
-export function formatNumber(value: number, type: NumberType, decimalPlaces: number) {
-    const decimalPointedNumber = parseFloat(String(Math.round(value * 100) / 100)).toFixed(decimalPlaces);
+export function formatNumber(value: number, type: NumberType, decimalPlaces: number, includeSymbol:boolean) {
+    const decimalPointedNumber = new Decimal(value).toFixed(decimalPlaces);
 
     let formattedNumber = decimalPointedNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
+
+
     if (type === NumberType.FormattedMoney) {
-        formattedNumber = "£" + formattedNumber;
+        let formattedCurrency = decimalPointedNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        formattedCurrency = "£" + formattedCurrency;
+        return formattedCurrency;
     }
 
     if(type === NumberType.FormattedPercentage) {
-        formattedNumber = formattedNumber + "%";
+        let formattedPercentage = decimalPointedNumber.toString();
+        formattedPercentage = formattedPercentage + (includeSymbol ? "%" : "");
+        return formattedPercentage;
     }
 
     return formattedNumber
 }
 
-export function FormattedNumber(props: {value?: number, type: NumberType, decimalPlaces?: number | null}) {
+export function FormattedNumber(props: {value?: number, type: NumberType, decimalPlaces?: number | null, includeSymbol?: boolean | undefined}) {
     if (props.value === undefined || props.value === null) return <span></span>;
 
     const decimalPoint = props.decimalPlaces != null && props.decimalPlaces !== undefined ? props.decimalPlaces : 2;
 
-    const formattedNumber = formatNumber(props.value, props.type, decimalPoint);
+    const includeSymbol = props.includeSymbol != null && props.includeSymbol !== undefined ? props.includeSymbol : true;
+
+    const formattedNumber = formatNumber(props.value, props.type, decimalPoint, includeSymbol);
 
     return (<span>{formattedNumber}</span>)
 }

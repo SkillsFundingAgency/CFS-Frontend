@@ -127,7 +127,7 @@ describe('<AdditionalCalculations /> tests', () => {
 
         it('renders value columns with correct formatting', async () => {
             expect(await screen.findByText(/£100/)).toBeInTheDocument();
-            expect(await screen.findByText(/200%/)).toBeInTheDocument();
+            expect(await screen.findByText(/200/)).toBeInTheDocument();
         });
 
         it('does not render error message', async () => {
