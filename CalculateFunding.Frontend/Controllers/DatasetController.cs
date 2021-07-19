@@ -23,6 +23,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Common.Models.Search;
 using Microsoft.AspNetCore.Authentication;
 using CalculateFunding.Common.ApiClient.Datasets.Models;
+using DatasetRelationshipType = CalculateFunding.Common.ApiClient.DataSets.Models.DatasetRelationshipType;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -237,6 +238,54 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(response.Content);
         }
 
+        [HttpPost]
+        [Route("api/datasets/createRelationShip/{specificationId}")]
+        public async Task<IActionResult> CreateRelationShip([FromBody] CreateRelationshipViewModel viewModel,
+            [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(viewModel.Name, nameof(viewModel.Name));
+            Guard.ArgumentNotNull(viewModel.Description, nameof(viewModel.Description));
+
+            SpecificationSummary specification = await GetSpecification(specificationId);
+
+            if (specification == null)
+            {
+                return new NotFoundObjectResult(
+                    $"Unable to get specification response. Specification Id value = {specificationId}");
+            }
+
+            bool isAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
+                specification.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
+
+            if (!isAuthorizedToEdit)
+            {
+                return new ForbidResult();
+            }
+
+            CreateDefinitionSpecificationRelationshipModel datasetSchema =
+                new CreateDefinitionSpecificationRelationshipModel
+                {
+                    Name = viewModel.Name,
+                    SpecificationId = specificationId,
+                    Description = viewModel.Description,
+                    UsedInDataAggregations = false,
+                    TargetSpecificationId = viewModel.TargetSpecificationId,
+                    CalculationIds = viewModel.CalculationIds,
+                    FundingLineIds = viewModel.FundingLineIds,
+                    RelationshipType = DatasetRelationshipType.ReleasedData
+                };
+
+            ApiResponse<DefinitionSpecificationRelationship> newAssignDatasetResponse =
+                await _datasetApiClient.CreateRelationship(datasetSchema);
+
+            if (newAssignDatasetResponse?.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(true);
+            }
+
+            return new StatusCodeResult(500);
+        }
+
         [HttpPut]
         [Route("api/datasets/assignDatasetSchema/{specificationId}")]
         public async Task<IActionResult> AssignDatasetSchema([FromBody] AssignDatasetSchemaUpdateViewModel viewModel,
@@ -246,22 +295,16 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(viewModel.DatasetDefinitionId, nameof(viewModel.DatasetDefinitionId));
             Guard.ArgumentNotNull(viewModel.Description, nameof(viewModel.Description));
 
-            ApiResponse<SpecificationSummary> specificationResponse =
-                await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
-            if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
+            SpecificationSummary specification = await GetSpecification(specificationId);
+
+            if (specification == null)
             {
                 return new NotFoundObjectResult(
                     $"Unable to get specification response. Specification Id value = {specificationId}");
             }
 
-            if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content == null)
-            {
-                throw new InvalidOperationException(
-                    $"Unable to retrieve specification model from the response. Specification Id value = {specificationId}");
-            }
-
             bool isAuthorizedToEdit = await _authorizationHelper.DoesUserHavePermission(User,
-                specificationResponse.Content.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
+                specification.GetSpecificationId(), SpecificationActionTypes.CanEditSpecification);
 
             if (!isAuthorizedToEdit)
             {
@@ -283,32 +326,27 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (!ModelState.IsValid)
             {
-                if (specificationResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    SpecificationSummary specContent = specificationResponse.Content;
-
-                    ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse =
+                ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse =
                         await _datasetApiClient.GetDatasetDefinitions();
 
-                    if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        return new NotFoundObjectResult(ErrorMessages.DatasetDefinitionNotFoundInDatasetService);
-                    }
+                if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new NotFoundObjectResult(ErrorMessages.DatasetDefinitionNotFoundInDatasetService);
+                }
 
-                    if (datasetResponse.StatusCode == HttpStatusCode.OK)
-                    {
-                        IEnumerable<DatasetDefinition> datasetDefinitionList = datasetResponse.Content;
+                if (datasetResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    IEnumerable<DatasetDefinition> datasetDefinitionList = datasetResponse.Content;
 
-                        if (datasetDefinitionList == null)
-                        {
-                            throw new InvalidOperationException(
-                                $"Unable to retrieve Dataset definition from the response. Specification Id value = {specificationId}");
-                        }
-                    }
-                    else
+                    if (datasetDefinitionList == null)
                     {
-                        return new StatusCodeResult(500);
+                        throw new InvalidOperationException(
+                            $"Unable to retrieve Dataset definition from the response. Specification Id value = {specificationId}");
                     }
+                }
+                else
+                {
+                    return new StatusCodeResult(500);
                 }
             }
 
@@ -321,7 +359,8 @@ namespace CalculateFunding.Frontend.Controllers
                     Description = viewModel.Description,
                     IsSetAsProviderData = viewModel.IsSetAsProviderData,
                     UsedInDataAggregations = false,
-                    ConverterEnabled = viewModel.ConverterEnabled
+                    ConverterEnabled = viewModel.ConverterEnabled,
+                    RelationshipType = DatasetRelationshipType.Uploaded
                 };
 
             ApiResponse<DefinitionSpecificationRelationship> newAssignDatasetResponse =
@@ -588,6 +627,24 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return Ok(response.Content);
+        }
+
+        private async Task<SpecificationSummary> GetSpecification(string specificationId)
+        {
+            ApiResponse<SpecificationSummary> specificationResponse =
+                await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+            if (specificationResponse == null || specificationResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            if (specificationResponse.StatusCode == HttpStatusCode.OK && specificationResponse.Content == null)
+            {
+                throw new InvalidOperationException(
+                    $"Unable to retrieve specification model from the response. Specification Id value = {specificationId}");
+            }
+
+            return specificationResponse.Content;
         }
 
         private SelectDataSourceViewModel PopulateViewModel(SelectDatasourceModel selectDatasourceModel)

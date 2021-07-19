@@ -106,5 +106,55 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
             actual.Should().NotBeNull();
             actual.Result.Should().BeOfType<ForbidResult>();
         }
+
+
+
+        [TestMethod]
+        public void Should_CreateRelationship_Successfully()
+        {
+            CreateRelationshipViewModel data = Builder<CreateRelationshipViewModel>.CreateNew().Build();
+            _mockDatasetApiClient.Setup(x =>
+                    x.CreateRelationship(It.IsAny<CreateDefinitionSpecificationRelationshipModel>()))
+                .ReturnsAsync(() => new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK,
+                    Builder<DefinitionSpecificationRelationship>.CreateNew().Build()));
+            _mockSpecificationApiClient.Setup(x => x.GetSpecificationSummaryById(It.IsAny<string>()))
+                .ReturnsAsync(() => new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, Builder<SpecificationSummary>.CreateNew().Build())
+                    );
+            _mockAuthorisationHelper.Setup(x => x.DoesUserHavePermission(It.IsAny<ClaimsPrincipal>(),
+                It.IsAny<string>(), It.IsAny<SpecificationActionTypes>())).ReturnsAsync(true); 
+
+            _sut = new DatasetController(_mockDatasetApiClient.Object, _mockLogger.Object, _mockMapper.Object, _mockSpecificationApiClient.Object, _mockAuthorisationHelper.Object);
+            _mockMapper.Setup(x => x.Map<CreateDefinitionSpecificationRelationshipModel>(data))
+                .Returns(Builder<CreateDefinitionSpecificationRelationshipModel>.CreateNew().Build());
+
+            var actual = _sut.CreateRelationShip(data, "XZY098");
+
+            actual.Should().NotBeNull();
+            actual.Result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [TestMethod]
+        public void Should_CreateRelationShip_NoPermissions_Failure()
+        {
+            CreateRelationshipViewModel data = Builder<CreateRelationshipViewModel>.CreateNew().Build();
+            _mockDatasetApiClient.Setup(x =>
+                    x.CreateRelationship(It.IsAny<CreateDefinitionSpecificationRelationshipModel>()))
+                .ReturnsAsync(() => new ApiResponse<DefinitionSpecificationRelationship>(HttpStatusCode.OK,
+                    Builder<DefinitionSpecificationRelationship>.CreateNew().Build()));
+            _mockSpecificationApiClient.Setup(x => x.GetSpecificationSummaryById(It.IsAny<string>()))
+                .ReturnsAsync(() => new ApiResponse<SpecificationSummary>(HttpStatusCode.OK, Builder<SpecificationSummary>.CreateNew().Build())
+                    );
+            _mockAuthorisationHelper.Setup(x => x.DoesUserHavePermission(It.IsAny<ClaimsPrincipal>(),
+                It.IsAny<string>(), It.IsAny<SpecificationActionTypes>())).ReturnsAsync(false);
+            
+            _sut = new DatasetController(_mockDatasetApiClient.Object, _mockLogger.Object, _mockMapper.Object, _mockSpecificationApiClient.Object, _mockAuthorisationHelper.Object);
+            _mockMapper.Setup(x => x.Map<CreateDefinitionSpecificationRelationshipModel>(data))
+                .Returns(Builder<CreateDefinitionSpecificationRelationshipModel>.CreateNew().Build());
+
+            var actual = _sut.CreateRelationShip(data, "XZY098");
+
+            actual.Should().NotBeNull();
+            actual.Result.Should().BeOfType<ForbidResult>();
+        }
     }
 }
