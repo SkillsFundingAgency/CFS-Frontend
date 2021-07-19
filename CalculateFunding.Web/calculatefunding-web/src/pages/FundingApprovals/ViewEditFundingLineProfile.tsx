@@ -129,6 +129,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
 
     const handleEditProfileClick = async () => {
         if (!isEditMode) {
+            clearErrorMessages();
             history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit`);
         } else {
             try {
@@ -177,6 +178,7 @@ export function ViewEditFundingLineProfile({match}: RouteComponentProps<ViewEdit
     }
 
     const handleCancelClick = () => {
+        clearErrorMessages();
         history.push(`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`);
     }
 
