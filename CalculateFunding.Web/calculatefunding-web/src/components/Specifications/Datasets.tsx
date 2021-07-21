@@ -67,7 +67,7 @@ export function Datasets(props: { specificationId: string, lastConverterWizardRe
                 </div>
                 <div>
                     <Link className="govuk-link"
-                          to={featureFlagsState.specToSpec ? `/Datasets/SelectDatasetTypeToCreate/${props.specificationId}` :
+                          to={featureFlagsState.specToSpec ? `/Datasets/Create/SelectDatasetTypeToCreate/${props.specificationId}` :
                               `/Datasets/CreateDataset/${props.specificationId}`}>
                         Create dataset
                     </Link>

@@ -1,23 +1,25 @@
 import {render, screen} from "@testing-library/react";
-import {MemoryRouter, Route, Switch} from "react-router";
-import '@testing-library/jest-dom/extend-expect';
+import {match, MemoryRouter} from "react-router";
 import React from "react";
 import {FundingConfiguration} from "../../../types/FundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
+import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {ApprovalMode} from "../../../types/ApprovalMode";
 import {ProviderSource} from "../../../types/CoreProviderSummary";
 import {DataschemaDetailsViewModel} from "../../../types/Datasets/DataschemaDetailsViewModel";
-import {FundingConfigurationQueryResult} from "../../../hooks/useFundingConfiguration";
-import {QueryClient, QueryClientProvider} from "react-query";
 import * as redux from "react-redux";
+import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
+import {CreateDatasetFromUploadRouteProps} from "../../../pages/Datasets/Create/CreateDatasetFromUpload";
+import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
 // ToDo: These tests need sorting properly so no errors occur
 jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
 
-describe("<CreateDataset />", () => {
+describe("<CreateDatasetFromUpload />", () => {
 
     describe("when page loads for FDZ provider source", () => {
         beforeEach(() => {
@@ -130,6 +132,7 @@ const createDatasetTestSetup = () => {
         name: "2019-20"
     };
     const mockCfsFundingConfiguration: FundingConfiguration = {
+        updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
         approvalMode: ApprovalMode.All,
         providerSource: ProviderSource.CFS,
         defaultTemplateVersion: "1.1",
@@ -138,6 +141,7 @@ const createDatasetTestSetup = () => {
         enableConverterDataMerge: false
     }
     const mockFdzFundingConfiguration: FundingConfiguration = {
+        updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
         approvalMode: ApprovalMode.All,
         providerSource: ProviderSource.FDZ,
         defaultTemplateVersion: "1.1",
@@ -146,6 +150,7 @@ const createDatasetTestSetup = () => {
         enableConverterDataMerge: false
     }
     const testSpec: SpecificationSummary = {
+        coreProviderVersionUpdates: ProviderDataTrackingMode.UseLatest,
         name: "test spec name",
         id: "3567357",
         approvalStatus: "Cal",
@@ -178,8 +183,16 @@ const createDatasetTestSetup = () => {
     const mockFundingConfigurationHook = (result: FundingConfigurationQueryResult) => jest.spyOn(fundingConfigurationHook, 'useFundingConfiguration')
         .mockImplementation(() => result);
 
-    const mockStreamDataset1: DataschemaDetailsViewModel = {id: "1490999", name: "PE and Sport Grant", description: "PE and Sport Grant"};
-    const mockStreamDataset2: DataschemaDetailsViewModel = {id: "1221999", name: "PE and Sport Grant e2e", description: "PE and Sport Grant e2e"};
+    const mockStreamDataset1: DataschemaDetailsViewModel = {
+        id: "1490999",
+        name: "PE and Sport Grant",
+        description: "PE and Sport Grant"
+    };
+    const mockStreamDataset2: DataschemaDetailsViewModel = {
+        id: "1221999",
+        name: "PE and Sport Grant e2e",
+        description: "PE and Sport Grant e2e"
+    };
     const mockDatasetApi = () => {
         const service = jest.requireActual("../../../services/datasetService");
         return {
@@ -202,14 +215,24 @@ const createDatasetTestSetup = () => {
         }
     };
 
+    const mockHistory = {push: jest.fn()};
+    
     function renderCreateDatasetPage() {
-        const {CreateDataset} = require('../../../pages/Datasets/CreateDataset');
+        const {CreateDatasetFromUpload} = require('../../../pages/Datasets/Create/CreateDatasetFromUpload');
+
+        const mockRoute: match<CreateDatasetFromUploadRouteProps> = {
+            params: {
+                specificationId: testSpec.id,
+            },
+            url: "",
+            path: "",
+            isExact: true,
+        };
+        
         return render(<MemoryRouter initialEntries={['/Datasets/CreateDataset/' + testSpec.id]}>
-            <QueryClientProvider client={new QueryClient()}>
-                <Switch>
-                <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
-            </Switch>
-            </QueryClientProvider>
+            <QueryClientProviderTestWrapper>
+                <CreateDatasetFromUpload location={location} match={mockRoute} history={mockHistory}/>
+            </QueryClientProviderTestWrapper>
         </MemoryRouter>)
     }
 

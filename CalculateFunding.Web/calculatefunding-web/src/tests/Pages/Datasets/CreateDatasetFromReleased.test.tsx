@@ -6,7 +6,7 @@ import '@testing-library/jest-dom/extend-expect';
 import {Provider} from "react-redux";
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {QueryCache, QueryClient, QueryClientProvider} from "react-query";
+import {QueryClient, QueryClientProvider} from "react-query";
 import userEvent from "@testing-library/user-event";
 import * as redux from "react-redux";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
@@ -15,11 +15,13 @@ import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../../types/Permission";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import {CreateDatasetFromExistingRouteProps} from "../../../pages/Datasets/CreateDatasetFromReleased";
 import * as ReactQuery from "react-query";
 import {EligibleSpecificationReferenceModel} from "../../../types/Datasets/EligibleSpecificationReferenceModel";
 import {UseQueryResult} from "react-query/types/react/types";
 import {AxiosError} from "axios";
+import {AppContextWrapper} from "../../../context/AppContextState";
+import {CreateDatasetRouteProps} from "../../../pages/Datasets/Create/SelectDatasetTypeToCreate";
+import {SelectReferenceSpecification} from "../../../pages/Datasets/Create/SelectReferenceSpecification";
 
 
 const useSelectorSpy = jest.spyOn(redux, 'useSelector');
@@ -78,29 +80,31 @@ const testSpec2: SpecificationSummary = {
     providerSnapshotId: 42
 };
 
-const mockRoute: match<CreateDatasetFromExistingRouteProps> = {
+const mockRoute: match<CreateDatasetRouteProps> = {
     params: {
-        specificationId: testSpec1.id,
+        forSpecId: testSpec1.id,
     },
     url: "",
     path: "",
     isExact: true,
 };
 const renderPage = () => {
-    const {CreateDatasetFromReleased} = require('../../../pages/Datasets/CreateDatasetFromReleased');
+    const {SelectReferenceSpecification} = require('../../../pages/Datasets/Create/SelectReferenceSpecification');
     store.dispatch = jest.fn();
     return render(<MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
             <Provider store={store}>
-                <CreateDatasetFromReleased location={location} history={mockHistory} match={mockRoute}/>
+                <AppContextWrapper>
+                    <SelectReferenceSpecification location={location} history={mockHistory} match={mockRoute}/>
+                </AppContextWrapper>
             </Provider>
         </QueryClientProvider>
     </MemoryRouter>);
 };
 
-describe("<CreateDatasetFromReleased />", () => {
+describe("<SelectReferenceSpecification />", () => {
 
-    describe("<CreateDatasetFromReleased /> when no options available", () => {
+    describe("<SelectReferenceSpecification /> when no options available", () => {
         beforeEach(() => {
             hasPermissions();
             hasSpecification();
@@ -141,7 +145,7 @@ describe("<CreateDatasetFromReleased />", () => {
         });
     });
 
-    describe("<CreateDatasetFromReleased /> when options are available", () => {
+    describe("<SelectReferenceSpecification /> when options are available", () => {
         beforeEach(() => {
             hasPermissions();
             hasSpecification();
@@ -211,7 +215,7 @@ describe("<CreateDatasetFromReleased />", () => {
         });
     });
 
-    describe("<CreateDatasetFromReleased /> when user doesn't have permission", () => {
+    describe("<SelectReferenceSpecification /> when user doesn't have permission", () => {
         beforeEach(async () => {
             hasMissingPermissions();
             hasSpecification();

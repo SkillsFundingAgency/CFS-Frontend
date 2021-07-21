@@ -127,7 +127,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
             _mockMapper.Setup(x => x.Map<CreateDefinitionSpecificationRelationshipModel>(data))
                 .Returns(Builder<CreateDefinitionSpecificationRelationshipModel>.CreateNew().Build());
 
-            var actual = _sut.CreateRelationShip(data, "XZY098");
+            var actual = _sut.CreateRelationship(data, "XZY098");
 
             actual.Should().NotBeNull();
             actual.Result.Should().BeOfType<OkObjectResult>();
@@ -151,7 +151,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers.Dataset
             _mockMapper.Setup(x => x.Map<CreateDefinitionSpecificationRelationshipModel>(data))
                 .Returns(Builder<CreateDefinitionSpecificationRelationshipModel>.CreateNew().Build());
 
-            var actual = _sut.CreateRelationShip(data, "XZY098");
+            var actual = _sut.CreateRelationship(data, "XZY098");
 
             actual.Should().NotBeNull();
             actual.Result.Should().BeOfType<ForbidResult>();

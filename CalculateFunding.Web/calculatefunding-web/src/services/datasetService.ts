@@ -14,6 +14,11 @@ import {DatasetSearchResponseViewModel} from "../types/Datasets/DatasetSearchRes
 import {DatasetVersionHistoryViewModel} from "../types/Datasets/DatasetVersionHistoryViewModel";
 import {ToggleDatasetSchemaRequest} from "../types/Datasets/ToggleDatasetSchemaRequest";
 import {EligibleSpecificationReferenceModel} from "../types/Datasets/EligibleSpecificationReferenceModel";
+import {
+    CreateDatasetSpecificationRelationshipRequest,
+    PublishedSpecificationTemplateMetadata,
+    ValidateDefinitionSpecificationRelationshipModel
+} from "../types/Datasets/PublishedSpecificationTemplateMetadata";
 
 const baseUrl = "/api/datasets";
 
@@ -248,6 +253,32 @@ export async function getEligibleSpecificationDetailsForCreatingNewDataset(speci
     return axios(`/api/dataset-specifications/${specificationId}/eligible-specification-references`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
+    })
+}
+
+export async function getPublishedSpecificationTemplateMetadataForCreatingNewDataset(specificationId: string):
+    Promise<AxiosResponse<PublishedSpecificationTemplateMetadata[]>> {
+    return axios(`/api/dataset-specifications/${specificationId}/published-specification-template-metadata`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    })
+}
+
+export async function validateDefinitionForCreatingNewDataset(request: ValidateDefinitionSpecificationRelationshipModel):
+    Promise<AxiosResponse<ValidateDefinitionSpecificationRelationshipModel[]>> {
+    return axios(`/api/datasets/validate-definition-specification-relationship`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: request
+    })
+}
+
+export async function createDatasetFromReleased(request: CreateDatasetSpecificationRelationshipRequest):
+    Promise<AxiosResponse<object>> {
+    return axios(`/api/datasets/createRelationship/${request.specificationId}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: request
     })
 }
 

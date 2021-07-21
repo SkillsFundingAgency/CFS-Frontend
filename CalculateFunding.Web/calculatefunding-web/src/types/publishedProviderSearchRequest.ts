@@ -5,7 +5,7 @@ export enum PublishedProviderSearchFacet {
     ProviderType = "providerType",
     ProviderSubType = "providerSubType",
     LocalAuthority = "localAuthority",
-    FundingStatus = "fundingStatus",
+    FundingStatus = "status",
     MonthYearOpened = "monthYearOpened"
 }
 

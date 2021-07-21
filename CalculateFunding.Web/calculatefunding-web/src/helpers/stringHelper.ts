@@ -8,5 +8,5 @@
 
 export function convertCamelCaseToSpaceDelimited(text: string)
 {
-    return text.replace(/([A-Z])/g, ' $1').trim();
+    return !text ? '' : text.replace(/([A-Z])/g, ' $1').trim();
 }

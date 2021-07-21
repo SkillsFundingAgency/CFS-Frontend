@@ -8,6 +8,7 @@ import * as specPermsHook from "../../hooks/Permissions/useSpecificationPermissi
 import * as permissionsHook from "../../hooks/Permissions/useSpecificationPermissions";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {Permission} from "../../types/Permission";
+import {EffectiveSpecificationPermission} from "../../types/EffectiveSpecificationPermission";
 
 export const defaultFacets = [
     {name: PublishedProviderSearchFacet.HasErrors, facetValues: [{"name": "True", "count": 1}, {"name": "False", "count": 0}]},
@@ -108,6 +109,56 @@ export function buildPermissions(props: {
     let perm: FundingStreamPermissions = {
         fundingStreamId: props.fundingStreamId,
         fundingStreamName: props.fundingStreamName ? props.fundingStreamName : "",
+        userId: props.userId ? props.userId : "",
+        canAdministerFundingStream: false,
+        canApproveFunding: false,
+        canApproveSpecification: false,
+        canChooseFunding: false,
+        canCreateQaTests: false,
+        canCreateSpecification: false,
+        canDeleteCalculations: false,
+        canDeleteQaTests: false,
+        canDeleteSpecification: false,
+        canEditCalculations: false,
+        canEditQaTests: false,
+        canEditSpecification: false,
+        canMapDatasets: false,
+        canRefreshFunding: false,
+        canReleaseFunding: false,
+        canCreateTemplates: false,
+        canEditTemplates: false,
+        canDeleteTemplates: false,
+        canApproveTemplates: false,
+        canApplyCustomProfilePattern: false,
+        canAssignProfilePattern: false,
+        canDeleteProfilePattern: false,
+        canEditProfilePattern: false,
+        canCreateProfilePattern: false,
+        canRefreshPublishedQa: false,
+        canApproveAllCalculations: false,
+        canApproveAnyCalculations: false,
+        canApproveCalculations: false,
+        canUploadDataSourceFiles: false
+    }
+    if (props.setAllPermsEnabled) {
+        const boolFields = Object
+            .keys(perm)
+            .filter(p => (<any>perm)[p] === false);
+        boolFields.forEach(x => (<any>perm)[x] === false ? (<any>perm)[x] = true : null);
+    }
+    if (props.actions) {
+        props.actions.forEach(doIt => doIt(perm));
+    }
+    return perm;
+}
+export function buildEffectiveSpecificationPermission(props: {
+    specificationId: string,
+    setAllPermsEnabled?: boolean,
+    userId?: string,
+    actions?: ((perm: EffectiveSpecificationPermission) => void)[]
+}): EffectiveSpecificationPermission {
+    let perm: EffectiveSpecificationPermission = {
+        specificationId: props.specificationId,
         userId: props.userId ? props.userId : "",
         canAdministerFundingStream: false,
         canApproveFunding: false,

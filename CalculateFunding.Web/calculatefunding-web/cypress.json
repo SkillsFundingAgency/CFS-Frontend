@@ -1,4 +1,7 @@
 {
   "baseUrl": "https://localhost:3000",
-  "testFiles": "**/*.feature"
+  "testFiles": "**/*.feature.ts",
+  "env": {
+    "CYPRESS_CRASH_REPORTS" : "0"
+  }
 }

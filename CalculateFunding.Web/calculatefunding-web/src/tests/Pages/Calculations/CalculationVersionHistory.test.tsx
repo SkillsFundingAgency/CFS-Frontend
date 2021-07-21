@@ -2,7 +2,10 @@ import React from 'react';
 import {createBrowserHistory, createLocation} from "history";
 import {match, MemoryRouter} from "react-router";
 import '@testing-library/jest-dom/extend-expect';
-import {CalculationVersionHistory, CalculationVersionHistoryRoute} from "../../../pages/Calculations/CalculationVersionHistory";
+import {
+    CalculationVersionHistory,
+    CalculationVersionHistoryRoute
+} from "../../../pages/Calculations/CalculationVersionHistory";
 import {render, screen, waitFor, within} from "@testing-library/react";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
@@ -15,6 +18,7 @@ import * as specHook from "../../../hooks/useSpecificationSummary";
 import {CalculationVersionHistorySummary} from "../../../types/Calculations/CalculationVersionHistorySummary";
 import {QueryClient, QueryClientProvider} from "react-query";
 import {CalculationDataType} from "../../../types/Calculations/CalculationCompilePreviewResponse";
+import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
 const history = createBrowserHistory();
 const location = createLocation("", "", "", {search: "", pathname: "", hash: "", key: "", state: ""});
@@ -101,6 +105,7 @@ const testSpec: SpecificationSummary = {
     fundingStreams: [fundingStream],
     fundingPeriod: fundingPeriod,
     dataDefinitionRelationshipIds: [],
+    coreProviderVersionUpdates: ProviderDataTrackingMode.Manual,
     templateIds: {}
 };
 const testCalc: CalculationDetails = {

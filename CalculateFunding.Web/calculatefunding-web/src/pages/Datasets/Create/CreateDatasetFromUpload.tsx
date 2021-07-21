@@ -1,28 +1,28 @@
 import React, {useEffect, useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
-import {Header} from "../../components/Header";
-import {assignDatasetSchemaService, getDatasetsForFundingStreamService} from "../../services/datasetService";
-import {LoadingStatus} from "../../components/LoadingStatus";
-import {ConfirmationPanel} from "../../components/ConfirmationPanel";
-import {Section} from "../../types/Sections";
+import {Header} from "../../../components/Header";
+import {assignDatasetSchemaService, getDatasetsForFundingStreamService} from "../../../services/datasetService";
+import {LoadingStatus} from "../../../components/LoadingStatus";
+import {ConfirmationPanel} from "../../../components/ConfirmationPanel";
+import {Section} from "../../../types/Sections";
 import {Link} from "react-router-dom";
-import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {Footer} from "../../components/Footer";
-import {ProviderSource} from "../../types/CoreProviderSummary";
-import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
-import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
-import {useErrors} from "../../hooks/useErrors";
-import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
+import {Breadcrumb, Breadcrumbs} from "../../../components/Breadcrumbs";
+import {Footer} from "../../../components/Footer";
+import {ProviderSource} from "../../../types/CoreProviderSummary";
+import {useSpecificationSummary} from "../../../hooks/useSpecificationSummary";
+import {useFundingConfiguration} from "../../../hooks/useFundingConfiguration";
+import {useErrors} from "../../../hooks/useErrors";
+import {MultipleErrorSummary} from "../../../components/MultipleErrorSummary";
 import {AxiosError} from "axios";
 import {useMutation, useQuery} from "react-query";
-import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
-import {AssignDatasetSchemaRequest} from "../../types/Datasets/AssignDatasetSchemaRequest";
+import {LoadingFieldStatus} from "../../../components/LoadingFieldStatus";
+import {AssignDatasetSchemaRequest} from "../../../types/Datasets/AssignDatasetSchemaRequest";
 
-interface CreateDatasetPageRoute {
+export interface CreateDatasetFromUploadRouteProps {
     specificationId: string
 }
 
-export function CreateDataset({match}: RouteComponentProps<CreateDatasetPageRoute>) {
+export function CreateDatasetFromUpload({match}: RouteComponentProps<CreateDatasetFromUploadRouteProps>) {
     const specificationId = match.params.specificationId;
     const history = useHistory();
     const {errors, addError, clearErrorMessages} = useErrors();

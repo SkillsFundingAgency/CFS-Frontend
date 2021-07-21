@@ -1,0 +1,204 @@
+﻿.hidden {
+  display: none;
+}
+
+.arrowChange {
+  transform: rotateX(180deg);
+}
+
+.hiddenCheckboxes {
+  cursor: pointer;
+}
+
+.hiddenCheckboxes:hover{
+  background: #F8F8F8;
+  outline: 3px solid #FFBF47;
+}
+
+.hiddenCheckboxes:focus {
+  background: #F8F8F8;
+  outline: 3px solid #FFBF47;
+}
+
+.checkboxExpand {
+  margin-top: 10px;
+}
+
+.checkboxExpanded {
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.filterbyHeading {
+  text-align: left;
+  border: none;
+  box-shadow: none;
+}
+
+.filterbyHeading:hover {
+  background-color: #dbdad9;
+  text-align: left ;
+  border-color: #fd0;
+}
+
+.filterbyHeading:active {
+  background-color: #dbdad9;
+  text-align: left ;
+  border-color: #fd0;
+}
+
+dd {
+  margin-inline-start: 10px;
+}
+
+.filterSearch {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 10px;
+}
+
+.filterLabel {
+  font-size: 16px;
+  color: grey;
+  margin-top: 10px;
+}
+
+.filterSearchInput {
+  border-color: grey;
+}
+
+div.filter-content {
+  display: none;
+}
+
+
+.filterbyContainer {
+  border: solid 1px lightgrey;
+}
+
+.filterbyHeading {
+  background-color: lightgrey;
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 0px;
+  cursor: pointer;
+
+  h4 {
+    margin-bottom: 0px;
+  }
+}
+
+.filterbyCheckbox {
+  padding-left: 20px;
+  overflow-y: scroll;
+  max-height: 200px;
+}
+
+
+.filterbyCheckbox-autoheight {
+  padding-left: 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+.hiddenCheckboxes {
+  cursor: pointer;
+}
+
+.hiddenCheckboxes:hover{
+  background: #F8F8F8;
+  outline: 3px solid #FFBF47;
+}
+
+.hiddenCheckboxes:focus {
+  background: #F8F8F8;
+  outline: 3px solid #FFBF47;
+}
+
+.checkboxExpand {
+  margin-top: 10px;
+}
+
+.checkboxExpanded {
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.filterbyHeading {
+  text-align: left;
+  border: none;
+  box-shadow: none;
+}
+
+.filterbyHeading:hover {
+  background-color: #dbdad9;
+  text-align: left ;
+  border-color: #fd0;
+}
+
+.filterbyHeading:active {
+  background-color: #dbdad9;
+  text-align: left ;
+  border-color: #fd0;
+}
+
+dd {
+  margin-inline-start: 10px;
+}
+
+.hidden {
+  display: none;
+}
+
+.hiddenCheckboxes {
+  cursor: pointer;
+}
+
+.hiddenCheckboxes:hover{
+  background: #F8F8F8;
+  outline: 3px solid #FFBF47;
+}
+
+.hiddenCheckboxes:focus {
+  background: #F8F8F8;
+  outline: 3px solid #FFBF47;
+}
+
+.checkboxExpand {
+  margin-top: 10px;
+}
+
+.checkboxExpanded {
+  -ms-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.filterbyHeading {
+  text-align: left;
+  border: none;
+  box-shadow: none;
+}
+
+.filterbyHeading:hover {
+  background-color: #dbdad9;
+  text-align: left ;
+  border-color: #fd0;
+}
+
+.filterbyHeading:active {
+  background-color: #dbdad9;
+  text-align: left ;
+  border-color: #fd0;
+}
+
+dd {
+  margin-inline-start: 10px;
+}

@@ -239,8 +239,8 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/datasets/createRelationShip/{specificationId}")]
-        public async Task<IActionResult> CreateRelationShip([FromBody] CreateRelationshipViewModel viewModel,
+        [Route("api/datasets/createRelationship/{specificationId}")]
+        public async Task<IActionResult> CreateRelationship([FromBody] CreateRelationshipViewModel viewModel,
             [FromRoute] string specificationId)
         {
             Guard.ArgumentNotNull(viewModel.Name, nameof(viewModel.Name));
@@ -569,7 +569,7 @@ namespace CalculateFunding.Frontend.Controllers
             return new NotFoundResult();
         }
 
-        [Route("api/datasets/validate-definitionspecification-relationship")]
+        [Route("api/datasets/validate-definition-specification-relationship")]
         [HttpPost]
         public async Task<IActionResult> ValidateDefinitionSpecificationRelationship([FromBody] ValidateDefinitionSpecificationRelationshipModel model)
         {

@@ -72,6 +72,8 @@
     "test": "react-app-rewired test --testResultsProcessor ./node_modules/jest-junit-reporter",
     "eject": "react-scripts eject",
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
+    "cypress": "npx cypress open",
+    "cypress:ci": "cypress run --headless",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
   },
@@ -148,6 +150,7 @@
     "jest-junit": "^10.0.0",
     "jest-junit-reporter": "^1.1.0",
     "jest-localstorage-mock": "^2.4.12",
+    "miragejs": "^0.1.41",
     "react-test-renderer": "^16.14.0",
     "redux-devtools": "^3.7.0"
   }

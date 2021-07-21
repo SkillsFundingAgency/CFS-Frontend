@@ -33,7 +33,7 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
-        [Route("api/specifications/{specificationId}/published-specification-template-metadata")]
+        [Route("api/dataset-specifications/{specificationId}/published-specification-template-metadata")]
         [HttpGet]
         public async Task<IActionResult> GetPublishedSpecificationTemplateMetadata(string specificationId)
         {

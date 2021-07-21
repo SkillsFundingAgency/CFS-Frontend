@@ -13,8 +13,8 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {
     SelectDatasetTypeToCreate,
-    SelectDatasetTypeToCreateRouteProps
-} from "../../../pages/Datasets/SelectDatasetTypeToCreate";
+    CreateDatasetRouteProps
+} from "../../../pages/Datasets/Create/SelectDatasetTypeToCreate";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {Permission} from "../../../types/Permission";
@@ -59,9 +59,9 @@ const testSpec1: SpecificationSummary = {
     providerSnapshotId: 34
 };
 
-const mockRoute: match<SelectDatasetTypeToCreateRouteProps> = {
+const mockRoute: match<CreateDatasetRouteProps> = {
     params: {
-        specificationId: testSpec1.id,
+        forSpecId: testSpec1.id,
     },
     url: "",
     path: "",
@@ -69,7 +69,7 @@ const mockRoute: match<SelectDatasetTypeToCreateRouteProps> = {
 };
 
 const renderPage = () => {
-    const {SelectDatasetTypeToCreate} = require('../../../pages/Datasets/SelectDatasetTypeToCreate');
+    const {SelectDatasetTypeToCreate} = require('../../../pages/Datasets/Create/SelectDatasetTypeToCreate');
     store.dispatch = jest.fn();
     return render(<MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
@@ -153,7 +153,7 @@ describe("<SelectDatasetTypeToCreate />", () => {
             });
 
             it("redirects to correct page", async () => {
-                expect(mockHistoryPush).toBeCalledWith("/Datasets/CreateDatasetFromReleased/" + testSpec1.id);
+                expect(mockHistoryPush).toBeCalledWith("/Datasets/Create/SelectReferenceSpecification/" + testSpec1.id);
             });
 
         });

@@ -13,7 +13,7 @@ import {ViewResults} from "./pages/ViewResults";
 import {ViewCalculationResults} from "./pages/ViewCalculationResults";
 import {ProviderFundingOverview} from "./pages/FundingApprovals/ProviderFundingOverview";
 import {CreateSpecification} from "./pages/Specifications/CreateSpecification";
-import {CreateDataset} from "./pages/Datasets/CreateDataset";
+import {CreateDatasetFromUpload} from "./pages/Datasets/Create/CreateDatasetFromUpload";
 import {EditSpecification} from "./pages/Specifications/EditSpecification";
 import {ListTemplates} from "./pages/Templates/ListTemplates";
 import {PublishTemplate} from "./pages/Templates/PublishTemplate";
@@ -66,8 +66,12 @@ import {useEffectOnce} from "./hooks/useEffectOnce";
 import {Admin} from "./pages/Permissions/Admin";
 import {IndividualPermissionsAdmin} from "./pages/Permissions/IndividualPermissionsAdmin";
 import {FundingStreamPermissionsAdmin} from "./pages/Permissions/FundingStreamPermissionsAdmin";
-import {SelectDatasetTypeToCreate} from "./pages/Datasets/SelectDatasetTypeToCreate";
-import {CreateDatasetFromReleased} from "./pages/Datasets/CreateDatasetFromReleased";
+import {SelectDatasetTypeToCreate} from "./pages/Datasets/Create/SelectDatasetTypeToCreate";
+import {SelectReferenceSpecification} from "./pages/Datasets/Create/SelectReferenceSpecification";
+import {AppContextWrapper} from "./context/AppContextState";
+import {SpecifyDatasetDetails} from "./pages/Datasets/Create/SpecifyDatasetDetails";
+import {SelectDatasetTemplateItems} from "./pages/Datasets/Create/SelectDatasetTemplateItems";
+import {ConfirmDatasetToCreate} from "./pages/Datasets/Create/ConfirmDatasetToCreate";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -91,12 +95,9 @@ const App: React.FunctionComponent = () => {
     });
 
     useEffect(() => {
-        if (username.length> 0)
-        {
+        if (username.length > 0) {
             setAppInsightsAuthenticatedUser(username);
-        }
-        else
-        {
+        } else {
             initialiseAppInsights();
         }
     }, [username]);
@@ -122,69 +123,112 @@ const App: React.FunctionComponent = () => {
             <BrowserRouter basename="/app"
                            getUserConfirmation={(message, callback) => ConfirmationModal(message, callback, 'Leave this page', 'Stay on this page')}>
                 <QueryClientProvider client={queryClient}>
-                    <Switch>
-                        <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
-                        <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
-                        <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
-                        <Route path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId" component={SpecificationFundingApproval}/>
-                        <Route path="/Approvals/ConfirmFunding/:fundingStreamId/:fundingPeriodId/:specificationId/:mode" component={ConfirmFunding}/>
-                        <Route path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId" component={UploadBatch}/>
-                        <Route path="/Results/" component={ViewResults}/>
-                        <Route path="/ViewResults/ViewProvidersFundingStreamSelection" component={ViewProvidersFundingStreamSelection}/>
-                        <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId" component={ViewProvidersByFundingStream}/>
-                        <Route path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId" component={ViewProviderResults}/>
-                        <Route path="/SelectSpecification" component={SelectSpecification}/>
-                        <Route path="/SpecificationsList" component={SpecificationsList}/>
-                        <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults}/>
-                        <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
-                        <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
-                               component={ChangeProfileType}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/:editMode"
-                               component={ViewEditFundingLineProfile}/>
-                        <Route path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
-                               component={ProviderFundingOverview}/>
-                        <Route path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode" component={ProfileHistory}/>
-                        <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDataset}/>
-                        <Route path="/Datasets/ManageData" component={ManageData}/>
-                        <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>
-                        <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory}/>
-                        <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId" component={UpdateDataSourceFile}/>
-                        <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource}/>
-                        <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles}/>
-                        <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships}/>
-                        <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles}/>
-                        <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource}/>
-                        <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId"
-                               component={SelectDataSourceExpanded}/>
-                        <Route path="/Datasets/RefreshSql" component={RefreshSql} />
-                        <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
-                        <Route path="/Specifications/EditSpecification/:specificationId" component={EditSpecification}/>
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/List" component={ListTemplates}/>}
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>}
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>}
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Create" component={CreateTemplate}/>}
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
-                        {featureFlagsState.templateBuilderVisible && <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
-                        <Route path="/Specifications/CreateAdditionalCalculation/:specificationId" component={CreateAdditionalCalculation}/>
-                        <Route path="/Specifications/EditCalculation/:calculationId" component={EditCalculation}/>
-                        <Route path="/Specifications/EditVariationPoints/:specificationId/:fundingLineId" component={EditVariationPoints}/>
-                        <Route path="/Calculations/CalculationVersionHistory/:calculationId" component={CalculationVersionHistory}/>
-                        <Route path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId" component={CompareCalculationVersions}/>
-                        <Route path="/Permissions/MyPermissions" component={MyPermissions}/>
-                        <Route path="/Permissions/Admin" component={Admin}/>
-                        <Route path="/Permissions/Individual" component={IndividualPermissionsAdmin}/>
-                        <Route path="/Permissions/FundingStream" component={FundingStreamPermissionsAdmin}/>
-                        {featureFlagsState.specToSpec && <Route path="/Datasets/SelectDatasetTypeToCreate/:specificationId" component={SelectDatasetTypeToCreate}/>}
-                        {featureFlagsState.specToSpec && <Route path="/Datasets/CreateDatasetFromReleased/:specificationId" component={CreateDatasetFromReleased}/>}
-                        <Route path="*">
-                            <NoMatch/>
-                        </Route>
-                    </Switch>
-                    {process.env.NODE_ENV === 'development' && featureFlagsState.enableReactQueryDevTool &&
-                    <ReactQueryDevtools initialIsOpen={false}/>
-                    }
+                    <AppContextWrapper>
+                        <Switch>
+                            <Route exact path="/"><Home featureFlags={featureFlagsState}/></Route>
+                            <Route path="/Approvals/Select" component={FundingApprovalSelection}/>
+                            <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection}/>
+                            <Route
+                                path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
+                                component={SpecificationFundingApproval}/>
+                            <Route
+                                path="/Approvals/ConfirmFunding/:fundingStreamId/:fundingPeriodId/:specificationId/:mode"
+                                component={ConfirmFunding}/>
+                            <Route path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
+                                   component={UploadBatch}/>
+                            <Route path="/Results/" component={ViewResults}/>
+                            <Route path="/ViewResults/ViewProvidersFundingStreamSelection"
+                                   component={ViewProvidersFundingStreamSelection}/>
+                            <Route path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId"
+                                   component={ViewProvidersByFundingStream}/>
+                            <Route path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId"
+                                   component={ViewProviderResults}/>
+                            <Route path="/SelectSpecification" component={SelectSpecification}/>
+                            <Route path="/SpecificationsList" component={SpecificationsList}/>
+                            <Route path="/ViewSpecificationResults/:specificationId"
+                                   component={ViewSpecificationResults}/>
+                            <Route path="/ViewSpecification/:specificationId" component={ViewSpecification}/>
+                            <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults}/>
+                            <Route
+                                path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
+                                component={ChangeProfileType}/>
+                            <Route
+                                path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/:editMode"
+                                component={ViewEditFundingLineProfile}/>
+                            <Route
+                                path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
+                                component={ProviderFundingOverview}/>
+                            <Route
+                                path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode"
+                                component={ProfileHistory}/>
+                            <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetFromUpload}/>
+                            <Route path="/Datasets/ManageData" component={ManageData}/>
+                            <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema}/>
+                            <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory}/>
+                            <Route path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId"
+                                   component={UpdateDataSourceFile}/>
+                            <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource}/>
+                            <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles}/>
+                            <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships}/>
+                            <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles}/>
+                            <Route path="/Datasets/SelectDataSource/:datasetRelationshipId"
+                                   component={SelectDataSource}/>
+                            <Route path="/Datasets/SelectDataSourceExpanded/:specificationId/:datasetId/:relationshipId"
+                                   component={SelectDataSourceExpanded}/>
+                            <Route path="/Datasets/RefreshSql" component={RefreshSql}/>
+                            <Route path="/Specifications/CreateSpecification" component={CreateSpecification}/>
+                            <Route path="/Specifications/EditSpecification/:specificationId"
+                                   component={EditSpecification}/>
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/List" component={ListTemplates}/>}
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/:templateId/Edit" component={EditTemplate}/>}
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate}/>}
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/:templateId/Versions" component={ListVersions}/>}
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/Create" component={CreateTemplate}/>}
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate}/>}
+                            {featureFlagsState.templateBuilderVisible &&
+                            <Route path="/Templates/Publish/:templateId" component={PublishTemplate}/>}
+                            <Route path="/Specifications/CreateAdditionalCalculation/:specificationId"
+                                   component={CreateAdditionalCalculation}/>
+                            <Route path="/Specifications/EditCalculation/:calculationId" component={EditCalculation}/>
+                            <Route path="/Specifications/EditVariationPoints/:specificationId/:fundingLineId"
+                                   component={EditVariationPoints}/>
+                            <Route path="/Calculations/CalculationVersionHistory/:calculationId"
+                                   component={CalculationVersionHistory}/>
+                            <Route
+                                path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId"
+                                component={CompareCalculationVersions}/>
+                            <Route path="/Permissions/MyPermissions" component={MyPermissions}/>
+                            <Route path="/Permissions/Admin" component={Admin}/>
+                            <Route path="/Permissions/Individual" component={IndividualPermissionsAdmin}/>
+                            <Route path="/Permissions/FundingStream" component={FundingStreamPermissionsAdmin}/>
+                            {featureFlagsState.specToSpec &&
+                            <>
+                                <Route path="/Datasets/Create/SelectDatasetTypeToCreate/:forSpecId"
+                                       component={SelectDatasetTypeToCreate}/>
+                                <Route path="/Datasets/Create/SelectReferenceSpecification/:forSpecId"
+                                       component={SelectReferenceSpecification}/>
+                                <Route path="/Datasets/Create/SpecifyDatasetDetails/:forSpecId"
+                                       component={SpecifyDatasetDetails}/>
+                                <Route path="/Datasets/Create/SelectDatasetTemplateItems/:forSpecId"
+                                       component={SelectDatasetTemplateItems}/>
+                                <Route path="/Datasets/Create/ConfirmDatasetToCreate/:forSpecId"
+                                       component={ConfirmDatasetToCreate}/>
+                            </>
+                            }
+                            <Route path="*">
+                                <NoMatch/>
+                            </Route>
+                        </Switch>
+                        {process.env.NODE_ENV === 'development' && featureFlagsState.enableReactQueryDevTool &&
+                        <ReactQueryDevtools initialIsOpen={false}/>
+                        }
+                    </AppContextWrapper>
                 </QueryClientProvider>
             </BrowserRouter>
         );

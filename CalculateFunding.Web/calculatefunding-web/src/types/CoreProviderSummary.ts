@@ -20,7 +20,12 @@ export interface ProviderSnapshot {
     fundingStreamName: string;
 }
 
-export enum ProviderSource{
+export enum ProviderSource {
     CFS = "CFS",
     FDZ = "FDZ"
+}
+
+export enum PaymentOrganisationSource {
+    PaymentOrganisationAsProvider = "PaymentOrganisationAsProvider",
+    PaymentOrganisationFields = "PaymentOrganisationFields"
 }

@@ -3,13 +3,15 @@
     "module": "commonjs",
     "target": "es5",
     "lib": ["es5", "dom"],
+    "jsx": "react",
+    "allowJs": true,
+    "strict": true,
     "sourceMap": true,
     "types": ["cypress", "@testing-library/cypress"]
   },
-  "exclude": [
-    "node_modules"
-  ],
   "include": [
-    "**/*.tsx"
+    "../node_modules/cypress",
+    "./**/*.ts",
+    "./**/*.tsx"
   ]
 }
