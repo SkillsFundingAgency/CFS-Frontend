@@ -576,9 +576,19 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(model.Name, nameof(model.Name));
             Guard.IsNullOrWhiteSpace(model.SpecificationId, nameof(model.SpecificationId));
 
-            HttpStatusCode httpStatusCode = await _datasetApiClient.ValidateDefinitionSpecificationRelationship(model);
+            NoValidatedContentApiResponse result = await _datasetApiClient.ValidateDefinitionSpecificationRelationship(model);
 
-            return new StatusCodeResult((int)httpStatusCode);
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(result.ModelState);
+            }
+
+            if (result.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                return new InternalServerErrorResult($"Unable to validate relationship. An error has occurred.");
+            }
+
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpPut]

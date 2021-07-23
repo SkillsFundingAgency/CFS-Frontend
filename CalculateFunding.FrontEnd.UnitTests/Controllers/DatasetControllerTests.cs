@@ -419,7 +419,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
 
             _apiClient.ValidateDefinitionSpecificationRelationship(Arg.Is<ValidateDefinitionSpecificationRelationshipModel>(x => x.Name == model.Name))
-                .Returns(HttpStatusCode.OK);
+                .Returns(new NoValidatedContentApiResponse(HttpStatusCode.OK));
 
             // Act
             IActionResult result = await _controller.ValidateDefinitionSpecificationRelationship(model);
