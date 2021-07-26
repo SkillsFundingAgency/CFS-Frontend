@@ -120,12 +120,13 @@ namespace CalculateFunding.Frontend.Helpers
 
         protected static string VerifyObjectIdentifierClaimTypePresent(ClaimsPrincipal claimsPrincipal)
         {
-            if (!claimsPrincipal.HasClaim(c => c.Type == Common.Identity.Constants.ObjectIdentifierClaimType))
+            if (!claimsPrincipal.HasClaim(c => c.Type == Common.Identity.Constants.ObjectIdentifierClaimType || c.Type == ClaimTypes.NameIdentifier))
             {
                 throw new Exception("Cannot security trim a list when cannot identify the user");
             }
-
-            Claim oidClaim = claimsPrincipal.FindFirst(Common.Identity.Constants.ObjectIdentifierClaimType);
+            
+            Claim oidClaim = claimsPrincipal.Claims.FirstOrDefault(m => m.Type == Common.Identity.Constants.ObjectIdentifierClaimType 
+                                                                        || m.Type == ClaimTypes.NameIdentifier);
 
             return oidClaim.Value;
         }

@@ -1,13 +1,13 @@
-﻿using CalculateFunding.Frontend.Core.Middleware;
-
-namespace CalculateFunding.Frontend
+﻿namespace CalculateFunding.Frontend
 {
     using System;
     using System.IO;
-    using System.Threading.Tasks;    
+    using System.Threading.Tasks;
+    using System.Security.Claims;
     using Common.Identity.Authorization;
     using Common.Utility;
     using CalculateFunding.Common.Interfaces;
+    using Core.Middleware;
     using Extensions;
     using Helpers;
     using Hubs;
@@ -25,15 +25,18 @@ namespace CalculateFunding.Frontend
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Hosting;        
-    using Microsoft.OpenApi.Models;    
+    using Microsoft.Extensions.Hosting;
+    using Microsoft.OpenApi.Models;
     using Microsoft.FeatureManagement;
+    using Microsoft.AspNetCore.Authentication;
 
     public class Startup
     {
         private IWebHostEnvironment _hostingEnvironment;
-
+        private AuthenticationMode _authenticationMode;
         private bool _authenticationEnabled;
+
+        public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
@@ -42,17 +45,15 @@ namespace CalculateFunding.Frontend
 
             Configuration = configuration;
             _hostingEnvironment = hostingEnvironment;
+
+            GetConfigAuthenticationMode();
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            bool enablePlatformAuth = Configuration.GetValue<bool>("features:enablePlatformAuth");
-                
             services.AddControllers()
-                .AddNewtonsoftJson(options => {
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
@@ -65,16 +66,39 @@ namespace CalculateFunding.Frontend
             AzureAdOptions azureAdOptions = new AzureAdOptions();
             Configuration.Bind("AzureAd", azureAdOptions);
             _authenticationEnabled = azureAdOptions.IsEnabled;
+            string[] authenticatedGroupIds = azureAdOptions.Groups?.Split(",");
 
-            if (enablePlatformAuth)
+            if (_authenticationMode == AuthenticationMode.PlatformAuth)
             {
                 services.AddModule<AuthModule>(Configuration, _hostingEnvironment);
             }
-            else
+            else if (_authenticationMode == AuthenticationMode.IdentityServer)
             {
-                if (_authenticationEnabled)
-                {
-                    services.AddAuthentication(adOptions =>
+                IdentityServerOptions identityServerOptions = GetIdentityServerOptions();
+                services.AddAuthentication(options =>
+                    {
+                        options.DefaultScheme = "Cookies";
+                        options.DefaultChallengeScheme = "oidc";
+                    })
+                    .AddCookie()
+                    .AddOpenIdConnect("oidc", options =>
+                    {
+                        options.Authority = identityServerOptions.Authority;
+                        options.ClientId = identityServerOptions.ClientId;
+                        options.ClientSecret = identityServerOptions.Secret;
+                        options.ResponseType = "code";
+                        options.SaveTokens = true;
+
+                        options.GetClaimsFromUserInfoEndpoint = true;
+                        options.ClaimActions.MapUniqueJsonKey("groups", "groups");
+                        options.Scope.Add("groups");
+                    });
+
+                EnableOpenIdConnectAuthorization(services, authenticatedGroupIds);
+            }
+            else if (_authenticationMode == AuthenticationMode.AzureAd)
+            {
+                services.AddAuthentication(adOptions =>
                     {
                         adOptions.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         adOptions.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -82,40 +106,11 @@ namespace CalculateFunding.Frontend
                     .AddAzureAd(options => Configuration.Bind("AzureAd", options))
                     .AddCookie();
 
-                    services.AddAuthorization();
-
-                    services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
-                    services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
-
-                    services.Configure<PermissionOptions>(options =>
-                    {
-                        Configuration.GetSection("permissionOptions").Bind(options);
-                    });
-
-                    services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
-
-                    services.AddMvc(config =>
-                    {
-                        AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
-                                         .RequireAuthenticatedUser()
-                                         .RequireClaim("groups", azureAdOptions.Groups?.Split(","))
-                                         .Build();
-                        config.Filters.Add(new AuthorizeFilter(policy));
-
-                    });
-                }
-                else
-                {
-                    services.AddAuthorization();
-
-                    services.AddSingleton<IAuthorizationHelper, LocalDevelopmentAuthorizationHelper>();
-
-                    services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
-                    services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
-
-                    services.AddMvc();
-                    services.Configure<MvcOptions>(options => options.EnableEndpointRouting = false);
-                }
+                EnableOpenIdConnectAuthorization(services, authenticatedGroupIds);
+            }
+            else if (_authenticationMode == AuthenticationMode.Disabled)
+            {
+                EnableLocalAuthorization(services);
             }
 
             services.AddAntiforgery(options =>
@@ -176,6 +171,40 @@ namespace CalculateFunding.Frontend
             services.AddFeatureManagement();
         }
 
+        private void EnableOpenIdConnectAuthorization(IServiceCollection services,  string[] authenticatedGroupIds)
+        {
+            services.AddAuthorization();
+
+            services.AddSingleton<IAuthorizationHandler, FundingStreamPermissionHandler>();
+            services.AddSingleton<IAuthorizationHandler, SpecificationPermissionHandler>();
+
+            services.Configure<PermissionOptions>(options => { Configuration.GetSection("permissionOptions").Bind(options); });
+
+            services.AddSingleton<IAuthorizationHelper, AuthorizationHelper>();
+
+            services.AddMvc(config =>
+            {
+                AuthorizationPolicy policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("groups", authenticatedGroupIds)
+                    .Build();
+                config.Filters.Add(new AuthorizeFilter(policy));
+            });
+        }
+
+        private static void EnableLocalAuthorization(IServiceCollection services)
+        {
+            services.AddAuthorization();
+
+            services.AddSingleton<IAuthorizationHelper, LocalDevelopmentAuthorizationHelper>();
+
+            services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForFundingStreamPermissionHandler>();
+            services.AddSingleton<IAuthorizationHandler, AlwaysAllowedForSpecificationPermissionHandler>();
+
+            services.AddMvc();
+            services.Configure<MvcOptions>(options => options.EnableEndpointRouting = false);
+        }
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -195,7 +224,7 @@ namespace CalculateFunding.Frontend
                         return Task.CompletedTask;
                     });
                 });
-            }
+            } 
 
             using (StreamReader iisUrlRewriteStreamReader = File.OpenText("spa-url-rewrite.xml"))
             {
@@ -217,7 +246,7 @@ namespace CalculateFunding.Frontend
 
             app.UseRouting();
 
-            if (_authenticationEnabled)
+            if (_authenticationMode == AuthenticationMode.IdentityServer || _authenticationEnabled)
             {
                 app.UseAuthentication();
                 app.UseAuthorization();
@@ -230,8 +259,8 @@ namespace CalculateFunding.Frontend
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
                 endpoints.MapControllerRoute(
-                      name: "default",
-                      pattern: "{controller}/{action=Index}/{id?}");
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
                 endpoints.MapHub<Notifications>("/api/notifications");
             });
 
@@ -251,5 +280,13 @@ namespace CalculateFunding.Frontend
         {
             return Configuration.GetValue("FeatureManagement:EnableSwagger", false);
         }
+
+        private void GetConfigAuthenticationMode()
+        {
+            _authenticationMode = Configuration.GetValue<AuthenticationMode>("authenticationMode");
+        }
+
+        private IdentityServerOptions GetIdentityServerOptions() =>
+            Configuration.GetByTypeName<IdentityServerOptions>();
     }
 }
