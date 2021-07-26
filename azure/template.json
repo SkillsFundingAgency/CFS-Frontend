@@ -282,6 +282,30 @@
             "metadata": {
                 "description": "Thumbprint of Frontend App Certificate"
             }
+        },
+        "authenticationMode": {
+            "type": "string",
+            "metadata": {
+                "description": "Type of Authentication mode"
+            }
+        },
+        "IdentityServerOptionsAuthority": {
+            "type": "string",
+            "metadata": {
+                "description": "URL of Authority"
+            }
+        },
+        "IdentityServerOptionsSecret": {
+            "type": "string",
+            "metadata": {
+                "description": "ID Server options Secret"
+            }
+        },
+        "IdentityServerOptionsClientId": {
+            "type": "string",
+            "metadata": {
+                "description": "ID Server options Client ID"
+            }
         }
     },
     "variables": {
@@ -604,6 +628,22 @@
                             {
                                 "name": "graphClient:ApiKey",
                                 "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapigraph'),'2018-02-14').secretUriWithVersion, ')')]"
+                            },
+                            {
+                                "name": "authenticationMode",
+                                "value": "[parameters('authenticationMode')]"
+                            },
+                            {
+                                "name": "IdentityServerOptions__authority",
+                                "value": "[parameters('IdentityServerOptionsAuthority')]"
+                            },
+                            {
+                                "name": "IdentityServerOptions__secret",
+                                "value": "[parameters('IdentityServerOptionsSecret')]"
+                            },
+                            {
+                                "name": "IdentityServerOptions__clientId",
+                                "value": "[parameters('IdentityServerOptionsClientId')]"
                             }
                         ]
                     },
