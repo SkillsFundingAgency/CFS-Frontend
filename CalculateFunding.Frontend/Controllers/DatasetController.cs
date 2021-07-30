@@ -371,7 +371,11 @@ namespace CalculateFunding.Frontend.Controllers
                 return new OkObjectResult(true);
             }
 
-            return new StatusCodeResult(500);
+            this.ModelState.AddModelError(
+                $"{nameof(CreateDefinitionSpecificationRelationshipModel)}.{nameof(AssignDatasetSchemaViewModel.Name)}",
+                newAssignDatasetResponse.Message);
+
+            return BadRequest(this.ModelState);
         }
 
         [HttpGet]
