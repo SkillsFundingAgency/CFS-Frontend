@@ -9,7 +9,7 @@ export interface SpecificationSummary {
     description: string | null;
     providerVersionId?: string;
     fundingStreams: FundingStream[];
-    fundingPeriod: FundingPeriod
+    fundingPeriod: FundingPeriod;
     providerSnapshotId?: number;
     templateIds: { [key: string]: string };
     dataDefinitionRelationshipIds: string[];

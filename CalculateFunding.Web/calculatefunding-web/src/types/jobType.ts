@@ -5,7 +5,6 @@
     PublishBatchProviderFundingJob = "PublishBatchProviderFundingJob",
     PublishAllProviderFundingJob = "PublishAllProviderFundingJob",
     MapDatasetJob = "MapDatasetJob",
-    EditSpecificationJob = "EditSpecificationJob",
     AssignTemplateCalculationsJob = "AssignTemplateCalculationsJob",
     CreateAllocationJob = "CreateAllocationJob",
     CreateInstructAllocationJob = "CreateInstructAllocationJob",
@@ -49,4 +48,7 @@
     ReIndexUsersJob = "ReIndexUsersJob",
     GenerateFundingStreamPermissionsCsvJob = "GenerateFundingStreamPermissionsCsvJob",
     ConverterWizardActivityCsvGenerationJob = "ConverterWizardActivityCsvGenerationJob",
+    EditSpecificationJob = "EditSpecificationJob",
+    TrackLatestJob = "TrackLatestJob",
+    ReferencedSpecificationReMapJob = "ReferencedSpecificationReMapJob",
 }

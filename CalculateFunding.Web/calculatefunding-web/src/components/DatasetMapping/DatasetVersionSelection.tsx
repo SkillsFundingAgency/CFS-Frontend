@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import {DateTimeFormatter} from "../DateTimeFormatter";
-import {Dataset} from "../../types/Datasets/RelationshipData";
+import {Dataset} from "../../types/Datasets/DatasourceRelationshipResponseViewModel";
 
 export interface DatasetVersionSelectionProps {
     newVersionNumber: number | undefined,

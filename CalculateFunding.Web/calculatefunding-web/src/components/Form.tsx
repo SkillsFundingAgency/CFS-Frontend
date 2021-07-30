@@ -3,15 +3,19 @@
 export interface FormProps {
     token: string,
     heading: string,
-    onSubmit: any,
+    onSubmit?: any,
     children: any
 }
 
 const Form = ({ token, heading, onSubmit, children }: FormProps) => {
+    
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        onSubmit ? onSubmit() : e.preventDefault();
+    }
     return (
         <form id={`form-${token}`}
               className="form"
-              onSubmit={onSubmit}
+              onSubmit={handleSubmit}
               noValidate={true}>
             <div className="govuk-form-group">
                 <fieldset className="govuk-fieldset"

@@ -10,19 +10,20 @@ import {Main} from "../../../components/Main";
 import {useSpecificationPermissions} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {useSpecificationSummary} from "../../../hooks/useSpecificationSummary";
 import * as datasetService from "../../../services/datasetService";
-import {CreateDatasetWorkflowState, useAppContext} from "../../../context/AppContextState";
 import {CreateDatasetRouteProps} from "./SelectDatasetTypeToCreate";
 import Form from "../../../components/Form";
 import {
-    CreateDatasetSpecificationRelationshipRequest,
-    DatasetRelationshipType,
-    PublishedSpecificationTemplateMetadata,
-    TemplateItemType
+    PublishedSpecificationTemplateMetadata
 } from "../../../types/Datasets/PublishedSpecificationTemplateMetadata";
 import "../../../styles/search-filters.scss";
 import {convertCamelCaseToSpaceDelimited} from "../../../helpers/stringHelper";
 import {Link} from "react-router-dom";
 import {prop, sortBy} from "ramda";
+import {CreateDatasetWorkflowState} from "../../../context/states";
+import {useAppContext} from "../../../context/useAppContext";
+import {DatasetRelationshipType} from "../../../types/Datasets/DatasetRelationshipType";
+import {TemplateItemType} from "../../../types/Datasets/TemplateItemType";
+import {CreateDatasetSpecificationRelationshipRequest} from "../../../types/Datasets/CreateDatasetSpecificationRelationshipRequest";
 
 export function ConfirmDatasetToCreate({match}: RouteComponentProps<CreateDatasetRouteProps>) {
     const forSpecId: string = match.params.forSpecId;
@@ -40,7 +41,7 @@ export function ConfirmDatasetToCreate({match}: RouteComponentProps<CreateDatase
     const history = useHistory();
 
     useEffect(() => {
-        if (!state || state.createDatasetWorkflowState?.forSpecId != forSpecId) {
+        if (!state || state.createDatasetWorkflowState?.forSpecId !== forSpecId) {
             history.push(`/Datasets/Create/SelectDatasetTypeToCreate/${forSpecId}`);
         }
     }, [state, forSpecId]);
@@ -247,6 +248,7 @@ const Actions = (props: {
             <div className="govuk-button-group">
                 <button className="govuk-button govuk-!-margin-top-3"
                         data-module="govuk-button"
+                        type="button"
                         onClick={props.onSave}>
                     Create data set
                 </button>

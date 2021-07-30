@@ -446,7 +446,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     Arg.Any<string>(), Arg.Any<string>())
                 .Returns(response);
 
-            IActionResult result = await _controller.UpdateDefinitionSpecificationRelationship(
+            IActionResult result = await _controller.UpdateDatasetRelationship(
                 specificationId, relationshipId, new UpdateDefinitionSpecificationRelationshipModel());
 
             result
@@ -460,7 +460,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             UpdateDefinitionSpecificationRelationshipModel model = new UpdateDefinitionSpecificationRelationshipModel();
 
             Func<Task> func =
-                async () => await _controller.UpdateDefinitionSpecificationRelationship(null, "relationshipId", model);
+                async () => await _controller.UpdateDatasetRelationship(null, "relationshipId", model);
 
             func
                 .Should()
@@ -473,7 +473,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             UpdateDefinitionSpecificationRelationshipModel model = new UpdateDefinitionSpecificationRelationshipModel();
 
             Func<Task> func =
-                async () => await _controller.UpdateDefinitionSpecificationRelationship("specificationId", null, model);
+                async () => await _controller.UpdateDatasetRelationship("specificationId", null, model);
 
             func
                 .Should()
@@ -483,14 +483,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task GetAvailableFundingLinesCalculations_GivenBadRequestFromApi_ReturnsBadRequest()
         {
-            ValidatedApiResponse<PublishedSpecificationConfiguration> response = new ValidatedApiResponse<PublishedSpecificationConfiguration>(HttpStatusCode.BadRequest);
-            string relationshipId = "relationshipId";
-
             _apiClient
                 .GetFundingLinesCalculations(Arg.Any<string>())
-                .Returns(response);
+                .Returns(new ValidatedApiResponse<PublishedSpecificationConfiguration>(HttpStatusCode.BadRequest));
 
-            IActionResult result = await _controller.GetFundingLinesCalculationsForRelationship(relationshipId);
+            IActionResult result = await _controller.GetSpecificationDatsetRelationship("specificationId", "relationshipId");
 
             result
                 .Should()
@@ -501,7 +498,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public void GetAvailableFundingLinesCalculations_GivenRelationshipIdIsNull_ThrowsArgumentNullException()
         {
             Func<Task> func =
-                async () => await _controller.GetFundingLinesCalculationsForRelationship(null);
+                async () => await _controller.GetSpecificationDatsetRelationship(null, null);
 
             func
                 .Should()

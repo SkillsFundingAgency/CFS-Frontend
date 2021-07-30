@@ -4,25 +4,25 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using CalculateFunding.Common.ApiClient.Datasets.Models;
 using CalculateFunding.Common.ApiClient.DataSets;
 using CalculateFunding.Common.ApiClient.DataSets.Models;
-using CalculateFunding.Common.Utility;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
+using CalculateFunding.Common.Models.Search;
+using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
+using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using CalculateFunding.Frontend.ViewModels.Common;
-using CalculateFunding.Common.Models.Search;
-using Microsoft.AspNetCore.Authentication;
-using CalculateFunding.Common.ApiClient.Datasets.Models;
 using DatasetRelationshipType = CalculateFunding.Common.ApiClient.DataSets.Models.DatasetRelationshipType;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -201,29 +201,19 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/datasets/getdatasetsbyspecificationid/{specificationId}")]
-        public async Task<IActionResult> GetDatasetBySpecificationId(string specificationId)
+        [Route("api/specifications/{specificationId}/datasets")]
+        public async Task<IActionResult> GetDatasetsBySpecification(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> result =
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> response =
                 await _datasetApiClient.GetRelationshipsBySpecificationId(specificationId);
 
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                return Ok(result);
-            }
-
-            if (result.StatusCode == HttpStatusCode.NotFound)
-            {
-                return NotFound();
-            }
-
-            return BadRequest();
+            return response.Handle(nameof(DefinitionSpecificationRelationshipVersion), x => Ok(x.Content));
         }
 
         [HttpGet]
-        [Route("api/datasets/get-dataset-definitions/")]
+        [Route("api/datasets/get-dataset-definitions")]
         public async Task<IActionResult> GetDatasetDefinitions()
         {
             ApiResponse<IEnumerable<DatasetDefinition>> response = await _datasetApiClient.GetDatasetDefinitions();
@@ -397,7 +387,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/datasets/get-datasources-by-relationship-id/{relationshipId}")]
-        public async Task<IActionResult> GetPreviousVersions(string relationshipId)
+        public async Task<IActionResult> GetDatasetsByRelationship(string relationshipId)
         {
             ApiResponse<SelectDatasourceModel> result =
                 await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
@@ -596,8 +586,8 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPut]
-        [Route("api/specifications/{specificationId}/datasets/edit-definition-specification-relationship/{relationshipId}")]
-        public async Task<IActionResult> UpdateDefinitionSpecificationRelationship(
+        [Route("api/specifications/{specificationId}/dataset-relationship/{relationshipId}")]
+        public async Task<IActionResult> UpdateDatasetRelationship(
             [FromRoute] string specificationId,
             [FromRoute] string relationshipId,
             [FromBody] UpdateDefinitionSpecificationRelationshipModel updateDefinitionSpecificationRelationshipModel)
@@ -615,32 +605,86 @@ namespace CalculateFunding.Frontend.Controllers
                 await _datasetApiClient.UpdateDefinitionSpecificationRelationship(updateDefinitionSpecificationRelationshipModel,
                 specificationId, relationshipId);
 
-            IActionResult errorResult =
-                response.IsSuccessOrReturnFailureResult("UpdateDefinitionSpecificationRelationship");
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(response.Content);
+            return response.Handle(nameof(DefinitionSpecificationRelationshipVersion),
+                x => Ok(x.Content));
         }
 
         [HttpGet]
-        [Route("api/datasets/definition-relationships/{relationshipId}/get-funding-line-calculations")]
-        public async Task<IActionResult> GetFundingLinesCalculationsForRelationship([FromRoute] string relationshipId)
+        [Route("api/specifications/{currentSpecificationId}/dataset-relationship/{relationshipId}")]
+        public async Task<IActionResult> GetSpecificationDatsetRelationship([FromRoute] string currentSpecificationId, [FromRoute] string relationshipId)
         {
+            Guard.IsNullOrWhiteSpace(currentSpecificationId, nameof(currentSpecificationId));
             Guard.IsNullOrWhiteSpace(relationshipId, nameof(relationshipId));
 
-            ApiResponse<PublishedSpecificationConfiguration> response = await _datasetApiClient.GetFundingLinesCalculations(relationshipId);
+            ApiResponse<PublishedSpecificationConfiguration> templateItemsResponse = await _datasetApiClient
+                .GetFundingLinesCalculations(relationshipId);
 
-            IActionResult errorResult =
-                response.IsSuccessOrReturnFailureResult("GetFundingLinesCalculationsForRelationship");
+            IActionResult errorResult = templateItemsResponse.IsSuccessOrReturnFailureResult(nameof(PublishedSpecificationConfiguration));
             if (errorResult != null)
             {
                 return errorResult;
             }
 
-            return Ok(response.Content);
+            Task<ApiResponse<SpecificationSummary>> referenceSpecificationRequest =
+                _specificationsApiClient
+                    .GetSpecificationSummaryById(templateItemsResponse.Content.SpecificationId);
+
+            Task<ApiResponse<SpecificationSummary>> currentSpecificationRequest =
+                _specificationsApiClient
+                    .GetSpecificationSummaryById(currentSpecificationId);
+
+            Task<ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>>> relationshipsForCurrentSpecificationRequest =
+                _datasetApiClient
+                    .GetRelationshipsBySpecificationId(currentSpecificationId);
+
+            await TaskHelper.WhenAllAndThrow(referenceSpecificationRequest, currentSpecificationRequest, relationshipsForCurrentSpecificationRequest);
+
+            ApiResponse<SpecificationSummary> targetSpecification = referenceSpecificationRequest.Result;
+            errorResult = targetSpecification.IsSuccessOrReturnFailureResult(nameof(SpecificationSummary));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            ApiResponse<SpecificationSummary> currentSpecification = currentSpecificationRequest.Result;
+            errorResult = targetSpecification.IsSuccessOrReturnFailureResult(nameof(SpecificationSummary));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            ApiResponse<IEnumerable<DatasetSpecificationRelationshipViewModel>> relationshipsResponse = relationshipsForCurrentSpecificationRequest.Result;
+            errorResult = relationshipsResponse.IsSuccessOrReturnFailureResult(nameof(DatasetSpecificationRelationshipViewModel));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            DatasetSpecificationRelationshipViewModel relationship = relationshipsResponse.Content.SingleOrDefault(_ => _.Id == relationshipId);
+
+            if (relationship == null)
+            {
+                return new InternalServerErrorResult($"Relationship '{relationshipId}' was not found in specification '{currentSpecificationId}'");
+            }
+
+            ReferencedSpecificationDatasetRelationshipResponse result = new ReferencedSpecificationDatasetRelationshipResponse
+            {
+                RelationshipId = relationship.Id,
+                RelationshipName = relationship.Name,
+                RelationshipDescription = relationship.RelationshipDescription,
+                FundingStreamId = templateItemsResponse.Content.FundingStreamId,
+                FundingStreamName = targetSpecification.Content.FundingStreams.First().Name,
+                FundingPeriodId = templateItemsResponse.Content.FundingPeriodId,
+                FundingPeriodName = targetSpecification.Content.FundingPeriod.Name,
+                ReferenceSpecificationId = templateItemsResponse.Content.SpecificationId,
+                ReferenceSpecificationName = targetSpecification.Content.Name,
+                CurrentSpecificationId = currentSpecification.Content.Id,
+                CurrentSpecificationName = currentSpecification.Content.Name,
+                Calculations = templateItemsResponse.Content.Calculations,
+                FundingLines = templateItemsResponse.Content.FundingLines,
+            };
+
+            return Ok(result);
         }
 
         private async Task<SpecificationSummary> GetSpecification(string specificationId)

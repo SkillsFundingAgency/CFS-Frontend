@@ -68,10 +68,12 @@ import {IndividualPermissionsAdmin} from "./pages/Permissions/IndividualPermissi
 import {FundingStreamPermissionsAdmin} from "./pages/Permissions/FundingStreamPermissionsAdmin";
 import {SelectDatasetTypeToCreate} from "./pages/Datasets/Create/SelectDatasetTypeToCreate";
 import {SelectReferenceSpecification} from "./pages/Datasets/Create/SelectReferenceSpecification";
-import {AppContextWrapper} from "./context/AppContextState";
 import {SpecifyDatasetDetails} from "./pages/Datasets/Create/SpecifyDatasetDetails";
 import {SelectDatasetTemplateItems} from "./pages/Datasets/Create/SelectDatasetTemplateItems";
 import {ConfirmDatasetToCreate} from "./pages/Datasets/Create/ConfirmDatasetToCreate";
+import {AppContextWrapper} from "./context/AppContextWrapper";
+import {EditDatasetReferencingReleased} from "./pages/Datasets/Edit/EditDatasetReferencingReleased";
+import {ConfirmDatasetToEdit} from "./pages/Datasets/Edit/ConfirmDatasetToEdit";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -219,6 +221,10 @@ const App: React.FunctionComponent = () => {
                                        component={SelectDatasetTemplateItems}/>
                                 <Route path="/Datasets/Create/ConfirmDatasetToCreate/:forSpecId"
                                        component={ConfirmDatasetToCreate}/>
+                                <Route path="/Datasets/:relationshipId/Edit/:specificationId"
+                                       component={EditDatasetReferencingReleased}/>
+                                <Route path="/Datasets/:relationshipId/ConfirmEdit/:specificationId"
+                                       component={ConfirmDatasetToEdit}/>
                             </>
                             }
                             <Route path="*">

@@ -2,12 +2,12 @@
 import {Server} from "miragejs";
 import {commonActions} from "../commonActions";
 import {
-    PublishedSpecificationTemplateMetadata,
-    TemplateItemType
+    PublishedSpecificationTemplateMetadata
 } from "../../../src/types/Datasets/PublishedSpecificationTemplateMetadata";
 import {ProviderDataTrackingMode} from "../../../src/types/Specifications/ProviderDataTrackingMode";
 import {SpecificationSummary} from "../../../src/types/SpecificationSummary";
 import {EligibleSpecificationReferenceModel} from "../../../src/types/Datasets/EligibleSpecificationReferenceModel";
+import {TemplateItemType} from "../../../src/types/Datasets/TemplateItemType";
 
 context('Select template items for a new dataset', () => {
     const data = mockApiData();
@@ -45,7 +45,6 @@ context('Select template items for a new dataset', () => {
             `/dataset-specifications/*`,
             (schema, request)
                 : EligibleSpecificationReferenceModel[] | PublishedSpecificationTemplateMetadata[] => {
-                console.log(schema, request);
                 if (request.url.includes('eligible-specification-references')) {
                     return [{
                         specificationId: data.spec2.id,

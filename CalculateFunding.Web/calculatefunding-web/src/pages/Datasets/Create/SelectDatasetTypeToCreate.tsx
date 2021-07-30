@@ -35,29 +35,6 @@ export function SelectDatasetTypeToCreate({match}: RouteComponentProps<CreateDat
         history.goBack();
     }
 
-    const Actions = () => {
-        return (
-            <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                    <button id="patternLink"
-                            type="submit"
-                            disabled={hasMissingPermissions}
-                            className="govuk-button govuk-!-margin-right-1"
-                            data-module="govuk-button">
-                        Continue
-                    </button>
-
-                    <button
-                        className="govuk-button govuk-button--secondary"
-                        data-module="govuk-button"
-                        onClick={onCancel}>
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     const onSelectReferencedData = () => {
         setReferenceReleased(true);
     };
@@ -66,7 +43,7 @@ export function SelectDatasetTypeToCreate({match}: RouteComponentProps<CreateDat
         setReferenceReleased(false);
     };
 
-    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         clearErrorMessages();
 
@@ -121,9 +98,37 @@ export function SelectDatasetTypeToCreate({match}: RouteComponentProps<CreateDat
                             </div>
                         </div>
                     </div>
-                    <Actions/>
+                    <Actions
+                        hasMissingPermissions={hasMissingPermissions}
+                        onSubmit={onSubmit}
+                        onCancel={onCancel}
+                    />
                 </Form>
             </section>
         </Main>
     );
 }
+
+const Actions = (props: {
+    hasMissingPermissions: boolean,
+    onSubmit: (e: React.MouseEvent<HTMLButtonElement>) => void,
+    onCancel: (e: React.MouseEvent<HTMLButtonElement>) => void,
+}) =>
+    <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+            <button id="patternLink"
+                    type="button"
+                    onClick={props.onSubmit}
+                    disabled={props.hasMissingPermissions}
+                    className="govuk-button govuk-!-margin-right-1"
+                    data-module="govuk-button">
+                Continue
+            </button>
+
+            <button className="govuk-button govuk-button--secondary"
+                    data-module="govuk-button"
+                    onClick={props.onCancel}>
+                Cancel
+            </button>
+        </div>
+    </div>

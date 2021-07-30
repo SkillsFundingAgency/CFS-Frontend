@@ -1,21 +1,33 @@
 import React from "react";
 import {MemoryRouter, Route, Switch} from "react-router";
-import {cleanup, render, waitFor, screen} from "@testing-library/react";
+import {cleanup, render, screen, waitFor} from "@testing-library/react";
 import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions";
-import {JobMonitoringFilter} from "../../../hooks/Jobs/useJobMonitor";
 import {IStoreState} from "../../../reducers/rootReducer";
 import * as redux from "react-redux";
 import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
+import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
+import {JobMonitoringFilter} from "../../../types/Jobs/JobMonitoringFilter";
+import {DatasetRelationship} from "../../../types/DatasetRelationship";
+import {getDatasetsBySpecification} from "../../../services/datasetService";
+import {DatasetRelationshipType} from "../../../types/Datasets/DatasetRelationshipType";
+import * as ReactQuery from "react-query";
+import {UseQueryResult} from "react-query/types/react/types";
+import {EligibleSpecificationReferenceModel} from "../../../types/Datasets/EligibleSpecificationReferenceModel";
+import {AxiosError} from "axios";
 
-const renderDatasets = async() => {
+const renderDatasets = async () => {
     const {Datasets} = require('../../../components/Specifications/Datasets');
-    const page = render(<MemoryRouter initialEntries={['/Datasets/SPEC123']}>
-        <Switch>
-            <Route path="/Datasets/:specificationId">
-                <Datasets specificationId={"SPEC123"} lastConverterWizardReportDate={new Date()} />
-            </Route>
-        </Switch>
-    </MemoryRouter>)
+    const page = render(
+        <QueryClientProviderTestWrapper>
+            <MemoryRouter initialEntries={['/Datasets/SPEC123']}>
+                <Switch>
+                    <Route path="/Datasets/:specificationId">
+                        <Datasets specificationId={"SPEC123"} lastConverterWizardReportDate={new Date()}/>
+                    </Route>
+                </Switch>
+            </MemoryRouter>
+        </QueryClientProviderTestWrapper>
+    )
 
     await waitFor(() => {
         expect(screen.getByText("Loading datasets")).not.toBeVisible()
@@ -25,52 +37,13 @@ const renderDatasets = async() => {
 }
 
 beforeAll(() => {
-    function mockDatasetBySpecificationIdService() {
-        const datasetBySpecificationIdService = jest.requireActual('../../../services/datasetService');
-        return {
-            ...datasetBySpecificationIdService,
-            getDatasetBySpecificationIdService: jest.fn(() => Promise.resolve({
-                status: 200,
-                data: {
-                    statusCode: 1,
-                    content: [{
-                        definition: {
-                            description: "",
-                            id: "",
-                            name: "definition1"
-                        },
-                        relationshipDescription: "",
-                        isProviderData: false,
-                        converterEligible: false,
-                        converterEnabled: false,
-                        id: "",
-                        name: ""
-                    },
-                    {
-                        definition: {
-                            description: "",
-                            id: "",
-                            name: "definition2"
-                        },
-                        relationshipDescription: "",
-                        isProviderData: false,
-                        converterEligible: true,
-                        converterEnabled: false,
-                        id: "Con123",
-                        name: ""
-                    }]
-                }
-            }))
-        }
-    }
-
-    jest.mock('../../../services/datasetService', () => mockDatasetBySpecificationIdService());
+    hasDatasets();
 })
 
 afterEach(cleanup);
 
 describe("<Datasets /> ", () => {
-    beforeEach(async() => {
+    beforeEach(async () => {
         hasReduxState({
             featureFlags: {
                 specToSpec: false,
@@ -83,12 +56,7 @@ describe("<Datasets /> ", () => {
         await renderDatasets();
     });
 
-    it("calls datasetBySpecificationIdService from the specificationService", async () => {
-        const {getDatasetBySpecificationIdService} = require('../../../services/datasetService');
-        expect(getDatasetBySpecificationIdService).toBeCalled();
-    });
-
-    it('renders definitions correctly', async()=>{
+    it('renders definitions correctly', async () => {
         expect(await screen.findByText(/definition1/)).toBeInTheDocument();
     })
 
@@ -141,4 +109,37 @@ const hasReduxState = (mocks: {
     useSelectorSpy.mockImplementation(callback => {
         return callback(state);
     });
+}
+const useQuerySpy = jest.spyOn(ReactQuery, 'useQuery');
+
+const hasDatasets = () => {
+    useQuerySpy.mockReturnValue({
+        data: [{
+            definition: {
+                description: "",
+                id: "",
+                name: "definition1"
+            },
+            relationshipDescription: "casual",
+            relationshipType: DatasetRelationshipType.Uploaded,
+            isProviderData: false,
+            converterEligible: false,
+            converterEnabled: false,
+            id: "",
+            name: ""
+        },
+            {
+                definition: null,
+                relationshipDescription: "how do I describe this relationship?",
+                relationshipType: DatasetRelationshipType.ReleasedData,
+                isProviderData: false,
+                converterEligible: true,
+                converterEnabled: false,
+                id: "Con123",
+                name: ""
+            }] as DatasetRelationship[],
+        status: 'success',
+        isSuccess: true,
+        isFetched: true,
+    } as UseQueryResult<DatasetRelationship[], AxiosError>);
 }

@@ -24,5 +24,22 @@ namespace CalculateFunding.Frontend.Extensions
 
             return false;
         }
+
+        public static bool IsBadRequest(this NoValidatedContentApiResponse validatedApiResponse,
+            out BadRequestObjectResult result)
+        {
+            Guard.ArgumentNotNull(validatedApiResponse, $"{typeof(NoValidatedContentApiResponse).Name} {nameof(validatedApiResponse)}");
+
+            if (validatedApiResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                result = new BadRequestObjectResult(validatedApiResponse.ModelState ?? new Dictionary<string, IEnumerable<string>>());
+
+                return true;
+            }
+
+            result = null;
+
+            return false;
+        }
     }
 }

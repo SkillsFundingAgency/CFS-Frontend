@@ -1,13 +1,13 @@
     import {FundingStream} from "../viewFundingTypes";
     import {Author} from "../Calculations/Author";
-    import {Definition} from "../DatasetSummary";
+    import {DatasetDefinition} from "../SpecificationDatasetsResponse";
 
     export interface MergeDatasetViewModel {
         blobName: string;
         version: number;
         lastUpdatedDate: Date;
         publishStatus: string;
-        definition: Definition;
+        definition: DatasetDefinition;
         description: string;
         author: Author;
         comment: string;

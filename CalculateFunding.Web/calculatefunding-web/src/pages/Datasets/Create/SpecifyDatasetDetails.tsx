@@ -9,10 +9,10 @@ import {PermissionStatus} from "../../../components/PermissionStatus";
 import {Main} from "../../../components/Main";
 import {useSpecificationPermissions} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {useSpecificationSummary} from "../../../hooks/useSpecificationSummary";
-import {useAppContext} from "../../../context/AppContextState";
 import {CreateDatasetRouteProps} from "./SelectDatasetTypeToCreate";
 import Form from "../../../components/Form";
 import {ErrorMessage} from "../../../types/ErrorMessage";
+import {useAppContext} from "../../../context/useAppContext";
 
 export function SpecifyDatasetDetails({match}: RouteComponentProps<CreateDatasetRouteProps>) {
     const forSpecId: string = match.params.forSpecId;

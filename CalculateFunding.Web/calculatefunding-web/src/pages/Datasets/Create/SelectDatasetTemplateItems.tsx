@@ -10,20 +10,17 @@ import {Main} from "../../../components/Main";
 import {useSpecificationPermissions} from "../../../hooks/Permissions/useSpecificationPermissions";
 import {useSpecificationSummary} from "../../../hooks/useSpecificationSummary";
 import * as datasetService from "../../../services/datasetService";
-import {useAppContext} from "../../../context/AppContextState";
 import {CreateDatasetRouteProps} from "./SelectDatasetTypeToCreate";
 import Form from "../../../components/Form";
 import {useQuery} from "react-query";
 import {AxiosError} from "axios";
-import {
-    PublishedSpecificationTemplateMetadata,
-    TemplateItemType
-} from "../../../types/Datasets/PublishedSpecificationTemplateMetadata";
+import {PublishedSpecificationTemplateMetadata} from "../../../types/Datasets/PublishedSpecificationTemplateMetadata";
 import {EligibleSpecificationReferenceModel} from "../../../types/Datasets/EligibleSpecificationReferenceModel";
 import "../../../styles/search-filters.scss";
 import {convertCamelCaseToSpaceDelimited} from "../../../helpers/stringHelper";
 import {LoadingStatus} from "../../../components/LoadingStatus";
 import {prop, sortBy} from "ramda";
+import {useAppContext} from "../../../context/useAppContext";
 
 export function SelectDatasetTemplateItems({match}: RouteComponentProps<CreateDatasetRouteProps>) {
     const forSpecId: string = match.params.forSpecId;
@@ -80,7 +77,7 @@ export function SelectDatasetTemplateItems({match}: RouteComponentProps<CreateDa
     }, [hideUnselected, templateItems, searchText])
 
     useEffect(() => {
-        if (!state || state.createDatasetWorkflowState?.forSpecId != forSpecId) {
+        if (!state || state.createDatasetWorkflowState?.forSpecId !== forSpecId) {
             history.push(`/Datasets/Create/SelectDatasetTypeToCreate/${forSpecId}`);
         }
     }, [state, forSpecId])

@@ -9,8 +9,24 @@ import {ProviderSource} from "../types/CoreProviderSummary";
 import {FundingStreamPermissions} from "../types/FundingStreamPermissions";
 import {EffectiveSpecificationPermission} from "../types/EffectiveSpecificationPermission";
 import {buildEffectiveSpecificationPermission, buildPermissions} from "../tests/fakes/testFactories";
+import {DatasetMetadata, DatasetTemplateMetadata} from "../types/Datasets/DatasetMetadata";
+import {SpecificationSummary} from "../types/SpecificationSummary";
+import {ProviderDataTrackingMode} from "../types/Specifications/ProviderDataTrackingMode";
+import {ReferencedSpecificationRelationshipMetadata} from "../types/Datasets/ReferencedSpecificationRelationshipMetadata";
 
 
+const specSummary1: SpecificationSummary = {
+    id: "111",
+    name: "PSG 19-20",
+    fundingPeriod: {id: "say1920", name: "Schools Academic Year 2019-20"},
+    fundingStreams: [{id: "PSG", name: "PE and Sport Premium Grant"}],
+    description: "lorem ipsum lalala",
+    isSelectedForFunding: false,
+    approvalStatus: "Draft", 
+    coreProviderVersionUpdates: ProviderDataTrackingMode.Manual, 
+    dataDefinitionRelationshipIds: [], 
+    templateIds: {'1.1': ''},
+};
 const spec1: SpecificationListResultsItem = {
     id: "111",
     name: "PSG 19-20",
@@ -165,7 +181,6 @@ export const mockApiData = () => {
         name: "Dedicated Schools Grant",
     };
 
-
     function getSpecifications() {
         return {
             totalCount: 2,
@@ -225,7 +240,48 @@ export const mockApiData = () => {
             }
         };
     }
-
+    
+    const fundingLine1: DatasetTemplateMetadata = {
+        name: 'funding line 1',
+        templateId: 97,
+        isObsolete: false,
+        isSelected: true
+    }
+    const calc1: DatasetTemplateMetadata = {
+        name: 'calc a',
+        templateId: 51,
+        isObsolete: false,
+        isSelected: true
+    }
+    const calc2: DatasetTemplateMetadata = {
+        name: 'calc b',
+        templateId: 433,
+        isObsolete: true,
+        isSelected: false
+    }
+    const datasetMetadata1 = {
+        fundingStreamId: fundingStream1.id,
+        fundingPeriodId: fundingPeriod1.id,
+        specificationId: specSummary1.id,
+        fundingLines: [fundingLine1],
+        calculations: [calc1, calc2]
+    } as DatasetMetadata;
+    const relationshipMetadata1: ReferencedSpecificationRelationshipMetadata = {
+        currentSpecificationId: spec1.id,
+        currentSpecificationName: spec1.name,
+        fundingPeriodId: fundingPeriod1.id,
+        fundingPeriodName: fundingPeriod1.name,
+        fundingStreamId: fundingStream1.id,
+        fundingStreamName: fundingStream1.name,
+        referenceSpecificationId: spec2.id,
+        referenceSpecificationName: spec2.name,
+        relationshipDescription: "relationship description",
+        relationshipId: "relationshipId",
+        relationshipName: "Relationship Name",
+        fundingLines: [fundingLine1],
+        calculations: [calc1, calc2],
+    };
+    
     return {
         fundingStream1,
         fundingStream2,
@@ -234,5 +290,11 @@ export const mockApiData = () => {
         spec1,
         spec2,
         getSpecifications,
+        specSummary1,
+        fundingLine1,
+        calc1,
+        calc2,
+        datasetMetadata1,
+        relationshipMetadata1
     }
 }

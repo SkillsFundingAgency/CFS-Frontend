@@ -24,7 +24,7 @@ namespace CalculateFunding.Common.ApiClient.Models
             {
                 return onNoContent(apiResponse);
             }
-            
+
             IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName);
 
             return errorResult ?? onSuccess(apiResponse);
@@ -46,7 +46,7 @@ namespace CalculateFunding.Common.ApiClient.Models
             {
                 return onNoContent(apiResponse);
             }
-            
+
             IActionResult errorResult = apiResponse.IsSuccessOrReturnFailureResult(entityName);
 
             return errorResult ?? onSuccess(apiResponse);
@@ -63,6 +63,19 @@ namespace CalculateFunding.Common.ApiClient.Models
             }
 
             return (apiResponse as ApiResponse<T>).IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
+        }
+
+        public static IActionResult IsSuccessOrReturnFailureResult(
+            this NoValidatedContentApiResponse apiResponse,
+            string entityName,
+            bool treatNoContentAsSuccess = true)
+        {
+            if (apiResponse != null && apiResponse.IsBadRequest(out BadRequestObjectResult badRequestObject))
+            {
+                return badRequestObject;
+            }
+
+            return apiResponse.IsSuccessOrReturnFailureResult(entityName, treatNoContentAsSuccess);
         }
 
         public static IActionResult IsSuccessOrReturnFailureResult<T>(

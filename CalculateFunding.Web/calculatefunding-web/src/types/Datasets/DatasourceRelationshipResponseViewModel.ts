@@ -8,7 +8,7 @@ export interface Dataset {
     name: string;
 }
 
-export interface RelationshipData {
+export interface DatasourceRelationshipResponseViewModel {
     specificationId: string;
     specificationName: string;
     definitionId: string;

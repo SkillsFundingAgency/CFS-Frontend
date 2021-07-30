@@ -10,7 +10,7 @@ import * as useRelationshipDataHook from "../../../hooks/useRelationshipData";
 import {RelationshipDataQueryResult} from "../../../hooks/useRelationshipData";
 import * as useSpecificationSummaryHook from "../../../hooks/useSpecificationSummary";
 import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
-import {RelationshipData} from "../../../types/Datasets/RelationshipData";
+import {DatasourceRelationshipResponseViewModel} from "../../../types/Datasets/DatasourceRelationshipResponseViewModel";
 import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {JobType} from "../../../types/jobType";
 import {RunningStatus} from "../../../types/RunningStatus";
@@ -36,7 +36,7 @@ const matchMock: match<SelectDataSourceRouteProps> = {
     isExact: true,
     url: ""
 };
-const mockRelationshipData: RelationshipData = {
+const mockRelationshipData: DatasourceRelationshipResponseViewModel = {
     specificationId: "asdfga",
     datasets: [],
     definitionId: "asdfa",

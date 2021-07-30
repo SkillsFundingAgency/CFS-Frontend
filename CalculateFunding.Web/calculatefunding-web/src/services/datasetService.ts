@@ -3,7 +3,6 @@ import {CreateDatasetRequestViewModel} from "../types/Datasets/CreateDatasetRequ
 import {DatasetSearchRequestViewModel} from "../types/Datasets/DatasetSearchRequestViewModel";
 import axios, {AxiosResponse} from "axios"
 import {DatasourceVersionSearchModel} from "../types/Datasets/DatasourceVersionSearchModel";
-import {RelationshipData} from "../types/Datasets/RelationshipData";
 import {UpdateNewDatasetVersionResponseViewModel} from "../types/Datasets/UpdateDatasetRequestViewModel";
 import {DataschemaDetailsViewModel} from "../types/Datasets/DataschemaDetailsViewModel";
 import {AssignDatasetSchemaRequest} from "../types/Datasets/AssignDatasetSchemaRequest";
@@ -15,19 +14,24 @@ import {DatasetVersionHistoryViewModel} from "../types/Datasets/DatasetVersionHi
 import {ToggleDatasetSchemaRequest} from "../types/Datasets/ToggleDatasetSchemaRequest";
 import {EligibleSpecificationReferenceModel} from "../types/Datasets/EligibleSpecificationReferenceModel";
 import {
-    CreateDatasetSpecificationRelationshipRequest,
-    PublishedSpecificationTemplateMetadata,
-    ValidateDefinitionSpecificationRelationshipModel
+    PublishedSpecificationTemplateMetadata
 } from "../types/Datasets/PublishedSpecificationTemplateMetadata";
+import {DatasetMetadata} from "../types/Datasets/DatasetMetadata";
+import {DatasetRelationship} from "../types/DatasetRelationship";
+import {ValidateDefinitionSpecificationRelationshipModel} from "../types/Datasets/ValidateDefinitionSpecificationRelationshipModel";
+import {
+    CreateDatasetSpecificationRelationshipRequest
+} from "../types/Datasets/CreateDatasetSpecificationRelationshipRequest";
+import {UpdateDatasetSpecificationRelationshipRequest} from "../types/Datasets/UpdateDatasetSpecificationRelationshipRequest";
+import {ReferencedSpecificationRelationshipMetadata} from "../types/Datasets/ReferencedSpecificationRelationshipMetadata";
+import {DatasourceRelationshipResponseViewModel} from "../types/Datasets/DatasourceRelationshipResponseViewModel";
 
 const baseUrl = "/api/datasets";
 
-export async function getDatasetBySpecificationIdService(specificationId: string) {
-    return axios(`${baseUrl}/getdatasetsbyspecificationid/${specificationId}`, {
+export async function getDatasetsBySpecification(specificationId: string): Promise<AxiosResponse<DatasetRelationship[]>> {
+    return axios(`/api/specifications/${specificationId}/datasets`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'},
     });
 }
 
@@ -35,9 +39,7 @@ export async function getDatasetDefinitionsService():
     Promise<AxiosResponse<DatasetDefinition[]>> {
     return axios(`${baseUrl}/get-dataset-definitions/`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'},
     });
 }
 
@@ -45,20 +47,16 @@ export async function assignDatasetSchemaService(request: AssignDatasetSchemaReq
     Promise<AxiosResponse<boolean>> {
     return axios(`${baseUrl}/assignDatasetSchema/${request.specificationId}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: request
     });
 }
 
-export async function toggleDatasetRelaionshipService(request: ToggleDatasetSchemaRequest):
+export async function toggleDatasetRelationshipService(request: ToggleDatasetSchemaRequest):
     Promise<AxiosResponse<boolean>> {
     return axios(`${baseUrl}/toggleDatasetRelationship/${request.relationshipId}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: request.converterEnabled
     });
 }
@@ -66,9 +64,7 @@ export async function toggleDatasetRelaionshipService(request: ToggleDatasetSche
 export async function searchDatasetDefinitionsService(request: DatasetDefinitionRequestViewModel) {
     return axios(`/api/dataset-definitions/search`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: request
     })
 }
@@ -104,9 +100,7 @@ export async function createDatasetService(request: CreateDatasetRequestViewMode
 export async function updateDatasetService(fundingStreamId: string, datasetId: string, fileName: string) {
     return axios(`${baseUrl}/${fundingStreamId}/${datasetId}`, {
         method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: {
             fileName: fileName
         }
@@ -178,9 +172,7 @@ export async function validateDatasetService(
 export async function getDatasetValidateStatusService(operationId: string) {
     return axios(`/api/dataset-validate-status/${operationId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }
 
@@ -188,9 +180,7 @@ export async function searchDatasetService(request: DatasetSearchRequestViewMode
     Promise<AxiosResponse<DatasetSearchResponseViewModel>> {
     return axios(`${baseUrl}/search`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: {
             searchTerm: request.searchTerm,
             pageNumber: request.pageNumber,
@@ -210,21 +200,26 @@ export async function getDatasetsForFundingStreamService(fundingStreamId: string
     })
 }
 
-export async function getRelationshipData(relationshipId: string): Promise<AxiosResponse<RelationshipData>> {
+export async function getDatasourcesByRelationship(relationshipId: string)
+    : Promise<AxiosResponse<DatasourceRelationshipResponseViewModel>> {
     return axios(`${baseUrl}/get-datasources-by-relationship-id/${relationshipId}`, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
+    })
+}
+
+export async function getReferencedSpecificationRelationshipMetadata(specificationId: string, relationshipId: string)
+    : Promise<AxiosResponse<ReferencedSpecificationRelationshipMetadata>> {
+    return axios(`/api/specifications/${specificationId}/dataset-relationship/${relationshipId}`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
     })
 }
 
 export async function searchDatasetRelationshipsService(request: DatasetDefinitionRequestViewModel) {
     return axios(`/api/datasetrelationships/search`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: request
     })
 }
@@ -232,18 +227,14 @@ export async function searchDatasetRelationshipsService(request: DatasetDefiniti
 export async function assignDataSourceService(relationshipId: string, specificationId: string, datasetVersionId: string) {
     return axios(`${baseUrl}/assign-datasource-version-to-relationship/${specificationId}/${relationshipId}/${datasetVersionId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }
 
 export async function getExpandedDataSources(relationshipId: string, datasetId: string, searchRequest: DatasourceVersionSearchModel) {
     return axios(`${baseUrl}/expanded-datasources/${relationshipId}/${datasetId}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         data: searchRequest
     })
 }
@@ -266,7 +257,7 @@ export async function getPublishedSpecificationTemplateMetadataForCreatingNewDat
 
 export async function validateDefinitionForCreatingNewDataset(request: ValidateDefinitionSpecificationRelationshipModel):
     Promise<AxiosResponse<ValidateDefinitionSpecificationRelationshipModel[]>> {
-    return axios(`/api/datasets/validate-definition-specification-relationship`, {
+    return axios(`${baseUrl}/validate-definition-specification-relationship`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         data: request
@@ -275,8 +266,17 @@ export async function validateDefinitionForCreatingNewDataset(request: ValidateD
 
 export async function createDatasetFromReleased(request: CreateDatasetSpecificationRelationshipRequest):
     Promise<AxiosResponse<object>> {
-    return axios(`/api/datasets/createRelationship/${request.specificationId}`, {
+    return axios(`${baseUrl}/createRelationship/${request.specificationId}`, {
         method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        data: request
+    })
+}
+
+export async function updateDatasetFromReleased(request: UpdateDatasetSpecificationRelationshipRequest):
+    Promise<AxiosResponse<object>> {
+    return axios(`/api/specifications/${request.specificationId}/dataset-relationship/${request.relationshipId}`, {
+        method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         data: request
     })
@@ -285,17 +285,20 @@ export async function createDatasetFromReleased(request: CreateDatasetSpecificat
 export async function getCurrentDatasetVersionByDatasetId(datasetId: string) {
     return axios(`${baseUrl}/get-current-dataset-version-by-dataset-id/${datasetId}`, {
         method: "GET",
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
     })
 }
 
 export async function downloadValidateDatasetValidationErrorSasUrl(jobId: string) {
     return axios(`${baseUrl}/download-validate-dataset-error-url/${jobId}`, {
         method: "GET",
-        headers: {
-            'Content-Type': 'application/json'
-        }
+        headers: {'Content-Type': 'application/json'}
+    })
+}
+
+export async function getDatasetTemplateItems(relationshipId: string): Promise<AxiosResponse<DatasetMetadata>> {
+    return axios(`${baseUrl}/relationships/${relationshipId}/template-items`, {
+        method: "GET",
+        headers: {'Content-Type': 'application/json'}
     })
 }

@@ -1,23 +1,23 @@
 ﻿import {AxiosError} from "axios";
 import {useQuery, UseQueryOptions} from "react-query";
-import {getRelationshipData} from "../services/datasetService";
-import {RelationshipData} from "../types/Datasets/RelationshipData";
+import {getDatasourcesByRelationship, getReferencedSpecificationRelationshipMetadata} from "../services/datasetService";
+import {DatasourceRelationshipResponseViewModel} from "../types/Datasets/DatasourceRelationshipResponseViewModel";
 
 export type RelationshipDataQueryResult = {
-    relationshipData: RelationshipData | undefined,
+    relationshipData: DatasourceRelationshipResponseViewModel | undefined,
     isLoadingRelationshipData: boolean,
     isErrorLoadingRelationshipData: boolean,
     errorLoadingRelationshipData: string
 }
 export const useRelationshipData = (relationshipId: string,
-                                    queryConfig: UseQueryOptions<RelationshipData, AxiosError> =
+                                    queryConfig: UseQueryOptions<DatasourceRelationshipResponseViewModel, AxiosError> =
                                         {
                                             enabled: (relationshipId && relationshipId.length > 0) === true
                                         })
     : RelationshipDataQueryResult => {
-    const {data, isLoading, isError, error} = useQuery<RelationshipData, AxiosError>(
+    const {data, isLoading, isError, error} = useQuery<DatasourceRelationshipResponseViewModel, AxiosError>(
         `datasources-by-relationship-${relationshipId}`,
-        async () => (await getRelationshipData(relationshipId)).data,
+        async () => (await getDatasourcesByRelationship(relationshipId)).data,
         queryConfig);
     return {
         relationshipData: data,

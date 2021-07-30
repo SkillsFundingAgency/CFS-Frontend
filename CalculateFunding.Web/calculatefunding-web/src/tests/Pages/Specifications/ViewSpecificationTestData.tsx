@@ -30,6 +30,8 @@ import {SpecificationSummary} from "../../../types/SpecificationSummary";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {equals} from "ramda";
+import {DatasetRelationship} from "../../../types/DatasetRelationship";
+import {getDatasetsBySpecification} from "../../../services/datasetService";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -141,6 +143,7 @@ export function ViewSpecificationTestData() {
             specificationId: mockSpec.id
         },
         id: "sertdhw4e5t",
+        isEnabled: true,
         onError: () => {
         },
         startDate: DateTime.local()
@@ -248,6 +251,7 @@ export function ViewSpecificationTestData() {
                         specificationId: request?.filterBy.specificationId,
                         jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
                     },
+                    isEnabled: true,
                     id: "sertdhw4e5t",
                     onError: () => request.onError,
                     startDate: DateTime.now()
@@ -260,6 +264,7 @@ export function ViewSpecificationTestData() {
                     filterBy: {},
                     id: "sertdhw4e5t",
                     onError: () => null,
+                    isEnabled: true,
                     startDate: DateTime.now()
                 }
                 subscription = sub;
@@ -438,25 +443,37 @@ export function ViewSpecificationTestData() {
 
     const mockDatasetBySpecificationIdService = () => {
         jest.mock("../../../services/datasetService", () => {
-            const datasetBySpecificationIdService = jest.requireActual('../../../services/datasetService');
+            const datasetService = jest.requireActual('../../../services/datasetService');
             return {
-                ...datasetBySpecificationIdService,
-                getDatasetBySpecificationIdService: jest.fn(() => Promise.resolve({
-                    data: {
-                        statusCode: 1,
-                        content: [{
+                ...datasetService,
+                getDatasetsBySpecification: jest.fn(() => Promise.resolve(
+                    [{
+                        definition: {
+                            description: "",
+                            id: "",
+                            name: "definition1"
+                        },
+                        relationshipDescription: "",
+                        isProviderData: false,
+                        converterEligible: false,
+                        converterEnabled: false,
+                        id: "",
+                        name: ""
+                    },
+                        {
                             definition: {
                                 description: "",
                                 id: "",
-                                name: ""
+                                name: "definition2"
                             },
                             relationshipDescription: "",
                             isProviderData: false,
-                            id: "",
+                            converterEligible: true,
+                            converterEnabled: false,
+                            id: "Con123",
                             name: ""
-                        }]
-                    }
-                }))
+                        }] as DatasetRelationship[]
+                )),
             }
         });
     }

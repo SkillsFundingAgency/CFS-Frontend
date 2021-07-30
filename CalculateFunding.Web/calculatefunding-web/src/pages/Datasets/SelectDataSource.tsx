@@ -13,7 +13,7 @@ import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNo
 import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useSpecificationSummary} from "../../hooks/useSpecificationSummary";
 import {useRelationshipData} from "../../hooks/useRelationshipData";
-import {Dataset} from "../../types/Datasets/RelationshipData";
+import {Dataset} from "../../types/Datasets/DatasourceRelationshipResponseViewModel";
 import {DatasetVersionSelection} from "../../components/DatasetMapping/DatasetVersionSelection";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
