@@ -34,6 +34,7 @@ export function UpdateDataSourceFileTestData() {
             jobTypes: [],
         },
         id: "sertdhw4e5t",
+        isEnabled: true,
         onError: () => {},
         startDate: DateTime.local()
     };
@@ -100,6 +101,7 @@ export function UpdateDataSourceFileTestData() {
                 const sub: JobSubscription = {
                     filterBy: {},
                     id: "sertdhw4e5t",
+                    isEnabled: true,
                     onError: () => null,
                     startDate: DateTime.now()
                 }
@@ -109,6 +111,7 @@ export function UpdateDataSourceFileTestData() {
             replaceSubs: (requests: AddJobSubscription[]) => {
                 const sub: JobSubscription = {
                     filterBy: {},
+                    isEnabled: true,
                     id: "sertdhw4e5t",
                     onError: () => null,
                     startDate: DateTime.now()

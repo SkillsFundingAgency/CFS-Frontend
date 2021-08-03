@@ -5,7 +5,11 @@ import {RouteComponentProps, useHistory} from "react-router";
 import {LoadingStatus} from "../../components/LoadingStatus";
 import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {DatasetChangeType, DatasetVersionHistoryViewModel, DatasetVersionHistoryItem} from "../../types/Datasets/DatasetVersionHistoryViewModel";
+import {
+    DatasetChangeType,
+    DatasetVersionHistoryItem,
+    DatasetVersionHistoryViewModel
+} from "../../types/Datasets/DatasetVersionHistoryViewModel";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import * as datasetService from "../../services/datasetService";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
@@ -23,6 +27,8 @@ import {JobDetails} from "../../types/jobDetails";
 import {DatasetEmptyFieldEvaluationOptions} from "../../types/Datasets/DatasetEmptyFieldEvaluationOptions";
 import {RunningStatus} from "../../types/RunningStatus";
 import {JobSubscription, MonitorFallback, MonitorMode, useJobSubscription} from "../../hooks/Jobs/useJobSubscription";
+import {JobProgressNotificationBanner} from "../../components/Jobs/JobProgressNotificationBanner";
+import {JobType} from "../../types/jobType";
 
 export interface UpdateDataSourceFileRouteProps {
     fundingStreamId: string;
@@ -43,7 +49,8 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         version: 0,
         changeType: DatasetChangeType.Unknown
     });
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [hideForm, setHideForm] = useState<boolean | undefined>(undefined);
     const [updateType, setUpdateType] = useState<string>("");
     const [datasetEmptyFieldEvaluationOptions, setDatasetEmptyFieldEvaluationOptions]
         = useState<DatasetEmptyFieldEvaluationOptions>(DatasetEmptyFieldEvaluationOptions.NA);
@@ -70,9 +77,27 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
     });
     const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
 
+    const converterWizardJobInProgress = jobNotifications
+        .find(j => j.latestJob?.isActive &&
+            j.latestJob?.jobType === JobType.RunConverterDatasetMergeJob);
+
+    useEffect(() => {
+        addSub({
+            filterBy: {
+                jobTypes: [JobType.RunConverterDatasetMergeJob],
+            },
+            monitorMode: MonitorMode.SignalR,
+            monitorFallback: MonitorFallback.Polling,
+            onError: err => addError({error: err, description: 'Error while monitoring background converter wizard jobs'})
+        })
+        return () => {
+            removeAllSubs();
+        };
+    }, []);
+    
     useEffect(() => {
         if (jobNotifications.length === 0) return;
-
+        
         const notification = jobNotifications.find(n => n.subscription.id === jobSubscription?.id);
         const newJob = notification?.latestJob;
 
@@ -327,6 +352,10 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
         }
     }
 
+    const onShowHiddenForm = () => {
+        setHideForm(false);
+    }
+
     return <div>
         <Header location={Section.Datasets}/>
         <div className="govuk-width-container">
@@ -347,6 +376,19 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         Update {dataset.name} (version {dataset.version})
                     </h1>
                 </legend>
+
+                {converterWizardJobInProgress &&
+                <JobProgressNotificationBanner
+                    job={converterWizardJobInProgress.latestJob}
+                    jobInProgressOverride={{
+                        heading: 'Converter wizard in progress',
+                        description: 'You will not be able to update this data source file until the converter wizard is complete.'
+                    }}
+                    displaySuccessfulJob={false}
+                    displayFailedJob={false}
+                />
+                }
+
                 <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
                     <div className="govuk-summary-list__row">
                         <dt className="govuk-summary-list__key">
@@ -368,146 +410,165 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         </dd>
                     </div>
                 </dl>
-                <div id="update-type"
-                     className={"govuk-form-group" + (!validation.updateTypeValid ? " govuk-form-group--error" : "")}>
-                    <div className="govuk-radios">
-                        <label className="govuk-label govuk-!-margin-bottom-5" htmlFor="update-type-radios">
-                            Select update type
-                        </label>
-                        <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-type-merge" name="update-type"
-                                   type="radio" data-testid="update-datasource-merge" value="merge"
-                                   onClick={(e) => setUpdateType(e.currentTarget.value)}/>
-                            <label className="govuk-label govuk-radios__label" htmlFor="update-type-merge">
-                                Merge existing version
-                            </label>
-                            <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
-                                Combine a new data source with the existing file
-                            </div>
-                        </div>
-                        <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-type-new" name="update-type" type="radio"
-                                   value="new" data-testid="update-datasource-new"
-                                   onClick={(e) => setUpdateType(e.currentTarget.value)}/>
-                            <label className="govuk-label govuk-radios__label" htmlFor="update-type-new">
-                                Create new version
-                            </label>
-                            <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
-                                Replace the existing data source with a new file
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {(updateType === "merge") &&
-                <div data-testid="update-type-merge-confirmation"
-                     className={"govuk-form-group" + (!validation.mergeConfirmationValid ? " govuk-form-group--error" : "")}>
-                    <div className="govuk-radios">
-                        <label className="govuk-label govuk-!-margin-bottom-5" htmlFor="update-type-radios">
-                            Do you want to treat empty cells as values when updating providers?
-                        </label>
-                        <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-datasource-merge-blank-yes"
-                                   name="update-merge-confirmation"
-                                   type="radio" data-testid="update-datasource-merge-blank-yes" value="merge"
-                                   onClick={() =>
-                                       setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.AsNull)}/>
-                            <label className="govuk-label govuk-radios__label"
-                                   htmlFor="update-datasource-merge-blank-yes">
-                                Yes
-                            </label>
-                            <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
-                                Allow an empty cell to replace an existing previous value
-                            </div>
-                        </div>
-                        <div className="govuk-radios__item">
-                            <input className="govuk-radios__input" id="update-datasource-merge-blank-no"
-                                   name="update-merge-confirmation"
-                                   type="radio" value="new" data-testid="update-datasource-merge-blank-no"
-                                   onClick={() =>
-                                       setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.Ignore)}/>
-                            <label className="govuk-label govuk-radios__label"
-                                   htmlFor="update-datasource-merge-blank-no">
-                                No
-                            </label>
-                            <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
-                                Ignore any empty cells in the file upload
-                            </div>
-                        </div>
-                    </div>
+
+                {converterWizardJobInProgress && hideForm !== false &&
+                <div className="govuk-grid-column-full govuk-!-padding-3 border content-toggle-container-jq">
+                    <h3 className="govuk-heading-s">Why is some of this page hidden?</h3>
+                    <p>While the converter wizard is in progress, we are unable to make any updates to the page. This message will automatically dissappear when the converter wizard is complete.</p>
+                    <button 
+                        className="govuk-link content-toggle-jq"
+                        onClick={onShowHiddenForm}
+                    >
+                        I understand I cannot currently update this page. Show page content.
+                    </button>
                 </div>
                 }
-                <div id="select-data-source"
-                     className={"govuk-form-group" + (!validation.fileValid ? " govuk-form-group--error" : "")}>
-                    <label className="govuk-label" htmlFor="file-upload-data-source">
-                        Select data source file
-                    </label>
-                    {
-                        (!validation.fileValid) ?
-                            <span id="data-source-error-message" className="govuk-error-message">
-                                <span className="govuk-visually-hidden">Error:</span>
-                                {
-                                    (!validation.fileValid) ?
-                                        "Upload a xls or xlsx file"
-                                        : ""
-                                }
-                            </span>
-                            : ""
+                {(!converterWizardJobInProgress || hideForm === false) &&
+                <>
+                    <div id="update-type"
+                         className={"govuk-form-group" + (!validation.updateTypeValid ? " govuk-form-group--error" : "")}>
+                        <div className="govuk-radios">
+                            <label className="govuk-label govuk-!-margin-bottom-5" htmlFor="update-type-radios">
+                                Select update type
+                            </label>
+                            <div className="govuk-radios__item">
+                                <input className="govuk-radios__input" id="update-type-merge" name="update-type"
+                                       type="radio" data-testid="update-datasource-merge" value="merge"
+                                       onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                                <label className="govuk-label govuk-radios__label" htmlFor="update-type-merge">
+                                    Merge existing version
+                                </label>
+                                <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
+                                    Combine a new data source with the existing file
+                                </div>
+                            </div>
+                            <div className="govuk-radios__item">
+                                <input className="govuk-radios__input" id="update-type-new" name="update-type"
+                                       type="radio"
+                                       value="new" data-testid="update-datasource-new"
+                                       onClick={(e) => setUpdateType(e.currentTarget.value)}/>
+                                <label className="govuk-label govuk-radios__label" htmlFor="update-type-new">
+                                    Create new version
+                                </label>
+                                <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
+                                    Replace the existing data source with a new file
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {(updateType === "merge") &&
+                    <div data-testid="update-type-merge-confirmation"
+                         className={"govuk-form-group" + (!validation.mergeConfirmationValid ? " govuk-form-group--error" : "")}>
+                        <div className="govuk-radios">
+                            <label className="govuk-label govuk-!-margin-bottom-5" htmlFor="update-type-radios">
+                                Do you want to treat empty cells as values when updating providers?
+                            </label>
+                            <div className="govuk-radios__item">
+                                <input className="govuk-radios__input" id="update-datasource-merge-blank-yes"
+                                       name="update-merge-confirmation"
+                                       type="radio" data-testid="update-datasource-merge-blank-yes" value="merge"
+                                       onClick={() =>
+                                           setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.AsNull)}/>
+                                <label className="govuk-label govuk-radios__label"
+                                       htmlFor="update-datasource-merge-blank-yes">
+                                    Yes
+                                </label>
+                                <div id="update-type-merge-hint" className="govuk-hint govuk-radios__hint">
+                                    Allow an empty cell to replace an existing previous value
+                                </div>
+                            </div>
+                            <div className="govuk-radios__item">
+                                <input className="govuk-radios__input" id="update-datasource-merge-blank-no"
+                                       name="update-merge-confirmation"
+                                       type="radio" value="new" data-testid="update-datasource-merge-blank-no"
+                                       onClick={() =>
+                                           setDatasetEmptyFieldEvaluationOptions(DatasetEmptyFieldEvaluationOptions.Ignore)}/>
+                                <label className="govuk-label govuk-radios__label"
+                                       htmlFor="update-datasource-merge-blank-no">
+                                    No
+                                </label>
+                                <div id="update-type-new-hint" className="govuk-hint govuk-radios__hint">
+                                    Ignore any empty cells in the file upload
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     }
-                    <input className={"govuk-file-upload" + (!validation.fileValid ? " govuk-file-upload--error" : "")}
-                           id="file-upload-data-source" name="file-upload-data-source" type="file"
-                           onChange={(e) => storeFileUpload(e)}
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-                           data-testid="update-datasource-file-upload"/>
-                </div>
+                    <div id="select-data-source"
+                         className={"govuk-form-group" + (!validation.fileValid ? " govuk-form-group--error" : "")}>
+                        <label className="govuk-label" htmlFor="file-upload-data-source">
+                            Select data source file
+                        </label>
+                        {
+                            (!validation.fileValid) ?
+                                <span id="data-source-error-message" className="govuk-error-message">
+                                <span className="govuk-visually-hidden">Error:</span>
+                                    {
+                                        (!validation.fileValid) ?
+                                            "Upload a xls or xlsx file"
+                                            : ""
+                                    }
+                            </span>
+                                : ""
+                        }
+                        <input
+                            className={"govuk-file-upload" + (!validation.fileValid ? " govuk-file-upload--error" : "")}
+                            id="file-upload-data-source" name="file-upload-data-source" type="file"
+                            onChange={(e) => storeFileUpload(e)}
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                            data-testid="update-datasource-file-upload"/>
+                    </div>
 
-                <div className="govuk-form-group">
-                    <label className="govuk-label" htmlFor="more-detail">
-                        Description
-                    </label>
-                    <span className="govuk-hint">
+                    <div className="govuk-form-group">
+                        <label className="govuk-label" htmlFor="more-detail">
+                            Description
+                        </label>
+                        <span className="govuk-hint">
 
                     </span>
-                    <textarea className="govuk-textarea" rows={5}
-                              aria-describedby="more-detail-hint" value={description}
-                              onChange={(e) => setDescription(e.target.value)}>
+                        <textarea className="govuk-textarea" rows={5}
+                                  aria-describedby="more-detail-hint" value={description}
+                                  onChange={(e) => setDescription(e.target.value)}>
                     </textarea>
-                </div>
+                    </div>
 
-                <div id="change-note"
-                     className={"govuk-form-group" + (!validation.changeNoteValid ? " govuk-form-group--error" : "")}>
-                    <label className="govuk-label" htmlFor="more-detail">
-                        Change note
-                    </label>
-                    <span className="govuk-hint">
+                    <div id="change-note"
+                         className={"govuk-form-group" + (!validation.changeNoteValid ? " govuk-form-group--error" : "")}>
+                        <label className="govuk-label" htmlFor="more-detail">
+                            Change note
+                        </label>
+                        <span className="govuk-hint">
 
                     </span>
-                    {
-                        (!validation.changeNoteValid) ?
-                            <span className="govuk-error-message">
+                        {
+                            (!validation.changeNoteValid) ?
+                                <span className="govuk-error-message">
                                 <span className="govuk-visually-hidden">Error:</span>
                                 Enter change note
                             </span>
-                            : ""
-                    }
-                    <textarea
-                        className={"govuk-textarea" + (!validation.changeNoteValid ? " govuk-textarea--error" : "")}
-                        rows={5}
-                        aria-describedby="more-detail-hint" value={changeNote}
-                        onChange={(e) => setChangeNote(e.target.value)}
-                        data-testid="update-datasource-changenote">
+                                : ""
+                        }
+                        <textarea
+                            className={"govuk-textarea" + (!validation.changeNoteValid ? " govuk-textarea--error" : "")}
+                            rows={5}
+                            aria-describedby="more-detail-hint" value={changeNote}
+                            onChange={(e) => setChangeNote(e.target.value)}
+                            data-testid="update-datasource-changenote">
                     </textarea>
-                </div>
+                    </div>
 
-                <button id={"submit-datasource-file"} className="govuk-button govuk-!-margin-right-1"
-                        data-module="govuk-button"
-                        onClick={submitDataSourceFile} data-testid="update-datasource-save">
-                    Save
-                </button>
-                <Link id={"cancel-datasource-link"} to={`/Datasets/ManageData`}
-                      className="govuk-button govuk-button--secondary"
-                      data-module="govuk-button">
-                    Cancel
-                </Link>
+                    <button id={"submit-datasource-file"} className="govuk-button govuk-!-margin-right-1"
+                            data-module="govuk-button"
+                            onClick={submitDataSourceFile} data-testid="update-datasource-save">
+                        Save
+                    </button>
+                    <Link id={"cancel-datasource-link"} to={`/Datasets/ManageData`}
+                          className="govuk-button govuk-button--secondary"
+                          data-module="govuk-button">
+                        Cancel
+                    </Link>
+                </>
+                }
             </fieldset>
             {(mergeResults !== undefined) ?
                 <>

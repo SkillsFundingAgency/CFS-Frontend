@@ -10,7 +10,7 @@ export interface ReportMetadataViewModel {
     size: string;
     grouping: ReportGrouping,
     groupingLevel: ReportGroupingLevel
-    reportType: JobType
+    reportType: ReportType
     expanded?: boolean,
     customRef?: React.MutableRefObject<null>,
 }
@@ -30,7 +30,7 @@ export enum ReportGroupingLevel {
     Released = "Released"
 }
 
-export enum JobType {
+export enum ReportType {
     Undefined,
     CurrentState,
     Released,

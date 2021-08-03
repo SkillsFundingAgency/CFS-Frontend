@@ -4,7 +4,7 @@ import {DownloadableReports} from "../../../components/Reports/DownloadableRepor
 import {render, screen} from "@testing-library/react";
 import {Route, Switch} from "react-router-dom";
 import {waitFor} from "@testing-library/dom";
-import {JobType, ReportGrouping, ReportGroupingLevel} from "../../../types/Specifications/ReportMetadataViewModel";
+import {ReportType, ReportGrouping, ReportGroupingLevel} from "../../../types/Specifications/ReportMetadataViewModel";
 import userEvent from "@testing-library/user-event";
 import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as errorHook from "../../../hooks/useErrors";
@@ -117,7 +117,7 @@ const mockValidateDownloadableReports = jest.fn(() => Promise.resolve({
             size: "123",
             grouping: ReportGrouping.Live,
             groupingLevel: ReportGroupingLevel.Undefined,
-            reportType: JobType.Undefined
+            reportType: ReportType.Undefined
         },
         {
             specificationReportIdentifier: "2",
@@ -128,7 +128,7 @@ const mockValidateDownloadableReports = jest.fn(() => Promise.resolve({
             size: "123",
             grouping: ReportGrouping.Group,
             groupingLevel: ReportGroupingLevel.Current,
-            reportType: JobType.Undefined
+            reportType: ReportType.Undefined
         },
         {
             specificationReportIdentifier: "3",
@@ -139,7 +139,7 @@ const mockValidateDownloadableReports = jest.fn(() => Promise.resolve({
             size: "123",
             grouping: ReportGrouping.Profiling,
             groupingLevel: ReportGroupingLevel.All,
-            reportType: JobType.Undefined
+            reportType: ReportType.Undefined
         },
         {
             specificationReportIdentifier: "4",
@@ -150,7 +150,7 @@ const mockValidateDownloadableReports = jest.fn(() => Promise.resolve({
             size: "123",
             grouping: ReportGrouping.Provider,
             groupingLevel: ReportGroupingLevel.Released,
-            reportType: JobType.Undefined
+            reportType: ReportType.Undefined
         }
     ]
 }));

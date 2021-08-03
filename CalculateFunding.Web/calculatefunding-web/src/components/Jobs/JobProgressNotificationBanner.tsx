@@ -1,27 +1,77 @@
-import React from "react";
+import React, {useMemo} from "react";
 import {DateTimeFormatter} from "../DateTimeFormatter";
 import {JobDetails} from "../../types/jobDetails";
 
+export interface JobNotificationTextProps {
+    heading?: string;
+    description?: string;
+}
+
 export interface JobProgressNotificationBannerProps {
     job: JobDetails | undefined,
+    displayFailedJob?: boolean,
+    jobInProgressOverride?: JobNotificationTextProps,
+    jobFailedOverride?: JobNotificationTextProps,
+    jobSuccessfulOverride?: JobNotificationTextProps,
     displaySuccessfulJob?: boolean
 }
 
 export function JobProgressNotificationBanner(props: JobProgressNotificationBannerProps) {
+
+    const title = useMemo(() => {
+        if (!props.job) return '';
+
+        if (props.job.isActive && props.jobInProgressOverride)
+            return props.jobInProgressOverride.heading;
+
+        if (props.job.isFailed && props.jobFailedOverride)
+            return props.jobFailedOverride.heading;
+
+        if (props.job.isSuccessful && props.jobSuccessfulOverride)
+            return props.jobSuccessfulOverride.heading;
+
+        return `Job ${props.job.statusDescription}: ${props.job.jobDescription}${props.job.outcome && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}`;
+        
+    }, [props.job, props.jobFailedOverride, props.jobInProgressOverride, props.jobSuccessfulOverride]);
+    
+    const description = useMemo(() => {
+        if (!props.job) return '';
+
+        if (props.job.isActive && props.jobInProgressOverride)
+            return props.jobInProgressOverride.description;
+
+        if (props.job.isFailed && props.jobFailedOverride)
+            return props.jobFailedOverride.description;
+
+        if (props.job.isSuccessful && props.jobSuccessfulOverride)
+            return props.jobSuccessfulOverride.description;
+
+        return undefined;
+        
+    }, [props.job, props.jobFailedOverride, props.jobInProgressOverride, props.jobSuccessfulOverride]);
+
+    const cssClass = useMemo(() => {
+        if (!props.job) return '';
+
+        return props.job.isFailed ? "govuk-error-summary-red" :
+            props.job.isSuccessful ? "govuk-error-summary-green" :
+                props.job.isActive ? "govuk-error-summary-orange" :
+                    "";
+        
+    }, [props.job]);
+
     if (!props.job) {
         return null;
     }
 
-    if (props.displaySuccessfulJob != null && !props.displaySuccessfulJob && props.job.isSuccessful)
-    {
+    if (props.displaySuccessfulJob != null && !props.displaySuccessfulJob && props.job.isSuccessful) {
         return null;
     }
 
-    const cssClass = props.job.isFailed ? "govuk-error-summary-red" :
-        props.job.isSuccessful ? "govuk-error-summary-green" :
-            props.job.isActive ? "govuk-error-summary-orange" :
-                "";
-
+    if (props.displayFailedJob != null && !props.displayFailedJob && props.job.isFailed) {
+        return null;
+    }
+    
     return <div
         className={`govuk-error-summary ${cssClass}`}
         aria-labelledby="error-summary-title"
@@ -32,13 +82,15 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
 
         <h2 className="govuk-error-summary__title" id="error-summary-title">
             <span data-testid="job-notification-title">
-                Job {props.job.statusDescription}: {props.job.jobDescription}{props.job.outcome && props.job.outcome.length > 0 ? ": " + props.job.outcome : ""}
-                </span>
+                {title}
+            </span>
             {props.job.isActive &&
-            <div className="loader loader-small" role="alert" aria-live="assertive" aria-label="Monitoring job"/>
+            <div className="loader loader-small" role="alert"/>
             }
+
             {props.job.isFailed && props.job.failures.length > 0 &&
             <ul className="govuk-list govuk-error-summary__list">
+                {props.jobFailedOverride}
                 {props.job.failures.map(f =>
                     <li>
                         <p className="govuk-body">
@@ -55,10 +107,19 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
                     <p className="govuk-body">
                         {`Initiated by ${props.job.invokerUserDisplayName} on `}
                         <span data-testid="formatted-created-date">
-                            <DateTimeFormatter date={props.job.created as Date} />
+                            <DateTimeFormatter date={props.job.created as Date}/>
                         </span>
                     </p>
                 </li>
+                {description &&
+                <li>
+                    <p className="govuk-body-s italic">
+                        <span>
+                            {description}
+                        </span>
+                    </p>
+                </li>
+                }
                 {props.job.isFailed &&
                 <li>
                     <p className="govuk-body-s">
@@ -71,7 +132,7 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
                     <p className="govuk-body-s">
                         <strong>Completed: </strong>
                         <span data-testid="formatted-completed-date">
-                            <DateTimeFormatter date={props.job.lastUpdated as Date} />
+                            <DateTimeFormatter date={props.job.lastUpdated as Date}/>
                         </span>
                     </p>
                 </li>}
