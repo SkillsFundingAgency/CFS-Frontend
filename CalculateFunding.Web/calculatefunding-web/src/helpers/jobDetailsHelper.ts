@@ -39,7 +39,7 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
                     description: x.description,
                     type: x.type,
                     jobType: x.jobType,
-                    jobDescription: x.jobType};
+                    jobDescription: getJobProgressMessage(x.jobType)};
             });
         const hasValidationError = result.failures.some(e => e.type === JobOutcomeType.ValidationError);
         result.outcome = result.failures.length === 1 ? "One of the job steps failed" : "Some of the job steps failed";

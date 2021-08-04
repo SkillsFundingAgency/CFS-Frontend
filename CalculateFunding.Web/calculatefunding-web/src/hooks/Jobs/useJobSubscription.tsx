@@ -81,13 +81,10 @@ export const useJobSubscription = ({
     };
 
     const addSub = async (request: AddJobSubscription): Promise<JobSubscription> => {
-        if (subs.length === 0) {
-            reset();
-        }
-
         const newSub = util.convert(request);
         const existing = util.findExistingSubscription(subs, newSub);
         if (!existing) {
+            console.log(`Subscribing to jobs with jobId=[${newSub.filterBy.jobId}], jobTypes=[${newSub.filterBy.jobTypes?.join(',')}], specificationId=[${newSub.filterBy.specificationId}], `)
             setSubs(existing => [...existing, newSub]);
         }
         if (!!newSub.fetchPriorNotifications) {
@@ -104,12 +101,10 @@ export const useJobSubscription = ({
 
     const removeSub = (id: string) => {
         setSubs(existing => existing.filter(x => x.id !== id));
-        setNotifications(existing => existing.filter(n => n.subscription.id === id));
     };
 
     const removeAllSubs = () => {
         setSubs([]);
-        setNotifications([]);
     };
 
     const onSignalRFail = (error: string) => {

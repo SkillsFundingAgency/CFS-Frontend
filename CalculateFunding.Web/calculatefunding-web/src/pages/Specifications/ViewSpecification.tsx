@@ -41,7 +41,13 @@ import {useCalculationErrors} from "../../hooks/Calculations/useCalculationError
 import {useFundingConfiguration} from "../../hooks/useFundingConfiguration";
 import {JobObserverState} from '../../states/JobObserverState';
 import * as action from "../../actions/jobObserverActions";
-import {JobNotification, JobSubscription, MonitorMode, useJobSubscription} from "../../hooks/Jobs/useJobSubscription";
+import {
+    JobNotification,
+    JobSubscription,
+    MonitorFallback,
+    MonitorMode,
+    useJobSubscription
+} from "../../hooks/Jobs/useJobSubscription";
 import {JobDetails} from "../../types/jobDetails";
 
 export interface ViewSpecificationRoute {
@@ -309,6 +315,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                 } else {
                     await addSub({
                         monitorMode: MonitorMode.SignalR,
+                        monitorFallback: MonitorFallback.Polling,
+                        fetchPriorNotifications: true,
                         filterBy: {specificationId: specificationId, jobTypes: [JobType.ApproveAllCalculationsJob], jobId: response.data?.id},
                         onError: e => addError({error: e, description: "Error while checking for approve all calculation job"})
                     });
