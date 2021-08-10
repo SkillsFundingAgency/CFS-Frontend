@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
 using CalculateFunding.Common.ApiClient.Calcs.Models;
+using CalculateFunding.Common.ApiClient.Calcs.Models.ObsoleteItems;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
@@ -100,6 +101,12 @@ namespace CalculateFunding.Frontend.Controllers
                 CodeReference = _.CodeReference,
                 ItemType = _.ItemType,
                 SpecificationId = _.SpecificationId,
+                DatasetRelationshipId = _.DatasetRelationshipId,
+                DatasetRelationshipName = _.DatasetRelationshipName,
+                DatasetFieldId = _.DatasetFieldId,
+                DatasetFieldName = _.DatasetFieldName,
+                DatasetDatatype = _.DatasetDatatype,
+                IsReleasedData = _.IsReleasedData,
                 EnumValueName = _.EnumValueName,
                 FundingLineId = _.FundingLineId,
                 FundingLineName = _.FundingLineName,
