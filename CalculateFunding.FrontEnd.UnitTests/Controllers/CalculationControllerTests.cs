@@ -409,7 +409,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [TestMethod]
-        public async Task ApproveAllCalculations_GivenApproveAllCalculationsReturnsBadRequest_ThrowsInvalidOperationException()
+        public void ApproveAllCalculations_GivenApproveAllCalculationsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
 

@@ -398,7 +398,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task SetProfileVariationPointers_Throws_InvalidOperationException_Given_An_Error_Occurred_While_Updating()
+        public void SetProfileVariationPointers_Throws_InvalidOperationException_Given_An_Error_Occurred_While_Updating()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
             string aValidSpecificationId = "ABC";

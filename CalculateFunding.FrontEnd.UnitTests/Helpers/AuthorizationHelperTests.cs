@@ -515,7 +515,7 @@ namespace CalculateFunding.Frontend.UnitTests.Helpers
         }
 
         [TestMethod]
-        public async Task Specifications_GetFundingStreamPermissionsForUser_WhenUserDoesIsNotAnAfmin_ThenThrowsAnException()
+        public void Specifications_GetFundingStreamPermissionsForUser_WhenUserDoesIsNotAnAfmin_ThenThrowsAnException()
         {
             string executingUserId = "usr1";
             ClaimsPrincipal user = BuildClaimsPrincipal(executingUserId);

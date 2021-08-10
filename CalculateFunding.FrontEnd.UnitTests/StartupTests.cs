@@ -56,7 +56,7 @@ namespace CalculateFunding.Frontend.UnitTests
 
             // Act
             target.ConfigureServices(services);
-            services.AddSingleton<IHttpContextAccessor>(httpContextAccessor);
+            services.AddSingleton(httpContextAccessor);
 
             // Assert
             ServiceProvider serviceProvider = services.BuildServiceProvider();

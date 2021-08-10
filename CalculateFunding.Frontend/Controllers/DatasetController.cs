@@ -22,6 +22,7 @@ using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Serilog;
 using DatasetRelationshipType = CalculateFunding.Common.ApiClient.DataSets.Models.DatasetRelationshipType;
 
@@ -301,43 +302,27 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            if (!string.IsNullOrWhiteSpace(viewModel.Name))
-            {
-                ApiResponse<DefinitionSpecificationRelationship> existingRelationshipResponse =
-                    await _datasetApiClient.GetRelationshipBySpecificationIdAndName(specificationId, viewModel.Name);
+            ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse =
+                    await _datasetApiClient.GetDatasetDefinitions();
 
-                if (existingRelationshipResponse.StatusCode != HttpStatusCode.NotFound)
-                {
-                    this.ModelState.AddModelError(
-                        $"{nameof(AssignDatasetSchemaViewModel)}.{nameof(AssignDatasetSchemaViewModel.Name)}",
-                        ValidationMessages.RelationshipNameAlreadyExists);
-                }
+            if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new NotFoundObjectResult(ErrorMessages.DatasetDefinitionNotFoundInDatasetService);
             }
 
-            if (!ModelState.IsValid)
+            if (datasetResponse.StatusCode == HttpStatusCode.OK)
             {
-                ApiResponse<IEnumerable<DatasetDefinition>> datasetResponse =
-                        await _datasetApiClient.GetDatasetDefinitions();
+                IEnumerable<DatasetDefinition> datasetDefinitionList = datasetResponse.Content;
 
-                if (datasetResponse == null || datasetResponse.StatusCode == HttpStatusCode.NotFound)
+                if (datasetDefinitionList == null)
                 {
-                    return new NotFoundObjectResult(ErrorMessages.DatasetDefinitionNotFoundInDatasetService);
+                    throw new InvalidOperationException(
+                        $"Unable to retrieve Dataset definition from the response. Specification Id value = {specificationId}");
                 }
-
-                if (datasetResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    IEnumerable<DatasetDefinition> datasetDefinitionList = datasetResponse.Content;
-
-                    if (datasetDefinitionList == null)
-                    {
-                        throw new InvalidOperationException(
-                            $"Unable to retrieve Dataset definition from the response. Specification Id value = {specificationId}");
-                    }
-                }
-                else
-                {
-                    return new StatusCodeResult(500);
-                }
+            }
+            else
+            {
+                return new StatusCodeResult(500);
             }
 
             CreateDefinitionSpecificationRelationshipModel datasetSchema =
@@ -361,9 +346,16 @@ namespace CalculateFunding.Frontend.Controllers
                 return new OkObjectResult(true);
             }
 
-            this.ModelState.AddModelError(
-                $"{nameof(CreateDefinitionSpecificationRelationshipModel)}.{nameof(AssignDatasetSchemaViewModel.Name)}",
-                newAssignDatasetResponse.Message);
+            IDictionary<string, IEnumerable<string>> modelStateEntryItems = newAssignDatasetResponse.Message.GetModelStateEntyItems();
+
+            if (modelStateEntryItems != null)
+            {
+                this.ModelState.AddModelStateErrors(modelStateEntryItems);
+            }
+            else
+            {
+                this.ModelState.AddModelError(nameof(AssignDatasetSchemaViewModel.Name),newAssignDatasetResponse.Message);
+            }
 
             return BadRequest(this.ModelState);
         }

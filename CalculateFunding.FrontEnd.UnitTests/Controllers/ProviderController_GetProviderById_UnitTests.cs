@@ -53,7 +53,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task Should_GetCurrentProviderVersionForFundingStream_ValidId_Success()
+        public void Should_GetCurrentProviderVersionForFundingStream_ValidId_Success()
         {
             string testFundingStreamId = "a valid id";
             var currentProviderMetadataResponse = new ApiResponse<CurrentProviderVersionMetadata>(HttpStatusCode.OK,
