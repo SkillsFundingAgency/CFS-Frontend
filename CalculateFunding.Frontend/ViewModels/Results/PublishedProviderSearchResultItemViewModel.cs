@@ -33,6 +33,8 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         
         public string Indicative { get; set; }
 
+        public bool IsIndicative => string.Equals(Indicative, "Only indicative allocations", System.StringComparison.OrdinalIgnoreCase);
+
         public bool HasErrors { get; set; }
 
         public string[] Errors { get; set; }

@@ -18,6 +18,7 @@ export interface PublishedProviderResult {
     fundingPeriodId: string;
     hasErrors: boolean;
     errors: string[];
+    isIndicative: boolean;
 }
 
 export interface PublishedProviderSearchResults {

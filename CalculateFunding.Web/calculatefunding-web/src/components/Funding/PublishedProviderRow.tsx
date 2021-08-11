@@ -22,7 +22,8 @@ export const PublishedProviderRow = (props: IPublishedProviderRowProps) => {
                         enableSelection={props.enableSelection}
                         handleItemSelectionToggle={props.handleItemSelectionToggle}
                         isSelected={props.isSelected}
-                        publishedProvider={provider}/>
+                        publishedProvider={provider}
+            />
             <td className="govuk-table__cell govuk-body">{provider.ukprn}</td>
             {provider.hasErrors ?
                 <td className="govuk-table__cell govuk-body"><span className="govuk-error-message">Error</span></td>

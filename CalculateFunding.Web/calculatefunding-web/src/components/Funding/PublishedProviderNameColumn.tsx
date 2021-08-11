@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import {PublishedProviderResult} from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import {Link} from "react-router-dom";
+import {Tag, TagTypes} from "../Tag";
 
 export interface IPublishedProviderNameColumnProps {
     id: string,
@@ -23,6 +24,7 @@ export const PublishedProviderNameColumn = (props: IPublishedProviderNameColumnP
                           className="govuk-link govuk-link--no-visited-state">
                         {provider.providerName}
                     </Link>
+                    {provider.isIndicative ? <span className={'float-right'}><Tag text={'indicative'} type={TagTypes.grey} /></span> : "" }
                     {provider.errors.map((err, index) =>
                         <span key={`err-${props.id}-${index}`} className="govuk-error-message govuk-!-margin-top-2">
                             <span className="govuk-visually-hidden">Error:</span>
@@ -47,17 +49,18 @@ export const PublishedProviderNameColumn = (props: IPublishedProviderNameColumnP
                     <Link to={props.fundingOverviewUrl}
                           className="govuk-link govuk-link--no-visited-state">
                         {provider.providerName}
-                    </Link>
+                    </Link>  {provider.isIndicative ? <span className={'float-right'}><Tag text={'indicative'} type={TagTypes.grey} /></span> : "" }
                 </label>
             </div>
         </td>
     } else {
         return <td className="govuk-table__cell govuk-!-padding-bottom-0">
-            <Link id={props.id} 
+            <Link id={props.id}
                   to={props.fundingOverviewUrl}
                   className="govuk-link govuk-link--no-visited-state">
                 {provider.providerName}
             </Link>
+            {provider.isIndicative ? <span className={'float-right'}><Tag text={'indicative'} type={TagTypes.grey} /></span> : "" }
         </td>
     }
 };
