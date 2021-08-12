@@ -15,12 +15,12 @@ using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Provider;
 using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using NSubstitute;
@@ -99,21 +99,21 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task RefreshFunding_Returns_OK_Result_Given_User_Has_Required_Permission()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanRefreshFunding);
-            
+
             _publishingApiClient.RefreshFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
 
             IActionResult result = await _publishController.RefreshFunding(ValidSpecificationId);
 
             result.Should().BeAssignableTo<OkObjectResult>();
         }
-        
+
         [TestMethod]
         public async Task RefreshFunding_Returns_BadRequestForBadRequestApiResponses()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanRefreshFunding);
 
             _validatedApiResponse = new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.BadRequest);
-            
+
             _publishingApiClient.RefreshFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
 
             IActionResult result = await _publishController.RefreshFunding(ValidSpecificationId);
@@ -165,7 +165,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             ValidatedApiResponse<IEnumerable<string>> apiResponse
                 = new ValidatedApiResponse<IEnumerable<string>>(HttpStatusCode.BadRequest)
-                { 
+                {
                     ModelState = new Dictionary<string, IEnumerable<string>> {
                         { "", errors }
                     }
@@ -203,21 +203,21 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task ApproveFunding_Returns_OK_Result_Given_User_Has_Required_Permission()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanApproveFunding);
-            
+
             _publishingApiClient.ApproveFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
 
             IActionResult result = await _publishController.ApproveFunding(ValidSpecificationId);
 
             result.Should().BeAssignableTo<OkObjectResult>();
         }
-        
+
         [TestMethod]
         public async Task ApproveFunding_Returns_BadRequestForBadRequestApiResponses()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanApproveFunding);
 
             _validatedApiResponse = new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.BadRequest);
-            
+
             _publishingApiClient.ApproveFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
 
             IActionResult result = await _publishController.ApproveFunding(ValidSpecificationId);
@@ -245,14 +245,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             result.Should().BeAssignableTo<OkObjectResult>();
         }
-        
+
         [TestMethod]
         public async Task PublishFunding_Returns_BadRequestForBadRequestApiResponses()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanReleaseFunding);
 
             _validatedApiResponse = new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.BadRequest);
-            
+
             _publishingApiClient.PublishFundingForSpecification(Arg.Any<string>()).Returns(_validatedApiResponse);
 
             IActionResult result = await _publishController.PublishFunding(ValidSpecificationId);
@@ -515,7 +515,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Should()
                 .BeSameAs(expectedJob);
         }
-        
+
         [TestMethod]
         public async Task RunSqlImportJobGuardedByCanRefreshPublishedQaPermission()
         {
@@ -532,7 +532,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Received(0)
                 .QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
         }
-        
+
         [TestMethod]
         public async Task GetLatestPublishedDateDelegatesToPublishingEndPointAndReturnsLatestDate()
         {
@@ -557,7 +557,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task UploadBatchDelegatesToPublishingEndPoint()
         {
             Mock<IFormFile> file = new Mock<IFormFile>();
-            byte[] contents = {3, 63, 8, 100};
+            byte[] contents = { 3, 63, 8, 100 };
             MemoryStream ms = new MemoryStream();
             StreamWriter writer = new StreamWriter(ms);
             writer.Write(File.Create("blah blah"));
@@ -567,7 +567,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns((Stream stream, CancellationToken token) => ms.CopyToAsync(stream))
                 .Verifiable();
             file.SetupGet(x => x.Length).Returns(contents.Length);
-            BatchUploadResponse expectedResponse = new BatchUploadResponse { BatchId = Guid.NewGuid().ToString(), Url = "http:whatever"};
+            BatchUploadResponse expectedResponse = new BatchUploadResponse { BatchId = Guid.NewGuid().ToString(), Url = "http:whatever" };
 
             _publishingApiClient
                 .UploadBatch(Arg.Any<BatchUploadRequest>())
@@ -590,8 +590,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 BatchId = NewRandomString(),
                 FundingPeriodId = NewRandomString(),
                 FundingStreamId = NewRandomString()
-            };     
-            
+            };
+
             JobCreationResponse expectedResponse = new JobCreationResponse();
 
             _publishingApiClient.QueueBatchUploadValidation(Arg.Is<BatchUploadValidationRequest>(req =>
@@ -599,9 +599,9 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     req.FundingStreamId == request.FundingStreamId &&
                     req.FundingPeriodId == request.FundingPeriodId))
                 .Returns(new ValidatedApiResponse<JobCreationResponse>(HttpStatusCode.OK, expectedResponse));
-            
+
             OkObjectResult result = await _publishController.QueueBatchUploadValidation(request) as OkObjectResult;
-            
+
             result?
                 .Value
                 .Should()
@@ -700,18 +700,62 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetBatchPublishedProviderIdsDelegatesToPublishingEndPoint()
         {
             string batchId = NewRandomString();
-            
+
             IEnumerable<string> expectedResponse = ArraySegment<string>.Empty;
 
             _publishingApiClient.GetBatchPublishedProviderIds(batchId)
                 .Returns(new ApiResponse<IEnumerable<string>>(HttpStatusCode.OK, expectedResponse));
-            
+
             OkObjectResult result = await _publishController.GetBatchPublishedProviderIds(batchId) as OkObjectResult;
-            
+
             result?
                 .Value
                 .Should()
                 .BeSameAs(expectedResponse);
+        }
+
+        [TestMethod]
+        public async Task GetCurrentPublishedProvider_Returns_BadRequestForBadRequestApiResponses()
+        {
+            string fundingStreamId = NewRandomString();
+            string specificationId = NewRandomString();
+            string providerId = NewRandomString();
+
+            _publishingApiClient.GetCurrentPublishedProviderVersion(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                .Returns(new ApiResponse<PublishedProviderVersion>(HttpStatusCode.BadRequest));
+
+            IActionResult result = await _publishController.GetCurrentPublishedProviderVersion(fundingStreamId, specificationId, providerId);
+
+            result.Should().BeAssignableTo<BadRequestResult>();
+        }
+
+        [TestMethod]
+        public async Task GetCurrentPublishedProvider_Returns_Ok_ForCorrectModel()
+        {
+            string fundingStreamId = NewRandomString();
+            string specificationId = NewRandomString();
+            string providerId = NewRandomString();
+            string ukprn = NewRandomString();
+            string name = NewRandomString();
+
+            _publishingApiClient.GetCurrentPublishedProviderVersion(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<string>())
+                .Returns(new ApiResponse<PublishedProviderVersion>(HttpStatusCode.OK, new PublishedProviderVersion
+                {
+                    Provider = new Provider
+                    {
+                        UKPRN = ukprn,
+                        Name = name
+                    },
+                    IsIndicative = true
+                }));
+
+            IActionResult result = await _publishController.GetCurrentPublishedProviderVersion(fundingStreamId, specificationId, providerId);
+
+            result.Should().BeAssignableTo<OkObjectResult>();
+            PublishedProviderVersionViewModel publishedProviderVersionViewModel = result.As<OkObjectResult>().Value.As<PublishedProviderVersionViewModel>();
+            publishedProviderVersionViewModel.UKPRN.Should().Be(ukprn);
+            publishedProviderVersionViewModel.Name.Should().Be(name);
+            publishedProviderVersionViewModel.IsIndicative.Should().Be(true);
         }
 
         private static string NewRandomString() => Guid.NewGuid().ToString();
@@ -719,7 +763,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private async Task<IActionResult> WhenTheRunSqlJobIsCreated(string specificationId,
             string fundingStreamId)
             => await _publishController.RunSqlImportJob(specificationId, fundingStreamId);
-        
+
         private async Task<IActionResult> WhenTheLatestPublishedDateIsQueried(string fundingStreamId,
             string fundingPeriodId)
             => await _publishController.GetLatestPublishedDate(fundingStreamId, fundingPeriodId);

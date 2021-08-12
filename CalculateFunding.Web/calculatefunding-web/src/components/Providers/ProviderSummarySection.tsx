@@ -2,12 +2,16 @@
 import {SpecificationSummary} from "../../types/SpecificationSummary";
 import {ProviderSummary} from "../../types/ProviderSummary";
 import {LoadingFieldStatus} from "../LoadingFieldStatus";
+import {PublishedProviderVersion} from "types/PublishedProvider/PublishedProviderVersion";
+import {Tag, TagTypes} from "components/Tag";
 
 export interface ProviderSummarySectionProps {
     specification: SpecificationSummary | undefined,
     isLoadingSpecification: boolean,
     providerVersion: ProviderSummary | undefined,
+    publishedProviderVersion: PublishedProviderVersion | undefined,
     isLoadingProviderVersion: boolean,
+    isLoadingPublishedProviderVersion: boolean,
     status: string,
     fundingTotal: string
 }
@@ -20,6 +24,8 @@ export function ProviderSummarySection(props: ProviderSummarySectionProps) {
                     {props.isLoadingProviderVersion ?
                         <LoadingFieldStatus
                             title="Loading..."/> : props.providerVersion ? props.providerVersion.name : ""}
+                    {!props.isLoadingPublishedProviderVersion && props.publishedProviderVersion?.isIndicative ?
+                        <span className="govuk-!-margin-left-1"><Tag text="indicative" type={TagTypes.grey} /></span> : null}
                 </h1>
                 <span className="govuk-caption-l">
                 {props.isLoadingSpecification ? <LoadingFieldStatus

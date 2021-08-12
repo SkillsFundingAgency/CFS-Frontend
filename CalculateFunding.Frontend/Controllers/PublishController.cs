@@ -14,6 +14,7 @@ using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Provider;
 using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Results;
 using CalculateFunding.Frontend.ViewModels.Specs;
@@ -466,6 +467,35 @@ namespace CalculateFunding.Frontend.Controllers
 
             return response.Handle(nameof(PublishedProviderVersion),
                 onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpGet("api/specifications/{specificationId}/publishedproviders/{providerId}/fundingStreams/{fundingStreamId}")]
+        public async Task<IActionResult> GetCurrentPublishedProviderVersion(
+            [FromRoute] string fundingStreamId,
+            [FromRoute] string specificationId,
+            [FromRoute] string providerId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            ApiResponse<PublishedProviderVersion> response =
+                await _publishingApiClient.GetCurrentPublishedProviderVersion(specificationId, fundingStreamId, providerId);
+
+            return response.Handle(nameof(PublishedProviderVersion),
+                onSuccess: x =>
+                {
+                    PublishedProviderVersion publishedProviderVersion = response.Content;
+
+                    PublishedProviderVersionViewModel publishedProviderVersionViewModel = new PublishedProviderVersionViewModel()
+                    {
+                        UKPRN = publishedProviderVersion.Provider.UKPRN,
+                        Name = publishedProviderVersion.Provider.Name,
+                        IsIndicative = publishedProviderVersion.IsIndicative
+                    };
+
+                    return Ok(publishedProviderVersionViewModel);
+                });
         }
 
         [HttpPost("api/publishedProviders/batch")]

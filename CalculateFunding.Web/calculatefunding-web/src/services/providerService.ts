@@ -7,6 +7,7 @@ import {ProviderResultForSpecification} from "../types/Provider/ProviderResultFo
 import {ProviderSnapshot} from "../types/CoreProviderSummary";
 import {CurrentProviderVersionForFundingStream} from "../types/Provider/CurrentProviderVersionForFundingStream";
 import {SpecificationCalculationResultsMetadata} from "../types/Provider/SpecificationCalculationResultsMetadata";
+import {PublishedProviderVersion} from "../types/PublishedProvider/PublishedProviderVersion";
 
 const baseURL = "/api/provider";
 
@@ -18,6 +19,11 @@ export async function getProviderByIdAndVersionService(providerId:string, provid
 export async function getProviderFundingLineErrors(specificationId: string, fundingStreamId: string, providerId: string): 
     Promise<AxiosResponse<PublishedProviderError[]>> {
     return axios.get<PublishedProviderError[]>(`/api/specifications/${specificationId}/publishedProviders/${providerId}/fundingStreams/${fundingStreamId}/errors`);
+}
+
+export async function getCurrentPublishedProvider(specificationId: string, fundingStreamId: string, providerId: string): 
+    Promise<AxiosResponse<PublishedProviderVersion>> {
+    return axios.get<PublishedProviderVersion>(`/api/specifications/${specificationId}/publishedProviders/${providerId}/fundingStreams/${fundingStreamId}`);
 }
 
 export async function getProviderTransactionsService(specificationId:string, providerId:string): 
