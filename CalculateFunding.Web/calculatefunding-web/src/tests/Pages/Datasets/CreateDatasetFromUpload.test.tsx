@@ -16,13 +16,11 @@ import {CreateDatasetFromUploadRouteProps} from "../../../pages/Datasets/Create/
 import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
 import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
 
-// ToDo: These tests need sorting properly so no errors occur
-jest.spyOn(global.console, 'error').mockImplementation(() => jest.fn());
-
 describe("<CreateDatasetFromUpload />", () => {
 
     describe("when page loads for FDZ provider source", () => {
         beforeEach(() => {
+            jest.clearAllMocks();
             testing.mockSpecificationHook();
             testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockFdzFundingConfiguration));
 
@@ -62,16 +60,19 @@ describe("<CreateDatasetFromUpload />", () => {
         });
 
         it('renders dataset name input', async () => {
-            expect(await screen.findByLabelText(/Dataset name/)).toBeInTheDocument();
+            screen.debug(await screen.findByText(/Data set name/));
+            expect(await screen.findByText(/Data set name/)).toBeInTheDocument();
         });
 
         it('renders dataset description input', async () => {
-            expect(await screen.findByLabelText(/Description/)).toBeInTheDocument();
+            screen.debug(await screen.findByText(/Description/));
+            expect(await screen.findByText(/Description/)).toBeInTheDocument();
         });
     });
 
     describe("when page loads for CFS provider source", () => {
         beforeEach(() => {
+            jest.clearAllMocks();
             testing.mockSpecificationHook();
             testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockCfsFundingConfiguration));
 
@@ -111,11 +112,11 @@ describe("<CreateDatasetFromUpload />", () => {
         });
 
         it('renders dataset name input', async () => {
-            expect(await screen.findByLabelText(/Dataset name/)).toBeInTheDocument();
+            expect(await screen.findByText(/Data set name/)).toBeInTheDocument();
         });
 
         it('renders dataset description input', async () => {
-            expect(await screen.findByLabelText(/Description/)).toBeInTheDocument();
+            expect(await screen.findByText(/Description/)).toBeInTheDocument();
         });
     });
 });
@@ -169,7 +170,8 @@ const createDatasetTestSetup = () => {
             errorCheckingForSpecification: null,
             haveErrorCheckingForSpecification: false,
             isFetchingSpecification: false,
-            isSpecificationFetched: true
+            isSpecificationFetched: true,
+            clearSpecificationFromCache: () => Promise.resolve()
         }));
 
     const mockFundingConfigurationQueryResult = (config: FundingConfiguration): FundingConfigurationQueryResult => {
@@ -185,11 +187,13 @@ const createDatasetTestSetup = () => {
 
     const mockStreamDataset1: DataschemaDetailsViewModel = {
         id: "1490999",
+        converterEligible: false,
         name: "PE and Sport Grant",
         description: "PE and Sport Grant"
     };
     const mockStreamDataset2: DataschemaDetailsViewModel = {
         id: "1221999",
+        converterEligible: false,
         name: "PE and Sport Grant e2e",
         description: "PE and Sport Grant e2e"
     };

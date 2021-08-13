@@ -370,10 +370,10 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
             <MultipleErrorSummary errors={errors}/>
 
-            <fieldset className="govuk-fieldset" hidden={isLoading || updateStatus !== UpdateStatus.Unset}>
+            <fieldset className="govuk-fieldset" hidden={isLoading || !dataset || updateStatus !== UpdateStatus.Unset}>
                 <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
                     <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">
-                        Update {dataset.name} (version {dataset.version})
+                        Update {dataset?.name} (version {dataset?.version})
                     </h1>
                 </legend>
 
@@ -395,9 +395,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                             Last updated by
                         </dt>
                         <dd className="govuk-summary-list__value"
-                            data-testid="update-datasource-author"> {dataset.lastUpdatedByName} <span
+                            data-testid="update-datasource-author"> {dataset?.lastUpdatedByName} <span
                             className="govuk-!-margin-left-2">
-                                <DateTimeFormatter date={dataset.lastUpdatedDate}/>
+                                <DateTimeFormatter date={dataset?.lastUpdatedDate}/>
                             </span>
                         </dd>
                     </div>
@@ -526,8 +526,10 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         <span className="govuk-hint">
 
                     </span>
-                        <textarea className="govuk-textarea" rows={5}
-                                  aria-describedby="more-detail-hint" value={description}
+                        <textarea className="govuk-textarea" 
+                                  rows={5}
+                                  aria-describedby="more-detail-hint" 
+                                  value={description || ''}
                                   onChange={(e) => setDescription(e.target.value)}>
                     </textarea>
                     </div>

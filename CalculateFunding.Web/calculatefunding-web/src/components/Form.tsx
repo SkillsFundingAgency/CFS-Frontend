@@ -3,11 +3,12 @@
 export interface FormProps {
     token: string,
     heading: string,
+    titleCaption?: string,
     onSubmit?: any,
     children: any
 }
 
-const Form = ({ token, heading, onSubmit, children }: FormProps) => {
+const Form = ({ token, heading, titleCaption, onSubmit, children }: FormProps) => {
     
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         onSubmit ? onSubmit() : e.preventDefault();
@@ -21,6 +22,7 @@ const Form = ({ token, heading, onSubmit, children }: FormProps) => {
                 <fieldset className="govuk-fieldset"
                           aria-describedby={`${token}-hint`}>
                     <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+                        {titleCaption && <h3 className="govuk-caption-xl">{titleCaption}</h3>}
                         <h1 className="govuk-fieldset__heading">
                             {heading}
                         </h1>

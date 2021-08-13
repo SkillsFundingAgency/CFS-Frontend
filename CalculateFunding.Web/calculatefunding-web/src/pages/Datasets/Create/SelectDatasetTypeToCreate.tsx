@@ -82,6 +82,7 @@ export function SelectDatasetTypeToCreate({match}: RouteComponentProps<CreateDat
                                 <RadioOption
                                     token="released"
                                     label="Released data"
+                                    value="released"
                                     disabled={hasMissingPermissions}
                                     checked={referenceReleased === true}
                                     callback={onSelectReferencedData}
@@ -90,6 +91,7 @@ export function SelectDatasetTypeToCreate({match}: RouteComponentProps<CreateDat
                                 <RadioOption
                                     token="uploaded"
                                     label="Uploaded data"
+                                    value="uploaded"
                                     disabled={hasMissingPermissions}
                                     checked={referenceReleased === false}
                                     callback={onSelectUploadedData}

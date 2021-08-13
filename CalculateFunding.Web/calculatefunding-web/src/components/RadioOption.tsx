@@ -3,9 +3,10 @@
 export interface RadioOptionProps {
     token: string,
     label: string,
-    hint: string,
+    value: string,
+    hint?: string,
     checked: boolean,
-    disabled: boolean,
+    disabled?: boolean,
     callback: () => void
 }
 
@@ -13,6 +14,7 @@ const RadioOption = ({
                          token,
                          label,
                          hint,
+                         value,
                          checked,
                          disabled,
                          callback
@@ -24,8 +26,8 @@ const RadioOption = ({
                    name={`${token}-data`}
                    type="radio"
                    checked={checked}
-                   disabled={disabled}
-                   value={token}
+                   disabled={disabled === true}
+                   value={value}
                    onChange={callback}
                    aria-describedby={`${token}-data-hint`}/>
             <label id={`${token}-data-label`}
@@ -33,9 +35,11 @@ const RadioOption = ({
                    htmlFor={`${token}-data`}>
                 {label}
             </label>
+            {hint?.length &&
             <div id={`${token}-data-hint`} className="govuk-hint govuk-radios__hint">
                 {hint}
             </div>
+            }
         </div>
     );
 }

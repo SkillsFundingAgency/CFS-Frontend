@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {RouteComponentProps, useHistory} from "react-router";
 import {Header} from "../../../components/Header";
 import {assignDatasetSchemaService, getDatasetsForFundingStreamService} from "../../../services/datasetService";
@@ -15,8 +15,13 @@ import {useErrors} from "../../../hooks/useErrors";
 import {MultipleErrorSummary} from "../../../components/MultipleErrorSummary";
 import {AxiosError} from "axios";
 import {useMutation, useQuery} from "react-query";
-import {LoadingFieldStatus} from "../../../components/LoadingFieldStatus";
 import {AssignDatasetSchemaRequest} from "../../../types/Datasets/AssignDatasetSchemaRequest";
+import {DataschemaDetailsViewModel} from "../../../types/Datasets/DataschemaDetailsViewModel";
+import {SelectionField, SelectionFieldOption} from "../../../components/SelectionField";
+import Form from "../../../components/Form";
+import RadioOption from "../../../components/RadioOption";
+import {TextField} from "../../../components/TextField";
+import {TextAreaField} from "../../../components/TextAreaField";
 
 export interface CreateDatasetFromUploadRouteProps {
     specificationId: string
@@ -25,94 +30,113 @@ export interface CreateDatasetFromUploadRouteProps {
 export function CreateDatasetFromUpload({match}: RouteComponentProps<CreateDatasetFromUploadRouteProps>) {
     const specificationId = match.params.specificationId;
     const history = useHistory();
-    const {errors, addError, clearErrorMessages} = useErrors();
+    const {errors, addError, addValidationErrorsAsIndividualErrors, clearErrorMessages} = useErrors();
     const {specification, isLoadingSpecification} =
-        useSpecificationSummary(specificationId, err => addError({error: err, description: "Error while loading specification"}));
+        useSpecificationSummary(specificationId, err => addError({
+            error: err,
+            description: "Error while loading specification"
+        }));
     const fundingPeriodId = specification && specification?.fundingPeriod?.id;
     const fundingStreamId = specification && specification.fundingStreams[0].id;
     const {fundingConfiguration, isLoadingFundingConfiguration} =
         useFundingConfiguration(fundingStreamId, fundingPeriodId,
             err => addError({error: err, description: "Error while loading funding configuration"}));
     const {data: dataSchemas, isLoading: isLoadingDataSchemas} =
-        useQuery(
+        useQuery<DataschemaDetailsViewModel[], AxiosError>(
             `data-schemas-for-stream-${fundingStreamId}`,
-            () => getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")
-                .then((response) => {
-                    return response.data;
-                }),
+            async () => (await getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")).data,
             {
                 enabled: fundingStreamId !== undefined,
-                onError: err => addError({error: err as AxiosError, description: "Error while loading available data schemas"})
+                onError: err => addError({
+                    error: err as AxiosError,
+                    description: "Error while loading available data schemas"
+                })
             });
     const {mutate: assignDatasetSchema, isLoading: isUpdating, isSuccess} =
         useMutation<boolean, AxiosError, AssignDatasetSchemaRequest>(
             async (request) => (await assignDatasetSchemaService(request)).data,
             {
-                onError: err => addError({error: err, description: "Error while trying to assign dataset schema"}),
+                onError: err => {
+                    if (err?.response?.status === 400) {
+                        addValidationErrorsAsIndividualErrors({validationErrors: err.response.data});
+                    } else {
+                        addError({error: err, description: "Error while trying to assign dataset schema"})
+                    }
+                },
                 onSuccess: data => {
-                    if (updateRequest && updateRequest.addAnotherAfter) {
+                    if (andAnother) {
                         clearFormData();
                     } else {
                         history.push(`/ViewSpecification/${specificationId}?showDatasets=true`)
                     }
                 }
             });
-    const [updateRequest, setUpdateRequest] = useState<AssignDatasetSchemaRequest>();
-    const [isSetAsProviderData, setIsSetAsProviderData] = useState<boolean>(false);
+    const [andAnother, setAndAnother] = useState<boolean>();
+    const [isSetAsProviderData, setIsSetAsProviderData] = useState<boolean | undefined>(false);
     const [converterEligible, setConverterEligible] = useState<boolean>(false);
-    const [converterEnabled, setConverterEnabled] = useState<boolean>(false);
-    const [datasetName, setDatasetName] = useState({
-        name: "",
-        isValid: true
-    });
-    const [datasetDescription, setDatasetDescription] = useState({
-        description: "",
-        isValid: true
-    });
+    const [converterEnabled, setConverterEnabled] = useState<boolean | undefined>(false);
+    const [selectedDatasetName, setDatasetName] = useState<string>();
+    const [datasetDescription, setDatasetDescription] = useState<string>();
+    const [selectedDataSchema, setDatasetDataSchema] = useState<string>();
 
-    const [datasetDataSchema, setDatasetDataschema] = useState({
-        value: "",
-        isValid: true
-    });
-
-    document.title = "Specification Results - Calculate funding";
+    document.title = "Create Data Set - Calculate funding";
 
 
     function changeDataSchema(e: React.ChangeEvent<HTMLSelectElement>) {
-        const value = e.target.value.trim();
+        const value = e.target.value;
 
         const selectedDefinition = dataSchemas?.filter(x => x.id === value)[0];
 
-        if (selectedDefinition !== null)
-        {
+        if (!!selectedDefinition) {
             setConverterEligible(selectedDefinition?.converterEligible ?? false);
         }
 
-        setDatasetDataschema(prevState => {
-            return {
-                ...prevState, value: value, isValid: value !== ""
-            }
-        });
+        if (validateDataSchema(value)) {
+            setDatasetDataSchema(value);
+        }
+    }
+
+    function validateDataSchema(value: string | undefined) {
+        if (!value?.length) {
+            addError({error: `Select data schema`, fieldName: 'DatasetDefinitionId'});
+            return false;
+        }
+
+        return true;
     }
 
     function changeDatasetName(e: React.ChangeEvent<HTMLInputElement>) {
-        const value = e.target.value.trim();
+        const value = e.target.value;
 
-        setDatasetName(prevState => {
-            return {
-                ...prevState, name: value, isValid: value !== ""
-            }
-        });
+        if (validateDatasetName(value)) {
+            setDatasetName(value);
+        }
+    }
+
+    function validateDatasetName(value: string | undefined) {
+        if (!value?.length) {
+            addError({error: `Missing name`, fieldName: 'Name'});
+            return false;
+        }
+
+        return true;
     }
 
     function changeDatasetDescription(e: React.ChangeEvent<HTMLTextAreaElement>) {
-        const value = e.target.value.trim();
+        const value = e.target.value;
 
-        setDatasetDescription(prevState => {
-            return {
-                ...prevState, description: value, isValid: value !== ""
-            }
-        });
+        if (validateDatasetDescription(value)) {
+            setDatasetDescription(value);
+        }
+    }
+
+    function validateDatasetDescription(value: string | undefined) {
+        if (!value?.length) {
+            addError({error: `Missing description`, fieldName: 'Description'});
+            return false;
+        }
+
+        return true;
     }
 
     const saveDataset = async (continueAddingAfter: boolean) => {
@@ -122,61 +146,37 @@ export function CreateDatasetFromUpload({match}: RouteComponentProps<CreateDatas
 
         if (valid) {
             const request: AssignDatasetSchemaRequest = {
-                name: datasetName.name,
-                description: datasetDescription.description,
-                datasetDefinitionId: datasetDataSchema.value,
-                specificationId,
-                isSetAsProviderData,
+                name: selectedDatasetName as string,
+                description: datasetDescription as string,
+                datasetDefinitionId: selectedDataSchema as string,
+                specificationId: specificationId,
+                isSetAsProviderData: !!isSetAsProviderData,
                 addAnotherAfter: continueAddingAfter,
-                converterEnabled: converterEnabled
+                converterEnabled: !!converterEnabled
             };
-            setUpdateRequest(request);
+            setAndAnother(continueAddingAfter);
+
+            await assignDatasetSchema(request)
         }
     }
 
     function checkSubmission() {
-        const isDatasetNameValid = datasetName.name !== "";
-        const isDatasetDataSchemaValid = datasetDataSchema.value !== "";
-        const isDatasetDescriptionValid = datasetDescription.description !== "";
-
-        if (datasetName.isValid !== isDatasetNameValid) {
-            setDatasetName(prevState => {
-                return {
-                    ...prevState, isValid: isDatasetNameValid
-                }
-            });
-        }
-
-        if (datasetDataSchema.isValid !== isDatasetDataSchemaValid) {
-            setDatasetDataschema(prevState => {
-                return {...prevState, isValid: isDatasetDataSchemaValid}
-            })
-        }
-
-        if (datasetDescription.isValid !== isDatasetDescriptionValid) {
-            setDatasetDescription(prevState => {
-                return {...prevState, isValid: isDatasetDescriptionValid}
-            })
-        }
-
-        return (isDatasetNameValid && isDatasetDataSchemaValid && isDatasetDescriptionValid);
+        const validations = [validateDatasetName(selectedDatasetName),
+            validateDataSchema(selectedDataSchema),
+            validateDatasetDescription(datasetDescription)];
+        return validations.every(func => func);
     }
 
     function clearFormData() {
-        setDatasetDescription({description: "", isValid: true});
-        setDatasetName({name: "", isValid: true});
-        setDatasetDataschema({value: "", isValid: true});
+        clearErrorMessages();
+        setDatasetDescription('');
+        setDatasetName(undefined);
+        setDatasetDataSchema(undefined);
         setIsSetAsProviderData(false);
 
         // @ts-ignore
-        document.getElementById('save-dataset-form').reset();
+        document.getElementById('form-save-dataset').reset();
     }
-
-    useEffect(() => {
-        if (updateRequest) {
-            assignDatasetSchema(updateRequest);
-        }
-    }, [updateRequest])
 
     return <div>
         <Header location={Section.Specifications}/>
@@ -184,12 +184,13 @@ export function CreateDatasetFromUpload({match}: RouteComponentProps<CreateDatas
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={specification ? specification.name : "specification"} url={`/ViewSpecification/${specificationId}`}/>
+                <Breadcrumb name={specification ? specification.name : "specification"}
+                            url={`/ViewSpecification/${specificationId}`}/>
                 <Breadcrumb name={"Create dataset"}/>
             </Breadcrumbs>
 
             <ConfirmationPanel title={"Dataset created"}
-                               children={`Dataset ${updateRequest?.name} has been created.`}
+                               children={`Dataset ${selectedDatasetName} has been created.`}
                                hidden={!isSuccess}/>
 
             <MultipleErrorSummary errors={errors}/>
@@ -206,150 +207,97 @@ export function CreateDatasetFromUpload({match}: RouteComponentProps<CreateDatas
             {!isUpdating && specification && fundingConfiguration &&
             <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
-                    <form id="save-dataset-form">
-                        <fieldset className="govuk-fieldset">
-                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                                <h3 className="govuk-caption-xl">{specification.name}</h3>
-                                <h1 className="govuk-fieldset__heading">
-                                    Create dataset
-                                </h1>
-                            </legend>
+                    <Form
+                        token='create-dataset'
+                        heading='Create dataset'
+                        titleCaption={specification.name}
+                    >
+                        <SelectionField
+                            token='data-schema'
+                            label='Select data schema'
+                            hint='Please select data schema'
+                            options={dataSchemas?.map<SelectionFieldOption>(d => ({
+                                id: d.id,
+                                displayValue: d.name
+                            }))}
+                            changeSelection={changeDataSchema}
+                            selectedValue={selectedDataSchema}
+                            errors={errors.filter(e => e.fieldName === 'DatasetDefinitionId')}
+                            isLoading={isLoadingDataSchemas}
+                        />
+                        <TextField
+                            token='dataset-name'
+                            label='Data set name'
+                            hint='Use a descriptive unique name other users can understand'
+                            onChange={changeDatasetName}
+                            value={selectedDatasetName}
+                            errors={errors.filter(e => e.fieldName === 'Name')}
+                            isLoading={isLoadingDataSchemas}
+                        />
+                        <TextAreaField
+                            token='dataset-name'
+                            label='Description'
+                            hint='Please provide a description for the dataset'
+                            onChange={changeDatasetDescription}
+                            value={datasetDescription}
+                            errors={errors.filter(e => e.fieldName === 'Name')}
+                            isLoading={isLoadingDataSchemas}
+                        />
 
-                            <div className={"govuk-form-group" + (datasetDataSchema.isValid ? "" : " govuk-form-group--error")}>
-                                <label className="govuk-label" htmlFor="select-data-schema">
-                                    Select data schema
-                                </label>
-                                {isLoadingDataSchemas && <LoadingFieldStatus title={"Loading..."}/>}
-                                {dataSchemas &&
-                                <select id={"select-data-schema"}
-                                        className="govuk-select"
-                                        name="select-data-schema"
-                                        aria-describedby="select-data-schema-hint"
-                                        onChange={(e) => changeDataSchema(e)}>
-                                    <option key={-1} value="">Please select</option>
-                                    )
-                                    {dataSchemas.map((d, index) =>
-                                        <option key={index} value={d.id}>{d.name}</option>)
-                                    }
-                                </select>
-                                }
-                                <div hidden={datasetDataSchema.isValid || isLoadingDataSchemas}>
-                                    <span id="select-data-schema-hint" className="govuk-error-message">Please select a data schema</span>
+                        {fundingConfiguration && fundingConfiguration.providerSource === ProviderSource.CFS &&
+                        <div className="govuk-form-group">
+                            <fieldset className="govuk-fieldset">
+                                <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                                    <h3 className="govuk-heading-m">
+                                        Set as provider data
+                                    </h3>
+                                </legend>
+                                <div className="govuk-radios govuk-radios--inline">
+                                    <RadioOption
+                                        token='set-as-data-provider-yes'
+                                        label='Yes'
+                                        value='true'
+                                        checked={isSetAsProviderData === true}
+                                        callback={() => setIsSetAsProviderData(true)}
+                                    />
+                                    <RadioOption
+                                        token='set-as-data-provider-no'
+                                        label='No'
+                                        value='false'
+                                        checked={isSetAsProviderData === false}
+                                        callback={() => setIsSetAsProviderData(false)}
+                                    />
                                 </div>
-                            </div>
-
-                            <div className={"govuk-form-group" + (datasetName.isValid ? "" : " govuk-form-group--error")}>
-                                <label className="govuk-label" htmlFor="dataset-name">
-                                    Dataset name
-                                </label>
-                                <span id="event-name-hint" className="govuk-hint">
-                                    Use a descriptive unique name other users can understand
-                                </span>
-                                <input className="govuk-input"
-                                       id="dataset-name"
-                                       name="dataset-name"
-                                       aria-describedby="dataset-name-error"
-                                       type="text"
-                                       onChange={(e) => changeDatasetName(e)}/>
-                                <div hidden={datasetName.isValid}>
-                                    <span id="dataset-name-error" className="govuk-error-message">
-                                        Please provide a name for the dataset
-                                    </span>
+                            </fieldset>
+                        </div>
+                        }
+                        {converterEligible &&
+                        <div className="govuk-form-group">
+                            <fieldset className="govuk-fieldset ">
+                                <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                                    <h3 className="govuk-heading-m">
+                                        Enable copy data for provider
+                                    </h3>
+                                </legend>
+                                <div className="govuk-radios govuk-radios--inline">
+                                    <RadioOption
+                                        token='set-converter-enabled-yes'
+                                        label='Yes'
+                                        value='true'
+                                        checked={converterEnabled === true}
+                                        callback={() => setConverterEnabled(true)}
+                                    />
+                                    <RadioOption
+                                        token='set-converter-enabled-no'
+                                        label='No'
+                                        value='false'
+                                        checked={converterEnabled === false}
+                                        callback={() => setConverterEnabled(false)}
+                                    />
                                 </div>
-                            </div>
-
-                            <div className={"govuk-form-group" + (datasetDescription.isValid ? "" : " govuk-form-group--error")}>
-                                <label className="govuk-label" htmlFor="dataset-description">
-                                    Description
-                                </label>
-                                <textarea className="govuk-textarea"
-                                          id="dataset-description"
-                                          name="dataset-description"
-                                          rows={8}
-                                          aria-describedby="dataset-description-hint"
-                                          onChange={(e) => changeDatasetDescription(e)}/>
-                                <div hidden={datasetDescription.isValid}>
-                                    <span id="dataset-description-hint" className="govuk-error-message">
-                                        Please provide a description for the dataset
-                                    </span>
-                                </div>
-                            </div>
-
-                            {fundingConfiguration && fundingConfiguration.providerSource === ProviderSource.CFS &&
-                            <div className="govuk-form-group">
-                                <fieldset className="govuk-fieldset">
-                                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                                        <h3 className="govuk-heading-m">
-                                            Set as provider data
-                                        </h3>
-                                    </legend>
-                                    <div className="govuk-radios govuk-radios--inline">
-                                        <div className="govuk-radios__item">
-                                            <input className="govuk-radios__input"
-                                                   id="set-as-data-provider-yes"
-                                                   name="set-as-data-provider"
-                                                   type="radio"
-                                                   value="true"
-                                                   onChange={() => setIsSetAsProviderData(true)}/>
-                                            <label className="govuk-label govuk-radios__label"
-                                                   htmlFor="set-as-data-provider-yes">
-                                                Yes
-                                            </label>
-                                        </div>
-                                        <div className="govuk-radios__item">
-                                            <input className="govuk-radios__input"
-                                                   id="set-as-data-provider-no"
-                                                   name="set-as-data-provider"
-                                                   type="radio"
-                                                   value="false"
-                                                   onChange={() => setIsSetAsProviderData(false)}/>
-                                            <label className="govuk-label govuk-radios__label"
-                                                   htmlFor="set-as-data-provider-no">
-                                                No
-                                            </label>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            }
-                            {converterEligible &&
-                            <div className="govuk-form-group">
-                                <fieldset className="govuk-fieldset ">
-                                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                                        <h3 className="govuk-heading-m">
-                                            Enable copy data for provider
-                                        </h3>
-                                    </legend>
-                                    <div className="govuk-radios govuk-radios--inline">
-                                        <div className="govuk-radios__item">
-                                            <input className="govuk-radios__input"
-                                                    id="set-converter-enabled-yes"
-                                                    name="set-converter-enabled"
-                                                    type="radio"
-                                                    value="true"
-                                                    onChange={() => setConverterEnabled(true)}/>
-                                            <label className="govuk-label govuk-radios__label"
-                                                    htmlFor="set-converter-enabled-yes">
-                                                Yes
-                                            </label>
-                                        </div>
-                                        <div className="govuk-radios__item">
-                                            <input className="govuk-radios__input"
-                                                    id="set-converter-enabled-no"
-                                                    name="set-converter-enabled"
-                                                    type="radio"
-                                                    value="false"
-                                                    onChange={() => setConverterEnabled(false)}/>
-                                            <label className="govuk-label govuk-radios__label"
-                                                    htmlFor="set-converter-enabled-no">
-                                                No
-                                            </label>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>}
-                        </fieldset>
-                    </form>
+                            </fieldset>
+                        </div>}
+                    </Form>
                     <button className="govuk-button govuk-!-margin-right-1"
                             data-module="govuk-button"
                             onClick={() => saveDataset(false)}>

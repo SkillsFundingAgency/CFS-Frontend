@@ -2,17 +2,16 @@
 import * as React from "react";
 import {ErrorMessage, ValidationErrors} from "../types/ErrorMessage";
 
-export interface ErrorProps {
+export interface ErrorProps extends BaseErrorProps {
     error: AxiosError | Error | string, 
-    description ? : string, 
-    fieldName ? : string, 
-    suggestion?: any
 }
-export interface ValidationErrorProps {
+export interface ValidationErrorProps extends BaseErrorProps {
+    message : string,
     validationErrors: ValidationErrors, 
-    message : string, 
-    description? : string, 
-    fieldName? : string, 
+}
+interface BaseErrorProps {
+    description? : string,
+    fieldName? : string,
     suggestion?: any
 }
 
@@ -69,6 +68,23 @@ export const useErrors = () => {
         setErrors(errors => [...errors, errorMessage]);
     };
 
+    // flattens out validation errors into separate errors related to their relevant field names
+    const addValidationErrorsAsIndividualErrors = (props: {validationErrors: ValidationErrors}) => {
+        if (!props.validationErrors) return;
+        const errorCount: number = errors.length;
+        Object.keys(props.validationErrors).forEach(fieldName => {
+            const fieldErrors = props.validationErrors[fieldName];
+            fieldErrors.forEach(fieldError => {
+                const errorMessage: ErrorMessage = {
+                    id: errorCount + 1,
+                    fieldName: fieldName,
+                    message: fieldError || ''
+                };
+                setErrors(errors => [...errors, errorMessage]);
+            })
+        })
+    };
+
     const clearErrorMessages = (fieldNames?: string[]) => {
         if (errors.length > 0) {
             if (!fieldNames) {
@@ -84,6 +100,7 @@ export const useErrors = () => {
         addError,
         addErrorMessage,
         addValidationErrors,
+        addValidationErrorsAsIndividualErrors,
         clearErrorMessages
     }
 }

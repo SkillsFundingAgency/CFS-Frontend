@@ -286,7 +286,7 @@ export function ManageDataSourceFiles() {
                                         <div>
                                             <p className="govuk-body">
                                                 <a className="govuk-link" target="_self"
-                                                   href={`/api/datasets/download-dataset-file/${ds.id}`}>{`${ds.definitionName.replace(/\s/g, "").toLowerCase()}.xlsx`}</a>
+                                                   href={`/api/datasets/download-dataset-file/${ds?.id}`}>{`${ds.definitionName?.replace(/\s/g, "")?.toLowerCase()}.xlsx`}</a>
                                             </p>
                                         </div>
                                     </td>
