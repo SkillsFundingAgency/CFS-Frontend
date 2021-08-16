@@ -279,9 +279,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(dest => dest.Outcomes,
                     opt => opt.MapFrom(src => Map(src)));
             CreateMap<Trigger, TriggerViewModel>();
-            CreateMap<PublishedProviderSearchItem, PublishedProviderSearchResultItemViewModel>()
-                .ForMember(dest => dest.IsIndicative,
-                    opt => opt.Ignore());
+            CreateMap<PublishedProviderSearchItem, PublishedProviderSearchResultItemViewModel>();
         }
 
         private IEnumerable<JobOutcomeViewModel> Map(JobViewModel job)
