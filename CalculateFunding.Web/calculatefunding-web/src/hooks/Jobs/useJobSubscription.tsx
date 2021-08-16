@@ -73,70 +73,93 @@ export const useJobSubscription = ({
     const util = useMemo(jobSubscriptionUtilities, []);
 
     const replaceSubs = (request: AddJobSubscription[]): JobSubscription[] => {
+        console.log('Replacing existing job subscriptions with new ones');
         reset();
 
         const newSubs = request.map(x => util.convert(x))
         setSubs(newSubs);
+        if (newSubs.some(s => s.isEnabled && s.monitorMode === MonitorMode.SignalR)) {
+            setIsSignalREnabled(true);
+        }
         return newSubs;
     };
 
     const addSub = async (request: AddJobSubscription): Promise<JobSubscription> => {
+        console.log('Adding job subscription', request);
         const newSub = util.convert(request);
         const existing = util.findExistingSubscription(subs, newSub);
         if (!existing) {
-            console.log(`Subscribing to jobs with jobId=[${newSub.filterBy.jobId}], jobTypes=[${newSub.filterBy.jobTypes?.join(',')}], specificationId=[${newSub.filterBy.specificationId}], `)
+            console.log(`Subscribing to jobs with ` +
+                `jobId=[${newSub.filterBy.jobId?.length ? newSub.filterBy.jobId : 'any'}], ` +
+                `jobTypes=[${newSub.filterBy.jobTypes?.length ? newSub.filterBy.jobTypes.join(',') : 'any'}], ` +
+                `specificationId=[${newSub.filterBy?.specificationId?.length ? newSub.filterBy.specificationId : 'any'}]`, newSub);
             setSubs(existing => [...existing, newSub]);
+            if (newSub.isEnabled && newSub.monitorMode === MonitorMode.SignalR) {
+                setIsSignalREnabled(true);
+            }
+        } else {
+
+            console.log(`Subscription already exists`, newSub, existing);
         }
         if (!!newSub.fetchPriorNotifications) {
+            console.log('Fetching previous job results');
             await loadLatestJobUpdate(newSub);
         }
         return newSub;
     };
 
     const reset = () => {
+        console.log('Resetting job notifications');
         setIsSignalREnabled(true);
         setNotifications([]);
         setJobPollingInterval(0);
     };
 
     const removeSub = (id: string) => {
+        console.log('Removing job subscription with id ' + id);
         setSubs(existing => existing.filter(x => x.id !== id));
     };
 
     const removeAllSubs = () => {
+        console.log('Removing all job subscriptions');
         setSubs([]);
     };
 
     const onSignalRFail = (error: string) => {
-        // signalR has failed, so get the hook to stop signalR
-        setIsSignalREnabled(false);
+        console.log('SignalR has failed', error);
 
-        if (subs.length === 0) return;
-
-        if (util.anySubsWithSignalROrFallbackPolling(subs)) {
-            setJobPollingInterval(milliseconds.TenSeconds);
-        }
-
-        // try to kickstart signalR
-        setInterval(() => setIsSignalREnabled(true), milliseconds.TenSeconds);
+        onSignalRCloseOrFail();
     };
 
     const onSignalRClose = () => {
+        console.log('SignalR has closed');
+
+        onSignalRCloseOrFail();
+    };
+
+    const onSignalRCloseOrFail = () => {
         // trigger signalR shutdown
         setIsSignalREnabled(false);
 
         if (subs.length === 0) return;
 
-        if (util.anySubsWithSignalROrFallbackPolling(subs)) {
+        if (jobPollingInterval <= 0 && util.anySubsWithSignalROrFallbackPolling(subs)) {
+            console.log('Initiating polling');
             setJobPollingInterval(milliseconds.TenSeconds);
         }
 
-        // try to kickstart signalR
-        setInterval(() => setIsSignalREnabled(true), milliseconds.TenSeconds);
+        if (subs.some(s => s.isEnabled && s.monitorMode === MonitorMode.SignalR)) {
+            // try to kickstart signalR
+            console.log('Setting up timer to kickstart signalR');
+            setInterval(() => setIsSignalREnabled(true), milliseconds.TenSeconds);
+        }
     };
 
     const onSignalRReconnected = async () => {
+        console.log('SignalR has reconnected');
+
         // cancel polling because we now have signalR working again
+        console.log('Clearing polling');
         setJobPollingInterval(0);
 
         // try to find any job updates that were missed in the interim
@@ -145,7 +168,8 @@ export const useJobSubscription = ({
 
     const onSignalRReconnecting = () => {
         // try to find any job updates that would otherwise be missed in the interim
-        if (util.anySubsWithSignalROrFallbackPolling(subs)) {
+        if (jobPollingInterval <= 0 && util.anySubsWithSignalROrFallbackPolling(subs)) {
+            console.log('Initiating polling');
             setJobPollingInterval(milliseconds.TenSeconds);
         }
     };
@@ -204,6 +228,7 @@ export const useJobSubscription = ({
     const mergeNotifications = (newNotifications: JobNotification[]) => {
         if (newNotifications.length === 0) return;
 
+        console.log('Merging notifications');
         setNotifications(existingOnes => {
             const existingNotificationSubIds = existingOnes.map(n => n.subscription.id);
             const matchingNewOnes = newNotifications.filter(n => existingNotificationSubIds.includes(n.subscription.id));
@@ -219,7 +244,6 @@ export const useJobSubscription = ({
                 }
                 output = [...output, matchingNewOne];
             });
-
 
             return output;
         });
@@ -242,6 +266,7 @@ export const useJobSubscription = ({
                 await loadLatestJobUpdatesBySpec(sub.filterBy);
             } else {
                 // todo: what to do if just looking for job types - no suitable api to call
+                console.error('Oops! Looking for jobs by type(s) but no suitable api endpoint to call');
             }
         }
     };
@@ -250,6 +275,7 @@ export const useJobSubscription = ({
         let newNotifications: JobNotification[] = [];
         for (const jobId of jobIds) {
             const job = await checkForJobByJobId(jobId);
+            console.log('Polled for job by job id', job);
             if (util.isJobValid(job)) {
                 const subsToNotify = util.findMatchingSubs(subs, job as JobDetails);
                 subsToNotify.forEach(s => {
@@ -270,10 +296,12 @@ export const useJobSubscription = ({
         if (!filter.jobTypes || filter.jobTypes.length == 0) {
             if (filter.specificationId && filter.triggerByEntityId) {
                 const job = await checkForSpecificationJobTriggeredByEntity(filter.specificationId, filter.triggerByEntityId);
+                console.log(`Polled for job by specification [${filter.specificationId}] and triggered entity id [${filter.triggerByEntityId}]`, job);
                 jobs = job ? [job] : [];
             }
         } else {
             jobs = await checkForSpecificationJobByJobTypes(filter.specificationId, filter.jobTypes);
+            console.log(`Polled for jobs by specification [${filter.specificationId}] and job types [${filter.jobTypes.join(',')}]`, jobs);
         }
 
         if (!jobs || jobs.length === 0) return;
@@ -304,6 +332,8 @@ export const useJobSubscription = ({
     }, jobPollingInterval);
 
     useEffect(() => {
+        console.log(`SignalR: job update received`, signalRResults);
+
         // if any new results from signalR then we can cancel polling
         setJobPollingInterval(0);
 
@@ -311,12 +341,15 @@ export const useJobSubscription = ({
     }, [signalRResults]);
 
     useEffect(() => {
+        console.log('Subscription state change', subs);
         if (!subs || subs.length === 0) {
             // no subs, deactivate signalR and polling
+            console.log('No subscriptions - therefore deactivate signalR and polling');
             setIsSignalREnabled(false);
             setJobPollingInterval(0);
         } else if (!isSignalREnabled && subs.some(s => s.monitorFallback === MonitorFallback.Polling)) {
             // signalR is currently disabled & subs with fallback polling: make sure polling is enabled if applicable
+            console.log('SignalR disabled - initiating polling');
             setJobPollingInterval(milliseconds.TenSeconds);
         } else {
             // do one off fetches and then clear flag 

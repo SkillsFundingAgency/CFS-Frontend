@@ -374,7 +374,6 @@ describe("<SelectDataSource/>", () => {
 
         it("renders correct title", async () => {
             const outerDiv = screen.getByTestId('job-notification');
-            screen.debug(outerDiv)
             expect(screen.getByText(/Job in progress: Running Converter Wizard/)).toBeInTheDocument();
         });
 

@@ -88,30 +88,34 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
             },
             monitorMode: MonitorMode.SignalR,
             monitorFallback: MonitorFallback.Polling,
-            onError: err => addError({error: err, description: 'Error while monitoring background converter wizard jobs'})
+            onError: err => addError({
+                error: err,
+                description: 'Error while monitoring background converter wizard jobs'
+            })
         })
         return () => {
             removeAllSubs();
         };
     }, []);
-    
+
     useEffect(() => {
         if (jobNotifications.length === 0) return;
-        
+
         const notification = jobNotifications.find(n => n.subscription.id === jobSubscription?.id);
         const newJob = notification?.latestJob;
 
-        if (!notification || !newJob || newJob.runningStatus !== RunningStatus.Completed) return;
-
+        if (!notification || newJob?.runningStatus !== RunningStatus.Completed) return;
+        
         removeSub(notification.subscription.id);
         setJobSubscription(undefined);
-
+        clearErrorMessages();
+        
         if (newJob.isSuccessful) {
             return onDatasetValidated(updateType);
         } else {
             onValidationJobFailed(newJob);
         }
-        clearErrorMessages();
+        
         setIsLoading(false);
     }, [jobNotifications]);
 
@@ -136,9 +140,11 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                     message: "Validation failed"
                 });
                 setIsLoading(false);
-            }).catch((err) => {
-            addError({error: "Unable to retrieve validation report", description: "Validation failed"});
-        });
+            })
+            .catch((err) => {
+                console.error('Error getting validation details', err);
+                addError({error: "Unable to retrieve validation report", description: "Validation failed"});
+            });
     }
 
     useEffectOnce(() => {
@@ -160,13 +166,14 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         error: err,
                         description: `Error while getting current provider version for funding stream ${match.params.fundingStreamId}`
                     }));
-            }).catch((err) => addError({
+            })
+            .catch((err) => addError({
                 error: err,
                 description: `Error while getting dataset ${match.params.datasetId}`
-            })
-        ).finally(() => {
-            setIsLoading(false);
-        });
+            }))
+            .finally(() => {
+                setIsLoading(false);
+            });
 
         return () => removeAllSubs();
     });
@@ -414,8 +421,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                 {converterWizardJobInProgress && hideForm !== false &&
                 <div className="govuk-grid-column-full govuk-!-padding-3 border content-toggle-container-jq">
                     <h3 className="govuk-heading-s">Why is some of this page hidden?</h3>
-                    <p>While the converter wizard is in progress, we are unable to make any updates to the page. This message will automatically dissappear when the converter wizard is complete.</p>
-                    <button 
+                    <p>While the converter wizard is in progress, we are unable to make any updates to the page. This
+                        message will automatically dissappear when the converter wizard is complete.</p>
+                    <button
                         className="govuk-link content-toggle-jq"
                         onClick={onShowHiddenForm}
                     >
@@ -526,9 +534,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
                         <span className="govuk-hint">
 
                     </span>
-                        <textarea className="govuk-textarea" 
+                        <textarea className="govuk-textarea"
                                   rows={5}
-                                  aria-describedby="more-detail-hint" 
+                                  aria-describedby="more-detail-hint"
                                   value={description || ''}
                                   onChange={(e) => setDescription(e.target.value)}>
                     </textarea>

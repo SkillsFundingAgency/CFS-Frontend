@@ -41,6 +41,7 @@ export const useSignalRJobMonitor = ({
                                          onClose
                                      }: SignalRJobMonitorProps): SignalRJobMonitorResult => {
     const [notifications, setNotifications] = useState<JobNotification[]>([]);
+    const [newJob, setNewJob] = useState<JobDetails>();
     const [hubConnection, setHubConnection] = useState<HubConnection>();
     const hubRef = useRef<HubConnection>();
 
@@ -65,6 +66,7 @@ export const useSignalRJobMonitor = ({
     }
 
     const stopSignalR = async () => {
+        console.log(`SignalR: shutting down`);
         hubConnection?.stop();
         
         if (hubRef?.current) {
@@ -94,7 +96,7 @@ export const useSignalRJobMonitor = ({
         return job && job.jobId && job.jobId.length > 1; // to catch edge case of 0 turned to string
     }
 
-    const findMatchingSubs = (job: JobResponse): JobSubscription[] => {
+    const findMatchingSubs = (job: JobResponse | JobDetails): JobSubscription[] => {
         if (!hasEnabledSubscriptions()) {
             return [];
         }
@@ -109,39 +111,36 @@ export const useSignalRJobMonitor = ({
         return matches ?? [];
     }
 
-    const filterJobsByType = (job: JobResponse, filterBy: JobMonitoringFilter) => {
+    const filterJobsByType = (job: JobResponse | JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobTypes || (filterBy.jobTypes.length === 0 || filterBy.jobTypes.find(type => job.jobType === type.toString()));
     }
 
-    const filterJobsByTriggeringEntityId = (job: JobResponse, filterBy: JobMonitoringFilter) => {
+    const filterJobsByTriggeringEntityId = (job: JobResponse | JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.triggerByEntityId ||
             job.trigger?.entityId === filterBy.triggerByEntityId;
     };
 
-    const filterJobsByIdOrParent = (job: JobResponse, filterBy: JobMonitoringFilter) => {
+    const filterJobsByIdOrParent = (job: JobResponse | JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.jobId || (job.jobId === filterBy.jobId || (filterBy.includeChildJobs !== false && job.parentJobId === filterBy.jobId));
     }
 
-    const filterJobsBySpecification = (job: JobResponse, filterBy: JobMonitoringFilter) => {
+    const filterJobsBySpecification = (job: JobResponse | JobDetails, filterBy: JobMonitoringFilter) => {
         return !filterBy.specificationId || job.specificationId === filterBy.specificationId;
     }
 
     const processMessage = (message: any) => {
+        console.log(`SignalR: received job`, message);
         const job = (message as JobResponse);
         if (isThisJobValid(job)) {
-            const matchingSubscriptions = findMatchingSubs(job)
             const jobDetails = getJobDetailsFromJobResponse(job);
-            if (matchingSubscriptions.length > 0 && jobDetails) {
-                const updated = matchingSubscriptions.map(sub => createJobNotification(jobDetails, sub));
-                setNotifications(existing => {
-                    const unchanged = excludeSubscriptionsFromNotifications(existing, subscriptions);
-                    return [...unchanged, ...updated]
-                });
+            if (jobDetails) {
+                setNewJob(jobDetails);
             }
         }
     }
 
     const notifyDisconnection = (error: Error | string | undefined) => {
+        console.log(`SignalR: disconnected`, error);
         const realError = (error as Error);
         const errorMessage = !!realError ? `Error while monitoring jobs: ${realError.message}` : !!error ? error as string : null;
         if (!!errorMessage) console.error(errorMessage);
@@ -155,10 +154,12 @@ export const useSignalRJobMonitor = ({
     }
 
     const notifyReconnection = () => {
+        console.log(`SignalR: reconnected`);
         onReconnection && onReconnection();
     }
 
     const notifyReconnecting = (error: Error | string | undefined) => {
+        console.log(`SignalR: reconnecting`, error);
         if (!!error) console.error(error);
         onReconnecting && onReconnecting();
     }
@@ -166,6 +167,7 @@ export const useSignalRJobMonitor = ({
     const monitorJobNotifications = async () => {
         try {
             if (!hubRef.current) {
+                console.log(`SignalR: setting up configuration`);
                 let hubConnect: HubConnection = new HubConnectionBuilder()
                     .withUrl(`/api/notifications`)
                     .withAutomaticReconnect([5, 8, 13])
@@ -178,6 +180,7 @@ export const useSignalRJobMonitor = ({
                 hubConnect.onreconnecting(error => notifyReconnecting(error));
                 hubConnect.onreconnected(connectionId => notifyReconnection());
 
+                console.log(`SignalR: connecting`);
                 await hubConnect.start();
 
                 // if all subs are linked to the SAME spec, then just follow that spec
@@ -191,22 +194,42 @@ export const useSignalRJobMonitor = ({
                 setHubConnection(hubConnect);
             }
         } catch (err) {
-            notifyDisconnection(err);
+            console.error(`SignalR: error`, err);
             await stopSignalR();
+            notifyDisconnection(err);
         }
     }
     
+    useEffect(() => {
+        if (newJob) {
+            const matchingSubscriptions = findMatchingSubs(newJob);
+            if (matchingSubscriptions.length > 0) {
+                console.log(`SignalR: creating ${newJob.completionStatus || ''} ${newJob.runningStatus} job notification`, newJob);
+                const updated = matchingSubscriptions.map(sub => createJobNotification(newJob, sub));
+                setNotifications(existing => {
+                    const unchanged = excludeSubscriptionsFromNotifications(existing, subscriptions);
+                    return [...unchanged, ...updated]
+                });
+            } else {
+                console.log(`SignalR: no matching subscription found for this job`, newJob, subscriptions);
+            }
+        }
+    }, [newJob]);
     
     useEffect(() => {
+        console.log(`SignalR: state change [isEnabled: "${isEnabled?.toString()}", subscriptions: ${subscriptions.length}, hubConnection.state: "${hubConnection?.state}"]`, subscriptions);
+        
         const shouldReconnect = isEnabled && hasDisconnected();
         if (shouldReconnect) {
             notifyDisconnection("SignalR has disconnected");
             subscriptions.forEach(s => s.isEnabled && !!s.onDisconnect && s.onDisconnect())
         } else {
             if (isEnabled && hasEnabledSubscriptions() && !hasInitialised()) {
+                console.log(`SignalR: criteria for initialisation detected`);
                 monitorJobNotifications();
             } else {
                 if (!isEnabled || (!hasEnabledSubscriptions && hubRef.current)) {
+                    console.log(`SignalR: criteria for shutting down detected`);
                     stopSignalR();
                 } else {
                     hubRef.current = hubConnection;
