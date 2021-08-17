@@ -8,14 +8,12 @@ if (isTestWindow(window)) {
                 method: request.method,
                 headers: request.requestHeaders,
                 body: request.requestBody,
-            })
-                .then((res) => {
-                    // @ts-ignore
-                    const content = res.headers.map['content-type'] === 'application/json' ? res.json() : res.text()
-                    return new Promise((resolve) => {
-                        content.then((body) => resolve([res.status, res.headers, body]))
-                    })
+            }).then((res) => {
+                // @ts-ignore
+                const content = res.headers.map['content-type'] === 'application/json' ? res.json() : res.text()
+                return new Promise((resolve) => {
+                    content.then((body) => resolve([res.status, res.headers, body]))
                 })
-                // .catch();
+            });
     });
 }

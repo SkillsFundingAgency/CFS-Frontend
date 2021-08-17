@@ -2,11 +2,9 @@
 import {Server} from "miragejs";
 import {ProviderDataTrackingMode} from "../../../src/types/Specifications/ProviderDataTrackingMode";
 import {SpecificationSummary} from "../../../src/types/SpecificationSummary";
-import {commonActions} from "../commonActions";
 
-context('Create new dataset', () => {
+context('When creating a new data set, I want to specify whether from Released or Uploaded data', () => {
     const data = mockApiData();
-    const {specifyDatasetTypeToCreate_Released, selectReferenceSpecification, specifyDatasetDetails, selectTemplateItems} = commonActions();
 
     let server: Server;
 
@@ -32,11 +30,7 @@ context('Create new dataset', () => {
                 } as SpecificationSummary
             }
         );
-        cy.visit('/Datasets/Create/SelectDatasetTypeToCreate/' + data.spec1.id)
-        specifyDatasetTypeToCreate_Released(server, data);
-        selectReferenceSpecification(server, data);
-        specifyDatasetDetails(server, data);
-        selectTemplateItems(server, data);
+        cy.visit('/Datasets/Create/SelectDatasetTypeToCreate/' + data.spec1.id);
     });
     afterEach(() => {
         server.shutdown();

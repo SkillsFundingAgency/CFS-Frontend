@@ -17,6 +17,7 @@ import {NoData} from "../../components/NoData";
 import {Footer} from "../../components/Footer";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
+import {convertToSlug, removeSpaces} from "../../helpers/stringHelper";
 
 export function ManageDataSourceFiles() {
     const initialSearch: DatasetSearchRequestViewModel = {
@@ -280,13 +281,18 @@ export function ManageDataSourceFiles() {
                                             </details>
                                         </div>
                                     </th>
-
-                                    <td className="govuk-table__cell"><DateTimeFormatter date={ds.lastUpdated}/></td>
+                                    <td className="govuk-table__cell">
+                                        <DateTimeFormatter date={ds.lastUpdated}/>
+                                    </td>
                                     <td className="govuk-table__cell">
                                         <div>
                                             <p className="govuk-body">
+                                                {ds.definitionName &&
                                                 <a className="govuk-link" target="_self"
-                                                   href={`/api/datasets/download-dataset-file/${ds?.id}`}>{`${ds.definitionName?.replace(/\s/g, "")?.toLowerCase()}.xlsx`}</a>
+                                                   href={`/api/datasets/download-dataset-file/${ds?.id}`}>
+                                                    {`${convertToSlug(ds.definitionName || '')}.xlsx`}
+                                                </a>
+                                                }
                                             </p>
                                         </div>
                                     </td>

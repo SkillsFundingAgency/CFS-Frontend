@@ -4,10 +4,11 @@ import {BackLink} from "./BackLink";
 export interface TitleProps {
     title: string,
     description?: string,
+    children?: any,
     includeBackLink?: boolean
 }
 
-export function Title({title, description, includeBackLink = false}: TitleProps) {
+export function Title({title, description, children, includeBackLink = false}: TitleProps) {
     return (
         <>
             {includeBackLink &&
@@ -21,7 +22,8 @@ export function Title({title, description, includeBackLink = false}: TitleProps)
                  data-testid="page-title">
                 <hgroup className="govuk-grid-column-full">
                     <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{title}</h1>
-                    <p className="govuk-body">{description}</p>
+                    {description && <p className="govuk-body">{description}</p>}
+                    {children}
                 </hgroup>
             </div>
         </>

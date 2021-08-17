@@ -93,6 +93,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     const [converterWizardJob, setConverterWizardJob] = useState<JobDetails>();
     const [lastConverterWizardReportDate, setLastConverterWizardReportDate] = useState<Date | undefined>(undefined);
     const [approveAllCalculationsJob, setApproveAllCalcsJob] = useState<JobDetails>();
+    const fundingStream = specification?.fundingStreams ? specification.fundingStreams[0] : undefined;
     const history = useHistory();
     const dispatch = useDispatch();
     const location = useLocation();
@@ -116,13 +117,12 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         calculationErrors,
         isLoadingCalculationErrors,
         calculationErrorCount,
-        clearCalculationErrorsFromCache
     } = useCalculationErrors(specificationId, err => {
         addError({error: err, description: "Error while checking for calculation errors"})
     }, 0)
 
     const {fundingConfiguration} =
-        useFundingConfiguration(specification.fundingStreams[0].id, specification.fundingPeriod.id,
+        useFundingConfiguration(fundingStream?.id, specification.fundingPeriod?.id,
             err => addError({error: err, description: `Error while loading funding configuration`}));
 
     useEffect(() => {
@@ -183,11 +183,11 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             } else {
                 await spec.fundingStreams.some(async (stream) => {
                     const result = await specificationService
-                        .getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod.id, stream.id);
+                        .getSpecificationsSelectedForFundingByPeriodAndStreamService(spec.fundingPeriod?.id, stream.id);
                     const selectedSpecs = result.data;
                     const hasAnySelectedForFunding = selectedSpecs !== null && selectedSpecs.length > 0;
                     if (hasAnySelectedForFunding) {
-                        setSelectedForFundingSpecId(selectedSpecs[0].id);
+                        setSelectedForFundingSpecId(selectedSpecs[0]?.id);
                     }
                     return hasAnySelectedForFunding;
                 });
@@ -249,7 +249,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         clearErrorMessages();
         if (job.isComplete) {
             if (job.isSuccessful) {
-                history.push(`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`);
+                history.push(`/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification.fundingPeriod.id}/${specificationId}`);
             } else {
                 addError({error: job.outcome || job.statusDescription, description: "Failed to choose specification for funding"});
             }
@@ -418,7 +418,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"View specifications"} url={"/SpecificationsList"}/>
-                <Breadcrumb name={specification.name}/>
+                <Breadcrumb name={specification?.name}/>
             </Breadcrumbs>
 
             <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
@@ -446,7 +446,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         {specification.name}
                     </h1>
                     <span className="govuk-caption-l">
-                        {specification.fundingStreams[0].name} for {specification.fundingPeriod.name}
+                        {fundingStream?.name} for {specification?.fundingPeriod?.name}
                     </span>
                     {!isLoadingSelectedForFunding && specification.isSelectedForFunding &&
                     <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
@@ -482,7 +482,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <li>
                             {specification.isSelectedForFunding || selectedForFundingSpecId ?
                                 <Link className="govuk-link govuk-link--no-visited-state"
-                                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
+                                      to={`/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}>
                                     View funding
                                 </Link>
                                 :
@@ -494,7 +494,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                     </ul>
                 </div>
             </div>
-            {initialTab.length > 0 && !isApproveCalcsJobMonitoring && specification.id.length > 0 && !isRefreshJobMonitoring &&
+            {initialTab.length > 0 && !isApproveCalcsJobMonitoring && specification.id?.length > 0 && !isRefreshJobMonitoring &&
             <div className="govuk-main-wrapper  govuk-!-padding-top-2">
                 <div className="govuk-grid-row" data-testid="hi">
                     <Tabs initialTab={"fundingline-structure"}>

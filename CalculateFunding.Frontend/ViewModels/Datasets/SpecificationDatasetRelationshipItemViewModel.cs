@@ -13,6 +13,8 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
         public string DatasetName { get; set; }
 
         public string RelationshipDescription { get; set; }
+        
+        public CalculateFunding.Common.ApiClient.DataSets.Models.DatasetRelationshipType RelationshipType { get; set; }
 
         public int DatasetVersion { get; set; }
 
@@ -26,33 +28,6 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
 
 		public bool IsProviderData { get; set; }
 
-
-        public string DatasetPhrase
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(DatasetName))
-                {
-                    return "No data source file mapped";
-                }
-
-                return $"{DatasetName} (version {DatasetVersion})  ";
-            }
-        }
-
-        public string LinkPhrase
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(DatasetName))
-                {
-                    return "Map data source file";
-                }
-
-                return "Change data source file";
-            }
-        }
-
         public bool IsLatestVersion { get; set; }
 
         public DateTimeOffset? LastUpdatedDate { get; set; }
@@ -60,5 +35,6 @@ namespace CalculateFunding.Frontend.ViewModels.Datasets
         public string LastUpdatedAuthorName { get; set; }
 
         public bool HasDataSourceFileToMap { get; set; }
+        public string ReferencedSpecificationName { get; set; }
     }
 }

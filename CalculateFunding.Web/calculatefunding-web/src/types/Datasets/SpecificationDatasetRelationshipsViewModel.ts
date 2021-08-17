@@ -1,10 +1,11 @@
 import {Specification} from "../viewFundingTypes";
 import {SpecificationTrimmedViewModel} from "./SpecificationTrimmedViewModel";
+import {DatasetRelationshipType} from "./DatasetRelationshipType";
 
 export interface SpecificationDatasetRelationshipsViewModel {
     items: SpecificationDatasetRelationshipsViewModelItem[];
     specification: Specification;
-    specificationTrimmedViewModel: SpecificationTrimmedViewModel;
+    specificationTrimmedViewModel?: SpecificationTrimmedViewModel;
 }
 
 export interface SpecificationDatasetRelationshipsViewModelItem {
@@ -12,7 +13,9 @@ export interface SpecificationDatasetRelationshipsViewModelItem {
     definitionName: string;
     definitionDescription: string;
     datasetName: string;
+    relationshipType: DatasetRelationshipType;
     relationshipDescription: string;
+    referencedSpecificationName: string;
     datasetVersion: number;
     datasetId: string;
     converterEnabled: boolean,
@@ -20,12 +23,9 @@ export interface SpecificationDatasetRelationshipsViewModelItem {
     relationshipId: string;
     relationName: string;
     isProviderData: boolean;
-    datasetPhrase: string;
-    linkPhrase: string;
     isLatestVersion: boolean,
     lastUpdatedDate: Date,
     lastUpdatedAuthorName: string,
     hasDataSourceFileToMap: boolean,
-    hasConverterWizardRunning?: boolean
 }
 

@@ -346,18 +346,18 @@ namespace CalculateFunding.Frontend.Controllers
                 return new OkObjectResult(true);
             }
 
-            IDictionary<string, IEnumerable<string>> modelStateEntryItems = newAssignDatasetResponse.Message.GetModelStateEntyItems();
+            IDictionary<string, IEnumerable<string>> modelStateEntryItems = newAssignDatasetResponse?.Message?.GetModelStateEntyItems();
 
             if (modelStateEntryItems != null)
             {
-                this.ModelState.AddModelStateErrors(modelStateEntryItems);
+                ModelState.AddModelStateErrors(modelStateEntryItems);
             }
             else
             {
-                this.ModelState.AddModelError(nameof(AssignDatasetSchemaViewModel.Name),newAssignDatasetResponse.Message);
+                ModelState.AddModelError(nameof(AssignDatasetSchemaViewModel.Name), newAssignDatasetResponse.Message);
             }
 
-            return BadRequest(this.ModelState);
+            return BadRequest(ModelState);
         }
 
         [HttpGet]

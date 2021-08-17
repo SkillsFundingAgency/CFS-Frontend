@@ -25,6 +25,7 @@ import {
 import {UpdateDatasetSpecificationRelationshipRequest} from "../types/Datasets/UpdateDatasetSpecificationRelationshipRequest";
 import {ReferencedSpecificationRelationshipMetadata} from "../types/Datasets/ReferencedSpecificationRelationshipMetadata";
 import {DatasourceRelationshipResponseViewModel} from "../types/Datasets/DatasourceRelationshipResponseViewModel";
+import {SpecificationDatasetRelationshipsViewModel} from "../types/Datasets/SpecificationDatasetRelationshipsViewModel";
 
 const baseUrl = "/api/datasets";
 
@@ -50,6 +51,15 @@ export async function assignDatasetSchemaService(request: AssignDatasetSchemaReq
         headers: {'Content-Type': 'application/json'},
         data: request
     });
+}
+
+export async function getDatasetRelationshipsBySpec(specificationId: string)
+: Promise<AxiosResponse<SpecificationDatasetRelationshipsViewModel>>{
+    return axios(`/api/datasetRelationships/get-sources`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'},
+        params: {specificationId: specificationId}
+    })
 }
 
 export async function toggleDatasetRelationshipService(request: ToggleDatasetSchemaRequest):

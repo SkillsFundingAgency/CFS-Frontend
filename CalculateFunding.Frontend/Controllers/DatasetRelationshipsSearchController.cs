@@ -47,7 +47,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/datasetrelationships/search")]
+        [Route("api/dataSetRelationships/search")]
         public async Task<IActionResult> SearchDatasetRelationships([FromBody] SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
@@ -65,7 +65,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/datasetrelationships/get-sources")]
+        [Route("api/dataSetRelationships/get-sources")]
         public async Task<IActionResult> GetSources(string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -103,33 +103,41 @@ namespace CalculateFunding.Frontend.Controllers
                 return null;
             }
 
-
             IEnumerable<Task<SpecificationDatasetRelationshipItemViewModel>> viewModelItems =
-                apiResponse.Content.Select(async m => new SpecificationDatasetRelationshipItemViewModel
+                apiResponse.Content
+                    .OrderBy(m => m.Name)
+                    .Select(async m =>
                 {
-                    DatasetId = m.DatasetId,
-                    DatasetName = m.DatasetName,
-                    DefinitionName = m.Definition != null ? m.Definition.Name : string.Empty,
-                    DefinitionId = m.Definition != null ? m.Definition.Id : string.Empty,
-                    DefinitionDescription = m.Definition?.Description ?? string.Empty,
-                    DatasetVersion = m.Version ?? 0,
-                    RelationName = m.Name,
-                    RelationshipId = m.Id,
-                    RelationshipDescription = m.RelationshipDescription,
-                    IsProviderData = m.IsProviderData,
-                    IsLatestVersion = m.IsLatestVersion,
-                    LastUpdatedDate = m.LastUpdatedDate,
-                    LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name)
-                        ? "Unknown"
-                        : m.LastUpdatedAuthor.Name,
-                    ConverterEnabled = m.ConverterEnabled,
-                    HasDataSourceFileToMap = await GetDataSourceFiles(m.Id)
+                    Task<bool> hasDataSourceFileToMapTask = GetDataSourceFiles(m.Id);
+                    Task<ApiResponse<SpecificationSummary>> referenceSpecTask = m.PublishedSpecificationConfiguration != null ? _specificationsApiClient
+                        .GetSpecificationSummaryById(m.PublishedSpecificationConfiguration.SpecificationId) : null;
+
+                    return new SpecificationDatasetRelationshipItemViewModel
+                    {
+                        DatasetId = m.DatasetId,
+                        DatasetName = m.DatasetName,
+                        RelationshipType = m.RelationshipType,
+                        DefinitionName = m.Definition != null ? m.Definition.Name : string.Empty,
+                        DefinitionId = m.Definition != null ? m.Definition.Id : string.Empty,
+                        DefinitionDescription = m.Definition?.Description ?? string.Empty,
+                        DatasetVersion = m.Version ?? 0,
+                        RelationName = m.Name,
+                        RelationshipId = m.Id,
+                        RelationshipDescription = m.RelationshipDescription,
+                        ReferencedSpecificationName = referenceSpecTask != null ?
+                            (await referenceSpecTask).Content?.Name : "",
+                        IsProviderData = m.IsProviderData,
+                        IsLatestVersion = m.IsLatestVersion,
+                        LastUpdatedDate = m.LastUpdatedDate,
+                        LastUpdatedAuthorName = string.IsNullOrWhiteSpace(m.LastUpdatedAuthor?.Name)
+                            ? "Unknown"
+                            : m.LastUpdatedAuthor.Name,
+                        ConverterEnabled = m.ConverterEnabled,
+                        HasDataSourceFileToMap = await hasDataSourceFileToMapTask
+                    };
                 });
 
-            SpecificationDatasetRelationshipItemViewModel[]
-                items = await Task.WhenAll(viewModelItems.ToArraySafe());
-
-            viewModel.Items = items.OrderBy(_ => _.RelationName);
+            viewModel.Items = await Task.WhenAll(viewModelItems.ToArraySafe());
 
             return viewModel;
         }
@@ -144,7 +152,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
-                return result.Content.Datasets != null && result.Content.Datasets.Any(); 
+                return result.Content.Datasets != null && result.Content.Datasets.Any();
             }
 
             return false;
