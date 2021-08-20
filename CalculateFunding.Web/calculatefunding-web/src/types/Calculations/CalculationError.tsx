@@ -3,6 +3,12 @@ import {AxiosError} from "axios";
 export interface CalculationError{
     id: string;
     specificationId: string;
+    datasetRelationshipId: string;
+    datasetRelationshipName: string;
+    datasetFieldId: string;
+    datasetFieldName: string;
+    datasetDatatype: DatasetDataType;
+    isReleasedData: boolean;
     title: string;
     itemType: string;
     enumValueName: string;
@@ -10,6 +16,7 @@ export interface CalculationError{
     fundingStreamId?: any;
     templateCalculationId: number;
     codeReference: string;
+    fundingLineName: string;
     templateCalculations: ObsoleteCalculationSummary[];
     additionalCalculations: ObsoleteCalculationSummary[];
 }
@@ -36,4 +43,18 @@ export enum ObsoleteItemType{
 export interface ObsoleteCalculationSummary{
     id:string,
     name:string,
+}
+
+export enum DatasetDataType {
+    Boolean = "Boolean",
+    Char = "Char",
+    Byte = "Byte",
+    Integer = "Integer",
+    Float = "Float",
+    Decimal = "Decimal",
+    DateTime = "DateTime",
+    String = "String",
+    NullableOfInteger = "NullableOfInteger",
+    NullableOfDecimal = "NullableOfDecimal",
+    NullableOfBoolean = "NullableOfBoolean"
 }

@@ -119,17 +119,33 @@ namespace CalculateFunding.Frontend.Controllers
 
         private string GenerateTitleForObsoleteItem(ObsoleteItem obsoleteItem, TemplateMetadataDistinctContents policyContents)
         {
-            switch (obsoleteItem.ItemType)
+            if (!obsoleteItem.IsReleasedData)
             {
-                case ObsoleteItemType.EnumValue:
+                switch (obsoleteItem.ItemType)
+                {
+                    case ObsoleteItemType.EnumValue:
 
-                    TemplateMetadataCalculation calcInTemplate = policyContents.Calculations.Single(c => c.TemplateCalculationId == obsoleteItem.TemplateCalculationId);
+                        TemplateMetadataCalculation calcInTemplate = policyContents.Calculations.Single(c => c.TemplateCalculationId == obsoleteItem.TemplateCalculationId);
 
-                    return $"{obsoleteItem.EnumValueName} in {calcInTemplate.Name} is not valid";
-                case ObsoleteItemType.FundingLine:
-                    return $"Missing funding line - ID: {obsoleteItem.FundingLineId} Name: {obsoleteItem.FundingLineName}";
-                default:
-                    throw new InvalidOperationException($"Unknown obsolete item type {obsoleteItem.ItemType}");
+                        return $"{obsoleteItem.EnumValueName} in {calcInTemplate.Name} is not valid";
+                    case ObsoleteItemType.FundingLine:
+                        return $"Missing funding line - ID: {obsoleteItem.FundingLineId} Name: {obsoleteItem.FundingLineName}";
+                    default:
+                        throw new InvalidOperationException($"Unknown obsolete item type {obsoleteItem.ItemType}");
+                }
+            }
+            else
+            {
+                switch (obsoleteItem.ItemType)
+                {
+                    case ObsoleteItemType.FundingLine:
+                        return $"Missing Released Data - Funding Line: {obsoleteItem.FundingLineName}";
+                    case ObsoleteItemType.Calculation:
+                        TemplateMetadataCalculation calcInTemplate = policyContents.Calculations.Single(c => c.TemplateCalculationId == obsoleteItem.TemplateCalculationId);
+                        return $"Missing Released Data - Calculation: {calcInTemplate.Name}";
+                    default:
+                        throw new InvalidOperationException($"Unknown obsolete item type {obsoleteItem.ItemType}");
+                }
             }
         }
 

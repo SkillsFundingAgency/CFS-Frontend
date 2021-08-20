@@ -59,10 +59,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             ObsoleteItem[] obsoleteItems = new[]
             {
-                NewObsoleteItem(specificationId, calculationIdOne),
-                NewObsoleteItem(specificationId, calculationIdOne, calculationIdTwo),
-                NewObsoleteItem(specificationId, calculationIdThree, calculationIdFour),
-                NewObsoleteItem(specificationId, calculationIdThree, calculationIdFive, calculationIdOne),
+                NewObsoleteItem(specificationId, false, calculationIdOne),
+                NewObsoleteItem(specificationId, true, calculationIdOne, calculationIdTwo),
+                NewObsoleteItem(specificationId, false, calculationIdThree, calculationIdFour),
+                NewObsoleteItem(specificationId, false, calculationIdThree, calculationIdFive, calculationIdOne),
             };
 
             string calculationNameOne = NewRandomString();
@@ -122,7 +122,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 FundingLineName = _.FundingLineName,
                 FundingStreamId = _.FundingStreamId,
                 TemplateCalculationId = _.TemplateCalculationId,
-                TemplateCalculations = AsCalculationSummaries(_.CalculationIds, calculations),
+                TemplateCalculations = AsCalculationSummaries(_.CalculationIds, calculations)
             }).ToArray();
 
         private IEnumerable<CalculationSummaryViewModel> AsCalculationSummaries(IEnumerable<string> calculationIds,
@@ -191,6 +191,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         
         private ObsoleteItem NewObsoleteItem(
             string specificationId,
+            bool isReleasedData,
             params string[] calculationIds) => new ObsoleteItem
             {
                 Id = NewRandomString(),
@@ -201,7 +202,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 SpecificationId = specificationId,
                 FundingLineId = NewRandomUint(),
                 FundingStreamId = NewRandomString(),
-                CalculationIds = calculationIds
+                CalculationIds = calculationIds,
+                IsReleasedData = isReleasedData
             };
 
         private static uint NewRandomUint() => (uint)new Random().Next(int.MaxValue);
