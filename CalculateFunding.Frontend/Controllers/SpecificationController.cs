@@ -1,13 +1,18 @@
 ﻿using CalculateFunding.Common.ApiClient.Models;
+using CalculateFunding.Common.ApiClient.Policies;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Models.Versioning;
+using CalculateFunding.Common.TemplateMetadata.Enums;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
+using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,11 +20,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using CalculateFunding.Common.ApiClient.Users.Models;
-using CalculateFunding.Frontend.ViewModels.Common;
-using CalculateFunding.Common.ApiClient.Policies.Models;
-using CalculateFunding.Common.ApiClient.Policies;
-using CalculateFunding.Common.TemplateMetadata.Enums;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -592,6 +592,34 @@ namespace CalculateFunding.Frontend.Controllers
 
             HttpStatusCode response =
                 await _specificationsApiClient.SetProfileVariationPointers(specificationId, profileVariationPointer);
+
+            if (response == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(response);
+            }
+
+            throw new InvalidOperationException($"An error occurred while updating profile variation pointers. Status code={response}");
+        }
+
+        [Route("api/specs/{specificationId}/profile-variation-pointers")]
+        [HttpPatch]
+        public async Task<IActionResult> MergeProfileVariationPointers(
+            [FromRoute] string specificationId,
+            [FromBody] IEnumerable<ProfileVariationPointer> profileVariationPointers)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.ArgumentNotNull(profileVariationPointers, nameof(profileVariationPointers));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(
+                User,
+                specificationId,
+                SpecificationActionTypes.CanEditSpecification))
+            {
+                return new ForbidResult();
+            }
+
+            HttpStatusCode response =
+                await _specificationsApiClient.MergeProfileVariationPointers(specificationId, profileVariationPointers);
 
             if (response == HttpStatusCode.OK)
             {
