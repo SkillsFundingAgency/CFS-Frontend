@@ -376,7 +376,7 @@ export function GdsMonacoEditor(props: {
 
                                             };
 
-                                            if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
+                                            if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase() && !pathItem.isObsolete)) {
                                                 let description = "";
                                                 let friendlyName = "";
 
@@ -425,7 +425,7 @@ export function GdsMonacoEditor(props: {
                                                 }
                                             };
 
-                                            if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
+                                            if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase() && !pathItem.isObsolete)) {
                                                 let description = "";
                                                 let friendlyName = "";
 
@@ -478,7 +478,7 @@ export function GdsMonacoEditor(props: {
                                             range: editorRange
                                         };
 
-                                        if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase())) {
+                                        if (pathItems.find(pathItem => pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase() && !pathItem.isObsolete)) {
                                             let description = "";
                                             let friendlyName = "";
 
