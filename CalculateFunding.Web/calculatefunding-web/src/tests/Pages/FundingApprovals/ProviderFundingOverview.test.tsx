@@ -119,7 +119,7 @@ const testProvider: ProviderSummary = {
     ukprn: "",
     upin: "",
     urn: "",
-    paymentOrganisationId: "",
+    paymentOrganisationIdentifier: "",
     paymentOrganisationName: "",
     providerTypeCode: "",
     providerSubTypeCode: "",

@@ -60,7 +60,7 @@ export interface ProviderSummary {
     localGovernmentGroupTypeCode?: any;
     countryName: string;
     countryCode: string;
-    paymentOrganisationId: string;
+    paymentOrganisationIdentifier: string;
     paymentOrganisationName: string;
     paymentOrganisationUpin: string;
     paymentOrganisationTrustCode: string;

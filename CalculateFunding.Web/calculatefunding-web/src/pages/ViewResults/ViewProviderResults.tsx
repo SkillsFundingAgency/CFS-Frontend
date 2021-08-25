@@ -182,8 +182,8 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                         status={specificationSummary.approvalStatus as PublishStatus}
                                         providerId={providerId}
                                         addError={addError}
-                                        clearErrorMessages={clearErrorMessages} 
-                                        showApproveButton={false} 
+                                        clearErrorMessages={clearErrorMessages}
+                                        showApproveButton={false}
                                         useCalcEngine={true}
                                         jobTypes={[JobType.AssignTemplateCalculationsJob]}/>
                                 }
@@ -521,7 +521,7 @@ export function ViewProviderResults({match}: RouteComponentProps<ViewProviderRes
                                                     Identifier
                                                 </dt>
                                                 <dd className="govuk-summary-list__value">
-                                                    {providerDetails.paymentOrganisationId}
+                                                    {providerDetails.paymentOrganisationIdentifier}
                                                 </dd>
                                             </div>
                                         </dl>

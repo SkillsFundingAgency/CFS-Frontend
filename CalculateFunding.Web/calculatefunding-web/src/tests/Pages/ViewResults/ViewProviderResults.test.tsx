@@ -81,7 +81,7 @@ const testProvider: ProviderSummary = {
     ukprn: "ukprn test",
     upin: "",
     urn: "",
-    paymentOrganisationId: "",
+    paymentOrganisationIdentifier: "",
     paymentOrganisationName: "",
     censusWardCode: "",
     censusWardName: "",
