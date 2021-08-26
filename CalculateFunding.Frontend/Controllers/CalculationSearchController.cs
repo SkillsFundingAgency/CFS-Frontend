@@ -66,13 +66,17 @@ namespace CalculateFunding.Frontend.Controllers
 				Filters = new Dictionary<string, string[]>
 				{
 					{"specificationId", new[] {viewModel.SpecificationId}}, 
-					{"status", new[] {viewModel.Status}}, 
 					{"calculationType", new[] {viewModel.CalculationType}}
 				},
 				PageNumber = viewModel.PageNumber,
 				PageSize = 50,
                 OrderBy = viewModel.OrderBy
             };
+
+            if (!string.IsNullOrEmpty(viewModel.Status))
+            {
+                request.Filters.Add("status", new[] { viewModel.Status });
+            }
 
 			if (!string.IsNullOrEmpty(viewModel.SearchTerm))
 			{
