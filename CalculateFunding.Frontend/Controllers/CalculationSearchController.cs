@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/calculations/getcalculationsforspecification")]
-        public async Task<IActionResult> GetAdditionalCalculationsForSpecification(CalculationSearchRequestViewModel viewModel)
+        public async Task<IActionResult> GetAdditionalCalculationsForSpecification([FromBody] CalculationSearchRequestViewModel viewModel)
         {
 			Guard.IsNullOrWhiteSpace(viewModel.SpecificationId, nameof(viewModel.SpecificationId));
 			Guard.ArgumentNotNull(viewModel.CalculationType, nameof(viewModel.CalculationType));
@@ -71,7 +71,8 @@ namespace CalculateFunding.Frontend.Controllers
 				},
 				PageNumber = viewModel.PageNumber,
 				PageSize = 50,
-			};
+                OrderBy = viewModel.OrderBy
+            };
 
 			if (!string.IsNullOrEmpty(viewModel.SearchTerm))
 			{

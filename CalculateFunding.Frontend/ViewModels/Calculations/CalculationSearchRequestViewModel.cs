@@ -1,4 +1,6 @@
-﻿namespace CalculateFunding.Frontend.ViewModels.Calculations
+﻿using System.Collections.Generic;
+
+namespace CalculateFunding.Frontend.ViewModels.Calculations
 {
     public class CalculationSearchRequestViewModel
     {
@@ -11,5 +13,7 @@
 	    public int PageNumber { get; set; }
 
 	    public string SearchTerm { get; set; }
+
+        public IEnumerable<string> OrderBy { get; set; }
     }
 }

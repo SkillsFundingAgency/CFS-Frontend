@@ -26,8 +26,8 @@
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="2.8.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="8.1.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="2.9.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="8.3.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="7.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="2.0.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.4.22" />

@@ -3,7 +3,6 @@
     using System;
     using System.IO;
     using System.Threading.Tasks;
-    using System.Security.Claims;
     using Common.Identity.Authorization;
     using Common.Utility;
     using CalculateFunding.Common.Interfaces;

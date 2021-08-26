@@ -336,7 +336,42 @@ namespace CalculateFunding.Frontend.Services
             results.StartItemNumber.Should().Be(51);
             results.EndItemNumber.Should().Be(100);
         }
-        
+
+        [TestMethod]
+        public async Task PerformSearch_SortExpressionPassedCorrectlyToCallee()
+        {
+            // Arrange
+            ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+            ILogger logger = Substitute.For<ILogger>();
+            IMapper mapper = MappingHelper.CreateFrontEndMapper();
+
+            ICalculationSearchService calculationSearchService = new CalculationSearchService(calcsClient, mapper, logger);
+
+            IEnumerable<string> orderByExpression = new List<string> { "name asc" };
+
+            int numberOfItems = 50;
+
+            var itemResult = GeneratePagedResult(numberOfItems);
+            itemResult.Content.TotalCount = 175;
+
+            calcsClient
+                .FindCalculations(Arg.Is<SearchFilterRequest>(_ => _.OrderBy == orderByExpression))
+                .Returns(itemResult);
+
+            SearchRequestViewModel request = new SearchRequestViewModel()
+            {
+                PageNumber = 2,
+                OrderBy = orderByExpression
+            };
+
+            // Act
+            CalculationSearchResultViewModel results = await calculationSearchService.PerformSearch(request);
+
+            // Assert
+            results.StartItemNumber.Should().Be(51);
+            results.EndItemNumber.Should().Be(100);
+        }
+
         private ApiResponse<SearchResults<CalculationSearchResult>> GeneratePagedResult(int numberOfItems, IEnumerable<SearchFacet> facets = null)
         {
             SearchResults<CalculationSearchResult> output = new SearchResults<CalculationSearchResult>();

@@ -54,7 +54,7 @@ namespace CalculateFunding.Frontend.Services
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-            SearchFilterRequest requestOptions = new SearchFilterRequest()
+            SearchFilterRequest requestOptions = new SearchFilterRequest
             {
                 Page = request.PageNumber.HasValue ? request.PageNumber.Value : 1,
                 PageSize = request.PageSize.HasValue ? request.PageSize.Value : 50,
@@ -62,7 +62,8 @@ namespace CalculateFunding.Frontend.Services
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
                 FacetCount = request.FacetCount,
-                SearchMode = SearchMode.All
+                SearchMode = SearchMode.All,
+                OrderBy = request.OrderBy
             };
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
