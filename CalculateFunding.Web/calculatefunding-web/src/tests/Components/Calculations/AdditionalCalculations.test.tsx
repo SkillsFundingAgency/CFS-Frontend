@@ -16,6 +16,7 @@ import {Permission} from "../../../types/Permission";
 describe('<AdditionalCalculations /> tests', () => {
     beforeAll(() => {
         jest.mock('../../../services/calculationService', () => mockCalculationService());
+        jest.mock('../../../services/specificationService', () => mockSpecificationService());
     });
 
     afterEach(() => {
@@ -64,8 +65,8 @@ describe('<AdditionalCalculations /> tests', () => {
         });
 
         it("it calls the services correct number of times", async () => {
-            const {searchCalculationsForSpecification} = require('../../../services/calculationService');
-            await waitFor(() => expect(searchCalculationsForSpecification).toBeCalledTimes(1));
+            const {getAdditionalCalculationsForSpecificationService} = require('../../../services/specificationService');
+            await waitFor(() => expect(getAdditionalCalculationsForSpecificationService).toBeCalledTimes(1));
         });
 
         it('create button is displayed', async () => {
@@ -282,28 +283,6 @@ const mockCalculationService = () => {
     const calculationService = jest.requireActual('../../../services/calculationService');
     return {
         ...calculationService,
-        searchCalculationsForSpecification: jest.fn(() => Promise.resolve({
-            status: 200,
-            data: {
-                totalCount: 2,
-                totalResults: 2,
-                totalErrorResults: 0,
-                currentPage: 1,
-                lastPage: 1,
-                startItemNumber: 0,
-                endItemNumber: 0,
-                pagerState: {
-                    displayNumberOfPages: 0,
-                    previousPage: 0,
-                    nextPage: 0,
-                    lastPage: 0,
-                    pages: [],
-                    currentPage: 0
-                },
-                facets: [],
-                calculations: [testCalc1, testCalc2]
-            }
-        })),
         searchForCalculationsByProviderService: jest.fn(() => Promise.resolve({
             status: 200,
             data: {
@@ -326,5 +305,37 @@ const mockCalculationService = () => {
                 calculations: [testCalc1, testCalc2]
             }
         }))
+    }
+}
+const mockSpecificationService = () => {
+    const specificationService = jest.requireActual('../../../services/specificationService');
+    return {
+        ...specificationService,
+        getAdditionalCalculationsForSpecificationService: jest.fn(() => Promise.resolve({
+            status: 200,
+            data:{
+                calculations: [
+                    testCalc1,
+                    testCalc2
+                ],
+                totalResults: 2,
+                totalErrorResults: 0,
+                currentPage: 1,
+                startItemNumber: 1,
+                endItemNumber: 3,
+                pagerState: {
+                    displayNumberOfPages: 2,
+                    previousPage: null,
+                    nextPage: null,
+                    lastPage: 1,
+                    pages: [
+                        1
+                    ],
+                    currentPage: 1
+                },
+                facets: []
+            }
+        })),
+
     }
 }

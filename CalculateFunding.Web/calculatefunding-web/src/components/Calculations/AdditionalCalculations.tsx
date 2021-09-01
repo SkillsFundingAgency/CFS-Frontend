@@ -3,8 +3,11 @@ import {Link} from "react-router-dom";
 import {DateTimeFormatter} from "../DateTimeFormatter";
 import Pagination from "../Pagination";
 import * as React from "react";
-import {searchCalculationsForSpecification, searchForCalculationsByProviderService} from "../../services/calculationService";
-import {CalculationSearchResultResponse, CalculationType} from "../../types/CalculationSearchResponse";
+import {searchForCalculationsByProviderService} from "../../services/calculationService";
+import {
+    CalculationSearchResultResponse,
+    CalculationType
+} from "../../types/CalculationSearchResponse";
 import {useEffect, useState} from "react";
 import {useSpecificationPermissions} from "../../hooks/Permissions/useSpecificationPermissions";
 import {useCalculationCircularDependencies} from "../../hooks/Calculations/useCalculationCircularDependencies";
@@ -14,6 +17,9 @@ import {formatNumber, NumberType} from "../FormattedNumber";
 import {cloneDeep} from "lodash";
 import {ValueType} from "../../types/ValueType";
 import {Permission} from "../../types/Permission";
+import {getAdditionalCalculationsForSpecificationService} from "../../services/specificationService";
+import '../../styles/SortableTable.scss';
+import SortableButton from "components/SortableButton";
 
 export interface AdditionalCalculationsProps {
     specificationId: string,
@@ -29,6 +35,7 @@ export function AdditionalCalculations({
     const [additionalCalculationsSearchTerm, setAdditionalCalculationSearchTerm] = useState('');
     const [isLoadingAdditionalCalculations, setIsLoadingAdditionalCalculations] = useState(false);
     const [statusFilter] = useState("");
+    const [sortBy, setSortBy] = useState<string>("name asc");
     const {isPermissionsFetched, hasMissingPermissions} =
         useSpecificationPermissions(specificationId, [Permission.CanEditCalculations]);
     const {circularReferenceErrors, isLoadingCircularDependencies} =
@@ -38,17 +45,17 @@ export function AdditionalCalculations({
 
     useEffect(() => {
         movePage(firstPage);
-    }, [specificationId]);
+    }, [specificationId, sortBy]);
 
     function renderValue(value: number | null | undefined, calculationType: ValueType): string {
         if (!value) return '';
         switch (calculationType) {
             case ValueType.Currency:
-                return formatNumber(value, NumberType.FormattedMoney, 0);
+                return formatNumber(value, NumberType.FormattedMoney, 0, false);
             case ValueType.Percentage:
-                return formatNumber(value, NumberType.FormattedPercentage, 0);
+                return formatNumber(value, NumberType.FormattedPercentage, 0, false);
             case ValueType.Number:
-                return formatNumber(value, NumberType.FormattedDecimalNumber, 0);
+                return formatNumber(value, NumberType.FormattedDecimalNumber, 0, false);
         }
         return `${value}`;
     }
@@ -68,6 +75,7 @@ export function AdditionalCalculations({
                     status: status,
                     pageNumber: pageNumber,
                     searchTerm: searchTerm,
+                    orderBy: [sortBy],
                     calculationType: "Additional"
                 }, providerId)).data;
 
@@ -86,15 +94,16 @@ export function AdditionalCalculations({
 
                 setAdditionalCalculations(mappedResults);
             } else {
-                const searchCalculationsForSpecificationResponse = await searchCalculationsForSpecification({
+                getAdditionalCalculationsForSpecificationService({
                     specificationId: specificationId,
                     status: status,
                     pageNumber: pageNumber,
                     searchTerm: searchTerm,
+                    orderBy: [sortBy],
                     calculationType: CalculationType.Additional
+                }).then(response =>{
+                    setAdditionalCalculations(response.data);
                 });
-
-                setAdditionalCalculations(searchCalculationsForSpecificationResponse.data);
             }
         } catch (err) {
             addError({
@@ -105,6 +114,26 @@ export function AdditionalCalculations({
         } finally {
             setIsLoadingAdditionalCalculations(false);
         }
+    }
+
+    function sortByValue(sortType:string) {
+        switch (sortBy)
+        {
+            case `${sortType} asc`:
+                setSortBy(`${sortType} desc`)
+                break;
+            case `${sortType} desc`:
+                setSortBy(`${sortType} asc`)
+                break;
+            default:
+                setSortBy(`${sortType} asc`)
+                break;
+        }
+    }
+
+    function searchByText(specificationId: string, status: string, pageNumber: number, searchTerm: string){
+        setSortBy("");
+        findAdditionalCalculations(specificationId, status, pageNumber, searchTerm);
     }
 
     return <section className="govuk-tabs__panel" id="additional-calculations">
@@ -136,7 +165,7 @@ export function AdditionalCalculations({
                 <button
                     className="govuk-button"
                     type="submit"
-                    onClick={() => findAdditionalCalculations(specificationId, statusFilter, 1, additionalCalculationsSearchTerm)}>
+                    onClick={() => searchByText(specificationId, statusFilter, 1, additionalCalculationsSearchTerm)}>
                     Search
                 </button>
             </div>
@@ -146,15 +175,16 @@ export function AdditionalCalculations({
             <table className="govuk-table">
                 <thead className="govuk-table__head">
                     <tr className="govuk-table__row">
-                        <th scope="col" className="govuk-table__header">Additional calculation name</th>
-                        {!providerId && <th scope="col" className="govuk-table__header">Status</th>}
-                        <th scope="col" className="govuk-table__header">Type</th>
-                        {providerId && <th scope="col" className="govuk-table__header">Value</th>}
-                        {!providerId && <th scope="col" className="govuk-table__header">Last edited date</th>}
+                        <th scope="col" className="govuk-table__header"><SortableButton title={"Additional calculation name"} sortName={"name"} callback={sortByValue} /></th>
+                        {!providerId && <th scope="col" className="govuk-table__header" >
+                            <SortableButton callback={sortByValue} sortName={"status"} title={"Status"} /></th>}
+                        <th scope="col" className="govuk-table__header"><SortableButton callback={sortByValue} sortName={"valueType"} title={"Type"} /></th>
+                        {providerId && <th scope="col" className="govuk-table__header"><SortableButton callback={sortByValue} sortName={"valueType"} title={"Value"} /></th>}
+                        {!providerId && <th scope="col" className="govuk-table__header"><SortableButton callback={sortByValue} sortName={"lastUpdatedDate"} title={"Last edited date"} /></th>}
                     </tr>
                 </thead>
                 <tbody className="govuk-table__body">
-                    {additionalCalculations.calculations.map((ac, index) => {
+                    {additionalCalculations.calculations?.map((ac, index) => {
                         const hasError = circularReferenceErrors && circularReferenceErrors.some((error) => error.node.calculationid === ac.id);
                         const linkUrl = showCreateButton ? `/Specifications/EditCalculation/${ac.id}` : `/ViewCalculationResults/${ac.id}`;
                         return <tr className="govuk-table__row" key={index}>

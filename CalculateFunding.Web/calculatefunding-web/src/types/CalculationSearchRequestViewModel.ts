@@ -2,6 +2,7 @@ export interface CalculationSearchRequestViewModel {
     specificationId: string,
     calculationType: string,
     status: string,
-    pageNumber: number
+    pageNumber: number,
+    orderBy: string[],
     searchTerm: string,
 }
