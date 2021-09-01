@@ -14,7 +14,7 @@ import {SpecificationListResults} from "../types/Specifications/SpecificationLis
 const baseURL = "/api/specs";
 
 
-export async function getSpecificationSummaryService(specificationId: string): 
+export async function getSpecificationSummaryService(specificationId: string):
     Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/specification-summary-by-id/${specificationId}`, {
         method: 'GET',
@@ -63,7 +63,7 @@ export async function getSpecificationsByFundingPeriodAndStreamIdService(funding
     });
 }
 
-export async function getSpecificationsByFundingPeriodAndStreamIdWithResultsService(fundingStreamId: string, fundingPeriodId: string) {
+export async function getSpecificationsByFundingPeriodAndStreamIdWithResultsService(fundingStreamId: string, fundingPeriodId: string) : Promise<AxiosResponse<SpecificationSummary[]>> {
     return axios(`${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}/with-results`, {
         method: 'GET',
         headers: {
@@ -97,7 +97,7 @@ export async function approveFundingLineStructureService(specificationId: string
     });
 }
 
-export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationModel): 
+export async function createSpecificationService(createSpecificationViewModel: CreateSpecificationModel):
     Promise<AxiosResponse<SpecificationSummary>> {
     return axios(`${baseURL}/create`, {
         method: 'POST',

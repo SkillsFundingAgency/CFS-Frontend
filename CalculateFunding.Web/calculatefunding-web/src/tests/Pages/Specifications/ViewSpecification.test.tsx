@@ -5,6 +5,7 @@ import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpec
 import {ViewSpecificationTestData} from "./ViewSpecificationTestData";
 import {Permission} from "../../../types/Permission";
 import {JobNotification} from "../../../hooks/Jobs/useJobSubscription";
+import {fakeSpecification} from "../../fakes/getSpecification.fake";
 
 
 const testData = ViewSpecificationTestData();
@@ -30,7 +31,7 @@ describe('<ViewSpecification /> ', () => {
         });
 
         describe("Service call checks ", () => {
-            
+
             it("it calls the specificationService", async () => {
                 const {getSpecificationSummaryService} = require('../../../services/specificationService');
                 await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1));
@@ -38,7 +39,7 @@ describe('<ViewSpecification /> ', () => {
         });
 
         describe('page render checks ', () => {
-            
+
             it('shows correct status in funding line structure tab', async () => {
                 await waitFor(() => expect(screen.getByText('Draft')).toBeInTheDocument());
             });
@@ -56,11 +57,17 @@ describe('<ViewSpecification /> ', () => {
             it('shows that the specification is converter wizard enabled', async () => {
                 expect(await screen.findByText(/In year opener enabled/)).toBeInTheDocument();
             });
+
+            it('renders the link to the specification results page', async () => {
+                const link = await screen.findByRole("link", {name: /View specification results/}) as HTMLAnchorElement;
+                expect(link).toBeInTheDocument();
+                expect(link.getAttribute("href")).toBe(`/ViewSpecificationResults/${testData.mockSpec.id}`);
+            })
         });
     });
 
     describe("with ApproveAllCalculations permission ", () => {
-        
+
         it("it calls correct services given approve all calculations button is clicked", async () => {
             testData.mockSpecificationPermissions();
             testData.mockSpecificationService();
@@ -81,7 +88,7 @@ describe('<ViewSpecification /> ', () => {
     });
 
     describe("without ApproveAllCalculations permission ", () => {
-        
+
         it("shows permission message when approve all calculations button is clicked", async () => {
             const withoutPermissions: SpecificationPermissionsResult = {
                 userId: "3456",

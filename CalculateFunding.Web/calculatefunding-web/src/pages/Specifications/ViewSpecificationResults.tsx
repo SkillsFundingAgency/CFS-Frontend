@@ -63,8 +63,8 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
             <div className="govuk-main-wrapper" hidden={isLoadingSpecification}>
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-two-thirds">
-                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification !== undefined ? specification.name : ""}</h1>
-                        <span className="govuk-caption-l">{specification !== undefined ? specification.fundingPeriod.name : ""}</span>
+                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification !== undefined ? specification?.name : ""}</h1>
+                        <span className="govuk-caption-l">{specification !== undefined ? specification.fundingPeriod?.name : ""}</span>
                         {specification && specification.isSelectedForFunding &&
                         <p className="govuk-body govuk-!-margin-top-2">
                             <strong className="govuk-tag">Chosen for funding</strong>
@@ -72,16 +72,17 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                         }
                     </div>
                     <div className="govuk-grid-column-one-third">
-                        {specification && specification.isSelectedForFunding &&
                         <ul className="govuk-list right-align">
+                        {specification && specification.isSelectedForFunding &&
                             <li>
                                 <Link className="govuk-link govuk-link--no-visited-state"
                                       to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>
                                     View funding
                                 </Link>
                             </li>
-                        </ul>
                         }
+                        <li><Link className={'govuk-link'} to={`/ViewSpecification/${specification?.id}`}>Manage specification</Link></li>
+                        </ul>
                     </div>
                 </div>
                 {initialTab.length > 0 &&
@@ -98,7 +99,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                                     }</Tabs.Tab>
                             </ul>
                             <Tabs.Panel label="fundingline-structure">
-                                {specification !== undefined && specification.fundingStreams.length > 0 ?
+                                {specification !== undefined && specification.fundingStreams?.length > 0 ?
                                     <FundingLineResults
                                         specificationId={specification.id}
                                         fundingStreamId={specification.fundingStreams[0].id}
@@ -118,7 +119,7 @@ export function ViewSpecificationResults({match}: RouteComponentProps<ViewSpecif
                             </Tabs.Panel>
                             <Tabs.Panel label="downloadable-reports">
                                 <DownloadableReports
-                                    fundingPeriodId={specification !== undefined ? specification.fundingPeriod.id : ""}
+                                    fundingPeriodId={specification !== undefined ? specification.fundingPeriod?.id : ""}
                                     specificationId={specificationId}
                                 />
                             </Tabs.Panel>

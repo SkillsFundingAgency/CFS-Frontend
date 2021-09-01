@@ -73,9 +73,9 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
 
     return (
         <Main location={Section.Datasets}>
-            
+
             <MultipleErrorSummary errors={errors}/>
-            
+
             <Breadcrumbs>
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"}/>
@@ -95,14 +95,19 @@ export function DataRelationships({match}: RouteComponentProps<DataRelationships
                     <div className="govuk-grid-column-two-thirds">
                         <AddDataRelationshipButton specificationId={specificationId}/>
                     </div>
+                    <div className="govuk-grid-column-one-third">
+                        <ul className="govuk-list right-align">
+                        <li><Link className={'govuk-link'} to={`/ViewSpecification/${specificationId}`}>Manage specification</Link></li>
+                        </ul>
+                    </div>
                 </div>
-                
+
                 <SpecificationDataRelationshipsGrid
                     isLoadingDatasetRelationships={isLoading}
                     datasetRelationships={datasetRelationships?.items || []}
                     converterWizardJobs={converterWizardJobs}
                 />
-                
+
                 <div className="govuk-grid-row govuk-!-margin-bottom-4 govuk-!-margin-top-0">
                     <div className="govuk-grid-column-full">
                         <BackToTop id={"top"}/>

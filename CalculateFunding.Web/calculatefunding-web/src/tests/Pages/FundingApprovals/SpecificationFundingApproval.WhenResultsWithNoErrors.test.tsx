@@ -57,6 +57,12 @@ describe("<SpecificationFundingApproval />", () => {
         it('renders provider status', async () => {
             expect(await screen.findByText(test.provider1.fundingStatus)).toBeInTheDocument();
         });
+
+        it('renders the link to the specification results page', async () => {
+            const link = screen.getByRole("link", {name: /Manage specification/}) as HTMLAnchorElement;
+            expect(link).toBeInTheDocument();
+            expect(link.getAttribute("href")).toBe(`/ViewSpecification/${test.testSpec.id}`);
+        })
     });
 });
 

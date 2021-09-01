@@ -49,6 +49,8 @@ import {
     useJobSubscription
 } from "../../hooks/Jobs/useJobSubscription";
 import {JobDetails} from "../../types/jobDetails";
+import {useQuery} from "react-query";
+import {useSpecificationResults} from "../../hooks/Specifications/useSpecificationResults";
 
 export interface ViewSpecificationRoute {
     specificationId: string;
@@ -140,7 +142,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
     useEffect(() => {
         setReleaseTimetableIsEnabled(featureFlagsState.releaseTimetableVisible);
     }, [featureFlagsState.releaseTimetableVisible]);
-    
+
     useEffect(() => {
         if (jobObserverState?.jobFilter) {
             addSub({
@@ -173,6 +175,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
         }
     }, [specificationId]);
 
+    const {specificationHasCalculationResults, isLoadingSpecificationResults} = useSpecificationResults(specification.id, specification.fundingStreams[0].id, specification.fundingPeriod.id, err => addError({error: err, description:'Error while loading specification results'}))
+
     const fetchData = async () => {
         try {
             const spec: SpecificationSummary = (await specificationService.getSpecificationSummaryService(specificationId)).data;
@@ -199,7 +203,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
 
     async function handleJobNotification(notification: JobNotification) {
         if (!notification?.latestJob) return;
-        
+
         switch (notification.latestJob.jobType) {
             case JobType.ConverterWizardActivityCsvGenerationJob:
                 await handleConverterWizardReportJob(notification);
@@ -429,14 +433,14 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                            hidden={!isApproveCalcsJobMonitoring && !isRefreshJobMonitoring}
                            subTitle={"Please wait, this could take several minutes"}
                            description={"Please do not refresh the page, you will be redirected automatically"}/>
-            
+
             {(isRefreshJobMonitoring || (converterWizardJob && !converterWizardJob.isSuccessful) || isApproveCalcsJobMonitoring) &&
             <div className="govuk-form-group">
                 {(isRefreshJobMonitoring || isApproveCalcsJobMonitoring) &&
                 <LoadingFieldStatus title={"Checking for running jobs..."}/>}
-                {isApproveCalcsJobRunning && 
+                {isApproveCalcsJobRunning &&
                 <JobProgressNotificationBanner job={approveAllCalculationsJob} displaySuccessfulJob={true}/>}
-                {converterWizardJob && 
+                {converterWizardJob &&
                 <JobProgressNotificationBanner job={converterWizardJob}/>}
             </div>}
 
@@ -469,7 +473,7 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         </li>
 
                         <li>
-                            <button type="button" className="govuk-link" 
+                            <button type="button" className="govuk-link"
                                     onClick={approveAllCalculations}
                                     data-testid="approve-calculations">
                                 Approve all calculations
@@ -490,6 +494,10 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                                         data-testid="choose-for-funding">Choose for funding</button>
                             }
                         </li>
+                        }
+                        {!isLoadingSpecificationResults && specificationHasCalculationResults &&
+                        <li><Link className={'govuk-link'} to={`/ViewSpecificationResults/${specificationId}`}>View
+                            specification results</Link></li>
                         }
                     </ul>
                 </div>

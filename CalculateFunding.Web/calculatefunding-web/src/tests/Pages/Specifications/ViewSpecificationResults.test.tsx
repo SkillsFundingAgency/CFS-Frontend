@@ -60,8 +60,16 @@ describe("<ViewSpecificationResults />", () => {
             expect(link).toHaveAttribute('href',
                 `/Approvals/SpecificationFundingApproval/${testSpecChosenForFunding.fundingStreams[0].id}/${testSpecChosenForFunding.fundingPeriod.id}/${testSpecChosenForFunding.id}`);
         });
+
+        it('renders the link to the specification results page', async () => {
+            renderViewSpecificationResults();
+
+            const link = screen.getByRole("link", {name: /Manage specification/}) as HTMLAnchorElement;
+            expect(link).toBeInTheDocument();
+            expect(link.getAttribute("href")).toBe(`/ViewSpecification/${testSpecChosenForFunding.id}`);
+        })
     });
-    
+
     describe("with specification NOT chosen for funding", () => {
 
         beforeEach(() => {
@@ -85,6 +93,14 @@ describe("<ViewSpecificationResults />", () => {
             renderViewSpecificationResults();
             expect(screen.queryByText(/Chosen for funding/)).not.toBeInTheDocument();
         });
+
+        it('renders the link to the specification results page', async () => {
+            renderViewSpecificationResults();
+
+            const link = screen.getByRole("link", {name: /Manage specification/}) as HTMLAnchorElement;
+            expect(link).toBeInTheDocument();
+            expect(link.getAttribute("href")).toBe(`/ViewSpecification/${testSpecNotChosenForFunding.id}`);
+        })
     });
 
 });

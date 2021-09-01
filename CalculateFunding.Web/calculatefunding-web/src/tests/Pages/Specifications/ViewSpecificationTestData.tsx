@@ -32,6 +32,7 @@ import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
 import {equals} from "ramda";
 import {DatasetRelationship} from "../../../types/DatasetRelationship";
 import {getDatasetsBySpecification} from "../../../services/datasetService";
+import {getSpecificationsByFundingPeriodAndStreamIdWithResultsService} from "../../../services/specificationService";
 
 const store: Store<IStoreState> = createStore(
     rootReducer
@@ -89,7 +90,7 @@ export function ViewSpecificationTestData() {
         templateIds: {},
         dataDefinitionRelationshipIds: []
     };
-    
+
     const calculationErrorsResult: CalculationErrorQueryResult = {
         clearCalculationErrorsFromCache(): Promise<void> {
             return Promise.resolve(undefined);
@@ -176,7 +177,7 @@ export function ViewSpecificationTestData() {
             subscription: subscription as JobSubscription,
             latestJob: job
         };
-        
+
         return notification;
     };
     const haveConverterJobInProgressNotification = () => {
@@ -226,7 +227,7 @@ export function ViewSpecificationTestData() {
         };
         return notification;
     }
-    
+
     let notificationCallback: (n: JobNotification) => void = () => null;
     let hasNotificationCallback: boolean = false;
     const getNotificationCallback = () => {
@@ -391,6 +392,9 @@ export function ViewSpecificationTestData() {
                 getSpecificationsSelectedForFundingByPeriodAndStreamService: jest.fn(() => Promise.resolve({
                     data: []
                 })),
+                getSpecificationsByFundingPeriodAndStreamIdWithResultsService: jest.fn(() => Promise.resolve({
+                    data: [{}]
+                }))
             }
         });
     }

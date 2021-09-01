@@ -17,7 +17,7 @@ context('Given a specification with data relationships', () => {
             (schema, request)
                 : SpecificationDatasetRelationshipsViewModel => dataRelationshipResponse
         );
-        
+
         cy.visit(`/Datasets/DataRelationships/${specification.id}`);
     });
     after(() => {
@@ -41,8 +41,16 @@ context('Given a specification with data relationships', () => {
             cy.findAllByRole('rowheader')
                 .should('have.length', 2);
         });
+
+        it('displays the link to Manage specification', () =>{
+            cy.contains('Manage subscription');
+            cy.findByRole('link', {name: /Manage subscription/i})
+                .click()
+                .url()
+                .should('include', '/ViewSpecification/' + specification.id);
+        })
     });
-    
+
     describe('when I click to add a new data set', () => {
 
         it('goes to the correct page', () => {
@@ -74,7 +82,7 @@ context('Given a specification with data relationships', () => {
         dataDefinitionRelationshipIds: [],
         templateIds: {}
     };
-    
+
     function makeDataRelationship(props: {
         relationshipId: string,
         relationName: string,

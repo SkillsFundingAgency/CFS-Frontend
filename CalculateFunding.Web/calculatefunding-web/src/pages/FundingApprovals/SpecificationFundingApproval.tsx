@@ -264,6 +264,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                     </div>
                     <div className="govuk-grid-column-one-third">
                         <ul className="govuk-list right-align">
+                            <li><Link className={'govuk-link'} to={`/ViewSpecification/${specification?.id}`}>Manage specification</Link></li>
                             {fundingConfiguration && fundingConfiguration.approvalMode === ApprovalMode.Batches &&
                             <li>
                                 <Link className="govuk-link govuk-link--no-visited-state"
@@ -285,6 +286,7 @@ export function SpecificationFundingApproval({match}: RouteComponentProps<Specif
                                     Refresh funding
                                 </button>
                             </li>
+
                             {lastRefresh &&
                             <p className="govuk-body-s govuk-!-margin-bottom-0">
                                 Last refresh <DateTimeFormatter date={lastRefresh as Date}/>
