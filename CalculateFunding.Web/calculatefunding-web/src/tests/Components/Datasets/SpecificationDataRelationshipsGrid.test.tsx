@@ -46,7 +46,7 @@ describe('<SpecificationDataRelationshipsGrid />', () => {
         it('renders correct data', async () => {
             const params: SpecificationDataRelationshipsGridProps = {
                 converterWizardJobs: [],
-                datasetRelationships: [dataRelationship1, dataRelationship2],
+                datasetRelationships: [dataRelationship1, dataRelationship2, dataRelationship3],
                 isLoadingDatasetRelationships: false
             };
             await renderComponent(params);
@@ -61,16 +61,25 @@ describe('<SpecificationDataRelationshipsGrid />', () => {
             expect(within(data1Row).queryByText(/not referencing any spec/)).not.toBeInTheDocument();
             expect(within(data1Row).getByRole('cell', {name: /Uploaded data/})).toBeInTheDocument();
             expect(within(data1Row).getByRole('cell', {name: /Dataset AAA \(version 1\)/})).toBeInTheDocument();
-            expect(within(data1Row).getByRole('link', {name: /Map/})).toBeInTheDocument();
+            expect(within(data1Row).getByRole('link', {name: /Change/})).toBeInTheDocument();
             
             const data2Row = screen.getByTestId(`tr-relationship-${convertToSlug(dataRelationship2.relationshipId)}`);
             expect(data2Row).toBeInTheDocument();
             expect(within(data2Row).getByText(/Relation 222/)).toBeInTheDocument();
             expect(within(data2Row).getByText(/Ref Spec AAA/)).toBeInTheDocument();
-            expect(within(data1Row).queryByText(/no definition name/)).not.toBeInTheDocument();
+            expect(within(data2Row).queryByText(/no definition name/)).not.toBeInTheDocument();
             expect(within(data2Row).getByRole('cell', {name: /Released data/})).toBeInTheDocument();
             expect(within(data2Row).getByRole('cell', {name: /Dataset BBB \(version 1\)/})).toBeInTheDocument();
-            expect(within(data2Row).getByRole('link', {name: /Map/})).toBeInTheDocument();
+            expect(within(data2Row).getByRole('link', {name: /Change/})).toBeInTheDocument();
+
+            const data3Row = screen.getByTestId(`tr-relationship-${convertToSlug(dataRelationship3.relationshipId)}`);
+            expect(data3Row).toBeInTheDocument();
+            expect(within(data3Row).getByText(/Relation 333/)).toBeInTheDocument();
+            expect(within(data3Row).getByText(/Definition YYY/)).toBeInTheDocument();
+            expect(within(data3Row).queryByText(/not referencing any spec/)).not.toBeInTheDocument();
+            expect(within(data3Row).getByRole('cell', {name: /Uploaded data/})).toBeInTheDocument();
+            expect(within(data3Row).getByRole('cell', {name: /No data source file mapped/})).toBeInTheDocument();
+            expect(within(data3Row).getByRole('link', {name: /Map/})).toBeInTheDocument();
         });
     });
 });
@@ -79,7 +88,7 @@ describe('<SpecificationDataRelationshipsGrid />', () => {
 function makeDataRelationship(props: {
     relationshipId: string,
     relationName: string,
-    datasetName: string,
+    datasetName: string | null,
     definitionName: string,
     referencedSpecificationName: string,
     hasDataSourceFileToMap: boolean,
@@ -124,4 +133,13 @@ const dataRelationship2 = makeDataRelationship({
     definitionName: 'no definition name',
     hasDataSourceFileToMap: true,
     type: DatasetRelationshipType.ReleasedData
+});
+const dataRelationship3 = makeDataRelationship({
+    relationshipId: 'rel333',
+    relationName: 'Relation 333',
+    referencedSpecificationName: 'not referencing any spec',
+    datasetName: null,
+    definitionName: 'Definition YYY',
+    hasDataSourceFileToMap: true,
+    type: DatasetRelationshipType.Uploaded
 });

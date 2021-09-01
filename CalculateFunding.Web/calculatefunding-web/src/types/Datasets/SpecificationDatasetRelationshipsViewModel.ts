@@ -12,7 +12,7 @@ export interface SpecificationDatasetRelationshipsViewModelItem {
     definitionId: string;
     definitionName: string;
     definitionDescription: string;
-    datasetName: string;
+    datasetName: string | null;
     relationshipType: DatasetRelationshipType;
     relationshipDescription: string;
     referencedSpecificationName: string;

@@ -148,7 +148,7 @@ const DataRelationshipItemRow = React.memo(({
                     <LoadingFieldStatus title={"Converter wizard running. Please wait."}/> :
                     !item.hasDataSourceFileToMap ?
                         'No data source files uploaded to map to' :
-                        item.datasetName.length > 0 ? `${item.datasetName} (version ${item.datasetVersion})` :
+                        item.datasetName && item.datasetName.length > 0 ? `${item.datasetName} (version ${item.datasetVersion})` :
                             'No data source file mapped'
                 }
             </td>
@@ -156,7 +156,7 @@ const DataRelationshipItemRow = React.memo(({
                 {item.hasDataSourceFileToMap && !hasConverterWizardRunning &&
                 <Link to={`/Datasets/SelectDataSource/${item.relationshipId}`}
                       className="govuk-link">
-                    {item.datasetName.length > 0 ? 'Map' : 'Change'}
+                    {item.datasetName && item.datasetName.length > 0 ? 'Change' : 'Map'}
                 </Link>
                 }
             </td>
