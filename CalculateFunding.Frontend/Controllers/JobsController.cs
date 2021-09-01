@@ -58,6 +58,21 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [Route("api/jobs/latest-by-job-definition-ids/{jobDefinitionId}")]
+        public async Task<IActionResult> GetLatestJobsByJobDefinitionId([FromRoute] string jobDefinitionId)
+        {
+            Guard.IsNullOrWhiteSpace(jobDefinitionId, nameof(jobDefinitionId));
+
+            ApiResponse<IDictionary<string, JobViewModel>> response = await _jobsApiClient.GetLatestJobsByJobDefinitionIds(jobDefinitionId);
+
+            return response.Handle(nameof(JobViewModel),
+                onNotFound: Ok,
+                onNoContent: Ok,
+                onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content[jobDefinitionId])));
+        }
+
+        [HttpGet]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("api/jobs/latest-by-entity-id/{specificationId}/{entityId}")]
         public async Task<IActionResult> GetLatestJobByTriggerEntityId([FromRoute] string specificationId, [FromRoute] string entityId)
         {
@@ -81,7 +96,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<JobViewModel> response = await _jobsApiClient.GetJobById(jobId);
 
-            return response.Handle(nameof(JobSummary),
+            return response.Handle(nameof(JobViewModel),
                 onNotFound: NotFound,
                 onNoContent: NotFound,
                 onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content)));

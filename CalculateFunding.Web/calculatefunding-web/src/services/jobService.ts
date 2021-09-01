@@ -19,6 +19,13 @@ export async function getJob(jobId: string): Promise<AxiosResponse<JobResponse |
     });
 }
 
+export async function getLatestJobByJobDefinitionId(jobDefinitionId: JobType): Promise<AxiosResponse<JobResponse | undefined>> {
+    return axios(`${baseURL}/latest-by-job-definition-ids/${jobDefinitionId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+    });
+}
+
 export async function getLatestSuccessfulJob(specificationId: string, jobType: string): Promise<AxiosResponse<JobResponse | undefined>> {
     return axios(`${baseURL}/latest-success/${specificationId}/${jobType}`, {
         method: 'GET',

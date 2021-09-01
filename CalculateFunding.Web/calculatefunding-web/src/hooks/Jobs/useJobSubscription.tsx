@@ -4,7 +4,7 @@ import {useEffect, useMemo} from "react";
 import {DateTime} from "luxon";
 import {JobDetails} from "../../types/jobDetails";
 import {JobMonitorMode, useSignalRJobMonitor} from "./useSignalRJobMonitor";
-import {getJob, getJobStatusUpdatesForSpecification, getLatestJobByEntityId} from "../../services/jobService";
+import {getJob, getJobStatusUpdatesForSpecification, getLatestJobByEntityId, getLatestJobByJobDefinitionId} from "../../services/jobService";
 import {getJobDetailsFromJobResponse} from "../../helpers/jobDetailsHelper";
 import {useInterval} from "../useInterval";
 import {milliseconds} from "../../helpers/TimeInMs";
@@ -59,7 +59,6 @@ export interface JobSubscriptionProps {
 }
 
 // used to monitor multiple jobs, including polling as a fallback, and to stop/start monitoring
-// limitation of the polling: only works when we know the jobId as there's no other suitable jobs api endpoint to use
 export const useJobSubscription = ({
                                        onError,
                                        onNewNotification,
@@ -193,6 +192,13 @@ export const useJobSubscription = ({
         return getJobDetailsFromJobResponse(response.data);
     };
 
+    const checkForJobByJobType = async (jobType: JobType): Promise<JobDetails | undefined> => {
+        if (!util.isJobIdValid(jobType)) return;
+        const response = await getLatestJobByJobDefinitionId(jobType);
+        if (!response.data) return undefined;
+        return getJobDetailsFromJobResponse(response.data);
+    };
+
     const checkForSpecificationJobByJobTypes = async (specId: string | undefined, jobTypes: JobType[] | undefined):
         Promise<JobDetails[] | undefined> => {
         if (!specId || !jobTypes || jobTypes.length === 0) {
@@ -264,9 +270,10 @@ export const useJobSubscription = ({
                 await loadLatestJobUpdatesById([sub.filterBy.jobId]);
             } else if (!!sub.filterBy.specificationId) {
                 await loadLatestJobUpdatesBySpec(sub.filterBy);
+            } else if (!!sub.filterBy.jobTypes) {
+                await loadLatestJobUpdatesByJobTypes(sub.filterBy.jobTypes);
             } else {
-                // todo: what to do if just looking for job types - no suitable api to call
-                console.error('Oops! Looking for jobs by type(s) but no suitable api endpoint to call');
+                console.error('Oops! Looking for jobs but no suitable api endpoint to call');
             }
         }
     };
@@ -276,6 +283,24 @@ export const useJobSubscription = ({
         for (const jobId of jobIds) {
             const job = await checkForJobByJobId(jobId);
             console.log('Polled for job by job id', job);
+            if (util.isJobValid(job)) {
+                const subsToNotify = util.findMatchingSubs(subs, job as JobDetails);
+                subsToNotify.forEach(s => {
+                    newNotifications = [...notifications, {
+                        latestJob: job,
+                        subscription: s
+                    }];
+                });
+            }
+        }
+        mergeNotifications(newNotifications);
+    };
+
+    const loadLatestJobUpdatesByJobTypes = async (jobTypes: JobType[]) => {
+        let newNotifications: JobNotification[] = [];
+        for (const jobType of jobTypes) {
+            const job = await checkForJobByJobType(jobType);
+            console.log('Polled for job by job type', job);
             if (util.isJobValid(job)) {
                 const subsToNotify = util.findMatchingSubs(subs, job as JobDetails);
                 subsToNotify.forEach(s => {
