@@ -145,10 +145,12 @@ namespace CalculateFunding.Frontend.Controllers
         private async Task<bool> GetDataSourceFiles(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
+            {
                 return false;
+            }
 
             ApiResponse<SelectDatasourceModel> result =
-                await _datasetsApiClient.GetDataSourcesByRelationshipId(id);
+                await _datasetsApiClient.GetDataSourcesByRelationshipId(id, top: null, pageNumber: null);
 
             if (result.StatusCode == HttpStatusCode.OK)
             {

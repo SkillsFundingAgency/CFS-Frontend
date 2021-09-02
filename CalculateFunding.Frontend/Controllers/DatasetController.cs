@@ -379,10 +379,13 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/datasets/get-datasources-by-relationship-id/{relationshipId}")]
-        public async Task<IActionResult> GetDatasetsByRelationship(string relationshipId)
+        public async Task<IActionResult> GetDatasetsByRelationship(
+            [FromRoute] string relationshipId,
+            [FromQuery] int? top,
+            [FromQuery] int? pageNumber)
         {
             ApiResponse<SelectDatasourceModel> result =
-                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
+                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId, top: top, pageNumber: pageNumber);
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
@@ -402,7 +405,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(datasetVersionId, nameof(datasetVersionId));
 
             ApiResponse<SelectDatasourceModel> sourcesResponse =
-                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
+                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId, top: null, pageNumber: null);
 
             if (sourcesResponse.StatusCode != HttpStatusCode.OK || sourcesResponse.Content == null)
             {
@@ -462,7 +465,7 @@ namespace CalculateFunding.Frontend.Controllers
             [FromBody] SearchModel search)
         {
             ApiResponse<SelectDatasourceModel> result =
-                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId);
+                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId, top: null, pageNumber: null);
 
             DatasetVersions datasetVersions = result.Content.Datasets.SingleOrDefault(d => d.Id == datasetId);
 
