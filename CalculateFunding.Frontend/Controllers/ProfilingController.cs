@@ -80,7 +80,7 @@ namespace CalculateFunding.Frontend.Controllers
             IEnumerable<FundingStreamPeriodProfilePattern> fundingStreamPeriodProfilePatterns =
                 apiResponse.Content;
 
-            var profilePatterns = fundingStreamPeriodProfilePatterns
+            List<ProfilePeriodPattern> profilePatterns = fundingStreamPeriodProfilePatterns
                 .Where(p => p.FundingLineId == fundingLineId)
                 .SelectMany(p => p.ProfilePattern).ToList();
 

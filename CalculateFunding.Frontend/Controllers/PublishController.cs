@@ -604,6 +604,20 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
+        [HttpGet("api/publishing/available-funding-line-periods/{specificationId}")]
+        public async Task<IActionResult> GetAvailableFundingLinePeriods(string specificationId)
+        {
+            ApiResponse<IEnumerable<AvailableVariationPointerFundingLine>> response =
+                await _publishingApiClient.GetAvailableFundingLineProfilePeriodsForVariationPointers(specificationId);
+            
+            if(response.StatusCode == HttpStatusCode.OK)
+            {
+                return new OkObjectResult(response.Content);
+            }
+
+            return BadRequest();
+        }
+
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
         {
             if (!await _authorizationHelper.DoesUserHavePermission(

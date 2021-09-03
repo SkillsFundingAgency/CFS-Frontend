@@ -8,6 +8,7 @@ export interface ProfileVariationPointer {
 }
 
 export interface FundingLineProfileVariationPointer {
+    fundingLineName: string;
     fundingLineId: string;
     profileVariationPointer: ProfileVariationPointer | null;
 }

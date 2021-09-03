@@ -42,7 +42,7 @@ export interface ProfilePeriodPattern {
     periodPatternPercentage: number
 }
 
-enum PeriodType {
+export enum PeriodType {
     CalendarMonth
 }
 

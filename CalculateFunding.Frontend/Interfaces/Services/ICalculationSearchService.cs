@@ -12,9 +12,9 @@ namespace CalculateFunding.Frontend.Interfaces.Services
         Task<CalculationSearchResultViewModel> PerformSearch(SearchRequestViewModel request);
 
         Task<CalculationSearchResultViewModel> PerformSearch(string specificationId,
-	        CalculationType calculationType,
-	        PublishStatus? status,
-	        string searchTerm,
-	        int? page);
+            CalculationType calculationType,
+            PublishStatus? status,
+            string searchTerm,
+            int? page);
     }
 }

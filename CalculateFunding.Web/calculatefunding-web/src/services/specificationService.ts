@@ -1,10 +1,13 @@
-import axios, {AxiosResponse} from "axios"
+import axios, {AxiosError, AxiosResponse} from "axios"
 import {CalculationSearchRequestViewModel} from "../types/CalculationSearchRequestViewModel";
 import {SpecificationSearchRequestViewModel} from "../types/SpecificationSearchRequestViewModel";
 import {PublishStatus, PublishStatusModel} from "../types/PublishStatusModel";
 import {CreateSpecificationModel} from "../types/Specifications/CreateSpecificationModel";
 import {UpdateSpecificationModel} from "../types/Specifications/UpdateSpecificationModel";
-import {ProfileVariationPointer} from "../types/Specifications/ProfileVariationPointer";
+import {
+    FundingLineProfileVariationPointer,
+    ProfileVariationPointer
+} from "../types/Specifications/ProfileVariationPointer";
 import {SpecificationSummary} from "../types/SpecificationSummary";
 import {FundingPeriod, Specification} from "../types/viewFundingTypes";
 import {FundingStreamWithSpecificationSelectedForFunding} from "../types/SpecificationSelectedForFunding";
@@ -132,7 +135,7 @@ export async function getDownloadableReportsService(specificationId: string, fun
     });
 }
 
-export async function getProfileVariationPointersService(specificationId: string) {
+export async function getProfileVariationPointersService(specificationId: string) : Promise<AxiosResponse<FundingLineProfileVariationPointer[]>> {
     return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
         method: 'GET',
         headers: {
@@ -144,6 +147,16 @@ export async function getProfileVariationPointersService(specificationId: string
 export async  function setProfileVariationPointersService(specificationId:string, profileVariationPointer: ProfileVariationPointer[]) {
     return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
         method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: profileVariationPointer
+    });
+}
+
+export async  function mergeProfileVariationPointersService(specificationId:string, profileVariationPointer: ProfileVariationPointer[]) {
+    return axios(`${baseURL}/${specificationId}/profile-variation-pointers`, {
+        method: 'PATCH',
         headers: {
             'Content-Type': 'application/json'
         },

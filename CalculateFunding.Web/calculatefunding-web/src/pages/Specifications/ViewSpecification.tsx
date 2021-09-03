@@ -555,6 +555,8 @@ export function ViewSpecification({match}: RouteComponentProps<ViewSpecification
                         <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variations"}>
                             <VariationManagement
                                 specificationId={specificationId}
+                                fundingPeriodId={specification.fundingPeriod.id}
+                                fundingStreamId={specification.fundingStreams[0].id}
                                 addError={addError}
                                 clearErrorMessages={clearErrorMessages}/>
                         </Tabs.Panel>

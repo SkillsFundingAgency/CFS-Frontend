@@ -1,11 +1,20 @@
 import axios, {AxiosResponse} from "axios"
 import {ProfileTotal} from "../types/FundingLineProfile";
-import {FundingStreamPeriodProfilePattern} from "../types/ProviderProfileTotalsForStreamAndPeriod";
+import {
+    FundingStreamPeriodProfilePattern,
+    ProfilingInstallments
+} from "../types/ProviderProfileTotalsForStreamAndPeriod";
 
 const baseURL = "/api/profiling";
 
-export async function getProfilePatternsForFundingLine(fundingStreamId: string, fundingPeriodId: string, fundingLineId: string) {
+export async function getProfilePatternsForFundingLine(fundingStreamId: string, fundingPeriodId: string, fundingLineId: string) : Promise<AxiosResponse<ProfilingInstallments[]>> {
     return axios(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}/fundingLineId/${fundingLineId}`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    });
+}
+export async function getProfilePatternsList(fundingStreamId: string, fundingPeriodId: string) {
+    return axios(`${baseURL}/patterns/fundingStream/${fundingStreamId}/fundingPeriod/${fundingPeriodId}/list`, {
         method: 'GET',
         headers: {'Content-Type': 'application/json'}
     });

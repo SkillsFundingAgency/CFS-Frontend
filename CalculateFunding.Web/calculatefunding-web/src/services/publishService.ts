@@ -5,8 +5,9 @@ import {PublishedProviderFundingCount} from "../types/PublishedProvider/Publishe
 import {JobCreatedResponse} from "../types/JobCreatedResponse";
 import {LatestPublishedDate} from "../types/PublishedProvider/LatestPublishedDate";
 import {PublishProviderDataDownload} from "../types/PublishedProvider/PublishProviderDataDownload";
+import {AvailableVariationPointerFundingLine} from "../types/Publishing/AvailableVariationPointerFundingLine";
 
-export async function getFundingSummaryForApprovingService(specificationId: string, publishedProviderIds: string[]): 
+export async function getFundingSummaryForApprovingService(specificationId: string, publishedProviderIds: string[]):
     Promise<AxiosResponse<PublishedProviderFundingCount>> {
     return axios(`/api/specs/${specificationId}/funding-summary-for-approval`, {
         method: 'POST',
@@ -15,7 +16,7 @@ export async function getFundingSummaryForApprovingService(specificationId: stri
     });
 }
 
-export async function getFundingSummaryForReleasingService(specificationId: string, publishedProviderIds: string[]): 
+export async function getFundingSummaryForReleasingService(specificationId: string, publishedProviderIds: string[]):
     Promise<AxiosResponse<PublishedProviderFundingCount>> {
     return axios(`/api/specs/${specificationId}/funding-summary-for-release`, {
         method: 'POST',
@@ -24,7 +25,7 @@ export async function getFundingSummaryForReleasingService(specificationId: stri
     });
 }
 
-export async function getReleaseTimetableForSpecificationService(specificationId: string): 
+export async function getReleaseTimetableForSpecificationService(specificationId: string):
     Promise<AxiosResponse<ReleaseTimetableSummary>> {
     return axios(`/api/publish/getTimetable/${specificationId}`, {
         method: 'GET',
@@ -40,7 +41,7 @@ export async function saveReleaseTimetableForSpecificationService(saveReleaseTim
     });
 }
 
-export async function preValidateForRefreshFundingService(specificationId: string): 
+export async function preValidateForRefreshFundingService(specificationId: string):
     Promise<AxiosResponse<string[]>> {
     return axios(`/api/specs/${specificationId}/validate-for-refresh`, {
         method: 'POST',
@@ -48,7 +49,7 @@ export async function preValidateForRefreshFundingService(specificationId: strin
     });
 }
 
-export async function refreshSpecificationFundingService(specificationId: string): 
+export async function refreshSpecificationFundingService(specificationId: string):
     Promise<AxiosResponse<string>> {
     return axios(`/api/specs/${specificationId}/refresh`, {
         method: 'POST',
@@ -56,7 +57,7 @@ export async function refreshSpecificationFundingService(specificationId: string
     });
 }
 
-export async function approveSpecificationFundingService(specificationId: string): 
+export async function approveSpecificationFundingService(specificationId: string):
     Promise<AxiosResponse<JobCreatedResponse>> {
     return axios(`/api/specs/${specificationId}/approve`, {
         method: 'POST',
@@ -64,7 +65,7 @@ export async function approveSpecificationFundingService(specificationId: string
     });
 }
 
-export async function releaseSpecificationFundingService(specificationId: string): 
+export async function releaseSpecificationFundingService(specificationId: string):
     Promise<AxiosResponse<JobCreatedResponse>> {
         return axios(`/api/specs/${specificationId}/release`, {
             method: 'POST',
@@ -72,7 +73,7 @@ export async function releaseSpecificationFundingService(specificationId: string
         });
 }
 
-export async function approveProvidersFundingService(specificationId: string, providers: string[]): 
+export async function approveProvidersFundingService(specificationId: string, providers: string[]):
     Promise<AxiosResponse<JobCreatedResponse>> {
     return axios(`/api/specs/${specificationId}/funding-approval/providers`, {
         method: 'POST',
@@ -81,7 +82,7 @@ export async function approveProvidersFundingService(specificationId: string, pr
     });
 }
 
-export async function releaseProvidersFundingService(specificationId: string, providers: string[]): 
+export async function releaseProvidersFundingService(specificationId: string, providers: string[]):
     Promise<AxiosResponse<JobCreatedResponse>> {
         return axios(`/api/specs/${specificationId}/funding-release/providers`, {
             method: 'POST',
@@ -90,7 +91,7 @@ export async function releaseProvidersFundingService(specificationId: string, pr
         });
 }
 
-export async function runSqlImportJob(specificationId: string, fundingStreamId: string): 
+export async function runSqlImportJob(specificationId: string, fundingStreamId: string):
     Promise<AxiosResponse<JobCreatedResponse>> {
     return axios(`/api/sqlqa/specifications/${specificationId}/funding-streams/${fundingStreamId}/import/queue`, {
         method: 'GET',
@@ -98,7 +99,7 @@ export async function runSqlImportJob(specificationId: string, fundingStreamId: 
     });
 }
 
-export async function getLatestPublishedDate(fundingStreamId: string, fundingPeriodId: string): 
+export async function getLatestPublishedDate(fundingStreamId: string, fundingPeriodId: string):
     Promise<AxiosResponse<LatestPublishedDate>> {
     return axios(`/api/publishedproviders/${fundingStreamId}/${fundingPeriodId}/lastupdated`, {
         method: 'GET',
@@ -148,3 +149,10 @@ export async function generateCsvForApprovalAll(specificationId: string):
     });
 }
 
+export async function getAvailableFundingLinePeriods(specificationId: string):
+    Promise<AxiosResponse<AvailableVariationPointerFundingLine[]>> {
+    return axios(`/api/publishing/available-funding-line-periods/${specificationId}`, {
+        method: 'GET',
+        headers: {'Content-Type': 'application/json'}
+    });
+}

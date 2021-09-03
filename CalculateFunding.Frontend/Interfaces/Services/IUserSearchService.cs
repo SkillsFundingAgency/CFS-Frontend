@@ -7,6 +7,5 @@
     public interface IUserSearchService
     {
         Task<UserSearchResultViewModel> PerformSearch(SearchRequestViewModel request);
-
-	}
+    }
 }

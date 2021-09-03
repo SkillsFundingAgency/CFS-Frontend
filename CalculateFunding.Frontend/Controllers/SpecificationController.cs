@@ -544,6 +544,7 @@ namespace CalculateFunding.Frontend.Controllers
                             new FundingLineProfileVariationPointer
                             {
                                 FundingLineId = s.FundingLineCode,
+                                FundingLineName = s.Name,
                                 ProfileVariationPointer = currentProfileVariationPointers?.SingleOrDefault(p => p.FundingLineId == s.FundingLineCode)
                             });
 

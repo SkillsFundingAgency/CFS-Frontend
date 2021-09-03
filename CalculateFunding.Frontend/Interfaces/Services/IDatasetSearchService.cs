@@ -10,7 +10,6 @@ namespace CalculateFunding.Frontend.Services
     {
         Task<DatasetSearchResultViewModel> PerformSearch(SearchRequestViewModel request);
 
-	    Task<DatasetVersionSearchResultViewModel> PerformSearchDatasetVersion(SearchRequestViewModel searchRequest);
-
+        Task<DatasetVersionSearchResultViewModel> PerformSearchDatasetVersion(SearchRequestViewModel searchRequest);
     }
 }

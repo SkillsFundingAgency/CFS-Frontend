@@ -60,7 +60,7 @@ describe("<CreateDatasetFromUpload />", () => {
 
         beforeEach(() => {
             jest.clearAllMocks();
-            
+
             testing.mockSpecificationHook();
             testing.mockFundingConfigurationHook(testing.mockFundingConfigurationQueryResult(testing.mockCfsFundingConfiguration));
 
@@ -91,9 +91,9 @@ describe("<CreateDatasetFromUpload />", () => {
             expect(await screen.findByRole("heading", {name: testing.testSpec.name})).toBeInTheDocument();
         });
 
-        it('renders Set as provider data', async () => {
-            expect(await screen.findByRole("heading", {name: /Set as provider data/})).toBeInTheDocument();
-        });
+        // it('renders Set as provider data', async () => {
+        //     expect(await screen.findByRole("heading", {name: /Set as provider data/})).toBeInTheDocument();
+        // });
 
         it('renders data schema selections', async () => {
             expect(await screen.findByText(/Select data schema/)).toBeInTheDocument();
