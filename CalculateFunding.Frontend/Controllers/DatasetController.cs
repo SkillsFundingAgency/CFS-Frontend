@@ -382,7 +382,7 @@ namespace CalculateFunding.Frontend.Controllers
             [FromQuery] int? maxVersionsPerDataSet)
         {
             ApiResponse<SelectDatasourceModel> response = await _datasetApiClient
-                .GetDataSourcesByRelationshipId(relationshipId, top: maxVersionsPerDataSet, pageNumber: 0); // HACK because of BE bug
+                .GetDataSourcesByRelationshipId(relationshipId, top: maxVersionsPerDataSet, null);
 
             return response.Handle(nameof(relationshipId), onSuccess: x => Ok(x.Content));
         }
