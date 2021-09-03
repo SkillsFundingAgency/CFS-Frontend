@@ -23,10 +23,10 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/datasets/search")]
-        public async Task<IActionResult> SearchDatasets([FromBody]DatasetSearchRequestViewModel request)
+        public async Task<IActionResult> SearchDatasets([FromBody] DatasetSearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
-            
+
             SearchRequestViewModel searchRequest = new SearchRequestViewModel
             {
                 Filters = new Dictionary<string, string[]>(),
@@ -43,13 +43,14 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 searchRequest.Filters.Add("fundingStreamName", request.FundingStreams.ToArray());
             }
-            
+
             if (request.DataSchemas?.Length > 0)
             {
                 searchRequest.Filters.Add("definitionName", request.DataSchemas.ToArray());
             }
-            
+
             DatasetSearchResultViewModel result = await _datasetSearchService.PerformSearch(searchRequest);
+
             if (result != null)
             {
                 return Ok(result);
@@ -61,16 +62,18 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/datasets/getdatasetversions/{datasetId}")]
+        [Route("api/datasets/{datasetId}/versions")]
         public async Task<IActionResult> GetDatasetVersions(
-            string datasetId, [FromQuery]int pageNumber, [FromQuery]int pageSize)
+            string datasetId,
+            [FromQuery] int pageNumber,
+            [FromQuery] int pageSize)
         {
             Guard.IsNullOrWhiteSpace(datasetId, nameof(datasetId));
 
             Dictionary<string, string[]> datasetIdFilter = new Dictionary<string, string[]>
-                {{"datasetId", new[] {datasetId}}};
+                { { "datasetId", new[] { datasetId } } };
 
-            SearchRequestViewModel searchRequest = new SearchRequestViewModel()
+            SearchRequestViewModel searchRequest = new SearchRequestViewModel
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
@@ -80,16 +83,14 @@ namespace CalculateFunding.Frontend.Controllers
 
             DatasetVersionSearchResultViewModel searchResult =
                 await _datasetSearchService.PerformSearchDatasetVersion(searchRequest);
-            
+
             if (searchResult != null)
             {
                 return new OkObjectResult(searchResult);
             }
-            else
-            {
-                return new InternalServerErrorResult(
-                    "There was an error retrieving data sources from the Search Version Index.");
-            }
+
+            return new InternalServerErrorResult(
+                "There was an error retrieving data sources from the Search Version Index.");
         }
     }
 }

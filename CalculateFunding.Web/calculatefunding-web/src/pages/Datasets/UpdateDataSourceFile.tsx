@@ -7,9 +7,9 @@ import {Link} from "react-router-dom";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
 import {
     DatasetChangeType,
-    DatasetVersionHistoryItem,
-    DatasetVersionHistoryViewModel
-} from "../../types/Datasets/DatasetVersionHistoryViewModel";
+    DatasetVersionDetails,
+    DatasetVersionSearchResponse
+} from "../../types/Datasets/DatasetVersionSearchResponse";
 import {useEffectOnce} from "../../hooks/useEffectOnce";
 import * as datasetService from "../../services/datasetService";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
@@ -36,7 +36,7 @@ export interface UpdateDataSourceFileRouteProps {
 }
 
 export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSourceFileRouteProps>) {
-    const [dataset, setDataset] = useState<DatasetVersionHistoryItem>({
+    const [dataset, setDataset] = useState<DatasetVersionDetails>({
         id: "",
         blobName: "",
         changeNote: "",
@@ -149,9 +149,9 @@ export function UpdateDataSourceFile({match}: RouteComponentProps<UpdateDataSour
 
     useEffectOnce(() => {
         setIsLoading(true);
-        datasetService.getDatasetHistoryService(match.params.datasetId, 1, 1)
+        datasetService.searchDatasetVersions(match.params.datasetId, 1, 1)
             .then((result) => {
-                const response = result.data as DatasetVersionHistoryViewModel;
+                const response = result.data as DatasetVersionSearchResponse;
                 setDataset(response.results[0]);
                 setDescription(response.results[0].description);
                 setChangeNote(response.results[0].changeNote);

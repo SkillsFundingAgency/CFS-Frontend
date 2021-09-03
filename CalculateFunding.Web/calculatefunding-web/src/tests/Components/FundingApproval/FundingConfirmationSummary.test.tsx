@@ -1,10 +1,10 @@
 import React from 'react';
-import {render, screen, waitForElementToBeRemoved,} from '@testing-library/react';
+import {render, screen} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import {createStore, Store} from "redux";
 import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
 import {Provider} from "react-redux";
-import {match, MemoryRouter} from "react-router";
+import {MemoryRouter} from "react-router";
 import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
 import {FundingConfirmationSummary} from "../../../components/Funding/FundingConfirmationSummary";
 import { FundingActionType, PublishedProviderFundingCount } from '../../../types/PublishedProvider/PublishedProviderFundingCount';

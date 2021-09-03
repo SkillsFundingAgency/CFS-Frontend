@@ -30,13 +30,8 @@ namespace CalculateFunding.Frontend.Clients.DatasetsClient.Models
 			}
 			else
 			{
-				StartItemNumber = ((CurrentPage - 1) * PageSize) + 1;
-				EndItemNumber = StartItemNumber + PageSize - 1;
-			}
-
-			if (EndItemNumber > Results.Count())
-			{
-				EndItemNumber = Results.Count();
+				StartItemNumber = (CurrentPage - 1) * PageSize + 1;
+				EndItemNumber = StartItemNumber + Results.Count() - 1;
 			}
 		}
 

@@ -1,6 +1,6 @@
 ﻿import {Header} from "../../components/Header";
 import {Section} from "../../types/Sections";
-import {RouteComponentProps, useHistory} from "react-router";
+import {RouteComponentProps} from "react-router";
 import {UpdateCalculationViewModel} from "../../types/Calculations/CreateAdditonalCalculationViewModel";
 import {UpdateCalculationRequest, updateCalculationService, updateCalculationStatusService, } from "../../services/calculationService";
 import {LoadingStatus} from "../../components/LoadingStatus";

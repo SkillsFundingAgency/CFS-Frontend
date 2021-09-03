@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from "react";
 import {Section} from "../../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../../components/Breadcrumbs";
-import {getDatasetHistoryService} from "../../services/datasetService";
+import {searchDatasetVersions} from "../../services/datasetService";
 import {RouteComponentProps} from "react-router";
-import {DatasetChangeType, DatasetVersionHistoryItem, DatasetVersionHistoryViewModel} from "../../types/Datasets/DatasetVersionHistoryViewModel";
+import {DatasetChangeType, DatasetVersionDetails, DatasetVersionSearchResponse} from "../../types/Datasets/DatasetVersionSearchResponse";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {MultipleErrorSummary} from "../../components/MultipleErrorSummary";
 import {useErrors} from "../../hooks/useErrors";
@@ -17,15 +17,15 @@ export interface DatasetHistoryRouteProps {
 }
 
 export function DatasetHistory({match}: RouteComponentProps<DatasetHistoryRouteProps>) {
-    const [dataset, setDataset] = useState<DatasetVersionHistoryItem>();
-    const [datasetHistory, setDatasetHistory] = useState<DatasetVersionHistoryViewModel>();
+    const [dataset, setDataset] = useState<DatasetVersionDetails>();
+    const [datasetHistory, setDatasetHistory] = useState<DatasetVersionSearchResponse>();
     const [pageNumber, setPageNumber] = useState<number>(1);
     const {errors, addError} = useErrors();
 
     useEffect(() => {
-        getDatasetHistoryService(match.params.datasetId, pageNumber, 50)
+        searchDatasetVersions(match.params.datasetId, pageNumber, 50)
             .then((response) => {
-                const result = response.data as DatasetVersionHistoryViewModel;
+                const result = response.data as DatasetVersionSearchResponse;
                 setDatasetHistory(result);
                 setDataset(result.results[0]);
             })

@@ -22,6 +22,7 @@ import Form from "../../../components/Form";
 import RadioOption from "../../../components/RadioOption";
 import {TextField} from "../../../components/TextField";
 import {TextAreaField} from "../../../components/TextAreaField";
+import {PageHeaderFieldset} from "../../../components/Fieldset";
 
 export interface CreateDatasetFromUploadRouteProps {
     specificationId: string
@@ -212,6 +213,10 @@ export function CreateDatasetFromUpload({match}: RouteComponentProps<CreateDatas
                         heading='Create dataset'
                         titleCaption={specification.name}
                     >
+                        <PageHeaderFieldset
+                            token='create-dataset'
+                            heading="Check funding lines/calculations before creating data set"
+                        />
                         <SelectionField
                             token='data-schema'
                             label='Select data schema'

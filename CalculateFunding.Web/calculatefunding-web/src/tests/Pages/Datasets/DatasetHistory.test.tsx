@@ -3,7 +3,7 @@ import {match, MemoryRouter} from "react-router";
 import {DatasetHistory, DatasetHistoryRouteProps} from "../../../pages/Datasets/DatasetHistory";
 import {createLocation} from "history";
 import {render, screen, waitFor, within} from "@testing-library/react";
-import {DatasetChangeType, DatasetVersionHistoryItem, DatasetVersionHistoryViewModel} from "../../../types/Datasets/DatasetVersionHistoryViewModel";
+import {DatasetChangeType, DatasetVersionDetails, DatasetVersionSearchResponse} from "../../../types/Datasets/DatasetVersionSearchResponse";
 
 const mockHistory = {push: jest.fn()};
 const location = createLocation("", "", "");
@@ -89,7 +89,7 @@ describe("<DatasetHistory />", () => {
         });
     });
 
-    const mockDataset1: DatasetVersionHistoryItem = {
+    const mockDataset1: DatasetVersionDetails = {
         blobName: "version3",
         changeNote: "change note 3",
         changeType: DatasetChangeType.NewVersion,
@@ -102,7 +102,7 @@ describe("<DatasetHistory />", () => {
         name: "Dataset Blahblah",
         version: 3
     }
-    const mockDataset2: DatasetVersionHistoryItem = {
+    const mockDataset2: DatasetVersionDetails = {
         blobName: "version4",
         changeNote: "change note 4",
         changeType: DatasetChangeType.Merge,
@@ -115,8 +115,8 @@ describe("<DatasetHistory />", () => {
         name: "Dataset Blahblah",
         version: 4
     }
-    const mockResults: DatasetVersionHistoryItem[] = [mockDataset2, mockDataset1];
-    const mockHistoryData: DatasetVersionHistoryViewModel = {
+    const mockResults: DatasetVersionDetails[] = [mockDataset2, mockDataset1];
+    const mockHistoryData: DatasetVersionSearchResponse = {
         results: mockResults,
         currentPage: 2,
         startItemNumber: 3,
@@ -140,7 +140,7 @@ describe("<DatasetHistory />", () => {
             const service = jest.requireActual("../../../services/datasetService");
             return {
                 ...service,
-                getDatasetHistoryService: jest.fn(() => Promise.resolve({
+                searchDatasetVersions: jest.fn(() => Promise.resolve({
                     data: mockHistoryData
                 }))
             }

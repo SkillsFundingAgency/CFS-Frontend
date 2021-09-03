@@ -33,7 +33,7 @@ export function SpecifyDatasetDetails({match}: RouteComponentProps<CreateDataset
     const history = useHistory();
 
     useEffect(() => {
-        if (!state || state.createDatasetWorkflowState?.forSpecId != forSpecId) {
+        if (!state || state.createDatasetWorkflowState?.forSpecId !== forSpecId) {
             history.push(`/Datasets/Create/SelectDatasetTypeToCreate/${forSpecId}`);
         }
     }, [state, forSpecId])

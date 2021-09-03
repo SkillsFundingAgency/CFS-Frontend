@@ -12,13 +12,11 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
-using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Clients.DatasetsClient.Models;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Properties;
-using CalculateFunding.Frontend.ViewModels.Common;
 using CalculateFunding.Frontend.ViewModels.Datasets;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -381,18 +379,12 @@ namespace CalculateFunding.Frontend.Controllers
         [Route("api/datasets/get-datasources-by-relationship-id/{relationshipId}")]
         public async Task<IActionResult> GetDatasetsByRelationship(
             [FromRoute] string relationshipId,
-            [FromQuery] int? top,
-            [FromQuery] int? pageNumber)
+            [FromQuery] int? maxVersionsPerDataSet)
         {
-            ApiResponse<SelectDatasourceModel> result =
-                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId, top: top, pageNumber: pageNumber);
+            ApiResponse<SelectDatasourceModel> response = await _datasetApiClient
+                .GetDataSourcesByRelationshipId(relationshipId, top: maxVersionsPerDataSet, pageNumber: 0); // HACK because of BE bug
 
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(result.Content);
-            }
-
-            return new StatusCodeResult(Convert.ToInt32(result.StatusCode));
+            return response.Handle(nameof(relationshipId), onSuccess: x => Ok(x.Content));
         }
 
         [HttpPost]
@@ -423,7 +415,7 @@ namespace CalculateFunding.Frontend.Controllers
             if (string.IsNullOrWhiteSpace(datasetVersionId))
             {
                 SelectDataSourceViewModel viewModel = PopulateViewModel(sourcesResponse.Content);
-                this.ModelState.AddModelError($"{nameof(SelectDataSourceViewModel)}.{nameof(datasetVersionId)}", "");
+                ModelState.AddModelError($"{nameof(SelectDataSourceViewModel)}.{nameof(datasetVersionId)}", "");
                 if (viewModel == null)
                 {
                     return new StatusCodeResult(500);
@@ -455,56 +447,6 @@ namespace CalculateFunding.Frontend.Controllers
             _logger.Error($"Failed to assign dataset version with status code: {result.StatusCode}");
 
             return new StatusCodeResult(500);
-        }
-
-        [HttpPost]
-        [Route("api/datasets/expanded-datasources/{relationshipId}/{datasetId}")]
-        public async Task<IActionResult> GetExpandedDataSourcesSearch(
-            [FromRoute] string relationshipId,
-            [FromRoute] string datasetId,
-            [FromBody] SearchModel search)
-        {
-            ApiResponse<SelectDatasourceModel> result =
-                await _datasetApiClient.GetDataSourcesByRelationshipId(relationshipId, top: null, pageNumber: null);
-
-            DatasetVersions datasetVersions = result.Content.Datasets.SingleOrDefault(d => d.Id == datasetId);
-
-            if (datasetVersions != null)
-            {
-                int totalPages = datasetVersions.Versions.Count() / search.Top;
-                if (datasetVersions.Versions.Count() % search.Top > 0)
-                {
-                    totalPages++;
-                }
-
-                int startNumber = ((search.Top * search.PageNumber) - search.Top) + 1;
-                int endNumber = (search.Top * search.PageNumber);
-                if (endNumber > datasetVersions.Versions.Count())
-                {
-                    endNumber = datasetVersions.Versions.Count();
-                }
-
-                PagedDatasetSearchResults searchPagedResult = new PagedDatasetSearchResults
-                {
-                    Name = datasetVersions.Name,
-                    Id = datasetVersions.Id,
-                    Description = datasetVersions.Description,
-                    Items = datasetVersions.Versions.Skip(startNumber - 1).Take(5),
-                    TotalCount = datasetVersions.Versions.Count(),
-                    PagerState = new PagerState(search.PageNumber, totalPages),
-                    StartItemNumber = startNumber,
-                    EndItemNumber = endNumber
-                };
-
-                return Ok(searchPagedResult);
-            }
-
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(result.Content);
-            }
-
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
 
         [HttpGet]

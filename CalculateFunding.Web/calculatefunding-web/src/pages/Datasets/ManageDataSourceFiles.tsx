@@ -73,18 +73,17 @@ export function ManageDataSourceFiles() {
         setIsLoading(true);
         searchDatasetService(searchRequestViewModel)
             .then((result) => {
-                const response = result.data as DatasetSearchResponseViewModel;
-                setDatasetSearchData(response);
+                setDatasetSearchData(result.data);
 
                 if (filterFundingStreams.length === 0) {
-                    if (response.facets !== undefined && response.facets.length > 5) {
-                        setFundingStreams(response.facets[5].facetValues)
+                    if (result.data.facets !== undefined && result.data.facets.length > 5) {
+                        setFundingStreams(result.data.facets[5].facetValues)
                     }
                 }
 
                 if (filterDataSchemas.length === 0) {
-                    if (response.facets !== undefined && response.facets.length > 2) {
-                        setDataSchema(response.facets[2].facetValues)
+                    if (result.data.facets !== undefined && result.data.facets.length > 2) {
+                        setDataSchema(result.data.facets[2].facetValues)
                     }
                 }
             })

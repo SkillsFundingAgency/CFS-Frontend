@@ -8,11 +8,9 @@ import {FeatureFlagsState} from "../../../states/FeatureFlagsState";
 import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
 import {JobMonitoringFilter} from "../../../types/Jobs/JobMonitoringFilter";
 import {DatasetRelationship} from "../../../types/DatasetRelationship";
-import {getDatasetsBySpecification} from "../../../services/datasetService";
 import {DatasetRelationshipType} from "../../../types/Datasets/DatasetRelationshipType";
 import * as ReactQuery from "react-query";
 import {UseQueryResult} from "react-query/types/react/types";
-import {EligibleSpecificationReferenceModel} from "../../../types/Datasets/EligibleSpecificationReferenceModel";
 import {AxiosError} from "axios";
 
 const renderDatasets = async () => {

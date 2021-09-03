@@ -1,5 +1,5 @@
 ﻿import {Section} from "../../types/Sections";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {FundingStreamPermissions} from "../../types/FundingStreamPermissions";
 import {useSelector} from "react-redux";
 import {IStoreState} from "../../reducers/rootReducer";

@@ -1,37 +1,52 @@
 ﻿import React from "react";
+import { InlineFieldset, PageHeaderFieldset } from "./Fieldset";
 
 export interface FormProps {
-    token: string,
-    heading: string,
-    titleCaption?: string,
-    onSubmit?: any,
-    children: any
+  token: string;
+  heading: string;
+  inline?: boolean; // whether the form is inside a page with existing page title etc or not
+  titleCaption?: string;
+  onSubmit?: any;
+  children: any;
 }
 
-const Form = ({ token, heading, titleCaption, onSubmit, children }: FormProps) => {
-    
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        onSubmit ? onSubmit() : e.preventDefault();
-    }
-    return (
-        <form id={`form-${token}`}
-              className="form"
-              onSubmit={handleSubmit}
-              noValidate={true}>
-            <div className="govuk-form-group">
-                <fieldset className="govuk-fieldset"
-                          aria-describedby={`${token}-hint`}>
-                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-                        {titleCaption && <h3 className="govuk-caption-xl">{titleCaption}</h3>}
-                        <h1 className="govuk-fieldset__heading">
-                            {heading}
-                        </h1>
-                    </legend>
-                </fieldset>
-                {children}
-            </div>
-        </form>
-    );
+const Form: React.FunctionComponent<FormProps> = ({
+  token,
+  inline,
+  heading,
+  titleCaption,
+  onSubmit,
+  children,
+}) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    onSubmit ? onSubmit() : e.preventDefault();
+  };
+  return (
+    <form
+      id={`form-${token}`}
+      data-testid={`form-${token}`}
+      className={`form ${inline ? "govuk-!-margin-top-3" : ""}`}
+      onSubmit={handleSubmit}
+      noValidate={true}
+    >
+      <div className="govuk-form-group">
+        {inline ? (
+          <InlineFieldset
+            token={token}
+            heading={heading}
+            titleCaption={titleCaption}
+          />
+        ) : (
+          <PageHeaderFieldset
+            token={token}
+            heading={heading}
+            titleCaption={titleCaption}
+          />
+        )}
+        {children}
+      </div>
+    </form>
+  );
 };
 
 export default Form;

@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import React from "react";
 import {
     downloadValidateDatasetValidationErrorSasUrl,
-    getDatasetHistoryService,
+    searchDatasetVersions,
     updateDatasetService, uploadDatasetVersionService, validateDatasetService
 } from "../../../services/datasetService";
 import userEvent from "@testing-library/user-event";
@@ -24,9 +24,9 @@ describe("<UpdateDataSourceFile />", () => {
 
     describe("service call checks ", () => {
         it("calls the correct services on initial page load", async () => {
-            const {getDatasetHistoryService, downloadValidateDatasetValidationErrorSasUrl} = require('../../../services/datasetService');
+            const {searchDatasetVersions, downloadValidateDatasetValidationErrorSasUrl} = require('../../../services/datasetService');
             const {getCurrentProviderVersionForFundingStream } = require('../../../services/providerService');
-            await waitFor(() => expect(getDatasetHistoryService).toBeCalledTimes(1));
+            await waitFor(() => expect(searchDatasetVersions).toBeCalledTimes(1));
             await waitFor(() => expect(getCurrentProviderVersionForFundingStream).toBeCalledTimes(1));
             await waitFor(() => expect(downloadValidateDatasetValidationErrorSasUrl).not.toBeCalled());
         })

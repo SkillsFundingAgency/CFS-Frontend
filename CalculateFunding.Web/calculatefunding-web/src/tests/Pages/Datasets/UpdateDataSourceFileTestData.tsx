@@ -9,6 +9,7 @@ import userEvent from "@testing-library/user-event";
 import {UpdateNewDatasetVersionResponseViewModel} from "../../../types/Datasets/UpdateDatasetRequestViewModel";
 import {AddJobSubscription, JobNotification, JobSubscription} from "../../../hooks/Jobs/useJobSubscription";
 import {DateTime} from "luxon";
+import {searchDatasetVersions} from "../../../services/datasetService";
 
 export function UpdateDataSourceFileTestData() {
 
@@ -155,7 +156,7 @@ export function UpdateDataSourceFileTestData() {
                     "description": "dataset-description",
                     "changeNote": "change-note",
                     "version": 1,
-                    "definitionName": "defintition-name",
+                    "definitionName": "definition-name",
                     "lastUpdatedDate": "2000-01-01T01:00:00.00+00:00",
                     "lastUpdatedByName": "Joe Bloggs",
                     "blobName": "a/very/long/blob/url/with-an-excelfile-at-the-end.xlsx",
@@ -257,7 +258,7 @@ export function UpdateDataSourceFileTestData() {
             return {
                 ...service,
                 validateDatasetService: mockValidateDatasetService,
-                getDatasetHistoryService: mockGetDatasetHistoryService,
+                searchDatasetVersions: mockGetDatasetHistoryService,
                 updateDatasetService: mockUpdateDatasetService,
                 uploadDatasetVersionService: mockUploadDatasetVersionService,
                 downloadValidateDatasetValidationErrorSasUrl: mockDownloadValidateDatasetValidationErrorSasUrl,
@@ -272,7 +273,7 @@ export function UpdateDataSourceFileTestData() {
             return {
                 ...service,
                 validateDatasetService: mockValidateDatasetServiceWithBadResult,
-                getDatasetHistoryService: mockGetDatasetHistoryService,
+                searchDatasetVersions: mockGetDatasetHistoryService,
                 updateDatasetService: mockUpdateDatasetService,
                 uploadDatasetVersionService: mockUploadDatasetVersionService,
                 downloadValidateDatasetValidationErrorSasUrl: mockDownloadValidateDatasetValidationErrorSasUrl,
