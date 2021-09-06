@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Calculations;
-using CalculateFunding.Frontend.Helpers;
+using System;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
@@ -44,6 +44,8 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public string CalculationExceptionMessage { get; set; }
 
+        public bool IsIndicativeProvider { get; set; }
+
         public string LastUpdatedDateDisplay => LastUpdatedDate.ToString(FormatStrings.DateTimeFormatString);
 
         public string DateOpenedDisplay => OpenDate.HasValue
@@ -54,7 +56,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
 
         public void SetCalculationResultDisplay(CalculationValueTypeViewModel calculationValueTypeViewModel)
         {
-	        CalculationResultDisplay = CalculationResult.AsFormatCalculationType(calculationValueTypeViewModel);
+            CalculationResultDisplay = CalculationResult.AsFormatCalculationType(calculationValueTypeViewModel);
         }
 
         public string AsDisplay(CalculationValueTypeViewModel calculationValueTypeViewModel)
