@@ -63,9 +63,9 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(jobDefinitionId, nameof(jobDefinitionId));
 
-            ApiResponse<IDictionary<string, JobViewModel>> response = await _jobsApiClient.GetLatestJobsByJobDefinitionIds(jobDefinitionId);
+            ApiResponse<IDictionary<string, JobSummary>> response = await _jobsApiClient.GetLatestJobsByJobDefinitionIds(jobDefinitionId);
 
-            return response.Handle(nameof(JobViewModel),
+            return response.Handle(nameof(JobSummary),
                 onNotFound: Ok,
                 onNoContent: Ok,
                 onSuccess: x => Ok(_mapper.Map<JobSummaryViewModel>(x.Content[jobDefinitionId])));

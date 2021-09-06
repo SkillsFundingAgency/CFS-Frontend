@@ -32,10 +32,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task When_GetLatestJobsByJobDefinitionId_has_Valid_Jobs_Returns_Jobs()
         {
-            IDictionary<string, JobViewModel> expected = new Dictionary<string, JobViewModel>
+            IDictionary<string, JobSummary> expected = new Dictionary<string, JobSummary>
             {
                 {
-                    "CreateSpecification", new JobViewModel
+                    "CreateSpecification", new JobSummary
                     {
                         Id = "ABC123",
                         JobDefinitionId = "CreateSpecification",
@@ -46,7 +46,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             _mockJobsApiClient
                 .Setup(x => x.GetLatestJobsByJobDefinitionIds(It.Is<string[]>(_ => _.FirstOrDefault() == "CreateSpecification")))
-                .ReturnsAsync(new ApiResponse<IDictionary<string, JobViewModel>>(HttpStatusCode.OK, expected));
+                .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.OK, expected));
 
             _sut = new JobsController(_mockJobsApiClient.Object, MappingHelper.CreateFrontEndMapper());
 
@@ -70,7 +70,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task When_GetLatestJobByJobDefinitionId_has_no_jobs_Returns_OK()
         {
-            IDictionary<string, JobViewModel> expected = new Dictionary<string, JobViewModel>
+            IDictionary<string, JobSummary> expected = new Dictionary<string, JobSummary>
             {
                 {
                     "CreateSpecification", null
@@ -79,7 +79,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
             _mockJobsApiClient
                 .Setup(x => x.GetLatestJobsByJobDefinitionIds("CreateSpecification"))
-                .ReturnsAsync(new ApiResponse<IDictionary<string, JobViewModel>>(HttpStatusCode.OK, expected));
+                .ReturnsAsync(new ApiResponse<IDictionary<string, JobSummary>>(HttpStatusCode.OK, expected));
 
             _sut = new JobsController(_mockJobsApiClient.Object, Mock.Of<IMapper>());
 
