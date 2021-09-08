@@ -100,6 +100,7 @@ describe("<DataSourceSelectionForm />", () => {
       expect(screen.queryByTestId("data-set-version-selector")).not.toBeInTheDocument();
       expect(screen.getByRole("button", { name: /Save/ })).toBeDisabled();
       expect(screen.getByRole("button", { name: /Cancel/ })).toBeEnabled();
+      expect(screen.queryByRole("button", { name: /View all versions/ })).not.toBeInTheDocument();
     });
   });
 
@@ -121,6 +122,32 @@ describe("<DataSourceSelectionForm />", () => {
       expect(screen.queryByTestId("data-set-selector")).not.toBeInTheDocument();
       expect(screen.getByTestId("data-set-version-selector")).toBeInTheDocument();
       expect(screen.getByRole("heading", { name: /Select data source version/ })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /View all versions/ })).not.toBeInTheDocument();
+    });
+  });
+
+  describe("when viewing single dataset result with more than 5 versions", () => {
+    const dataset = createDataSetWithVersions({ datasetId: "ds1", numberOfVersions: 6 });
+    it("renders correctly", async () => {
+      renderComponent({
+        relationshipData: createDataSourceRelationshipData({
+          datasets: [dataset],
+        }),
+        selection: { dataset: dataset, version: dataset.versions[0].version },
+        isViewingAllVersions: false,
+        datasetVersionSearchResponse: undefined,
+      });
+
+      expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("no-data")).not.toBeInTheDocument();
+      expect(screen.getByTestId("form-select-data-source")).toBeInTheDocument();
+      expect(screen.queryByTestId("data-set-selector")).not.toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /Select data source version/ })).toBeInTheDocument();
+      const datasetVersionsContainer = screen.getByTestId("data-set-version-selector");
+      expect(datasetVersionsContainer).toBeInTheDocument();
+      expect(
+        within(datasetVersionsContainer).getByRole("button", { name: /View all versions/ })
+      ).toBeInTheDocument();
     });
   });
 
@@ -279,7 +306,9 @@ function createDataSetWithVersions(props: {
     totalCount: props.numberOfVersions || 1,
     versions: !props.numberOfVersions
       ? [createDataSetVersionSummary({ version: 1 })]
-      : [...Array(props.numberOfVersions).keys()].map((n) => createDataSetVersionSummary({ version: n + 1 })),
+      : [...Array(Math.max(props.numberOfVersions, 5)).keys()].map((n) =>
+          createDataSetVersionSummary({ version: n + 1 })
+        ),
     description: "",
   };
 }

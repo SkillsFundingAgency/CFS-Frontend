@@ -1,98 +1,121 @@
 import React from "react";
-import {render, waitFor} from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import * as specificationService from "../../../services/specificationService";
-import {MemoryRouter, Route, Switch} from "react-router";
-import {QueryClientProviderTestWrapper} from "../../Hooks/QueryClientProviderTestWrapper";
-import {QueryClient, QueryClientProvider} from "react-query";
+import { render, waitFor, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Switch } from "react-router";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { VariationManagement } from "../../../components/Specifications/VariationManagement";
+import * as pointersHook from "../../../hooks/Variation/useProfileVariationPointers";
+import * as ReactQuery from "react-query";
+import { FundingLineProfileVariationPointer } from "../../../types/Specifications/ProfileVariationPointer";
+import { ProfileVariationPointersResult } from "../../../hooks/Variation/useProfileVariationPointers";
+import { AvailableVariationPointerFundingLine } from "../../../types/Publishing/AvailableVariationPointerFundingLine";
+import { UseQueryResult } from "react-query/types/react/types";
+import { AxiosError } from "axios";
 
 const specificationId = "SPEC123";
 
-const renderVariationManagement = () => {
-    const {VariationManagement} = require('../../../components/specifications/VariationManagement');
-    return render(
-        <MemoryRouter initialEntries={[`/VariationManagement/${specificationId}`]}>
-            <QueryClientProvider client={new QueryClient()}>
-            <Switch>
-                <Route path={`/VariationManagement/${specificationId}`}>
-                    <VariationManagement
-                        specificationId={specificationId}
-                        addError={jest.fn()}
-                        clearErrorMessages={jest.fn()}
-                    />
-                </Route>
-            </Switch>
-            </QueryClientProvider>
-        </MemoryRouter>);
-}
+const renderVariationManagement = async () => {
+  render(
+    <MemoryRouter initialEntries={[`/VariationManagement/${specificationId}`]}>
+      <QueryClientProvider client={new QueryClient()}>
+        <Switch>
+          <Route path={`/VariationManagement/${specificationId}`}>
+            <VariationManagement
+              specificationId={specificationId}
+              addError={jest.fn()}
+              clearErrorMessages={jest.fn()}
+              fundingPeriodId={"aaa"}
+              fundingStreamId={"bbb"}
+            />
+          </Route>
+        </Switch>
+      </QueryClientProvider>
+    </MemoryRouter>
+  );
+  await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
+};
 
+const useQuerySpy = jest.spyOn(ReactQuery, "useQuery");
+const pointersHookSpy = jest.spyOn(pointersHook, "useProfileVariationPointers");
 
-const mockServices = () => {
-    jest.mock("../../../services/specificationService", () => {
-        const mockService = jest.requireActual("../../../services/specificationService");
-        return {
-            ...mockService,
-            getProfileVariationPointersService: jest.fn(() => Promise.resolve({
-                data: [{
-                    fundingLineName: "FL One",
-                    fundingLineId: "FL1",
-                    profileVariationPointer: {
-                        fundingStreamId: "FS1",
-                        fundingLineId: "FL2",
-                        periodType: "Calendar",
-                        typeValue: "Monthly",
-                        year: 2002,
-                        occurrence: 1
-                    }},
-                    {
-                        fundingLineName: "FL Two",
-                        fundingLineId: "FL2",
-                        profileVariationPointer: {
-                            fundingStreamId: "FS1",
-                            fundingLineId: "FL2",
-                            periodType: "Calendar",
-                            typeValue: "Monthly",
-                            year: 2002,
-                            occurrence: 1
-                        }
-                }],
-                status: 200
-            }))
-        }
-    });
-}
+const mockPointers: FundingLineProfileVariationPointer[] = [
+  {
+    fundingLineName: "FL One",
+    fundingLineId: "FL1",
+    profileVariationPointer: {
+      fundingStreamId: "FS1",
+      fundingLineId: "FL2",
+      periodType: "Calendar",
+      typeValue: "Monthly",
+      year: 2002,
+      occurrence: 1,
+    },
+  },
+  {
+    fundingLineName: "FL Two",
+    fundingLineId: "FL2",
+    profileVariationPointer: {
+      fundingStreamId: "FS1",
+      fundingLineId: "FL2",
+      periodType: "Calendar",
+      typeValue: "Monthly",
+      year: 2002,
+      occurrence: 1,
+    },
+  },
+];
+const mockPointerResults: ProfileVariationPointersResult = {
+  isLoadingVariationManagement: false,
+  isFetchingVariationManagement: false,
+  profileVariationPointers: mockPointers,
+};
 
-    describe("<VariationManagement /> ", () => {
-        beforeAll(() => {
-            mockServices();
-        });
-        afterEach(() => {
-             jest.clearAllMocks();
-        });
+const hasVariationPointers = () => pointersHookSpy.mockImplementation(() => mockPointerResults);
 
-    it("calls getProfileVariationPointersService from the specificationService", async () => {
-        const {getProfileVariationPointersService} = require('../../../services/specificationService')
-            await renderVariationManagement();
-         await waitFor(() => expect(getProfileVariationPointersService).toBeCalledTimes(1));
-    });
+const mockFundingLines: AvailableVariationPointerFundingLine[] = [
+  {
+    fundingLineCode: "MOCK-001",
+    fundingLineName: "MockPeriod",
+    selectedPeriod: {
+      periodType: "MockPeriodType",
+      year: 2000,
+      occurrence: 1,
+      period: "MockPeriod",
+    },
+    periods: [],
+  },
+];
+const hasAvailableFundingLines = () =>
+  useQuerySpy.mockReturnValue({
+    data: mockFundingLines,
+    status: "success",
+    isSuccess: true,
+    isFetching: false,
+    isLoading: false,
+    isFetched: true,
+  } as UseQueryResult<AvailableVariationPointerFundingLine[], AxiosError>);
+
+describe("<VariationManagement /> ", () => {
+  beforeEach(async () => {
+    hasVariationPointers();
+    hasAvailableFundingLines();
+
+    await renderVariationManagement();
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("does not render No Results message", async () => {
+    await waitFor(() => expect(screen.queryByTestId("no-data")).not.toBeInTheDocument());
+  });
+
+  it("renders correctly", async () => {
+    screen.debug();
+
+    expect(
+      screen.getByRole("cell", {
+        name: /MockPeriodType 2000 Instalment 1/,
+      })
+    );
+  });
 });
-
-const getProfileVariationPointersServiceSpy = jest.fn(() => Promise.resolve({
-    data: [
-        {
-            fundingLineId: "fundingLineId",
-            profileVariationPointer: {
-                fundingStreamId: "fundingStreamId",
-                fundingLineId: "fundingLineId",
-                occurrence: 2,
-                periodType: "CalendarMonth",
-                typeValue: "March",
-                year: 2021,
-            }
-        }
-    ],
-    status: 200,
-    statusText: "",
-    headers: {},
-    config: {}
-}));

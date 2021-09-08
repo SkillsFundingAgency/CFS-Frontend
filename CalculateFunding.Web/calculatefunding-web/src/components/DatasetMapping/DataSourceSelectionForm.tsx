@@ -50,13 +50,13 @@ export const DataSourceSelectionForm: React.FunctionComponent<DataSourceSelectio
   const hasNoData = !relationshipData?.datasets?.length;
   const showSingleDataSet = relationshipData?.datasets?.length === 1;
   const formHeading =
-    isBusy || isLoading || isViewingAllVersions || hasMissingPermissions || hasNoData
+    isBusy || isLoading || showSingleDataSet || isViewingAllVersions || hasMissingPermissions || hasNoData
       ? ""
       : showSingleDataSet
       ? (selection.dataset?.name as string)
       : "Select data source file";
   const formCaption =
-    isBusy || isLoading || isViewingAllVersions || hasMissingPermissions || hasNoData
+    isBusy || isLoading || showSingleDataSet || isViewingAllVersions || hasMissingPermissions || hasNoData
       ? ""
       : showSingleDataSet
       ? (selection.dataset?.description as string)
@@ -70,7 +70,7 @@ export const DataSourceSelectionForm: React.FunctionComponent<DataSourceSelectio
           {(showSingleDataSet || isViewingAllVersions) && selection.dataset ? (
             <DataSetVersionSelector
               dataset={selection.dataset}
-              versionCount={selection.dataset.versions.length}
+              versionCount={selection.dataset.totalCount}
               versionSearchResult={datasetVersionSearchResponse}
               isSearchingForDataSetVersions={isSearchingForDataSetVersions}
               isViewingAllVersions={isViewingAllVersions}
@@ -155,7 +155,7 @@ const DataSetSelector = (props: {
               <DataSetVersionSelector
                 selection={props.selection}
                 dataset={dataset}
-                versionCount={dataset.totalCount || 0}
+                versionCount={dataset.totalCount}
                 isViewingAllVersions={false}
                 isSearchingForDataSetVersions={props.isSearchingForDataSetVersions}
                 onVersionSelected={props.onChangeVersion}

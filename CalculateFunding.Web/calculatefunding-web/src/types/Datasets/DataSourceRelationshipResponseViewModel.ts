@@ -4,7 +4,7 @@ import { DatasetRelationshipType } from "./DatasetRelationshipType";
 export interface DatasetWithVersions {
   description: string;
   selectedVersion?: number;
-  totalCount?: number;
+  totalCount: number;
   versions: DatasetVersionSummary[];
   id: string;
   name: string;
