@@ -310,6 +310,11 @@ export async function createDatasetFromReleased(
 export async function updateDatasetFromReleased(
   request: UpdateDatasetSpecificationRelationshipRequest
 ): Promise<AxiosResponse> {
+  if (!request?.specificationId?.length || !request?.relationshipId?.length)
+  {
+    return Promise.reject(new Error("Missing parameter(s)"));
+  }
+  
   return axios(
     `/api/specifications/${request.specificationId}/dataset-relationship/${request.relationshipId}`,
     {
