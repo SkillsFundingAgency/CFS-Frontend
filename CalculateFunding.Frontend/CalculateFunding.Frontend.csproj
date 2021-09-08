@@ -36,7 +36,7 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="4.3.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.10.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="6.2.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="7.0.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="7.2.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.22.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="2.15.0" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Calcs" Version="5.3.2" />
