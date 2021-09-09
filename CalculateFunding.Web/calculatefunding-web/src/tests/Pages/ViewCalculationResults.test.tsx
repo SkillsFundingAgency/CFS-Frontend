@@ -151,6 +151,12 @@ describe("<ViewCalculationResults />", () => {
                     "searchTerm": searchQuery
                 }));
         });
+
+        it("finds the Indicative flag", async () =>{
+            const {container} = renderViewCalculationResultsPage();
+            await waitFor(() => expect(container.querySelectorAll('.govuk-accordion__section')).toHaveLength(2));
+            expect(container.querySelectorAll(".govuk-tag--grey")).toHaveLength(2);
+        })
     });
 });
 
@@ -205,7 +211,7 @@ const mockSpecification = () => jest.spyOn(specHook, 'useSpecificationSummary')
         errorCheckingForSpecification: null,
         haveErrorCheckingForSpecification: false,
         isFetchingSpecification: false,
-        isSpecificationFetched: true
+        isSpecificationFetched: true,
     }));
 
 function mockCalculationService() {
@@ -238,7 +244,8 @@ function mockCalculationService() {
                         "calculationExceptionMessage": "",
                         "lastUpdatedDateDisplay": "30 September 01:49 pm",
                         "dateOpenedDisplay": "01 June 12:00 am",
-                        "calculationResultDisplay": "Excluded"
+                        "calculationResultDisplay": "Excluded",
+                        "isIndicativeProvider" : "true"
                     },
                     {
                         "id": "68f64680-4675-4179-904f-4d59ba13853a_10083778",
@@ -262,7 +269,8 @@ function mockCalculationService() {
                         "calculationExceptionMessage": "",
                         "lastUpdatedDateDisplay": "30 September 01:16 pm",
                         "dateOpenedDisplay": "02 September 12:00 am",
-                        "calculationResultDisplay": "Excluded"
+                        "calculationResultDisplay": "Excluded",
+                        "isIndicativeProvider" : "true"
                     }
                 ],
                 "totalResults": 8676,

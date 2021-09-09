@@ -14,7 +14,7 @@ import {JobType} from "../../types/jobType";
 import {useErrors} from "../../hooks/useErrors";
 import {runGenerateCalculationCsvResultsJob} from "../../services/calculationService";
 import {ReportCategory} from "../../types/Specifications/ReportCategory";
-import {AccordianPanel} from "../AccordianPanel";
+import {AccordionPanel} from "../AccordionPanel";
 import {InputSearch} from "../InputSearch";
 import {DownloadableReportItem} from "./DownloadableReportItem";
 import {BackToTop} from "../BackToTop";
@@ -288,7 +288,7 @@ export function DownloadableReports(props: {
                         {
                             downloadableReportsGrouping
                                 .map((group, groupIndex) => {
-                                    return <AccordianPanel title={`${group} level reports`}
+                                    return <AccordionPanel title={`${group} level reports`}
                                                            key={`panel-group-${groupIndex}`} id={`panel-${groupIndex}`}
                                                            boldSubtitle={""} subtitle={""}
                                                            expanded={downloadableReports.some((r) =>
@@ -320,7 +320,7 @@ export function DownloadableReports(props: {
                                                         </div>
                                                     }
                                                 )}
-                                    </AccordianPanel>
+                                    </AccordionPanel>
                                 })
                         }
                     </div>

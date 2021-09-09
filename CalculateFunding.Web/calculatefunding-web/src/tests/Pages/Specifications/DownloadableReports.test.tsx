@@ -74,18 +74,18 @@ describe("<DownloadableReports /> ", () => {
     })
 
     it("renders open-close status of accordians correctly", async () => {
-        const accordians = await screen.getAllByTestId(`accordian-panel`) as HTMLDivElement[];
-        accordians.map((accordian)=>{
-            expect(accordian.className).not.toBe("govuk-accordion__section govuk-accordion__section--expanded");
+        const accordions = await screen.getAllByTestId(`accordion-panel`) as HTMLDivElement[];
+        accordions.map((accordion)=>{
+            expect(accordion.className).not.toBe("govuk-accordion__section govuk-accordion__section--expanded");
         })
 
         const openClosebutton = await screen.findByTestId(`open-close`);
         userEvent.click(openClosebutton);
 
         await waitFor(() => {
-            const accordians = screen.getAllByTestId(`accordian-panel`) as HTMLDivElement[];
-            accordians.map((accordian)=>{
-                expect(accordian.className).toBe("govuk-accordion__section govuk-accordion__section--expanded");
+            const accordions = screen.getAllByTestId(`accordion-panel`) as HTMLDivElement[];
+            accordions.map((accordion)=>{
+                expect(accordion.className).toBe("govuk-accordion__section govuk-accordion__section--expanded");
             })
         });
     })

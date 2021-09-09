@@ -12,7 +12,7 @@ import {ErrorSummary} from "../../components/ErrorSummary";
 import {DateTimeFormatter} from "../../components/DateTimeFormatter";
 import {formatDateTime} from "../../helpers/DateHelper";
 import {FormattedNumber, NumberType} from "../../components/FormattedNumber";
-import {AccordianPanel} from "../../components/AccordianPanel";
+import {AccordionPanel} from "../../components/AccordionPanel";
 import {Link} from "react-router-dom";
 import {BackLink} from "../../components/BackLink";
 
@@ -104,10 +104,10 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
                                         </button>
                                     </div>
                                     {data.fundingLineChanges.map((_, i) => (
-                                        <AccordianPanel key={`panel-${i}`} id={`panel-${i}`} expanded={false}
-                                            title={`Profile prior to ${formatDateTime(_.lastUpdatedDate)}`} autoExpand={allExpanded}
-                                            boldSubtitle={""}
-                                            subtitle={`Last updated by ${_.lastUpdatedUser.name} on ${formatDateTime(_.lastUpdatedDate)}`}>
+                                        <AccordionPanel key={`panel-${i}`} id={`panel-${i}`} expanded={false}
+                                                        title={`Profile prior to ${formatDateTime(_.lastUpdatedDate)}`} autoExpand={allExpanded}
+                                                        boldSubtitle={""}
+                                                        subtitle={`Last updated by ${_.lastUpdatedUser.name} on ${formatDateTime(_.lastUpdatedDate)}`}>
                                             <div id="accordion-default-content-1" className="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-1">
                                                 <div className="govuk-grid-row">
                                                     <div className="govuk-grid-column-two-thirds">
@@ -169,7 +169,7 @@ export function ProfileHistory({match}: RouteComponentProps<ProfileHistoryProps>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </AccordianPanel>
+                                        </AccordionPanel>
                                     ))}
                                 </div>
                                 <BackLink to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}/view`}/>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Pagination from "../../components/Pagination";
-import {AccordianPanel} from "../../components/AccordianPanel";
+import {AccordionPanel} from "../../components/AccordionPanel";
 import {Details} from "../../components/Details";
 import {mount} from "enzyme";
 

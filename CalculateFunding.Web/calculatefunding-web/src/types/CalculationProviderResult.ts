@@ -35,4 +35,5 @@ export interface CalculationProviderResult {
     lastUpdatedDateDisplay: string;
     dateOpenedDisplay: string;
     calculationResultDisplay: string;
+    isIndicativeProvider: boolean;
 }

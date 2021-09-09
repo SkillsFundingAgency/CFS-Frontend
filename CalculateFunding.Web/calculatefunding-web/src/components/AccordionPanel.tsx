@@ -1,9 +1,10 @@
 import * as React from "react";
 import {useEffect, useState} from "react";
+import {Tag, TagTypes} from "./Tag";
 
-export function AccordianPanel(props: {
+export function AccordionPanel(props: {
     id: string, expanded: boolean, title: string, subtitle: string, boldSubtitle: string,
-    autoExpand: boolean, children: React.ReactNode
+    autoExpand: boolean, tagVisible?: boolean, tagText?:string, tagType?: TagTypes, children: React.ReactNode
 }) {
     const [panelExpanded, setPanelExpanded] = useState(props.expanded);
 
@@ -17,7 +18,7 @@ export function AccordianPanel(props: {
 
     return (
         <div className={"govuk-accordion__section" + (panelExpanded ? " govuk-accordion__section--expanded" : "")}
-            id={props.id} role="region" data-testid="accordian-panel">
+            id={props.id} role="region" data-testid="accordion-panel">
             <div className="govuk-accordion__section-header">
                 <h2 className="govuk-accordion__section-heading">
                     <button type="button" id={"accordion-default-heading-" + props.id}
@@ -28,6 +29,7 @@ export function AccordianPanel(props: {
                         onClick={() => setPanelExpanded(!panelExpanded)} /></h2>
                 <p className="govuk-body">{props.subtitle}{props.boldSubtitle}
                 </p>
+                {props.tagVisible && <Tag text={props.tagText ? props.tagText : ""} type={props.tagType ? props.tagType : TagTypes.default}/>}
             </div>
             {props.children}
         </div>

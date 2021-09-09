@@ -1,73 +1,54 @@
 import React from 'react';
-import {AccordianPanel} from "../../components/AccordianPanel";
-
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+import {AccordionPanel} from "../../components/AccordionPanel";
+import {queryByTestId, render, screen} from "@testing-library/react";
 
 describe('<AccordianPanel />', () => {
     it(' renders a panel', () => {
-        const wrapper = shallow(<AccordianPanel autoExpand={true} id="testPanel" children={null}
-                                                boldSubtitle="Bold Test Subtitle" expanded={false}
-                                                subtitle="Test Subtitle" title="Test Title"/>);
+        const {container} = render(<AccordionPanel autoExpand={true} id="testPanel" children={null}
+                               boldSubtitle="Bold Test Subtitle" expanded={false}
+                               subtitle="Test Subtitle" title="Test Title"/>);
 
-        const actual = wrapper.find('#testPanel');
-
-        expect(actual.children().length).toBe(1);
+        expect(container.querySelector('.govuk-accordion__section')).toBeInTheDocument();
     });
 
     it(' has an auto expanded panel', () => {
-        const wrapper = shallow(<AccordianPanel autoExpand={true} id="testPanel" children={null}
-                                                boldSubtitle="Bold Test Subtitle" expanded={true}
-                                                subtitle="Test Subtitle" title="Test Title"/>);
+        const {container} = render(<AccordionPanel autoExpand={true} id="testPanel" children={null}
+                                                   boldSubtitle="Bold Test Subtitle" expanded={true}
+                                                   subtitle="Test Subtitle" title="Test Title"/>);
 
-        const actual = wrapper.find('#testPanel');
-
-        expect(actual.hasClass('govuk-accordion__section--expanded')).toBeTruthy();
+        expect(container.querySelector('.govuk-accordion__section--expanded')).toBeInTheDocument();
     });
 
     it(' has a manually expanded panel', () => {
-        const wrapper = shallow(<AccordianPanel autoExpand={false} id="testPanel" children={null}
-                                                boldSubtitle="Bold Test Subtitle" expanded={true}
-                                                subtitle="Test Subtitle" title="Test Title"/>);
+        const {container} = render(<AccordionPanel autoExpand={false} id="testPanel" children={null}
+                                                   boldSubtitle="Bold Test Subtitle" expanded={true}
+                                                   subtitle="Test Subtitle" title="Test Title"/>);
 
-        const actual = wrapper.find('#testPanel');
-
-        expect(actual.hasClass('govuk-accordion__section--expanded')).toBeTruthy();
-
+        expect(container.querySelector('.govuk-accordion__section--expanded')).toBeInTheDocument();
     });
 
     it(' has the correct title', () => {
-        const wrapper = shallow(<AccordianPanel autoExpand={false} id="testPanel" children={null}
-                                                boldSubtitle="Bold Test Subtitle" expanded={true}
-                                                subtitle="Test Subtitle" title="Test Title"/>);
+        render(<AccordionPanel autoExpand={false} id="testPanel" children={null}
+                               boldSubtitle="Bold Test Subtitle" expanded={true}
+                               subtitle="Test Subtitle" title="Test Title"/>);
 
-        const actual = wrapper.find('#accordion-default-heading-testPanel');
 
-        expect(actual.text() === "Test Title").toBeTruthy();
-
+        expect(screen.getByText(/Test Title/)).toBeInTheDocument()
     });
 
     it(' has the correct sub title', () => {
-        const wrapper = shallow(<AccordianPanel autoExpand={false} id="testPanel" children={null}
-                                                boldSubtitle="Bold Test Subtitle" expanded={true}
-                                                subtitle="Test Subtitle" title="Test Title"/>);
+        render(<AccordionPanel autoExpand={false} id="testPanel" children={null}
+                               boldSubtitle="Bold Test Subtitle" expanded={true}
+                               subtitle="Test Subtitle" title="Test Title"/>);
 
-        const actual = wrapper.find('p');
-
-        expect(actual.contains("Test Subtitle")).toBeTruthy();
-
+        expect(screen.getByText(/Test Subtitle/)).toBeInTheDocument();
     });
 
     it(' has the correct bold sub title', () => {
-        const wrapper = shallow(<AccordianPanel autoExpand={false} id="testPanel" children={null}
-                                                boldSubtitle="Bold Test Subtitle" expanded={true}
-                                                subtitle="Test Subtitle" title="Test Title"/>);
+        render(<AccordionPanel autoExpand={false} id="testPanel" children={null}
+                               boldSubtitle="Bold Test Subtitle" expanded={true}
+                               subtitle="Test Subtitle" title="Test Title"/>);
 
-        const actual = wrapper.find('p');
-
-        expect(actual.contains("Bold Test Subtitle")).toBeTruthy();
-
+        expect(screen.getByText(/Bold Test Subtitle/)).toBeInTheDocument();
     });
 });

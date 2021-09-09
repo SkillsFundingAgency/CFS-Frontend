@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Link} from "react-router-dom";
 import {CalculationError} from "../../types/Calculations/CalculationError";
-import {AccordianPanel} from "../AccordianPanel";
+import {AccordionPanel} from "../AccordionPanel";
 
 export function CalculationErrors(props: { calculationErrors: CalculationError[] | undefined }) {
     const [allExpanded, setAllExpanded] = useState<boolean>(false);
@@ -26,7 +26,7 @@ export function CalculationErrors(props: { calculationErrors: CalculationError[]
                         </button>
                     </div>
                 {props.calculationErrors?.map((_, index) =>
-                    <AccordianPanel key={`panel-${_}`} id={`panel-${_}`} expanded={false}
+                    <AccordionPanel key={`panel-${_}`} id={`panel-${_}`} expanded={false}
                                     title={_.title} autoExpand={allExpanded}
                                     boldSubtitle={""} subtitle="">
                         <div id="accordion-default-content-1" className="govuk-accordion__section-content" aria-labelledby="accordion-default-heading-1">
@@ -47,7 +47,7 @@ export function CalculationErrors(props: { calculationErrors: CalculationError[]
                                 </div>
                             </div>
                         </div>
-                    </AccordianPanel>
+                    </AccordionPanel>
                 )}
                 </div>
             </div>

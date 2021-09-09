@@ -5,7 +5,7 @@ import {Header} from "../components/Header";
 import {RouteComponentProps} from "react-router";
 import {CollapsiblePanel} from "../components/CollapsiblePanel";
 import {FundingStream} from "../types/viewFundingTypes";
-import {AccordianPanel} from "../components/AccordianPanel";
+import {AccordionPanel} from "../components/AccordionPanel";
 import Pagination from "../components/Pagination";
 import {Section} from "../types/Sections";
 import {Breadcrumb, Breadcrumbs} from "../components/Breadcrumbs";
@@ -18,7 +18,6 @@ import {getCalculationProvidersService} from "../services/calculationService";
 import {CalculationProviderResultList} from "../types/CalculationProviderResult";
 import {LoadingStatus} from "../components/LoadingStatus";
 import {JobType} from "../types/jobType";
-import {ProviderSearchBox} from "../components/ProviderSearchBox";
 import {useLatestSpecificationJobWithMonitoring} from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import {LoadingFieldStatus} from "../components/LoadingFieldStatus";
 import {useSpecificationSummary} from "../hooks/useSpecificationSummary";
@@ -26,6 +25,7 @@ import {useErrors} from "../hooks/useErrors";
 import {MultipleErrorSummary} from "../components/MultipleErrorSummary";
 import {useCalculation} from "../hooks/Calculations/useCalculation";
 import {CollapsibleSearchBox} from "../components/CollapsibleSearchBox";
+import {TagTypes} from "../components/Tag";
 
 export interface ViewCalculationResultsRoute {
     calculationId: string
@@ -386,8 +386,10 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                             </div>
                             {providers.calculationProviderResults.map(cpr => {
                                     const value = cpr.calculationResultDisplay;
-                                    return <AccordianPanel id={cpr.id} expanded={false} title={cpr.providerName}
+                                    return <AccordionPanel id={cpr.id} expanded={false} title={cpr.providerName}
                                                            subtitle={"Value:"} boldSubtitle={` ${value}`}
+                                                           tagVisible={cpr.isIndicativeProvider} tagText={"Indicative"}
+                                                           tagType={TagTypes.grey}
                                                            key={cpr.id} autoExpand={autoExpand}>
                                         <div id={"accordion-default-content-" + cpr.id}
                                              className="govuk-accordion__section-content">
@@ -431,7 +433,7 @@ export function ViewCalculationResults({match}: RouteComponentProps<ViewCalculat
                                                 </div>
                                             </dl>
                                         </div>
-                                    </AccordianPanel>
+                                    </AccordionPanel>
                                 }
                             )}
                         </div>
