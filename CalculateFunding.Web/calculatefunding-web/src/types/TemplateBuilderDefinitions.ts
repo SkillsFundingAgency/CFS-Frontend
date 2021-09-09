@@ -1,4 +1,5 @@
 import {FundingPeriod, FundingStream} from "./viewFundingTypes";
+import {PagerState} from "./PagerState";
 
 export enum NodeType {
     FundingLine = "FundingLine",
@@ -43,10 +44,10 @@ export enum ValueFormatType {
 }
 
 export enum TemplatePermissions {
-  Create = "create",
-  Edit = "edit",
-  Delete = "delete",
-  Approve = "approve"
+    Create = "create",
+    Edit = "edit",
+    Delete = "delete",
+    Approve = "approve"
 }
 
 export interface GroupRate {
@@ -192,10 +193,13 @@ export interface TemplateSearchResult {
 }
 
 export interface TemplateSearchResponse {
-    totalCount: number,
-    totalErrorCount: number,
-    facets: SearchFacet[],
-    results: TemplateSearchResult[]
+    totalCount: number;
+    totalErrorCount: number;
+    facets: SearchFacet[];
+    results: TemplateSearchResult[];
+    pagerState: PagerState | undefined;
+    startItemNumber: number;
+    endItemNumber: number;
 }
 
 export interface SearchFacet {

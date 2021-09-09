@@ -27,6 +27,8 @@ using IEnumerableExtensions = System.Linq.IEnumerableExtensions;
 using GraphApiModels = CalculateFunding.Common.ApiClient.Graph.Models;
 using Newtonsoft.Json.Linq;
 using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
+using CalculateFunding.Frontend.Controllers;
 
 namespace CalculateFunding.Frontend.ViewModels
 {
@@ -41,6 +43,16 @@ namespace CalculateFunding.Frontend.ViewModels
             MapCalcs();
             MapGraph();
             MapUserPermissions();
+            MapTemplates();
+        }
+
+        private void MapTemplates()
+        {
+            CreateMap<SearchResults<TemplateIndex>, TemplateBuildController.SearchTemplatesResultsViewModel>()
+                .ForMember(m => m.StartItemNumber, opt => opt.Ignore())
+                .ForMember(m => m.EndItemNumber, opt => opt.Ignore())
+                .ForMember(m => m.PagerState, opt => opt.Ignore());
+            ;
         }
 
         private void MapUserPermissions()

@@ -4,7 +4,7 @@ import {FundingStreamPermissions} from "../../../types/FundingStreamPermissions"
 import * as redux from "react-redux";
 import {MemoryRouter} from "react-router";
 import {TemplateSearchResponse, TemplateStatus} from "../../../types/TemplateBuilderDefinitions";
-import {render, waitFor} from "@testing-library/react";
+import {render, waitFor, screen} from "@testing-library/react";
 import '@testing-library/jest-dom/extend-expect';
 import {buildPermissions} from "../../fakes/testFactories";
 
@@ -54,7 +54,17 @@ export const mockNoTemplateResults: TemplateSearchResponse = {
     totalCount: 0,
     totalErrorCount: 0,
     facets: [],
-    results: []
+    results: [],
+    endItemNumber: 0,
+    startItemNumber: 0,
+    pagerState: {
+        lastPage: 0,
+        nextPage: 0,
+        pages: [],
+        displayNumberOfPages: 0,
+        previousPage: 0,
+        currentPage: 0
+    }
 };
 
 function mockSearchForTemplates(response: TemplateSearchResponse) {
@@ -145,6 +155,15 @@ describe("List Templates when there are NO templates to list", () => {
             expect(queryAllByText(`There are no records to match your search`)).toHaveLength(1);
         });
     });
+
+    it("does not render the pagination controls", async () => {
+        renderListTemplatesPage();
+
+        await waitFor(() => {
+            const actual = screen.queryByText(/Next Page/)
+            expect(actual).toBeNull();
+        });
+    })
 });
 
 describe("List Templates when there are templates to list", () => {

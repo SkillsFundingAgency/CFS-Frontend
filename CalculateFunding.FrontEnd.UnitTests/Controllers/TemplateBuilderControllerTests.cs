@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Frontend.Clients.TemplateBuilderClient.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.Interfaces;
+using CalculateFunding.Frontend.ViewModels;
 using CalculateFunding.Frontend.ViewModels.TemplateBuilder;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +23,19 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     [TestClass]
     public class TemplateBuilderControllerTests
     {
+        private IMapper _mapper;
+        
+        [TestInitialize]
+        public void Setup()
+        {
+            MapperConfiguration mapperConfiguration = new MapperConfiguration(c =>
+            {
+                c.AddProfile<FrontEndMappingProfile>();
+            });
+            _mapper = mapperConfiguration.CreateMapper();    
+        }
+        
+        
         [TestMethod]
         public async Task CreateDraftTemplate_ReturnsCorrectResult()
         {
@@ -31,6 +46,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 FundingStreamId = "TEST",
                 FundingPeriodId = "TEST"
             };
+            
             string templateId = Guid.NewGuid().ToString();
             apiClient
                 .CreateDraftTemplate(Arg.Any<TemplateCreateCommand>())
@@ -38,7 +54,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             var authHelper = Substitute.For<IAuthorizationHelper>();
             authHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), Arg.Is(model.FundingStreamId))
                 .Returns(new FundingStreamPermission {CanCreateTemplates = true, FundingStreamId = model.FundingStreamId});
-            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
+            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>(), _mapper);
 
             IActionResult result = await controller.CreateDraftTemplate(model);
 
@@ -74,7 +90,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             var authHelper = Substitute.For<IAuthorizationHelper>();
             authHelper.GetUserFundingStreamPermissions(Arg.Any<ClaimsPrincipal>(), Arg.Is(model.FundingStreamId))
                 .Returns(new FundingStreamPermission {CanCreateTemplates = false, FundingStreamId = model.FundingStreamId});
-            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
+            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>(), _mapper);
 
             IActionResult result = await controller.CreateDraftTemplate(model);
 
@@ -115,7 +131,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .Returns(new ApiResponse<TemplateVersionListResponse>(HttpStatusCode.OK, new TemplateVersionListResponse { PageResults = returnedContent }));
 
             var authHelper = Substitute.For<IAuthorizationHelper>();
-            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
+            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>(), _mapper);
 
             IActionResult result = await controller.GetTemplateVersions(templateId, statuses, 1, 20);
 
@@ -174,7 +190,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 .GetTemplateVersions(templateId, statuses, Arg.Any<int>(), Arg.Any<int>())
                 .Returns(new ApiResponse<TemplateVersionListResponse>(HttpStatusCode.OK, new TemplateVersionListResponse { PageResults = returnedContent }));
             var authHelper = Substitute.For<IAuthorizationHelper>();
-            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>());
+            TemplateBuildController controller = new TemplateBuildController(apiClient, authHelper, Substitute.For<ILogger>(), _mapper);
 
             IActionResult result = await controller.GetTemplateVersions(templateId, statuses, 1, 20);
 
