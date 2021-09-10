@@ -15,7 +15,7 @@ import { CalculationSearchResultResponse, CalculationType } from "../../types/Ca
 import { Permission } from "../../types/Permission";
 import { ValueType } from "../../types/ValueType";
 import { DateTimeFormatter } from "../DateTimeFormatter";
-import { NumberType,formatNumber } from "../FormattedNumber";
+import { formatNumber,NumberType } from "../FormattedNumber";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { LoadingStatus } from "../LoadingStatus";
 import Pagination from "../Pagination";
