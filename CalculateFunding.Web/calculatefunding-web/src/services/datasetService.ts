@@ -1,26 +1,27 @@
 import axios, { AxiosResponse } from "axios";
-import { DataSourceRelationshipResponseViewModel } from "../types/Datasets/DataSourceRelationshipResponseViewModel";
-import { DatasetDefinitionRequestViewModel } from "../types/Datasets/DatasetDefinitionRequestViewModel";
-import { CreateDatasetRequestViewModel } from "../types/Datasets/CreateDatasetRequestViewModel";
-import { DatasetSearchRequestViewModel } from "../types/Datasets/DatasetSearchRequestViewModel";
-import { UpdateNewDatasetVersionResponseViewModel } from "../types/Datasets/UpdateDatasetRequestViewModel";
-import { DataschemaDetailsViewModel } from "../types/Datasets/DataschemaDetailsViewModel";
+
+import { DatasetRelationship } from "../types/DatasetRelationship";
 import { AssignDatasetSchemaRequest } from "../types/Datasets/AssignDatasetSchemaRequest";
+import { CreateDatasetRequestViewModel } from "../types/Datasets/CreateDatasetRequestViewModel";
+import { CreateDatasetSpecificationRelationshipRequest } from "../types/Datasets/CreateDatasetSpecificationRelationshipRequest";
+import { DataschemaDetailsViewModel } from "../types/Datasets/DataschemaDetailsViewModel";
+import { DatasetDefinitionRequestViewModel } from "../types/Datasets/DatasetDefinitionRequestViewModel";
 import { DatasetDefinition } from "../types/Datasets/DatasetDefinitionResponseViewModel";
 import { DatasetEmptyFieldEvaluationOptions } from "../types/Datasets/DatasetEmptyFieldEvaluationOptions";
-import { NewDatasetVersionResponseViewModel } from "../types/Datasets/NewDatasetVersionResponseViewModel";
+import { DatasetMetadata } from "../types/Datasets/DatasetMetadata";
+import { DatasetSearchRequestViewModel } from "../types/Datasets/DatasetSearchRequestViewModel";
 import { DatasetSearchResponseViewModel } from "../types/Datasets/DatasetSearchResponseViewModel";
 import { DatasetVersionSearchResponse } from "../types/Datasets/DatasetVersionSearchResponse";
-import { ToggleDatasetSchemaRequest } from "../types/Datasets/ToggleDatasetSchemaRequest";
+import { DataSourceRelationshipResponseViewModel } from "../types/Datasets/DataSourceRelationshipResponseViewModel";
 import { EligibleSpecificationReferenceModel } from "../types/Datasets/EligibleSpecificationReferenceModel";
+import { NewDatasetVersionResponseViewModel } from "../types/Datasets/NewDatasetVersionResponseViewModel";
 import { PublishedSpecificationTemplateMetadata } from "../types/Datasets/PublishedSpecificationTemplateMetadata";
-import { DatasetMetadata } from "../types/Datasets/DatasetMetadata";
-import { DatasetRelationship } from "../types/DatasetRelationship";
-import { ValidateDefinitionSpecificationRelationshipModel } from "../types/Datasets/ValidateDefinitionSpecificationRelationshipModel";
-import { CreateDatasetSpecificationRelationshipRequest } from "../types/Datasets/CreateDatasetSpecificationRelationshipRequest";
-import { UpdateDatasetSpecificationRelationshipRequest } from "../types/Datasets/UpdateDatasetSpecificationRelationshipRequest";
 import { ReferencedSpecificationRelationshipMetadata } from "../types/Datasets/ReferencedSpecificationRelationshipMetadata";
 import { SpecificationDatasetRelationshipsViewModel } from "../types/Datasets/SpecificationDatasetRelationshipsViewModel";
+import { ToggleDatasetSchemaRequest } from "../types/Datasets/ToggleDatasetSchemaRequest";
+import { UpdateNewDatasetVersionResponseViewModel } from "../types/Datasets/UpdateDatasetRequestViewModel";
+import { UpdateDatasetSpecificationRelationshipRequest } from "../types/Datasets/UpdateDatasetSpecificationRelationshipRequest";
+import { ValidateDefinitionSpecificationRelationshipModel } from "../types/Datasets/ValidateDefinitionSpecificationRelationshipModel";
 
 const baseUrl = "/api/datasets";
 
@@ -231,10 +232,13 @@ export async function getDataSourcesByRelationship(
   relationshipId: string,
   maxVersionsPerDataSet = 5
 ): Promise<AxiosResponse<DataSourceRelationshipResponseViewModel>> {
-  return axios(`${baseUrl}/get-datasources-by-relationship-id/${relationshipId}?maxVersionsPerDataSet=${maxVersionsPerDataSet}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
+  return axios(
+    `${baseUrl}/get-datasources-by-relationship-id/${relationshipId}?maxVersionsPerDataSet=${maxVersionsPerDataSet}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 }
 
 export async function getReferencedSpecificationRelationshipMetadata(
@@ -310,11 +314,10 @@ export async function createDatasetFromReleased(
 export async function updateDatasetFromReleased(
   request: UpdateDatasetSpecificationRelationshipRequest
 ): Promise<AxiosResponse> {
-  if (!request?.specificationId?.length || !request?.relationshipId?.length)
-  {
+  if (!request?.specificationId?.length || !request?.relationshipId?.length) {
     return Promise.reject(new Error("Missing parameter(s)"));
   }
-  
+
   return axios(
     `/api/specifications/${request.specificationId}/dataset-relationship/${request.relationshipId}`,
     {

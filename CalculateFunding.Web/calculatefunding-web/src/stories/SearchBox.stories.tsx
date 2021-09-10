@@ -1,10 +1,11 @@
-import React from 'react';
-import { Story, Meta } from '@storybook/react';
-import {SearchBox, SearchBoxProps} from "../components/SearchBox";
+import { Meta, Story } from "@storybook/react";
+import React from "react";
+
+import { SearchBox, SearchBoxProps } from "../components/SearchBox";
 
 export default {
-    title: 'CFS/SearchBox',
-    component: SearchBox,
+  title: "CFS/SearchBox",
+  component: SearchBox,
 } as Meta;
 
 const Template: Story<SearchBoxProps> = (args) => <SearchBox {...args} />;

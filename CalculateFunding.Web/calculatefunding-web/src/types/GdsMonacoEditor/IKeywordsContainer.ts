@@ -1,5 +1,5 @@
-import {IKeyword} from "./IKeyword";
+import { IKeyword } from "./IKeyword";
 
 export interface IKeywordsContainer {
-    [key: string]: IKeyword
+  [key: string]: IKeyword;
 }

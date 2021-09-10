@@ -1,5 +1,5 @@
 ﻿export enum ApprovalMode {
-    Undefined = "Undefined",
-    All = "All",
-    Batches = "Batches",
+  Undefined = "Undefined",
+  All = "All",
+  Batches = "Batches",
 }

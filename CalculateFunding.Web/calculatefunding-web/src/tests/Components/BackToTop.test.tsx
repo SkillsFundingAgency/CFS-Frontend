@@ -1,69 +1,66 @@
-import React from 'react';
-import {mount} from "enzyme";
-import {BackToTop} from "../../components/BackToTop";
+import { mount } from "enzyme";
+import React from "react";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
+import { BackToTop } from "../../components/BackToTop";
 
-describe('<BackToTop />', () => {
-    it(' renders a panel', () => {
-        const wrapper = mount(<BackToTop id={"testId"}/>);
+const Adapter = require("enzyme-adapter-react-16");
+const enzyme = require("enzyme");
+enzyme.configure({ adapter: new Adapter() });
 
-        const actual = wrapper.find('.app-back-to-top');
+describe("<BackToTop />", () => {
+  it(" renders a panel", () => {
+    const wrapper = mount(<BackToTop id={"testId"} />);
 
-        expect(actual.children().length).toBe(1);
-    });
+    const actual = wrapper.find(".app-back-to-top");
 
-    it(' has the correct href', () => {
-        const wrapper = mount(<BackToTop id={"testId"}/>);
+    expect(actual.children().length).toBe(1);
+  });
 
-        const actual = wrapper.find('a');
+  it(" has the correct href", () => {
+    const wrapper = mount(<BackToTop id={"testId"} />);
 
-        expect(actual.prop("href")).toBe("#testId");
+    const actual = wrapper.find("a");
 
-    });
+    expect(actual.prop("href")).toBe("#testId");
+  });
 
-    it(' has the correct body text', () => {
-        const wrapper = mount(<BackToTop id={"testId"}/>);
+  it(" has the correct body text", () => {
+    const wrapper = mount(<BackToTop id={"testId"} />);
 
-        const actual = wrapper.find('a');
+    const actual = wrapper.find("a");
 
-        expect(actual.text()).toBe("Back to top");
+    expect(actual.text()).toBe("Back to top");
+  });
 
-    });
+  it(" has the correct body text", () => {
+    const wrapper = mount(<BackToTop id={"testId"} />);
 
-    it(' has the correct body text', () => {
-        const wrapper = mount(<BackToTop id={"testId"}/>);
+    const actual = wrapper.find("a");
 
-        const actual = wrapper.find('a');
+    expect(actual.text()).toBe("Back to top");
+  });
 
-        expect(actual.text()).toBe("Back to top");
+  it(" is hidden", () => {
+    const wrapper = mount(<BackToTop id={"testId"} hidden={true} />);
 
-    });
+    const actual = wrapper.find(".app-back-to-top");
 
-    it(' is hidden', () => {
-        const wrapper = mount(<BackToTop id={"testId"} hidden={true}/>);
+    expect(actual.props().hidden).toBeTruthy();
+  });
 
-        const actual = wrapper.find('.app-back-to-top');
+  it(" is visible", () => {
+    const wrapper = mount(<BackToTop id={"testId"} hidden={false} />);
 
-        expect(actual.props().hidden).toBeTruthy();
-    });
+    const actual = wrapper.find(".app-back-to-top");
 
-    it(' is visible', () => {
-        const wrapper = mount(<BackToTop id={"testId"} hidden={false}/>);
+    expect(actual.props().hidden).toBeFalsy();
+  });
 
-        const actual = wrapper.find('.app-back-to-top');
+  it(" is visible when hidden is not used", () => {
+    const wrapper = mount(<BackToTop id={"testId"} />);
 
-        expect(actual.props().hidden).toBeFalsy();
-    });
+    const actual = wrapper.find(".app-back-to-top");
 
-    it(' is visible when hidden is not used', () => {
-        const wrapper = mount(<BackToTop id={"testId"} />);
-
-        const actual = wrapper.find('.app-back-to-top');
-
-        expect(actual.props().hidden).toBeFalsy();
-    });
-
+    expect(actual.props().hidden).toBeFalsy();
+  });
 });

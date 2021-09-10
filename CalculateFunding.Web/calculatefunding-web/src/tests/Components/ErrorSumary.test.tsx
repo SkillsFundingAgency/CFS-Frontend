@@ -1,28 +1,29 @@
-import React from 'react';
-import {DateTimeFormatter} from "../../components/DateTimeFormatter";
-import {ErrorSummary} from "../../components/ErrorSummary";
+import React from "react";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+import { DateTimeFormatter } from "../../components/DateTimeFormatter";
+import { ErrorSummary } from "../../components/ErrorSummary";
 
-describe('<ErrorSummary />', () => {
-    it(' renders a panel', () => {
-        const wrapper = shallow(<ErrorSummary title="Test title" error="Error message"
-                                              suggestion="Suggestion to user"/>);
+const Adapter = require("enzyme-adapter-react-16");
+const enzyme = require("enzyme");
+enzyme.configure({ adapter: new Adapter() });
+const { shallow } = enzyme;
 
-        const actual = wrapper.find('div.govuk-error-summary');
+describe("<ErrorSummary />", () => {
+  it(" renders a panel", () => {
+    const wrapper = shallow(
+      <ErrorSummary title="Test title" error="Error message" suggestion="Suggestion to user" />
+    );
 
-        expect(actual.children().length).toBe(2);
-    });
+    const actual = wrapper.find("div.govuk-error-summary");
 
-    it(' hides the error summary when no title is provided', () => {
-        const wrapper = shallow(<ErrorSummary title="" error="Error message"
-                                              suggestion="Suggestion to user"/>);
+    expect(actual.children().length).toBe(2);
+  });
 
-        const actual = wrapper.find('div.govuk-error-summary');
+  it(" hides the error summary when no title is provided", () => {
+    const wrapper = shallow(<ErrorSummary title="" error="Error message" suggestion="Suggestion to user" />);
 
-        expect(actual.props('hidden')).toBeTruthy();
-    });
+    const actual = wrapper.find("div.govuk-error-summary");
+
+    expect(actual.props("hidden")).toBeTruthy();
+  });
 });

@@ -1,9 +1,9 @@
 import * as monaco from "monaco-editor";
 
 export interface IDefaultTypeMember {
-    label: string;
+  label: string;
 
-    description?: string;
+  description?: string;
 
-    type: monaco.languages.CompletionItemKind;
+  type: monaco.languages.CompletionItemKind;
 }

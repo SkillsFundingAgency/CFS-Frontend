@@ -1,6 +1,6 @@
-import {UserPermissions} from "./UserPermissions";
+import { UserPermissions } from "./UserPermissions";
 
 export interface User extends UserPermissions {
-    username: string;
-    hasConfirmedSkills: boolean;
+  username: string;
+  hasConfirmedSkills: boolean;
 }

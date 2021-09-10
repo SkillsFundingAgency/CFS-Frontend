@@ -1,4 +1,4 @@
 ﻿export interface ToggleDatasetSchemaRequest {
-    relationshipId: string,
-    converterEnabled: boolean
+  relationshipId: string;
+  converterEnabled: boolean;
 }

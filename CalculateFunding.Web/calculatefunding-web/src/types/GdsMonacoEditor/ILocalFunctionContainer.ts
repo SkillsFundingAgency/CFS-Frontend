@@ -1,6 +1,5 @@
-import {ILocalFunction} from "./ILocalFunction";
+import { ILocalFunction } from "./ILocalFunction";
 
 export interface ILocalFunctionContainer {
-    [key: string]: ILocalFunction
+  [key: string]: ILocalFunction;
 }
-

@@ -1,19 +1,21 @@
 import { Subject } from "rxjs";
+
 import { NodeType } from "../types/TemplateBuilderDefinitions";
 
 interface dragSubject {
-    draggedNodeId: string,
-    draggedNodeKind: NodeType
+  draggedNodeId: string;
+  draggedNodeKind: NodeType;
 }
 
 interface selectSubject {
-    selectedNodeId: string
+  selectedNodeId: string;
 }
 
 const subject1 = new Subject<dragSubject>();
 const subject2 = new Subject<selectSubject>();
 
-export const sendDragInfo = (id: string, kind: NodeType) => subject1.next({ draggedNodeId: id, draggedNodeKind: kind });
+export const sendDragInfo = (id: string, kind: NodeType) =>
+  subject1.next({ draggedNodeId: id, draggedNodeKind: kind });
 export const clearDragInfo = () => subject1.next();
 export const getDragInfo = () => subject1.asObservable();
 

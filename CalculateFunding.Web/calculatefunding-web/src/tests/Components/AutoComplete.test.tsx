@@ -1,239 +1,295 @@
-import React from 'react';
-import {AutoComplete, AutoCompleteMode} from "../../components/AutoComplete";
-import {shallow} from 'enzyme';
-import {fireEvent, render} from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
+
+import { fireEvent, render } from "@testing-library/react";
+import { shallow } from "enzyme";
+import React from "react";
+
+import { AutoComplete, AutoCompleteMode } from "../../components/AutoComplete";
 
 const validData = [
-    "Bedfordshire",
-    "Hertfordshire",
-    "Buckinghamshire",
-    "Northamptonshire",
-    "Norfolk",
-    "Oxfordshire"
+  "Bedfordshire",
+  "Hertfordshire",
+  "Buckinghamshire",
+  "Northamptonshire",
+  "Norfolk",
+  "Oxfordshire",
 ];
 
 const northamptonshireId = "4";
 const norfolkId = "5";
 
 const validDataPrefixedIdMode = [
-    "__1__Bedfordshire",
-    "__2__Hertfordshire",
-    "__3__Buckinghamshire",
-    `__${northamptonshireId}__Northamptonshire`,
-    `__${norfolkId}__Norfolk`,
-    "__6__Oxfordshire"
+  "__1__Bedfordshire",
+  "__2__Hertfordshire",
+  "__3__Buckinghamshire",
+  `__${northamptonshireId}__Northamptonshire`,
+  `__${norfolkId}__Norfolk`,
+  "__6__Oxfordshire",
 ];
 
 const callbackFunction = jest.fn();
 
-describe('<AutoComplete />', () => {
-    afterEach(() => {
-        callbackFunction.mockClear();
+describe("<AutoComplete />", () => {
+  afterEach(() => {
+    callbackFunction.mockClear();
+  });
+
+  it("renders a panel", () => {
+    const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+
+    const actual = wrapper.find("div.govuk-form-group");
+
+    expect(actual.length).toBe(1);
+  });
+
+  it("shows the dropdown list", () => {
+    const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+
+    wrapper.find("input").simulate("click", {
+      currentTarget: {
+        value: "",
+      },
     });
 
-    it('renders a panel', () => {
-        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+    const actual = wrapper.find("ul.govuk-list");
+    expect(actual.length).toBe(1);
+    expect(actual.children().length).toBe(validData.length);
+  });
 
-        const actual = wrapper.find('div.govuk-form-group');
+  it("filters the dropdown list with data already entered", () => {
+    const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
 
-        expect(actual.length).toBe(1);
+    wrapper.find("input").simulate("click", {
+      currentTarget: {
+        value: "Buckinghamshire",
+      },
     });
 
-    it('shows the dropdown list', () => {
-        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+    const actual = wrapper.find("ul.govuk-list");
+    expect(actual.length).toBe(1);
+    expect(actual.children().length).toBe(1);
+  });
 
-        wrapper.find('input').simulate("click", {
-            currentTarget: {
-                value: ""
-            }
-        });
+  it("filters the dropdown list on change", () => {
+    const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
 
-        const actual = wrapper.find('ul.govuk-list');
-        expect(actual.length).toBe(1);
-        expect(actual.children().length).toBe(validData.length);
+    wrapper.find("input").simulate("change", {
+      currentTarget: {
+        value: "nor",
+      },
     });
 
-    it('filters the dropdown list with data already entered', () => {
-        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+    const actual = wrapper.find("ul.govuk-list");
+    expect(actual.length).toBe(1);
+    expect(actual.children().length).toBe(2);
+  });
 
-        wrapper.find('input').simulate("click", {
-            currentTarget: {
-                value: "Buckinghamshire"
-            }
-        });
+  it("returns the full list when the input is cleared", () => {
+    const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
 
-        const actual = wrapper.find('ul.govuk-list');
-        expect(actual.length).toBe(1);
-        expect(actual.children().length).toBe(1);
+    wrapper.find("input").simulate("change", {
+      currentTarget: {
+        value: "nor",
+      },
     });
 
-    it('filters the dropdown list on change', () => {
-        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
-
-        wrapper.find('input').simulate("change", {
-            currentTarget: {
-                value: "nor"
-            }
-        });
-
-        const actual = wrapper.find('ul.govuk-list');
-        expect(actual.length).toBe(1);
-        expect(actual.children().length).toBe(2);
+    wrapper.find("input").simulate("change", {
+      currentTarget: {
+        value: "",
+      },
     });
 
-    it('returns the full list when the input is cleared', () => {
-        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+    const actual = wrapper.find("ul.govuk-list");
+    expect(actual.length).toBe(1);
+    expect(actual.children().length).toBe(validData.length);
+  });
 
-        wrapper.find('input').simulate("change", {
-            currentTarget: {
-                value: "nor"
-            }
-        });
+  it("triggers a call back with empty value when the input is cleared", () => {
+    const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
 
-        wrapper.find('input').simulate("change", {
-            currentTarget: {
-                value: ""
-            }
-        });
-
-        const actual = wrapper.find('ul.govuk-list');
-        expect(actual.length).toBe(1);
-        expect(actual.children().length).toBe(validData.length);
+    wrapper.find("input").simulate("change", {
+      currentTarget: {
+        value: "nor",
+      },
     });
 
-    it('triggers a call back with empty value when the input is cleared', () => {
-        const wrapper = shallow(<AutoComplete callback={callbackFunction} suggestions={validData} />);
-
-        wrapper.find('input').simulate("change", {
-            currentTarget: {
-                value: "nor"
-            }
-        });
-
-        wrapper.find('input').simulate("change", {
-            currentTarget: {
-                value: ""
-            }
-        });
-
-        expect(callbackFunction).toHaveBeenCalledTimes(1);
-        expect(callbackFunction).toHaveBeenLastCalledWith("");
+    wrapper.find("input").simulate("change", {
+      currentTarget: {
+        value: "",
+      },
     });
 
-    it('triggers a call back with id value when mode is PrefixedId', () => {
-        const {getByRole, getByTestId} = render(<AutoComplete callback={callbackFunction} suggestions={validDataPrefixedIdMode}
-            mode={AutoCompleteMode.PrefixedId} />);
+    expect(callbackFunction).toHaveBeenCalledTimes(1);
+    expect(callbackFunction).toHaveBeenLastCalledWith("");
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Norfolk'}});
-        fireEvent.click(getByTestId(norfolkId), {target: {innerText: 'Norfolk'}});
+  it("triggers a call back with id value when mode is PrefixedId", () => {
+    const { getByRole, getByTestId } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(callbackFunction).toHaveBeenCalledTimes(1);
-        expect(callbackFunction).toHaveBeenLastCalledWith(norfolkId);
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Norfolk" } });
+    fireEvent.click(getByTestId(norfolkId), { target: { innerText: "Norfolk" } });
 
-    it('triggers a call back with value when mode is Standard', () => {
-        const {getByRole, getByTestId} = render(<AutoComplete callback={callbackFunction} suggestions={validData} />);
+    expect(callbackFunction).toHaveBeenCalledTimes(1);
+    expect(callbackFunction).toHaveBeenLastCalledWith(norfolkId);
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Norfolk'}});
-        fireEvent.click(getByTestId("Norfolk"), {target: {innerText: 'Norfolk'}});
+  it("triggers a call back with value when mode is Standard", () => {
+    const { getByRole, getByTestId } = render(
+      <AutoComplete callback={callbackFunction} suggestions={validData} />
+    );
 
-        expect(callbackFunction).toHaveBeenCalledTimes(1);
-        expect(callbackFunction).toHaveBeenLastCalledWith("Norfolk");
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Norfolk" } });
+    fireEvent.click(getByTestId("Norfolk"), { target: { innerText: "Norfolk" } });
 
-    it('hides suggestions after suggestion is clicked', () => {
-        const {getByRole, getByTestId, queryByTestId} = render(<AutoComplete callback={callbackFunction} suggestions={validDataPrefixedIdMode}
-            mode={AutoCompleteMode.PrefixedId} />);
+    expect(callbackFunction).toHaveBeenCalledTimes(1);
+    expect(callbackFunction).toHaveBeenLastCalledWith("Norfolk");
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Nor'}});
-        expect(getByTestId(northamptonshireId)).toBeInTheDocument();
-        expect(getByTestId(norfolkId)).toBeInTheDocument();
-        fireEvent.click(getByTestId(norfolkId), {target: {innerText: 'Norfolk'}});
+  it("hides suggestions after suggestion is clicked", () => {
+    const { getByRole, getByTestId, queryByTestId } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(queryByTestId(northamptonshireId)).not.toBeInTheDocument();
-        expect(getByRole('textbox')).toHaveValue("Norfolk");
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Nor" } });
+    expect(getByTestId(northamptonshireId)).toBeInTheDocument();
+    expect(getByTestId(norfolkId)).toBeInTheDocument();
+    fireEvent.click(getByTestId(norfolkId), { target: { innerText: "Norfolk" } });
 
-    it('renders search label and pager when includePager is true', () => {
-        const {getByRole, getByText} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(queryByTestId(northamptonshireId)).not.toBeInTheDocument();
+    expect(getByRole("textbox")).toHaveValue("Norfolk");
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Norfolk'}});
+  it("renders search label and pager when includePager is true", () => {
+    const { getByRole, getByText } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(getByText("Search")).toBeInTheDocument();
-        expect(getByText("1 of 1")).toBeInTheDocument();
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Norfolk" } });
 
-    it('does not render pager when includePager is true until user enters value', () => {
-        const {queryByTestId} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(getByText("Search")).toBeInTheDocument();
+    expect(getByText("1 of 1")).toBeInTheDocument();
+  });
 
-        expect(queryByTestId("forward")).not.toBeInTheDocument();
-        expect(queryByTestId("back")).not.toBeInTheDocument();
-    });
+  it("does not render pager when includePager is true until user enters value", () => {
+    const { queryByTestId } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-    it('triggers a call back with correct id value when pager is rendered and user clicks forward', () => {
-        const {getByRole, getByTestId, getByText} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(queryByTestId("forward")).not.toBeInTheDocument();
+    expect(queryByTestId("back")).not.toBeInTheDocument();
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Nor'}});
-        fireEvent.click(getByTestId("forward"));
+  it("triggers a call back with correct id value when pager is rendered and user clicks forward", () => {
+    const { getByRole, getByTestId, getByText } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(getByText("2 of 2")).toBeInTheDocument();
-        expect(callbackFunction).toHaveBeenCalledTimes(1);
-        expect(callbackFunction).toHaveBeenLastCalledWith(norfolkId);
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Nor" } });
+    fireEvent.click(getByTestId("forward"));
 
-    it('triggers a call back with correct id value when pager is rendered and user clicks back', () => {
-        const {getByRole, getByTestId, getByText} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(getByText("2 of 2")).toBeInTheDocument();
+    expect(callbackFunction).toHaveBeenCalledTimes(1);
+    expect(callbackFunction).toHaveBeenLastCalledWith(norfolkId);
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Nor'}});
-        fireEvent.click(getByTestId("forward"));
-        fireEvent.click(getByTestId("back"));
+  it("triggers a call back with correct id value when pager is rendered and user clicks back", () => {
+    const { getByRole, getByTestId, getByText } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(getByText("1 of 2")).toBeInTheDocument();
-        expect(callbackFunction).toHaveBeenCalledTimes(2);
-        expect(callbackFunction).toHaveBeenLastCalledWith(northamptonshireId);
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Nor" } });
+    fireEvent.click(getByTestId("forward"));
+    fireEvent.click(getByTestId("back"));
 
-    it('does not trigger a call back when pager is on page 1 and user clicks back', () => {
-        const {getByRole, getByTestId, getByText} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(getByText("1 of 2")).toBeInTheDocument();
+    expect(callbackFunction).toHaveBeenCalledTimes(2);
+    expect(callbackFunction).toHaveBeenLastCalledWith(northamptonshireId);
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Nor'}});
+  it("does not trigger a call back when pager is on page 1 and user clicks back", () => {
+    const { getByRole, getByTestId, getByText } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(getByText("1 of 2")).toBeInTheDocument();
+    fireEvent.change(getByRole("textbox"), { target: { value: "Nor" } });
 
-        fireEvent.click(getByTestId("back"));
+    expect(getByText("1 of 2")).toBeInTheDocument();
 
-        expect(callbackFunction).not.toHaveBeenCalled();
-    });
+    fireEvent.click(getByTestId("back"));
 
-    it('does not trigger a call back when pager is on last page and user clicks forward', () => {
-        const {getByRole, getByTestId, getByText} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(callbackFunction).not.toHaveBeenCalled();
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Nor'}});
+  it("does not trigger a call back when pager is on last page and user clicks forward", () => {
+    const { getByRole, getByTestId, getByText } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(getByText("1 of 2")).toBeInTheDocument();
-        fireEvent.click(getByTestId("forward"));
-        expect(getByText("2 of 2")).toBeInTheDocument();
-        fireEvent.click(getByTestId("forward"));
+    fireEvent.change(getByRole("textbox"), { target: { value: "Nor" } });
 
-        expect(callbackFunction).toHaveBeenCalledTimes(1);
-    });
+    expect(getByText("1 of 2")).toBeInTheDocument();
+    fireEvent.click(getByTestId("forward"));
+    expect(getByText("2 of 2")).toBeInTheDocument();
+    fireEvent.click(getByTestId("forward"));
 
-    it('resets pager after suggestion is clicked', () => {
-        const {getByRole, getByTestId, getByText} = render(<AutoComplete callback={callbackFunction}
-            suggestions={validDataPrefixedIdMode} includePager={true} mode={AutoCompleteMode.PrefixedId} />);
+    expect(callbackFunction).toHaveBeenCalledTimes(1);
+  });
 
-        fireEvent.change(getByRole('textbox'), {target: {value: 'Nor'}});
-        expect(getByText("1 of 2")).toBeInTheDocument();
-        fireEvent.click(getByTestId(norfolkId), {target: {innerText: 'Norfolk'}});
+  it("resets pager after suggestion is clicked", () => {
+    const { getByRole, getByTestId, getByText } = render(
+      <AutoComplete
+        callback={callbackFunction}
+        suggestions={validDataPrefixedIdMode}
+        includePager={true}
+        mode={AutoCompleteMode.PrefixedId}
+      />
+    );
 
-        expect(getByText("1 of 1")).toBeInTheDocument();
-    });
+    fireEvent.change(getByRole("textbox"), { target: { value: "Nor" } });
+    expect(getByText("1 of 2")).toBeInTheDocument();
+    fireEvent.click(getByTestId(norfolkId), { target: { innerText: "Norfolk" } });
+
+    expect(getByText("1 of 1")).toBeInTheDocument();
+  });
 });

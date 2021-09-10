@@ -1,5 +1,5 @@
-export enum CharacterRestrictions{
-    NumericOnly = "NumericOnly",
-    AlphaOnly = "AlphaOnly",
-    AlphaNumeric = "AlphaNumeric"
+export enum CharacterRestrictions {
+  NumericOnly = "NumericOnly",
+  AlphaOnly = "AlphaOnly",
+  AlphaNumeric = "AlphaNumeric",
 }

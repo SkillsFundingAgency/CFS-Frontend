@@ -1,5 +1,5 @@
-import {IDefaultType} from "./IDefaultType";
+import { IDefaultType } from "./IDefaultType";
 
 export interface IDefaultTypeContainer {
-    [key: string]: IDefaultType
+  [key: string]: IDefaultType;
 }

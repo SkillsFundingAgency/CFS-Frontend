@@ -1,2 +1,2 @@
-﻿export * from './makeServer';
-export * from './mirage.interceptor';
+﻿export * from "./makeServer";
+export * from "./mirage.interceptor";

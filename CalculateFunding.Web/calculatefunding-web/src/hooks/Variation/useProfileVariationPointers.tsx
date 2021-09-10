@@ -1,7 +1,8 @@
-﻿import { useQuery } from "react-query";
-import { AxiosError } from "axios";
-import { FundingLineProfileVariationPointer } from "../../types/Specifications/ProfileVariationPointer";
+﻿import { AxiosError } from "axios";
+import { useQuery } from "react-query";
+
 import { getProfileVariationPointersService } from "../../services/specificationService";
+import { FundingLineProfileVariationPointer } from "../../types/Specifications/ProfileVariationPointer";
 
 export interface ProfileVariationPointersQueryProps {
   specificationId: string | undefined;

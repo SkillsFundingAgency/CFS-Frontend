@@ -1,5 +1,6 @@
 ﻿import { AxiosError } from "axios";
 import * as React from "react";
+
 import { ErrorMessage, ValidationErrors } from "../types/ErrorMessage";
 
 export interface ErrorProps extends BaseErrorProps {
@@ -17,44 +18,26 @@ interface BaseErrorProps {
   suggestion?: any;
 }
 
-interface ErrorHookResult {
+export interface ErrorHookResult {
   errors: ErrorMessage[];
   validate: (validationFn: () => boolean, errorSettings: ErrorProps) => boolean;
   addError: ({ error, description, fieldName, suggestion }: ErrorProps) => void;
-  addErrorMessage: (
-    errorMessage: any,
-    description?: string,
-    fieldName?: string,
-    suggestion?: any
-  ) => void;
-  addValidationErrors: ({
-    validationErrors,
-    message,
-    description,
-    fieldName,
-  }: ValidationErrorProps) => void;
-  addValidationErrorsAsIndividualErrors: (props: {
-    validationErrors: ValidationErrors;
-  }) => void;
+  addErrorMessage: (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) => void;
+  addValidationErrors: ({ validationErrors, message, description, fieldName }: ValidationErrorProps) => void;
+  addValidationErrorsAsIndividualErrors: (props: { validationErrors: ValidationErrors }) => void;
   clearErrorMessages: (fieldNames?: string[]) => void;
 }
 
 export const useErrors = (): ErrorHookResult => {
   const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
-  const addErrorMessage = (
-    errorMessage: any,
-    description?: string,
-    fieldName?: string,
-    suggestion?: any
-  ) => {
+  const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) => {
     const isDuplicateError =
       errors &&
       errors.some(
         (err) =>
           !err.validationErrors &&
-          (err.description === description ||
-            (!description && !err.description)) &&
+          (err.description === description || (!description && !err.description)) &&
           (err.fieldName === fieldName || (!fieldName && !err.fieldName)) &&
           (err.message === errorMessage || (!errorMessage && !err.message)) &&
           (err.suggestion === suggestion || (!suggestion && !err.suggestion))
@@ -74,10 +57,7 @@ export const useErrors = (): ErrorHookResult => {
     setErrors((errors) => [...errors, error]);
   };
 
-  const validate = (
-    validationFn: () => boolean,
-    errorSettings: ErrorProps
-  ): boolean => {
+  const validate = (validationFn: () => boolean, errorSettings: ErrorProps): boolean => {
     if (!validationFn()) {
       addError(errorSettings);
       return false;
@@ -86,12 +66,7 @@ export const useErrors = (): ErrorHookResult => {
     return true;
   };
 
-  const addError = ({
-    error,
-    description,
-    fieldName,
-    suggestion,
-  }: ErrorProps) => {
+  const addError = ({ error, description, fieldName, suggestion }: ErrorProps) => {
     let errorMessage = "";
     const axiosError = error as AxiosError;
     if (axiosError && axiosError.isAxiosError) {
@@ -131,9 +106,7 @@ export const useErrors = (): ErrorHookResult => {
   };
 
   // flattens out validation errors into separate errors related to their relevant field names
-  const addValidationErrorsAsIndividualErrors = (props: {
-    validationErrors: ValidationErrors;
-  }) => {
+  const addValidationErrorsAsIndividualErrors = (props: { validationErrors: ValidationErrors }) => {
     if (!props.validationErrors) return;
     const errorCount: number = errors.length;
     Object.keys(props.validationErrors).forEach((fieldName) => {
@@ -154,12 +127,7 @@ export const useErrors = (): ErrorHookResult => {
       if (!fieldNames) {
         setErrors([]);
       } else {
-        setErrors(
-          errors.filter(
-            (e) =>
-              !e.fieldName || (e.fieldName && !fieldNames.includes(e.fieldName))
-          )
-        );
+        setErrors(errors.filter((e) => !e.fieldName || (e.fieldName && !fieldNames.includes(e.fieldName))));
       }
     }
   };

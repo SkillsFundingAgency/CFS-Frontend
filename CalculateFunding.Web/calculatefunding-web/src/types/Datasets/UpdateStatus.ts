@@ -1,6 +1,6 @@
-export enum UpdateStatus{
-    Unset,
-    Successful,
-    InProgress,
-    Matched
+export enum UpdateStatus {
+  Unset,
+  Successful,
+  InProgress,
+  Matched,
 }

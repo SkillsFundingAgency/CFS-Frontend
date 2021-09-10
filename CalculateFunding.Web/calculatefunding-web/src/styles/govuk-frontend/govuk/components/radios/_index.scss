@@ -4,7 +4,6 @@
 @import "../label/index";
 
 @include govuk-exports("govuk/component/radios") {
-
   $govuk-touch-target-size: 44px;
   $govuk-radios-size: 40px;
   $govuk-small-radios-size: 24px;
@@ -73,7 +72,7 @@
     cursor: pointer;
     // remove 300ms pause on mobile
     -ms-touch-action: manipulation;
-        touch-action: manipulation;
+    touch-action: manipulation;
   }
 
   // ( ) Radio ring
@@ -136,7 +135,7 @@
   }
 
   .govuk-radios__input:disabled + .govuk-radios__label {
-    opacity: .5;
+    opacity: 0.5;
   }
 
   // =========================================================
@@ -144,7 +143,7 @@
   // =========================================================
 
   .govuk-radios--inline {
-    @include govuk-media-query ($from: tablet) {
+    @include govuk-media-query($from: tablet) {
       @include govuk-clearfix;
 
       .govuk-radios__item {
@@ -210,7 +209,6 @@
   // =========================================================
 
   .govuk-radios--small {
-
     $input-offset: ($govuk-touch-target-size - $govuk-small-radios-size) / 2;
     $label-offset: $govuk-touch-target-size - $input-offset;
 
@@ -318,9 +316,9 @@
     // We use two box shadows, one that restores the original focus state [1]
     // and another that then applies the hover state [2].
     .govuk-radios__item:hover .govuk-radios__input:focus + .govuk-radios__label:before {
-      box-shadow:
-        0 0 0 $govuk-radios-focus-width $govuk-focus-colour, // 1
-        0 0 0 $govuk-hover-width        $govuk-hover-colour; // 2
+      box-shadow: 0 0 0 $govuk-radios-focus-width $govuk-focus-colour,
+        // 1
+        0 0 0 $govuk-hover-width $govuk-hover-colour; // 2
     }
 
     // For devices that explicitly don't support hover, don't provide a hover

@@ -1,17 +1,18 @@
-import React from 'react';
-import {CalculationResultsLink} from "../../../components/Calculations/CalculationResultsLink";
+import React from "react";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+import { CalculationResultsLink } from "../../../components/Calculations/CalculationResultsLink";
 
-describe('<CalculationResultsLink />', () => {
-    it(' renders a link', () => {
-        const wrapper = shallow(<CalculationResultsLink calculationId="1234" />);
+const Adapter = require("enzyme-adapter-react-16");
+const enzyme = require("enzyme");
+enzyme.configure({ adapter: new Adapter() });
+const { shallow } = enzyme;
 
-        const actual = wrapper.find('Link');
+describe("<CalculationResultsLink />", () => {
+  it(" renders a link", () => {
+    const wrapper = shallow(<CalculationResultsLink calculationId="1234" />);
 
-        expect(actual.children().length).toBe(1);
-    });
+    const actual = wrapper.find("Link");
+
+    expect(actual.children().length).toBe(1);
+  });
 });

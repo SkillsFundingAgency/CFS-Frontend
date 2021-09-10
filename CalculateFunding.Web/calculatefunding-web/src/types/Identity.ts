@@ -1,5 +1,5 @@
 export interface Identity {
-    name?: string;
-    AuthenticationType?: string;
-    isAuthenticated: boolean;
+  name?: string;
+  AuthenticationType?: string;
+  isAuthenticated: boolean;
 }

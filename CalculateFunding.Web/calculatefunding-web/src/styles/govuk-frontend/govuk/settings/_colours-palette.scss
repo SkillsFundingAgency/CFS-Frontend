@@ -18,9 +18,8 @@
 
 $govuk-use-legacy-palette: if(
   (
-    $govuk-compatibility-govukfrontendtoolkit or
-    $govuk-compatibility-govuktemplate or
-    $govuk-compatibility-govukelements
+    $govuk-compatibility-govukfrontendtoolkit or $govuk-compatibility-govuktemplate or
+      $govuk-compatibility-govukelements
   ),
   true,
   false
@@ -42,13 +41,11 @@ $_govuk-colour-palette-modern: (
   "dark-blue": #003078,
   "light-blue": #5694ca,
   "purple": #4c2c92,
-
   "black": #0b0c0c,
   "dark-grey": #505a5f,
   "mid-grey": #b1b4b6,
   "light-grey": #f3f2f1,
   "white": #ffffff,
-
   "light-purple": #6f72af,
   "bright-purple": #912b88,
   "pink": #d53880,
@@ -56,7 +53,7 @@ $_govuk-colour-palette-modern: (
   "orange": #f47738,
   "brown": #b58840,
   "light-green": #85994b,
-  "turquoise": #28a197
+  "turquoise": #28a197,
 );
 
 /// Legacy colour palette
@@ -83,13 +80,12 @@ $_govuk-colour-palette-legacy: (
   "turquoise": #28a197,
   "light-blue": #2b8cc4,
   "blue": #005ea5,
-
   "black": #0b0c0c,
   "grey-1": #6f777b,
   "grey-2": #bfc1c3,
   "grey-3": #dee0e2,
   "grey-4": #f8f8f8,
-  "white": #ffffff
+  "white": #ffffff,
 );
 
 /// Colour palette

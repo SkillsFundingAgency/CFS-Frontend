@@ -1,5 +1,5 @@
-import { DatasetVersionSummary } from "./DatasetVersionSummary";
 import { PagerState } from "../PagerState";
+import { DatasetVersionSummary } from "./DatasetVersionSummary";
 
 export interface DataSetVersionSearchResult {
   totalCount: number;

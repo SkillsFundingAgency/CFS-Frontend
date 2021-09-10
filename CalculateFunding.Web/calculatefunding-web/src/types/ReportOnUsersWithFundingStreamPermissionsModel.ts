@@ -1,4 +1,4 @@
 ﻿export interface ReportOnUsersWithFundingStreamPermissionsModel {
-    url: string;
-    fileName: string;
+  url: string;
+  fileName: string;
 }

@@ -1,14 +1,14 @@
 ﻿export interface SpecificationSelectedForFunding {
-    name: string;
-    id: string;
+  name: string;
+  id: string;
 }
 export interface FundingPeriodWithSpecificationSelectedForFunding {
-    name: string;
-    id: string;
-    specifications: SpecificationSelectedForFunding[];
+  name: string;
+  id: string;
+  specifications: SpecificationSelectedForFunding[];
 }
 export interface FundingStreamWithSpecificationSelectedForFunding {
-    name: string;
-    id: string;
-    periods: FundingPeriodWithSpecificationSelectedForFunding[];
+  name: string;
+  id: string;
+  periods: FundingPeriodWithSpecificationSelectedForFunding[];
 }

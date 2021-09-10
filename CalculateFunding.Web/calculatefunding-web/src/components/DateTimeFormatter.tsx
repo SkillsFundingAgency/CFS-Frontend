@@ -1,9 +1,8 @@
-import React from 'react';
-import {DateTime} from "luxon";
-import {formatDateTime} from "../helpers/DateHelper";
+import { DateTime } from "luxon";
+import React from "react";
 
-export function DateTimeFormatter(props: {date: Date, militaryTime?:boolean}) {
-    return (
-        <span data-testid="datetime-formatter">{formatDateTime(props.date, props.militaryTime)}</span>
-    );
+import { formatDateTime } from "../helpers/DateHelper";
+
+export function DateTimeFormatter(props: { date: Date; militaryTime?: boolean }) {
+  return <span data-testid="datetime-formatter">{formatDateTime(props.date, props.militaryTime)}</span>;
 }

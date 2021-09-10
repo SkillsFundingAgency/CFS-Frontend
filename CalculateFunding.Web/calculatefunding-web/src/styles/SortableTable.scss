@@ -1,5 +1,5 @@
-@import '../styles/govuk-frontend';
-@import '../styles/govuk-frontend/govuk/settings/colours-applied';
+@import "../styles/govuk-frontend";
+@import "../styles/govuk-frontend/govuk/settings/colours-applied";
 
 [aria-sort] button,
 [aria-sort] button:hover {
@@ -54,7 +54,7 @@
 
 [aria-sort="ascending"] button:after {
   content: " \25b2";
-  font-size: .8em;
+  font-size: 0.8em;
   position: absolute;
   right: -5px;
   top: 2px;
@@ -62,7 +62,7 @@
 
 [aria-sort="descending"] button:after {
   content: " \25bc";
-  font-size: .8em;
+  font-size: 0.8em;
   position: absolute;
   right: -5px;
   top: 2px;

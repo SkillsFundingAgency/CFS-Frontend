@@ -1,139 +1,144 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-	typeof define === 'function' && define.amd ? define('GOVUKFrontend', factory) :
-	(factory());
-}(this, (function () { 'use strict';
+  typeof exports === "object" && typeof module !== "undefined"
+    ? factory()
+    : typeof define === "function" && define.amd
+    ? define("GOVUKFrontend", factory)
+    : factory();
+})(this, function () {
+  "use strict";
 
-(function(undefined) {
+  (function (undefined) {
+    // Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Object/defineProperty/detect.js
+    var detect =
+      // In IE8, defineProperty could only act on DOM elements, so full support
+      // for the feature requires the ability to set a property on an arbitrary object
+      "defineProperty" in Object &&
+      (function () {
+        try {
+          var a = {};
+          Object.defineProperty(a, "test", { value: 42 });
+          return true;
+        } catch (e) {
+          return false;
+        }
+      })();
 
-// Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Object/defineProperty/detect.js
-var detect = (
-  // In IE8, defineProperty could only act on DOM elements, so full support
-  // for the feature requires the ability to set a property on an arbitrary object
-  'defineProperty' in Object && (function() {
-  	try {
-  		var a = {};
-  		Object.defineProperty(a, 'test', {value:42});
-  		return true;
-  	} catch(e) {
-  		return false
-  	}
-  }())
-);
+    if (detect) return;
 
-if (detect) return
+    // Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Object.defineProperty&flags=always
+    (function (nativeDefineProperty) {
+      var supportsAccessors = Object.prototype.hasOwnProperty("__defineGetter__");
+      var ERR_ACCESSORS_NOT_SUPPORTED = "Getters & setters cannot be defined on this javascript engine";
+      var ERR_VALUE_ACCESSORS = "A property cannot both have accessors and be writable or have a value";
 
-// Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Object.defineProperty&flags=always
-(function (nativeDefineProperty) {
+      Object.defineProperty = function defineProperty(object, property, descriptor) {
+        // Where native support exists, assume it
+        if (
+          nativeDefineProperty &&
+          (object === window ||
+            object === document ||
+            object === Element.prototype ||
+            object instanceof Element)
+        ) {
+          return nativeDefineProperty(object, property, descriptor);
+        }
 
-	var supportsAccessors = Object.prototype.hasOwnProperty('__defineGetter__');
-	var ERR_ACCESSORS_NOT_SUPPORTED = 'Getters & setters cannot be defined on this javascript engine';
-	var ERR_VALUE_ACCESSORS = 'A property cannot both have accessors and be writable or have a value';
+        if (object === null || !(object instanceof Object || typeof object === "object")) {
+          throw new TypeError("Object.defineProperty called on non-object");
+        }
 
-	Object.defineProperty = function defineProperty(object, property, descriptor) {
+        if (!(descriptor instanceof Object)) {
+          throw new TypeError("Property description must be an object");
+        }
 
-		// Where native support exists, assume it
-		if (nativeDefineProperty && (object === window || object === document || object === Element.prototype || object instanceof Element)) {
-			return nativeDefineProperty(object, property, descriptor);
-		}
+        var propertyString = String(property);
+        var hasValueOrWritable = "value" in descriptor || "writable" in descriptor;
+        var getterType = "get" in descriptor && typeof descriptor.get;
+        var setterType = "set" in descriptor && typeof descriptor.set;
 
-		if (object === null || !(object instanceof Object || typeof object === 'object')) {
-			throw new TypeError('Object.defineProperty called on non-object');
-		}
+        // handle descriptor.get
+        if (getterType) {
+          if (getterType !== "function") {
+            throw new TypeError("Getter must be a function");
+          }
+          if (!supportsAccessors) {
+            throw new TypeError(ERR_ACCESSORS_NOT_SUPPORTED);
+          }
+          if (hasValueOrWritable) {
+            throw new TypeError(ERR_VALUE_ACCESSORS);
+          }
+          Object.__defineGetter__.call(object, propertyString, descriptor.get);
+        } else {
+          object[propertyString] = descriptor.value;
+        }
 
-		if (!(descriptor instanceof Object)) {
-			throw new TypeError('Property description must be an object');
-		}
+        // handle descriptor.set
+        if (setterType) {
+          if (setterType !== "function") {
+            throw new TypeError("Setter must be a function");
+          }
+          if (!supportsAccessors) {
+            throw new TypeError(ERR_ACCESSORS_NOT_SUPPORTED);
+          }
+          if (hasValueOrWritable) {
+            throw new TypeError(ERR_VALUE_ACCESSORS);
+          }
+          Object.__defineSetter__.call(object, propertyString, descriptor.set);
+        }
 
-		var propertyString = String(property);
-		var hasValueOrWritable = 'value' in descriptor || 'writable' in descriptor;
-		var getterType = 'get' in descriptor && typeof descriptor.get;
-		var setterType = 'set' in descriptor && typeof descriptor.set;
+        // OK to define value unconditionally - if a getter has been specified as well, an error would be thrown above
+        if ("value" in descriptor) {
+          object[propertyString] = descriptor.value;
+        }
 
-		// handle descriptor.get
-		if (getterType) {
-			if (getterType !== 'function') {
-				throw new TypeError('Getter must be a function');
-			}
-			if (!supportsAccessors) {
-				throw new TypeError(ERR_ACCESSORS_NOT_SUPPORTED);
-			}
-			if (hasValueOrWritable) {
-				throw new TypeError(ERR_VALUE_ACCESSORS);
-			}
-			Object.__defineGetter__.call(object, propertyString, descriptor.get);
-		} else {
-			object[propertyString] = descriptor.value;
-		}
+        return object;
+      };
+    })(Object.defineProperty);
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
 
-		// handle descriptor.set
-		if (setterType) {
-			if (setterType !== 'function') {
-				throw new TypeError('Setter must be a function');
-			}
-			if (!supportsAccessors) {
-				throw new TypeError(ERR_ACCESSORS_NOT_SUPPORTED);
-			}
-			if (hasValueOrWritable) {
-				throw new TypeError(ERR_VALUE_ACCESSORS);
-			}
-			Object.__defineSetter__.call(object, propertyString, descriptor.set);
-		}
-
-		// OK to define value unconditionally - if a getter has been specified as well, an error would be thrown above
-		if ('value' in descriptor) {
-			object[propertyString] = descriptor.value;
-		}
-
-		return object;
-	};
-}(Object.defineProperty));
-})
-.call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
-
-(function(undefined) {
-
+  (function (undefined) {
     // Detection from https://raw.githubusercontent.com/Financial-Times/polyfill-service/master/packages/polyfill-library/polyfills/DOMTokenList/detect.js
-    var detect = (
-      'DOMTokenList' in this && (function (x) {
-        return 'classList' in x ? !x.classList.toggle('x', false) && !x.className : true;
-      })(document.createElement('x'))
-    );
+    var detect =
+      "DOMTokenList" in this &&
+      (function (x) {
+        return "classList" in x ? !x.classList.toggle("x", false) && !x.className : true;
+      })(document.createElement("x"));
 
-    if (detect) return
+    if (detect) return;
 
     // Polyfill from https://raw.githubusercontent.com/Financial-Times/polyfill-service/master/packages/polyfill-library/polyfills/DOMTokenList/polyfill.js
     (function (global) {
       var nativeImpl = "DOMTokenList" in global && global.DOMTokenList;
 
       if (
-          !nativeImpl ||
-          (
-            !!document.createElementNS &&
-            !!document.createElementNS('http://www.w3.org/2000/svg', 'svg') &&
-            !(document.createElementNS("http://www.w3.org/2000/svg", "svg").classList instanceof DOMTokenList)
-          )
-        ) {
-        global.DOMTokenList = (function() { // eslint-disable-line no-unused-vars
+        !nativeImpl ||
+        (!!document.createElementNS &&
+          !!document.createElementNS("http://www.w3.org/2000/svg", "svg") &&
+          !(document.createElementNS("http://www.w3.org/2000/svg", "svg").classList instanceof DOMTokenList))
+      ) {
+        global.DOMTokenList = (function () {
+          // eslint-disable-line no-unused-vars
           var dpSupport = true;
           var defineGetter = function (object, name, fn, configurable) {
             if (Object.defineProperty)
               Object.defineProperty(object, name, {
                 configurable: false === dpSupport ? true : !!configurable,
-                get: fn
+                get: fn,
               });
-
             else object.__defineGetter__(name, fn);
           };
 
           /** Ensure the browser allows Object.defineProperty to be used on native JavaScript objects. */
           try {
             defineGetter({}, "support");
-          }
-          catch (e) {
+          } catch (e) {
             dpSupport = false;
           }
-
 
           var _DOMTokenList = function (el, prop) {
             var that = this;
@@ -142,14 +147,17 @@ if (detect) return
             var length = 0;
             var maxLength = 0;
             var addIndexGetter = function (i) {
-              defineGetter(that, i, function () {
-                preop();
-                return tokens[i];
-              }, false);
-
+              defineGetter(
+                that,
+                i,
+                function () {
+                  preop();
+                  return tokens[i];
+                },
+                false
+              );
             };
             var reindex = function () {
-
               /** Define getter functions for array-like access to the tokenList's contents. */
               if (length >= maxLength)
                 for (; maxLength < length; ++maxLength) {
@@ -168,12 +176,13 @@ if (detect) return
               if (args.length)
                 for (i = 0; i < args.length; ++i)
                   if (rSpace.test(args[i])) {
-                    error = new SyntaxError('String "' + args[i] + '" ' + "contains" + ' an invalid character');
+                    error = new SyntaxError(
+                      'String "' + args[i] + '" ' + "contains" + " an invalid character"
+                    );
                     error.code = 5;
                     error.name = "InvalidCharacterError";
                     throw error;
                   }
-
 
               /** Split the new value apart by whitespace*/
               if (typeof el[prop] === "object") {
@@ -187,8 +196,7 @@ if (detect) return
 
               /** Repopulate the internal token lists */
               tokenMap = {};
-              for (i = 0; i < tokens.length; ++i)
-                tokenMap[tokens[i]] = true;
+              for (i = 0; i < tokens.length; ++i) tokenMap[tokens[i]] = true;
               length = tokens.length;
               reindex();
             };
@@ -203,11 +211,10 @@ if (detect) return
             });
 
             /** Override the default toString/toLocaleString methods to return a space-delimited list of tokens when typecast. */
-            that.toLocaleString =
-              that.toString = function () {
-                preop();
-                return tokens.join(" ");
-              };
+            that.toLocaleString = that.toString = function () {
+              preop();
+              return tokens.join(" ");
+            };
 
             that.item = function (idx) {
               preop();
@@ -220,7 +227,7 @@ if (detect) return
             };
 
             that.add = function () {
-              preop.apply(that, args = arguments);
+              preop.apply(that, (args = arguments));
 
               for (var args, token, i = 0, l = args.length; i < l; ++i) {
                 token = args[i];
@@ -243,7 +250,7 @@ if (detect) return
             };
 
             that.remove = function () {
-              preop.apply(that, args = arguments);
+              preop.apply(that, (args = arguments));
 
               /** Build a hash of token names to compare against when recollecting our token list. */
               for (var args, ignore = {}, i = 0, t = []; i < args.length; ++i) {
@@ -252,8 +259,7 @@ if (detect) return
               }
 
               /** Run through our tokens list and reassign only those that aren't defined in the hash declared above. */
-              for (i = 0; i < tokens.length; ++i)
-                if (!ignore[tokens[i]]) t.push(tokens[i]);
+              for (i = 0; i < tokens.length; ++i) if (!ignore[tokens[i]]) t.push(tokens[i]);
 
               tokens = t;
               length = t.length >>> 0;
@@ -296,34 +302,34 @@ if (detect) return
           };
 
           return _DOMTokenList;
-        }());
+        })();
       }
 
       // Add second argument to native DOMTokenList.toggle() if necessary
       (function () {
-        var e = document.createElement('span');
-        if (!('classList' in e)) return;
-        e.classList.toggle('x', false);
-        if (!e.classList.contains('x')) return;
+        var e = document.createElement("span");
+        if (!("classList" in e)) return;
+        e.classList.toggle("x", false);
+        if (!e.classList.contains("x")) return;
         e.classList.constructor.prototype.toggle = function toggle(token /*, force*/) {
           var force = arguments[1];
           if (force === undefined) {
             var add = !this.contains(token);
-            this[add ? 'add' : 'remove'](token);
+            this[add ? "add" : "remove"](token);
             return add;
           }
           force = !!force;
-          this[force ? 'add' : 'remove'](token);
+          this[force ? "add" : "remove"](token);
           return force;
         };
-      }());
+      })();
 
       // Add multiple arguments to native DOMTokenList.add() if necessary
       (function () {
-        var e = document.createElement('span');
-        if (!('classList' in e)) return;
-        e.classList.add('a', 'b');
-        if (e.classList.contains('b')) return;
+        var e = document.createElement("span");
+        if (!("classList" in e)) return;
+        e.classList.add("a", "b");
+        if (e.classList.contains("b")) return;
         var native = e.classList.constructor.prototype.add;
         e.classList.constructor.prototype.add = function () {
           var args = arguments;
@@ -332,16 +338,16 @@ if (detect) return
             native.call(this, args[i]);
           }
         };
-      }());
+      })();
 
       // Add multiple arguments to native DOMTokenList.remove() if necessary
       (function () {
-        var e = document.createElement('span');
-        if (!('classList' in e)) return;
-        e.classList.add('a');
-        e.classList.add('b');
-        e.classList.remove('a', 'b');
-        if (!e.classList.contains('b')) return;
+        var e = document.createElement("span");
+        if (!("classList" in e)) return;
+        e.classList.add("a");
+        e.classList.add("b");
+        e.classList.remove("a", "b");
+        if (!e.classList.contains("b")) return;
         var native = e.classList.constructor.prototype.remove;
         e.classList.constructor.prototype.remove = function () {
           var args = arguments;
@@ -350,164 +356,172 @@ if (detect) return
             native.call(this, args[i]);
           }
         };
-      }());
+      })();
+    })(this);
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
 
-    }(this));
+  (function (undefined) {
+    // Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Document/detect.js
+    var detect = "Document" in this;
 
-}).call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
+    if (detect) return;
 
-(function(undefined) {
+    // Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Document&flags=always
+    if (typeof WorkerGlobalScope === "undefined" && typeof importScripts !== "function") {
+      if (this.HTMLDocument) {
+        // IE8
 
-// Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Document/detect.js
-var detect = ("Document" in this);
+        // HTMLDocument is an extension of Document.  If the browser has HTMLDocument but not Document, the former will suffice as an alias for the latter.
+        this.Document = this.HTMLDocument;
+      } else {
+        // Create an empty function to act as the missing constructor for the document object, attach the document object as its prototype.  The function needs to be anonymous else it is hoisted and causes the feature detect to prematurely pass, preventing the assignments below being made.
+        this.Document =
+          this.HTMLDocument =
+          document.constructor =
+            new Function("return function Document() {}")();
+        this.Document.prototype = document;
+      }
+    }
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
 
-if (detect) return
+  (function (undefined) {
+    // Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Element/detect.js
+    var detect = "Element" in this && "HTMLElement" in this;
 
-// Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Document&flags=always
-if ((typeof WorkerGlobalScope === "undefined") && (typeof importScripts !== "function")) {
+    if (detect) return;
 
-	if (this.HTMLDocument) { // IE8
+    // Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Element&flags=always
+    (function () {
+      // IE8
+      if (window.Element && !window.HTMLElement) {
+        window.HTMLElement = window.Element;
+        return;
+      }
 
-		// HTMLDocument is an extension of Document.  If the browser has HTMLDocument but not Document, the former will suffice as an alias for the latter.
-		this.Document = this.HTMLDocument;
+      // create Element constructor
+      window.Element = window.HTMLElement = new Function("return function Element() {}")();
 
-	} else {
+      // generate sandboxed iframe
+      var vbody = document.appendChild(document.createElement("body"));
+      var frame = vbody.appendChild(document.createElement("iframe"));
 
-		// Create an empty function to act as the missing constructor for the document object, attach the document object as its prototype.  The function needs to be anonymous else it is hoisted and causes the feature detect to prematurely pass, preventing the assignments below being made.
-		this.Document = this.HTMLDocument = document.constructor = (new Function('return function Document() {}')());
-		this.Document.prototype = document;
-	}
-}
+      // use sandboxed iframe to replicate Element functionality
+      var frameDocument = frame.contentWindow.document;
+      var prototype = (Element.prototype = frameDocument.appendChild(frameDocument.createElement("*")));
+      var cache = {};
 
+      // polyfill Element.prototype on an element
+      var shiv = function (element, deep) {
+        var childNodes = element.childNodes || [],
+          index = -1,
+          key,
+          value,
+          childNode;
 
-})
-.call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
+        if (element.nodeType === 1 && element.constructor !== Element) {
+          element.constructor = Element;
 
-(function(undefined) {
+          for (key in cache) {
+            value = cache[key];
+            element[key] = value;
+          }
+        }
 
-// Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Element/detect.js
-var detect = ('Element' in this && 'HTMLElement' in this);
+        while ((childNode = deep && childNodes[++index])) {
+          shiv(childNode, deep);
+        }
 
-if (detect) return
+        return element;
+      };
 
-// Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Element&flags=always
-(function () {
+      var elements = document.getElementsByTagName("*");
+      var nativeCreateElement = document.createElement;
+      var interval;
+      var loopLimit = 100;
 
-	// IE8
-	if (window.Element && !window.HTMLElement) {
-		window.HTMLElement = window.Element;
-		return;
-	}
+      prototype.attachEvent("onpropertychange", function (event) {
+        var propertyName = event.propertyName,
+          nonValue = !cache.hasOwnProperty(propertyName),
+          newValue = prototype[propertyName],
+          oldValue = cache[propertyName],
+          index = -1,
+          element;
 
-	// create Element constructor
-	window.Element = window.HTMLElement = new Function('return function Element() {}')();
+        while ((element = elements[++index])) {
+          if (element.nodeType === 1) {
+            if (nonValue || element[propertyName] === oldValue) {
+              element[propertyName] = newValue;
+            }
+          }
+        }
 
-	// generate sandboxed iframe
-	var vbody = document.appendChild(document.createElement('body'));
-	var frame = vbody.appendChild(document.createElement('iframe'));
+        cache[propertyName] = newValue;
+      });
 
-	// use sandboxed iframe to replicate Element functionality
-	var frameDocument = frame.contentWindow.document;
-	var prototype = Element.prototype = frameDocument.appendChild(frameDocument.createElement('*'));
-	var cache = {};
+      prototype.constructor = Element;
 
-	// polyfill Element.prototype on an element
-	var shiv = function (element, deep) {
-		var
-		childNodes = element.childNodes || [],
-		index = -1,
-		key, value, childNode;
+      if (!prototype.hasAttribute) {
+        // <Element>.hasAttribute
+        prototype.hasAttribute = function hasAttribute(name) {
+          return this.getAttribute(name) !== null;
+        };
+      }
 
-		if (element.nodeType === 1 && element.constructor !== Element) {
-			element.constructor = Element;
+      // Apply Element prototype to the pre-existing DOM as soon as the body element appears.
+      function bodyCheck() {
+        if (!loopLimit--) clearTimeout(interval);
+        if (document.body && !document.body.prototype && /(complete|interactive)/.test(document.readyState)) {
+          shiv(document, true);
+          if (interval && document.body.prototype) clearTimeout(interval);
+          return !!document.body.prototype;
+        }
+        return false;
+      }
+      if (!bodyCheck()) {
+        document.onreadystatechange = bodyCheck;
+        interval = setInterval(bodyCheck, 25);
+      }
 
-			for (key in cache) {
-				value = cache[key];
-				element[key] = value;
-			}
-		}
+      // Apply to any new elements created after load
+      document.createElement = function createElement(nodeName) {
+        var element = nativeCreateElement(String(nodeName).toLowerCase());
+        return shiv(element);
+      };
 
-		while (childNode = deep && childNodes[++index]) {
-			shiv(childNode, deep);
-		}
+      // remove sandboxed iframe
+      document.removeChild(vbody);
+    })();
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
 
-		return element;
-	};
-
-	var elements = document.getElementsByTagName('*');
-	var nativeCreateElement = document.createElement;
-	var interval;
-	var loopLimit = 100;
-
-	prototype.attachEvent('onpropertychange', function (event) {
-		var
-		propertyName = event.propertyName,
-		nonValue = !cache.hasOwnProperty(propertyName),
-		newValue = prototype[propertyName],
-		oldValue = cache[propertyName],
-		index = -1,
-		element;
-
-		while (element = elements[++index]) {
-			if (element.nodeType === 1) {
-				if (nonValue || element[propertyName] === oldValue) {
-					element[propertyName] = newValue;
-				}
-			}
-		}
-
-		cache[propertyName] = newValue;
-	});
-
-	prototype.constructor = Element;
-
-	if (!prototype.hasAttribute) {
-		// <Element>.hasAttribute
-		prototype.hasAttribute = function hasAttribute(name) {
-			return this.getAttribute(name) !== null;
-		};
-	}
-
-	// Apply Element prototype to the pre-existing DOM as soon as the body element appears.
-	function bodyCheck() {
-		if (!(loopLimit--)) clearTimeout(interval);
-		if (document.body && !document.body.prototype && /(complete|interactive)/.test(document.readyState)) {
-			shiv(document, true);
-			if (interval && document.body.prototype) clearTimeout(interval);
-			return (!!document.body.prototype);
-		}
-		return false;
-	}
-	if (!bodyCheck()) {
-		document.onreadystatechange = bodyCheck;
-		interval = setInterval(bodyCheck, 25);
-	}
-
-	// Apply to any new elements created after load
-	document.createElement = function createElement(nodeName) {
-		var element = nativeCreateElement(String(nodeName).toLowerCase());
-		return shiv(element);
-	};
-
-	// remove sandboxed iframe
-	document.removeChild(vbody);
-}());
-
-})
-.call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
-
-(function(undefined) {
-
+  (function (undefined) {
     // Detection from https://raw.githubusercontent.com/Financial-Times/polyfill-service/8717a9e04ac7aff99b4980fbedead98036b0929a/packages/polyfill-library/polyfills/Element/prototype/classList/detect.js
-    var detect = (
-      'document' in this && "classList" in document.documentElement && 'Element' in this && 'classList' in Element.prototype && (function () {
-        var e = document.createElement('span');
-        e.classList.add('a', 'b');
-        return e.classList.contains('b');
-      }())
-    );
+    var detect =
+      "document" in this &&
+      "classList" in document.documentElement &&
+      "Element" in this &&
+      "classList" in Element.prototype &&
+      (function () {
+        var e = document.createElement("span");
+        e.classList.add("a", "b");
+        return e.classList.contains("b");
+      })();
 
-    if (detect) return
+    if (detect) return;
 
     // Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Element.prototype.classList&flags=always
     (function (global) {
@@ -516,65 +530,65 @@ if (detect) return
         if (Object.defineProperty)
           Object.defineProperty(object, name, {
             configurable: false === dpSupport ? true : !!configurable,
-            get: fn
+            get: fn,
           });
-
         else object.__defineGetter__(name, fn);
       };
       /** Ensure the browser allows Object.defineProperty to be used on native JavaScript objects. */
       try {
         defineGetter({}, "support");
-      }
-      catch (e) {
+      } catch (e) {
         dpSupport = false;
       }
       /** Polyfills a property with a DOMTokenList */
       var addProp = function (o, name, attr) {
+        defineGetter(
+          o.prototype,
+          name,
+          function () {
+            var tokenList;
 
-        defineGetter(o.prototype, name, function () {
-          var tokenList;
+            var THIS = this,
+              /** Prevent this from firing twice for some reason. What the hell, IE. */
+              gibberishProperty = "__defineGetter__" + "DEFINE_PROPERTY" + name;
+            if (THIS[gibberishProperty]) return tokenList;
+            THIS[gibberishProperty] = true;
 
-          var THIS = this,
+            /**
+             * IE8 can't define properties on native JavaScript objects, so we'll use a dumb hack instead.
+             *
+             * What this is doing is creating a dummy element ("reflection") inside a detached phantom node ("mirror")
+             * that serves as the target of Object.defineProperty instead. While we could simply use the subject HTML
+             * element instead, this would conflict with element types which use indexed properties (such as forms and
+             * select lists).
+             */
+            if (false === dpSupport) {
+              var visage;
+              var mirror = addProp.mirror || document.createElement("div");
+              var reflections = mirror.childNodes;
+              var l = reflections.length;
 
-          /** Prevent this from firing twice for some reason. What the hell, IE. */
-          gibberishProperty = "__defineGetter__" + "DEFINE_PROPERTY" + name;
-          if(THIS[gibberishProperty]) return tokenList;
-          THIS[gibberishProperty] = true;
+              for (var i = 0; i < l; ++i)
+                if (reflections[i]._R === THIS) {
+                  visage = reflections[i];
+                  break;
+                }
 
-          /**
-           * IE8 can't define properties on native JavaScript objects, so we'll use a dumb hack instead.
-           *
-           * What this is doing is creating a dummy element ("reflection") inside a detached phantom node ("mirror")
-           * that serves as the target of Object.defineProperty instead. While we could simply use the subject HTML
-           * element instead, this would conflict with element types which use indexed properties (such as forms and
-           * select lists).
-           */
-          if (false === dpSupport) {
+              /** Couldn't find an element's reflection inside the mirror. Materialise one. */
+              visage || (visage = mirror.appendChild(document.createElement("div")));
 
-            var visage;
-            var mirror = addProp.mirror || document.createElement("div");
-            var reflections = mirror.childNodes;
-            var l = reflections.length;
+              tokenList = DOMTokenList.call(visage, THIS, attr);
+            } else tokenList = new DOMTokenList(THIS, attr);
 
-            for (var i = 0; i < l; ++i)
-              if (reflections[i]._R === THIS) {
-                visage = reflections[i];
-                break;
-              }
+            defineGetter(THIS, name, function () {
+              return tokenList;
+            });
+            delete THIS[gibberishProperty];
 
-            /** Couldn't find an element's reflection inside the mirror. Materialise one. */
-            visage || (visage = mirror.appendChild(document.createElement("div")));
-
-            tokenList = DOMTokenList.call(visage, THIS, attr);
-          } else tokenList = new DOMTokenList(THIS, attr);
-
-          defineGetter(THIS, name, function () {
             return tokenList;
-          });
-          delete THIS[gibberishProperty];
-
-          return tokenList;
-        }, true);
+          },
+          true
+        );
       };
 
       addProp(global.Element, "classList", "className");
@@ -582,8 +596,11 @@ if (detect) return
       addProp(global.HTMLLinkElement, "relList", "rel");
       addProp(global.HTMLAnchorElement, "relList", "rel");
       addProp(global.HTMLAreaElement, "relList", "rel");
-    }(this));
-
-}).call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
-
-})));
+    })(this);
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
+});

@@ -1,6 +1,7 @@
-﻿import { Section } from "../types/Sections";
+﻿import React from "react";
 import { Link } from "react-router-dom";
-import React from "react";
+
+import { Section } from "../types/Sections";
 
 export const TopHeader = React.memo(function (props: { location: Section }) {
   const windowLocation = window.location.href;

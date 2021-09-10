@@ -1,3 +1,3 @@
 export interface IKeyword {
-    label: string;
+  label: string;
 }

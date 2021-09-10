@@ -1,4 +1,3 @@
-export interface PublishProviderDataDownload
-{
-    url :string
+export interface PublishProviderDataDownload {
+  url: string;
 }

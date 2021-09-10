@@ -1,5 +1,5 @@
-import {IDefaultTypeMember} from "./IDefaultTypeMember";
+import { IDefaultTypeMember } from "./IDefaultTypeMember";
 
 export interface IDefaultMemberTypeContainer {
-    [key: string]: IDefaultTypeMember
+  [key: string]: IDefaultTypeMember;
 }

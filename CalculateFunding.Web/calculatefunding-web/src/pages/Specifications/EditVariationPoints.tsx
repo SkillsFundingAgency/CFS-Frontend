@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
+import { RouteComponentProps, useHistory } from "react-router";
+
+import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
-import { RouteComponentProps, useHistory } from "react-router";
+import { LoadingStatus } from "../../components/LoadingStatus";
+import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
+import { useErrors } from "../../hooks/useErrors";
+import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
+import { useProfileVariationPointers } from "../../hooks/Variation/useProfileVariationPointers";
+import { getProfilePatternsForFundingLine } from "../../services/profilingService";
+import { setProfileVariationPointersService } from "../../services/specificationService";
+import { ProfilingInstallments } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import { Section } from "../../types/Sections";
-import {
-  setProfileVariationPointersService,
-} from "../../services/specificationService";
 import {
   FundingLineProfileVariationPointer,
   ProfileVariationPointer,
 } from "../../types/Specifications/ProfileVariationPointer";
-import { ProfilingInstallments } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
-import { LoadingStatus } from "../../components/LoadingStatus";
-import { getProfilePatternsForFundingLine } from "../../services/profilingService";
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { useErrors } from "../../hooks/useErrors";
-import { useProfileVariationPointers } from "../../hooks/Variation/useProfileVariationPointers";
-import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 
 export interface EditVariationPointsRouteProps {
   specificationId: string;
@@ -60,8 +59,8 @@ export function EditVariationPoints({ match }: RouteComponentProps<EditVariation
       try {
         clearErrorMessages();
         setIsLoadingInstalments(true);
-        
-        const currentPointer = profileVariationPointers.find(p => p.fundingLineId === fundingLineId);
+
+        const currentPointer = profileVariationPointers.find((p) => p.fundingLineId === fundingLineId);
         setCurrentProfileVariationPointer(currentPointer);
         const installments = (
           await getProfilePatternsForFundingLine(
@@ -99,7 +98,7 @@ export function EditVariationPoints({ match }: RouteComponentProps<EditVariation
         setIsLoadingInstalments(false);
       }
     };
-      
+
     loadProfileVariationPointerData();
   }, [specification, fundingLineId, profileVariationPointers]);
 
@@ -160,7 +159,7 @@ export function EditVariationPoints({ match }: RouteComponentProps<EditVariation
       addError({ error: err, description: "Error while updating profile variation pointer" });
     }
   }
-  
+
   const isLoading: boolean = isLoadingInstalments || isLoadingVariationManagement || isLoadingSpecification;
 
   return (

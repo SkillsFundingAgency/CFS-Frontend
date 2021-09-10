@@ -1,3 +1,3 @@
 export interface LatestPublishedDate {
-    value: Date | null
+  value: Date | null;
 }

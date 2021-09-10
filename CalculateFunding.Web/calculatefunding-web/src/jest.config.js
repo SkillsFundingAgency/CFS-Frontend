@@ -1,7 +1,4 @@
 module.exports = {
-    verbose: true,
-    transformIgnorePatterns: [
-        "node_modules\/(?!(monaco-editor)\/)"
-    ]
-}
-;
+  verbose: true,
+  transformIgnorePatterns: ["node_modules/(?!(monaco-editor)/)"],
+};

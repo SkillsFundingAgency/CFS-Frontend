@@ -1,7 +1,7 @@
 export interface IFunctionParameter {
-    name: string;
+  name: string;
 
-    description: string;
+  description: string;
 
-    type: string;
+  type: string;
 }

@@ -1,4 +1,4 @@
 ﻿export enum TemplateItemType {
-    Calculation = 'Calculation',
-    FundingLine = 'FundingLine',
+  Calculation = "Calculation",
+  FundingLine = "FundingLine",
 }

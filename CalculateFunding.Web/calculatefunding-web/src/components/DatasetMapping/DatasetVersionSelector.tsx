@@ -1,12 +1,13 @@
 ﻿import React from "react";
-import { DateTimeFormatter } from "../DateTimeFormatter";
-import { DatasetWithVersions } from "../../types/Datasets/DataSourceRelationshipResponseViewModel";
-import { LoadingFieldStatus } from "../LoadingFieldStatus";
-import { InlineFieldset } from "../Fieldset";
-import { DataSourceSelection } from "../../types/Datasets/DataSourceSelection";
-import Pagination from "../Pagination";
+
 import { DatasetVersionSearchResponse } from "../../types/Datasets/DatasetVersionSearchResponse";
+import { DatasetWithVersions } from "../../types/Datasets/DataSourceRelationshipResponseViewModel";
+import { DataSourceSelection } from "../../types/Datasets/DataSourceSelection";
+import { DateTimeFormatter } from "../DateTimeFormatter";
+import { InlineFieldset } from "../Fieldset";
+import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { NoData } from "../NoData";
+import Pagination from "../Pagination";
 
 export interface DatasetVersionSelectorProps {
   dataset: DatasetWithVersions;

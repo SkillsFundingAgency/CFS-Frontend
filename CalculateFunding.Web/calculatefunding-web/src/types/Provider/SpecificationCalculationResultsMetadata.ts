@@ -1,4 +1,4 @@
 export interface SpecificationCalculationResultsMetadata {
-    specificationId: string,
-    lastUpdated: Date
+  specificationId: string;
+  lastUpdated: Date;
 }

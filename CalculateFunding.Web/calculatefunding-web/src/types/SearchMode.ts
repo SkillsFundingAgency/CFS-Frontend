@@ -1,4 +1,4 @@
 export enum SearchMode {
-    Any,
-    All
+  Any,
+  All,
 }

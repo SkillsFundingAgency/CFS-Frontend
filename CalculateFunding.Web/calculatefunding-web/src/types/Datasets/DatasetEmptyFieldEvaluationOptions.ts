@@ -1,5 +1,5 @@
 export enum DatasetEmptyFieldEvaluationOptions {
-    NA,
-    AsNull,
-    Ignore
+  NA,
+  AsNull,
+  Ignore,
 }

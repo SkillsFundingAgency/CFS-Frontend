@@ -1,7 +1,7 @@
 {
-    "loginType": "aad",
-    "baseUrl": "",
-    "debugOn": true,
-    "tracingOn": true,
-    "appInsightsKey": ""
+  "loginType": "aad",
+  "baseUrl": "",
+  "debugOn": true,
+  "tracingOn": true,
+  "appInsightsKey": ""
 }

@@ -1,27 +1,30 @@
-﻿import {useQuery} from "react-query";
-import {AxiosError} from "axios";
-import {getCalculationCircularDependencies} from "../../services/calculationService";
-import {CircularReferenceError} from "../../types/Calculations/CircularReferenceError";
+﻿import { AxiosError } from "axios";
+import { useQuery } from "react-query";
 
+import { getCalculationCircularDependencies } from "../../services/calculationService";
+import { CircularReferenceError } from "../../types/Calculations/CircularReferenceError";
 
 export type CalculationCircularDependenciesQueryResult = {
-    circularReferenceErrors: CircularReferenceError[] | undefined,
-    isLoadingCircularDependencies: boolean
-}
+  circularReferenceErrors: CircularReferenceError[] | undefined;
+  isLoadingCircularDependencies: boolean;
+};
 
-export const useCalculationCircularDependencies = (specificationId: string, onError: (err: AxiosError) => void)
-    : CalculationCircularDependenciesQueryResult => {
-    const {data, isLoading} = useQuery<CircularReferenceError[], AxiosError>(
-        `calculation-circular-ref-check-${specificationId}`,
-        async () => (await getCalculationCircularDependencies(specificationId)).data,
-        {
-            onError: onError,
-            refetchOnWindowFocus: false,
-            enabled: (specificationId && specificationId.length > 0) === true
-        });
+export const useCalculationCircularDependencies = (
+  specificationId: string,
+  onError: (err: AxiosError) => void
+): CalculationCircularDependenciesQueryResult => {
+  const { data, isLoading } = useQuery<CircularReferenceError[], AxiosError>(
+    `calculation-circular-ref-check-${specificationId}`,
+    async () => (await getCalculationCircularDependencies(specificationId)).data,
+    {
+      onError: onError,
+      refetchOnWindowFocus: false,
+      enabled: (specificationId && specificationId.length > 0) === true,
+    }
+  );
 
-    return {
-        circularReferenceErrors: data,
-        isLoadingCircularDependencies: isLoading,
-    };
+  return {
+    circularReferenceErrors: data,
+    isLoadingCircularDependencies: isLoading,
+  };
 };

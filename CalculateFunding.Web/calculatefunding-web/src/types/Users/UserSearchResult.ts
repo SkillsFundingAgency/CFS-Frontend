@@ -1,8 +1,8 @@
 ﻿export interface UserSearchResult {
-    users: UserSearchResultItem[] | undefined
+  users: UserSearchResultItem[] | undefined;
 }
 export interface UserSearchResultItem {
-    id: string,
-    name: string,
-    username: string
+  id: string;
+  name: string;
+  username: string;
 }

@@ -1,19 +1,19 @@
-import {IFunctionParameter} from "./IFunctionParameter";
+import { IFunctionParameter } from "./IFunctionParameter";
 
 export interface ILocalFunction {
-    label: string;
+  label: string;
 
-    friendlyName: string;
+  friendlyName: string;
 
-    description: string;
+  description: string;
 
-    parameters: Array<IFunctionParameter>;
+  parameters: Array<IFunctionParameter>;
 
-    returnType: string;
+  returnType: string;
 
-    isCustom: boolean;
+  isCustom: boolean;
 
-    isObsolete: boolean;
+  isObsolete: boolean;
 
-    getFunctionAndParameterDescription(): string;
+  getFunctionAndParameterDescription(): string;
 }

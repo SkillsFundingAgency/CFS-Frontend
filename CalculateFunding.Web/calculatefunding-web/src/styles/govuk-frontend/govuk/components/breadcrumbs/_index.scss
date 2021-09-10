@@ -1,5 +1,4 @@
 @include govuk-exports("govuk/component/breadcrumbs") {
-
   // Size of chevron (excluding border)
   $chevron-size: 7px;
 
@@ -32,7 +31,6 @@
   }
 
   .govuk-breadcrumbs__list-item {
-
     display: inline-block;
     position: relative;
 
@@ -73,9 +71,9 @@
 
       -webkit-transform: rotate(45deg);
 
-          -ms-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
 
-              transform: rotate(45deg);
+      transform: rotate(45deg);
 
       border: solid;
       border-width: $chevron-border-width $chevron-border-width 0 0;

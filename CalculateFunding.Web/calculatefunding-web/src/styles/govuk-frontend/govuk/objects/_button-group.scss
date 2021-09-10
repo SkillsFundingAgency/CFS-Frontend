@@ -34,11 +34,11 @@
     display: flex;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
     -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
 
     // Give links within the button group the same font-size and line-height
     // as buttons.
@@ -72,14 +72,14 @@
 
       -webkit-box-direction: normal;
 
-          -ms-flex-direction: row;
+      -ms-flex-direction: row;
 
-              flex-direction: row;
+      flex-direction: row;
       -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
+      flex-wrap: wrap;
       -webkit-box-align: baseline;
-          -ms-flex-align: baseline;
-              align-items: baseline;
+      -ms-flex-align: baseline;
+      align-items: baseline;
 
       .govuk-button,
       .govuk-link {

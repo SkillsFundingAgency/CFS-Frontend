@@ -1,59 +1,59 @@
-  .orgchart.myChart > ul > li > ul li::before {
-    border-top-color: #215a88;
-  }
-  
-  .orgchart.myChart > ul > li > ul li .oc-node::before,
-  .orgchart.myChart ul li .oc-node:not(:only-child)::after {
-    background-color: #215a88;
-  }
-  
-  .orgchart.myChart .oc-node .fundingLine {
-    box-sizing: border-box;
-    background-color: #215a88;
-    color: #fff;
-    width: 210px;
-    height: 50px;
-    padding: 2px;
-  }
+.orgchart.myChart > ul > li > ul li::before {
+  border-top-color: #215a88;
+}
 
-  .orgchart.myChart .oc-node .calculation {
-    box-sizing: border-box;
-    background-color: #00bfff;
-    color: #fff;
-    width: 210px;
-    height: 50px;
-    padding: 2px;
-  }
-  
-  .orgchart.myChart .oc-node .box {
-    box-sizing: border-box;
-    color: #215a88;
-    background-color: #fff;
-    width: 210px;
-    height: 50px;
-    padding: 2px;
-    border: 1px solid #215a88;
-  }
+.orgchart.myChart > ul > li > ul li .oc-node::before,
+.orgchart.myChart ul li .oc-node:not(:only-child)::after {
+  background-color: #215a88;
+}
 
-  .orgchart.myChart .oc-node .buttons {
-    box-sizing: border-box;
-    background-color: transparent;
-    width: 210px;
-    height: 40px;
-    padding: 2px;
-  }
+.orgchart.myChart .oc-node .fundingLine {
+  box-sizing: border-box;
+  background-color: #215a88;
+  color: #fff;
+  width: 210px;
+  height: 50px;
+  padding: 2px;
+}
 
-  .orgchart.myChart .govuk-button {
-    font-size: 12px;
-    margin: 0px 2px 5px 0px;
-  }
+.orgchart.myChart .oc-node .calculation {
+  box-sizing: border-box;
+  background-color: #00bfff;
+  color: #fff;
+  width: 210px;
+  height: 50px;
+  padding: 2px;
+}
 
-  .govuk-body-s {
-    margin-bottom: 0px;
-  }
+.orgchart.myChart .oc-node .box {
+  box-sizing: border-box;
+  color: #215a88;
+  background-color: #fff;
+  width: 210px;
+  height: 50px;
+  padding: 2px;
+  border: 1px solid #215a88;
+}
 
-  .clone {
-    color: #fff !important;
-    background-color: #C0C0C0 !important;
-    border-color: #C0C0C0 !important;
-  }
+.orgchart.myChart .oc-node .buttons {
+  box-sizing: border-box;
+  background-color: transparent;
+  width: 210px;
+  height: 40px;
+  padding: 2px;
+}
+
+.orgchart.myChart .govuk-button {
+  font-size: 12px;
+  margin: 0px 2px 5px 0px;
+}
+
+.govuk-body-s {
+  margin-bottom: 0px;
+}
+
+.clone {
+  color: #fff !important;
+  background-color: #c0c0c0 !important;
+  border-color: #c0c0c0 !important;
+}

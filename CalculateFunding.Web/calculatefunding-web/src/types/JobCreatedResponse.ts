@@ -1,3 +1,3 @@
 ﻿export interface JobCreatedResponse {
-    jobId: string
+  jobId: string;
 }

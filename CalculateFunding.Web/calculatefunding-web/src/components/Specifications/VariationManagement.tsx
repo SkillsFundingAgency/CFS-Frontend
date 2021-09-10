@@ -1,17 +1,18 @@
-import { LoadingStatus } from "../LoadingStatus";
-import { NoData } from "../NoData";
+import { AxiosError } from "axios";
 import * as React from "react";
 import { useState } from "react";
-import { ProfileVariationPointer } from "../../types/Specifications/ProfileVariationPointer";
-import { mergeProfileVariationPointersService } from "../../services/specificationService";
-import { ErrorProps } from "../../hooks/useErrors";
-import ProfilePatternSelector from "../Funding/ProfilePatternSelector";
 import { useQuery } from "react-query";
-import { AxiosError } from "axios";
-import { getAvailableFundingLinePeriods } from "../../services/publishService";
-import { AvailableVariationPointerFundingLine } from "../../types/Publishing/AvailableVariationPointerFundingLine";
+
+import { ErrorProps } from "../../hooks/useErrors";
 import { useProfileVariationPointers } from "../../hooks/Variation/useProfileVariationPointers";
+import { getAvailableFundingLinePeriods } from "../../services/publishService";
+import { mergeProfileVariationPointersService } from "../../services/specificationService";
+import { AvailableVariationPointerFundingLine } from "../../types/Publishing/AvailableVariationPointerFundingLine";
+import { ProfileVariationPointer } from "../../types/Specifications/ProfileVariationPointer";
+import ProfilePatternSelector from "../Funding/ProfilePatternSelector";
+import { LoadingStatus } from "../LoadingStatus";
 import { LoadingStatusNotifier } from "../LoadingStatusNotifier";
+import { NoData } from "../NoData";
 
 export interface VariationManagementProps {
   specificationId: string;

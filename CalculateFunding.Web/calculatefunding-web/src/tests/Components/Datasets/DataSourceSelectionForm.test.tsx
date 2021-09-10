@@ -1,18 +1,19 @@
 ﻿import { render, screen, within } from "@testing-library/react";
 import React from "react";
-import { DatasetRelationshipType } from "../../../types/Datasets/DatasetRelationshipType";
+
 import { DataSourceSelectionForm } from "../../../components/DatasetMapping/DataSourceSelectionForm";
-import { DataSourceSelection } from "../../../types/Datasets/DataSourceSelection";
-import {
-  DatasetWithVersions,
-  DataSourceRelationshipResponseViewModel,
-} from "../../../types/Datasets/DataSourceRelationshipResponseViewModel";
+import { DatasetRelationshipType } from "../../../types/Datasets/DatasetRelationshipType";
 import {
   DatasetChangeType,
   DatasetVersionDetails,
   DatasetVersionSearchResponse,
 } from "../../../types/Datasets/DatasetVersionSearchResponse";
 import { DatasetVersionSummary } from "../../../types/Datasets/DatasetVersionSummary";
+import {
+  DataSourceRelationshipResponseViewModel,
+  DatasetWithVersions,
+} from "../../../types/Datasets/DataSourceRelationshipResponseViewModel";
+import { DataSourceSelection } from "../../../types/Datasets/DataSourceSelection";
 
 const renderComponent = (props: {
   selection: DataSourceSelection;

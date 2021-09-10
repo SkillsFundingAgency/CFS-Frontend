@@ -1,50 +1,50 @@
-import React from 'react';
-import {LoadingStatus} from "../../components/LoadingStatus";
+import React from "react";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+import { LoadingStatus } from "../../components/LoadingStatus";
 
-describe('<LoadingStatus />', () => {
+const Adapter = require("enzyme-adapter-react-16");
+const enzyme = require("enzyme");
+enzyme.configure({ adapter: new Adapter() });
+const { shallow } = enzyme;
 
-    it(' renders a loading status', () => {
-        const wrapper = shallow(<LoadingStatus id={"testLoading"} title={"test title"} />);
+describe("<LoadingStatus />", () => {
+  it(" renders a loading status", () => {
+    const wrapper = shallow(<LoadingStatus id={"testLoading"} title={"test title"} />);
 
-        const actual = wrapper.find("#testLoading");
+    const actual = wrapper.find("#testLoading");
 
-        expect(actual.children().length).toBe(1);
-    });
+    expect(actual.children().length).toBe(1);
+  });
 
-    it(' has the correct title', () => {
-        const wrapper = shallow(<LoadingStatus title={"test title"} />);
+  it(" has the correct title", () => {
+    const wrapper = shallow(<LoadingStatus title={"test title"} />);
 
-        const actual = wrapper.find('h2.govuk-heading-l');
+    const actual = wrapper.find("h2.govuk-heading-l");
 
-        expect(actual.text() === "test title").toBeTruthy();
-    });
+    expect(actual.text() === "test title").toBeTruthy();
+  });
 
-    it(' has the correct sub title', () => {
-        const wrapper = shallow(<LoadingStatus title={"test title"} subTitle={"test sub title"} />);
+  it(" has the correct sub title", () => {
+    const wrapper = shallow(<LoadingStatus title={"test title"} subTitle={"test sub title"} />);
 
-        const actual = wrapper.find('h3.govuk-heading-m');
+    const actual = wrapper.find("h3.govuk-heading-m");
 
-        expect(actual.text() === "test sub title").toBeTruthy();
-    });
+    expect(actual.text() === "test sub title").toBeTruthy();
+  });
 
-    it(' has the correct description', () => {
-        const wrapper = shallow(<LoadingStatus title={"test title"}  description={"test description"} />);
+  it(" has the correct description", () => {
+    const wrapper = shallow(<LoadingStatus title={"test title"} description={"test description"} />);
 
-        const actual = wrapper.find('p');
+    const actual = wrapper.find("p");
 
-        expect(actual.text() === "test description").toBeTruthy();
-    });
+    expect(actual.text() === "test description").toBeTruthy();
+  });
 
-    it(' hides component given hidden property is set to true', () => {
-        const wrapper = shallow(<LoadingStatus id={"testLoading"} title={"test title"}  hidden={true} />);
+  it(" hides component given hidden property is set to true", () => {
+    const wrapper = shallow(<LoadingStatus id={"testLoading"} title={"test title"} hidden={true} />);
 
-        const actual = wrapper.find("#testLoading");
+    const actual = wrapper.find("#testLoading");
 
-        expect(actual.props().hidden).toBeTruthy();
-    });
+    expect(actual.props().hidden).toBeTruthy();
+  });
 });

@@ -1,4 +1,4 @@
 ﻿export interface BatchUploadResponse {
-    batchId: string,
-    url: string
+  batchId: string;
+  url: string;
 }

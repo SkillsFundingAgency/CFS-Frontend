@@ -1,3 +1,3 @@
-import {useEffect} from "react";
+import { useEffect } from "react";
 
-export const useEffectOnce = (func:any) => useEffect(func, []);
+export const useEffectOnce = (func: any) => useEffect(func, []);

@@ -1,11 +1,12 @@
-import React from "react";
-import { render, waitFor, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createLocation, createMemoryHistory } from "history";
-import { match, MemoryRouter } from "react-router";
-import { EditVariationPointsRouteProps } from "../../../pages/Specifications/EditVariationPoints";
+import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import * as specificationService from "../../../services/specificationService";
+import { MemoryRouter,match } from "react-router";
+
+import { EditVariationPointsRouteProps } from "../../../pages/Specifications/EditVariationPoints";
 import * as profilingService from "../../../services/profilingService";
+import * as specificationService from "../../../services/specificationService";
 
 jest.mock("../../../components/AdminNav");
 

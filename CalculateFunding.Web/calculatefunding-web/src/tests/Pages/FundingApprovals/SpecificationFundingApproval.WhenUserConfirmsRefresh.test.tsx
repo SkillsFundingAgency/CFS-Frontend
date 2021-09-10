@@ -1,118 +1,121 @@
-﻿import React from 'react';
-import {act, render, screen, waitFor, within} from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import * as redux from "react-redux";
-import {FundingApprovalTestData} from "./FundingApprovalTestData";
-import {ValidationErrors} from "../../../types/ErrorMessage";
-import {createMockAxiosError} from "../../fakes/fakeAxios";
-import * as publishService from "../../../services/publishService";
-import userEvent from "@testing-library/user-event";
+﻿import "@testing-library/jest-dom/extend-expect";
 
-const useSelectorSpy = jest.spyOn(redux, 'useSelector');
+import { act, render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import React from "react";
+import * as redux from "react-redux";
+
+import * as publishService from "../../../services/publishService";
+import { ValidationErrors } from "../../../types/ErrorMessage";
+import { createMockAxiosError } from "../../fakes/fakeAxios";
+import { FundingApprovalTestData } from "./FundingApprovalTestData";
+
+const useSelectorSpy = jest.spyOn(redux, "useSelector");
 const test = FundingApprovalTestData();
 
 describe("<SpecificationFundingApproval />", () => {
-    afterEach(() => jest.clearAllMocks());
+  afterEach(() => jest.clearAllMocks());
 
-    describe("when user confirms refresh", () => {
+  describe("when user confirms refresh", () => {
+    describe("and there is a validation error", () => {
+      const mockValidationErrors: ValidationErrors = {
+        "error-message": ["stack overflow", "divide by zero"],
+        "": ["hello error"],
+      };
+      const mockValidationError = jest
+        .fn()
+        .mockRejectedValue(createMockAxiosError(mockValidationErrors, 400));
 
-        describe("and there is a validation error", () => {
-            const mockValidationErrors: ValidationErrors = {
-                "error-message": ["stack overflow", "divide by zero"],
-                "": ["hello error"]
-            }
-            const mockValidationError = jest.fn().mockRejectedValue(createMockAxiosError(mockValidationErrors, 400));
+      beforeEach(async () => {
+        useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
+        test.hasSpecification();
+        test.hasNoActiveJobsRunning();
+        test.hasFundingConfigurationWithApproveAll();
+        test.hasFullSpecPermissions();
+        test.hasProvidersWithErrors([]);
+        test.hasSearchResults([test.provider1]);
+        jest
+          .spyOn(publishService, "preValidateForRefreshFundingService")
+          .mockImplementation(mockValidationError);
 
-            beforeEach(async () => {
-                useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-                test.hasSpecification();
-                test.hasNoActiveJobsRunning();
-                test.hasFundingConfigurationWithApproveAll();
-                test.hasFullSpecPermissions();
-                test.hasProvidersWithErrors([]);
-                test.hasSearchResults([test.provider1]);
-                jest.spyOn(publishService, 'preValidateForRefreshFundingService')
-                    .mockImplementation(mockValidationError);
+        await test.loadPage();
+      });
+      afterEach(() => {
+        jest.clearAllMocks();
+      });
 
-                await test.loadPage();
-            });
-            afterEach(() => {
-                jest.clearAllMocks();
-            });
+      it("renders error summary", async () => {
+        const refreshButtons = screen.getAllByRole("button", { name: /Refresh funding/ });
 
-            it('renders error summary', async () => {
-                const refreshButtons = screen.getAllByRole("button", {name: /Refresh funding/});
+        userEvent.click(refreshButtons[0]);
 
-                userEvent.click(refreshButtons[0]);
+        await waitFor(() => expect(mockValidationError).toHaveBeenCalledWith(test.testSpec.id));
 
-                await waitFor(() => expect(mockValidationError).toHaveBeenCalledWith(test.testSpec.id));
+        const errorSummary = await screen.findByTestId("error-summary");
+        expect(errorSummary).toBeInTheDocument();
+        expect(within(errorSummary).getByText("There is a problem")).toBeInTheDocument();
+        expect(within(errorSummary).getByText(/stack overflow/)).toBeInTheDocument();
+        expect(within(errorSummary).getByText(/divide by zero/)).toBeInTheDocument();
+        expect(within(errorSummary).getByText(/hello error/)).toBeInTheDocument();
 
-                const errorSummary = await screen.findByTestId("error-summary");
-                expect(errorSummary).toBeInTheDocument();
-                expect(within(errorSummary).getByText("There is a problem")).toBeInTheDocument();
-                expect(within(errorSummary).getByText(/stack overflow/)).toBeInTheDocument();
-                expect(within(errorSummary).getByText(/divide by zero/)).toBeInTheDocument();
-                expect(within(errorSummary).getByText(/hello error/)).toBeInTheDocument();
-
-                expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
-            });
-        });
-
-        describe("and there are no validation errors", () => {
-            const mockNoValidationError = jest.fn().mockResolvedValueOnce({
-                status: 200,
-                data: []
-            });
-            const mockJobCreated = jest.fn().mockResolvedValueOnce({
-                jobId: "12345"
-            });
-
-            beforeEach(() => {
-                useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-                test.hasSpecification();
-                test.hasNoActiveJobsRunning();
-                test.hasLastRefreshJob();
-                test.hasFundingConfigurationWithApproveAll();
-                test.hasFullSpecPermissions();
-                test.hasProvidersWithErrors([]);
-                test.hasSearchResults([test.provider1]);
-                test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
-                jest.spyOn(publishService, 'preValidateForRefreshFundingService')
-                    .mockImplementation(mockNoValidationError);
-                jest.spyOn(publishService, 'refreshSpecificationFundingService')
-                    .mockImplementation(mockJobCreated);
-
-                test.loadPage();
-            });
-            afterEach(() => {
-                jest.clearAllMocks();
-            });
-
-            it('renders refresh button as enabled', async () => {
-                const buttons = screen.getAllByRole("button", {name: /Refresh funding/});
-                expect(buttons).toHaveLength(2);
-                expect(buttons[0]).toBeEnabled();
-                expect(buttons[1]).toBeEnabled();
-            });
-
-            it('renders modal confirmation', async () => {
-                const refreshButtons = screen.getAllByRole("button", {name: /Refresh funding/});
-
-                userEvent.click(refreshButtons[0]);
-
-                await waitFor(() => expect(mockNoValidationError).toHaveBeenCalledWith(test.testSpec.id));
-
-                expect(await screen.findByTestId("modal-confirmation-placeholder")).toBeInTheDocument();
-                expect(screen.getByRole("heading", {name: /Confirm funding refresh/})).toBeInTheDocument();
-                expect(screen.getByRole("button", {name: /Cancel/})).toBeInTheDocument();
-                const confirmButton = screen.getByRole("button", {name: /Confirm/});
-                expect(confirmButton).toBeInTheDocument();
-
-                act(() => userEvent.click(confirmButton));
-
-                await waitFor(() => expect(mockJobCreated).toHaveBeenCalledWith(test.testSpec.id));
-            });
-        });
+        expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
+      });
     });
-});
 
+    describe("and there are no validation errors", () => {
+      const mockNoValidationError = jest.fn().mockResolvedValueOnce({
+        status: 200,
+        data: [],
+      });
+      const mockJobCreated = jest.fn().mockResolvedValueOnce({
+        jobId: "12345",
+      });
+
+      beforeEach(() => {
+        useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
+        test.hasSpecification();
+        test.hasNoActiveJobsRunning();
+        test.hasLastRefreshJob();
+        test.hasFundingConfigurationWithApproveAll();
+        test.hasFullSpecPermissions();
+        test.hasProvidersWithErrors([]);
+        test.hasSearchResults([test.provider1]);
+        test.hasSearchResultsWithProviderIds([test.provider1], [test.provider1.publishedProviderVersionId]);
+        jest
+          .spyOn(publishService, "preValidateForRefreshFundingService")
+          .mockImplementation(mockNoValidationError);
+        jest.spyOn(publishService, "refreshSpecificationFundingService").mockImplementation(mockJobCreated);
+
+        test.loadPage();
+      });
+      afterEach(() => {
+        jest.clearAllMocks();
+      });
+
+      it("renders refresh button as enabled", async () => {
+        const buttons = screen.getAllByRole("button", { name: /Refresh funding/ });
+        expect(buttons).toHaveLength(2);
+        expect(buttons[0]).toBeEnabled();
+        expect(buttons[1]).toBeEnabled();
+      });
+
+      it("renders modal confirmation", async () => {
+        const refreshButtons = screen.getAllByRole("button", { name: /Refresh funding/ });
+
+        userEvent.click(refreshButtons[0]);
+
+        await waitFor(() => expect(mockNoValidationError).toHaveBeenCalledWith(test.testSpec.id));
+
+        expect(await screen.findByTestId("modal-confirmation-placeholder")).toBeInTheDocument();
+        expect(screen.getByRole("heading", { name: /Confirm funding refresh/ })).toBeInTheDocument();
+        expect(screen.getByRole("button", { name: /Cancel/ })).toBeInTheDocument();
+        const confirmButton = screen.getByRole("button", { name: /Confirm/ });
+        expect(confirmButton).toBeInTheDocument();
+
+        act(() => userEvent.click(confirmButton));
+
+        await waitFor(() => expect(mockJobCreated).toHaveBeenCalledWith(test.testSpec.id));
+      });
+    });
+  });
+});

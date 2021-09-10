@@ -1,8 +1,7 @@
-﻿import {TemplateItemType} from "./TemplateItemType";
+﻿import { TemplateItemType } from "./TemplateItemType";
 
 export interface PublishedSpecificationTemplateMetadata {
-    name: string;
-    templateId: number;
-    type: TemplateItemType
+  name: string;
+  templateId: number;
+  type: TemplateItemType;
 }
-

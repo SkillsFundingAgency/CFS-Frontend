@@ -1,2 +1,2 @@
 // json-digger.d.ts
-declare module 'json-digger';
+declare module "json-digger";

@@ -1,84 +1,103 @@
-import React, {useLayoutEffect, useRef, useState} from "react";
-import {useErrors} from "../../hooks/useErrors";
-import {CharacterRestrictions} from "../../types/CharacterRestrictions";
-import {ErrorMessage} from "../../types/ErrorMessage";
+import React, { useLayoutEffect, useRef, useState } from "react";
+
+import { useErrors } from "../../hooks/useErrors";
+import { CharacterRestrictions } from "../../types/CharacterRestrictions";
+import { ErrorMessage } from "../../types/ErrorMessage";
 
 export function RadioSearch(props: {
-    text: string;
-    selectedSearchType: string | undefined;
-    timeout: number;
-    radioId: string,
-    radioName: string,
-    searchType: string,
-    minimumChars: number,
-    maximumChars?: number,
-    characterRestrictions: CharacterRestrictions
-    callback: any
+  text: string;
+  selectedSearchType: string | undefined;
+  timeout: number;
+  radioId: string;
+  radioName: string;
+  searchType: string;
+  minimumChars: number;
+  maximumChars?: number;
+  characterRestrictions: CharacterRestrictions;
+  callback: any;
 }) {
-    const [searchQuery, setSearchQuery] = useState({
-        searchName: props.radioName,
-        searchValue: ""
-    });
-    const didMount = useRef(false);
+  const [searchQuery, setSearchQuery] = useState({
+    searchName: props.radioName,
+    searchValue: "",
+  });
+  const didMount = useRef(false);
 
-    const {errors, addError, clearErrorMessages} = useErrors();
+  const { errors, addError, clearErrorMessages } = useErrors();
 
-    useLayoutEffect(() => {
-        if (didMount.current) {
-            if (searchQuery.searchValue.length >= props.minimumChars || searchQuery.searchValue.length === 0) {
-                const timeout = setTimeout(() => props.callback(searchQuery.searchName, searchQuery.searchValue), props.timeout ?? 900);
-                return () => clearTimeout(timeout);
-            }
-        } else {
-            didMount.current = true;
-        }
-    }, [searchQuery]);
+  useLayoutEffect(() => {
+    if (didMount.current) {
+      if (searchQuery.searchValue.length >= props.minimumChars || searchQuery.searchValue.length === 0) {
+        const timeout = setTimeout(
+          () => props.callback(searchQuery.searchName, searchQuery.searchValue),
+          props.timeout ?? 900
+        );
+        return () => clearTimeout(timeout);
+      }
+    } else {
+      didMount.current = true;
+    }
+  }, [searchQuery]);
 
-    function updateSearch(name: string, value: string) {
-        let searchValid = true;
-        if (props.characterRestrictions === CharacterRestrictions.NumericOnly) {
-            const regEx = new RegExp("[^0-9]");
-            if (regEx.test(value)) {
-                addError({error: "Numeric characters only", description: "Only numbers allowed"});
-                searchValid = false;
-            } else {
-                clearErrorMessages();
-            }
-        } else if (props.characterRestrictions === CharacterRestrictions.AlphaOnly) {
-            const regEx = new RegExp("[^0-9]");
-            if (!regEx.test(value)) {
-                addError({error: "Alpha characters only", description: "Only letters allowed"});
-                searchValid = false;
-            } else {
-                clearErrorMessages();
-            }
-        }
-
-        if (searchValid) {
-            setSearchQuery(() => {
-                return {
-                    searchName: name,
-                    searchValue: value
-                }
-            });
-        }
+  function updateSearch(name: string, value: string) {
+    let searchValid = true;
+    if (props.characterRestrictions === CharacterRestrictions.NumericOnly) {
+      const regEx = new RegExp("[^0-9]");
+      if (regEx.test(value)) {
+        addError({ error: "Numeric characters only", description: "Only numbers allowed" });
+        searchValid = false;
+      } else {
+        clearErrorMessages();
+      }
+    } else if (props.characterRestrictions === CharacterRestrictions.AlphaOnly) {
+      const regEx = new RegExp("[^0-9]");
+      if (!regEx.test(value)) {
+        addError({ error: "Alpha characters only", description: "Only letters allowed" });
+        searchValid = false;
+      } else {
+        clearErrorMessages();
+      }
     }
 
-    function setSearch(name: string) {
-        props.callback(name, null);
+    if (searchValid) {
+      setSearchQuery(() => {
+        return {
+          searchName: name,
+          searchValue: value,
+        };
+      });
     }
+  }
 
-    return <div className={"govuk-radios__item"}>
-        <label className={"govuk-radios__label"} htmlFor={props.radioId}><input type="radio" className={"govuk-radios__input"}
-               id={props.radioId}
-               name={props.radioName} onChange={() => setSearch(props.searchType)}/>
-        {props.text}</label>
-        <div className="govuk-inset-text" hidden={props.selectedSearchType !== props.searchType}>
-            <input role={'searchTerm'} className={"govuk-input" + (errors.length > 0 ? " govuk-input--error" : "")} type={"text"}
-                   onChange={(e) => updateSearch(props.searchType, e.target.value)}
-                   maxLength={props.maximumChars}></input>
-            {(errors as ErrorMessage[]).map((err, index) => <span key={index}
-                                                                  className={"govuk-error-message"}>{err.message}</span>)}
-        </div>
+  function setSearch(name: string) {
+    props.callback(name, null);
+  }
+
+  return (
+    <div className={"govuk-radios__item"}>
+      <label className={"govuk-radios__label"} htmlFor={props.radioId}>
+        <input
+          type="radio"
+          className={"govuk-radios__input"}
+          id={props.radioId}
+          name={props.radioName}
+          onChange={() => setSearch(props.searchType)}
+        />
+        {props.text}
+      </label>
+      <div className="govuk-inset-text" hidden={props.selectedSearchType !== props.searchType}>
+        <input
+          role={"searchTerm"}
+          className={"govuk-input" + (errors.length > 0 ? " govuk-input--error" : "")}
+          type={"text"}
+          onChange={(e) => updateSearch(props.searchType, e.target.value)}
+          maxLength={props.maximumChars}
+        ></input>
+        {(errors as ErrorMessage[]).map((err, index) => (
+          <span key={index} className={"govuk-error-message"}>
+            {err.message}
+          </span>
+        ))}
+      </div>
     </div>
+  );
 }

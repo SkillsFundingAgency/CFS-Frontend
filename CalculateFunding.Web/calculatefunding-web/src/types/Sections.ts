@@ -1,9 +1,9 @@
-export enum Section{
-    Home,
-    Specifications,
-    Datasets,
-    Tests,
-    Results,
-    Approvals,
-    Templates
+export enum Section {
+  Home,
+  Specifications,
+  Datasets,
+  Tests,
+  Results,
+  Approvals,
+  Templates,
 }

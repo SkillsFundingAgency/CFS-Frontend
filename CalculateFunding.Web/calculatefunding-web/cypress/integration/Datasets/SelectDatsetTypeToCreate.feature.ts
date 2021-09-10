@@ -9,7 +9,7 @@ context("When creating a new data set, I want to specify whether from Released o
   let server: Server;
 
   before(() => {
-    server = makeServer({environment: "test"});
+    server = makeServer({ environment: "test" });
     setup();
   });
   afterEach(() => {
@@ -50,18 +50,16 @@ context("When creating a new data set, I want to specify whether from Released o
 
   describe("when user selects Uploaded option and then Continue", () => {
     before(() => {
-      server = makeServer({environment: "test"});
+      server = makeServer({ environment: "test" });
       setup();
     });
     it("goes to correct page", () => {
-      
       cy.findByRole("link", { name: data.spec1.name }).should("exist");
       cy.findByRole("radio", { name: /Uploaded data/ }).check();
       cy.findByRole("button", { name: /Continue/ }).click();
       cy.url().should("include", `/Datasets/CreateDataset/${data.spec1.id}`);
     });
   });
-
 
   function setup() {
     server.get("/specs/*", (schema, request) => {

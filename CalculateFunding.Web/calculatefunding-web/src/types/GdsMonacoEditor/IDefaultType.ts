@@ -1,11 +1,11 @@
-import {IDefaultMemberTypeContainer} from "./IDefaultMemberTypeContainer";
+import { IDefaultMemberTypeContainer } from "./IDefaultMemberTypeContainer";
 
 export interface IDefaultType {
-    label: string;
+  label: string;
 
-    description?: string;
+  description?: string;
 
-    items: IDefaultMemberTypeContainer;
+  items: IDefaultMemberTypeContainer;
 
-    isObsolete: boolean;
+  isObsolete: boolean;
 }

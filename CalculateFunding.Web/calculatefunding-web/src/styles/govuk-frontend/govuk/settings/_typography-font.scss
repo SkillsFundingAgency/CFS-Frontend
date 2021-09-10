@@ -16,9 +16,8 @@
 
 $govuk-use-legacy-font: if(
   (
-    $govuk-compatibility-govukfrontendtoolkit or
-    $govuk-compatibility-govuktemplate or
-    $govuk-compatibility-govukelements
+    $govuk-compatibility-govukfrontendtoolkit or $govuk-compatibility-govuktemplate or
+      $govuk-compatibility-govukelements
   ),
   true,
   false
@@ -44,11 +43,7 @@ $govuk-font-family: if(
 /// @type List
 /// @access public
 
-$govuk-font-family-tabular: if(
-  $govuk-use-legacy-font,
-  $govuk-font-family-nta-tabular,
-  false
-) !default;
+$govuk-font-family-tabular: if($govuk-use-legacy-font, $govuk-font-family-nta-tabular, false) !default;
 
 /// Font families to use for print media
 ///
@@ -68,9 +63,7 @@ $govuk-font-family-print: sans-serif !default;
 /// @type Boolean
 /// @access public
 
-$govuk-include-default-font-face: (
-  $govuk-font-family == $govuk-font-family-gds-transport
-) !default;
+$govuk-include-default-font-face: ($govuk-font-family == $govuk-font-family-gds-transport) !default;
 
 // =========================================================
 // Font weights

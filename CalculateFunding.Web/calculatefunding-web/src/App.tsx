@@ -1,82 +1,81 @@
+import "./App.scss";
+
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { QueryClient, QueryClientProvider } from "react-query";
+import { ReactQueryDevtools } from "react-query/devtools";
+import { useDispatch, useSelector } from "react-redux";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { IStoreState } from "./reducers/rootReducer";
-import { FeatureFlagsState } from "./states/FeatureFlagsState";
+
+import { getFeatureFlags } from "./actions/FeatureFlagsActions";
 import {
   getHasUserConfirmedSkills,
   getUserFundingStreamPermissions,
   userActionGetUser,
 } from "./actions/userAction";
-import "./App.scss";
-import { Footer } from "./components/Footer";
-import { Section } from "./types/Sections";
-import { Home } from "./pages/Home";
-import { Header } from "./components/Header";
-import { ViewResults } from "./pages/ViewResults";
-import { ViewCalculationResults } from "./pages/ViewCalculationResults";
-import { ProviderFundingOverview } from "./pages/FundingApprovals/ProviderFundingOverview";
-import { CreateSpecification } from "./pages/Specifications/CreateSpecification";
-import { CreateDatasetFromUpload } from "./pages/Datasets/Create/CreateDatasetFromUpload";
-import { EditSpecification } from "./pages/Specifications/EditSpecification";
-import { ListTemplates } from "./pages/Templates/ListTemplates";
-import { PublishTemplate } from "./pages/Templates/PublishTemplate";
-import { EditTemplate } from "./pages/Templates/EditTemplate";
-import { CreateTemplate } from "./pages/Templates/CreateTemplate";
-import { CloneTemplate } from "./pages/Templates/CloneTemplate";
-import { ListVersions } from "./pages/Templates/ListVersions";
-import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
-import { SpecificationsList } from "./pages/Specifications/SpecificationsList";
-import { ViewSpecificationResults } from "./pages/Specifications/ViewSpecificationResults";
-import { ViewSpecification } from "./pages/Specifications/ViewSpecification";
-import { CreateAdditionalCalculation } from "./pages/Calculations/CreateAdditionalCalculation";
-import { ManageData } from "./pages/Datasets/ManageData";
-import { EditVariationPoints } from "./pages/Specifications/EditVariationPoints";
-import { CalculationVersionHistory } from "./pages/Calculations/CalculationVersionHistory";
-import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprovalSelection";
-import { getFeatureFlags } from "./actions/FeatureFlagsActions";
-import { DownloadDataSchema } from "./pages/Datasets/DownloadDataSchema";
-import { DatasetHistory } from "./pages/Datasets/DatasetHistory";
-import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
-import { LoadNewDataSource } from "./pages/Datasets/LoadNewDataSource";
-import { ManageDataSourceFiles } from "./pages/Datasets/ManageDataSourceFiles";
-import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
-import { MapDataSourceFiles } from "./pages/Datasets/MapDataSourceFiles";
-import { ViewProvidersFundingStreamSelection } from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
-import { ViewProvidersByFundingStream } from "./pages/ViewResults/ViewProvidersByFundingStream";
-import { DataRelationships } from "./pages/Datasets/DataRelationships";
-import { ViewProviderResults } from "./pages/ViewResults/ViewProviderResults";
-import { MyPermissions } from "./pages/Permissions/MyPermissions";
 import { ConfirmationModal } from "./components/ConfirmationModal";
-import { ConfirmSkills } from "./pages/ConfirmSkills";
+import { Footer } from "./components/Footer";
+import { Header } from "./components/Header";
 import { LoadingStatus } from "./components/LoadingStatus";
-import { CompareCalculationVersions } from "./pages/Calculations/CompareCalculationVersions";
-import { ViewEditFundingLineProfile } from "./pages/FundingApprovals/ViewEditFundingLineProfile";
-import { ChangeProfileType } from "./pages/FundingApprovals/ChangeProfileType";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { ReactQueryDevtools } from "react-query/devtools";
-import { ProfileHistory } from "./pages/FundingApprovals/ProfileHistory";
-import { EditCalculation } from "./pages/Calculations/EditCalculation";
-import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
-import { RefreshSql } from "./pages/Datasets/RefreshSql";
-import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
-import {
-  initialiseAppInsights,
-  setAppInsightsAuthenticatedUser,
-} from "./services/appInsightsService";
+import { AppContextWrapper } from "./context/AppContextWrapper";
 import { useEffectOnce } from "./hooks/useEffectOnce";
-import { Admin } from "./pages/Permissions/Admin";
-import { IndividualPermissionsAdmin } from "./pages/Permissions/IndividualPermissionsAdmin";
-import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
+import { CalculationVersionHistory } from "./pages/Calculations/CalculationVersionHistory";
+import { CompareCalculationVersions } from "./pages/Calculations/CompareCalculationVersions";
+import { CreateAdditionalCalculation } from "./pages/Calculations/CreateAdditionalCalculation";
+import { EditCalculation } from "./pages/Calculations/EditCalculation";
+import { ConfirmSkills } from "./pages/ConfirmSkills";
+import { ConfirmDatasetToCreate } from "./pages/Datasets/Create/ConfirmDatasetToCreate";
+import { CreateDatasetFromUpload } from "./pages/Datasets/Create/CreateDatasetFromUpload";
+import { SelectDatasetTemplateItems } from "./pages/Datasets/Create/SelectDatasetTemplateItems";
 import { SelectDatasetTypeToCreate } from "./pages/Datasets/Create/SelectDatasetTypeToCreate";
 import { SelectReferenceSpecification } from "./pages/Datasets/Create/SelectReferenceSpecification";
 import { SpecifyDatasetDetails } from "./pages/Datasets/Create/SpecifyDatasetDetails";
-import { SelectDatasetTemplateItems } from "./pages/Datasets/Create/SelectDatasetTemplateItems";
-import { ConfirmDatasetToCreate } from "./pages/Datasets/Create/ConfirmDatasetToCreate";
-import { AppContextWrapper } from "./context/AppContextWrapper";
-import { EditDatasetReferencingReleased } from "./pages/Datasets/Edit/EditDatasetReferencingReleased";
+import { DataRelationships } from "./pages/Datasets/DataRelationships";
+import { DatasetHistory } from "./pages/Datasets/DatasetHistory";
+import { DownloadDataSchema } from "./pages/Datasets/DownloadDataSchema";
 import { ConfirmDatasetToEdit } from "./pages/Datasets/Edit/ConfirmDatasetToEdit";
+import { EditDatasetReferencingReleased } from "./pages/Datasets/Edit/EditDatasetReferencingReleased";
+import { LoadNewDataSource } from "./pages/Datasets/LoadNewDataSource";
+import { ManageData } from "./pages/Datasets/ManageData";
+import { ManageDataSourceFiles } from "./pages/Datasets/ManageDataSourceFiles";
 import { SelectDataSource } from "./pages/Datasets/Map/SelectDataSource";
+import { MapDataSourceFiles } from "./pages/Datasets/MapDataSourceFiles";
+import { RefreshSql } from "./pages/Datasets/RefreshSql";
+import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
+import { ChangeProfileType } from "./pages/FundingApprovals/ChangeProfileType";
+import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
+import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprovalSelection";
+import { ProfileHistory } from "./pages/FundingApprovals/ProfileHistory";
+import { ProviderFundingOverview } from "./pages/FundingApprovals/ProviderFundingOverview";
+import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
+import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
+import { ViewEditFundingLineProfile } from "./pages/FundingApprovals/ViewEditFundingLineProfile";
+import { Home } from "./pages/Home";
+import { Admin } from "./pages/Permissions/Admin";
+import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
+import { IndividualPermissionsAdmin } from "./pages/Permissions/IndividualPermissionsAdmin";
+import { MyPermissions } from "./pages/Permissions/MyPermissions";
+import { CreateSpecification } from "./pages/Specifications/CreateSpecification";
+import { EditSpecification } from "./pages/Specifications/EditSpecification";
+import { EditVariationPoints } from "./pages/Specifications/EditVariationPoints";
+import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
+import { SpecificationsList } from "./pages/Specifications/SpecificationsList";
+import { ViewSpecification } from "./pages/Specifications/ViewSpecification";
+import { ViewSpecificationResults } from "./pages/Specifications/ViewSpecificationResults";
+import { CloneTemplate } from "./pages/Templates/CloneTemplate";
+import { CreateTemplate } from "./pages/Templates/CreateTemplate";
+import { EditTemplate } from "./pages/Templates/EditTemplate";
+import { ListTemplates } from "./pages/Templates/ListTemplates";
+import { ListVersions } from "./pages/Templates/ListVersions";
+import { PublishTemplate } from "./pages/Templates/PublishTemplate";
+import { ViewCalculationResults } from "./pages/ViewCalculationResults";
+import { ViewResults } from "./pages/ViewResults";
+import { ViewProviderResults } from "./pages/ViewResults/ViewProviderResults";
+import { ViewProvidersByFundingStream } from "./pages/ViewResults/ViewProvidersByFundingStream";
+import { ViewProvidersFundingStreamSelection } from "./pages/ViewResults/ViewProvidersFundingStreamSelection";
+import { IStoreState } from "./reducers/rootReducer";
+import { initialiseAppInsights, setAppInsightsAuthenticatedUser } from "./services/appInsightsService";
+import { FeatureFlagsState } from "./states/FeatureFlagsState";
+import { Section } from "./types/Sections";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,17 +87,13 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FunctionComponent = () => {
-  const featureFlagsState: FeatureFlagsState = useSelector<
-    IStoreState,
-    FeatureFlagsState
-  >((state) => state.featureFlags);
+  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
+    (state) => state.featureFlags
+  );
   const hasConfirmedSkills: boolean | undefined = useSelector(
-    (state: IStoreState) =>
-      state.userState && state.userState.hasConfirmedSkills
+    (state: IStoreState) => state.userState && state.userState.hasConfirmedSkills
   );
-  const username: string = useSelector(
-    (state: IStoreState) => state.userState && state.userState.userName
-  );
+  const username: string = useSelector((state: IStoreState) => state.userState && state.userState.userName);
 
   const dispatch = useDispatch();
 
@@ -125,10 +120,7 @@ const App: React.FunctionComponent = () => {
   if (hasConfirmedSkills === undefined) {
     return (
       <div>
-        <LoadingStatus
-          title={"Loading"}
-          subTitle={"Please wait while the page is loading..."}
-        />
+        <LoadingStatus title={"Loading"} subTitle={"Please wait while the page is loading..."} />
         <Footer />
       </div>
     );
@@ -138,12 +130,7 @@ const App: React.FunctionComponent = () => {
       <BrowserRouter
         basename="/app"
         getUserConfirmation={(message, callback) =>
-          ConfirmationModal(
-            message,
-            callback,
-            "Leave this page",
-            "Stay on this page"
-          )
+          ConfirmationModal(message, callback, "Leave this page", "Stay on this page")
         }
       >
         <QueryClientProvider client={queryClient}>
@@ -152,14 +139,8 @@ const App: React.FunctionComponent = () => {
               <Route exact path="/">
                 <Home featureFlags={featureFlagsState} />
               </Route>
-              <Route
-                path="/Approvals/Select"
-                component={FundingApprovalSelection}
-              />
-              <Route
-                path="/Approvals/FundingApprovalSelection/"
-                component={FundingApprovalSelection}
-              />
+              <Route path="/Approvals/Select" component={FundingApprovalSelection} />
+              <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection} />
               <Route
                 path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
                 component={SpecificationFundingApproval}
@@ -185,26 +166,11 @@ const App: React.FunctionComponent = () => {
                 path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId"
                 component={ViewProviderResults}
               />
-              <Route
-                path="/SelectSpecification"
-                component={SelectSpecification}
-              />
-              <Route
-                path="/SpecificationsList"
-                component={SpecificationsList}
-              />
-              <Route
-                path="/ViewSpecificationResults/:specificationId"
-                component={ViewSpecificationResults}
-              />
-              <Route
-                path="/ViewSpecification/:specificationId"
-                component={ViewSpecification}
-              />
-              <Route
-                path="/ViewCalculationResults/:calculationId"
-                component={ViewCalculationResults}
-              />
+              <Route path="/SelectSpecification" component={SelectSpecification} />
+              <Route path="/SpecificationsList" component={SpecificationsList} />
+              <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
+              <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
+              <Route path="/ViewCalculationResults/:calculationId" component={ViewCalculationResults} />
               <Route
                 path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
                 component={ChangeProfileType}
@@ -221,48 +187,21 @@ const App: React.FunctionComponent = () => {
                 path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode"
                 component={ProfileHistory}
               />
-              <Route
-                path="/Datasets/CreateDataset/:specificationId"
-                component={CreateDatasetFromUpload}
-              />
+              <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetFromUpload} />
               <Route path="/Datasets/ManageData" component={ManageData} />
-              <Route
-                path="/Datasets/DownloadDataSchema"
-                component={DownloadDataSchema}
-              />
-              <Route
-                path="/Datasets/DatasetHistory/:datasetId"
-                component={DatasetHistory}
-              />
+              <Route path="/Datasets/DownloadDataSchema" component={DownloadDataSchema} />
+              <Route path="/Datasets/DatasetHistory/:datasetId" component={DatasetHistory} />
               <Route
                 path="/Datasets/UpdateDataSourceFile/:fundingStreamId/:datasetId"
                 component={UpdateDataSourceFile}
               />
-              <Route
-                path="/Datasets/LoadNewDataSource"
-                component={LoadNewDataSource}
-              />
-              <Route
-                path="/Datasets/ManageDataSourceFiles"
-                component={ManageDataSourceFiles}
-              />
-              <Route
-                path="/Datasets/DataRelationships/:specificationId"
-                component={DataRelationships}
-              />
-              <Route
-                path="/Datasets/MapDataSourceFiles"
-                component={MapDataSourceFiles}
-              />
-              <Route
-                path="/Datasets/SelectDataSource/:datasetRelationshipId"
-                component={SelectDataSource}
-              />
+              <Route path="/Datasets/LoadNewDataSource" component={LoadNewDataSource} />
+              <Route path="/Datasets/ManageDataSourceFiles" component={ManageDataSourceFiles} />
+              <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships} />
+              <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles} />
+              <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource} />
               <Route path="/Datasets/RefreshSql" component={RefreshSql} />
-              <Route
-                path="/Specifications/CreateSpecification"
-                component={CreateSpecification}
-              />
+              <Route path="/Specifications/CreateSpecification" component={CreateSpecification} />
               <Route
                 path="/Specifications/EditSpecification/:specificationId"
                 component={EditSpecification}
@@ -271,46 +210,28 @@ const App: React.FunctionComponent = () => {
                 <Route path="/Templates/List" component={ListTemplates} />
               )}
               {featureFlagsState.templateBuilderVisible && (
-                <Route
-                  path="/Templates/:templateId/Edit"
-                  component={EditTemplate}
-                />
+                <Route path="/Templates/:templateId/Edit" component={EditTemplate} />
               )}
               {featureFlagsState.templateBuilderVisible && (
-                <Route
-                  path="/Templates/:templateId/Versions/:version"
-                  component={EditTemplate}
-                />
+                <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate} />
               )}
               {featureFlagsState.templateBuilderVisible && (
-                <Route
-                  path="/Templates/:templateId/Versions"
-                  component={ListVersions}
-                />
+                <Route path="/Templates/:templateId/Versions" component={ListVersions} />
               )}
               {featureFlagsState.templateBuilderVisible && (
                 <Route path="/Templates/Create" component={CreateTemplate} />
               )}
               {featureFlagsState.templateBuilderVisible && (
-                <Route
-                  path="/Templates/:templateId/Clone/:version"
-                  component={CloneTemplate}
-                />
+                <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate} />
               )}
               {featureFlagsState.templateBuilderVisible && (
-                <Route
-                  path="/Templates/Publish/:templateId"
-                  component={PublishTemplate}
-                />
+                <Route path="/Templates/Publish/:templateId" component={PublishTemplate} />
               )}
               <Route
                 path="/Specifications/CreateAdditionalCalculation/:specificationId"
                 component={CreateAdditionalCalculation}
               />
-              <Route
-                path="/Specifications/EditCalculation/:calculationId"
-                component={EditCalculation}
-              />
+              <Route path="/Specifications/EditCalculation/:calculationId" component={EditCalculation} />
               <Route
                 path="/Specifications/EditVariationPoints/:specificationId/:fundingLineId"
                 component={EditVariationPoints}
@@ -323,19 +244,10 @@ const App: React.FunctionComponent = () => {
                 path="/Calculations/CompareCalculationVersions/:calculationId/:firstCalculationVersionId/:secondCalculationVersionId"
                 component={CompareCalculationVersions}
               />
-              <Route
-                path="/Permissions/MyPermissions"
-                component={MyPermissions}
-              />
+              <Route path="/Permissions/MyPermissions" component={MyPermissions} />
               <Route path="/Permissions/Admin" component={Admin} />
-              <Route
-                path="/Permissions/Individual"
-                component={IndividualPermissionsAdmin}
-              />
-              <Route
-                path="/Permissions/FundingStream"
-                component={FundingStreamPermissionsAdmin}
-              />
+              <Route path="/Permissions/Individual" component={IndividualPermissionsAdmin} />
+              <Route path="/Permissions/FundingStream" component={FundingStreamPermissionsAdmin} />
               {featureFlagsState.specToSpec && (
                 <>
                   <Route
@@ -372,10 +284,9 @@ const App: React.FunctionComponent = () => {
                 <NoMatch />
               </Route>
             </Switch>
-            {process.env.NODE_ENV === "development" &&
-              featureFlagsState.enableReactQueryDevTool && (
-                <ReactQueryDevtools initialIsOpen={false} />
-              )}
+            {process.env.NODE_ENV === "development" && featureFlagsState.enableReactQueryDevTool && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
           </AppContextWrapper>
         </QueryClientProvider>
       </BrowserRouter>
@@ -401,20 +312,13 @@ function NoMatch() {
     <div>
       <Header location={Section.Home} />
       <div className="govuk-width-container">
-        <main
-          className="govuk-main-wrapper govuk-main-wrapper--l"
-          id="main-content"
-          role="main"
-        >
+        <main className="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <h1 className="govuk-heading-xl">Page not found</h1>
+              <p className="govuk-body">If you typed the web address, check it is correct.</p>
               <p className="govuk-body">
-                If you typed the web address, check it is correct.
-              </p>
-              <p className="govuk-body">
-                If you pasted the web address, check you copied the entire
-                address.
+                If you pasted the web address, check you copied the entire address.
               </p>
             </div>
           </div>

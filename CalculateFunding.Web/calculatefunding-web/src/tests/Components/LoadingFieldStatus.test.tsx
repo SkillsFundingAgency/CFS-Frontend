@@ -1,34 +1,34 @@
-import React from 'react';
-import {LoadingFieldStatus} from "../../components/LoadingFieldStatus";
+import React from "react";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 
-describe('<LoadingFieldStatus />', () => {
+const Adapter = require("enzyme-adapter-react-16");
+const enzyme = require("enzyme");
+enzyme.configure({ adapter: new Adapter() });
+const { shallow } = enzyme;
 
-    it(' renders a loading status', () => {
-        const wrapper = shallow(<LoadingFieldStatus id={"testLoading"} title={"test title"} />);
+describe("<LoadingFieldStatus />", () => {
+  it(" renders a loading status", () => {
+    const wrapper = shallow(<LoadingFieldStatus id={"testLoading"} title={"test title"} />);
 
-        const actual = wrapper.find("#testLoading");
+    const actual = wrapper.find("#testLoading");
 
-        expect(actual.children().length).toBe(1);
-    });
+    expect(actual.children().length).toBe(1);
+  });
 
-    it(' has the correct description', () => {
-        const wrapper = shallow(<LoadingFieldStatus title={"test title"} hidden={false} />);
+  it(" has the correct description", () => {
+    const wrapper = shallow(<LoadingFieldStatus title={"test title"} hidden={false} />);
 
-        const actual = wrapper.find('span.loader-text');
+    const actual = wrapper.find("span.loader-text");
 
-        expect(actual.text() === "test title").toBeTruthy();
-    });
+    expect(actual.text() === "test title").toBeTruthy();
+  });
 
-    it(' hides component given hidden property is set to true', () => {
-        const wrapper = shallow(<LoadingFieldStatus id={"testLoading"} title={"test title"}  hidden={true} />);
+  it(" hides component given hidden property is set to true", () => {
+    const wrapper = shallow(<LoadingFieldStatus id={"testLoading"} title={"test title"} hidden={true} />);
 
-        const actual = wrapper.find("#testLoading>span");
+    const actual = wrapper.find("#testLoading>span");
 
-        expect(actual.props().hidden).toBeTruthy();
-    });
+    expect(actual.props().hidden).toBeTruthy();
+  });
 });

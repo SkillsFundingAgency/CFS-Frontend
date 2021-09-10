@@ -1,184 +1,187 @@
-import React from "react";
-import {CompletionStatus} from "../../../types/CompletionStatus";
-import {RunningStatus} from "../../../types/RunningStatus";
-import {JobType} from "../../../types/jobType";
-import {render, screen} from "@testing-library/react";
-import '@testing-library/jest-dom/extend-expect';
-import {
-    JobProgressNotificationBanner,
-    JobProgressNotificationBannerProps
-} from "../../../components/Jobs/JobProgressNotificationBanner";
-import {JobDetails, JobResponse} from "../../../types/jobDetails";
-import {getJobDetailsFromJobResponse} from "../../../helpers/jobDetailsHelper";
+import "@testing-library/jest-dom/extend-expect";
 
+import { render, screen } from "@testing-library/react";
+import React from "react";
+
+import {
+  JobProgressNotificationBanner,
+  JobProgressNotificationBannerProps,
+} from "../../../components/Jobs/JobProgressNotificationBanner";
+import { getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
+import { CompletionStatus } from "../../../types/CompletionStatus";
+import { JobDetails, JobResponse } from "../../../types/jobDetails";
+import { JobType } from "../../../types/jobType";
+import { RunningStatus } from "../../../types/RunningStatus";
 
 const renderComponent = (props: JobProgressNotificationBannerProps) => {
-    const {JobProgressNotificationBanner} = require("../../../components/Jobs/JobProgressNotificationBanner");
-    return render(<JobProgressNotificationBanner {...props} />);
+  const { JobProgressNotificationBanner } = require("../../../components/Jobs/JobProgressNotificationBanner");
+  return render(<JobProgressNotificationBanner {...props} />);
 };
 
-describe('<JobProgressNotificationBanner />', () => {
+describe("<JobProgressNotificationBanner />", () => {
+  it("renders correctly when job queued", () => {
+    const job = createTestJob(undefined, RunningStatus.Queued);
 
-    it("renders correctly when job queued", () => {
-        const job = createTestJob(undefined, RunningStatus.Queued);
+    renderComponent({ job });
 
-        renderComponent({job});
+    expect(screen.getByText("Job in queue: Mapping dataset"));
 
-        expect(screen.getByText("Job in queue: Mapping dataset"));
+    const outerDiv = screen.getByTestId("job-notification");
+    expect(outerDiv.className).toContain("govuk-error-summary-orange");
 
-        const outerDiv = screen.getByTestId('job-notification');
-        expect(outerDiv.className).toContain("govuk-error-summary-orange");
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
+    expect(screen.getByTestId("formatted-created-date")).toBeInTheDocument();
+    expect(screen.queryByText("Completed:")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("formatted-completed-date")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
+    expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
+  });
 
-        expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
-        expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
-        expect(screen.queryByText("Completed:")).not.toBeInTheDocument();
-        expect(screen.queryByTestId('formatted-completed-date')).not.toBeInTheDocument();
-        expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
-        expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
+  it("renders correctly when job in progress", () => {
+    const job = createTestJob(undefined, RunningStatus.InProgress);
+
+    renderComponent({ job });
+
+    expect(screen.getByText("Job in progress: Mapping dataset"));
+
+    const outerDiv = screen.getByTestId("job-notification");
+    expect(outerDiv.className).toContain("govuk-error-summary-orange");
+
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
+    expect(screen.getByTestId("formatted-created-date")).toBeInTheDocument();
+    expect(screen.queryByText("Completed:")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("formatted-completed-date")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
+    expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
+  });
+
+  it("renders custom heading and description when job in progress", () => {
+    const job = createTestJob(undefined, RunningStatus.InProgress);
+
+    renderComponent({
+      job,
+      jobInProgressOverride: {
+        heading: "custom in-progress heading",
+        description: "custom in-progress description",
+      },
     });
 
-    it("renders correctly when job in progress", () => {
-        const job = createTestJob(undefined, RunningStatus.InProgress);
+    expect(screen.getByRole("heading", { name: "custom in-progress heading" }));
+    expect(screen.getByText("custom in-progress description"));
+  });
 
-        renderComponent({job});
+  it("renders correctly when job completed successfully", () => {
+    const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
 
-        expect(screen.getByText("Job in progress: Mapping dataset"));
+    renderComponent({ job });
 
-        const outerDiv = screen.getByTestId('job-notification');
-        expect(outerDiv.className).toContain("govuk-error-summary-orange");
+    expect(screen.getByText("Job completed successfully: Mapping dataset"));
 
-        expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
-        expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
-        expect(screen.queryByText("Completed:")).not.toBeInTheDocument();
-        expect(screen.queryByTestId('formatted-completed-date')).not.toBeInTheDocument();
-        expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
-        expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
+    const outerDiv = screen.getByTestId("job-notification");
+    expect(outerDiv.className).toContain("govuk-error-summary-green");
+
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
+    expect(screen.getByTestId("formatted-created-date")).toBeInTheDocument();
+    expect(screen.getByText("Completed:"));
+    expect(screen.queryByTestId("formatted-completed-date")).toBeInTheDocument();
+    expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
+    expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
+  });
+
+  it("renders custom heading and description when job successful", () => {
+    const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
+
+    renderComponent({
+      job,
+      jobSuccessfulOverride: {
+        heading: "custom success heading",
+        description: "custom success description",
+      },
     });
 
-    it("renders custom heading and description when job in progress", () => {
-        const job = createTestJob(undefined, RunningStatus.InProgress);
+    expect(screen.getByRole("heading", { name: "custom success heading" }));
+    expect(screen.getByText("custom success description"));
+  });
 
-        renderComponent({
-            job, 
-            jobInProgressOverride: {
-                heading: 'custom in-progress heading',
-                description: 'custom in-progress description'
-            }
-        });
+  it("renders correctly when job failed", () => {
+    const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
 
-        expect(screen.getByRole('heading', {name: 'custom in-progress heading'}));
-        expect(screen.getByText('custom in-progress description'));
+    renderComponent({ job });
+
+    expect(screen.getByText("Job failed: Mapping dataset"));
+
+    const outerDiv = screen.getByTestId("job-notification");
+    expect(outerDiv.className).toContain("govuk-error-summary-red");
+
+    expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
+    expect(screen.getByTestId("formatted-created-date")).toBeInTheDocument();
+    expect(screen.getByText("Completed:"));
+    expect(screen.queryByTestId("formatted-completed-date")).toBeInTheDocument();
+    expect(screen.getByText(/Job ID/)).toBeInTheDocument();
+    expect(screen.getByText(/job-id-5472345/)).toBeInTheDocument();
+  });
+
+  it("renders custom heading and description when job failed", () => {
+    const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
+
+    renderComponent({
+      job,
+      jobFailedOverride: {
+        heading: "custom failure heading",
+        description: "custom failure description",
+      },
     });
 
-    it("renders correctly when job completed successfully", () => {
-        const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
+    expect(screen.getByRole("heading", { name: "custom failure heading" }));
+    expect(screen.getByText("custom failure description"));
+  });
 
-        renderComponent({job});
+  it("does not render status of successfully completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
 
-        expect(screen.getByText("Job completed successfully: Mapping dataset"));
+    renderComponent({ job, displaySuccessfulJob: false });
 
-        const outerDiv = screen.getByTestId('job-notification');
-        expect(outerDiv.className).toContain("govuk-error-summary-green");
+    expect(screen.queryByText("Job completed successfully: Mapping dataset")).not.toBeInTheDocument();
+  });
 
-        expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
-        expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
-        expect(screen.getByText("Completed:"));
-        expect(screen.queryByTestId('formatted-completed-date')).toBeInTheDocument();
-        expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
-        expect(screen.queryByText(job.jobId)).not.toBeInTheDocument();
-    });
+  it("renders status based on Queued completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(undefined, RunningStatus.Queued);
 
-    it("renders custom heading and description when job successful", () => {
-        const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
+    renderComponent({ job, displaySuccessfulJob: false });
 
-        renderComponent({
-            job,
-            jobSuccessfulOverride: {
-                heading: 'custom success heading',
-                description: 'custom success description'
-            }
-        });
+    expect(screen.getByText("Job in queue: Mapping dataset"));
+  });
 
-        expect(screen.getByRole('heading', {name: 'custom success heading'}));
-        expect(screen.getByText('custom success description'));
-    });
+  it("renders status based on InProgress completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(undefined, RunningStatus.InProgress);
 
-    it("renders correctly when job failed", () => {
-        const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
+    renderComponent({ job, displaySuccessfulJob: false });
 
-        renderComponent({job});
+    expect(screen.getByText("Job in progress: Mapping dataset"));
+  });
 
-        expect(screen.getByText("Job failed: Mapping dataset"));
+  it("renders status based on failed completed job given displaySuccessfulJob is false", () => {
+    const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
 
-        const outerDiv = screen.getByTestId('job-notification');
-        expect(outerDiv.className).toContain("govuk-error-summary-red");
+    renderComponent({ job, displaySuccessfulJob: false });
 
-        expect(screen.getByText(/Initiated by Harry Potter on/)).toBeInTheDocument();
-        expect(screen.getByTestId('formatted-created-date')).toBeInTheDocument();
-        expect(screen.getByText("Completed:"));
-        expect(screen.queryByTestId('formatted-completed-date')).toBeInTheDocument();
-        expect(screen.getByText(/Job ID/)).toBeInTheDocument();
-        expect(screen.getByText(/job-id-5472345/)).toBeInTheDocument();
-    });
-
-    it("renders custom heading and description when job failed", () => {
-        const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
-
-        renderComponent({
-            job,
-            jobFailedOverride: {
-                heading: 'custom failure heading',
-                description: 'custom failure description'
-            }
-        });
-
-        expect(screen.getByRole('heading', {name: 'custom failure heading'}));
-        expect(screen.getByText('custom failure description'));
-    });
-
-    it("does not render status of successfully completed job given displaySuccessfulJob is false", () => {
-        const job = createTestJob(CompletionStatus.Succeeded, RunningStatus.Completed);
-
-        renderComponent({job, displaySuccessfulJob: false});
-
-        expect(screen.queryByText("Job completed successfully: Mapping dataset")).not.toBeInTheDocument();
-    });
-
-    it("renders status based on Queued completed job given displaySuccessfulJob is false", () => {
-        const job = createTestJob(undefined, RunningStatus.Queued);
-
-        renderComponent({job, displaySuccessfulJob: false});
-
-        expect(screen.getByText("Job in queue: Mapping dataset"));
-    });
-
-    it("renders status based on InProgress completed job given displaySuccessfulJob is false", () => {
-        const job = createTestJob(undefined, RunningStatus.InProgress);
-
-        renderComponent({job, displaySuccessfulJob: false});
-
-        expect(screen.getByText("Job in progress: Mapping dataset"));
-    });
-
-    it("renders status based on failed completed job given displaySuccessfulJob is false", () => {
-        const job = createTestJob(CompletionStatus.Failed, RunningStatus.Completed);
-
-        renderComponent({job, displaySuccessfulJob: false});
-
-        expect(screen.getByText("Job failed: Mapping dataset"));
-    });
+    expect(screen.getByText("Job failed: Mapping dataset"));
+  });
 });
 
-function createTestJob(completionStatus: CompletionStatus | undefined, runningStatus: RunningStatus): JobDetails {
-    return getJobDetailsFromJobResponse({
-        completionStatus: completionStatus,
-        invokerUserDisplayName: "Harry Potter",
-        invokerUserId: "",
-        jobId: `job-id-5472345`,
-        jobType: JobType.MapDatasetJob,
-        runningStatus: runningStatus,
-        specificationId: "",
-        created: new Date("2020-09-02T09:50:45.4873729+00:00"),
-        lastUpdated: new Date(Date.now())
-    } as JobResponse) as JobDetails;
+function createTestJob(
+  completionStatus: CompletionStatus | undefined,
+  runningStatus: RunningStatus
+): JobDetails {
+  return getJobDetailsFromJobResponse({
+    completionStatus: completionStatus,
+    invokerUserDisplayName: "Harry Potter",
+    invokerUserId: "",
+    jobId: "job-id-5472345",
+    jobType: JobType.MapDatasetJob,
+    runningStatus: runningStatus,
+    specificationId: "",
+    created: new Date("2020-09-02T09:50:45.4873729+00:00"),
+    lastUpdated: new Date(Date.now()),
+  } as JobResponse) as JobDetails;
 }

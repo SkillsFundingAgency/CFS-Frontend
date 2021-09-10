@@ -1,5 +1,4 @@
 @include govuk-exports("govuk/component/header") {
-
   $govuk-header-background: govuk-colour("black");
   $govuk-header-border-color: $govuk-brand-colour;
   $govuk-header-border-width: govuk-spacing(2);
@@ -143,7 +142,7 @@
     @include govuk-responsive-margin(2, "bottom");
     padding-right: govuk-spacing(8);
 
-    @include govuk-media-query ($from: desktop) {
+    @include govuk-media-query($from: desktop) {
       width: 33.33%;
       padding-right: $govuk-gutter-half;
       float: left;
@@ -152,7 +151,7 @@
   }
 
   .govuk-header__content {
-    @include govuk-media-query ($from: desktop) {
+    @include govuk-media-query($from: desktop) {
       width: 66.66%;
       padding-left: $govuk-gutter-half;
       float: left;
@@ -174,7 +173,7 @@
 
     &:hover {
       -webkit-text-decoration: solid underline $govuk-header-link-underline-thickness;
-              text-decoration: solid underline $govuk-header-link-underline-thickness;
+      text-decoration: solid underline $govuk-header-link-underline-thickness;
 
       @if ($govuk-link-underline-offset) {
         text-underline-offset: $govuk-link-underline-offset;
@@ -191,7 +190,7 @@
       margin-left: govuk-spacing(1);
     }
 
-    @include govuk-media-query ($from: tablet) {
+    @include govuk-media-query($from: tablet) {
       top: govuk-spacing(3);
     }
   }
@@ -213,14 +212,14 @@
   .js-enabled {
     .govuk-header__menu-button {
       display: block;
-      @include govuk-media-query ($from: desktop) {
+      @include govuk-media-query($from: desktop) {
         display: none;
       }
     }
 
     .govuk-header__navigation {
       display: none;
-      @include govuk-media-query ($from: desktop) {
+      @include govuk-media-query($from: desktop) {
         display: block;
       }
     }
@@ -231,7 +230,7 @@
   }
 
   .govuk-header__navigation--end {
-    @include govuk-media-query ($from: desktop) {
+    @include govuk-media-query($from: desktop) {
       margin: 0;
       padding: govuk-spacing(1) 0;
       text-align: right;
@@ -246,7 +245,7 @@
     padding: govuk-spacing(2) 0;
     border-bottom: 1px solid $govuk-header-nav-item-border-color;
 
-    @include govuk-media-query ($from: desktop) {
+    @include govuk-media-query($from: desktop) {
       display: inline-block;
       margin-right: govuk-spacing(3);
       padding: govuk-spacing(1) 0;

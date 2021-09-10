@@ -1,8 +1,8 @@
 export interface SpecificationSearchRequestViewModel {
-    searchText: string,
-    fundingPeriods: string[],
-    fundingStreams: string[],
-    status: string[],
-    pageSize: number,
-    page: number
+  searchText: string;
+  fundingPeriods: string[];
+  fundingStreams: string[];
+  status: string[];
+  pageSize: number;
+  page: number;
 }

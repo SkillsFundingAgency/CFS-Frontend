@@ -1,147 +1,152 @@
 (function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-	typeof define === 'function' && define.amd ? define('GOVUKFrontend', factory) :
-	(factory());
-}(this, (function () { 'use strict';
+  typeof exports === "object" && typeof module !== "undefined"
+    ? factory()
+    : typeof define === "function" && define.amd
+    ? define("GOVUKFrontend", factory)
+    : factory();
+})(this, function () {
+  "use strict";
 
-(function(undefined) {
+  (function (undefined) {
+    // Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Document/detect.js
+    var detect = "Document" in this;
 
-// Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Document/detect.js
-var detect = ("Document" in this);
+    if (detect) return;
 
-if (detect) return
+    // Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Document&flags=always
+    if (typeof WorkerGlobalScope === "undefined" && typeof importScripts !== "function") {
+      if (this.HTMLDocument) {
+        // IE8
 
-// Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Document&flags=always
-if ((typeof WorkerGlobalScope === "undefined") && (typeof importScripts !== "function")) {
+        // HTMLDocument is an extension of Document.  If the browser has HTMLDocument but not Document, the former will suffice as an alias for the latter.
+        this.Document = this.HTMLDocument;
+      } else {
+        // Create an empty function to act as the missing constructor for the document object, attach the document object as its prototype.  The function needs to be anonymous else it is hoisted and causes the feature detect to prematurely pass, preventing the assignments below being made.
+        this.Document =
+          this.HTMLDocument =
+          document.constructor =
+            new Function("return function Document() {}")();
+        this.Document.prototype = document;
+      }
+    }
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
 
-	if (this.HTMLDocument) { // IE8
+  (function (undefined) {
+    // Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Element/detect.js
+    var detect = "Element" in this && "HTMLElement" in this;
 
-		// HTMLDocument is an extension of Document.  If the browser has HTMLDocument but not Document, the former will suffice as an alias for the latter.
-		this.Document = this.HTMLDocument;
+    if (detect) return;
 
-	} else {
+    // Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Element&flags=always
+    (function () {
+      // IE8
+      if (window.Element && !window.HTMLElement) {
+        window.HTMLElement = window.Element;
+        return;
+      }
 
-		// Create an empty function to act as the missing constructor for the document object, attach the document object as its prototype.  The function needs to be anonymous else it is hoisted and causes the feature detect to prematurely pass, preventing the assignments below being made.
-		this.Document = this.HTMLDocument = document.constructor = (new Function('return function Document() {}')());
-		this.Document.prototype = document;
-	}
-}
+      // create Element constructor
+      window.Element = window.HTMLElement = new Function("return function Element() {}")();
 
+      // generate sandboxed iframe
+      var vbody = document.appendChild(document.createElement("body"));
+      var frame = vbody.appendChild(document.createElement("iframe"));
 
-})
-.call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
+      // use sandboxed iframe to replicate Element functionality
+      var frameDocument = frame.contentWindow.document;
+      var prototype = (Element.prototype = frameDocument.appendChild(frameDocument.createElement("*")));
+      var cache = {};
 
-(function(undefined) {
+      // polyfill Element.prototype on an element
+      var shiv = function (element, deep) {
+        var childNodes = element.childNodes || [],
+          index = -1,
+          key,
+          value,
+          childNode;
 
-// Detection from https://github.com/Financial-Times/polyfill-service/blob/master/packages/polyfill-library/polyfills/Element/detect.js
-var detect = ('Element' in this && 'HTMLElement' in this);
+        if (element.nodeType === 1 && element.constructor !== Element) {
+          element.constructor = Element;
 
-if (detect) return
+          for (key in cache) {
+            value = cache[key];
+            element[key] = value;
+          }
+        }
 
-// Polyfill from https://cdn.polyfill.io/v2/polyfill.js?features=Element&flags=always
-(function () {
+        while ((childNode = deep && childNodes[++index])) {
+          shiv(childNode, deep);
+        }
 
-	// IE8
-	if (window.Element && !window.HTMLElement) {
-		window.HTMLElement = window.Element;
-		return;
-	}
+        return element;
+      };
 
-	// create Element constructor
-	window.Element = window.HTMLElement = new Function('return function Element() {}')();
+      var elements = document.getElementsByTagName("*");
+      var nativeCreateElement = document.createElement;
+      var interval;
+      var loopLimit = 100;
 
-	// generate sandboxed iframe
-	var vbody = document.appendChild(document.createElement('body'));
-	var frame = vbody.appendChild(document.createElement('iframe'));
+      prototype.attachEvent("onpropertychange", function (event) {
+        var propertyName = event.propertyName,
+          nonValue = !cache.hasOwnProperty(propertyName),
+          newValue = prototype[propertyName],
+          oldValue = cache[propertyName],
+          index = -1,
+          element;
 
-	// use sandboxed iframe to replicate Element functionality
-	var frameDocument = frame.contentWindow.document;
-	var prototype = Element.prototype = frameDocument.appendChild(frameDocument.createElement('*'));
-	var cache = {};
+        while ((element = elements[++index])) {
+          if (element.nodeType === 1) {
+            if (nonValue || element[propertyName] === oldValue) {
+              element[propertyName] = newValue;
+            }
+          }
+        }
 
-	// polyfill Element.prototype on an element
-	var shiv = function (element, deep) {
-		var
-		childNodes = element.childNodes || [],
-		index = -1,
-		key, value, childNode;
+        cache[propertyName] = newValue;
+      });
 
-		if (element.nodeType === 1 && element.constructor !== Element) {
-			element.constructor = Element;
+      prototype.constructor = Element;
 
-			for (key in cache) {
-				value = cache[key];
-				element[key] = value;
-			}
-		}
+      if (!prototype.hasAttribute) {
+        // <Element>.hasAttribute
+        prototype.hasAttribute = function hasAttribute(name) {
+          return this.getAttribute(name) !== null;
+        };
+      }
 
-		while (childNode = deep && childNodes[++index]) {
-			shiv(childNode, deep);
-		}
+      // Apply Element prototype to the pre-existing DOM as soon as the body element appears.
+      function bodyCheck() {
+        if (!loopLimit--) clearTimeout(interval);
+        if (document.body && !document.body.prototype && /(complete|interactive)/.test(document.readyState)) {
+          shiv(document, true);
+          if (interval && document.body.prototype) clearTimeout(interval);
+          return !!document.body.prototype;
+        }
+        return false;
+      }
+      if (!bodyCheck()) {
+        document.onreadystatechange = bodyCheck;
+        interval = setInterval(bodyCheck, 25);
+      }
 
-		return element;
-	};
+      // Apply to any new elements created after load
+      document.createElement = function createElement(nodeName) {
+        var element = nativeCreateElement(String(nodeName).toLowerCase());
+        return shiv(element);
+      };
 
-	var elements = document.getElementsByTagName('*');
-	var nativeCreateElement = document.createElement;
-	var interval;
-	var loopLimit = 100;
-
-	prototype.attachEvent('onpropertychange', function (event) {
-		var
-		propertyName = event.propertyName,
-		nonValue = !cache.hasOwnProperty(propertyName),
-		newValue = prototype[propertyName],
-		oldValue = cache[propertyName],
-		index = -1,
-		element;
-
-		while (element = elements[++index]) {
-			if (element.nodeType === 1) {
-				if (nonValue || element[propertyName] === oldValue) {
-					element[propertyName] = newValue;
-				}
-			}
-		}
-
-		cache[propertyName] = newValue;
-	});
-
-	prototype.constructor = Element;
-
-	if (!prototype.hasAttribute) {
-		// <Element>.hasAttribute
-		prototype.hasAttribute = function hasAttribute(name) {
-			return this.getAttribute(name) !== null;
-		};
-	}
-
-	// Apply Element prototype to the pre-existing DOM as soon as the body element appears.
-	function bodyCheck() {
-		if (!(loopLimit--)) clearTimeout(interval);
-		if (document.body && !document.body.prototype && /(complete|interactive)/.test(document.readyState)) {
-			shiv(document, true);
-			if (interval && document.body.prototype) clearTimeout(interval);
-			return (!!document.body.prototype);
-		}
-		return false;
-	}
-	if (!bodyCheck()) {
-		document.onreadystatechange = bodyCheck;
-		interval = setInterval(bodyCheck, 25);
-	}
-
-	// Apply to any new elements created after load
-	document.createElement = function createElement(nodeName) {
-		var element = nativeCreateElement(String(nodeName).toLowerCase());
-		return shiv(element);
-	};
-
-	// remove sandboxed iframe
-	document.removeChild(vbody);
-}());
-
-})
-.call('object' === typeof window && window || 'object' === typeof self && self || 'object' === typeof global && global || {});
-
-})));
+      // remove sandboxed iframe
+      document.removeChild(vbody);
+    })();
+  }.call(
+    ("object" === typeof window && window) ||
+      ("object" === typeof self && self) ||
+      ("object" === typeof global && global) ||
+      {}
+  ));
+});

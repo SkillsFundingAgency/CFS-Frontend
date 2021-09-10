@@ -2,6 +2,6 @@
   "baseUrl": "http://localhost:3000",
   "testFiles": "**/*.feature.ts",
   "env": {
-    "CYPRESS_CRASH_REPORTS" : "0"
+    "CYPRESS_CRASH_REPORTS": "0"
   }
 }

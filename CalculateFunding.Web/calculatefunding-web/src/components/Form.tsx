@@ -1,4 +1,5 @@
 ﻿import React from "react";
+
 import { InlineFieldset, PageHeaderFieldset } from "./Fieldset";
 
 export interface FormProps {
@@ -31,17 +32,9 @@ const Form: React.FunctionComponent<FormProps> = ({
     >
       <div className="govuk-form-group">
         {inline ? (
-          <InlineFieldset
-            token={token}
-            heading={heading}
-            titleCaption={titleCaption}
-          />
+          <InlineFieldset token={token} heading={heading} titleCaption={titleCaption} />
         ) : (
-          <PageHeaderFieldset
-            token={token}
-            heading={heading}
-            titleCaption={titleCaption}
-          />
+          <PageHeaderFieldset token={token} heading={heading} titleCaption={titleCaption} />
         )}
         {children}
       </div>

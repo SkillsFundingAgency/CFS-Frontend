@@ -1,12 +1,13 @@
-import configureMockStore from "redux-mock-store";
-import thunk from "redux-thunk";
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { getFeatureFlags, FeatureFlagsActionTypes } from "../../actions/FeatureFlagsActions";
+import configureMockStore from "redux-mock-store";
+import thunk from "redux-thunk";
+
+import { FeatureFlagsActionTypes, getFeatureFlags } from "../../actions/FeatureFlagsActions";
 import { IStoreState } from "../../reducers/rootReducer";
 
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+const middlewares = [thunk];
+const mockStore = configureMockStore(middlewares);
 const fetchMock = new MockAdapter(axios);
 
 describe("featureflagsactions", () => {
@@ -15,12 +16,15 @@ describe("featureflagsactions", () => {
   });
 
   it("fetches feature flags", async () => {
-    const featureFlagsPayload = [{ "name": "EnableVariations", "isEnabled": true }, { "name": "TemplateBuilderVisible", "isEnabled": false }];
+    const featureFlagsPayload = [
+      { name: "EnableVariations", isEnabled: true },
+      { name: "TemplateBuilderVisible", isEnabled: false },
+    ];
 
     fetchMock.onGet("/api/featureflags").reply(200, featureFlagsPayload);
-    
+
     const expectedActions = [
-      { type: FeatureFlagsActionTypes.GET_FEATUREFLAGS, payload: featureFlagsPayload},
+      { type: FeatureFlagsActionTypes.GET_FEATUREFLAGS, payload: featureFlagsPayload },
     ];
 
     const store = mockStore(storeWithData);
@@ -29,23 +33,25 @@ describe("featureflagsactions", () => {
 
     expect(store.getActions()).toEqual(expectedActions);
   });
-})
+});
 
 const storeWithData: IStoreState = {
   userState: {
     isLoggedIn: false,
-    userName: '',
+    userName: "",
     hasConfirmedSkills: true,
-    fundingStreamPermissions: []
+    fundingStreamPermissions: [],
   },
+  jobObserverState: { jobFilter: undefined },
   featureFlags: {
     templateBuilderVisible: false,
     enableReactQueryDevTool: false,
     releaseTimetableVisible: false,
-    profilingPatternVisible: false
+    profilingPatternVisible: false,
+    specToSpec: false,
   },
   fundingSearchSelection: {
     selectedProviderIds: [],
-    searchCriteria: undefined
-  }
+    searchCriteria: undefined,
+  },
 };

@@ -1,4 +1,4 @@
 ﻿export enum ProviderDataTrackingMode {
-    UseLatest = "UseLatest",
-    Manual = "Manual"
+  UseLatest = "UseLatest",
+  Manual = "Manual",
 }

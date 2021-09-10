@@ -1,5 +1,4 @@
 @include govuk-exports("govuk/component/footer") {
-
   $govuk-footer-background: $govuk-canvas-background-colour;
   $govuk-footer-border: $govuk-border-colour;
   // This variable can be removed entirely once the legacy palette goes away,
@@ -73,13 +72,13 @@
     margin-right: -$govuk-gutter-half;
     margin-left: -$govuk-gutter-half;
     -ms-flex-wrap: wrap;
-        flex-wrap: wrap; // Support: Flexbox
+    flex-wrap: wrap; // Support: Flexbox
     -webkit-box-align: end;
-        -ms-flex-align: end;
-            align-items: flex-end; // Support: Flexbox
+    -ms-flex-align: end;
+    align-items: flex-end; // Support: Flexbox
     -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center; // Support: Flexbox
+    -ms-flex-pack: center;
+    justify-content: center; // Support: Flexbox
   }
 
   .govuk-footer__meta-item {
@@ -90,18 +89,18 @@
 
   .govuk-footer__meta-item--grow {
     -webkit-box-flex: 1;
-        -ms-flex: 1;
-            flex: 1; // Support: Flexbox
-    @include govuk-media-query ($until: tablet) {
+    -ms-flex: 1;
+    flex: 1; // Support: Flexbox
+    @include govuk-media-query($until: tablet) {
       -ms-flex-preferred-size: 320px;
-          flex-basis: 320px; // Support: Flexbox
+      flex-basis: 320px; // Support: Flexbox
     }
   }
 
   .govuk-footer__licence-logo {
     display: inline-block;
     margin-right: govuk-spacing(2);
-    @include govuk-media-query ($until: desktop) {
+    @include govuk-media-query($until: desktop) {
       margin-bottom: govuk-spacing(3);
     }
     vertical-align: top;
@@ -145,7 +144,7 @@
   .govuk-footer__heading {
     @include govuk-responsive-margin(7, "bottom");
     padding-bottom: govuk-spacing(4);
-    @include govuk-media-query ($until: tablet) {
+    @include govuk-media-query($until: tablet) {
       padding-bottom: govuk-spacing(2);
     }
     border-bottom: 1px solid $govuk-footer-border;
@@ -158,7 +157,7 @@
     margin-right: -$govuk-gutter-half;
     margin-left: -$govuk-gutter-half;
     -ms-flex-wrap: wrap;
-        flex-wrap: wrap; // Support: Flexbox
+    flex-wrap: wrap; // Support: Flexbox
   }
 
   .govuk-footer__section {
@@ -169,26 +168,26 @@
     vertical-align: top;
     // Ensure columns take up equal width (typically one-half:one-half)
     -webkit-box-flex: 1;
-        -ms-flex-positive: 1;
-            flex-grow: 1; // Support: Flexbox
+    -ms-flex-positive: 1;
+    flex-grow: 1; // Support: Flexbox
     -ms-flex-negative: 1;
-        flex-shrink: 1; // Support: Flexbox
-    @include govuk-media-query ($until: desktop) {
+    flex-shrink: 1; // Support: Flexbox
+    @include govuk-media-query($until: desktop) {
       // Make sure columns do not drop below 200px in width
       // Will typically result in wrapping, and end up in a single column on smaller screens.
       -ms-flex-preferred-size: 200px;
-          flex-basis: 200px; // Support: Flexbox
+      flex-basis: 200px; // Support: Flexbox
     }
   }
 
   // If there are only two sections, set the layout to be two-third:one-third on desktop
-  @include govuk-media-query ($from: desktop) {
+  @include govuk-media-query($from: desktop) {
     // We match the first section with `:first-child`.
     // To ensure the section is one of two, we can count backwards using `:nth-last-child(2)`.
     .govuk-footer__section:first-child:nth-last-child(2) {
       -webkit-box-flex: 2;
-          -ms-flex-positive: 2;
-              flex-grow: 2; // Support: Flexbox
+      -ms-flex-positive: 2;
+      flex-grow: 2; // Support: Flexbox
     }
   }
 
@@ -197,7 +196,7 @@
     padding: 0;
     list-style: none;
     -webkit-column-gap: $govuk-gutter;
-            column-gap: $govuk-gutter; // Support: Columns
+    column-gap: $govuk-gutter; // Support: Columns
 
     // Disable thicker underlines on hover because of a bug in Chromium
     // affecting links within columns
@@ -207,15 +206,15 @@
     }
   }
 
-  @include govuk-media-query ($from: desktop) {
+  @include govuk-media-query($from: desktop) {
     .govuk-footer__list--columns-2 {
       -webkit-column-count: 2;
-              column-count: 2; // Support: Columns
+      column-count: 2; // Support: Columns
     }
 
     .govuk-footer__list--columns-3 {
       -webkit-column-count: 3;
-              column-count: 3; // Support: Columns
+      column-count: 3; // Support: Columns
     }
   }
 

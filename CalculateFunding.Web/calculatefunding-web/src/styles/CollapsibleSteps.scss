@@ -1,11 +1,13 @@
 h2 > {
-    .collapsible-step-header-title, .collapsible-step-header-description,
-    .collapsible-step-header-status, .collapsible-step-header-value-container,
-    .collapsible-step-header-updated-date {
-        vertical-align: top;
-    }
+  .collapsible-step-header-title,
+  .collapsible-step-header-description,
+  .collapsible-step-header-status,
+  .collapsible-step-header-value-container,
+  .collapsible-step-header-updated-date {
+    vertical-align: top;
+  }
 }
 
 span.govuk-error-container {
-    display: block;
+  display: block;
 }

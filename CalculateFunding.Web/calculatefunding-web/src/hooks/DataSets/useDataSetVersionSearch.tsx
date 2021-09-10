@@ -1,7 +1,8 @@
-﻿import { useQuery } from "react-query";
-import { DatasetVersionSearchResponse } from "../../types/Datasets/DatasetVersionSearchResponse";
-import { AxiosError } from "axios";
+﻿import { AxiosError } from "axios";
+import { useQuery } from "react-query";
+
 import * as datasetService from "../../services/datasetService";
+import { DatasetVersionSearchResponse } from "../../types/Datasets/DatasetVersionSearchResponse";
 
 export interface DataSetVersionSearchQuery {
   relationshipId: string | undefined;
@@ -25,10 +26,7 @@ export const useDataSetVersionSearch = ({
   enabled,
   onError,
 }: DataSetVersionSearchQuery): DataSetVersionSearchQueryResult => {
-  const { data, isLoading } = useQuery<
-    DatasetVersionSearchResponse,
-    AxiosError
-  >(
+  const { data, isLoading } = useQuery<DatasetVersionSearchResponse, AxiosError>(
     [
       "data-set-versions",
       {
@@ -38,14 +36,7 @@ export const useDataSetVersionSearch = ({
         pageSize: pageSize,
       },
     ],
-    async () =>
-      (
-        await datasetService.searchDatasetVersions(
-          dataSetId as string,
-          pageNumber,
-          pageSize
-        )
-      ).data,
+    async () => (await datasetService.searchDatasetVersions(dataSetId as string, pageNumber, pageSize)).data,
     {
       onError: onError,
       enabled: enabled && !!dataSetId && !!relationshipId,

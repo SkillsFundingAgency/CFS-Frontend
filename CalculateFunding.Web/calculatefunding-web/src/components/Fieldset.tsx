@@ -17,9 +17,7 @@ export const PageHeaderFieldset: React.FunctionComponent<FieldsetProps> = ({
     <fieldset className="govuk-fieldset" aria-describedby={`${token}-hint`}>
       {!!heading?.length && (
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-          {!!titleCaption?.length && (
-            <h3 className="govuk-caption-xl">{titleCaption}</h3>
-          )}
+          {!!titleCaption?.length && <h3 className="govuk-caption-xl">{titleCaption}</h3>}
           <h1 className="govuk-fieldset__heading">{heading}</h1>
         </legend>
       )}
@@ -41,9 +39,7 @@ export const InlineFieldset: React.FunctionComponent<FieldsetProps> = ({
           <h4 className="govuk-fieldset__heading govuk-caption-s">{heading}</h4>
         </legend>
       )}
-      {!!titleCaption?.length && (
-        <span className="govuk-hint">{titleCaption}</span>
-      )}
+      {!!titleCaption?.length && <span className="govuk-hint">{titleCaption}</span>}
       {children}
     </fieldset>
   );

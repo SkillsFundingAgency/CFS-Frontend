@@ -1,82 +1,79 @@
-import {Author} from "./Author";
-import {Reference} from "../Reference";
-import {CalculationType} from "../CalculationSearchResponse";
-import {CalculationDetails} from "../CalculationDetails";
+import { CalculationDetails } from "../CalculationDetails";
+import { CalculationType } from "../CalculationSearchResponse";
+import { Reference } from "../Reference";
+import { Author } from "./Author";
 
 export interface CalculationCompilePreviewResponse {
-    compilerOutput: CompilerOutput
-    calculation: CalculationDetails,
-    previewProviderCalculation: PreviewProviderCalculationResponseModel
+  compilerOutput: CompilerOutput;
+  calculation: CalculationDetails;
+  previewProviderCalculation: PreviewProviderCalculationResponseModel;
 }
 
 export interface PreviewProviderCalculationResponseModel {
-    providerName: string;
-    calculationResult: CalculationResult;
+  providerName: string;
+  calculationResult: CalculationResult;
 }
 
 export interface CalculationResult {
-    calculation: Reference;
-    value: object | undefined;
-    exceptionType: string,
-    exceptionMessage: string,
-    exceptionStackTrace: string,
-    calculationType: CalculationType,
-    calculationDataType: CalculationDataType
+  calculation: Reference;
+  value: object | undefined;
+  exceptionType: string;
+  exceptionMessage: string;
+  exceptionStackTrace: string;
+  calculationType: CalculationType;
+  calculationDataType: CalculationDataType;
 }
 
-export enum CalculationDataType
-{
-    Decimal,
-    String,
-    Boolean,
-    Enum,
+export enum CalculationDataType {
+  Decimal,
+  String,
+  Boolean,
+  Enum,
 }
 
 export interface CompilerOutput {
-    success: boolean;
-    compilerMessages: CompilerMessage[];
-    sourceFiles: SourceFile[];
+  success: boolean;
+  compilerMessages: CompilerMessage[];
+  sourceFiles: SourceFile[];
 }
 
 export interface CompilerMessage {
-    severity: CompileErrorSeverity;
-    message: string;
-    location: Location;
+  severity: CompileErrorSeverity;
+  message: string;
+  location: Location;
 }
 
-export enum CompileErrorSeverity
-{
-    Hidden,
-    Info,
-    Warning,
-    Error,
+export enum CompileErrorSeverity {
+  Hidden,
+  Info,
+  Warning,
+  Error,
 }
 
-export interface PreviewCompileRequestViewModel{
-    sourceCode: string,
-    providerId: string,
-    dataType: CalculationDataType
+export interface PreviewCompileRequestViewModel {
+  sourceCode: string;
+  providerId: string;
+  dataType: CalculationDataType;
 }
 
 export interface CompilerOutputViewModel {
-    hasCodeBuiltSuccessfully: boolean | undefined;
-    previewResponse: CalculationCompilePreviewResponse | undefined
-    isProviderValid: boolean | undefined;
-    providerRuntimeException: string;
-    providerName: string;
-    providerResult: CalculationResult | undefined;
+  hasCodeBuiltSuccessfully: boolean | undefined;
+  previewResponse: CalculationCompilePreviewResponse | undefined;
+  isProviderValid: boolean | undefined;
+  providerRuntimeException: string;
+  providerName: string;
+  providerResult: CalculationResult | undefined;
 }
 
 export interface SourceFile {
-    fileName: string;
-    sourceCode: string;
+  fileName: string;
+  sourceCode: string;
 }
 
-
 export interface Location {
-    startChar: number;
-    endChar: number;
-    startLine: number;
-    endLine: number;
-    owner: Author;
+  startChar: number;
+  endChar: number;
+  startLine: number;
+  endLine: number;
+  owner: Author;
 }

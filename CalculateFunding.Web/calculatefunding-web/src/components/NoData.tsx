@@ -5,19 +5,10 @@ export interface NoDataProps {
   excludeSearchTips?: boolean;
 }
 
-export const NoData: React.FunctionComponent<NoDataProps> = ({
-  hidden,
-  excludeSearchTips
-}) => {
+export const NoData: React.FunctionComponent<NoDataProps> = ({ hidden, excludeSearchTips }) => {
   return (
-    <div
-      className="no-results govuk-!-font-size-19"
-      data-testid="no-data"
-      hidden={!!hidden}
-    >
-      <p className="govuk-body govuk-!-font-weight-bold">
-        There are no matching results.
-      </p>
+    <div className="no-results govuk-!-font-size-19" data-testid="no-data" hidden={!!hidden}>
+      <p className="govuk-body govuk-!-font-weight-bold">There are no matching results.</p>
       {!excludeSearchTips && (
         <>
           <p className="govuk-body">Improve your search results by:</p>
@@ -31,4 +22,4 @@ export const NoData: React.FunctionComponent<NoDataProps> = ({
       )}
     </div>
   );
-}
+};

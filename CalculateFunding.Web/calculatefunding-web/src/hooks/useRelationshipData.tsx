@@ -1,5 +1,6 @@
 ﻿import { AxiosError } from "axios";
-import { useQuery, UseQueryOptions } from "react-query";
+import { UseQueryOptions,useQuery } from "react-query";
+
 import { getDataSourcesByRelationship } from "../services/datasetService";
 import { DataSourceRelationshipResponseViewModel } from "../types/Datasets/DataSourceRelationshipResponseViewModel";
 
@@ -12,17 +13,11 @@ export type RelationshipDataQueryResult = {
 
 export const useRelationshipData = (
   relationshipId: string,
-  queryConfig: UseQueryOptions<
-    DataSourceRelationshipResponseViewModel,
-    AxiosError
-  > = {
+  queryConfig: UseQueryOptions<DataSourceRelationshipResponseViewModel, AxiosError> = {
     enabled: (relationshipId && relationshipId.length > 0) === true,
   }
 ): RelationshipDataQueryResult => {
-  const { data, isLoading, isError, error } = useQuery<
-    DataSourceRelationshipResponseViewModel,
-    AxiosError
-  >(
+  const { data, isLoading, isError, error } = useQuery<DataSourceRelationshipResponseViewModel, AxiosError>(
     `datasources-by-relationship-${relationshipId}`,
     async () => (await getDataSourcesByRelationship(relationshipId)).data,
     queryConfig

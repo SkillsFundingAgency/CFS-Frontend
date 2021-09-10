@@ -1,5 +1,5 @@
-import {IVariable} from "./IVariable";
+import { IVariable } from "./IVariable";
 
 export interface IVariableContainer {
-    [key: string]: IVariable
+  [key: string]: IVariable;
 }

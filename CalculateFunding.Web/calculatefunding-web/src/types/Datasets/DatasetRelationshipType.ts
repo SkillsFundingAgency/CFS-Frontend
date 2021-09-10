@@ -1,4 +1,4 @@
 ﻿export enum DatasetRelationshipType {
-    Uploaded = 'Uploaded',
-    ReleasedData = 'ReleasedData',
+  Uploaded = "Uploaded",
+  ReleasedData = "ReleasedData",
 }

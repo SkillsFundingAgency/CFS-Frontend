@@ -1,42 +1,43 @@
-import React from 'react';
-import {WarningText} from "../../components/WarningText";
-import {mount} from "enzyme";
+import { mount } from "enzyme";
+import React from "react";
 
-const Adapter = require('enzyme-adapter-react-16');
-const enzyme = require('enzyme');
-enzyme.configure({adapter: new Adapter()});
-const {shallow} = enzyme;
+import { WarningText } from "../../components/WarningText";
 
-describe('<WarningText />', () => {
-    it(' renders a panel', () => {
-        const wrapper = shallow(<WarningText text={"Testing Component"} />);
+const Adapter = require("enzyme-adapter-react-16");
+const enzyme = require("enzyme");
+enzyme.configure({ adapter: new Adapter() });
+const { shallow } = enzyme;
 
-        const actual = wrapper.find('div.govuk-warning-text');
+describe("<WarningText />", () => {
+  it(" renders a panel", () => {
+    const wrapper = shallow(<WarningText text={"Testing Component"} />);
 
-        expect(actual.length).toBe(1);
-    });
+    const actual = wrapper.find("div.govuk-warning-text");
 
-    it(' is hidden', () => {
-        const wrapper = mount(<WarningText text={"Testing Component"} hidden={true}/>);
+    expect(actual.length).toBe(1);
+  });
 
-        const actual = wrapper.find('div.govuk-warning-text');
+  it(" is hidden", () => {
+    const wrapper = mount(<WarningText text={"Testing Component"} hidden={true} />);
 
-        expect(actual.props().hidden).toBeTruthy();
-    });
+    const actual = wrapper.find("div.govuk-warning-text");
 
-    it(' is visible', () => {
-        const wrapper = mount(<WarningText text={"Testing Component"} hidden={false}/>);
+    expect(actual.props().hidden).toBeTruthy();
+  });
 
-        const actual = wrapper.find('div.govuk-warning-text');
+  it(" is visible", () => {
+    const wrapper = mount(<WarningText text={"Testing Component"} hidden={false} />);
 
-        expect(actual.props().hidden).toBeFalsy();
-    });
+    const actual = wrapper.find("div.govuk-warning-text");
 
-    it(' has the correct text', () => {
-        const wrapper = mount(<WarningText text={"Testing Component"} hidden={false}/>);
+    expect(actual.props().hidden).toBeFalsy();
+  });
 
-        const actual = wrapper.find('strong.govuk-warning-text__text>span').at(1);
+  it(" has the correct text", () => {
+    const wrapper = mount(<WarningText text={"Testing Component"} hidden={false} />);
 
-        expect(actual.text()).toBe("Testing Component");
-    });
+    const actual = wrapper.find("strong.govuk-warning-text__text>span").at(1);
+
+    expect(actual.text()).toBe("Testing Component");
+  });
 });

@@ -1,10 +1,11 @@
-import React from 'react';
-import { Story, Meta } from '@storybook/react';
-import {CrownLogo} from "../components/CrownLogo";
+import { Meta, Story } from "@storybook/react";
+import React from "react";
+
+import { CrownLogo } from "../components/CrownLogo";
 
 export default {
-    title: 'CFS/CrownLogo',
-    component: CrownLogo,
+  title: "CFS/CrownLogo",
+  component: CrownLogo,
 } as Meta;
 
 const Template: Story = (args) => <CrownLogo />;

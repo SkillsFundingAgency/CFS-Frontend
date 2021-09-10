@@ -20,7 +20,6 @@
 /// @access public
 
 @function govuk-spacing($spacing-point) {
-
   $actual-input-type: type-of($spacing-point);
   @if $actual-input-type != "number" {
     @error "Expected a number (integer), but got a "
@@ -53,8 +52,13 @@
 ///
 /// @access private
 
-@mixin _govuk-responsive-spacing($responsive-spacing-point, $property, $direction: "all", $important: false, $adjustment: false) {
-
+@mixin _govuk-responsive-spacing(
+  $responsive-spacing-point,
+  $property,
+  $direction: "all",
+  $important: false,
+  $adjustment: false
+) {
   $actual-input-type: type-of($responsive-spacing-point);
   @if $actual-input-type != "number" {
     @error "Expected a number (integer), but got a " + "#{$actual-input-type}.";
@@ -75,14 +79,12 @@
 
   // Loop through each breakpoint in the map
   @each $breakpoint, $breakpoint-value in $scale-map {
-
     @if ($adjustment) {
       $breakpoint-value: $breakpoint-value + $adjustment;
     }
 
     // The 'null' breakpoint is for mobile.
     @if $breakpoint == null {
-
       @if $direction == all {
         #{$property}: $breakpoint-value if($important, !important, null);
       } @else {
@@ -122,8 +124,19 @@
 ///
 /// @access public
 
-@mixin govuk-responsive-margin($responsive-spacing-point, $direction: "all", $important: false, $adjustment: false) {
-  @include _govuk-responsive-spacing($responsive-spacing-point, "margin", $direction, $important, $adjustment);
+@mixin govuk-responsive-margin(
+  $responsive-spacing-point,
+  $direction: "all",
+  $important: false,
+  $adjustment: false
+) {
+  @include _govuk-responsive-spacing(
+    $responsive-spacing-point,
+    "margin",
+    $direction,
+    $important,
+    $adjustment
+  );
 }
 
 /// Responsive padding
@@ -148,6 +161,17 @@
 ///
 /// @access public
 
-@mixin govuk-responsive-padding($responsive-spacing-point, $direction: "all", $important: false, $adjustment: false) {
-  @include _govuk-responsive-spacing($responsive-spacing-point, "padding", $direction, $important, $adjustment);
+@mixin govuk-responsive-padding(
+  $responsive-spacing-point,
+  $direction: "all",
+  $important: false,
+  $adjustment: false
+) {
+  @include _govuk-responsive-spacing(
+    $responsive-spacing-point,
+    "padding",
+    $direction,
+    $important,
+    $adjustment
+  );
 }

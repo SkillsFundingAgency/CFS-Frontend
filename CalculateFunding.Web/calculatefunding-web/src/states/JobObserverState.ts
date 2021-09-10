@@ -1,5 +1,5 @@
-﻿import {JobMonitoringFilter} from "../types/Jobs/JobMonitoringFilter";
+﻿import { JobMonitoringFilter } from "../types/Jobs/JobMonitoringFilter";
 
 export interface JobObserverState {
-  jobFilter: JobMonitoringFilter | undefined,
+  jobFilter: JobMonitoringFilter | undefined;
 }

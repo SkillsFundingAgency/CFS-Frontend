@@ -1,14 +1,15 @@
-﻿import {
-  DatasetWithVersions,
+﻿import React from "react";
+
+import { DatasetVersionSearchResponse } from "../../types/Datasets/DatasetVersionSearchResponse";
+import { DatasetVersionSummary } from "../../types/Datasets/DatasetVersionSummary";
+import {
   DataSourceRelationshipResponseViewModel,
+  DatasetWithVersions,
 } from "../../types/Datasets/DataSourceRelationshipResponseViewModel";
 import { DataSourceSelection } from "../../types/Datasets/DataSourceSelection";
-import { DatasetVersionSearchResponse } from "../../types/Datasets/DatasetVersionSearchResponse";
 import Form from "../Form";
-import { DataSetVersionSelector } from "./DatasetVersionSelector";
-import { DatasetVersionSummary } from "../../types/Datasets/DatasetVersionSummary";
-import React from "react";
 import { NoData } from "../NoData";
+import { DataSetVersionSelector } from "./DatasetVersionSelector";
 
 export interface DataSourceSelectionFormProps {
   isLoading: boolean;

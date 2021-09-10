@@ -1,87 +1,103 @@
-import React from 'react';
-import { EditDescriptionModal } from "../../../components/TemplateBuilder/EditDescriptionModal";
-import { mount } from 'enzyme';
 import { waitFor } from "@testing-library/react";
+import { mount } from "enzyme";
+import React from "react";
+
+import { EditDescriptionModal } from "../../../components/TemplateBuilder/EditDescriptionModal";
 
 it("is visible when showModal is true", () => {
-    const originalDescription = "This is a description";
-    const toggleModalMock = jest.fn();
-    const saveDescriptionMock = jest.fn();
+  const originalDescription = "This is a description";
+  const toggleModalMock = jest.fn();
+  const saveDescriptionMock = jest.fn();
 
-    const wrapper = mount(<EditDescriptionModal
-        originalDescription={originalDescription}
-        showModal={true}
-        toggleModal={toggleModalMock}
-        saveDescription={saveDescriptionMock} />);
+  const wrapper = mount(
+    <EditDescriptionModal
+      originalDescription={originalDescription}
+      showModal={true}
+      toggleModal={toggleModalMock}
+      saveDescription={saveDescriptionMock}
+    />
+  );
 
-    const actual = wrapper.find('#edit-desc-modal');
+  const actual = wrapper.find("#edit-desc-modal");
 
-    expect(actual.prop('style')).toHaveProperty('display', 'block');
+  expect(actual.prop("style")).toHaveProperty("display", "block");
 });
 
 it("renders renders original description", () => {
-    const originalDescription = "This is a description";
-    const toggleModalMock = jest.fn();
-    const saveDescriptionMock = jest.fn();
+  const originalDescription = "This is a description";
+  const toggleModalMock = jest.fn();
+  const saveDescriptionMock = jest.fn();
 
-    const wrapper = mount(<EditDescriptionModal
-        originalDescription={originalDescription}
-        showModal={true}
-        toggleModal={toggleModalMock}
-        saveDescription={saveDescriptionMock} />);
+  const wrapper = mount(
+    <EditDescriptionModal
+      originalDescription={originalDescription}
+      showModal={true}
+      toggleModal={toggleModalMock}
+      saveDescription={saveDescriptionMock}
+    />
+  );
 
-    const actual = wrapper.find('#original-description');
+  const actual = wrapper.find("#original-description");
 
-    expect(actual.text()).toBe(originalDescription);
+  expect(actual.text()).toBe(originalDescription);
 });
 
 it("hides itself when showModal is false", () => {
-    const originalDescription = "This is a description";
-    const toggleModalMock = jest.fn();
-    const saveDescriptionMock = jest.fn();
+  const originalDescription = "This is a description";
+  const toggleModalMock = jest.fn();
+  const saveDescriptionMock = jest.fn();
 
-    const wrapper = mount(<EditDescriptionModal
-        originalDescription={originalDescription}
-        showModal={false}
-        toggleModal={toggleModalMock}
-        saveDescription={saveDescriptionMock} />);
+  const wrapper = mount(
+    <EditDescriptionModal
+      originalDescription={originalDescription}
+      showModal={false}
+      toggleModal={toggleModalMock}
+      saveDescription={saveDescriptionMock}
+    />
+  );
 
-    const actual = wrapper.find('#edit-desc-modal');
+  const actual = wrapper.find("#edit-desc-modal");
 
-    expect(actual.prop('style')).toHaveProperty('display', 'none');
+  expect(actual.prop("style")).toHaveProperty("display", "none");
 });
 
 it("toggles modal visibility when closed button called", () => {
-    const originalDescription = "This is a description";
-    const toggleModalMock = jest.fn();
-    const saveDescriptionMock = jest.fn();
+  const originalDescription = "This is a description";
+  const toggleModalMock = jest.fn();
+  const saveDescriptionMock = jest.fn();
 
-    const wrapper = mount(<EditDescriptionModal
-        originalDescription={originalDescription}
-        showModal={true}
-        toggleModal={toggleModalMock}
-        saveDescription={saveDescriptionMock} />);
+  const wrapper = mount(
+    <EditDescriptionModal
+      originalDescription={originalDescription}
+      showModal={true}
+      toggleModal={toggleModalMock}
+      saveDescription={saveDescriptionMock}
+    />
+  );
 
-    const actual = wrapper.find('#close').simulate('click');
+  const actual = wrapper.find("#close").simulate("click");
 
-    expect(toggleModalMock).toHaveBeenCalledTimes(1);
+  expect(toggleModalMock).toHaveBeenCalledTimes(1);
 });
 
 it("toggles modal visibility when save button called", async () => {
-    const originalDescription = "This is a description";
-    const toggleModalMock = jest.fn();
-    const saveDescriptionMock = jest.fn().mockResolvedValue(Promise.resolve(true));
+  const originalDescription = "This is a description";
+  const toggleModalMock = jest.fn();
+  const saveDescriptionMock = jest.fn().mockResolvedValue(Promise.resolve(true));
 
-    const wrapper = mount(<EditDescriptionModal
-        originalDescription={originalDescription}
-        showModal={true}
-        toggleModal={toggleModalMock}
-        saveDescription={saveDescriptionMock} />);
+  const wrapper = mount(
+    <EditDescriptionModal
+      originalDescription={originalDescription}
+      showModal={true}
+      toggleModal={toggleModalMock}
+      saveDescription={saveDescriptionMock}
+    />
+  );
 
-    wrapper.find('#save').simulate('click');
+  wrapper.find("#save").simulate("click");
 
-    await waitFor(() => {
-        expect(saveDescriptionMock).toHaveBeenCalledTimes(1);
-        expect(toggleModalMock).toHaveBeenCalledTimes(1);
-    });
+  await waitFor(() => {
+    expect(saveDescriptionMock).toHaveBeenCalledTimes(1);
+    expect(toggleModalMock).toHaveBeenCalledTimes(1);
+  });
 });

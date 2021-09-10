@@ -1,15 +1,16 @@
+import { render, screen, waitFor } from "@testing-library/react";
+import { AxiosError } from "axios";
 import React from "react";
-import { render, waitFor, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Switch } from "react-router";
 import { QueryClient, QueryClientProvider } from "react-query";
+import * as ReactQuery from "react-query";
+import { UseQueryResult } from "react-query/types/react/types";
+import { MemoryRouter, Route, Switch } from "react-router";
+
 import { VariationManagement } from "../../../components/Specifications/VariationManagement";
 import * as pointersHook from "../../../hooks/Variation/useProfileVariationPointers";
-import * as ReactQuery from "react-query";
-import { FundingLineProfileVariationPointer } from "../../../types/Specifications/ProfileVariationPointer";
 import { ProfileVariationPointersResult } from "../../../hooks/Variation/useProfileVariationPointers";
 import { AvailableVariationPointerFundingLine } from "../../../types/Publishing/AvailableVariationPointerFundingLine";
-import { UseQueryResult } from "react-query/types/react/types";
-import { AxiosError } from "axios";
+import { FundingLineProfileVariationPointer } from "../../../types/Specifications/ProfileVariationPointer";
 
 const specificationId = "SPEC123";
 
@@ -110,8 +111,6 @@ describe("<VariationManagement /> ", () => {
   });
 
   it("renders correctly", async () => {
-    screen.debug();
-
     expect(
       screen.getByRole("cell", {
         name: /MockPeriodType 2000 Instalment 1/,

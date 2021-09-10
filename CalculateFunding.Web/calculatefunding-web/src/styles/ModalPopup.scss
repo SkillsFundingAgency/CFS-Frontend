@@ -9,8 +9,8 @@
   z-index: 100;
 
   overflow: auto;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
@@ -38,7 +38,7 @@
     background-color: black;
     min-width: 44px;
     width: auto;
-    margin: 2px 2px 3px 2px;;
+    margin: 2px 2px 3px 2px;
     padding: 2px;
   }
   button:hover {
@@ -76,6 +76,12 @@ button.govuk-link {
 }
 
 @keyframes animatetop {
-  from {top: -300px; opacity: 0}
-  to {top: 0; opacity: 1}
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
 }

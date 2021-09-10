@@ -1,10 +1,10 @@
 export interface PublishStatusModel {
-    publishStatus: PublishStatus;
+  publishStatus: PublishStatus;
 }
 
 export enum PublishStatus {
-    Draft = "Draft",
-    Approved = "Approved",
-    Updated = "Updated",
-    Archived = "Archived"
+  Draft = "Draft",
+  Approved = "Approved",
+  Updated = "Updated",
+  Archived = "Archived",
 }

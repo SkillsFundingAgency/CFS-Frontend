@@ -1,5 +1,5 @@
-import { DatasetVersionSummary } from "./DatasetVersionSummary";
 import { DatasetRelationshipType } from "./DatasetRelationshipType";
+import { DatasetVersionSummary } from "./DatasetVersionSummary";
 
 export interface DatasetWithVersions {
   description: string;
