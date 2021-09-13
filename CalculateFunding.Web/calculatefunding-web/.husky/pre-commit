@@ -2,4 +2,6 @@
 . "$(dirname "$0")/_/husky.sh"
 
 cd CalculateFunding.Web/calculatefunding-web
+
+yarn ts:compile
 yarn lint-staged

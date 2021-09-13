@@ -1,41 +1,39 @@
-import "@testing-library/jest-dom/extend-expect";
-
-import {render, screen, waitFor} from "@testing-library/react";
-import {DateTime} from "luxon";
+import { render, screen, waitFor } from "@testing-library/react";
+import { DateTime } from "luxon";
 import React from "react";
-import {QueryClient, QueryClientProvider} from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
-import {Provider} from "react-redux";
-import {MemoryRouter, Route, Switch} from "react-router";
-import {Store,createStore} from "redux";
+import { Provider } from "react-redux";
+import { MemoryRouter, Route, Switch } from "react-router";
+import { createStore, Store } from "redux";
 
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
-import {AddJobSubscription, JobNotification, JobSubscription} from "../../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription, JobNotification, JobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as latestJobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import {SpecificationPermissionsResult} from "../../../hooks/Permissions/useSpecificationPermissions";
+import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
-import {IStoreState, rootReducer} from "../../../reducers/rootReducer";
-import {JobObserverState} from "../../../states/JobObserverState";
-import {ApprovalMode} from "../../../types/ApprovalMode";
+import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
+import { JobObserverState } from "../../../states/JobObserverState";
+import { ApprovalMode } from "../../../types/ApprovalMode";
 import {
   CalculationError,
   CalculationErrorQueryResult,
   DatasetDataType,
-  ObsoleteItemType
+  ObsoleteItemType,
 } from "../../../types/Calculations/CalculationError";
-import {CompletionStatus} from "../../../types/CompletionStatus";
-import {ProviderSource} from "../../../types/CoreProviderSummary";
-import {DatasetRelationship} from "../../../types/DatasetRelationship";
-import {FundingConfiguration} from "../../../types/FundingConfiguration";
-import {JobType} from "../../../types/jobType";
-import {UpdateCoreProviderVersion} from "../../../types/Provider/UpdateCoreProviderVersion";
-import {RunningStatus} from "../../../types/RunningStatus";
-import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
-import {SpecificationSummary} from "../../../types/SpecificationSummary";
-import {FundingPeriod, FundingStream} from "../../../types/viewFundingTypes";
-import {fullSpecPermissions} from "../../fakes/testFactories";
+import { CompletionStatus } from "../../../types/CompletionStatus";
+import { ProviderSource } from "../../../types/CoreProviderSummary";
+import { DatasetRelationship } from "../../../types/DatasetRelationship";
+import { FundingConfiguration } from "../../../types/FundingConfiguration";
+import { JobType } from "../../../types/jobType";
+import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
+import { RunningStatus } from "../../../types/RunningStatus";
+import { ProviderDataTrackingMode } from "../../../types/Specifications/ProviderDataTrackingMode";
+import { SpecificationSummary } from "../../../types/SpecificationSummary";
+import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
+import { fullSpecPermissions } from "../../fakes/testFactories";
 
 const store: Store<IStoreState> = createStore(rootReducer);
 
@@ -112,7 +110,7 @@ export function ViewSpecificationTestData() {
     additionalCalculations: [],
     templateCalculations: [],
     title: "",
-    templateCalculationId: 1
+    templateCalculationId: 1,
   };
   const calculationErrorsResult: CalculationErrorQueryResult = {
     clearCalculationErrorsFromCache(): Promise<void> {
@@ -126,6 +124,7 @@ export function ViewSpecificationTestData() {
     isFetchingCalculationErrors: false,
     calculationErrorCount: 1,
   };
+
   const calculationNoErrorsResult: CalculationErrorQueryResult = {
     clearCalculationErrorsFromCache(): Promise<void> {
       return Promise.resolve(undefined);
@@ -138,6 +137,7 @@ export function ViewSpecificationTestData() {
     isFetchingCalculationErrors: false,
     calculationErrorCount: 0,
   };
+
   const hasNoCalcErrors = () => {
     jest
       .spyOn(useCalculationErrorsHook, "useCalculationErrors")
@@ -159,12 +159,14 @@ export function ViewSpecificationTestData() {
     },
     id: "sertdhw4e5t",
     isEnabled: true,
-    onError: () => {},
+    onError: () => null,
     startDate: DateTime.local(),
   };
+
   const haveNoJobNotification = () => {
     notification = undefined;
   };
+
   const haveRefreshFailedJobNotification = () => {
     const job = {
       jobId: "jobId-generatedByRefresh",
@@ -193,6 +195,36 @@ export function ViewSpecificationTestData() {
 
     return notification;
   };
+
+  const haveEditSpecificationFailedJobNotification = () => {
+    const job = {
+      jobId: "jobId-EditSpecification",
+      jobType: JobType.EditSpecificationJob,
+      statusDescription: "Updating specification",
+      jobDescription: "",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Failed,
+      failures: [],
+      isSuccessful: false,
+      isFailed: true,
+      isActive: false,
+      isComplete: true,
+      outcome: "EditSpecification failed",
+    };
+    subscription.id = "EditSpecification-sub-id";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: mockSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+
   const haveConverterJobInProgressNotification = () => {
     subscription.id = "converter";
     notification = {
@@ -213,6 +245,7 @@ export function ViewSpecificationTestData() {
     };
     return notification;
   };
+
   const haveReportJobCompleteNotification = () => {
     const job = {
       isComplete: true,
@@ -248,7 +281,7 @@ export function ViewSpecificationTestData() {
   };
 
   const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
-  jobSubscriptionSpy.mockImplementation(({ onError, onNewNotification, isEnabled }) => {
+  jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
     if (onNewNotification && !hasNotificationCallback) {
       notificationCallback = onNewNotification;
       hasNotificationCallback = true;
@@ -269,7 +302,7 @@ export function ViewSpecificationTestData() {
         subscription = sub;
         return Promise.resolve(sub);
       },
-      replaceSubs: (requests: AddJobSubscription[]) => {
+      replaceSubs: () => {
         const sub: JobSubscription = {
           filterBy: {},
           id: "sertdhw4e5t",
@@ -280,8 +313,8 @@ export function ViewSpecificationTestData() {
         subscription = sub;
         return [sub];
       },
-      removeSub: (request) => {},
-      removeAllSubs: () => {},
+      removeSub: () => null,
+      removeAllSubs: () => null,
       subs: [],
       results: notification ? [notification] : [],
     };
@@ -591,5 +624,6 @@ export function ViewSpecificationTestData() {
     mockCalculationService,
     mockCalculationWithDraftCalculationsService,
     hasNoJobObserverState,
+    haveEditSpecificationFailedJobNotification,
   };
 }

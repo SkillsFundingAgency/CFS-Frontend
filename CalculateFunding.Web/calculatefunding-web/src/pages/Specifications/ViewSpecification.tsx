@@ -2,7 +2,6 @@ import { cloneDeep } from "lodash";
 import * as QueryString from "query-string";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory, useLocation } from "react-router";
 import { Link } from "react-router-dom";
@@ -19,7 +18,7 @@ import { FundingLineResults } from "../../components/fundingLineStructure/Fundin
 import { Header } from "../../components/Header";
 import { JobProgressNotificationBanner } from "../../components/Jobs/JobProgressNotificationBanner";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
-import { LoadingStatus } from "../../components/LoadingStatus";
+import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { Datasets } from "../../components/Specifications/Datasets";
@@ -41,7 +40,6 @@ import { IStoreState } from "../../reducers/rootReducer";
 import * as calculationService from "../../services/calculationService";
 import * as publishService from "../../services/publishService";
 import * as specificationService from "../../services/specificationService";
-import { FeatureFlagsState } from "../../states/FeatureFlagsState";
 import { JobObserverState } from "../../states/JobObserverState";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { CalculationType } from "../../types/CalculationSearchResponse";
@@ -58,13 +56,9 @@ export interface ViewSpecificationRoute {
 }
 
 export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificationRoute>) {
-  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
-    (state) => state.featureFlags
-  );
   const jobObserverState: JobObserverState = useSelector<IStoreState, JobObserverState>(
     (state) => state.jobObserverState
   );
-  const [releaseTimetableIsEnabled, setReleaseTimetableIsEnabled] = useState(false);
   const initialSpecification: SpecificationSummary = {
     coreProviderVersionUpdates: undefined,
     name: "",
@@ -161,10 +155,6 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
   }, [location]);
 
   useEffect(() => {
-    setReleaseTimetableIsEnabled(featureFlagsState.releaseTimetableVisible);
-  }, [featureFlagsState.releaseTimetableVisible]);
-
-  useEffect(() => {
     if (jobObserverState?.jobFilter) {
       addSub({
         filterBy: jobObserverState.jobFilter,
@@ -216,7 +206,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
       if (spec.isSelectedForFunding) {
         setSelectedForFundingSpecId(spec.id);
       } else {
-        await spec.fundingStreams.some(async (stream) => {
+        spec.fundingStreams.some(async (stream) => {
           const result =
             await specificationService.getSpecificationsSelectedForFundingByPeriodAndStreamService(
               spec.fundingPeriod?.id,
@@ -240,22 +230,15 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
     switch (notification.latestJob.jobType) {
       case JobType.ConverterWizardActivityCsvGenerationJob:
-        await handleConverterWizardReportJob(notification);
-        break;
+        return await handleConverterWizardReportJob(notification);
       case JobType.RefreshFundingJob:
-        await handleRefreshFundingJobNotification(notification);
-        break;
+        return await handleRefreshFundingJobNotification(notification);
       case JobType.ApproveAllCalculationsJob:
-        await handleApproveAllCalculationsJob(notification);
-        break;
+        return await handleApproveAllCalculationsJob(notification);
       case JobType.RunConverterDatasetMergeJob:
-        await handleConverterWizardJob(notification);
-        break;
-      default:
-        if (observedJobSubscription && notification.subscription.id === observedJobSubscription.id) {
-          await handleObservedJobNotification(notification);
-          break;
-        }
+        return await handleConverterWizardJob(notification);
+      case JobType.EditSpecificationJob:
+        return await handleEditSpecificationJob(notification);
     }
   }
 
@@ -284,6 +267,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
   async function handleRefreshFundingJobNotification(notification: JobNotification) {
     if (notification?.latestJob?.jobType !== JobType.RefreshFundingJob) return;
+
     const job = notification.latestJob;
     clearErrorMessages();
     if (job.isComplete) {
@@ -303,6 +287,11 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
   async function handleApproveAllCalculationsJob(notification: JobNotification) {
     if (notification.latestJob?.jobType !== JobType.ApproveAllCalculationsJob) return;
+
+    if (observedJobSubscription && notification.subscription.id === observedJobSubscription.id) {
+      await handleObservedJobNotification(notification);
+    }
+
     const job = notification.latestJob;
     setApproveAllCalcsJob(job);
     if (job.isComplete) {
@@ -312,6 +301,11 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
   async function handleConverterWizardJob(notification: JobNotification) {
     if (notification.latestJob?.jobType !== JobType.RunConverterDatasetMergeJob) return;
+
+    if (observedJobSubscription && notification.subscription.id === observedJobSubscription.id) {
+      await handleObservedJobNotification(notification);
+    }
+
     const job = notification.latestJob;
     if (job.isActive) {
       setConverterWizardJob(job);
@@ -321,8 +315,32 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
     }
   }
 
+  async function handleEditSpecificationJob(notification: JobNotification) {
+    if (notification.latestJob?.jobType !== JobType.EditSpecificationJob) {
+      return;
+    }
+
+    if (observedJobSubscription && notification.subscription.id === observedJobSubscription.id) {
+      return await handleObservedJobNotification(notification);
+    }
+
+    const job = notification.latestJob;
+    if (job.isFailed) {
+      addError({
+        error: job.outcome as string,
+        description: "There has been a problem updating this specification",
+      });
+    }
+  }
+
   async function handleConverterWizardReportJob(notification: JobNotification) {
     if (notification.latestJob?.jobType !== JobType.ConverterWizardActivityCsvGenerationJob) return;
+
+    if (observedJobSubscription && notification.subscription.id === observedJobSubscription.id) {
+      setLastConverterWizardReportDate(undefined);
+      return await handleObservedJobNotification(notification);
+    }
+
     const job = notification.latestJob;
     if (job.isComplete) {
       if (job.isSuccessful) {
@@ -406,7 +424,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
         const response = await publishService.refreshSpecificationFundingService(specificationId);
         const jobId = response.data as string;
         if (jobId != null && jobId !== "") {
-          const newSub = (await addSub({
+          await addSub({
             monitorMode: MonitorMode.SignalR,
             filterBy: {
               specificationId: specificationId,
@@ -415,7 +433,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
             },
             onError: (e) =>
               addError({ error: e, description: "Error while checking for refresh funding job" }),
-          })) as JobSubscription;
+          });
         } else {
           addError({ error: "A problem occurred while refreshing funding" });
         }
@@ -450,7 +468,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
         });
         return false;
       }
-    } catch (err: any) {
+    } catch (err) {
       addError({ error: "A problem occurred while choosing specification" });
       return false;
     }
@@ -497,11 +515,21 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
         <MultipleErrorSummary errors={errors} />
 
-        <LoadingStatus
-          title={"Checking calculations"}
-          hidden={!isApproveCalcsJobMonitoring && !isRefreshJobMonitoring}
-          subTitle={"Please wait, this could take several minutes"}
-          description={"Please do not refresh the page, you will be redirected automatically"}
+        <LoadingStatusNotifier
+          notifications={[
+            {
+              isActive: isApproveCalcsJobMonitoring,
+              title: "Background job is running",
+              subTitle: "Approving calculations",
+              description: "Please wait, this could take several minutes",
+            },
+            {
+              isActive: isRefreshJobMonitoring,
+              title: "Background job is running",
+              subTitle: "Refreshing funding",
+              description: "Please wait, this could take several minutes",
+            },
+          ]}
         />
 
         {(isRefreshJobMonitoring ||
@@ -518,7 +546,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           </div>
         )}
 
-        <div className="govuk-grid-row" hidden={!!isApproveCalcsJobMonitoring || !!isRefreshJobMonitoring}>
+        <div className="govuk-grid-row" hidden={isApproveCalcsJobMonitoring || isRefreshJobMonitoring}>
           <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
             <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
             <span className="govuk-caption-l">

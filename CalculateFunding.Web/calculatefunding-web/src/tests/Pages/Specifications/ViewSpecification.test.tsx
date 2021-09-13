@@ -1,11 +1,8 @@
-import { act, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
-import { JobNotification } from "../../../hooks/Jobs/useJobSubscription";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { Permission } from "../../../types/Permission";
-import { fakeSpecification } from "../../fakes/getSpecification.fake";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
 const testData = ViewSpecificationTestData();
@@ -91,7 +88,7 @@ describe("<ViewSpecification /> ", () => {
       const withoutPermissions: SpecificationPermissionsResult = {
         userId: "3456",
         isCheckingForPermissions: false,
-        hasPermission: (perm: Permission) => false,
+        hasPermission: () => false,
         hasMissingPermissions: true,
         isPermissionsFetched: true,
         permissionsEnabled: [],
