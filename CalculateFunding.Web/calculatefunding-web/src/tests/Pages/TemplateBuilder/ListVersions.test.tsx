@@ -1,6 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, waitFor } from "@testing-library/react";
+﻿import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import React from "react";
@@ -14,40 +12,39 @@ const templateId = "xxxx-xxxx-xxxx-xxxx";
 const fetchMock = new MockAdapter(axios);
 const useSelectorSpy = jest.spyOn(redux, "useSelector");
 
-const noFundingStreamPermissions: FundingStreamPermissions = 
-  {
-    canApproveAllCalculations: false,
-    canApproveAnyCalculations: false,
-    canApproveCalculations: false,
-    canRefreshPublishedQa: false,
-    canUploadDataSourceFiles: false,
-    fundingStreamId: "DSG",
-    userId: "",
-    canAdministerFundingStream: false,
-    canApproveFunding: false,
-    canApproveSpecification: false,
-    canChooseFunding: false,
-    canCreateQaTests: false,
-    canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
-    canEditCalculations: false,
-    canEditQaTests: false,
-    canEditSpecification: false,
-    canMapDatasets: false,
-    canRefreshFunding: false,
-    canReleaseFunding: false,
-    canCreateTemplates: false,
-    canEditTemplates: false,
-    canDeleteTemplates: false,
-    canApproveTemplates: false,
-    canApplyCustomProfilePattern: false,
-    canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
-    canEditProfilePattern: false,
-    canCreateProfilePattern: false
-  };
+const noFundingStreamPermissions: FundingStreamPermissions = {
+  canApproveAllCalculations: false,
+  canApproveAnyCalculations: false,
+  canApproveCalculations: false,
+  canRefreshPublishedQa: false,
+  canUploadDataSourceFiles: false,
+  fundingStreamId: "DSG",
+  userId: "",
+  canAdministerFundingStream: false,
+  canApproveFunding: false,
+  canApproveSpecification: false,
+  canChooseFunding: false,
+  canCreateQaTests: false,
+  canCreateSpecification: false,
+  canDeleteCalculations: false,
+  canDeleteQaTests: false,
+  canDeleteSpecification: false,
+  canEditCalculations: false,
+  canEditQaTests: false,
+  canEditSpecification: false,
+  canMapDatasets: false,
+  canRefreshFunding: false,
+  canReleaseFunding: false,
+  canCreateTemplates: false,
+  canEditTemplates: false,
+  canDeleteTemplates: false,
+  canApproveTemplates: false,
+  canApplyCustomProfilePattern: false,
+  canAssignProfilePattern: false,
+  canDeleteProfilePattern: false,
+  canEditProfilePattern: false,
+  canCreateProfilePattern: false,
+};
 export const noPermissionsState: FundingStreamPermissions[] = [noFundingStreamPermissions];
 
 describe("Template Versions page when there are two versions and I have no permissions ", () => {

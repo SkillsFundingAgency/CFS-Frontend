@@ -15,13 +15,14 @@ import { FilterAllocationType } from "../Search/FilterAllocationType";
 import { FilterCheckboxFieldset } from "../Search/FilterCheckboxFieldset";
 import { FilterOptionProps } from "../Search/FilterCheckboxOption";
 
-export interface IPublishedProviderSearchFiltersProps {
+
+export interface PublishedProviderSearchFiltersProps {
   facets: Facet[];
   numberOfProvidersWithErrors: number;
   clearFundingSearchSelection: () => void;
 }
 
-export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFiltersProps) {
+export function PublishedProviderSearchFilters(props: PublishedProviderSearchFiltersProps) {
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
@@ -171,56 +172,92 @@ export function PublishedProviderSearchFilters(props: IPublishedProviderSearchFi
 
   return (
     <>
-      <CollapsiblePanel title={"Search"} expanded={true}>
+      <CollapsiblePanel title={"Search"} isExpanded={true}>
         <fieldset className="govuk-fieldset" aria-describedby="how-contacted-conditional-hint">
-          <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading">
-            <h4 className="govuk-heading-s">Search</h4>
-          </legend>
           <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span">
             Select one option.
           </span>
           <ProviderSearchBox searchField={selectedTextSearch} callback={setSelectedTextSearch} />
         </fieldset>
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by provider type"} expanded={providerTypeFacets.length > 0}>
+      <CollapsiblePanel
+        title={"Filter by provider type"}
+        isExpanded={providerTypeFacets.length > 0}
+        isCollapsible={true}
+        showFacetCount={true}
+        facetCount={searchCriteria?.providerType.length}
+      >
         <FilterCheckboxFieldset
           fieldId="providerType"
           onChangeHandler={changeProviderTypeFilter}
           options={providerTypeOptions}
         />
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by provider sub type"} expanded={providerSubTypeFacets.length > 0}>
+      <CollapsiblePanel
+        title={"Filter by provider sub type"}
+        isExpanded={providerSubTypeFacets.length > 0}
+        isCollapsible={true}
+        showFacetCount={true}
+        facetCount={searchCriteria?.providerSubType.length}
+      >
         <FilterCheckboxFieldset
           fieldId="providerSubType"
           onChangeHandler={changeProviderSubTypeFilter}
           options={providerSubTypeOptions}
         />
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by status"} expanded={statusFacets.length > 0}>
+      <CollapsiblePanel
+        title={"Filter by status"}
+        isExpanded={statusFacets.length > 0}
+        isCollapsible={true}
+        showFacetCount={true}
+        facetCount={searchCriteria?.status.length}
+      >
         <FilterCheckboxFieldset
           fieldId="status"
           onChangeHandler={changeStatusFilter}
           options={statusOptions}
         />
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by local authority"} expanded={localAuthorityFacets.length > 0}>
+      <CollapsiblePanel
+        title={"Filter by local authority"}
+        isExpanded={localAuthorityFacets.length > 0}
+        isCollapsible={true}
+        showFacetCount={true}
+        facetCount={searchCriteria?.localAuthority.length}
+      >
         <FilterCheckboxFieldset
           fieldId="status"
           onChangeHandler={changeLocalAuthorityFilter}
           options={localAuthorityOptions}
         />
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by error status"} expanded={props.numberOfProvidersWithErrors > 0}>
+      <CollapsiblePanel
+        title={"Filter by error status"}
+        isExpanded={props.numberOfProvidersWithErrors > 0}
+        isCollapsible={true}
+      >
         <FilterCheckboxFieldset
           fieldId="has-errors"
           onChangeHandler={changeErrorFilter}
           options={hasErrorOptions}
         />
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by allocation type"} expanded={true}>
+      <CollapsiblePanel
+        title={"Filter by allocation type"}
+        isExpanded={true}
+        isCollapsible={true}
+        showFacetCount={false}
+      >
         <FilterAllocationType callback={setAllocationType} />
       </CollapsiblePanel>
-      <CollapsiblePanel title={"Filter by open date"} expanded={openDateFacets.length > 0}>
+      <CollapsiblePanel
+        title={"Filter by open date"}
+        isExpanded={openDateFacets.length > 0}
+        isCollapsible={true}
+        showFacetCount={true}
+        facetCount={searchCriteria?.monthYearOpened.length}
+      >
         <FilterCheckboxFieldset
           fieldId="openDate"
           onChangeHandler={changeMonthYearOpenedFilter}

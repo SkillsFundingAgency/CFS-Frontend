@@ -302,13 +302,19 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-third">
               <form id="searchProviders">
-                <CollapsiblePanel title={"Search"} expanded={true}>
+                <CollapsiblePanel title={"Search"} isExpanded={true}>
                   <fieldset className="govuk-fieldset">
                     <span className="govuk-hint sidebar-search-span">Select one option.</span>
                     <CollapsibleSearchBox searchTerm={""} callback={filterBySearchTerm} />
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title="Filter by provider type" expanded={false}>
+                <CollapsiblePanel
+                  title="Filter by provider type"
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={calculationProviderSearchRequest.providerType.length}
+                >
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-checkboxes">
                       {filterProviderTypes.map((pt, index) => (
@@ -332,7 +338,13 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                     </div>
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title="Filter by provider sub type" expanded={false}>
+                <CollapsiblePanel
+                  title="Filter by provider sub type"
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={calculationProviderSearchRequest.providerSubType.length}
+                >
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-checkboxes">
                       {filterProviderSubTypes.map((pt, index) => (
@@ -356,7 +368,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                     </div>
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title="Filter by results status" expanded={false}>
+                <CollapsiblePanel title="Filter by results status" isExpanded={true} isCollapsible={true}>
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-radios">
                       {filterResultsStatus.map((pt, index) => (
@@ -378,7 +390,13 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                     </div>
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title="Filter by local authority(LA)" expanded={false}>
+                <CollapsiblePanel
+                  title="Filter by local authority(LA)"
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={calculationProviderSearchRequest.localAuthority.length}
+                >
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-checkboxes">
                       {filterLocalAuthority.map((pt, index) => (

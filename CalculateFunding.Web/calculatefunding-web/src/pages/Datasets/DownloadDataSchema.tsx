@@ -183,7 +183,7 @@ export function DownloadDataSchema() {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
             <form id="searchDatasources">
-              <CollapsiblePanel title={"Search"} expanded={true}>
+              <CollapsiblePanel title={"Search"} isExpanded={true} isCollapsible={false}>
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label filterLabel" htmlFor="filter-by-type">
@@ -200,7 +200,13 @@ export function DownloadDataSchema() {
                   </div>
                 </fieldset>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by funding stream"} expanded={true}>
+              <CollapsiblePanel
+                title={"Filter by funding stream"}
+                isExpanded={true}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.filters["fundingStreamName"]?.length}
+              >
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label">Search</label>

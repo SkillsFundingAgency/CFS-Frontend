@@ -34,6 +34,7 @@ export const ListVersions = () => {
   const [includePublished, setIncludePublished] = useState<boolean>(true);
   const [errors, setErrors] = useState<ErrorMessage[]>([]);
   const itemsPerPage = 10;
+  const [statusCount, setStatusCount] = useState<number>(0);
 
   function loadTemplate() {
     const getTemplate = async () => {
@@ -55,6 +56,19 @@ export const ListVersions = () => {
   useEffectOnce(() => {
     loadTemplate();
   });
+
+  useEffect(() => {
+    let count = 0;
+    if (includeDrafts) {
+      count++;
+    }
+
+    if (includePublished) {
+      count++;
+    }
+
+    setStatusCount(count);
+  }, [includeDrafts, includePublished]);
 
   useEffect(() => {
     function loadTemplateVersions() {
@@ -83,6 +97,7 @@ export const ListVersions = () => {
           .finally(() => setIsLoadingVersions(false));
       }
     }
+
     loadTemplateVersions();
   }, [page, includeDrafts, includePublished, templateId]);
 
@@ -104,10 +119,6 @@ export const ListVersions = () => {
     const errorCount: number = errors.length;
     const error: ErrorMessage = { id: errorCount + 1, fieldName: fieldName, message: errorMessage };
     setErrors((errors) => [...errors, error]);
-  }
-
-  function clearErrorMessages() {
-    setErrors([]);
   }
 
   return (
@@ -138,13 +149,9 @@ export const ListVersions = () => {
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-full">
                 <h1 className="govuk-heading-xl">{template && template.name}</h1>
-                <h3 className="govuk-caption-l govuk-!-padding-bottom-5">
-                  View or restore previous versions of the template.
+                <h3 className="govuk-caption-xl govuk-!-padding-bottom-6">
+                  {template && template.fundingStreamName} for {template && template.fundingPeriodName}
                 </h3>
-                <span className="govuk-caption-m">Funding stream</span>
-                <h3 className="govuk-heading-m">{template && template.fundingStreamName}</h3>
-                <span className="govuk-caption-m">Funding period</span>
-                <h3 className="govuk-heading-m">{template && template.fundingPeriodName}</h3>
               </div>
             </div>
           )}
@@ -152,7 +159,12 @@ export const ListVersions = () => {
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-third">
                 <form id="filters">
-                  <CollapsiblePanel title={"Filter by status"} expanded={false}>
+                  <CollapsiblePanel
+                    title={"Filter by status"}
+                    isExpanded={false}
+                    isCollapsible={false}
+                    facetCount={statusCount}
+                  >
                     <fieldset className="govuk-fieldset">
                       <div className="govuk-checkboxes">
                         <div className="govuk-checkboxes__item">

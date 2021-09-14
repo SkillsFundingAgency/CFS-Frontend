@@ -130,7 +130,7 @@ export const ListTemplates = () => {
         </div>
         <div className="govuk-grid-row" hidden={isLoading}>
           <div className="govuk-grid-column-one-third">
-            <CollapsiblePanel title={"Search"} expanded={true}>
+            <CollapsiblePanel title={"Search"} isExpanded={true}>
               <label className="govuk-label filterLabel" htmlFor="filter-by-type">
                 Search
               </label>

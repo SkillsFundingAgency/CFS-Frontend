@@ -90,6 +90,7 @@ export function SpecificationsList() {
       };
     });
   }
+
   function filterByFundingPeriod(e: React.ChangeEvent<HTMLInputElement>) {
     const filterUpdate = searchCriteria.fundingPeriods;
     if (e.target.checked) {
@@ -203,13 +204,19 @@ export function SpecificationsList() {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-third">
               <form id="searchSpecifications">
-                <CollapsiblePanel title="Search" expanded={true}>
+                <CollapsiblePanel title="Search" isExpanded={true}>
                   <fieldset className="govuk-fieldset">
                     <label className="govuk-label">Search</label>
                     <input className="govuk-input" onChange={filterBySearchTerm} />
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title={"Filter by funding period"} expanded={false}>
+                <CollapsiblePanel
+                  title={"Filter by funding period"}
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={searchCriteria.fundingPeriods.length}
+                >
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-form-group">
                       <label className="govuk-label">Search</label>
@@ -237,7 +244,13 @@ export function SpecificationsList() {
                     </div>
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title={"Filter by funding streams"} expanded={false}>
+                <CollapsiblePanel
+                  title={"Filter by funding streams"}
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={searchCriteria.fundingStreams.length}
+                >
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-form-group">
                       <label className="govuk-label">Search</label>
@@ -265,7 +278,13 @@ export function SpecificationsList() {
                     </div>
                   </fieldset>
                 </CollapsiblePanel>
-                <CollapsiblePanel title={"Filter by status"} expanded={false}>
+                <CollapsiblePanel
+                  title={"Filter by status"}
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={searchCriteria.status.length}
+                >
                   <fieldset className="govuk-fieldset">
                     <div className="govuk-form-group">
                       <label className="govuk-label">Search</label>

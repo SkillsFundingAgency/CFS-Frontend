@@ -227,7 +227,7 @@ export function ViewProvidersByFundingStream({
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
             <form id="searchProviders">
-              <CollapsiblePanel title={"Search"} expanded={true}>
+              <CollapsiblePanel title={"Search"} isExpanded={true}>
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <span className="govuk-caption-m govuk-!-margin-bottom-4">Select one option</span>
@@ -283,7 +283,13 @@ export function ViewProvidersByFundingStream({
                   </div>
                 </fieldset>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by provider type"} expanded={true}>
+              <CollapsiblePanel
+                title={"Filter by provider type"}
+                isExpanded={true}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.filters["providerType"]?.length}
+              >
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label">Search</label>
@@ -316,7 +322,13 @@ export function ViewProvidersByFundingStream({
                   </div>
                 </fieldset>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by provider sub type"} expanded={true}>
+              <CollapsiblePanel
+                title={"Filter by provider sub type"}
+                isExpanded={true}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.filters["providerSubType"]?.length}
+              >
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label">Search</label>
@@ -349,7 +361,13 @@ export function ViewProvidersByFundingStream({
                   </div>
                 </fieldset>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by local authority (LA)"} expanded={true}>
+              <CollapsiblePanel
+                title={"Filter by local authority (LA)"}
+                isExpanded={true}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.filters["authority"]?.length}
+              >
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label">Search</label>

@@ -1,5 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
@@ -9,7 +7,7 @@ import * as calcHook from "../../hooks/Calculations/useCalculation";
 import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { LatestSpecificationJobWithMonitoringResult } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specHook from "../../hooks/useSpecificationSummary";
-import {SpecificationSummaryQueryResult} from "../../hooks/useSpecificationSummary";
+import { SpecificationSummaryQueryResult } from "../../hooks/useSpecificationSummary";
 import { CalculationDetails } from "../../types/CalculationDetails";
 import { CalculationProviderSearchRequestViewModel } from "../../types/calculationProviderSearchRequestViewModel";
 import { CalculationDataType } from "../../types/Calculations/CalculationCompilePreviewResponse";
@@ -183,7 +181,7 @@ const testSpec1: SpecificationSummary = {
   fundingStreams: [fundingStream],
   fundingPeriod: fundingPeriod,
   dataDefinitionRelationshipIds: [],
-  templateIds: {}
+  templateIds: {},
 };
 const testCalc1: CalculationDetails = {
   dataType: CalculationDataType.Decimal,
@@ -216,7 +214,7 @@ const result: SpecificationSummaryQueryResult = {
   haveErrorCheckingForSpecification: false,
   isFetchingSpecification: false,
   isSpecificationFetched: true,
-}
+};
 const mockSpecification = () =>
   jest.spyOn(specHook, "useSpecificationSummary").mockImplementation(() => result);
 

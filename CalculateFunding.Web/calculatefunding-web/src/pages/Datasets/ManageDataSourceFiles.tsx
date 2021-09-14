@@ -10,7 +10,7 @@ import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
 import Pagination from "../../components/Pagination";
-import { convertToSlug, removeSpaces } from "../../helpers/stringHelper";
+import { convertToSlug } from "../../helpers/stringHelper";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useErrors } from "../../hooks/useErrors";
 import { searchDatasetService } from "../../services/datasetService";
@@ -192,7 +192,7 @@ export function ManageDataSourceFiles() {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
             <form id="searchDatasources">
-              <CollapsiblePanel title={"Search"} expanded={true}>
+              <CollapsiblePanel title={"Search"} isExpanded={true}>
                 <label className="govuk-label filterLabel" htmlFor="filter-by-type">
                   Search
                 </label>
@@ -205,7 +205,13 @@ export function ManageDataSourceFiles() {
                   onChange={(e) => searchText(e)}
                 />
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by funding stream"} expanded={false}>
+              <CollapsiblePanel
+                title={"Filter by funding stream"}
+                isExpanded={false}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.fundingStreams.length}
+              >
                 <div className="govuk-checkboxes">
                   {filterFundingStreams.map((fp, index) => (
                     <div key={index} className="govuk-checkboxes__item">
@@ -227,7 +233,13 @@ export function ManageDataSourceFiles() {
                   ))}
                 </div>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by data schema"} expanded={false}>
+              <CollapsiblePanel
+                title={"Filter by data schema"}
+                isExpanded={false}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.dataSchemas.length}
+              >
                 <div className="govuk-checkboxes">
                   {filterDataSchemas.map((fp, index) => (
                     <div key={index} className="govuk-checkboxes__item">

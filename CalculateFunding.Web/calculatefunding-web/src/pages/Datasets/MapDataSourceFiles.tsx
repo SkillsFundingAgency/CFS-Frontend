@@ -227,7 +227,7 @@ export function MapDataSourceFiles() {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
             <form id="searchDatasources">
-              <CollapsiblePanel title={"Search"} expanded={true}>
+              <CollapsiblePanel title={"Search"} isExpanded={true}>
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label filterLabel" htmlFor="filter-by-type">
@@ -244,7 +244,13 @@ export function MapDataSourceFiles() {
                   </div>
                 </fieldset>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by funding stream"} expanded={true}>
+              <CollapsiblePanel
+                title={"Filter by funding stream"}
+                isExpanded={true}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.filters["fundingStreamNames"]?.length}
+              >
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label">Search</label>
@@ -278,7 +284,13 @@ export function MapDataSourceFiles() {
                   </div>
                 </fieldset>
               </CollapsiblePanel>
-              <CollapsiblePanel title={"Filter by funding period"} expanded={true}>
+              <CollapsiblePanel
+                title={"Filter by funding period"}
+                isExpanded={true}
+                isCollapsible={true}
+                showFacetCount={true}
+                facetCount={searchRequest.filters["fundingPeriodName"]?.length}
+              >
                 <fieldset className="govuk-fieldset">
                   <div className="govuk-form-group">
                     <label className="govuk-label">Search</label>

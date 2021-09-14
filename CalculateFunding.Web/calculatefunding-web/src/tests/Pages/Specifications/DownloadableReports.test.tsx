@@ -5,10 +5,9 @@ import React from "react";
 import { MemoryRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
 
-import { DownloadableReports } from "../../../components/Reports/DownloadableReports";
 import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as errorHook from "../../../hooks/useErrors";
-import {ErrorHookResult} from "../../../hooks/useErrors";
+import { ErrorHookResult } from "../../../hooks/useErrors";
 import {
   ReportGrouping,
   ReportGroupingLevel,
