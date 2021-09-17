@@ -23,55 +23,121 @@ variables:
   value: 'ecf37bc0-472b-47bf-91e3-6774809fd194' 
 - group: 'Dotnet Core SDK Version'
 
-steps:
-- template: templates\build-frontend-react-spa.yml
-  parameters:
-    projectFolder: $(projectFolder)
-    DotnetCoreSdkVersion: $(DotnetCoreSdkVersion)
-    
-- task: UseDotNet@2
-  displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersion)'
-  inputs:
-    version: '$(DotnetCoreSdkVersion)'
+jobs:
+  - job:
+    displayName: 'Build, test and publish'
+    steps:
+    - task: NodeTool@0
+      displayName: 'Use Node 14.x'
+      inputs:
+        versionSpec: 14.x
 
-- task: DotNetCoreCLI@2
-  displayName: Restore
-  inputs:
-    command: restore
-    projects: '**/*.csproj'
-    vstsFeed: '$(vstsFeed)'
+    - powershell: |
+        cd '${{ variables.projectFolder }}'
+        Write-host "========================= Installing Yarn Packages  ========================="
+        yarn install --silent
+        Write-host "========================= Audit packages  ========================="
+        yarn install --audit
+      displayName: "Run yarn install"
 
-- task: DotNetCoreCLI@2
-  displayName: Test
-  inputs:
-    command: test
-    projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+    - powershell: |
+        cd '${{ variables.projectFolder }}'
+        $targetBranch = $env:SYSTEM_PULLREQUEST_TARGETBRANCH -replace "refs/heads/"
 
-- task: DotNetCoreCLI@2
-  displayName: Publish
-  inputs:
-    command: publish
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) /p:AssemblyVersion=$(Build.BuildNumber)'
+        Write-Host "========================= Running PR checks ========================="
+        Write-Host "Checking for differences between $targetBranch and current branch"
 
-- task: CopyFiles@2
-  displayName: 'Copy DevOps Files to: $(build.artifactstagingdirectory)/DevOps'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  inputs:
-    SourceFolder: DevOps
-    Contents: '**/*.*'
-    TargetFolder: '$(build.artifactstagingdirectory)/DevOps'
+        $mergeCommitHash = git merge-base HEAD origin/$targetBranch
+        Write-Host "Finding typescript changes between this branch and the current head (commit hash $mergeCommitHash)"
 
-- task: CopyFiles@2
-  displayName: 'Copy Azure Template Files to: $(build.artifactstagingdirectory)/azure'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  inputs:
-    SourceFolder: azure
-    Contents: '**/*.*'
-    TargetFolder: '$(build.artifactstagingdirectory)/azure'
+        $changedFiles = @(git diff --name-only $mergeCommitHash --diff-filter=d -- "*.ts" "*.tsx")
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-  inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
+        if($changedFiles.Count -gt 0) {
+          $truncatedChangedFiles = @($changedFiles | ForEach-Object { $_ -replace "CalculateFunding.Web/calculatefunding-web/", "" })
+
+          Write-Host "Changed files:"
+          Write-Host @truncatedChangedFiles
+
+          Write-Host "Running ESLint over changed files"
+
+          node .\node_modules\eslint\bin\eslint.js @truncatedChangedFiles
+        } else {
+          Write-Host "Skipping eslint step as no files were changed..."
+        }
+        Write-Host "Running typescript compiler..."
+        node .\node_modules\typescript\bin\tsc --noEmit
+        echo  "========================= Finished running PR checks ========================="
+        
+      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+      displayName: "Run PR checks"
+
+    - powershell: |
+        cd '${{ variables.projectFolder }}'
+        $env:CI = "true"
+        Write-host "========================= Yarn test ========================="
+        yarn test
+        Write-host "========================= Yarn build ========================="
+        $env:CI = "false"
+        yarn run build
+        Write-host "========================= Finished build/test ========================="
+      displayName: 'Run Yarn Test and build site'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish React Test Results as test-report.xml'
+      inputs:
+        testResultsFiles: 'test-report.xml'
+        searchFolder: '$(System.DefaultWorkingDirectory)\${{ variables.projectFolder }}'
+        testRunTitle: 'React Test _$(Build.BuildNumber)'
+
+    - task: CopyFiles@2
+      displayName: 'Copy Files to: CalculateFunding.Frontend/wwwroot/app'
+      inputs:
+        SourceFolder: '${{ variables.projectFolder }}/Build'
+        TargetFolder: CalculateFunding.Frontend/wwwroot/app
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersion)'
+      inputs:
+        version: '$(DotnetCoreSdkVersion)'
+
+    - task: DotNetCoreCLI@2
+      displayName: Restore
+      inputs:
+        command: restore
+        projects: '**/*.csproj'
+        vstsFeed: '$(vstsFeed)'
+
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        command: test
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+
+    - task: DotNetCoreCLI@2
+      displayName: Publish
+      inputs:
+        command: publish
+        arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) /p:AssemblyVersion=$(Build.BuildNumber)'
+
+    - task: CopyFiles@2
+      displayName: 'Copy DevOps Files to: $(build.artifactstagingdirectory)/DevOps/'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      inputs:
+        SourceFolder: DevOps
+        Contents: '**/*.ps1'
+        TargetFolder: '$(build.artifactstagingdirectory)/DevOps'
+
+    - task: CopyFiles@2
+      displayName: 'Copy Azure Template Files to: $(build.artifactstagingdirectory)/azure'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      inputs:
+        SourceFolder: azure
+        Contents: '**/*.*'
+        TargetFolder: '$(build.artifactstagingdirectory)/azure'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      inputs:
+        PathtoPublish: '$(build.artifactstagingdirectory)'
