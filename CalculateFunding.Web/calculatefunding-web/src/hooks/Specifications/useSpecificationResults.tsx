@@ -30,7 +30,8 @@ export const useSpecificationResults = (
   );
 
   return {
-    specificationHasCalculationResults: data !== undefined ? data.length > 0 : false,
+    specificationHasCalculationResults:
+      data !== undefined ? data.filter((d) => d.id === specificationId).length > 0 : false,
     isLoadingSpecificationResults: isLoading,
   };
 };

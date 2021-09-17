@@ -53,12 +53,11 @@ describe("<ViewSpecification /> ", () => {
         expect(await screen.findByText(/In year opener enabled/)).toBeInTheDocument();
       });
 
-      it("renders the link to the specification results page", async () => {
-        const link = (await screen.findByRole("link", {
+      it("does not render the link to the specification results page", async () => {
+        const link = (await screen.queryByRole("link", {
           name: /View specification results/,
         })) as HTMLAnchorElement;
-        expect(link).toBeInTheDocument();
-        expect(link.getAttribute("href")).toBe(`/ViewSpecificationResults/${testData.mockSpec.id}`);
+        expect(link).not.toBeInTheDocument();
       });
     });
   });
