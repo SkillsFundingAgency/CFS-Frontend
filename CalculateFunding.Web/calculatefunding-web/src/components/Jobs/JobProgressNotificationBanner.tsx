@@ -84,8 +84,8 @@ export function JobProgressNotificationBanner(props: JobProgressNotificationBann
         {props.job.isFailed && props.job.failures.length > 0 && (
           <ul className="govuk-list govuk-error-summary__list">
             {props.jobFailedOverride}
-            {props.job.failures.map((f) => (
-              <li>
+            {props.job.failures.map((f, idx) => (
+              <li key={idx}>
                 <p className="govuk-body">
                   {f.jobDescription}: {f.description}
                 </p>

@@ -1,7 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { act, render, screen, waitFor, within } from "@testing-library/react";
-import React from "react";
+﻿import { screen } from "@testing-library/react";
 import * as redux from "react-redux";
 
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
@@ -13,29 +10,31 @@ describe("<SpecificationFundingApproval />", () => {
   afterEach(() => jest.clearAllMocks());
 
   describe("when job is active", () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-      test.hasActiveJobRunning();
+      test.haveNoJobNotification();
       test.hasSpecification();
-      test.hasLastRefreshJob();
+      test.haveJobInProgressNotification();
       test.hasFundingConfigurationWithApproveAll();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors([]);
       test.hasSearchResults([test.provider1]);
 
-      test.loadPage();
+      await test.renderPage();
     });
 
     it("renders Specification details", async () => {
-      expect(screen.getByTestId("specName")).toBeInTheDocument();
+      expect(await screen.findByRole("heading", { name: test.testSpec.name })).toBeInTheDocument();
+    });
+
+    it("does not render error section", async () => {
+      expect(screen.queryByRole("alert", { name: "job-notification" })).not.toBeInTheDocument();
     });
 
     it("renders job progress spinner", async () => {
-      expect(screen.getByTestId("loader")).toBeInTheDocument();
+      expect(await screen.findByTestId("loader")).toBeInTheDocument();
       expect(
-        await screen.findByText(
-          `Job ${test.activeJob?.latestJob?.statusDescription}: ${test.activeJob?.latestJob?.jobDescription}`
-        )
+        screen.getByText(/Job Refresh Funding job is in progress: Refreshing Funding/)
       ).toBeInTheDocument();
     });
 

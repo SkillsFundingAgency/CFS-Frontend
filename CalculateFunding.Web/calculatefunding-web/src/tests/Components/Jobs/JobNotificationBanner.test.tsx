@@ -1,8 +1,7 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, waitFor } from "@testing-library/react";
+﻿import { render, screen } from "@testing-library/react";
 import React from "react";
 
+import { SpinnerDisplaySetting } from "../../../components/Jobs/JobLoadingSpinner";
 import {
   JobNotificationBanner,
   JobNotificationBannerProps,
@@ -14,14 +13,7 @@ import { JobType } from "../../../types/jobType";
 import { RunningStatus } from "../../../types/RunningStatus";
 
 const renderComponent = (params: JobNotificationBannerProps) => {
-  return render(
-    <JobNotificationBanner
-      job={params.job}
-      isCheckingForJob={params.isCheckingForJob}
-      jobCompletedOutcomeFailedMessage={params.jobCompletedOutcomeFailedMessage}
-      jobFailedMessage={params.jobFailedMessage}
-    />
-  );
+  return render(<JobNotificationBanner {...params} />);
 };
 
 describe("<JobNotificationBanner />", () => {
@@ -32,6 +24,11 @@ describe("<JobNotificationBanner />", () => {
       const props: JobNotificationBannerProps = {
         job: undefined,
         isCheckingForJob: false,
+        notificationSettings: [
+          {
+            jobTypes: [JobType.RefreshFundingJob],
+          },
+        ],
       };
       await renderComponent(props);
 
@@ -44,10 +41,23 @@ describe("<JobNotificationBanner />", () => {
       const props: JobNotificationBannerProps = {
         job: undefined,
         isCheckingForJob: true,
+        notificationSettings: [
+          {
+            jobTypes: [JobType.RefreshFundingJob],
+          },
+        ],
+        spinner: {
+          loadingText: "Loading text goes here",
+          isLoading: true,
+          loadingDescription: "Loading description goes here",
+          display: SpinnerDisplaySetting.ShowPageSpinner,
+        },
       };
       await renderComponent(props);
 
-      expect(screen.getByText("Checking for running jobs")).toBeInTheDocument();
+      expect(screen.getByTestId("loader")).toBeInTheDocument();
+      expect(screen.getByText(/Loading text goes here/)).toBeInTheDocument();
+      expect(screen.getByText(/Loading description goes here/)).toBeInTheDocument();
       expect(screen.queryByText(/Job initiated by/)).not.toBeInTheDocument();
       expect(screen.queryByText(/Results updated/)).not.toBeInTheDocument();
       expect(screen.queryByText(/Job ID/)).not.toBeInTheDocument();
@@ -59,6 +69,11 @@ describe("<JobNotificationBanner />", () => {
       const props: JobNotificationBannerProps = {
         job: mockQueuedJobResult,
         isCheckingForJob: false,
+        notificationSettings: [
+          {
+            jobTypes: [JobType.RefreshFundingJob],
+          },
+        ],
       };
 
       renderComponent(props);
@@ -75,7 +90,12 @@ describe("<JobNotificationBanner />", () => {
       const props: JobNotificationBannerProps = {
         job: mockCompletedJobWithNoOutcomeTypeResult,
         isCheckingForJob: false,
-        jobCompletedOutcomeFailedMessage: "a test jobCompletedOutcomeFailedMessage",
+        notificationSettings: [
+          {
+            jobTypes: [JobType.RefreshFundingJob],
+            failureOutcomeDescription: "a test jobCompletedOutcomeFailedMessage",
+          },
+        ],
       };
 
       renderComponent(props);
@@ -96,7 +116,12 @@ describe("<JobNotificationBanner />", () => {
         const props: JobNotificationBannerProps = {
           job: mockFailedJobWithNoChildFailedOutcomesResult,
           isCheckingForJob: false,
-          jobCompletedOutcomeFailedMessage: "a test jobCompletedOutcomeFailedMessage",
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              failureOutcomeDescription: "a test jobCompletedOutcomeFailedMessage",
+            },
+          ],
         };
 
         renderComponent(props);
@@ -114,7 +139,12 @@ describe("<JobNotificationBanner />", () => {
         const props: JobNotificationBannerProps = {
           job: mockFailedJobResult,
           isCheckingForJob: false,
-          jobCompletedOutcomeFailedMessage: "a test jobCompletedOutcomeFailedMessage",
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              failureOutcomeDescription: "a test jobCompletedOutcomeFailedMessage",
+            },
+          ],
         };
 
         renderComponent(props);
@@ -143,7 +173,12 @@ describe("<JobNotificationBanner />", () => {
         const props: JobNotificationBannerProps = {
           job: mockFailedJobWithNoChildFailedOutcomesResult,
           isCheckingForJob: false,
-          jobFailedMessage: "a test jobFailedMessage",
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              failDescription: "a test jobFailedMessage",
+            },
+          ],
         };
 
         renderComponent(props);
@@ -162,7 +197,12 @@ describe("<JobNotificationBanner />", () => {
         const props: JobNotificationBannerProps = {
           job: mockFailedJobResult,
           isCheckingForJob: false,
-          jobFailedMessage: "a test jobFailedMessage",
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              failDescription: "a test jobFailedMessage",
+            },
+          ],
         };
 
         renderComponent(props);
@@ -191,7 +231,11 @@ describe("<JobNotificationBanner />", () => {
         const props: JobNotificationBannerProps = {
           job: mockFailedJobResult,
           isCheckingForJob: false,
-          jobFailedMessage: undefined,
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+            },
+          ],
         };
 
         renderComponent(props);

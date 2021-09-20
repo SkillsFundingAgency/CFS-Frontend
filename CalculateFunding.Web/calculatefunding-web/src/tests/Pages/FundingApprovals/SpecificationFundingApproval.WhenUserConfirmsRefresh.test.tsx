@@ -1,8 +1,5 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+﻿import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 import * as redux from "react-redux";
 
 import * as publishService from "../../../services/publishService";
@@ -29,7 +26,6 @@ describe("<SpecificationFundingApproval />", () => {
       beforeEach(async () => {
         useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
         test.hasSpecification();
-        test.hasNoActiveJobsRunning();
         test.hasFundingConfigurationWithApproveAll();
         test.hasFullSpecPermissions();
         test.hasProvidersWithErrors([]);
@@ -74,8 +70,7 @@ describe("<SpecificationFundingApproval />", () => {
       beforeEach(() => {
         useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
         test.hasSpecification();
-        test.hasNoActiveJobsRunning();
-        test.hasLastRefreshJob();
+        test.haveRefreshSucceededJobNotification();
         test.hasFundingConfigurationWithApproveAll();
         test.hasFullSpecPermissions();
         test.hasProvidersWithErrors([]);

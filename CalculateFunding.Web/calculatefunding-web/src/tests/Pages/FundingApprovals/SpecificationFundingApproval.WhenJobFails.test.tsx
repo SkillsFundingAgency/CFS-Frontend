@@ -1,7 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { screen } from "@testing-library/react";
-import React from "react";
+﻿import { screen } from "@testing-library/react";
 import * as redux from "react-redux";
 
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
@@ -15,9 +12,8 @@ describe("<SpecificationFundingApproval />", () => {
   describe("when job has failed", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-      test.hasFailedJob();
+      test.haveFailedJobNotification();
       test.hasSpecification();
-      test.hasLastRefreshJob();
       test.hasFundingConfigurationWithApproveAll();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors([]);
@@ -34,14 +30,13 @@ describe("<SpecificationFundingApproval />", () => {
       expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
     });
 
+    it("renders error section", async () => {
+      expect(screen.getByRole("alert", { name: "job-notification" })).toBeInTheDocument();
+    });
+
     it("renders job error", async () => {
-      expect(
-        await screen.findByText((component) =>
-          component.startsWith(
-            `Job ${test.failedJob?.latestJob?.statusDescription}: ${test.failedJob?.latestJob?.jobDescription}`
-          )
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Refresh failed/)).toBeInTheDocument();
+      expect(screen.getByText(/Job Refreshing funding/)).toBeInTheDocument();
     });
 
     it("renders filters", async () => {

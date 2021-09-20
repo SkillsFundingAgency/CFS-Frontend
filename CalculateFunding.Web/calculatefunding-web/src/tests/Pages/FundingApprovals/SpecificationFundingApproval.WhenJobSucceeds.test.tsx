@@ -1,7 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { screen } from "@testing-library/react";
-import React from "react";
+﻿import { screen } from "@testing-library/react";
 import * as redux from "react-redux";
 
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
@@ -15,9 +12,8 @@ describe("<SpecificationFundingApproval />", () => {
   describe("when job has completed successfully", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-      test.hasSuccessfulCompletedJob();
       test.hasSpecification();
-      test.hasLastRefreshJob();
+      test.haveRefreshSucceededJobNotification();
       test.hasFundingConfigurationWithApproveAll();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors([]);
@@ -39,13 +35,7 @@ describe("<SpecificationFundingApproval />", () => {
     });
 
     it("renders job completed successfully", async () => {
-      expect(
-        screen.getByText((component) =>
-          component.startsWith(
-            `Job ${test.successfulCompletedJob?.latestJob?.statusDescription}: ${test.successfulCompletedJob?.latestJob?.jobDescription}`
-          )
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Refresh succeeded/)).toBeInTheDocument();
     });
 
     it("renders filters", async () => {

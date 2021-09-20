@@ -60,14 +60,15 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     addErrorMessage(err.message, "Error while loading specification")
   );
 
+  const jobsToWatch = [
+    JobType.CreateInstructAllocationJob,
+    JobType.GenerateGraphAndInstructAllocationJob,
+    JobType.CreateInstructGenerateAggregationsAllocationJob,
+    JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+  ];
   const { latestJob, isCheckingForJob } = useLatestSpecificationJobWithMonitoring(
     specificationId,
-    [
-      JobType.CreateInstructAllocationJob,
-      JobType.GenerateGraphAndInstructAllocationJob,
-      JobType.CreateInstructGenerateAggregationsAllocationJob,
-      JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-    ],
+    jobsToWatch,
     (err) => addError({ error: err, description: "Error checking for job" })
   );
 
@@ -273,8 +274,14 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
           <JobNotificationBanner
             job={latestJob}
             isCheckingForJob={isCheckingForJob}
-            jobCompletedOutcomeFailedMessage="Calculation run completed with one or more exceptions detected in the calculation code"
-            jobFailedMessage={"Calculation run failed due to a problem with the service"}
+            notificationSettings={[
+              {
+                jobTypes: jobsToWatch,
+                failDescription: "Calculation run failed due to a problem with the service",
+                failureOutcomeDescription:
+                  "Calculation run completed with one or more exceptions detected in the calculation code",
+              },
+            ]}
           />
         )}
         <div className="govuk-main-wrapper">

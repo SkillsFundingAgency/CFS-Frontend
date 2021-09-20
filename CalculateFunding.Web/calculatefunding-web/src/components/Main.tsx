@@ -11,7 +11,7 @@ export interface MainProps {
   children: any;
 }
 
-export function Main({ location, className, children }: MainProps) {
+export function Main({ location, className, children }: MainProps): JSX.Element {
   return (
     <>
       <TopHeader location={location} />
@@ -20,6 +20,7 @@ export function Main({ location, className, children }: MainProps) {
         <main
           className={`govuk-main-wrapper govuk-main-wrapper--auto-spacing ${className ? className : ""}`}
           id="main-content"
+          data-testid="main-content"
           role="main"
         >
           {children}

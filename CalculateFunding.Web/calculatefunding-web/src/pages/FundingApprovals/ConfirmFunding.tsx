@@ -9,6 +9,7 @@ import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { Footer } from "../../components/Footer";
 import { FundingConfirmationSummary } from "../../components/Funding/FundingConfirmationSummary";
 import { Header } from "../../components/Header";
+import { SpinnerDisplaySetting } from "../../components/Jobs/JobLoadingSpinner";
 import { JobNotificationBanner } from "../../components/Jobs/JobNotificationBanner";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
@@ -284,7 +285,15 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
         {!isCheckingForJob && latestJob && latestJob.isActive && (
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-three-quarters">
-              <JobNotificationBanner job={latestJob} isCheckingForJob={isCheckingForJob} />
+              <JobNotificationBanner
+                job={latestJob}
+                isCheckingForJob={isCheckingForJob}
+                spinner={{
+                  display: SpinnerDisplaySetting.ShowPageSpinner,
+                  loadingDescription: "Please wait",
+                  loadingText: "Checking for background jobs",
+                }}
+              />
             </div>
           </div>
         )}

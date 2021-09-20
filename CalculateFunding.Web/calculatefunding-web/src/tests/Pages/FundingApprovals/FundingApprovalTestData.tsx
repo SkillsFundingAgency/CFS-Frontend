@@ -1,16 +1,16 @@
 ﻿import { render, screen, waitFor } from "@testing-library/react";
+import { DateTime } from "luxon";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
-import { MemoryRouter,match } from "react-router";
-import { Store,createStore } from "redux";
+import { match, MemoryRouter } from "react-router";
+import { createStore, Store } from "redux";
 
-import { getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
 import * as providerErrorsHook from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import * as providerIdsSearchHook from "../../../hooks/FundingApproval/usePublishedProviderIds";
 import * as providerSearchHook from "../../../hooks/FundingApproval/usePublishedProviderSearch";
-import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import { LatestSpecificationJobWithMonitoringResult } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { AddJobSubscription, JobNotification, JobSubscription } from "../../../hooks/Jobs/useJobSubscription";
+import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
@@ -22,7 +22,6 @@ import { ApprovalMode } from "../../../types/ApprovalMode";
 import { CompletionStatus } from "../../../types/CompletionStatus";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { FundingLineProfile, ProfileTotal } from "../../../types/FundingLineProfile";
-import { JobResponse } from "../../../types/jobDetails";
 import { JobType } from "../../../types/jobType";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
 import { PublishedProviderResult } from "../../../types/PublishedProvider/PublishedProviderSearchResults";
@@ -75,57 +74,6 @@ export function FundingApprovalTestData() {
     isFetchingSpecification: false,
     isSpecificationFetched: true,
   };
-  const noJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: false,
-    isCheckingForJob: false,
-    latestJob: undefined,
-    isFetched: true,
-    isFetching: false,
-  };
-  const activeJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: true,
-    isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobResponse({
-      jobId: "rt56w",
-      jobType: JobType.RefreshFundingJob,
-      runningStatus: RunningStatus.InProgress,
-      invokerUserDisplayName: "testUser",
-      created: new Date(),
-      lastUpdated: new Date(),
-    }),
-    isFetched: true,
-    isFetching: false,
-  };
-  const failedJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: true,
-    isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobResponse({
-      jobId: "sd64",
-      jobType: JobType.RefreshFundingJob,
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Failed,
-      invokerUserDisplayName: "testUser",
-      created: new Date(),
-      lastUpdated: new Date(),
-    }),
-    isFetched: true,
-    isFetching: false,
-  };
-  const successfulCompletedJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: true,
-    isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobResponse({
-      jobId: "rfgd",
-      jobType: JobType.RefreshFundingJob,
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Succeeded,
-      invokerUserDisplayName: "testUser",
-      created: new Date(),
-      lastUpdated: new Date(),
-    }),
-    isFetched: true,
-    isFetching: false,
-  };
   const fundingConfigWithApproveAllResult: FundingConfigurationQueryResult = {
     fundingConfiguration: {
       approvalMode: ApprovalMode.All,
@@ -170,7 +118,7 @@ export function FundingApprovalTestData() {
     specificationId: testSpec.id,
     ukprn: "23932035",
     upin: "43634",
-    urn: "851305"
+    urn: "851305",
   };
   const providerWithError1: PublishedProviderResult = {
     isIndicative: false,
@@ -188,7 +136,7 @@ export function FundingApprovalTestData() {
     specificationId: testSpec.id,
     ukprn: "9641960",
     upin: "785220",
-    urn: "82096"
+    urn: "82096",
   };
   const profileTotal: ProfileTotal = {
     distributionPeriodId: "",
@@ -260,23 +208,6 @@ export function FundingApprovalTestData() {
     errors: [],
   };
 
-  const mockLastRefreshJob: JobResponse = {
-    jobId: "",
-    jobType: "",
-    lastUpdated: new Date(Date.UTC(2021, 1, 9)),
-    runningStatus: RunningStatus.Completed,
-  };
-  const hasLastRefreshJob = () => {
-    jest.mock("../../../services/jobService", () => {
-      const mockService = jest.requireActual("../../../services/jobService");
-
-      return {
-        ...mockService,
-        getLatestSuccessfulJob: mockLastRefreshJob,
-      };
-    });
-  };
-
   const fundingSearchSelectionState: FundingSearchSelectionState = {
     selectedProviderIds: [provider1.publishedProviderVersionId],
     searchCriteria: buildInitialPublishedProviderSearchRequest(
@@ -332,18 +263,178 @@ export function FundingApprovalTestData() {
     await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
   };
 
+  let notification: JobNotification | undefined;
+  let subscription: JobSubscription = {
+    filterBy: {
+      jobId: "jobId",
+      jobTypes: [],
+      specificationId: testSpec.id,
+    },
+    id: "sertdhw4e5t",
+    isEnabled: true,
+    onError: () => null,
+    startDate: DateTime.local(),
+  };
+
+  const haveNoJobNotification = () => {
+    notification = undefined;
+  };
+
+  const haveRefreshFailedJobNotification = () => {
+    const job = {
+      jobId: "jobId-generatedByRefresh",
+      jobType: JobType.RefreshFundingJob,
+      statusDescription: "",
+      jobDescription: "",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Failed,
+      failures: [],
+      isSuccessful: false,
+      isFailed: true,
+      isActive: false,
+      isComplete: true,
+      outcome: "Refresh failed",
+    };
+    subscription.id = "refresh";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: testSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+  const haveRefreshSucceededJobNotification = () => {
+    const job = {
+      jobId: "jobId-generatedByRefresh",
+      jobType: JobType.RefreshFundingJob,
+      statusDescription: "",
+      jobDescription: "",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Succeeded,
+      failures: [],
+      isSuccessful: true,
+      isFailed: false,
+      isActive: false,
+      isComplete: true,
+      outcome: "Refresh succeeded",
+    };
+    subscription.id = "refresh";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: testSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+
+  const haveFailedJobNotification = () => {
+    const job = {
+      jobId: "jobId-Failed",
+      jobType: JobType.RefreshFundingJob,
+      statusDescription: "Refreshing funding",
+      jobDescription: "",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Failed,
+      failures: [],
+      isSuccessful: false,
+      isFailed: true,
+      isActive: false,
+      isComplete: true,
+      outcome: "Refresh failed",
+    };
+    subscription.id = "Failed-sub-id";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: testSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+
+  const haveJobInProgressNotification = () => {
+    subscription.id = "Refresh-active";
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: {
+        isComplete: false,
+        jobId: "123",
+        jobType: JobType.RefreshFundingJob,
+        statusDescription: "Refresh Funding job is in progress",
+        jobDescription: "Refreshing Funding",
+        runningStatus: RunningStatus.InProgress,
+        failures: [],
+        isSuccessful: false,
+        isFailed: false,
+        isActive: true,
+        outcome: "",
+      },
+    };
+    return notification;
+  };
+
+  let notificationCallback: (n: JobNotification) => void = () => null;
+  let hasNotificationCallback = false;
+  const getNotificationCallback = () => {
+    return notificationCallback;
+  };
+
+  const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
+  jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
+    if (onNewNotification && !hasNotificationCallback) {
+      notificationCallback = onNewNotification;
+      hasNotificationCallback = true;
+    }
+    return {
+      addSub: (request: AddJobSubscription) => {
+        const sub: JobSubscription = {
+          filterBy: {
+            jobId: request?.filterBy.jobId,
+            specificationId: request?.filterBy.specificationId,
+            jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
+          },
+          isEnabled: true,
+          id: "sertdhw4e5t",
+          onError: () => request.onError,
+          startDate: DateTime.now(),
+        };
+        subscription = sub;
+        return Promise.resolve(sub);
+      },
+      replaceSubs: () => {
+        const sub: JobSubscription = {
+          filterBy: {},
+          id: "sertdhw4e5t",
+          onError: () => null,
+          isEnabled: true,
+          startDate: DateTime.now(),
+        };
+        subscription = sub;
+        return [sub];
+      },
+      removeSub: () => null,
+      removeAllSubs: () => null,
+      subs: [],
+      results: notification ? [notification] : [],
+    };
+  });
+
   const hasSpecification = () =>
     jest.spyOn(specHook, "useSpecificationSummary").mockImplementation(() => specResult);
-  const hasNoActiveJobsRunning = () =>
-    jest.spyOn(jobHook, "useLatestSpecificationJobWithMonitoring").mockImplementation(() => noJob);
-  const hasActiveJobRunning = () =>
-    jest.spyOn(jobHook, "useLatestSpecificationJobWithMonitoring").mockImplementation(() => activeJob);
-  const hasFailedJob = () =>
-    jest.spyOn(jobHook, "useLatestSpecificationJobWithMonitoring").mockImplementation(() => failedJob);
-  const hasSuccessfulCompletedJob = () =>
-    jest
-      .spyOn(jobHook, "useLatestSpecificationJobWithMonitoring")
-      .mockImplementation(() => successfulCompletedJob);
   const hasFundingConfigurationWithApproveAll = () =>
     jest
       .spyOn(fundingConfigurationHook, "useFundingConfiguration")
@@ -392,16 +483,14 @@ export function FundingApprovalTestData() {
     fundingLineWithError,
     fundingLineProfileWithMissingTotalAllocation,
     fundingSearchSelectionState,
-    mockLastRefreshJob,
-    activeJob,
-    failedJob,
-    successfulCompletedJob,
     hasSpecification,
-    hasLastRefreshJob,
-    hasNoActiveJobsRunning,
-    hasActiveJobRunning,
-    hasFailedJob,
-    hasSuccessfulCompletedJob,
+    notification,
+    getNotificationCallback,
+    haveNoJobNotification,
+    haveFailedJobNotification,
+    haveRefreshFailedJobNotification,
+    haveRefreshSucceededJobNotification,
+    haveJobInProgressNotification,
     hasFundingConfigurationWithApproveAll,
     hasFundingConfigurationWithBatchApproval,
     hasProvidersWithErrors,

@@ -1,7 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { screen } from "@testing-library/react";
-import React from "react";
+﻿import { screen } from "@testing-library/react";
 import * as redux from "react-redux";
 
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
@@ -15,8 +12,7 @@ describe("<SpecificationFundingApproval />", () => {
   describe("when page initially renders before loading specification", () => {
     it("renders Specification loading", async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-      test.hasNoActiveJobsRunning();
-      test.hasLastRefreshJob();
+      test.haveRefreshSucceededJobNotification();
       await test.renderPage();
       expect(await screen.getByText("Loading specification...")).toBeInTheDocument();
     });
@@ -25,9 +21,8 @@ describe("<SpecificationFundingApproval />", () => {
   describe("when loading specification, no active jobs", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-      test.hasNoActiveJobsRunning();
       test.hasSpecification();
-      test.hasLastRefreshJob();
+      test.haveRefreshSucceededJobNotification();
       test.hasFundingConfigurationWithApproveAll();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors([]);

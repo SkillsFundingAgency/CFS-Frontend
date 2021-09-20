@@ -1,8 +1,5 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { act, screen, within } from "@testing-library/react";
+﻿import { act, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 import * as redux from "react-redux";
 
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
@@ -17,8 +14,6 @@ describe("<SpecificationFundingApproval />", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
       test.hasSpecification();
-      test.hasNoActiveJobsRunning();
-      test.hasLastRefreshJob();
       test.hasFundingConfigurationWithApproveAll();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors(["Error: missing something"]);
@@ -55,8 +50,6 @@ describe("<SpecificationFundingApproval />", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
       test.hasSpecification();
-      test.hasNoActiveJobsRunning();
-      test.hasLastRefreshJob();
       test.hasFundingConfigurationWithBatchApproval();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors(["Error: missing something"]);

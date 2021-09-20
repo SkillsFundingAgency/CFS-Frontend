@@ -1,7 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { act, render, screen, waitFor, within } from "@testing-library/react";
-import React from "react";
+﻿import { screen } from "@testing-library/react";
 import * as redux from "react-redux";
 
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
@@ -16,8 +13,7 @@ describe("<SpecificationFundingApproval />", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
       test.hasSpecification();
-      test.hasNoActiveJobsRunning();
-      test.hasLastRefreshJob();
+      test.haveNoJobNotification();
       test.hasFundingConfigurationWithApproveAll();
       test.hasFullSpecPermissions();
       test.hasProvidersWithErrors([]);

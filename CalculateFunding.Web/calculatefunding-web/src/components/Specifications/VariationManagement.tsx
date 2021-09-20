@@ -10,7 +10,6 @@ import { mergeProfileVariationPointersService } from "../../services/specificati
 import { AvailableVariationPointerFundingLine } from "../../types/Publishing/AvailableVariationPointerFundingLine";
 import { ProfileVariationPointer } from "../../types/Specifications/ProfileVariationPointer";
 import ProfilePatternSelector from "../Funding/ProfilePatternSelector";
-import { LoadingStatus } from "../LoadingStatus";
 import { LoadingStatusNotifier } from "../LoadingStatusNotifier";
 import { NoData } from "../NoData";
 
@@ -24,7 +23,6 @@ export interface VariationManagementProps {
 
 export function VariationManagement({
   specificationId,
-  fundingPeriodId,
   fundingStreamId,
   addError,
   clearErrorMessages,
@@ -88,8 +86,6 @@ export function VariationManagement({
     }
   }
 
-  console.log("profileVariationPointers", profileVariationPointers);
-  console.log("availableFundingLines", availableFundingLines);
   const haveDataToShow: boolean =
     !!profileVariationPointers &&
     profileVariationPointers.length > 0 &&
