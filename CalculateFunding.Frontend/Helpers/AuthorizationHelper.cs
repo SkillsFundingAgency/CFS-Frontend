@@ -135,11 +135,7 @@ namespace CalculateFunding.Frontend.Helpers
 
             IEnumerable<FundingStreamPermission> allowedFundingStreams = fundingStreamPermissionsResponse.Content;
 
-            if (permissionRequired == SpecificationActionTypes.CanCreateQaTests)
-            {
-                allowedFundingStreams = allowedFundingStreams.Where(p => p.CanCreateQaTests);
-            }
-            else if (permissionRequired == SpecificationActionTypes.CanChooseFunding)
+            if (permissionRequired == SpecificationActionTypes.CanChooseFunding)
             {
                 allowedFundingStreams = allowedFundingStreams.Where(p => p.CanChooseFunding);
             }

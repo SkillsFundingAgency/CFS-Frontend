@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Security;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -17,7 +16,6 @@ using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace CalculateFunding.Frontend.Helpers
