@@ -100,7 +100,7 @@ namespace CalculateFunding.Frontend.Controllers
 
                 if (latestJobsResponse?.Content != null)
                 {
-                    JobSummary latestJob = latestJobsResponse.Content.Values.OrderByDescending(_ => _.LastUpdated).FirstOrDefault(_ => _.CompletionStatus == CompletionStatus.Succeeded);
+                    JobSummary latestJob = latestJobsResponse.Content.Values.Where(_ => _ != null).OrderByDescending(_ => _.LastUpdated).FirstOrDefault(_ => _.CompletionStatus == CompletionStatus.Succeeded);
 
                     if (latestJob != null)
                     {

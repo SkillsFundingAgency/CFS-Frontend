@@ -119,8 +119,12 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _jobsApiClient.Object);
 
             Dictionary<string, JobSummary> latestJobs = new Dictionary<string, JobSummary>();
+            latestJobs.Add("RefreshFundingJob", null);
+            latestJobs.Add("ApproveAllProviderFundingJob", null);
+            latestJobs.Add("ApproveBatchProviderFundingJob", null);
             latestJobs.Add("PublishAllProviderFundingJob", new JobSummary { LastUpdated = DateTimeOffset.Now,
                                                                             CompletionStatus = CompletionStatus.Succeeded});
+            latestJobs.Add("PublishBatchProviderFundingJob", null);
 
             _jobsApiClient
                 .Setup(x =>

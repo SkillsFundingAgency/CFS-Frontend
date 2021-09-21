@@ -3,8 +3,8 @@
 import { DatasetVersionSearchResponse } from "../../types/Datasets/DatasetVersionSearchResponse";
 import { DatasetVersionSummary } from "../../types/Datasets/DatasetVersionSummary";
 import {
-  DataSourceRelationshipResponseViewModel,
   DatasetWithVersions,
+  DataSourceRelationshipResponseViewModel,
 } from "../../types/Datasets/DataSourceRelationshipResponseViewModel";
 import { DataSourceSelection } from "../../types/Datasets/DataSourceSelection";
 import Form from "../Form";
@@ -82,7 +82,7 @@ export const DataSourceSelectionForm: React.FunctionComponent<DataSourceSelectio
             />
           ) : (
             <DataSetSelector
-              datasets={relationshipData.datasets}
+              datasets={relationshipData?.datasets}
               selection={selection}
               showSingleDataSet={showSingleDataSet}
               isSearchingForDataSetVersions={isSearchingForDataSetVersions}
@@ -112,7 +112,7 @@ export const DataSourceSelectionForm: React.FunctionComponent<DataSourceSelectio
 };
 
 const DataSetSelector = (props: {
-  datasets: DatasetWithVersions[];
+  datasets?: DatasetWithVersions[];
   showSingleDataSet: boolean;
   isSearchingForDataSetVersions: boolean;
   selection: DataSourceSelection;
@@ -145,7 +145,7 @@ const DataSetSelector = (props: {
       data-module="govuk-radios"
       data-testid="data-set-selector"
     >
-      {props.datasets.sort(compareDatasetRelationshipByLastUpdate).map((dataset) => {
+      {props.datasets?.sort(compareDatasetRelationshipByLastUpdate).map((dataset) => {
         const isSelected = props.selection.dataset
           ? dataset.id === props.selection.dataset?.id
           : !!dataset.selectedVersion;
