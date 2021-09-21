@@ -11,6 +11,7 @@ export function ConfirmationModal(
 ) {
   const container = document.createElement("div");
   container.setAttribute("modal-confirmation-placeholder", "");
+  container.setAttribute("class", "confirm-modal");
   container.setAttribute("data-testid", "modal-confirmation-placeholder");
   document.body.appendChild(container);
 
