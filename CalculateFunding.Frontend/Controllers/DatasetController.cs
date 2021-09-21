@@ -507,9 +507,10 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(model.Name, nameof(model.Name));
             Guard.IsNullOrWhiteSpace(model.SpecificationId, nameof(model.SpecificationId));
 
-            NoValidatedContentApiResponse httpStatusCode = await _datasetApiClient.ValidateDefinitionSpecificationRelationship(model);
+            ValidatedApiResponse<bool> response = await _datasetApiClient.ValidateDefinitionSpecificationRelationship(model);
 
-            return new StatusCodeResult((int)httpStatusCode.StatusCode);
+            return response.Handle(nameof(ValidateDefinitionSpecificationRelationshipModel),
+                x => Ok(x.Content));
         }
 
         [HttpPut]

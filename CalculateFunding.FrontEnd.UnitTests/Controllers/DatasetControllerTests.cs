@@ -419,7 +419,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
 
             _apiClient.ValidateDefinitionSpecificationRelationship(Arg.Is<ValidateDefinitionSpecificationRelationshipModel>(x => x.Name == model.Name))
-                .Returns(new NoValidatedContentApiResponse(HttpStatusCode.OK));
+                .Returns(new ValidatedApiResponse<bool>(HttpStatusCode.OK, true));
 
             // Act
             IActionResult result = await _controller.ValidateDefinitionSpecificationRelationship(model);
@@ -427,7 +427,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             // Assert
             result
                .Should()
-               .BeOfType<StatusCodeResult>()
+               .BeOfType<OkObjectResult>()
                .Which
                .StatusCode
                .Should()
