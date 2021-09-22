@@ -632,7 +632,7 @@ namespace CalculateFunding.Frontend.Controllers
                 await _publishingApiClient.RefreshFundingForSpecification(specificationId);
 
             return response.Handle("Refresh Funding",
-                onSuccess: x => x.Content.JobId != null ? (IActionResult)Ok(x.Content.JobId) : BadRequest());
+                onSuccess: x => x.Content.JobId != null ? (IActionResult)Ok(x.Content.JobId) : BadRequest(response.ModelState));
         }
 
         private static ProfilingViewModel MapToProfilingViewModel(IDictionary<int, ProfilingVersion> profilingVersions)

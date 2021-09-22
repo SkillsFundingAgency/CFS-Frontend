@@ -82,7 +82,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
   };
   const [specification, setSpecification] = useState<SpecificationSummary>(initialSpecification);
   const specificationId = match.params.specificationId;
-  const { errors, addError, clearErrorMessages } = useErrors();
+  const { errors, addError, clearErrorMessages, addValidationErrors } = useErrors();
   const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
   const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(true);
   const [initialTab, setInitialTab] = useState<string>("");
@@ -438,7 +438,12 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           addError({ error: "A problem occurred while refreshing funding" });
         }
       } catch (err: any) {
-        addError({ description: "A problem occurred while refreshing funding", error: err });
+        if (err.response.status === 400) {
+          const errResponse = err.response.data;
+          addValidationErrors({ validationErrors: errResponse, message: "Validation failed" });
+        } else {
+          addError({ description: "A problem occurred while refreshing funding", error: err });
+        }
       }
     }
   }
