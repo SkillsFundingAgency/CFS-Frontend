@@ -23,19 +23,19 @@ const mockPeriods: Period[] = [
   {
     period: "January",
     year: 2020,
-    periodType: "Calendar",
+    periodType: "CalendarMonth",
     occurrence: 1,
   },
   {
     period: "February",
     year: 2020,
-    periodType: "Calendar",
+    periodType: "CalendarMonth",
     occurrence: 2,
   },
   {
     period: "March",
     year: 2020,
-    periodType: "Calendar",
+    periodType: "CalendarMonth",
     occurrence: 3,
   },
 ];

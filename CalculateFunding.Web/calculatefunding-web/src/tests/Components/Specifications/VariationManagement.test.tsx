@@ -45,8 +45,8 @@ const mockPointers: FundingLineProfileVariationPointer[] = [
     profileVariationPointer: {
       fundingStreamId: "FS1",
       fundingLineId: "FL2",
-      periodType: "Calendar",
-      typeValue: "Monthly",
+      periodType: "CalendarMonth",
+      typeValue: "December",
       year: 2002,
       occurrence: 1,
     },
@@ -57,8 +57,8 @@ const mockPointers: FundingLineProfileVariationPointer[] = [
     profileVariationPointer: {
       fundingStreamId: "FS1",
       fundingLineId: "FL2",
-      periodType: "Calendar",
-      typeValue: "Monthly",
+      periodType: "CalendarMonth",
+      typeValue: "December",
       year: 2002,
       occurrence: 1,
     },

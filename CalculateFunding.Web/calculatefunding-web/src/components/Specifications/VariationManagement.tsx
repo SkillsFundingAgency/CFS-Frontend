@@ -62,9 +62,9 @@ export function VariationManagement({
     const pointerPattern: ProfileVariationPointer = {
       fundingLineId: pointer.fundingLineCode,
       fundingStreamId: fundingStreamId,
-      typeValue: "Calendar",
+      typeValue: splitPattern[1],
       year: parseInt(splitPattern[0]),
-      periodType: splitPattern[1],
+      periodType: "CalendarMonth",
       occurrence: parseInt(splitPattern[2]),
     };
 
@@ -145,9 +145,7 @@ export function VariationManagement({
                             {!period ? (
                               "Initial allocation"
                             ) : (
-                              <span>
-                                {`${period.periodType} ${period.year} Instalment ${period.occurrence}`}
-                              </span>
+                              <span>{`${period.period} ${period.year} Instalment ${period.occurrence}`}</span>
                             )}
                           </td>
                           <td className="govuk-table__cell">
