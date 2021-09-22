@@ -161,9 +161,10 @@ export const ListVersions = () => {
                 <form id="filters">
                   <CollapsiblePanel
                     title={"Filter by status"}
-                    isExpanded={false}
-                    isCollapsible={false}
+                    isExpanded={true}
+                    isCollapsible={true}
                     facetCount={statusCount}
+                    showFacetCount={true}
                   >
                     <fieldset className="govuk-fieldset">
                       <div className="govuk-checkboxes">
