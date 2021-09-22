@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import React, { useEffect, useMemo } from "react";
 import { useQuery } from "react-query";
+import { useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
@@ -12,7 +13,9 @@ import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { Title } from "../../components/Title";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../../hooks/useErrors";
+import { IStoreState } from "../../reducers/rootReducer";
 import { getDatasetRelationshipsBySpec } from "../../services/datasetService";
+import { FeatureFlagsState } from "../../states/FeatureFlagsState";
 import { SpecificationDatasetRelationshipsViewModel } from "../../types/Datasets/SpecificationDatasetRelationshipsViewModel";
 import { JobType } from "../../types/jobType";
 import { Section } from "../../types/Sections";
@@ -22,6 +25,7 @@ export interface DataRelationshipsRouteProps {
 }
 
 export function DataRelationships({ match }: RouteComponentProps<DataRelationshipsRouteProps>) {
+
   const specificationId = match.params.specificationId;
   const { data: datasetRelationships, isLoading } = useQuery<
     SpecificationDatasetRelationshipsViewModel,
@@ -52,6 +56,9 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
     [jobNotifications]
   );
   const { errors, addError } = useErrors();
+  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
+      (state) => state.featureFlags
+  );
 
   const watchConverterWizardJobForRelationship = (specificationId: string, triggerByEntityId: string) => {
     if (specificationId?.length && triggerByEntityId?.length) {
@@ -104,7 +111,7 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
       <section>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <AddDataRelationshipButton specificationId={specificationId} />
+            <AddDataRelationshipButton specificationId={specificationId} specToSpec={featureFlagsState.specToSpec} />
           </div>
           <div className="govuk-grid-column-one-third">
             <ul className="govuk-list right-align">
@@ -133,11 +140,11 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
   );
 }
 
-const AddDataRelationshipButton = React.memo((props: { specificationId: string }) => {
+const AddDataRelationshipButton = React.memo((props: { specificationId: string, specToSpec:boolean }) => {
   return (
     <Link
       id={"create-dataset-link"}
-      to={`/Datasets/CreateDataset/${props.specificationId}`}
+      to={props.specToSpec ? `/Datasets/Create/SelectDatasetTypeToCreate/${props.specificationId}` : `/Datasets/CreateDataset/${props.specificationId}`}
       className="govuk-button govuk-button--primary button-createSpecification govuk-!-margin-top-4"
       data-module="govuk-button"
     >
