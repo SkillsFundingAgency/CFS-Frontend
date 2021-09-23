@@ -45,24 +45,5 @@ describe("<SpecificationFundingApproval />", () => {
     it("does not render results", async () => {
       expect(screen.queryByTestId("published-provider-results")).not.toBeInTheDocument();
     });
-
-    it("renders refresh button as disabled", async () => {
-      const buttons = screen.getAllByRole("button", { name: /Refresh funding/ });
-      expect(buttons).toHaveLength(2);
-      expect(buttons[0]).toBeDisabled();
-      expect(buttons[1]).toBeDisabled();
-    });
-
-    it("renders approve button as disabled", async () => {
-      const button = screen.queryByRole("button", { name: /Approve/ });
-      expect(button).toBeInTheDocument();
-      expect(button).toBeDisabled();
-    });
-
-    it("renders release button as disabled", async () => {
-      const button = screen.queryByRole("button", { name: /Release/ });
-      expect(button).toBeInTheDocument();
-      expect(button).toBeDisabled();
-    });
   });
 });

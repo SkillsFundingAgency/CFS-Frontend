@@ -104,26 +104,9 @@ export const SpecificationFundingApproval = ({
     [jobNotifications]
   );
   const hasActiveActionJobs = actionJobs.some((j) => j.isActive);
-  const hasBlockingActionJobs = actionJobs.some((j) => j.isActive || j.isFailed);
-
-  const calcJobs: JobDetails[] = useMemo(
-    () =>
-      jobNotifications
-        .filter(
-          (n) =>
-            ((n.latestJob?.isActive || n.latestJob?.isFailed) &&
-              n.latestJob?.jobType === JobType.CreateInstructAllocationJob) ||
-            n.latestJob?.jobType === JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob ||
-            n.latestJob?.jobType === JobType.GenerateGraphAndInstructAllocationJob
-        )
-        .map((n) => n.latestJob as JobDetails) || ([] as JobDetails[]),
-    [jobNotifications]
-  );
-  const hasBlockingCalcJobs = calcJobs.some((j) => j.isActive || j.isFailed);
 
   const { publishedProvidersWithErrors, isLoadingPublishedProviderErrors } = usePublishedProviderErrorSearch(
     specificationId,
-    !hasBlockingActionJobs,
     (err) => addErrorMessage(err.message, "Error while loading provider funding errors")
   );
   const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
@@ -332,7 +315,6 @@ export const SpecificationFundingApproval = ({
     isLoadingSpecification ||
     isLoadingFundingConfiguration ||
     hasActiveActionJobs ||
-    hasBlockingActionJobs ||
     isLoadingSearchResults ||
     isLoadingRefresh;
 
@@ -343,8 +325,7 @@ export const SpecificationFundingApproval = ({
   const blockActionBasedOnProviderErrors =
     fundingConfiguration?.approvalMode === ApprovalMode.All && haveAnyProviderErrors;
 
-  const disableRefresh: boolean =
-    hasBlockingActionJobs || hasBlockingCalcJobs || !hasPermissionToRefresh || isLoadingRefresh;
+  const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh;
 
   return (
     <Main location={Section.Approvals}>
@@ -539,7 +520,6 @@ export const SpecificationFundingApproval = ({
             <button
               className="govuk-button"
               disabled={
-                hasBlockingActionJobs ||
                 !publishedProviderSearchResults?.canApprove ||
                 !hasPermissionToApprove ||
                 isLoadingRefresh ||
@@ -552,7 +532,6 @@ export const SpecificationFundingApproval = ({
             <button
               className="govuk-button govuk-button--warning govuk-!-margin-right-1"
               disabled={
-                hasBlockingActionJobs ||
                 !publishedProviderSearchResults?.canPublish ||
                 !hasPermissionToRelease ||
                 isLoadingRefresh ||

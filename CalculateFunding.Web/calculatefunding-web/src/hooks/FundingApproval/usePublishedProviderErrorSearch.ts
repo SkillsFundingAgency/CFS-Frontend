@@ -11,7 +11,6 @@ export type PublishedProviderErrorSearchQueryResult = {
 };
 export const usePublishedProviderErrorSearch = (
   specificationId: string,
-  isEnabled: boolean,
   onError: (err: AxiosError) => void
 ): PublishedProviderErrorSearchQueryResult => {
   const { data, isLoading, isError, error } = useQuery<string[], AxiosError>(
@@ -19,7 +18,7 @@ export const usePublishedProviderErrorSearch = (
     async () => (await getPublishedProviderErrors(specificationId)).data,
     {
       onError,
-      enabled: (specificationId && specificationId.length > 0 && isEnabled) === true,
+      enabled: (specificationId && specificationId.length > 0) === true,
     }
   );
   return {
