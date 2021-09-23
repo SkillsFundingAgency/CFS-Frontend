@@ -2,6 +2,7 @@
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
+import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
@@ -93,7 +94,7 @@ export const ListTemplates = () => {
   };
 
   return (
-    <div>
+    <div id={"listTemplates"}>
       <Header location={Section.Templates} />
       <div className="govuk-width-container">
         <Breadcrumbs>
@@ -228,6 +229,7 @@ export const ListTemplates = () => {
               </table>
             )}
             {!haveResults && <p className="govuk-body">There are no records to match your search</p>}
+            <BackToTop id={"listTemplates"} />
             {templateListResults?.pagerState !== undefined && (
               <Pagination
                 currentPage={templateListResults.pagerState.currentPage}
@@ -242,7 +244,9 @@ export const ListTemplates = () => {
                 totalResults={templateListResults.totalCount}
               />
             )}
+
           </div>
+
         </div>
       </div>
       <Footer />
