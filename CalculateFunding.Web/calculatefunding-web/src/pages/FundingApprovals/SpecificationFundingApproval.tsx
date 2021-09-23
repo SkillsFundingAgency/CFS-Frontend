@@ -200,12 +200,16 @@ export const SpecificationFundingApproval = ({
   }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
-    const completedRefreshJob = jobNotifications.find(
-      (n) => n.latestJob?.isComplete && n.latestJob?.jobType === JobType.RefreshFundingJob
+    const refreshJob = jobNotifications.find(
+      (n) => n.latestJob?.jobType === JobType.RefreshFundingJob
     )?.latestJob;
-    if (completedRefreshJob) {
-      setIsLoadingRefresh(false);
-      setLastRefresh(completedRefreshJob.lastUpdated);
+    if (refreshJob) {
+      if (refreshJob.isActive) {
+        setIsLoadingRefresh(true);
+      } else if (refreshJob.isComplete) {
+        setIsLoadingRefresh(false);
+        setLastRefresh(refreshJob.lastUpdated);
+      }
     }
     if (
       jobId !== "" &&
