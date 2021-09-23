@@ -1,6 +1,6 @@
 import "../styles/AutoComplete.scss";
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 
 export enum AutoCompleteMode {
   Standard,
@@ -56,7 +56,7 @@ export function AutoComplete({
     });
   }, [suggestions]);
 
-  function onChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function onChange(e: ChangeEvent<HTMLInputElement>) {
     setCurrentSearchIndex(0);
     const userInput = e.currentTarget.value;
     if (e.currentTarget.value.length === 0) {

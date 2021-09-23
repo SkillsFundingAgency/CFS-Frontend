@@ -113,7 +113,7 @@ describe("<VariationManagement /> ", () => {
   it("renders correctly", async () => {
     expect(
       screen.getByRole("cell", {
-        name: /MockPeriodType 2000 Instalment 1/,
+        name: /MockPeriod 2000 Instalment 1/,
       })
     );
   });

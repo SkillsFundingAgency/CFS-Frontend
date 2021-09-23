@@ -200,16 +200,12 @@ export const SpecificationFundingApproval = ({
   }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
-    const refreshJob = jobNotifications.find(
-      (n) => n.latestJob?.jobType === JobType.RefreshFundingJob
+    const completedRefreshJob = jobNotifications.find(
+      (n) => n.latestJob?.isComplete && n.latestJob?.jobType === JobType.RefreshFundingJob
     )?.latestJob;
-    if (refreshJob) {
-      if (refreshJob.isActive) {
-        setIsLoadingRefresh(true);
-      } else if (refreshJob.isComplete) {
-        setIsLoadingRefresh(false);
-        setLastRefresh(refreshJob.lastUpdated);
-      }
+    if (completedRefreshJob) {
+      setIsLoadingRefresh(false);
+      setLastRefresh(completedRefreshJob.lastUpdated);
     }
     if (
       jobId !== "" &&
@@ -332,14 +328,13 @@ export const SpecificationFundingApproval = ({
   }
 
   const isLoading =
-    errors.length === 0 &&
-    (!isSearchCriteriaInitialised ||
-      isLoadingSpecification ||
-      isLoadingFundingConfiguration ||
-      hasActiveActionJobs ||
-      hasBlockingActionJobs ||
-      isLoadingSearchResults ||
-      isLoadingRefresh);
+    !isSearchCriteriaInitialised ||
+    isLoadingSpecification ||
+    isLoadingFundingConfiguration ||
+    hasActiveActionJobs ||
+    hasBlockingActionJobs ||
+    isLoadingSearchResults ||
+    isLoadingRefresh;
 
   const haveAnyProviderErrors =
     isLoadingPublishedProviderErrors ||
