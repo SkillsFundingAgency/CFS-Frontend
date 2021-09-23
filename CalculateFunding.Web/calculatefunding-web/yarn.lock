@@ -2558,9 +2558,9 @@
   integrity sha512-Ot53G927ykMF8cQ3/zq4foZtdk+Tt1YpX7aUTHxBU7UHNdkEiBvBfZSq+rnlUmKCJ19VatwPG4mNzvcGpBj4og==
 
 "@microsoft/signalr@^5.0.6":
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/@microsoft/signalr/-/signalr-5.0.9.tgz#cff2b0a091298049fd012e7b6cd015a814f8698d"
-  integrity sha512-pQufk3+mChfystnmYpglyRYQFp+036QmOxbZUFr2cFf2iiS8ekBX5uVBOG8OexKcsG4TcJNAU/ref90Y9+3ZiA==
+  version "5.0.10"
+  resolved "https://registry.yarnpkg.com/@microsoft/signalr/-/signalr-5.0.10.tgz#4d216dabbf720379bc7932680ed6c299b1475f6e"
+  integrity sha512-7jg6s/cmULyeVvt5/bTB4N9T30HvAF1S06hL+nPcQMODXcclRo34Zcli/dfTLR8lCX31/cVEOmVgxXBOVRQ+Dw==
   dependencies:
     abort-controller "^3.0.0"
     eventsource "^1.0.7"
@@ -13672,7 +13672,14 @@ node-dir@^0.1.10, node-dir@^0.1.17:
   dependencies:
     minimatch "^3.0.2"
 
-node-fetch@^2.6.0, node-fetch@^2.6.1:
+node-fetch@^2.6.0:
+  version "2.6.4"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.4.tgz#7f1d13b8f9ff0c1a994dc6f73c69f7d652c7ace2"
+  integrity sha512-aD1fO+xtLiSCc9vuD+sYMxpIuQyhHscGSkBEo2o5LTV/3bTEAYvdUii29n8LlO5uLCmWdGP7uVUVXFo5SRdkLA==
+  dependencies:
+    whatwg-url "^5.0.0"
+
+node-fetch@^2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
@@ -19657,6 +19664,14 @@ whatwg-url@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/whatwg-url/-/whatwg-url-2.0.1.tgz#5396b2043f020ee6f704d9c45ea8519e724de659"
   integrity sha1-U5ayBD8CDub3BNnEXqhRnnJN5lk=
+  dependencies:
+    tr46 "~0.0.3"
+    webidl-conversions "^3.0.0"
+
+whatwg-url@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/whatwg-url/-/whatwg-url-5.0.0.tgz#966454e8765462e37644d3626f6742ce8b70965d"
+  integrity sha1-lmRU6HZUYuN2RNNib2dCzotwll0=
   dependencies:
     tr46 "~0.0.3"
     webidl-conversions "^3.0.0"

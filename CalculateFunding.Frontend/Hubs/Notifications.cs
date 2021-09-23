@@ -10,14 +10,12 @@ namespace CalculateFunding.Frontend.Hubs
         {
             string groupName = "notifications";
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            await Clients.Group(groupName).SendAsync("JoinGroup", groupName);
         }
 
         public async Task StopWatchingForAllNotifications()
         {
             string groupName = "notifications";
             await Clients.Group(groupName).SendAsync("LeaveGroup", groupName);
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
 
         public async Task StartWatchingForSpecificationNotifications(string specificationId)
@@ -26,7 +24,6 @@ namespace CalculateFunding.Frontend.Hubs
 
             string groupName = $"spec{specificationId.Replace("-", "")}";
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            await Clients.Group(groupName).SendAsync("JoinGroup", groupName);
         }
 
         public async Task StopWatchingForSpecificationNotifications(string specificationId)
@@ -34,7 +31,6 @@ namespace CalculateFunding.Frontend.Hubs
             Guard.ArgumentNotNull(specificationId, nameof(specificationId));
 
             string groupName = $"spec-{specificationId}";
-            await Clients.Group(groupName).SendAsync("LeaveGroup", groupName);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
     }

@@ -171,17 +171,16 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
     addSub({
       monitorMode: MonitorMode.SignalR,
-      filterBy: { specificationId: specificationId, jobTypes: [JobType.RunConverterDatasetMergeJob] },
-      onError: (e) => addError({ error: e, description: "Error while checking for converter wizard job" }),
-    });
-    addSub({
-      fetchPriorNotifications: true,
-      monitorMode: MonitorMode.SignalR,
+      monitorFallback: MonitorFallback.Polling,
       filterBy: {
         specificationId: specificationId,
-        jobTypes: [JobType.ConverterWizardActivityCsvGenerationJob],
+        jobTypes: [
+          JobType.RunConverterDatasetMergeJob,
+          JobType.ConverterWizardActivityCsvGenerationJob,
+          JobType.EditSpecificationJob,
+        ],
       },
-      onError: (e) => addError({ error: e, description: "Error while checking for converter wizard report" }),
+      onError: (e) => addError({ error: e, description: "Error while checking for converter wizard job" }),
     });
 
     return () => {
