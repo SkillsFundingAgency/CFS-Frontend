@@ -1,6 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { cleanup, render, waitFor } from "@testing-library/react";
+﻿import { cleanup, render, waitFor } from "@testing-library/react";
 import React from "react";
 import * as redux from "react-redux";
 import { MemoryRouter, Route, Switch } from "react-router";
@@ -30,20 +28,14 @@ export const noPermissionsState: FundingStreamPermissions[] = [
     canApproveFunding: false,
     canApproveSpecification: false,
     canChooseFunding: false,
-    canCreateQaTests: false,
     canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
     canEditCalculations: false,
-    canEditQaTests: false,
     canEditSpecification: false,
     canMapDatasets: false,
     canRefreshFunding: false,
     canReleaseFunding: false,
     canCreateTemplates: false,
     canEditTemplates: false,
-    canDeleteTemplates: false,
     canApproveTemplates: false,
     canApproveAllCalculations: false,
     canApproveAnyCalculations: false,
@@ -52,7 +44,6 @@ export const noPermissionsState: FundingStreamPermissions[] = [
     canRefreshPublishedQa: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
     canEditProfilePattern: false,
     canCreateProfilePattern: false,
   },
@@ -66,20 +57,14 @@ export const permissionsState: FundingStreamPermissions[] = [
     canApproveFunding: false,
     canApproveSpecification: false,
     canChooseFunding: false,
-    canCreateQaTests: false,
     canCreateSpecification: false,
-    canDeleteCalculations: false,
-    canDeleteQaTests: false,
-    canDeleteSpecification: false,
     canEditCalculations: false,
-    canEditQaTests: false,
     canEditSpecification: false,
     canMapDatasets: false,
     canRefreshFunding: false,
     canReleaseFunding: false,
     canCreateTemplates: true,
     canEditTemplates: true,
-    canDeleteTemplates: true,
     canApproveTemplates: true,
     canRefreshPublishedQa: false,
     canUploadDataSourceFiles: false,
@@ -88,7 +73,6 @@ export const permissionsState: FundingStreamPermissions[] = [
     canApproveAllCalculations: false,
     canApplyCustomProfilePattern: false,
     canAssignProfilePattern: false,
-    canDeleteProfilePattern: false,
     canEditProfilePattern: false,
     canCreateProfilePattern: false,
   },
@@ -124,6 +108,7 @@ beforeAll(() => {
       ),
     };
   }
+
   jest.mock("../../../services/templateBuilderDatasourceService", () => mockFunctions());
 });
 

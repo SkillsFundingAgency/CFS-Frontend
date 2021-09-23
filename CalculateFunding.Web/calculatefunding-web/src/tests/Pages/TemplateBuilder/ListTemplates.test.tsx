@@ -1,6 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, waitFor } from "@testing-library/react";
+﻿import { render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 import * as redux from "react-redux";
 import { MemoryRouter } from "react-router";
@@ -91,7 +89,6 @@ const permissionsState: FundingStreamPermissions[] = [
     actions: [
       (p) => (p.canCreateTemplates = true),
       (p) => (p.canEditTemplates = true),
-      (p) => (p.canDeleteTemplates = true),
       (p) => (p.canApproveTemplates = true),
     ],
   }),

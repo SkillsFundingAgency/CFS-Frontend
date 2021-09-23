@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useState } from "react";
 import { useSelector } from "react-redux";
 
 import { Main } from "../../components/Main";
@@ -22,18 +22,7 @@ export function MyPermissions() {
   const [currentFundingStream, setCurrentFundingStreamId] = useState<FundingStreamPermissions>();
   const [adminUsers, setAdminUsers] = useState<string[] | undefined>(undefined);
   const permitted: Permission[] = useFundingStreamPermissions(currentFundingStream);
-  const permissionsToShow: Permission[] = useMemo(() => {
-    const excludedPermissions = [
-      Permission.CanCreateQaTests,
-      Permission.CanEditQaTests,
-      Permission.CanDeleteQaTests,
-      Permission.CanDeleteCalculations,
-      Permission.CanDeleteTemplates,
-      Permission.CanDeleteSpecification,
-      Permission.CanDeleteProfilePattern,
-    ];
-    return Object.values(Permission).filter((p) => !excludedPermissions.includes(p));
-  }, []);
+  const permissionsToShow: Permission[] = Object.values(Permission);
   const { errors, addError } = useErrors();
 
   function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {

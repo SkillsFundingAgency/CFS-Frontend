@@ -1,6 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, waitFor } from "@testing-library/react";
+﻿import { render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import React from "react";
@@ -24,7 +22,6 @@ const permissionsState: FundingStreamPermissions[] = [
     actions: [
       (p) => (p.canCreateTemplates = true),
       (p) => (p.canEditTemplates = true),
-      (p) => (p.canDeleteTemplates = true),
       (p) => (p.canApproveTemplates = true),
     ],
   }),

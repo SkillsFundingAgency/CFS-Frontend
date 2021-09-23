@@ -35,17 +35,6 @@ export const useTemplatePermissions = (
     );
   }, [permissions, requiredFundingStreams]);
 
-  const canDeleteTemplate = useMemo(() => {
-    if (!permissions) {
-      return false;
-    }
-    return permissions.some(
-      (p) =>
-        p.canDeleteTemplates &&
-        (requiredFundingStreams.length === 0 || requiredFundingStreams.includes(p.fundingStreamId))
-    );
-  }, [permissions, requiredFundingStreams]);
-
   const canApproveTemplate = useMemo(() => {
     if (!permissions) {
       return false;
@@ -65,14 +54,11 @@ export const useTemplatePermissions = (
     if (!canCreateTemplate && requiredPermissions.includes(TemplatePermissions.Create)) {
       missing.push(TemplatePermissions.Create);
     }
-    if (!canDeleteTemplate && requiredPermissions.includes(TemplatePermissions.Delete)) {
-      missing.push(TemplatePermissions.Delete);
-    }
     if (!canApproveTemplate && requiredPermissions.includes(TemplatePermissions.Approve)) {
       missing.push(TemplatePermissions.Approve);
     }
     return missing;
-  }, [canEditTemplate, canCreateTemplate, canDeleteTemplate, canApproveTemplate, requiredPermissions]);
+  }, [canEditTemplate, canCreateTemplate, canApproveTemplate, requiredPermissions]);
 
   const fundingStreamPermissions = useMemo(() => {
     if (!permissions) {
@@ -93,10 +79,6 @@ export const useTemplatePermissions = (
             fundingStreamId: p.fundingStreamId,
             permission: p.canApproveTemplates ? TemplatePermissions.Approve : "",
           },
-          {
-            fundingStreamId: p.fundingStreamId,
-            permission: p.canDeleteTemplates ? TemplatePermissions.Delete : "",
-          },
         ].filter((f) => f.permission.length > 0);
       })
       .flat();
@@ -107,7 +89,6 @@ export const useTemplatePermissions = (
   return {
     canCreateTemplate,
     canEditTemplate,
-    canDeleteTemplate,
     canApproveTemplate,
     missingPermissions,
     fundingStreamPermissions,

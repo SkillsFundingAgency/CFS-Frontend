@@ -4,7 +4,7 @@ export function convertToPermissions(permissions: string[]): Permission[] {
   return permissions.map((p) => (<any>Permission)[p]);
 }
 
-export function getPermissionDescription(permission: Permission) {
+export function getPermissionDescription(permission: Permission): string {
   switch (permission) {
     case Permission.CanAdministerFundingStream:
       return "Can grant and remove permissions for users of a funding stream";
@@ -14,12 +14,8 @@ export function getPermissionDescription(permission: Permission) {
       return "Can edit a specification for the funding stream";
     case Permission.CanApproveSpecification:
       return "Can approve a specification for the funding stream";
-    case Permission.CanDeleteSpecification:
-      return "Can delete a specification for the funding stream";
     case Permission.CanEditCalculations:
       return "Can edit calculations within a specification for the funding stream";
-    case Permission.CanDeleteCalculations:
-      return "Can delete calculations within a specification for the funding stream";
     case Permission.CanMapDatasets:
       return "Can map data source files to datasets within a specification for the funding stream";
     case Permission.CanChooseFunding:
@@ -30,26 +26,16 @@ export function getPermissionDescription(permission: Permission) {
       return "Can approve a funding allocation values for a specification for the funding stream that has been chosen for funding";
     case Permission.CanReleaseFunding:
       return "Can release funding allocation values to downstream services for a specification for the funding stream that has been chosen for funding";
-    case Permission.CanCreateQaTests:
-      return "Can create tests in the QA environment";
-    case Permission.CanEditQaTests:
-      return "Can edit tests in the QA environment";
-    case Permission.CanDeleteQaTests:
-      return "Can delete tests in the QA environment";
     case Permission.CanCreateTemplates:
       return "Can create templates for the funding stream";
     case Permission.CanEditTemplates:
       return "Can edit templates for the funding stream";
-    case Permission.CanDeleteTemplates:
-      return "Can delete templates for the funding stream";
     case Permission.CanApproveTemplates:
       return "Can approve templates for the funding stream";
     case Permission.CanCreateProfilePattern:
       return "Can create profile patterns for funding lines within the funding stream";
     case Permission.CanEditProfilePattern:
       return "Can edit profile patterns for funding lines within the funding stream";
-    case Permission.CanDeleteProfilePattern:
-      return "Can delete profile patterns for funding lines within the funding stream";
     case Permission.CanAssignProfilePattern:
       return "Can assign profile patterns for funding lines within the funding stream";
     case Permission.CanApplyCustomProfilePattern:

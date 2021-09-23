@@ -46,7 +46,6 @@ export enum ValueFormatType {
 export enum TemplatePermissions {
   Create = "create",
   Edit = "edit",
-  Delete = "delete",
   Approve = "approve",
 }
 

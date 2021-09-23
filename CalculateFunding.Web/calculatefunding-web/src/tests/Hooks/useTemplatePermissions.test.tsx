@@ -11,7 +11,7 @@ const permissionsState: FundingStreamPermissions[] = [
   buildPermissions({
     fundingStreamId: "DSG",
     setAllPermsEnabled: false,
-    actions: [(p) => (p.canDeleteTemplates = true), (p) => (p.canApproveTemplates = true)],
+    actions: [(p) => (p.canEditTemplates = true), (p) => (p.canApproveTemplates = true)],
   }),
   buildPermissions({ fundingStreamId: "GAG", setAllPermsEnabled: false }),
   buildPermissions({
@@ -31,7 +31,6 @@ it("handles empty parameters correctly", () => {
   expect(result.current.missingPermissions).toEqual([]);
   expect(result.current.canEditTemplate).toBeTruthy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeTruthy();
   expect(result.current.canApproveTemplate).toBeTruthy();
 });
 
@@ -42,7 +41,6 @@ it("handles all parameters used correctly", () => {
   expect(result.current.missingPermissions).toEqual(["create"]);
   expect(result.current.canEditTemplate).toBeTruthy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeTruthy();
   expect(result.current.canApproveTemplate).toBeTruthy();
 });
 
@@ -52,11 +50,10 @@ it("calculates missing create permissions correctly", () => {
 });
 
 it("calculates permissions correctly for a funding stream", () => {
-  const { result } = renderHook(() => useTemplatePermissions(["delete", "approve"], ["DSG"]));
+  const { result } = renderHook(() => useTemplatePermissions(["edit", "approve"], ["DSG"]));
   expect(result.current.missingPermissions).toEqual([]);
-  expect(result.current.canEditTemplate).toBeFalsy();
+  expect(result.current.canEditTemplate).toBeTruthy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeTruthy();
   expect(result.current.canApproveTemplate).toBeTruthy();
 });
 
@@ -67,7 +64,6 @@ it("calculates permissions correctly for multiple funding streams", () => {
   expect(result.current.missingPermissions).toEqual(["create"]);
   expect(result.current.canEditTemplate).toBeTruthy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeTruthy();
   expect(result.current.canApproveTemplate).toBeTruthy();
 });
 
@@ -75,51 +71,44 @@ it("calculates required funding streams correctly when user has permission", () 
   const { result } = renderHook(() =>
     useTemplatePermissions(["create", "edit", "delete", "approve"], ["1619"])
   );
-  expect(result.current.missingPermissions).toEqual(["create", "delete", "approve"]);
+  expect(result.current.missingPermissions).toEqual(["create", "approve"]);
   expect(result.current.canEditTemplate).toBeTruthy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeFalsy();
   expect(result.current.canApproveTemplate).toBeFalsy();
 });
 
 it("calculates required funding streams correctly when user does not have permission", () => {
-  const { result } = renderHook(() => useTemplatePermissions(["edit"], ["DSG"]));
-  expect(result.current.missingPermissions).toEqual(["edit"]);
-  expect(result.current.canEditTemplate).toBeFalsy();
+  const { result } = renderHook(() => useTemplatePermissions(["create"], ["DSG"]));
+  expect(result.current.missingPermissions).toEqual(["create"]);
+  expect(result.current.canCreateTemplate).toBeFalsy();
 });
 
 it("calculates correctly when user has no permissions for a funding stream", () => {
-  const { result } = renderHook(() =>
-    useTemplatePermissions(["create", "edit", "delete", "approve"], ["GAG"])
-  );
-  expect(result.current.missingPermissions).toEqual(["edit", "create", "delete", "approve"]);
+  const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "approve"], ["GAG"]));
+  expect(result.current.missingPermissions).toEqual(["edit", "create", "approve"]);
   expect(result.current.canEditTemplate).toBeFalsy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeFalsy();
   expect(result.current.canApproveTemplate).toBeFalsy();
 });
 
 it("calculates correctly when user has permissions across multiple funding streams", () => {
-  const { result } = renderHook(() =>
-    useTemplatePermissions(["create", "edit", "delete", "approve"], ["GAG", "1619"])
-  );
-  expect(result.current.missingPermissions).toEqual(["create", "delete", "approve"]);
+  const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "approve"], ["GAG", "1619"]));
+  expect(result.current.missingPermissions).toEqual(["create", "approve"]);
   expect(result.current.canEditTemplate).toBeTruthy();
   expect(result.current.canCreateTemplate).toBeFalsy();
-  expect(result.current.canDeleteTemplate).toBeFalsy();
   expect(result.current.canApproveTemplate).toBeFalsy();
 });
 
 it("calculates funding stream permissions correctly", () => {
-  const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "delete", "approve"]));
+  const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "approve"]));
   expect(result.current.fundingStreamPermissions).toEqual([
     {
       fundingStreamId: "DSG",
-      permission: "approve",
+      permission: "edit",
     },
     {
       fundingStreamId: "DSG",
-      permission: "delete",
+      permission: "approve",
     },
     {
       fundingStreamId: "1619",
@@ -129,15 +118,15 @@ it("calculates funding stream permissions correctly", () => {
 });
 
 it("calculates funding stream permissions correctly (regardless of required permissions)", () => {
-  const { result } = renderHook(() => useTemplatePermissions(["create", "edit", "delete"]));
+  const { result } = renderHook(() => useTemplatePermissions(["create", "edit"]));
   expect(result.current.fundingStreamPermissions).toEqual([
     {
       fundingStreamId: "DSG",
-      permission: "approve",
+      permission: "edit",
     },
     {
       fundingStreamId: "DSG",
-      permission: "delete",
+      permission: "approve",
     },
     {
       fundingStreamId: "1619",
