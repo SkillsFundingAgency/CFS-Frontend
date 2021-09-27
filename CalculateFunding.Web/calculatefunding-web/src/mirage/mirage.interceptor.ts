@@ -1,10 +1,11 @@
-﻿import { Response,createServer } from "miragejs";
+﻿import { createServer, Response } from "miragejs";
 
 type TestWindow = Window & {
   handleFromCypress: (request: Request) => Promise<any>;
 };
 
 export const isTestWindow = (window: Window | TestWindow): window is TestWindow => {
+  // eslint-disable-next-line no-prototype-builtins
   return window.hasOwnProperty("Cypress");
 };
 

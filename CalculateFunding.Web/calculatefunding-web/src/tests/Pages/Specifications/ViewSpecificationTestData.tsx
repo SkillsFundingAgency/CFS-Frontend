@@ -9,7 +9,7 @@ import { createStore, Store } from "redux";
 
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
-import { AddJobSubscription, JobNotification, JobSubscription } from "../../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as latestJobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
@@ -27,6 +27,7 @@ import { CompletionStatus } from "../../../types/CompletionStatus";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { DatasetRelationship } from "../../../types/DatasetRelationship";
 import { FundingConfiguration } from "../../../types/FundingConfiguration";
+import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
 import { RunningStatus } from "../../../types/RunningStatus";

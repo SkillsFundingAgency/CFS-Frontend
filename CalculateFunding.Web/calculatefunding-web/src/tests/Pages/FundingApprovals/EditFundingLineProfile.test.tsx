@@ -7,7 +7,7 @@ import { createLocation, createMemoryHistory } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
 import { ConfirmationModal } from "../../../components/ConfirmationModal";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";

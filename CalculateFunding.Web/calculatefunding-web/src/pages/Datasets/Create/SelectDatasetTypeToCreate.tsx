@@ -118,7 +118,7 @@ const Actions = (props: {
       <button
         id="patternLink"
         type="button"
-        onClick={props.onSubmit}
+        onClick={(e) => props.onSubmit(e as React.MouseEvent<HTMLButtonElement>)}
         disabled={props.hasMissingPermissions}
         className="govuk-button govuk-!-margin-right-1"
         data-module="govuk-button"
@@ -129,7 +129,7 @@ const Actions = (props: {
       <button
         className="govuk-button govuk-button--secondary"
         data-module="govuk-button"
-        onClick={props.onCancel}
+        onClick={(e) => props.onCancel(e as React.MouseEvent<HTMLButtonElement>)}
       >
         Cancel
       </button>

@@ -1,9 +1,8 @@
 ﻿import { AxiosError } from "axios";
-import { UseQueryOptions,useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 import { QueryObserverResult, RefetchOptions } from "react-query/types/core/types";
 
 import * as publishedProviderService from "../../services/publishedProviderService";
-import { ApprovalMode } from "../../types/ApprovalMode";
 import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 
 export type PublishedProviderIdsQueryResult = {

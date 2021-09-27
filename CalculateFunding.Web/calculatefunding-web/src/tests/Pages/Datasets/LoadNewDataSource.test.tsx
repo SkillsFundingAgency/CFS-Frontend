@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
 import "@testing-library/jest-dom";
 
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -9,15 +8,8 @@ import * as redux from "react-redux";
 import { MemoryRouter } from "react-router";
 
 import * as monitor from "../../../hooks/Jobs/useJobSubscription";
-import { AddJobSubscription, JobNotification, JobSubscription } from "../../../hooks/Jobs/useJobSubscription";
-import {
-  createDatasetService,
-  getDatasetDefinitionsService,
-  uploadDataSourceService,
-  validateDatasetService,
-} from "../../../services/datasetService";
-import { getFundingStreamsService } from "../../../services/policyService";
 import { CompletionStatus } from "../../../types/CompletionStatus";
+import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { RunningStatus } from "../../../types/RunningStatus";
 
 describe("<LoadNewDataSource />", () => {
@@ -45,7 +37,6 @@ describe("<LoadNewDataSource />", () => {
 
   describe("service call checks ", () => {
     it("calls the correct services on initial page load", async () => {
-      const { getDatasetDefinitionsService } = require("../../../services/datasetService");
       const { getFundingStreamsService } = require("../../../services/policyService");
       await waitFor(() => expect(getFundingStreamsService).toBeCalledTimes(1));
     });

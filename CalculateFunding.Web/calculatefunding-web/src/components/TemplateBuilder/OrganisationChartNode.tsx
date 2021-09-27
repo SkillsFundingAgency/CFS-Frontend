@@ -160,7 +160,7 @@ function OrganisationChartNode({
     };
   }, [multipleSelect, datasource]);
 
-  const addArrows = (e: any) => {
+  const addArrows = () => {
     setBottomEdgeExpanded(!isChildrenCollapsed);
   };
 
@@ -262,10 +262,10 @@ function OrganisationChartNode({
         data-kind={datasource.kind}
         className={nodeClass}
         draggable={draggable && !isClone}
-        onDragStart={dragstartHandler}
-        onDragOver={dragoverHandler}
-        onDragEnd={dragendHandler}
-        onDrop={dropHandler}
+        onDragStart={(e) => dragstartHandler(e as React.DragEvent<HTMLDivElement>)}
+        onDragOver={(e) => dragoverHandler(e as React.DragEvent<HTMLDivElement>)}
+        onDragEnd={() => dragendHandler()}
+        onDrop={(e) => dropHandler(e as React.DragEvent<HTMLDivElement>)}
         onMouseEnter={addArrows}
         onMouseLeave={removeArrows}
       >

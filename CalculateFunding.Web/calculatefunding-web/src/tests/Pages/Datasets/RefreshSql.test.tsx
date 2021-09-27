@@ -8,12 +8,12 @@ import * as redux from "react-redux";
 import { MemoryRouter } from "react-router";
 
 import * as jobSubscription from "../../../hooks/Jobs/useJobSubscription";
-import { JobNotification, JobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as jobService from "../../../services/jobService";
 import * as publishService from "../../../services/publishService";
 import { CompletionStatus } from "../../../types/CompletionStatus";
+import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { Permission } from "../../../types/Permission";
 import { RunningStatus } from "../../../types/RunningStatus";
 import { createMockAxiosError } from "../../fakes/fakeAxios";

@@ -368,7 +368,11 @@ const TemplateItemRow = (props: {
 };
 
 const Actions = (props: { onContinue: (e: React.MouseEvent<HTMLButtonElement>) => void }) => (
-  <button className="govuk-button govuk-!-margin-top-3" data-module="govuk-button" onClick={props.onContinue}>
+  <button
+    className="govuk-button govuk-!-margin-top-3"
+    data-module="govuk-button"
+    onClick={(e) => props.onContinue(e as React.MouseEvent<HTMLButtonElement>)}
+  >
     Continue to summary
   </button>
 );

@@ -4,8 +4,8 @@ import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
 
 import {
-  UserActionEvent,
   getUserFundingStreamPermissions,
+  UserActionEvent,
   userActionGetUser,
 } from "../../actions/userAction";
 import { IStoreState } from "../../reducers/rootReducer";

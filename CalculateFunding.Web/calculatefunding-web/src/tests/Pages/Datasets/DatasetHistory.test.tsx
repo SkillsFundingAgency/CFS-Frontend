@@ -1,9 +1,9 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { createLocation } from "history";
 import React from "react";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
-import { DatasetHistory, DatasetHistoryRouteProps } from "../../../pages/Datasets/DatasetHistory";
+import { DatasetHistoryRouteProps } from "../../../pages/Datasets/DatasetHistory";
 import {
   DatasetChangeType,
   DatasetVersionDetails,

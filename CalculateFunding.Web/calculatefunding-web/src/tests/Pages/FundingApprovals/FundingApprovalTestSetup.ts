@@ -1,5 +1,4 @@
-﻿import * as redux from "react-redux";
-import { Store,createStore } from "redux";
+﻿import { createStore, Store } from "redux";
 
 import { getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -8,7 +7,6 @@ import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguratio
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
-import { JobObserverState } from "../../../states/JobObserverState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { CompletionStatus } from "../../../types/CompletionStatus";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
@@ -27,7 +25,6 @@ const store: Store<IStoreState> = createStore(rootReducer);
 store.dispatch = jest.fn();
 
 export const FundingApprovalTestSetup = () => {
-  const useSelectorSpy = jest.spyOn(redux, "useSelector");
   jest.mock("../../../components/AdminNav");
   const fundingStream1: FundingStream = {
     name: "WIZZ1",
@@ -247,12 +244,6 @@ export const FundingApprovalTestSetup = () => {
     isFetching: false,
   };
 
-  const mockNoJobObserverState: JobObserverState = {
-    jobFilter: undefined,
-  };
-  const hasNoJobObserverState = () => {
-    useSelectorSpy.mockReturnValue(mockNoJobObserverState);
-  };
   const mockPublishedProviderService = () => {
     jest.mock("../../../services/publishedProviderService", () => {
       const mockService = jest.requireActual("../../../services/publishedProviderService");

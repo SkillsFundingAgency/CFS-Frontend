@@ -1,8 +1,7 @@
 import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
-import { JobNotification } from "../../../hooks/Jobs/useJobSubscription";
+import { JobNotification } from "../../../types/Jobs/JobSubscriptionModels";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
 describe("<ViewSpecification /> ", () => {

@@ -10,12 +10,7 @@ import { Header } from "../../components/Header";
 import { JobProgressNotificationBanner } from "../../components/Jobs/JobProgressNotificationBanner";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import {
-  JobSubscription,
-  MonitorFallback,
-  MonitorMode,
-  useJobSubscription,
-} from "../../hooks/Jobs/useJobSubscription";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useErrors } from "../../hooks/useErrors";
 import * as datasetService from "../../services/datasetService";
@@ -30,6 +25,7 @@ import { MergeDatasetViewModel } from "../../types/Datasets/MergeDatasetViewMode
 import { UpdateNewDatasetVersionResponseViewModel } from "../../types/Datasets/UpdateDatasetRequestViewModel";
 import { UpdateStatus } from "../../types/Datasets/UpdateStatus";
 import { JobDetails } from "../../types/jobDetails";
+import { JobSubscription, MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { RunningStatus } from "../../types/RunningStatus";
 import { Section } from "../../types/Sections";
@@ -43,7 +39,8 @@ export interface UpdateDataSourceFileRouteProps {
 
 export function UpdateDataSourceFile({ match }: RouteComponentProps<UpdateDataSourceFileRouteProps>) {
   const [dataset, setDataset] = useState<DatasetVersionDetails>({
-    fundingStreamId: "", fundingStreamName: "",
+    fundingStreamId: "",
+    fundingStreamName: "",
     id: "",
     blobName: "",
     changeNote: "",
@@ -54,7 +51,7 @@ export function UpdateDataSourceFile({ match }: RouteComponentProps<UpdateDataSo
     lastUpdatedDate: new Date(),
     name: "",
     version: 0,
-    changeType: DatasetChangeType.Unknown
+    changeType: DatasetChangeType.Unknown,
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hideForm, setHideForm] = useState<boolean | undefined>(undefined);

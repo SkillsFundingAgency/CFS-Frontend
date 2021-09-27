@@ -11,19 +11,14 @@ import { PermissionStatus } from "../../../components/PermissionStatus";
 import { Title } from "../../../components/Title";
 import { WarningText } from "../../../components/WarningText";
 import { useDataSetVersionSearch } from "../../../hooks/DataSets/useDataSetVersionSearch";
-import {
-  AddJobSubscription,
-  JobNotification,
-  MonitorFallback,
-  MonitorMode,
-  useJobSubscription,
-} from "../../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription, useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../../hooks/useErrors";
 import { useRelationshipData } from "../../../hooks/useRelationshipData";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import * as datasetService from "../../../services/datasetService";
 import { DataSourceSelection } from "../../../types/Datasets/DataSourceSelection";
+import { JobNotification, MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
 import { Section } from "../../../types/Sections";

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { UseQueryOptions,useQuery,useQueryClient } from "react-query";
+import { useQuery, useQueryClient, UseQueryOptions } from "react-query";
 
 import { milliseconds } from "../../helpers/TimeInMs";
 import { getCalculationErrorsBySpecificationId } from "../../services/calculationService";

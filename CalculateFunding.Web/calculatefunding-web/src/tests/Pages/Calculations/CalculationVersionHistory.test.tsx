@@ -4,15 +4,12 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import { createBrowserHistory, createLocation } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
 import * as calcHook from "../../../hooks/Calculations/useCalculation";
 import * as specHook from "../../../hooks/useSpecificationSummary";
-import {SpecificationSummaryQueryResult} from "../../../hooks/useSpecificationSummary";
-import {
-  CalculationVersionHistory,
-  CalculationVersionHistoryRoute,
-} from "../../../pages/Calculations/CalculationVersionHistory";
+import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
+import { CalculationVersionHistoryRoute } from "../../../pages/Calculations/CalculationVersionHistory";
 import { CalculationDetails } from "../../../types/CalculationDetails";
 import { CalculationDataType } from "../../../types/Calculations/CalculationCompilePreviewResponse";
 import { CalculationVersionHistorySummary } from "../../../types/Calculations/CalculationVersionHistorySummary";
@@ -149,10 +146,10 @@ const mockSpecResult: SpecificationSummaryQueryResult = {
   errorCheckingForSpecification: null,
   haveErrorCheckingForSpecification: false,
   isFetchingSpecification: false,
-  isSpecificationFetched: true
+  isSpecificationFetched: true,
 };
 const mockSpecification = () =>
-  jest.spyOn(specHook, "useSpecificationSummary").mockImplementation(() => (mockSpecResult));
+  jest.spyOn(specHook, "useSpecificationSummary").mockImplementation(() => mockSpecResult);
 const mockTestCalcVersions: CalculationVersionHistorySummary[] = [
   {
     calculationId: "Calc0001",

@@ -232,7 +232,7 @@ const Actions = (props: {
         <button
           className="govuk-button govuk-!-margin-top-3"
           data-module="govuk-button"
-          onClick={props.onSave}
+          onClick={(e) => props.onSave(e as React.MouseEvent<HTMLButtonElement>)}
         >
           Update data set
         </button>

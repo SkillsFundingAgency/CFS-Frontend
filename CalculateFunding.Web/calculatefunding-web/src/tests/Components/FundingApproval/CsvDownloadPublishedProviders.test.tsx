@@ -4,7 +4,7 @@ import { render, screen, waitForElementToBeRemoved } from "@testing-library/reac
 import React from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
-import { Store,createStore } from "redux";
+import { createStore, Store } from "redux";
 
 import { CsvDownloadPublishedProviders } from "../../../components/Funding/CsvDownloadPublishedProviders";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";

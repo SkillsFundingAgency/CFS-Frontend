@@ -15,7 +15,7 @@ namespace CalculateFunding.Frontend.Hubs
         public async Task StopWatchingForAllNotifications()
         {
             string groupName = "notifications";
-            await Clients.Group(groupName).SendAsync("LeaveGroup", groupName);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
 
         public async Task StartWatchingForSpecificationNotifications(string specificationId)

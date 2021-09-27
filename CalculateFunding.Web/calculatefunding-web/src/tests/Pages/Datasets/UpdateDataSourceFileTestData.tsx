@@ -1,5 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DateTime } from "luxon";
@@ -7,10 +5,9 @@ import React from "react";
 import { MemoryRouter, Route, Switch } from "react-router";
 
 import * as monitor from "../../../hooks/Jobs/useJobSubscription";
-import { AddJobSubscription, JobNotification, JobSubscription } from "../../../hooks/Jobs/useJobSubscription";
-import { searchDatasetVersions } from "../../../services/datasetService";
 import { CompletionStatus } from "../../../types/CompletionStatus";
 import { UpdateNewDatasetVersionResponseViewModel } from "../../../types/Datasets/UpdateDatasetRequestViewModel";
+import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { RunningStatus } from "../../../types/RunningStatus";
 
 export function UpdateDataSourceFileTestData() {
@@ -37,7 +34,7 @@ export function UpdateDataSourceFileTestData() {
     },
     id: "sertdhw4e5t",
     isEnabled: true,
-    onError: () => {},
+    onError: () => null,
     startDate: DateTime.local(),
   };
 
@@ -99,7 +96,7 @@ export function UpdateDataSourceFileTestData() {
   const jobSubscriptionSpy = jest.spyOn(monitor, "useJobSubscription");
   jobSubscriptionSpy.mockImplementation(() => {
     return {
-      addSub: (request: AddJobSubscription) => {
+      addSub: () => {
         const sub: JobSubscription = {
           filterBy: {},
           id: "sertdhw4e5t",
@@ -110,7 +107,7 @@ export function UpdateDataSourceFileTestData() {
         subscription = sub;
         return Promise.resolve(sub as JobSubscription);
       },
-      replaceSubs: (requests: AddJobSubscription[]) => {
+      replaceSubs: () => {
         const sub: JobSubscription = {
           filterBy: {},
           isEnabled: true,
@@ -121,8 +118,8 @@ export function UpdateDataSourceFileTestData() {
         subscription = sub;
         return [sub];
       },
-      removeSub: (request) => {},
-      removeAllSubs: () => {},
+      removeSub: () => null,
+      removeAllSubs: () => null,
       subs: [],
       results: notification ? [notification] : [],
     };

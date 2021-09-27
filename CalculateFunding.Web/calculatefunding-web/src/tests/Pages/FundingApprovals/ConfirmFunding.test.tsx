@@ -7,8 +7,8 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
 import { Provider } from "react-redux";
-import { MemoryRouter,match } from "react-router";
-import { Store,createStore } from "redux";
+import { match, MemoryRouter } from "react-router";
+import { createStore, Store } from "redux";
 
 import { getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
 import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -75,7 +75,6 @@ const renderPage = async () => {
 };
 
 const useSelectorSpy = jest.spyOn(redux, "useSelector");
-const useDispatchSpy = jest.spyOn(redux, "useDispatch");
 jest.mock("../../../components/AdminNav");
 const config = setupTestConfig();
 
@@ -541,7 +540,7 @@ function setupTestConfig() {
     specificationId: testSpec.id,
     ukprn: "23932035",
     upin: "43634",
-    urn: "851305"
+    urn: "851305",
   };
   const provider2: PublishedProviderResult = {
     isIndicative: false,
@@ -559,7 +558,7 @@ function setupTestConfig() {
     specificationId: testSpec.id,
     ukprn: "9641960",
     upin: "785220",
-    urn: "82096"
+    urn: "82096",
   };
 
   const mockConfirmApprovalRoute: match<ConfirmFundingRouteProps> = {
@@ -610,7 +609,7 @@ function setupTestConfig() {
     localAuthoritiesCount: 0,
     providerTypes: [],
     providerTypesCount: 2,
-    totalFunding: 123456.99
+    totalFunding: 123456.99,
   };
   const mockFundingSummaryForApprovingService = jest.fn(() =>
     Promise.resolve({

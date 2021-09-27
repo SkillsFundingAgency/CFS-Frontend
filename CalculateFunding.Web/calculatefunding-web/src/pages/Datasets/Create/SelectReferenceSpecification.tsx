@@ -25,7 +25,7 @@ import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 export function SelectReferenceSpecification({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
   const forSpecId: string = match.params.forSpecId;
   const { errors, addError, clearErrorMessages } = useErrors();
-  const { state, dispatch } = useAppContext();
+  const { dispatch } = useAppContext();
   const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream>();
   const [selectedFundingPeriod, setSelectedFundingPeriod] = useState<FundingPeriod>();
   const { isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions } =
@@ -255,7 +255,11 @@ export function SelectReferenceSpecification({ match }: RouteComponentProps<Crea
               </dl>
             </div>
             <div className="govuk-grid-column-two-thirds">
-              <button className="govuk-button" data-module="govuk-button" onClick={onSubmit}>
+              <button
+                className="govuk-button"
+                data-module="govuk-button"
+                onClick={(e) => onSubmit(e as React.MouseEvent<HTMLButtonElement>)}
+              >
                 Continue
               </button>
             </div>

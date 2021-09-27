@@ -1,15 +1,14 @@
 ﻿import { DateTime } from "luxon";
 
-import jobSubscriptionUtilities from "../../helpers/jobSubscriptionUtilities";
-import { JobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import { findMatchingSubs } from "../../helpers/jobSubscriptionUtilities";
 import { JobDetails } from "../../types/jobDetails";
+import { JobSubscription } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { RunningStatus } from "../../types/RunningStatus";
 
 describe("jobSubscriptionUtilities tests", () => {
   describe("findMatchingSubs tests", () => {
     it("returns nothing if no subscriptions", () => {
-      const { findMatchingSubs } = jobSubscriptionUtilities();
       const subs: JobSubscription[] = [];
       const job: JobDetails = {
         failures: [],
@@ -30,7 +29,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns nothing if matching job type but not matching spec id", () => {
-      const { findMatchingSubs } = jobSubscriptionUtilities();
       const sub: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -61,7 +59,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns match if matching job id, job types, and job id", () => {
-      const { findMatchingSubs } = jobSubscriptionUtilities();
       const sub: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -94,7 +91,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns match if matching job trigger entity", () => {
-      const { findMatchingSubs } = jobSubscriptionUtilities();
       const sub: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -128,7 +124,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns match if matching child job", () => {
-      const { findMatchingSubs } = jobSubscriptionUtilities();
       const sub: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -163,7 +158,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns nothing if matching job trigger entity but not job type", () => {
-      const { findMatchingSubs } = jobSubscriptionUtilities();
       const sub: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,

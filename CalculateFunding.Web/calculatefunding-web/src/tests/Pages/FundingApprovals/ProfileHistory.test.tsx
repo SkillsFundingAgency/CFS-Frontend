@@ -5,7 +5,7 @@ import { render } from "@testing-library/react";
 import { createLocation, createMemoryHistory } from "history";
 import React from "react";
 import * as ReactQuery from "react-query";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
 import { ProfileHistoryProps } from "../../../pages/FundingApprovals/ProfileHistory";
 import { FundingLineChangeViewModel } from "../../../types/PublishedProvider/FundingLineProfile";

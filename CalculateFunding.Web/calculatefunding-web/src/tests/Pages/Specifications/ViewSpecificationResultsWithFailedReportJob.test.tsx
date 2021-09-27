@@ -8,8 +8,8 @@ import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Job
 import { LatestSpecificationJobWithMonitoringResult } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { RunningStatus } from "../../../types/RunningStatus";
-import {ProviderDataTrackingMode} from "../../../types/Specifications/ProviderDataTrackingMode";
-import {SpecificationSummary} from "../../../types/SpecificationSummary";
+import { ProviderDataTrackingMode } from "../../../types/Specifications/ProviderDataTrackingMode";
+import { SpecificationSummary } from "../../../types/SpecificationSummary";
 
 function renderViewSpecificationResults() {
   const { ViewSpecificationResults } = require("../../../pages/Specifications/ViewSpecificationResults");

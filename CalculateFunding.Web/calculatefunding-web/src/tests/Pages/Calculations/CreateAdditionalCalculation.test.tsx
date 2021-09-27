@@ -1,5 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createLocation } from "history";
@@ -9,24 +7,17 @@ import { MemoryRouter } from "react-router-dom";
 
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
-import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
-import {
-  CreateAdditionalCalculation,
-  CreateAdditionalCalculationRouteProps,
-} from "../../../pages/Calculations/CreateAdditionalCalculation";
-import {CalculationDetails} from "../../../types/CalculationDetails";
+import { CreateAdditionalCalculationRouteProps } from "../../../pages/Calculations/CreateAdditionalCalculation";
+import { CalculationDetails } from "../../../types/CalculationDetails";
 import {
   CalculationCompilePreviewResponse,
-  CalculationDataType,
-  CompileErrorSeverity, PreviewProviderCalculationResponseModel,
+  CompileErrorSeverity,
+  PreviewProviderCalculationResponseModel,
 } from "../../../types/Calculations/CalculationCompilePreviewResponse";
-import { CalculationType } from "../../../types/CalculationSearchResponse";
 import { Permission } from "../../../types/Permission";
-import { PublishStatus } from "../../../types/PublishStatusModel";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
-import { ValueType } from "../../../types/ValueType";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
 function renderPage() {
@@ -42,6 +33,7 @@ function renderPage() {
     </MemoryRouter>
   );
 }
+
 jest.mock("../../../components/AdminNav");
 
 describe("<CreateAdditionalCalculation> tests", () => {
@@ -145,7 +137,7 @@ const testSpec: SpecificationSummary = {
   isSelectedForFunding: true,
   providerVersionId: "",
   dataDefinitionRelationshipIds: [],
-  templateIds: {}
+  templateIds: {},
 };
 
 const matchMock: match<CreateAdditionalCalculationRouteProps> = {
@@ -166,7 +158,7 @@ const specResult: SpecificationSummaryQueryResult = {
   isSpecificationFetched: true,
 };
 const mockFailedBuildResponse: CalculationCompilePreviewResponse = {
-  calculation: {} as CalculationDetails, 
+  calculation: {} as CalculationDetails,
   previewProviderCalculation: {} as PreviewProviderCalculationResponseModel,
   compilerOutput: {
     success: false,
@@ -189,49 +181,6 @@ const mockFailedBuildResponse: CalculationCompilePreviewResponse = {
         message: "Typo error",
       },
     ],
-  }
-};
-const mockSuccessfulBuildResponse: CalculationCompilePreviewResponse = {
-  compilerOutput: {
-    success: true,
-    sourceFiles: [
-      {
-        fileName: "",
-        sourceCode: "",
-      },
-    ],
-    compilerMessages: [],
-  },
-  previewProviderCalculation: {
-    calculationResult: {
-      calculation: {
-        id: "",
-        name: "",
-      },
-      calculationDataType: CalculationDataType.Boolean,
-      calculationType: CalculationType.Template,
-      exceptionMessage: "",
-      exceptionStackTrace: "",
-      exceptionType: "",
-      value: undefined,
-    },
-    providerName: "",
-  },
-  calculation: {
-    id: "",
-    author: null,
-    fundingStreamId: "",
-    lastUpdated: new Date(),
-    name: "",
-    namespace: "",
-    sourceCode: "",
-    publishStatus: PublishStatus.Approved,
-    sourceCodeName: "",
-    specificationId: "",
-    valueType: ValueType.Boolean,
-    dataType: CalculationDataType.Decimal,
-    wasTemplateCalculation: false,
-    calculationType: CalculationType.Template,
   },
 };
 
@@ -290,21 +239,6 @@ const mockFailedBuild = () => {
         Promise.resolve({
           data: mockFailedBuildResponse,
           status: 400,
-        })
-      ),
-    };
-  });
-};
-const mockSuccessfulBuild = () => {
-  jest.mock("../../../services/calculationService", () => {
-    const service = jest.requireActual("../../../services/calculationService");
-
-    return {
-      ...service,
-      compileCalculationPreviewService: jest.fn(() =>
-        Promise.resolve({
-          data: mockSuccessfulBuildResponse,
-          status: 200,
         })
       ),
     };

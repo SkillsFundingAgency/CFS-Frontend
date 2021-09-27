@@ -4,13 +4,13 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createLocation } from "history";
 import React from "react";
-import { QueryCache, QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
 import * as redux from "react-redux";
-import { MemoryRouter,match } from "react-router";
-import { Store,createStore } from "redux";
+import { match, MemoryRouter } from "react-router";
+import { createStore, Store } from "redux";
 
-import { UploadBatch, UploadBatchRouteProps } from "../../../pages/FundingApprovals/UploadBatch";
+import { UploadBatchRouteProps } from "../../../pages/FundingApprovals/UploadBatch";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FundingApprovalTestSetup } from "./FundingApprovalTestSetup";
 

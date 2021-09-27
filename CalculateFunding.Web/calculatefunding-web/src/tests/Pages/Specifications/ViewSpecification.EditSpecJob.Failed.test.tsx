@@ -1,6 +1,6 @@
 ﻿import { act, screen, within } from "@testing-library/react";
 
-import { JobNotification } from "../../../hooks/Jobs/useJobSubscription";
+import { JobNotification } from "../../../types/Jobs/JobSubscriptionModels";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
 const testData = ViewSpecificationTestData();

@@ -6,7 +6,7 @@ import { createLocation, createMemoryHistory } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { ViewEditFundingLineProfileProps } from "../../../pages/FundingApprovals/ViewEditFundingLineProfile";

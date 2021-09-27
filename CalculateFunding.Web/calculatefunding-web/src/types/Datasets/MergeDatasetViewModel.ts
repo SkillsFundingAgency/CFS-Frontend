@@ -1,5 +1,5 @@
 import { Author } from "../Calculations/Author";
-import {DatasetDefinition} from "../DatasetDefinitions";
+import { DatasetDefinition } from "../DatasetDefinitions";
 import { FundingStream } from "../viewFundingTypes";
 
 export interface MergeDatasetViewModel {

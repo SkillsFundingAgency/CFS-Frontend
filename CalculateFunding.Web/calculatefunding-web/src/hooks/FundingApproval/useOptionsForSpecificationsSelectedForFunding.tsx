@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import { UseQueryOptions,useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 
 import { getSpecificationsSelectedForFundingService } from "../../services/specificationService";
 import { FundingStreamWithSpecificationSelectedForFunding } from "../../types/SpecificationSelectedForFunding";

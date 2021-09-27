@@ -12,7 +12,6 @@ describe("<SpecificationFundingApproval />", () => {
   describe("when job is active", () => {
     beforeEach(async () => {
       useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);
-      test.haveNoJobNotification();
       test.hasSpecification();
       test.haveJobInProgressNotification();
       test.hasFundingConfigurationWithApproveAll();

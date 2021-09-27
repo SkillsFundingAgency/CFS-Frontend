@@ -69,7 +69,7 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
           ?.filter((i) => i.type === TemplateItemType.Calculation)
           .map((i) => i.templateId),
       } as CreateDatasetSpecificationRelationshipRequest;
-      const response = await datasetService.createDatasetFromReleased(request);
+      await datasetService.createDatasetFromReleased(request);
       return true;
     } catch (e: any) {
       addError({
@@ -237,7 +237,7 @@ const Actions = (props: { forSpecId: string; onSave: (e: React.MouseEvent<HTMLBu
           className="govuk-button govuk-!-margin-top-3"
           data-module="govuk-button"
           type="button"
-          onClick={props.onSave}
+          onClick={(e) => props.onSave(e as React.MouseEvent<HTMLButtonElement>)}
         >
           Create data set
         </button>

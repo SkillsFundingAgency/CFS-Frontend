@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import React from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
-import { Store,createStore } from "redux";
+import { createStore, Store } from "redux";
 
 import { FundingConfirmationSummary } from "../../../components/Funding/FundingConfirmationSummary";
 import { ConfirmFundingRouteProps } from "../../../pages/FundingApprovals/ConfirmFunding";

@@ -1,4 +1,4 @@
-import { ITemplateBuilderHistory,db } from "../types/TemplateBuilder/TemplateBuilderDatabase";
+import { db, ITemplateBuilderHistory } from "../types/TemplateBuilder/TemplateBuilderDatabase";
 
 export const open = async () => {
   await db.open();

@@ -1,4 +1,4 @@
-import { Reducer,combineReducers } from "redux";
+import { combineReducers, Reducer } from "redux";
 
 import { GetFeatureFlagsAction } from "../actions/FeatureFlagsActions";
 import { IFundingSearchSelectionActions } from "../actions/FundingSearchSelectionActions";

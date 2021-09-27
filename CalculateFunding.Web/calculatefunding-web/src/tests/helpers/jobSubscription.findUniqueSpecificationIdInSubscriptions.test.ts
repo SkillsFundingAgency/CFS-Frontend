@@ -1,13 +1,12 @@
 ﻿import { DateTime } from "luxon";
 
-import jobSubscriptionUtilities from "../../helpers/jobSubscriptionUtilities";
-import { JobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import { findUniqueSpecificationIdInSubscriptions } from "../../helpers/jobSubscriptionUtilities";
+import { JobSubscription } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 
 describe("jobSubscriptionUtilities tests", () => {
   describe("findUniqueSpecificationIdInSubscriptions tests", () => {
     it("returns nothing if no subscriptions", () => {
-      const { findUniqueSpecificationIdInSubscriptions } = jobSubscriptionUtilities();
       const subs: JobSubscription[] = [];
       const result = findUniqueSpecificationIdInSubscriptions(subs);
 
@@ -15,7 +14,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns nothing if subscriptions not specification specific", () => {
-      const { findUniqueSpecificationIdInSubscriptions } = jobSubscriptionUtilities();
       const sub1: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -43,7 +41,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns nothing if subscriptions have different specifications", () => {
-      const { findUniqueSpecificationIdInSubscriptions } = jobSubscriptionUtilities();
       const sub1: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -73,7 +70,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns nothing if one subscription has a specification but the other does not", () => {
-      const { findUniqueSpecificationIdInSubscriptions } = jobSubscriptionUtilities();
       const sub1: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,
@@ -103,7 +99,6 @@ describe("jobSubscriptionUtilities tests", () => {
     });
 
     it("returns correct spec id if all subscriptions have the same specification", () => {
-      const { findUniqueSpecificationIdInSubscriptions } = jobSubscriptionUtilities();
       const sub1: JobSubscription = {
         id: "z35hsrt6h",
         isEnabled: true,

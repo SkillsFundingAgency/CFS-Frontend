@@ -2,9 +2,9 @@
 import { Link } from "react-router-dom";
 
 import { convertToSlug } from "../../helpers/stringHelper";
-import { JobNotification } from "../../hooks/Jobs/useJobSubscription";
 import { DatasetRelationshipType } from "../../types/Datasets/DatasetRelationshipType";
 import { SpecificationDatasetRelationshipsViewModelItem } from "../../types/Datasets/SpecificationDatasetRelationshipsViewModel";
+import { JobNotification } from "../../types/Jobs/JobSubscriptionModels";
 import { DateTimeFormatter } from "../DateTimeFormatter";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { LoadingStatus } from "../LoadingStatus";
@@ -15,10 +15,12 @@ export interface SpecificationDataRelationshipsGridProps {
   datasetRelationships: SpecificationDatasetRelationshipsViewModelItem[];
   converterWizardJobs: JobNotification[];
 }
+
 interface DataRelationshipItemRowProps {
   item: SpecificationDatasetRelationshipsViewModelItem;
   converterWizardJobs: JobNotification[];
 }
+
 interface DataSetDetailsProps {
   item: SpecificationDatasetRelationshipsViewModelItem;
 }

@@ -10,8 +10,8 @@ import {
 } from "../../../types/Datasets/DatasetVersionSearchResponse";
 import { DatasetVersionSummary } from "../../../types/Datasets/DatasetVersionSummary";
 import {
-  DataSourceRelationshipResponseViewModel,
   DatasetWithVersions,
+  DataSourceRelationshipResponseViewModel,
 } from "../../../types/Datasets/DataSourceRelationshipResponseViewModel";
 import { DataSourceSelection } from "../../../types/Datasets/DataSourceSelection";
 

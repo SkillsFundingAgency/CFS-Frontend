@@ -1,16 +1,14 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { render, screen, within } from "@testing-library/react";
 import { createBrowserHistory, createLocation } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
 import { Provider } from "react-redux";
-import { MemoryRouter,match } from "react-router";
-import { Store,createStore } from "redux";
+import { match, MemoryRouter } from "react-router";
+import { createStore, Store } from "redux";
 
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
-import { ProviderVersionQueryResult, useProviderVersion } from "../../../hooks/Providers/useProviderVersion";
+import { ProviderVersionQueryResult } from "../../../hooks/Providers/useProviderVersion";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
 import { ProviderFundingOverviewRoute } from "../../../pages/FundingApprovals/ProviderFundingOverview";

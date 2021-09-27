@@ -3,8 +3,8 @@ import { ThunkAction } from "redux-thunk";
 
 import { FundingSearchSelectionState } from "../states/FundingSearchSelectionState";
 import {
-  PublishedProviderSearchRequest,
   buildInitialPublishedProviderSearchRequest,
+  PublishedProviderSearchRequest,
 } from "../types/publishedProviderSearchRequest";
 
 export enum FundingSearchSelectionActionEvent {

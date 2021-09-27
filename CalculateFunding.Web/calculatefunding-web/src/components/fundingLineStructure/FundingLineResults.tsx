@@ -2,7 +2,6 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { useCalculationCircularDependencies } from "../../hooks/Calculations/useCalculationCircularDependencies";
-import { AddJobSubscription, JobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { ErrorProps } from "../../hooks/useErrors";
 import { getCalculationSummaryBySpecificationId } from "../../services/calculationService";
@@ -18,7 +17,7 @@ import { ValueFormatType } from "../../types/TemplateBuilderDefinitions";
 import { ApproveStatusButton } from "../ApproveStatusButton";
 import { BackToTop } from "../BackToTop";
 import { CollapsibleSteps, setCollapsibleStepsAllStepsStatus } from "../CollapsibleSteps";
-import { NumberType,formatNumber } from "../FormattedNumber";
+import { formatNumber, NumberType } from "../FormattedNumber";
 import { InputSearch } from "../InputSearch";
 import { LoadingStatus } from "../LoadingStatus";
 import { FundingLineStep } from "./FundingLineStep";

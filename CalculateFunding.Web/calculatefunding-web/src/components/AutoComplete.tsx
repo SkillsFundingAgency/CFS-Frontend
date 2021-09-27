@@ -1,6 +1,6 @@
 import "../styles/AutoComplete.scss";
 
-import React, { useEffect, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 
 export enum AutoCompleteMode {
   Standard,
@@ -73,7 +73,7 @@ export function AutoComplete({
     setSuggestions(userInput);
   }
 
-  function onClickInput(e: React.MouseEvent<HTMLInputElement>) {
+  function onClickInput(e: MouseEvent<HTMLInputElement>) {
     const userSelect = e.currentTarget.value;
     setAutoCompleteState((prevState) => {
       return { ...prevState, showSuggestions: !autoCompleteState.showSuggestions };
@@ -90,7 +90,7 @@ export function AutoComplete({
     });
   }
 
-  function listClick(e: React.MouseEvent<HTMLLIElement>) {
+  function listClick(e: MouseEvent<HTMLLIElement>) {
     const userSelected = e.currentTarget.innerText;
     const id = e.currentTarget.dataset.id;
     searchItem(userSelected, id);
@@ -167,7 +167,7 @@ export function AutoComplete({
           disabled={autoCompleteState.disabled}
           autoComplete={"off"}
           onChange={onChange}
-          onClick={onClickInput}
+          onClick={(e) => onClickInput(e as React.MouseEvent<HTMLInputElement>)}
           value={autoCompleteState.userInput}
         />
         <ul hidden={!autoCompleteState.showSuggestions} className="govuk-list autocomplete">
@@ -181,7 +181,7 @@ export function AutoComplete({
                 value={value}
                 data-id={id}
                 data-testid={id}
-                onClick={listClick}
+                onClick={(e) => listClick(e as React.MouseEvent<HTMLLIElement>)}
               >
                 {value}
               </li>

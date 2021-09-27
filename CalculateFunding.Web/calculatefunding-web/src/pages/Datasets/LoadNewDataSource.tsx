@@ -11,12 +11,7 @@ import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
-import {
-  JobSubscription,
-  MonitorFallback,
-  MonitorMode,
-  useJobSubscription,
-} from "../../hooks/Jobs/useJobSubscription";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { usePermittedFundingStreams } from "../../hooks/Permissions/usePermittedFundingStreams";
 import { useErrors } from "../../hooks/useErrors";
 import {
@@ -36,6 +31,7 @@ import {
   NewDatasetVersionResponseViewModel,
 } from "../../types/Datasets/NewDatasetVersionResponseViewModel";
 import { JobDetails } from "../../types/jobDetails";
+import { JobSubscription, MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { RunningStatus } from "../../types/RunningStatus";
 import { Section } from "../../types/Sections";
 import { UserPermission } from "../../types/UserPermission";
@@ -108,7 +104,7 @@ export function LoadNewDataSource() {
           message: "Validation failed",
         });
       })
-      .catch((err) => {
+      .catch(() => {
         addError({ error: "Unable to retrieve validation report", description: "Validation failed" });
       });
   }

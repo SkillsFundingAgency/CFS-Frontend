@@ -1,7 +1,7 @@
 import { Meta, Story } from "@storybook/react";
 import React from "react";
 
-import {Tag, TagProps, TagTypes} from "../components/Tag";
+import { Tag, TagProps, TagTypes } from "../components/Tag";
 
 export default {
   title: "CFS/Tag",

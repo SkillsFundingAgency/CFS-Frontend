@@ -115,7 +115,11 @@ const Actions = (props: {
 }) => (
   <div className="govuk-grid-row">
     <div className="govuk-grid-column-two-thirds">
-      <button className="govuk-button" data-module="govuk-button" onClick={props.onContinue}>
+      <button
+        className="govuk-button"
+        data-module="govuk-button"
+        onClick={(e) => props.onContinue(e as React.MouseEvent<HTMLButtonElement>)}
+      >
         Continue
       </button>
     </div>

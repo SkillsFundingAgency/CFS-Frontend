@@ -1,8 +1,47 @@
-﻿import { CompletionStatus } from "../types/CompletionStatus";
+﻿import { chain, descend, filter, head, sort, uniqBy } from "ramda";
+import { compose } from "redux";
+
+import { JobTypeNotificationSetting } from "../components/Jobs/JobNotificationSection";
+import { CompletionStatus } from "../types/CompletionStatus";
 import { JobDetails, JobFailure, JobOutcomeType, JobResponse } from "../types/jobDetails";
+import { JobNotification } from "../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../types/jobType";
 import { RunningStatus } from "../types/RunningStatus";
 import { convertCamelCaseToSpaceDelimited } from "./stringHelper";
+
+export const sortByLatest = sort<JobDetails>(descend((job) => job?.lastUpdated ?? new Date(0)));
+
+export const latestJob = compose<JobDetails>(head, sortByLatest);
+
+export const isJobEnabledForNotification = (
+  job: JobDetails,
+  settings: JobTypeNotificationSetting[] | undefined
+): boolean => {
+  if (!settings) return true;
+  const setting = settings?.find(
+    (s) =>
+      s.jobTypes.some((t) => t === job.jobType) &&
+      ((job.isActive && s.showActive) ||
+        (job.isFailed && s.showFailed) ||
+        (job.isSuccessful && s.showSuccessful))
+  );
+  return !!setting;
+};
+
+export const removeDuplicateJobsById = uniqBy<JobDetails, string>((j) => j?.jobId);
+
+export const removeInvalidJobs = filter<JobDetails>((a): a is JobDetails => !!a);
+
+export const activeJobs = filter<JobDetails>((j) => j.isActive);
+
+export const failedJobs = filter<JobDetails>((j) => j.isFailed);
+
+export const successfulJobs = filter<JobDetails>((j) => j.isSuccessful);
+
+export const extractJobsFromNotification = (n: JobNotification): JobDetails[] =>
+  n.latestJob ? [n.latestJob] : ([] as JobDetails[]);
+
+export const extractJobsFromNotifications = chain<JobNotification, JobDetails>(extractJobsFromNotification);
 
 export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobDetails | undefined {
   if (!job) return undefined;

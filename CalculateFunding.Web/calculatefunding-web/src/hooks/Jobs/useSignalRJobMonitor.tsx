@@ -6,7 +6,7 @@ import { getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
 import { milliseconds } from "../../helpers/TimeInMs";
 import { JobDetails, JobResponse } from "../../types/jobDetails";
 import { JobMonitoringFilter } from "../../types/Jobs/JobMonitoringFilter";
-import { JobNotification, JobSubscription, MonitorMode } from "./useJobSubscription";
+import { JobNotification, JobSubscription, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 
 export enum JobMonitorMode {
   WatchSingleSpecification,
@@ -198,7 +198,7 @@ export const useSignalRJobMonitor = ({
         hubConnect.on("NotificationEvent", processMessage);
         hubConnect.onclose((error) => notifyDisconnection(error));
         hubConnect.onreconnecting((error) => notifyReconnecting(error));
-        hubConnect.onreconnected((connectionId) => notifyReconnection());
+        hubConnect.onreconnected(() => notifyReconnection());
 
         console.log("SignalR: connecting");
         await hubConnect.start();

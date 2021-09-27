@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import { UseQueryOptions,useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 
 import * as publishedProviderService from "../../services/publishedProviderService";
 import { ApprovalMode } from "../../types/ApprovalMode";

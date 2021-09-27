@@ -1,11 +1,8 @@
 import { mount } from "enzyme";
 import React from "react";
-import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
-import { Store,createStore } from "redux";
 
 import { ManageData } from "../../../pages/Datasets/ManageData";
-import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 
 const Adapter = require("enzyme-adapter-react-16");
 const enzyme = require("enzyme");

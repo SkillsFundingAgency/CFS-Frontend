@@ -1,12 +1,12 @@
 ﻿import { DateTime } from "luxon";
 
-import jobSubscriptionUtilities from "../../helpers/jobSubscriptionUtilities";
-import { AddJobSubscription, JobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import { findExistingSubscription } from "../../helpers/jobSubscriptionUtilities";
+import { AddJobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import { JobSubscription } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 
 describe("findExistingSubscription tests", () => {
   it("returns nothing if no subscriptions", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const subs: JobSubscription[] = [];
     const newSub: AddJobSubscription = {
       filterBy: {
@@ -21,7 +21,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns nothing if matching job type but not matching spec id", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -47,7 +46,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns nothing if not matching job id", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -76,7 +74,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns nothing if matching spec id but not matching job type", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -103,7 +100,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns match if only matching spec id", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -128,7 +124,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns match if matching spec id and job type", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -155,7 +150,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns match if matching spec id, job types, and job id", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -184,7 +178,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns match if matching includeChildJobs", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {
@@ -227,7 +220,6 @@ describe("findExistingSubscription tests", () => {
   });
 
   it("returns match if matching triggerByEntityId", () => {
-    const { findExistingSubscription } = jobSubscriptionUtilities();
     const sub: JobSubscription = {
       id: "z35hsrt6h",
       filterBy: {

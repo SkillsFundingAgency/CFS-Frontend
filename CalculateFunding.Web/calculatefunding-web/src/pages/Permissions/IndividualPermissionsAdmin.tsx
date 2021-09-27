@@ -360,7 +360,7 @@ export function IndividualPermissionsAdmin() {
         </div>
       )}
 
-      {notification && <NotificationBanner title="Success" children={notification} />}
+      {notification && <NotificationBanner title="Success">{notification}</NotificationBanner>}
 
       {fundingStreamsForAdmin?.length === 0 && (
         <WarningText text="You don't have any admin permissions" className="govuk-!-margin-top-4" />
@@ -451,7 +451,7 @@ export function IndividualPermissionsAdmin() {
                 )}
               </button>
               <button
-                onClick={onCancelEdit}
+                onClick={(e) => onCancelEdit(e as React.MouseEvent<HTMLButtonElement>)}
                 className="govuk-button govuk-button--secondary govuk-!-margin-right-1"
               >
                 Back

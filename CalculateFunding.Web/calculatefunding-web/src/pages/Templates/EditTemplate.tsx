@@ -2,7 +2,7 @@ import "../../styles/EditTemplate.scss";
 
 import deepClone from "lodash/cloneDeep";
 import * as QueryString from "query-string";
-import React, { useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
 // @ts-ignore
 import { Link, useParams } from "react-router-dom";
@@ -38,8 +38,8 @@ import {
   getLastUsedId,
   getTemplateById,
   getTemplateVersion,
-  isCloneRoot,
   isClonedNode,
+  isCloneRoot,
   moveNode,
   removeNode,
   restoreTemplateContent,
@@ -340,11 +340,13 @@ export function EditTemplate() {
       const errStatus = err.response.status;
       if (errStatus === 400) {
         const errResponse = err.response.data;
+        // eslint-disable-next-line no-prototype-builtins
         if (errResponse.hasOwnProperty("FundingLine")) {
           errResponse["FundingLine"].forEach((error: string) => {
             addErrorMessage(error, "template");
           });
         }
+        // eslint-disable-next-line no-prototype-builtins
         if (errResponse.hasOwnProperty("Calculation")) {
           errResponse["Calculation"].forEach((error: string) => {
             addErrorMessage(error, "template");
@@ -402,11 +404,13 @@ export function EditTemplate() {
       const errStatus = err.response.status;
       if (errStatus === 400) {
         const errResponse = err.response.data;
+        // eslint-disable-next-line no-prototype-builtins
         if (errResponse.hasOwnProperty("FundingLine")) {
           errResponse["FundingLine"].forEach((error: string) => {
             addErrorMessage(error, "template");
           });
         }
+        // eslint-disable-next-line no-prototype-builtins
         if (errResponse.hasOwnProperty("Calculation")) {
           errResponse["Calculation"].forEach((error: string) => {
             addErrorMessage(error, "template");
@@ -426,7 +430,7 @@ export function EditTemplate() {
     history.push(`/Templates/Publish/${template.templateId}`);
   };
 
-  const handleAddFundingLineClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleAddFundingLineClick = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     const keyCount =
       ds.length > 0
@@ -456,7 +460,7 @@ export function EditTemplate() {
     setFocusNodeId(`n${id}`);
   };
 
-  const handleUndo = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleUndo = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     undo();
     if (undos === 0) {
@@ -464,13 +468,13 @@ export function EditTemplate() {
     }
   };
 
-  const handleRedo = (event: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleRedo = (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     redo();
     setIsDirty(true);
   };
 
-  const toggleEditDescription = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const toggleEditDescription = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     clearErrorMessages();
     setShowModal(!showModal);
@@ -693,7 +697,7 @@ export function EditTemplate() {
                         {template.description && template.description.trim().length > 0 && (
                           <button
                             id="edit-description-link"
-                            onClick={toggleEditDescription}
+                            onClick={(e) => toggleEditDescription(e as React.MouseEvent<HTMLButtonElement>)}
                             className="govuk-link govuk-link--no-visited-state"
                           >
                             Edit
@@ -702,7 +706,7 @@ export function EditTemplate() {
                         {(!template.description || template.description.trim().length === 0) && (
                           <button
                             id="add-description-link"
-                            onClick={toggleEditDescription}
+                            onClick={(e) => toggleEditDescription(e as React.MouseEvent<HTMLButtonElement>)}
                             className="govuk-link govuk-link--no-visited-state"
                           >
                             Add
@@ -777,7 +781,7 @@ export function EditTemplate() {
                       <a
                         href="#"
                         data-testid="redo"
-                        onClick={handleRedo}
+                        onClick={(e) => handleRedo(e as React.MouseEvent<HTMLAnchorElement>)}
                         className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-bottom-0 govuk-!-margin-right-0"
                       >
                         <span>↪</span> Redo ({redos})
@@ -787,7 +791,7 @@ export function EditTemplate() {
                       <a
                         href="#"
                         data-testid="undo"
-                        onClick={handleUndo}
+                        onClick={(e) => handleUndo(e as React.MouseEvent<HTMLAnchorElement>)}
                         className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0"
                       >
                         <span>↩</span> Undo ({undos})
@@ -797,7 +801,7 @@ export function EditTemplate() {
                       <a
                         href="#"
                         data-testid="add-funding-line"
-                        onClick={handleAddFundingLineClick}
+                        onClick={(e) => handleAddFundingLineClick(e as React.MouseEvent<HTMLAnchorElement>)}
                         className="govuk-link-m govuk-link--no-visited-state right-align govuk-!-margin-right-2 govuk-!-margin-bottom-0"
                       >
                         <span>+</span> Add a new funding line

@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createLocation, createMemoryHistory } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
 import { EditVariationPointsRouteProps } from "../../../pages/Specifications/EditVariationPoints";
 import * as profilingService from "../../../services/profilingService";

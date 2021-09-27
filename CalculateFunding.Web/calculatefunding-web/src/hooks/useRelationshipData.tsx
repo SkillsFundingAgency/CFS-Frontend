@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import { UseQueryOptions,useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 
 import { getDataSourcesByRelationship } from "../services/datasetService";
 import { DataSourceRelationshipResponseViewModel } from "../types/Datasets/DataSourceRelationshipResponseViewModel";

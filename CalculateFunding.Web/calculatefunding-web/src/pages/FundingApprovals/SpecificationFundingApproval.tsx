@@ -16,10 +16,10 @@ import { LoadingNotification, LoadingStatusNotifier } from "../../components/Loa
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
-import { getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
+import { activeJobs, getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../hooks/FundingApproval/usePublishedProviderSearch";
-import { MonitorFallback, MonitorMode, useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
@@ -30,6 +30,7 @@ import * as publishService from "../../services/publishService";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../types/ApprovalMode";
 import { JobDetails } from "../../types/jobDetails";
+import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
@@ -54,11 +55,7 @@ export const SpecificationFundingApproval = ({
   const isSearchCriteriaInitialised =
     state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
 
-  const {
-    addSub,
-    removeAllSubs,
-    results: jobNotifications,
-  } = useJobSubscription({
+  const { addSub, results: jobNotifications } = useJobSubscription({
     onError: (err) =>
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
   });
@@ -103,11 +100,10 @@ export const SpecificationFundingApproval = ({
         .map((n) => n.latestJob as JobDetails) || ([] as JobDetails[]),
     [jobNotifications]
   );
-  const hasActiveActionJobs = actionJobs.some((j) => j.isActive);
 
   const { publishedProvidersWithErrors, isLoadingPublishedProviderErrors } = usePublishedProviderErrorSearch(
     specificationId,
-    (err) => addErrorMessage(err.message, "Error while loading provider funding errors")
+    (err) => addError({ error: err, description: "Error while loading provider funding errors" })
   );
   const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
     match.params.specificationId,
@@ -157,29 +153,18 @@ export const SpecificationFundingApproval = ({
       );
     }
 
-    addSub({
-      filterBy: {
-        specificationId: specificationId,
-        jobTypes: [
-          JobType.RefreshFundingJob,
-          JobType.ApproveAllProviderFundingJob,
-          JobType.ApproveBatchProviderFundingJob,
-          JobType.PublishBatchProviderFundingJob,
-          JobType.PublishAllProviderFundingJob,
-          JobType.ReIndexPublishedProvidersJob,
-          JobType.CreateInstructAllocationJob,
-          JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-          JobType.GenerateGraphAndInstructAllocationJob,
-        ],
-      },
-      monitorMode: MonitorMode.SignalR,
-      monitorFallback: MonitorFallback.Polling,
-      fetchPriorNotifications: true,
-      onError: (err) =>
-        addError({ error: err, description: "An error occurred while monitoring a background job" }),
-    });
-
-    return () => removeAllSubs();
+    addJobTypeSubscription([JobType.RefreshFundingJob]);
+    addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
+    addJobTypeSubscription([
+      JobType.PublishBatchProviderFundingJob,
+      JobType.PublishAllProviderFundingJob,
+      JobType.ReIndexPublishedProvidersJob,
+    ]);
+    addJobTypeSubscription([
+      JobType.CreateInstructAllocationJob,
+      JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+      JobType.GenerateGraphAndInstructAllocationJob,
+    ]);
   }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
@@ -199,6 +184,20 @@ export const SpecificationFundingApproval = ({
       refetchSearchResults();
     }
   }, [jobNotifications, jobId]);
+
+  function addJobTypeSubscription(jobTypes: JobType[]) {
+    addSub({
+      filterBy: {
+        specificationId: specificationId,
+        jobTypes: jobTypes,
+      },
+      monitorMode: MonitorMode.SignalR,
+      monitorFallback: MonitorFallback.Polling,
+      fetchPriorNotifications: true,
+      onError: (err) =>
+        addError({ error: err, description: "An error occurred while monitoring a background job" }),
+    });
+  }
 
   function handleApprove() {
     if (
@@ -314,7 +313,6 @@ export const SpecificationFundingApproval = ({
     !isSearchCriteriaInitialised ||
     isLoadingSpecification ||
     isLoadingFundingConfiguration ||
-    hasActiveActionJobs ||
     isLoadingSearchResults ||
     isLoadingRefresh;
 
@@ -325,7 +323,10 @@ export const SpecificationFundingApproval = ({
   const blockActionBasedOnProviderErrors =
     fundingConfiguration?.approvalMode === ApprovalMode.All && haveAnyProviderErrors;
 
-  const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh;
+  const activeActionJobs = activeJobs(actionJobs);
+  const hasActiveActionJobs = !!activeActionJobs.length;
+
+  const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh || hasActiveActionJobs;
 
   return (
     <Main location={Section.Approvals}>
@@ -340,36 +341,38 @@ export const SpecificationFundingApproval = ({
 
       <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
-      <JobNotificationSection
-        jobNotifications={jobNotifications}
-        notificationSettings={[
-          {
-            jobTypes: [
-              JobType.CreateInstructAllocationJob,
-              JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-              JobType.GenerateGraphAndInstructAllocationJob,
-            ],
-            showActive: true,
-            showFailed: true,
-            showSuccessful: false,
-            activeDescription: "Calculation run in progress",
-            failDescription: "Calculation run failed",
-          },
-          {
-            jobTypes: [
-              JobType.RefreshFundingJob,
-              JobType.ApproveAllProviderFundingJob,
-              JobType.ApproveBatchProviderFundingJob,
-              JobType.PublishBatchProviderFundingJob,
-              JobType.PublishAllProviderFundingJob,
-              JobType.ReIndexPublishedProvidersJob,
-            ],
-            showActive: false,
-            showFailed: true,
-            showSuccessful: true,
-          },
-        ]}
-      />
+      {!isLoading && !activeActionJobs?.length && (
+        <JobNotificationSection
+          jobNotifications={jobNotifications}
+          notificationSettings={[
+            {
+              jobTypes: [
+                JobType.CreateInstructAllocationJob,
+                JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+                JobType.GenerateGraphAndInstructAllocationJob,
+              ],
+              showActive: true,
+              showFailed: true,
+              showSuccessful: false,
+              activeDescription: "Calculation run in progress",
+              failDescription: "Calculation run failed",
+            },
+            {
+              jobTypes: [
+                JobType.RefreshFundingJob,
+                JobType.ApproveAllProviderFundingJob,
+                JobType.ApproveBatchProviderFundingJob,
+                JobType.PublishBatchProviderFundingJob,
+                JobType.PublishAllProviderFundingJob,
+                JobType.ReIndexPublishedProvidersJob,
+              ],
+              showActive: false, // we show a spinner separately
+              showFailed: true,
+              showSuccessful: true,
+            },
+          ]}
+        />
+      )}
 
       {!isLoadingSpecification && specification && (
         <div className="govuk-grid-row govuk-!-margin-bottom-5">
@@ -440,7 +443,7 @@ export const SpecificationFundingApproval = ({
           />
         </div>
         <div className="govuk-grid-column-two-thirds">
-          {isLoading && (
+          {(isLoading || hasActiveActionJobs) && (
             <div>
               <LoadingStatusNotifier
                 notifications={[
@@ -454,16 +457,14 @@ export const SpecificationFundingApproval = ({
                     title: "Requesting refresh of funding...",
                     description: "Updating, please wait",
                   },
-                  ...actionJobs
-                    .filter((j) => j.isActive)
-                    .map<LoadingNotification>((job) => {
-                      return {
-                        title: `Job ${job.statusDescription}: ${job.jobDescription}`,
-                        description: job.isActive
-                          ? "Monitoring job progress. Please wait, this could take several minutes"
-                          : "",
-                      };
-                    }),
+                  ...activeActionJobs.map<LoadingNotification>((job) => {
+                    return {
+                      title: `Job ${job.statusDescription}: ${job.jobDescription}`,
+                      description: job.isActive
+                        ? "Monitoring job progress. Please wait, this could take several minutes"
+                        : "",
+                    };
+                  }),
                   {
                     isActive: isLoadingSearchResults,
                     title: "Loading provider funding data...",
@@ -520,6 +521,7 @@ export const SpecificationFundingApproval = ({
             <button
               className="govuk-button"
               disabled={
+                hasActiveActionJobs ||
                 !publishedProviderSearchResults?.canApprove ||
                 !hasPermissionToApprove ||
                 isLoadingRefresh ||
@@ -532,6 +534,7 @@ export const SpecificationFundingApproval = ({
             <button
               className="govuk-button govuk-button--warning govuk-!-margin-right-1"
               disabled={
+                hasActiveActionJobs ||
                 !publishedProviderSearchResults?.canPublish ||
                 !hasPermissionToRelease ||
                 isLoadingRefresh ||

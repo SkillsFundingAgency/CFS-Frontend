@@ -13,19 +13,14 @@ import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
 import { useOptionsForSpecificationsSelectedForFunding } from "../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
-import {
-  AddJobSubscription,
-  JobNotification,
-  MonitorFallback,
-  MonitorMode,
-  useJobSubscription,
-} from "../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription, useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { getLatestSuccessfulJob } from "../../services/jobService";
 import { getLatestPublishedDate, runSqlImportJob } from "../../services/publishService";
 import { CompletionStatus } from "../../types/CompletionStatus";
 import { JobDetails } from "../../types/jobDetails";
+import { JobNotification, MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { LatestPublishedDate } from "../../types/PublishedProvider/LatestPublishedDate";

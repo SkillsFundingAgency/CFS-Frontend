@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 
-import { IUserActions,UserActionEvent,hasConfirmedSkillsStateKey } from "../actions/userAction";
+import { hasConfirmedSkillsStateKey, IUserActions, UserActionEvent } from "../actions/userAction";
 import { IUserState } from "../states/IUserState";
 
 const initialState: IUserState = {

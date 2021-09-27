@@ -5,7 +5,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import * as redux from "react-redux";
 import { MemoryRouter, Route, Switch } from "react-router";
-import { Store,createStore } from "redux";
+import { createStore, Store } from "redux";
 
 import * as monitorHook from "../../../hooks/Jobs/useJobMonitor";
 import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";

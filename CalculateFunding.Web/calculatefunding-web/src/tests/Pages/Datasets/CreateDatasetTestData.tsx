@@ -1,7 +1,7 @@
 ﻿import { render } from "@testing-library/react";
 import React from "react";
 import * as redux from "react-redux";
-import { MemoryRouter,match } from "react-router";
+import { match, MemoryRouter } from "react-router";
 
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";

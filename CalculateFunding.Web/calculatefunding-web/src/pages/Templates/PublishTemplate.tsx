@@ -331,7 +331,7 @@ export const PublishTemplate = () => {
                       className="govuk-button"
                       data-testid="publish"
                       disabled={isPublishing || isLoading || !canApproveTemplate || !template}
-                      onClick={handlePublishClick}
+                      onClick={(e) => handlePublishClick(e as React.MouseEvent<HTMLButtonElement>)}
                     >
                       Publish
                     </button>

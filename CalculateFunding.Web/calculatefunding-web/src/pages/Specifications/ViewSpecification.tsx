@@ -25,13 +25,7 @@ import { Datasets } from "../../components/Specifications/Datasets";
 import { VariationManagement } from "../../components/Specifications/VariationManagement";
 import { Tabs } from "../../components/Tabs";
 import { useCalculationErrors } from "../../hooks/Calculations/useCalculationErrors";
-import {
-  JobNotification,
-  JobSubscription,
-  MonitorFallback,
-  MonitorMode,
-  useJobSubscription,
-} from "../../hooks/Jobs/useJobSubscription";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useSpecificationResults } from "../../hooks/Specifications/useSpecificationResults";
 import { useErrors } from "../../hooks/useErrors";
@@ -44,6 +38,12 @@ import { JobObserverState } from "../../states/JobObserverState";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { CalculationType } from "../../types/CalculationSearchResponse";
 import { JobDetails } from "../../types/jobDetails";
+import {
+  JobNotification,
+  JobSubscription,
+  MonitorFallback,
+  MonitorMode,
+} from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { PublishStatus } from "../../types/PublishStatusModel";

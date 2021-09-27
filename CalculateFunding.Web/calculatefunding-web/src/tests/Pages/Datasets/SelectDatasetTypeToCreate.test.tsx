@@ -1,28 +1,21 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, within } from "@testing-library/react";
+﻿import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createLocation } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
-import * as redux from "react-redux";
-import { MemoryRouter,match } from "react-router";
-import { Store,createStore } from "redux";
+import { match, MemoryRouter } from "react-router";
+import { createStore, Store } from "redux";
 
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as specHook from "../../../hooks/useSpecificationSummary";
-import {
-  CreateDatasetRouteProps,
-  SelectDatasetTypeToCreate,
-} from "../../../pages/Datasets/Create/SelectDatasetTypeToCreate";
+import { CreateDatasetRouteProps } from "../../../pages/Datasets/Create/SelectDatasetTypeToCreate";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { Permission } from "../../../types/Permission";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
-const useSelectorSpy = jest.spyOn(redux, "useSelector");
 const mockHistory = { push: jest.fn() };
 const location = createLocation("", "", "");
 const store: Store<IStoreState> = createStore(rootReducer);
@@ -32,17 +25,9 @@ const fundingStream1: FundingStream = {
   name: "WIZZ1",
   id: "Wizard Training Scheme",
 };
-const fundingStream2: FundingStream = {
-  name: "DRK1",
-  id: "Dark Arts Programme",
-};
 const fundingPeriod1: FundingPeriod = {
   id: "FP123",
   name: "2019-20",
-};
-const fundingPeriod2: FundingPeriod = {
-  id: "FP124",
-  name: "2020-21",
 };
 const testSpec1: SpecificationSummary = {
   name: "Wizard Training",

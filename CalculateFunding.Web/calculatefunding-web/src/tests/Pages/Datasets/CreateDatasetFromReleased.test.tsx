@@ -1,6 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, within } from "@testing-library/react";
+﻿import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AxiosError } from "axios";
 import { createLocation } from "history";
@@ -9,23 +7,20 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import * as ReactQuery from "react-query";
 import { UseQueryResult } from "react-query/types/react/types";
 import { Provider } from "react-redux";
-import * as redux from "react-redux";
-import { MemoryRouter,match } from "react-router";
-import { Store,createStore } from "redux";
+import { match, MemoryRouter } from "react-router";
+import { createStore, Store } from "redux";
 
 import { AppContextWrapper } from "../../../context/AppContextWrapper";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { CreateDatasetRouteProps } from "../../../pages/Datasets/Create/SelectDatasetTypeToCreate";
-import { SelectReferenceSpecification } from "../../../pages/Datasets/Create/SelectReferenceSpecification";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { EligibleSpecificationReferenceModel } from "../../../types/Datasets/EligibleSpecificationReferenceModel";
 import { Permission } from "../../../types/Permission";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
-const useSelectorSpy = jest.spyOn(redux, "useSelector");
 const mockHistory = { push: jest.fn() };
 const location = createLocation("", "", "");
 const store: Store<IStoreState> = createStore(rootReducer);
@@ -64,20 +59,6 @@ const testSpec1: SpecificationSummary = {
   templateIds: {},
   coreProviderVersionUpdates: undefined,
   providerSnapshotId: 34,
-};
-const testSpec2: SpecificationSummary = {
-  name: "Dark Arts",
-  approvalStatus: "",
-  description: "",
-  fundingPeriod: fundingPeriod2,
-  fundingStreams: [fundingStream2],
-  id: "XYZ123",
-  isSelectedForFunding: true,
-  providerVersionId: "",
-  dataDefinitionRelationshipIds: [],
-  templateIds: {},
-  coreProviderVersionUpdates: undefined,
-  providerSnapshotId: 42,
 };
 
 const mockRoute: match<CreateDatasetRouteProps> = {

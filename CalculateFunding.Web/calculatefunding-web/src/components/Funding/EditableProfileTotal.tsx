@@ -6,7 +6,7 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { ErrorProps } from "../../hooks/useErrors";
 import { ErrorMessage } from "../../types/ErrorMessage";
 import { ProfileTotal } from "../../types/PublishedProvider/FundingLineProfile";
-import { FormattedNumber, NumberType, formatNumber, toDecimal } from "../FormattedNumber";
+import { formatNumber, FormattedNumber, NumberType, toDecimal } from "../FormattedNumber";
 
 interface EditableProfileTotalProps {
   index: number;

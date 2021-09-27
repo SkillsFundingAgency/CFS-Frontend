@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import { UseQueryOptions,useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 
 import { milliseconds } from "../../helpers/TimeInMs";
 import { getUserPermissionsService } from "../../services/userService";
