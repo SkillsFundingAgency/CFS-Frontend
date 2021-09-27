@@ -76,11 +76,8 @@ jobs:
         $env:CI = "true"
         Write-host "========================= Yarn test ========================="
         yarn test
-        Write-host "========================= Yarn build ========================="
-        $env:CI = "false"
-        yarn run build
-        Write-host "========================= Finished build/test ========================="
-      displayName: 'Run Yarn Test and build site'
+        Write-host "========================= Finished test ========================="
+      displayName: 'Run Yarn Test site'
 
     - task: PublishTestResults@2
       displayName: 'Publish React Test Results as test-report.xml'
@@ -88,6 +85,14 @@ jobs:
         testResultsFiles: 'test-report.xml'
         searchFolder: '$(System.DefaultWorkingDirectory)\${{ variables.projectFolder }}'
         testRunTitle: 'React Test _$(Build.BuildNumber)'
+
+    - powershell: |
+        cd '${{ variables.projectFolder }}'
+        Write-host "========================= Yarn build ========================="
+        $env:CI = "false"
+        yarn run build
+        Write-host "========================= Finished build ========================="
+      displayName: 'Run Yarn build site'
 
     - task: CopyFiles@2
       displayName: 'Copy Files to: CalculateFunding.Frontend/wwwroot/app'
