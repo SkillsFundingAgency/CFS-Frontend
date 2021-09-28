@@ -85,6 +85,7 @@ jobs:
         testResultsFiles: 'test-report.xml'
         searchFolder: '$(System.DefaultWorkingDirectory)\${{ variables.projectFolder }}'
         testRunTitle: 'React Test _$(Build.BuildNumber)'
+      continueOnError: true  
 
     - powershell: |
         cd '${{ variables.projectFolder }}'
