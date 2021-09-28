@@ -78,6 +78,7 @@
     "cypress": "npx cypress open",
     "cypress:runAllTests": "npx cypress run",
     "test:cypress:ci": "start-server-and-test start:test http-get://localhost:3000/app cypress:ci",
+    "test:cypress:ui": "start-server-and-test start:test http-get://localhost:3000/app cypress:runAllTests",
     "cypress:ci": "cypress run --headless",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",

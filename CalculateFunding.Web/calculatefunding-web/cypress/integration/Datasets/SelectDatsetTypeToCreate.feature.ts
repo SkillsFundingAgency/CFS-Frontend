@@ -1,5 +1,6 @@
-﻿import { makeServer, mockApiData } from "../../../src/mirage";
-import { Server } from "miragejs";
+﻿import { Server } from "miragejs";
+
+import { makeServer, mockApiData } from "../../../src/mirage";
 import { ProviderDataTrackingMode } from "../../../src/types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../../src/types/SpecificationSummary";
 
@@ -9,11 +10,7 @@ context("When creating a new data set, I want to specify whether from Released o
   let server: Server;
 
   before(() => {
-    server = makeServer({ environment: "test" });
     setup();
-  });
-  afterEach(() => {
-    server.shutdown();
   });
 
   describe("when page has loaded", () => {
@@ -50,7 +47,6 @@ context("When creating a new data set, I want to specify whether from Released o
 
   describe("when user selects Uploaded option and then Continue", () => {
     before(() => {
-      server = makeServer({ environment: "test" });
       setup();
     });
     it("goes to correct page", () => {
@@ -61,8 +57,22 @@ context("When creating a new data set, I want to specify whether from Released o
     });
   });
 
+  describe("when user clicks Cancel", () => {
+    before(() => {
+      server = makeServer({ environment: "test" });
+      setup();
+    });
+    it("goes to correct page", () => {
+      cy.findByRole("link", { name: data.spec1.name }).should("exist");
+      cy.findByRole("button", { name: /Cancel/ }).click();
+      cy.url().should("include", `/ViewSpecification/${data.spec1.id}`);
+    });
+  });
+
   function setup() {
-    server.get("/specs/*", (schema, request) => {
+    server?.shutdown();
+    server = makeServer({ environment: "test" });
+    server.get("/specs/*", () => {
       return {
         id: "111",
         name: "PSG 19-20",

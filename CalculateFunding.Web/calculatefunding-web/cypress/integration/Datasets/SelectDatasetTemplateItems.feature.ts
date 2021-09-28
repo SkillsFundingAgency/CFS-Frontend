@@ -1,11 +1,12 @@
-﻿import { makeServer, mockApiData } from "../../../src/mirage";
-import { Server } from "miragejs";
-import { commonActions } from "../commonActions";
+﻿import { Server } from "miragejs";
+
+import { makeServer, mockApiData } from "../../../src/mirage";
+import { EligibleSpecificationReferenceModel } from "../../../src/types/Datasets/EligibleSpecificationReferenceModel";
 import { PublishedSpecificationTemplateMetadata } from "../../../src/types/Datasets/PublishedSpecificationTemplateMetadata";
+import { TemplateItemType } from "../../../src/types/Datasets/TemplateItemType";
 import { ProviderDataTrackingMode } from "../../../src/types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../../src/types/SpecificationSummary";
-import { EligibleSpecificationReferenceModel } from "../../../src/types/Datasets/EligibleSpecificationReferenceModel";
-import { TemplateItemType } from "../../../src/types/Datasets/TemplateItemType";
+import { commonActions } from "../commonActions";
 
 context("Select template items for a new dataset", () => {
   const data = mockApiData();
@@ -16,7 +17,7 @@ context("Select template items for a new dataset", () => {
 
   before(() => {
     server = makeServer({ environment: "test" });
-    server.get("/specs/*", (schema, request) => {
+    server.get("/specs/*", () => {
       return {
         id: "111",
         name: "PSG 19-20",

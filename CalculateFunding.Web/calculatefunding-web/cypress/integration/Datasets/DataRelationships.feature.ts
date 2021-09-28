@@ -1,11 +1,12 @@
-﻿import { makeServer } from "../../../src/mirage";
-import { Server } from "miragejs";
-import { FundingPeriod, FundingStream } from "../../../src/types/viewFundingTypes";
+﻿import { Server } from "miragejs";
+
+import { makeServer } from "../../../src/mirage";
+import { DatasetRelationshipType } from "../../../src/types/Datasets/DatasetRelationshipType";
 import {
   SpecificationDatasetRelationshipsViewModel,
   SpecificationDatasetRelationshipsViewModelItem,
 } from "../../../src/types/Datasets/SpecificationDatasetRelationshipsViewModel";
-import { DatasetRelationshipType } from "../../../src/types/Datasets/DatasetRelationshipType";
+import { FundingPeriod, FundingStream } from "../../../src/types/viewFundingTypes";
 
 context("Given a specification with data relationships", () => {
   let server: Server;
@@ -14,7 +15,7 @@ context("Given a specification with data relationships", () => {
     server = makeServer({ environment: "test" });
     server.get(
       "/datasetRelationships/get-sources",
-      (schema, request): SpecificationDatasetRelationshipsViewModel => dataRelationshipResponse
+      (): SpecificationDatasetRelationshipsViewModel => dataRelationshipResponse
     );
 
     cy.visit(`/Datasets/DataRelationships/${specification.id}`);
@@ -45,7 +46,7 @@ context("Given a specification with data relationships", () => {
     it("displays link to add a new data set", () => {
       cy.findByRole("link", { name: /Add new data set/i })
         .should("have.attr", "href")
-        .and("include", "/Datasets/CreateDataset/" + specification.id);
+        .and("include", "/Datasets/Create/SelectDatasetTypeToCreate/" + specification.id);
     });
   });
 
@@ -114,11 +115,6 @@ context("Given a specification with data relationships", () => {
     hasDataSourceFileToMap: true,
     type: DatasetRelationshipType.ReleasedData,
   });
-  const noDataRelationshipResponse: SpecificationDatasetRelationshipsViewModel = {
-    items: [],
-    specification: specification,
-    specificationTrimmedViewModel: undefined,
-  };
   const dataRelationshipResponse: SpecificationDatasetRelationshipsViewModel = {
     items: [dataRelationship1, dataRelationship2],
     specification: specification,

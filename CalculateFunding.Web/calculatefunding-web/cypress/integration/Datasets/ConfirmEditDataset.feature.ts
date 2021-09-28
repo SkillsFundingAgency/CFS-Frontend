@@ -1,5 +1,6 @@
-﻿import { makeServer, mockApiData } from "../../../src/mirage";
-import { Server, Response } from "miragejs";
+﻿import { Response,Server } from "miragejs";
+
+import { makeServer, mockApiData } from "../../../src/mirage";
 import { ReferencedSpecificationRelationshipMetadata } from "../../../src/types/Datasets/ReferencedSpecificationRelationshipMetadata";
 
 context("Confirm changes when editing a dataset from released data", () => {
@@ -81,6 +82,13 @@ context("Confirm changes when editing a dataset from released data", () => {
     it.skip("goes to correct page", () => {
       cy.findByRole("button", { name: /Update data set/ }).click();
       cy.url().should("include", `/ViewSpecification/${data.spec1.id}?showDatasets=true`);
+    });
+  });
+
+  describe("when user clicks Cancel", () => {
+    it.skip("goes to correct page", () => {
+      cy.findByRole("button", { name: /Cancel/ }).click();
+      cy.url().should("include", `/Datasets/Create/SelectDatasetTypeToCreate/${data.spec1.id}`);
     });
   });
 });

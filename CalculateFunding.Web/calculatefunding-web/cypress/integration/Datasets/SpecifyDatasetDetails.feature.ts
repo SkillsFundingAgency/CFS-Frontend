@@ -1,9 +1,10 @@
-﻿import { makeServer, mockApiData } from "../../../src/mirage";
-import { Server } from "miragejs";
-import { commonActions } from "../commonActions";
+﻿import { Server } from "miragejs";
+
+import { makeServer, mockApiData } from "../../../src/mirage";
+import { EligibleSpecificationReferenceModel } from "../../../src/types/Datasets/EligibleSpecificationReferenceModel";
 import { ProviderDataTrackingMode } from "../../../src/types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../../src/types/SpecificationSummary";
-import { EligibleSpecificationReferenceModel } from "../../../src/types/Datasets/EligibleSpecificationReferenceModel";
+import { commonActions } from "../commonActions";
 
 context("Specify dataset details for a new dataset", () => {
   const data = mockApiData();
@@ -13,7 +14,7 @@ context("Specify dataset details for a new dataset", () => {
 
   before(() => {
     server = makeServer({ environment: "test" });
-    server.get("/specs/*", (schema, request) => {
+    server.get("/specs/*", () => {
       return {
         id: "111",
         name: "PSG 19-20",
@@ -30,7 +31,7 @@ context("Specify dataset details for a new dataset", () => {
         providerVersionId: "",
       } as SpecificationSummary;
     });
-    server.get("/dataset-specifications/*", (schema, request) => {
+    server.get("/dataset-specifications/*", () => {
       return [
         {
           specificationId: data.spec2.id,

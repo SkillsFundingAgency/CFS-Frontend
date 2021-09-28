@@ -22,7 +22,9 @@ import { Section } from "../../../types/Sections";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 
-export function SelectReferenceSpecification({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
+export function SelectReferenceSpecification({
+  match,
+}: RouteComponentProps<CreateDatasetRouteProps>): JSX.Element {
   const forSpecId: string = match.params.forSpecId;
   const { errors, addError, clearErrorMessages } = useErrors();
   const { dispatch } = useAppContext();
@@ -90,7 +92,7 @@ export function SelectReferenceSpecification({ match }: RouteComponentProps<Crea
       (o) => o.fundingStreamId === selectedFundingStream.id && o.fundingPeriodId === selectedFundingPeriod.id
     );
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!selectedSpec) {
       if (!selectedFundingStream) {
@@ -119,7 +121,7 @@ export function SelectReferenceSpecification({ match }: RouteComponentProps<Crea
   };
 
   const onCancel = () => {
-    history.goBack();
+    history.push(`/Datasets/Create/SelectDatasetTypeToCreate/${forSpecId}`);
   };
 
   const FundingStreamSelection = () => {
@@ -305,7 +307,7 @@ export function SelectReferenceSpecification({ match }: RouteComponentProps<Crea
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <section>
-        <Form token="create-dataset" heading="Create data set" onSubmit={onSubmit}>
+        <Form token="create-dataset" heading="Create data set">
           <div>
             {validOptions ? (
               <>

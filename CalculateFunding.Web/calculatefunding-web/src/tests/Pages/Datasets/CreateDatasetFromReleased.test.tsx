@@ -1,7 +1,7 @@
 ﻿import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AxiosError } from "axios";
-import { createLocation } from "history";
+import { createLocation, createMemoryHistory } from "history";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as ReactQuery from "react-query";
@@ -21,11 +21,21 @@ import { Permission } from "../../../types/Permission";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
-const mockHistory = { push: jest.fn() };
+const mockHistoryBlock = jest.fn();
+const mockHistoryPush = jest.fn();
 const location = createLocation("", "", "");
 const store: Store<IStoreState> = createStore(rootReducer);
 
 jest.mock("../../../components/AdminNav");
+
+jest.mock("react-router", () => ({
+  ...jest.requireActual("react-router"),
+  useHistory: () => ({
+    push: mockHistoryPush,
+    block: mockHistoryBlock,
+  }),
+}));
+const history = createMemoryHistory();
 const fundingStream1: FundingStream = {
   name: "WIZZ1",
   id: "Wizard Training Scheme",
@@ -79,7 +89,7 @@ const renderPage = () => {
       <QueryClientProvider client={new QueryClient()}>
         <Provider store={store}>
           <AppContextWrapper>
-            <SelectReferenceSpecification location={location} history={mockHistory} match={mockRoute} />
+            <SelectReferenceSpecification location={location} history={history} match={mockRoute} />
           </AppContextWrapper>
         </Provider>
       </QueryClientProvider>
@@ -231,9 +241,13 @@ describe("<SelectReferenceSpecification />", () => {
     });
 
     it("renders Cancel button as enabled", async () => {
-      const button = screen.getByRole("button", { name: /Cancel/ });
+      const button = screen.getByRole("button", { name: /Cancel/ }) as HTMLInputElement;
       expect(button).toBeInTheDocument();
       expect(button).toBeEnabled();
+
+      userEvent.click(button);
+
+      expect(mockHistoryPush).toBeCalledWith("/Datasets/Create/SelectDatasetTypeToCreate/ABC123");
     });
   });
 });

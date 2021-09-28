@@ -1,5 +1,6 @@
-﻿import { makeServer, mockApiData } from "../../../src/mirage";
-import { Server } from "miragejs";
+﻿import { Server } from "miragejs";
+
+import { makeServer, mockApiData } from "../../../src/mirage";
 import { ReferencedSpecificationRelationshipMetadata } from "../../../src/types/Datasets/ReferencedSpecificationRelationshipMetadata";
 
 context("Select template items for a new dataset", () => {

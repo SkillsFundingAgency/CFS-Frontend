@@ -15,7 +15,7 @@ import { Permission } from "../../../types/Permission";
 import { Section } from "../../../types/Sections";
 import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 
-export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
+export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatasetRouteProps>): JSX.Element {
   const forSpecId: string = match.params.forSpecId;
   const { errors, addError, clearErrorMessages } = useErrors();
   const { state, dispatch } = useAppContext();
@@ -69,7 +69,7 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
   };
 
   const onCancel = () => {
-    history.goBack();
+    history.push(`/Datasets/Create/SelectReferenceSpecification/${forSpecId}`);
   };
 
   return (
@@ -91,7 +91,7 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <section>
-        <Form token="create-dataset" heading="Create data set" onSubmit={onSubmit}>
+        <Form token="create-dataset" heading="Create data set">
           <DatasetName
             datasetName={datasetName || ""}
             onDatasetNameChange={onDatasetNameChange}

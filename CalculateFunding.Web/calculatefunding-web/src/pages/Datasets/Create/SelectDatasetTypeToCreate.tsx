@@ -17,7 +17,9 @@ export interface CreateDatasetRouteProps {
   forSpecId: string;
 }
 
-export function SelectDatasetTypeToCreate({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
+export function SelectDatasetTypeToCreate({
+  match,
+}: RouteComponentProps<CreateDatasetRouteProps>): JSX.Element {
   const forSpecId: string = match.params.forSpecId;
   const { errors, addError, clearErrorMessages } = useErrors();
   const [referenceReleased, setReferenceReleased] = useState<boolean | undefined>();
@@ -32,7 +34,7 @@ export function SelectDatasetTypeToCreate({ match }: RouteComponentProps<CreateD
   const history = useHistory();
 
   const onCancel = () => {
-    history.goBack();
+    history.push(`/ViewSpecification/${forSpecId}`);
   };
 
   const onSelectReferencedData = () => {
@@ -76,7 +78,7 @@ export function SelectDatasetTypeToCreate({ match }: RouteComponentProps<CreateD
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <section>
-        <Form token="select-dataset-type" heading="Which data set type?" onSubmit={onSubmit}>
+        <Form token="select-dataset-type" heading="Which data set type?">
           <div className="govuk-grid-row govuk-!-margin-bottom-4">
             <div className="govuk-grid-column-two-thirds">
               <div className="govuk-radios">

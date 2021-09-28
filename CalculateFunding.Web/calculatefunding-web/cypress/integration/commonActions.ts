@@ -1,5 +1,4 @@
 ﻿import { Server } from "miragejs";
-
 export const commonActions = () => {
   const goToSpecificationsList = () => {
     cy.findAllByRole("link", { name: /Specifications/i })
@@ -30,7 +29,7 @@ export const commonActions = () => {
     cy.findByRole("combobox", { name: /Select funding period/ }).select(data.fundingPeriod2.name);
     cy.findByText(data.spec2.name).should("exist");
     cy.findByRole("button", { name: /Continue/ }).click();
-    cy.url().should("include", `/Datasets/Create/SpecifyDatasetDetails`);
+    cy.url().should("include", "/Datasets/Create/SpecifyDatasetDetails");
   };
 
   const specifyDatasetDetails = (theServer: Server, data: any) => {
