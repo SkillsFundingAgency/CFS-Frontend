@@ -605,6 +605,7 @@ export function LoadNewDataSource() {
                   suggestions={fundingStreamSuggestions.map((fs) => fs.name)}
                   callback={updateFundingStreamSelection}
                   disabled={fundingStreamIsLoading}
+                  componentId={"autocomplete-funding-stream"}
                 />
               )}
             </div>
@@ -636,6 +637,7 @@ export function LoadNewDataSource() {
                   suggestions={dataSchemaSuggestions.map((dss) => dss.name)}
                   callback={updateDataSchemaSelection}
                   disabled={dataSchemaIsLoading}
+                  componentId={"autocomplete-data-schema"}
                 />
               )}
             </div>
@@ -643,7 +645,7 @@ export function LoadNewDataSource() {
             <div
               className={"govuk-form-group" + (validateForm.fileNameValid ? "" : " govuk-form-group--error")}
             >
-              <label className="govuk-label" htmlFor="address-line-1">
+              <label className="govuk-label" htmlFor="dataset-source-filename">
                 Dataset source file name
               </label>
               <span id="event-name-hint" className="govuk-hint">

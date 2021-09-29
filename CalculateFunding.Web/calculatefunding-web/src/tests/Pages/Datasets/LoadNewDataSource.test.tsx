@@ -61,7 +61,7 @@ describe("<LoadNewDataSource />", () => {
   describe("form submission checks ", () => {
     it("displays core provider target date given a funding stream is selected", async () => {
       const { getCurrentProviderVersionForFundingStream } = require("../../../services/providerService");
-      const fundingStreams = await screen.getAllByTestId("input-auto-complete")[0];
+      const fundingStreams = await screen.getByTestId("autocomplete-funding-stream");
       fireEvent.change(fundingStreams, { target: { value: "GAG" } });
 
       fireEvent.click(screen.getByTestId("GAG"), { target: { innerText: "GAG" } });
@@ -75,7 +75,7 @@ describe("<LoadNewDataSource />", () => {
     });
 
     it("does not show a permissions message for funding stream where user has canUploadDataSourceFiles permission", async () => {
-      const fundingStreams = await screen.getAllByTestId("input-auto-complete")[0];
+      const fundingStreams = await screen.getByTestId("autocomplete-funding-stream");
       fireEvent.change(fundingStreams, { target: { value: "GAG" } });
       await waitFor(() => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
@@ -86,7 +86,7 @@ describe("<LoadNewDataSource />", () => {
     });
 
     it("filters out funding stream where user does not have canUploadDataSourceFiles permission", async () => {
-      fireEvent.change(screen.getAllByTestId("input-auto-complete")[0], { target: { value: "1619" } });
+      fireEvent.change(screen.getByTestId("autocomplete-funding-stream"), { target: { value: "1619" } });
       expect(screen.queryByTestId("1619")).not.toBeInTheDocument();
     });
 
@@ -154,14 +154,14 @@ describe("<LoadNewDataSource />", () => {
 });
 
 const givenFormIsCompleted = async () => {
-  const fundingStreams = await screen.getAllByTestId("input-auto-complete")[0];
+  const fundingStreams = await screen.getByTestId("autocomplete-funding-stream");
   fireEvent.change(fundingStreams, { target: { value: "GAG" } });
   fireEvent.click(screen.getByTestId("GAG"), { target: { innerText: "GAG" } });
   await waitFor(() => {
     expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
   });
 
-  const dataScheme = await screen.getAllByTestId("input-auto-complete")[1];
+  const dataScheme = await screen.getByTestId("autocomplete-data-schema");
   fireEvent.change(dataScheme, { target: { value: "Early Years AP Census Year 1" } });
   fireEvent.click(await screen.getByTestId("Early Years AP Census Year 1"), {
     target: { innerText: "Early Years AP Census Year 1" },

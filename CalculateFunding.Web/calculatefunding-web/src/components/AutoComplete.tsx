@@ -14,6 +14,7 @@ export interface AutoCompleteProps {
   includePager?: boolean;
   callback: any;
   mode?: AutoCompleteMode;
+  componentId?: string
 }
 
 export function AutoComplete({
@@ -23,9 +24,10 @@ export function AutoComplete({
   includePager,
   callback,
   mode = AutoCompleteMode.Standard,
+  componentId,
 }: AutoCompleteProps) {
   function hideSuggestions(event: any) {
-    if (event.target.className !== "autocomplete-option" && event.target.id !== "input-auto-complete") {
+    if (event.target.className !== "autocomplete-option" && event.target.id !== "input-auto-complete" && event.target.id !== componentId) {
       setAutoCompleteState((prevState) => {
         return { ...prevState, showSuggestions: false };
       });
@@ -161,8 +163,8 @@ export function AutoComplete({
       <div className="govuk-form-group" hidden={hidden}>
         <input
           className="govuk-input"
-          id="input-auto-complete"
-          data-testid="input-auto-complete"
+          id={componentId?? "input-auto-complete"}
+          data-testid={componentId?? "input-auto-complete"}
           type="text"
           disabled={autoCompleteState.disabled}
           autoComplete={"off"}
