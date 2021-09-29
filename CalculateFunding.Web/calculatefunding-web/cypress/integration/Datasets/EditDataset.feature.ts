@@ -41,7 +41,10 @@ context("Select template items for a new dataset", () => {
       cy.findByRole("definition", { name: /Funding period/ }).should("exist");
     });
     it("has Reference specification", () => {
-      cy.findByRole("definition", { name: /Reference specification/ }).should("exist");
+      cy.findByRole("definition", { name: /Reference specification/ })
+        .should("exist")
+        .findByText(`${data.spec2.name}`)
+        .should("exist");
     });
     it("has table with correct column headings", () => {
       cy.findByRole("table", { name: /Template items to select/ }).should("exist");

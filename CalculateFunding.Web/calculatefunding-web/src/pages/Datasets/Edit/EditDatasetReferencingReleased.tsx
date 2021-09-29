@@ -188,7 +188,7 @@ export function EditDatasetReferencingReleased({
             <ReferencedSpecificationDetails
               fundingStreamName={relationshipMetadata.fundingStreamName}
               fundingPeriodName={relationshipMetadata.fundingPeriodName}
-              refSpecificationName={relationshipMetadata.relationshipName}
+              refSpecificationName={relationshipMetadata.referenceSpecificationName}
             />
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-third position-sticky">
