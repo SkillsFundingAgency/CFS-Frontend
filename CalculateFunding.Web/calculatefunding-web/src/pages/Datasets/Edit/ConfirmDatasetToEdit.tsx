@@ -4,6 +4,7 @@ import { prop, sortBy } from "ramda";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
+import { ErrorMessage } from "types/ErrorMessage";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import Form from "../../../components/Form";
@@ -25,7 +26,7 @@ export function ConfirmDatasetToEdit({
   const relationshipId: string = match.params.relationshipId;
   const updatingSpecId: string = match.params.specificationId;
   const { errors, addError, clearErrorMessages } = useErrors();
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const settings = state.editDatasetWorkflowState;
   const [relationshipDescription, setRelationshipDescription] = useState<string | undefined>(
     settings?.relationshipDescription
@@ -41,14 +42,20 @@ export function ConfirmDatasetToEdit({
   }, [settings, relationshipId]);
 
   async function updateDatasetRelationship(): Promise<boolean> {
-    if (!settings || !settings.relationshipId || !settings.relationshipMetadata || !settings.selectedItems) {
+    if (
+      !settings ||
+      !settings.relationshipId ||
+      !relationshipDescription ||
+      !settings.relationshipMetadata ||
+      !settings.selectedItems
+    ) {
       return false;
     }
     try {
       const request = {
         specificationId: settings.relationshipMetadata.currentSpecificationId,
         relationshipId: settings.relationshipId,
-        description: relationshipDescription || settings.relationshipMetadata.relationshipDescription,
+        description: relationshipDescription,
         fundingLineIds: settings.selectedItems
           ?.filter((i) => i.type === TemplateItemType.FundingLine)
           .map((i) => i.templateId),
@@ -81,9 +88,21 @@ export function ConfirmDatasetToEdit({
       return;
     }
 
+    if (!relationshipDescription) {
+      addError({
+        fieldName: "relationship-description",
+        error: "Provide a description",
+      });
+      return;
+    }
+
     const success = await updateDatasetRelationship();
 
     if (success) {
+      dispatch({
+        type: "resetEditDatasetWorkflowState",
+      });
+
       history.push(
         `/ViewSpecification/${settings.relationshipMetadata.currentSpecificationId}?showDatasets=true`
       );
@@ -92,9 +111,7 @@ export function ConfirmDatasetToEdit({
 
   const onRelationshipDescriptionChange = async (description: string) => {
     clearErrorMessages(["relationship-description"]);
-    if (description?.length) {
-      setRelationshipDescription(description);
-    }
+    setRelationshipDescription(description);
   };
 
   return (
@@ -119,7 +136,7 @@ export function ConfirmDatasetToEdit({
             name={settings?.relationshipMetadata?.relationshipName}
             description={relationshipDescription}
             setDescription={onRelationshipDescriptionChange}
-            forSpecId={settings?.relationshipMetadata?.currentSpecificationId}
+            errors={errors.filter((e) => e.fieldName === "relationship-description")}
           />
           {settings?.selectedItems && <DatasetTemplateItemSelections items={settings.selectedItems} />}
           <Actions relationshipId={relationshipId} forSpecId={updatingSpecId} onSave={onSave} />
@@ -133,9 +150,11 @@ const RelationshipDetails = (props: {
   forSpecId?: string | undefined;
   name?: string | undefined;
   description?: string | undefined;
+  errors: ErrorMessage[];
   setDescription: (description: string) => Promise<void>;
 }) => {
   const [showModal, setShowModal] = useState(false);
+  const hasErrors = !!props.errors?.length;
 
   const toggleModal = () => {
     setShowModal((prev) => !prev);
@@ -152,7 +171,15 @@ const RelationshipDetails = (props: {
           </div>
           <div className="govuk-summary-list__row govuk-!-width-one-third">
             <dt className="govuk-summary-list__key govuk-!-width-one-third">Description</dt>
-            <dd className="govuk-summary-list__value govuk-!-padding-left-2">{props.description}</dd>
+            <dd className="govuk-summary-list__value govuk-!-padding-left-2">
+              {hasErrors &&
+                props.errors?.map((error) => (
+                  <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                    <span className="govuk-visually-hidden">Error:</span> {error.message}
+                  </span>
+                ))}
+              {props.description}
+            </dd>
             <dd className="govuk-summary-list__actions">
               <button className="govuk-link govuk-link--no-visited-state" type="button" onClick={toggleModal}>
                 Change <span className="govuk-visually-hidden">dataset description</span>

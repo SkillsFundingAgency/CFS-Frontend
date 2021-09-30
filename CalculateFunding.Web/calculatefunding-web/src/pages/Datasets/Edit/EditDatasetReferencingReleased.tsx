@@ -77,6 +77,8 @@ export function EditDatasetReferencingReleased({
       TemplateItemType.Calculation
     );
 
+    setRelationshipDescription(relationshipMetadata.relationshipDescription);
+
     setSelectedItems(
       union(
         fundingLines.filter((fl) => fl.isSelected),
@@ -133,7 +135,7 @@ export function EditDatasetReferencingReleased({
       payload: {
         relationshipId: relationshipId,
         relationshipMetadata: relationshipMetadata,
-        relationshipDescription: relationshipDescription || relationshipMetadata.relationshipDescription,
+        relationshipDescription: relationshipDescription,
         selectedItems: selectedItems,
       },
     });
@@ -154,9 +156,7 @@ export function EditDatasetReferencingReleased({
 
   const onRelationshipDescriptionChange = async (description: string) => {
     clearErrorMessages(["relationship-description"]);
-    if (description?.length) {
-      setRelationshipDescription(description);
-    }
+    setRelationshipDescription(description);
   };
 
   return (
@@ -181,7 +181,7 @@ export function EditDatasetReferencingReleased({
           <Form token="edit-template-items" heading="Check funding lines and calculations">
             <RelationshipDetails
               name={relationshipMetadata.relationshipName}
-              description={relationshipDescription || relationshipMetadata.relationshipDescription}
+              description={relationshipDescription}
               setDescription={onRelationshipDescriptionChange}
               forSpecId={relationshipMetadata?.currentSpecificationId}
             />
@@ -216,7 +216,7 @@ const RelationshipDetails = React.memo(
   (props: {
     forSpecId?: string | undefined;
     name: string;
-    description: string;
+    description: string | undefined;
     setDescription: (description: string) => Promise<void>;
   }) => {
     const [showModal, setShowModal] = useState(false);
