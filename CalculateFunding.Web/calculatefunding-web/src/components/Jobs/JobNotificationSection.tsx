@@ -5,8 +5,8 @@ import {
   activeJobs,
   extractJobsFromNotifications,
   failedJobs,
+  getLatestJob,
   isJobEnabledForNotification,
-  latestJob,
   removeDuplicateJobsById,
   removeInvalidJobs,
   sortByLatest,
@@ -62,12 +62,14 @@ const JobNotificationSection = ({
 
   const activeJobsToShow: JobDetails[] = activeJobs(jobs);
   const failedJobsToShow: JobDetails[] = failedJobs(jobs);
-  const successfulJobToShow: JobDetails = latestJob(successfulJobs(jobs));
+  const successfulJobToShow: JobDetails | undefined = getLatestJob(successfulJobs(jobs));
 
   // show all active jobs if any, otherwise show all failed jobs and/or the latest successful job
   const jobsToShow = activeJobsToShow.length
     ? activeJobsToShow
-    : removeInvalidJobs([...failedJobsToShow, successfulJobToShow]);
+    : removeInvalidJobs(
+        successfulJobToShow ? failedJobsToShow.concat(successfulJobToShow) : failedJobsToShow
+      );
 
   if (!jobsToShow?.length) return null;
 

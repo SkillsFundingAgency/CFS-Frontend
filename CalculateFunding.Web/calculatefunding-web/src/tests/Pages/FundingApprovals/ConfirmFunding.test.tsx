@@ -1,8 +1,7 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, waitFor, within } from "@testing-library/react";
+﻿import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createLocation } from "history";
+import { DateTime } from "luxon";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
@@ -10,9 +9,8 @@ import { Provider } from "react-redux";
 import { match, MemoryRouter } from "react-router";
 import { createStore, Store } from "redux";
 
-import { getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
-import * as jobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import { LatestSpecificationJobWithMonitoringResult } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as permissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
@@ -26,6 +24,8 @@ import { ApprovalMode } from "../../../types/ApprovalMode";
 import { CompletionStatus } from "../../../types/CompletionStatus";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { JobCreatedResponse } from "../../../types/JobCreatedResponse";
+import { JobDetails } from "../../../types/jobDetails";
+import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
@@ -56,7 +56,7 @@ jest.mock("react-router", () => ({
   }),
 }));
 
-const renderPage = async () => {
+const renderPageAndWaitUntilLoaded = async () => {
   const { ConfirmFunding } = require("../../../pages/FundingApprovals/ConfirmFunding");
   store.dispatch = jest.fn();
   const result = render(
@@ -89,16 +89,17 @@ describe("<ConfirmFunding />", () => {
         config.hasPermissions();
         config.hasMockPublishService();
         config.hasProviderService();
-        await renderPage();
+        await renderPageAndWaitUntilLoaded();
       });
       afterEach(() => jest.clearAllMocks());
 
       it("renders job progress message", async () => {
+        expect(await screen.findByTestId("job-notification-banner")).toBeInTheDocument();
         const alert = await screen.findByRole("alert", { name: /job-notification/ });
         expect(within(alert).getByRole("alert", { name: /Monitoring job/ })).toBeInTheDocument();
         expect(
           within(alert).getByText(
-            `Job ${config.activeJob?.latestJob?.statusDescription}: ${config.activeJob?.latestJob?.jobDescription}`
+            `Job ${config.activeJob?.statusDescription}: ${config.activeJob?.jobDescription}`
           )
         ).toBeInTheDocument();
       });
@@ -107,8 +108,12 @@ describe("<ConfirmFunding />", () => {
         expect(screen.getByText("The provider amount shown might not be up to date")).toBeInTheDocument();
       });
 
+      it("renders funding summary section", async () => {
+        expect(await screen.findByRole("table", { name: "funding-summary-table" })).toBeInTheDocument();
+      });
+
       it("renders approve button as disabled", async () => {
-        const button = screen.queryByRole("button", { name: /Confirm approval/ });
+        const button = screen.getByRole("button", { name: /Confirm approval/ });
         expect(button).toBeInTheDocument();
         expect(button).toBeDisabled();
       });
@@ -120,7 +125,7 @@ describe("<ConfirmFunding />", () => {
         });
 
         const lastRefresh = screen.getByTestId("last-refresh") as HTMLElement;
-        expect(lastRefresh.textContent).toContain("1 January 2020 10:30 AM by testUser");
+        expect(lastRefresh.textContent).toContain("20 November 2020 10:31 AM by Bob the User");
 
         const lastCalculation = screen.getByTestId("last-calculation-results") as HTMLElement;
         expect(lastCalculation.textContent).toContain("1 January 2021 10:30 AM");
@@ -138,7 +143,7 @@ describe("<ConfirmFunding />", () => {
         config.hasMockPublishedProviderService();
         config.hasPermissions();
 
-        await renderPage();
+        await renderPageAndWaitUntilLoaded();
       });
       afterEach(() => jest.clearAllMocks());
 
@@ -196,7 +201,7 @@ describe("<ConfirmFunding />", () => {
         config.hasProviderService();
         config.hasMockPublishedProviderService();
 
-        await renderPage();
+        await renderPageAndWaitUntilLoaded();
       });
       afterEach(() => jest.clearAllMocks());
 
@@ -270,7 +275,7 @@ describe("<ConfirmFunding />", () => {
         config.hasProviderService();
         config.hasMockPublishedProviderService();
 
-        await renderPage();
+        await renderPageAndWaitUntilLoaded();
       });
       afterEach(() => jest.clearAllMocks());
 
@@ -290,7 +295,7 @@ describe("<ConfirmFunding />", () => {
         });
       });
 
-      it("displays error given use has not ticked acknowledgement box", async () => {
+      it("displays error given user has not ticked acknowledgement box", async () => {
         await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
         const button = screen.queryByRole("button", { name: /Confirm approval/ }) as HTMLButtonElement;
         expect(button).toBeInTheDocument();
@@ -342,7 +347,6 @@ describe("<ConfirmFunding />", () => {
         expect(mockHistoryPush).toBeCalledWith(
           `/Approvals/SpecificationFundingApproval/${config.fundingStream.id}/${config.fundingPeriod.id}/${config.testSpec.id}`
         );
-        // expect(historySpy.)
       });
     });
 
@@ -357,7 +361,7 @@ describe("<ConfirmFunding />", () => {
         config.hasProviderService();
         config.hasMockPublishedProviderService();
 
-        await renderPage();
+        await renderPageAndWaitUntilLoaded();
       });
       afterEach(() => jest.clearAllMocks());
 
@@ -395,8 +399,6 @@ describe("<ConfirmFunding />", () => {
 });
 
 function setupTestConfig() {
-  // jest.mock("../../../components/AdminNav");
-
   const fundingStream: FundingStream = {
     id: "WIZ-123",
     name: "Wizard Training Scheme",
@@ -426,42 +428,6 @@ function setupTestConfig() {
     haveErrorCheckingForSpecification: false,
     isFetchingSpecification: false,
     isSpecificationFetched: true,
-  };
-  const noJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: false,
-    isCheckingForJob: false,
-    latestJob: undefined,
-    isFetched: true,
-    isFetching: false,
-  };
-  const activeJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: true,
-    isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobResponse({
-      jobId: "dfgwer",
-      jobType: JobType.RefreshFundingJob,
-      runningStatus: RunningStatus.InProgress,
-      invokerUserDisplayName: "testUser",
-      created: new Date(),
-      lastUpdated: new Date("2020-01-01T10:30:00.0000000+00:00"),
-    }),
-    isFetched: true,
-    isFetching: false,
-  };
-  const completedJob: LatestSpecificationJobWithMonitoringResult = {
-    hasJob: true,
-    isCheckingForJob: false,
-    latestJob: getJobDetailsFromJobResponse({
-      jobId: "135235",
-      jobType: JobType.ApproveBatchProviderFundingJob,
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Succeeded,
-      invokerUserDisplayName: "testUser",
-      created: new Date(),
-      lastUpdated: new Date("2020-01-01T10:30:00.0000000+00:00"),
-    }),
-    isFetched: true,
-    isFetching: false,
   };
   const mockFundingConfigWithApprovalAllMode: FundingConfigurationQueryResult = {
     fundingConfiguration: {
@@ -582,12 +548,127 @@ function setupTestConfig() {
   };
   const hasSpecification = () =>
     jest.spyOn(specHook, "useSpecificationSummary").mockImplementation(() => specResult);
-  const hasNoActiveJobsRunning = () =>
-    jest.spyOn(jobHook, "useLatestSpecificationJobWithMonitoring").mockImplementation(() => noJob);
-  const hasActiveJobRunning = () =>
-    jest.spyOn(jobHook, "useLatestSpecificationJobWithMonitoring").mockImplementation(() => activeJob);
-  const hasCompletedJob = () =>
-    jest.spyOn(jobHook, "useLatestSpecificationJobWithMonitoring").mockImplementation(() => completedJob);
+
+  let notification: JobNotification | undefined;
+  let subscription: JobSubscription = {
+    filterBy: {
+      jobId: "jobId",
+      jobTypes: [],
+      specificationId: testSpec.id,
+    },
+    id: "sertdhw4e5t",
+    isEnabled: true,
+    onError: () => null,
+    startDate: DateTime.local(),
+  };
+
+  const hasNoActiveJobsRunning = () => {
+    notification = undefined;
+  };
+
+  const hasSuccessfulApprovalJob = () => {
+    const job = {
+      jobId: "135235",
+      jobType: JobType.ApproveBatchProviderFundingJob,
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Succeeded,
+      invokerUserDisplayName: "testUser",
+      created: new Date(),
+      lastUpdated: new Date("2020-01-01T10:30:00.0000000+00:00"),
+      statusDescription: "",
+      jobDescription: "",
+      failures: [],
+      isSuccessful: true,
+      isFailed: false,
+      isActive: false,
+      isComplete: true,
+      outcome: "Funding approval succeeded",
+    };
+    subscription.id = "refresh";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: testSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+
+  const activeJob = {
+    isComplete: false,
+    jobId: "123",
+    jobType: JobType.RefreshFundingJob,
+    statusDescription: "Refresh Funding job is in progress",
+    jobDescription: "Refreshing Funding",
+    runningStatus: RunningStatus.InProgress,
+    failures: [],
+    isSuccessful: false,
+    isFailed: false,
+    isActive: true,
+    outcome: "",
+    lastUpdated: new Date("2020-11-20T10:31:03.2643188+00:00"),
+    invokerUserDisplayName: "Bob the User",
+    invokerUserId: "testUser",
+  } as JobDetails;
+  const hasActiveJobRunning = () => {
+    subscription.id = "Refresh-active";
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: activeJob,
+    };
+    return notification;
+  };
+
+  let notificationCallback: (n: JobNotification) => void = () => null;
+  let hasNotificationCallback = false;
+  const getNotificationCallback = () => {
+    return notificationCallback;
+  };
+
+  const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
+  jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
+    if (onNewNotification && !hasNotificationCallback) {
+      notificationCallback = onNewNotification;
+      hasNotificationCallback = true;
+    }
+    return {
+      addSub: (request: AddJobSubscription) => {
+        const sub: JobSubscription = {
+          filterBy: {
+            jobId: request?.filterBy.jobId,
+            specificationId: request?.filterBy.specificationId,
+            jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
+          },
+          isEnabled: true,
+          id: "sertdhw4e5t",
+          onError: () => request.onError,
+          startDate: DateTime.now(),
+        };
+        subscription = sub;
+        return Promise.resolve(sub);
+      },
+      replaceSubs: () => {
+        const sub: JobSubscription = {
+          filterBy: {},
+          id: "sertdhw4e5t",
+          onError: () => null,
+          isEnabled: true,
+          startDate: DateTime.now(),
+        };
+        subscription = sub;
+        return [sub];
+      },
+      removeSub: () => null,
+      removeAllSubs: () => null,
+      subs: [],
+      results: notification ? [notification] : [],
+    };
+  });
+
   const hasFundingConfigWithApproveAllMode = () =>
     jest
       .spyOn(fundingConfigurationHook, "useFundingConfiguration")
@@ -729,17 +810,18 @@ function setupTestConfig() {
     withPermissions,
     withoutPermissions,
     testSpec,
-    activeJob,
     noSelectedProviders,
     mockFundingSummaryForApprovingService,
     mockSearchService,
     mockConfirmApprovalRoute,
+    activeJob,
+    getNotificationCallback,
     hasMockPublishedProviderService,
     hasFundingConfigWithApproveAllMode,
     hasFundingConfigWithApproveBatchMode,
     hasSpecification,
     hasActiveJobRunning,
-    hasCompletedJob,
+    hasCompletedJob: hasSuccessfulApprovalJob,
     hasNoActiveJobsRunning,
     hasMockPublishService,
     hasProviderService,

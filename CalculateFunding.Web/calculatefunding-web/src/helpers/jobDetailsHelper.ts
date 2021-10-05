@@ -11,7 +11,7 @@ import { convertCamelCaseToSpaceDelimited } from "./stringHelper";
 
 export const sortByLatest = sort<JobDetails>(descend((job) => job?.lastUpdated ?? new Date(0)));
 
-export const latestJob = compose<JobDetails>(head, sortByLatest);
+export const getLatestJob = compose<JobDetails | undefined>(head, sortByLatest);
 
 export const isJobEnabledForNotification = (
   job: JobDetails,
@@ -20,7 +20,7 @@ export const isJobEnabledForNotification = (
   if (!settings) return true;
   const setting = settings?.find(
     (s) =>
-      s.jobTypes.some((t) => t === job.jobType) &&
+      (s.jobTypes.some((t) => t === job.jobType) || s.jobTypes.length === 0) &&
       ((job.isActive && s.showActive) ||
         (job.isFailed && s.showFailed) ||
         (job.isSuccessful && s.showSuccessful))

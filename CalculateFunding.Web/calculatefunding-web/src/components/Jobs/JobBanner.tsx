@@ -16,7 +16,9 @@ const JobBanner = ({ job, notificationSettings }: JobBannerProps): JSX.Element |
     return null;
   }
 
-  const setting = notificationSettings?.find((s) => s.jobTypes.some((t) => t === job.jobType));
+  const setting =
+    notificationSettings?.find((s) => s.jobTypes.some((t) => t === job.jobType)) ||
+    notificationSettings?.find((s) => s.jobTypes.length === 0);
 
   // if settings applied then we hide proactively
   if (

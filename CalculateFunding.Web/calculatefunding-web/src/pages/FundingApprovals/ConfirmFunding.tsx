@@ -6,15 +6,14 @@ import { Link } from "react-router-dom";
 import { initialiseFundingSearchSelection } from "../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
 import { FundingConfirmationSummary } from "../../components/Funding/FundingConfirmationSummary";
-import { Header } from "../../components/Header";
-import { SpinnerDisplaySetting } from "../../components/Jobs/JobLoadingSpinner";
-import { JobNotificationBanner } from "../../components/Jobs/JobNotificationBanner";
-import { LoadingStatus } from "../../components/LoadingStatus";
+import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
+import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
-import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { getLatestJob } from "../../helpers/jobDetailsHelper";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
@@ -26,6 +25,7 @@ import * as publishService from "../../services/publishService";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../types/ApprovalMode";
 import { HistoryPage } from "../../types/HistoryPage";
+import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import {
@@ -58,17 +58,6 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
-  const { latestJob, isCheckingForJob } = useLatestSpecificationJobWithMonitoring(
-    match.params.specificationId,
-    [
-      JobType.RefreshFundingJob,
-      JobType.ApproveAllProviderFundingJob,
-      JobType.ApproveBatchProviderFundingJob,
-      JobType.PublishBatchProviderFundingJob,
-      JobType.PublishAllProviderFundingJob,
-    ],
-    (err) => addError({ error: err, description: "Error checking for job" })
-  );
   const { specification, isLoadingSpecification } = useSpecificationSummary(
     match.params.specificationId,
     (err) => addError({ error: err, description: "Error while loading specification" })
@@ -82,6 +71,16 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     match.params.fundingPeriodId,
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
+
+  const {
+    addSub,
+    removeAllSubs,
+    results: notifications,
+  } = useJobSubscription({
+    onError: (err) =>
+      addError({ error: err, description: "An error occurred while monitoring the running jobs" }),
+  });
+
   const { errors, addError, clearErrorMessages } = useErrors();
   const [fundingSummary, setFundingSummary] = useState<PublishedProviderFundingCount>();
   const [jobId, setJobId] = useState<string>("");
@@ -94,10 +93,6 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
       fundingConfiguration === undefined ||
       !isPermissionsFetched,
     [specification, fundingConfiguration, isConfirming, isPermissionsFetched]
-  );
-  const isWaitingForJob = useMemo(
-    () => isCheckingForJob || (latestJob !== undefined && !latestJob.isComplete),
-    [isCheckingForJob, latestJob]
   );
   const hasPermissionToApprove = useMemo(
     () => hasPermission && hasPermission(Permission.CanApproveFunding),
@@ -119,8 +114,30 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
           description: `Error while getting specification calculation results metadata for specification Id: ${match.params.specificationId}`,
         });
       });
+
+    addSub({
+      monitorMode: MonitorMode.SignalR,
+      monitorFallback: MonitorFallback.Polling,
+      filterBy: {
+        specificationId: match.params.specificationId,
+        jobTypes: [
+          JobType.RefreshFundingJob,
+          JobType.ApproveAllProviderFundingJob,
+          JobType.ApproveBatchProviderFundingJob,
+          JobType.PublishBatchProviderFundingJob,
+          JobType.PublishAllProviderFundingJob,
+        ],
+      },
+      onError: (e) => addError({ error: e, description: "Error while checking for background job" }),
+    });
+
+    return () => {
+      removeAllSubs();
+    };
   }, [match.params.specificationId]);
 
+  const latestJob = getLatestJob(notifications.flatMap((n) => n.latestJob));
+  const isWaitingForJob = notifications.some((n) => !!n.latestJob?.isActive);
   useEffect(() => {
     if (!fundingConfiguration || fundingSummary) return;
 
@@ -181,11 +198,11 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
 
   useEffect(() => {
     const handleActionJobComplete = () => {
-      if (jobId && jobId.length > 0 && latestJob && latestJob.jobId === jobId) {
+      if (jobId?.length && latestJob?.jobId === jobId) {
         if (isConfirming) {
           setIsConfirming(false);
         }
-        if (latestJob.isComplete && latestJob.isSuccessful) {
+        if (latestJob.isSuccessful) {
           clearFundingSearchSelection();
           history.push(
             `/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`
@@ -195,7 +212,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     };
 
     handleActionJobComplete();
-  }, [latestJob, jobId]);
+  }, [getLatestJob, jobId]);
 
   const clearFundingSearchSelection = useCallback(() => {
     dispatch(
@@ -253,197 +270,183 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     }
   };
 
+  const actionIsComplete = jobId && jobId.length > 0 && latestJob && latestJob.isComplete;
+
   return (
-    <div>
-      <Header location={Section.Approvals} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"Approvals"} />
-          <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
-          <Breadcrumb
-            name="Funding approval results"
-            url={`/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`}
-          />
-          <Breadcrumb name={match.params.mode + " funding"} />
-        </Breadcrumbs>
+    <Main location={Section.Approvals}>
+      <MultipleErrorSummary errors={errors} />
 
-        <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Approvals"} />
+        <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
+        <Breadcrumb
+          name="Funding approval results"
+          url={`/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`}
+        />
+        <Breadcrumb name={match.params.mode + " funding"} />
+      </Breadcrumbs>
 
-        <div>
-          <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">
-            Confirm funding {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
-          </h1>
-          <span className="govuk-caption-xl govuk-!-margin-bottom-8">
-            Check the information below carefully before{" "}
-            {match.params.mode === FundingActionType.Approve ? "approving" : "releasing"} the funding
-          </span>
-        </div>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
 
-        <MultipleErrorSummary errors={errors} />
-
-        {!isCheckingForJob && latestJob && latestJob.isActive && (
-          <div className="govuk-grid-row govuk-!-margin-bottom-3">
-            <div className="govuk-grid-column-three-quarters">
-              <JobNotificationBanner
-                job={latestJob}
-                isCheckingForJob={isCheckingForJob}
-                spinner={{
-                  display: SpinnerDisplaySetting.ShowPageSpinner,
-                  loadingDescription: "Please wait",
-                  loadingText: "Checking for background jobs",
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {(isLoadingSpecification ||
-          isCheckingForJob ||
-          isLoadingFundingConfiguration ||
-          isConfirming ||
-          !isPermissionsFetched) && (
-          <div className="govuk-grid-row govuk-!-margin-bottom-3">
-            <div className="govuk-grid-column-full govuk-!-margin-bottom-5">
-              <LoadingStatus
-                title={
-                  isConfirming
-                    ? "Waiting for job to run"
-                    : isCheckingForJob
-                    ? "Checking for jobs running"
-                    : isLoadingSpecification
-                    ? "Loading specification"
-                    : isLoadingFundingConfiguration
-                    ? "Loading funding configuration"
-                    : !isPermissionsFetched
-                    ? "Checking permissions"
-                    : "Loading"
-                }
-                description="Please wait..."
-              />
-            </div>
-          </div>
-        )}
-
-        {fundingConfiguration && specification && (
-          <section data-testid="funding-summary-section">
-            <FundingConfirmationSummary
-              routingParams={match.params}
-              approvalMode={fundingConfiguration.approvalMode}
-              specification={specification}
-              fundingSummary={fundingSummary}
-              canApproveFunding={hasPermissionToApprove}
-              canReleaseFunding={hasPermissionToRelease}
-              addError={addError}
-              isWaitingForJob={isWaitingForJob}
-            />
-          </section>
-        )}
-
-        {jobId && jobId.length > 0 && latestJob && latestJob.isComplete ? (
-          <div className="govuk-grid-row govuk-!-margin-top-6">
-            <div className="govuk-grid-column-full">
-              <Link
-                className="govuk-button govuk-button--secondary"
-                data-module="govuk-button"
-                to={previousPage.path}
-              >
-                Back
-              </Link>
-            </div>
-          </div>
-        ) : (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <div
-                className={`govuk-form-group ${
-                  errors.filter((e) => e.fieldName === "acknowledge").length > 0
-                    ? "govuk-form-group--error"
-                    : ""
-                }`}
-              >
-                <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
-                  <legend className="govuk-fieldset__legend">
-                    <div className="govuk-warning-text">
-                      <span className="govuk-warning-text__icon" aria-hidden="true">
-                        !
-                      </span>
-                      <strong className="govuk-warning-text__text">
-                        <span className="govuk-warning-text__assistive">Warning</span>
-                        The provider amount shown might not be up to date
-                      </strong>
-                    </div>
-                  </legend>
-                  <ul className="govuk-list govuk-list--bullet">
-                    {specificationLastUpdatedDate !== undefined &&
-                      latestJob?.lastUpdated !== undefined &&
-                      latestJob.lastUpdated < specificationLastUpdatedDate && (
-                        <li data-testid="last-refresh">
-                          Providers were last refreshed <DateTimeFormatter date={latestJob.lastUpdated} /> by{" "}
-                          {latestJob.invokerUserDisplayName}
-                        </li>
-                      )}
-                    {specificationLastUpdatedDate !== undefined &&
-                      latestJob?.lastUpdated !== undefined &&
-                      latestJob.lastUpdated < specificationLastUpdatedDate && (
-                        <li data-testid="last-calculation-results">
-                          Total provider amount was last calculated{" "}
-                          <DateTimeFormatter date={specificationLastUpdatedDate} />
-                        </li>
-                      )}
-                    <li>
-                      Released funding values can change when data or calculations are altered. If the funding
-                      values change, their status will become ‘updated’ and they will need to be released
-                      again.
-                    </li>
-                    <li>
-                      Selected providers may not appear in the provider count due to; provider record missing
-                      from funding data, providers currently in error state or providers already set as
-                      approved or released
-                    </li>
-                  </ul>
-                  <div className="govuk-checkboxes">
-                    <div className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        name="acknowledgementCheckbox"
-                        type="checkbox"
-                        data-testid="acknowledgementCheckbox"
-                        checked={acknowledge}
-                        onChange={handleAcknowledge}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor="acknowledgementCheckbox"
-                      >
-                        I acknowledge that the total provider amount shown may not be up to date
-                      </label>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
-
-              <button
-                data-prevent-double-click="true"
-                className="govuk-button govuk-!-margin-right-1"
-                data-module="govuk-button"
-                disabled={isLoading || isWaitingForJob || !fundingSummary}
-                onClick={handleConfirm}
-              >
-                Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
-              </button>
-              <a
-                className="govuk-button govuk-button--secondary"
-                data-module="govuk-button"
-                onClick={() => history.goBack()}
-              >
-                Cancel
-              </a>
-            </div>
-          </div>
-        )}
+      <div>
+        <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">
+          Confirm funding {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
+        </h1>
+        <span className="govuk-caption-xl govuk-!-margin-bottom-8">
+          Check the information below carefully before{" "}
+          {match.params.mode === FundingActionType.Approve ? "approving" : "releasing"} the funding
+        </span>
       </div>
-      <Footer />
-    </div>
+
+      {notifications.length > 0 && (
+        <JobNotificationSection
+          jobNotifications={notifications}
+          notificationSettings={[
+            {
+              jobTypes: [], // any we have subscribed to
+              showActive: true,
+              showFailed: true,
+              showSuccessful: false,
+            },
+          ]}
+        />
+      )}
+
+      <LoadingStatusNotifier
+        notifications={[
+          {
+            id: "confirming",
+            isActive: isConfirming,
+            title: "Confirming...",
+            subTitle: "Waiting for job to run",
+          },
+          {
+            isActive: isLoadingSpecification,
+            title: "Loading specification",
+          },
+          {
+            isActive: isLoadingFundingConfiguration,
+            title: "Loading funding configuration",
+          },
+          {
+            isActive: !isPermissionsFetched,
+            title: "Loading permissions",
+          },
+        ]}
+      />
+
+      {fundingConfiguration && specification && (
+        <section data-testid="funding-summary-section">
+          <FundingConfirmationSummary
+            routingParams={match.params}
+            approvalMode={fundingConfiguration.approvalMode}
+            specification={specification}
+            fundingSummary={fundingSummary}
+            canApproveFunding={hasPermissionToApprove}
+            canReleaseFunding={hasPermissionToRelease}
+            addError={addError}
+            isWaitingForJob={isWaitingForJob}
+          />
+        </section>
+      )}
+
+      {actionIsComplete ? (
+        <div className="govuk-grid-row govuk-!-margin-top-6">
+          <div className="govuk-grid-column-full">
+            <Link
+              className="govuk-button govuk-button--secondary"
+              data-module="govuk-button"
+              to={previousPage.path}
+            >
+              Back
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-full">
+            <div
+              className={`govuk-form-group ${
+                errors.filter((e) => e.fieldName === "acknowledge").length ? "govuk-form-group--error" : ""
+              }`}
+            >
+              <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
+                <legend className="govuk-fieldset__legend">
+                  <div className="govuk-warning-text">
+                    <span className="govuk-warning-text__icon" aria-hidden="true">
+                      !
+                    </span>
+                    <strong className="govuk-warning-text__text">
+                      <span className="govuk-warning-text__assistive">Warning</span>
+                      The provider amount shown might not be up to date
+                    </strong>
+                  </div>
+                </legend>
+                <ul className="govuk-list govuk-list--bullet">
+                  {!!specificationLastUpdatedDate &&
+                    !!latestJob?.lastUpdated &&
+                    latestJob.lastUpdated < specificationLastUpdatedDate && (
+                      <li data-testid="last-refresh">
+                        Providers were last refreshed <DateTimeFormatter date={latestJob.lastUpdated} /> by{" "}
+                        {latestJob.invokerUserDisplayName}
+                      </li>
+                    )}
+                  {!!specificationLastUpdatedDate &&
+                    !!latestJob?.lastUpdated &&
+                    latestJob.lastUpdated < specificationLastUpdatedDate && (
+                      <li data-testid="last-calculation-results">
+                        Total provider amount was last calculated{" "}
+                        <DateTimeFormatter date={specificationLastUpdatedDate} />
+                      </li>
+                    )}
+                  <li>
+                    Released funding values can change when data or calculations are altered. If the funding
+                    values change, their status will become ‘updated’ and they will need to be released again.
+                  </li>
+                  <li>
+                    Selected providers may not appear in the provider count due to; provider record missing
+                    from funding data, providers currently in error state or providers already set as approved
+                    or released
+                  </li>
+                </ul>
+                <div className="govuk-checkboxes">
+                  <div className="govuk-checkboxes__item">
+                    <input
+                      className="govuk-checkboxes__input"
+                      name="acknowledgementCheckbox"
+                      type="checkbox"
+                      data-testid="acknowledgementCheckbox"
+                      checked={acknowledge}
+                      onChange={handleAcknowledge}
+                    />
+                    <label className="govuk-label govuk-checkboxes__label" htmlFor="acknowledgementCheckbox">
+                      I acknowledge that the total provider amount shown may not be up to date
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+
+            <button
+              data-prevent-double-click="true"
+              className="govuk-button govuk-!-margin-right-1"
+              data-module="govuk-button"
+              disabled={isLoading || isWaitingForJob || !fundingSummary}
+              onClick={handleConfirm}
+            >
+              Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
+            </button>
+            <a
+              className="govuk-button govuk-button--secondary"
+              data-module="govuk-button"
+              onClick={() => history.goBack()}
+            >
+              Cancel
+            </a>
+          </div>
+        </div>
+      )}
+    </Main>
   );
 }

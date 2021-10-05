@@ -1,6 +1,6 @@
 ﻿import { DateTime } from "luxon";
 
-import { latestJob, removeDuplicateJobsById, sortByLatest } from "../../helpers/jobDetailsHelper";
+import { getLatestJob, removeDuplicateJobsById, sortByLatest } from "../../helpers/jobDetailsHelper";
 import { JobDetails } from "../../types/jobDetails";
 
 describe("jobDetailsHelper tests", () => {
@@ -61,7 +61,7 @@ describe("jobDetailsHelper tests", () => {
     it("returns undefined if no jobs", () => {
       const jobs: JobDetails[] = [];
 
-      const result = latestJob(jobs);
+      const result = getLatestJob(jobs);
 
       expect(result).toStrictEqual(undefined);
     });
@@ -76,7 +76,7 @@ describe("jobDetailsHelper tests", () => {
         createDummyJob({ lastUpdated: baseDate.minus({ minute: 1 }).toJSDate() }),
       ];
 
-      const result = latestJob(jobs);
+      const result = getLatestJob(jobs);
 
       expect(result).toEqual(createDummyJob({ lastUpdated: baseDate.plus({ minute: 12 }).toJSDate() }));
     });
