@@ -15,7 +15,73 @@ context("Select template items for a new dataset", () => {
 
   let server: Server;
 
-  before(() => {
+  before(() => setup());
+  after(() => {
+    server.shutdown();
+  });
+
+  describe("when page has loaded", () => {
+    it("has correct title", () => {
+      cy.findByRole("heading", { name: /Select funding lines and calculations/ }).should("exist");
+    });
+    it("has link to spec", () => {
+      cy.findByRole("link", { name: data.spec1.name }).should("exist");
+    });
+    it("has Funding stream", () => {
+      cy.findByRole("definition", { name: /Funding stream/ }).should("exist");
+    });
+    it("has Funding period", () => {
+      cy.findByRole("definition", { name: /Funding period/ }).should("exist");
+    });
+    it("has Reference specification", () => {
+      cy.findByRole("definition", { name: /Reference specification/ }).should("exist");
+    });
+    it("has table with correct column headings", () => {
+      cy.findByRole("table", { name: /Template items to select/ }).should("exist");
+    });
+    it("has table with correct column values", () => {
+      cy.findByRole("cell", { name: /Calculate total pupil mass/ }).should("exist");
+      cy.findByRole("cell", { name: /162/ }).should("exist");
+      cy.findByRole("cell", { name: /Calculation/ }).should("exist");
+      cy.findByRole("cell", { name: /Sport allowance/ }).should("exist");
+      cy.findByRole("cell", { name: /342/ }).should("exist");
+      cy.findByRole("cell", { name: /Funding Line/ }).should("exist");
+    });
+    it("has Continue button", () => {
+      cy.findByRole("button", { name: /Continue to summary/ }).should("exist");
+    });
+  });
+
+  describe("when user clicks Continue without valid options", () => {
+    it("shows error message", () => {
+      cy.findByRole("button", { name: /Continue to summary/ }).click();
+
+      cy.findByText(/Please make a selection/).should("exist");
+    });
+  });
+
+  describe("when user selects items and clicks away to another page", () => {
+    it("renders confirm leave modal popup", () => {
+      cy.findByRole("checkbox", { name: /Calculate total pupil mass/ }).check();
+      cy.findByRole("checkbox", { name: /Sport allowance/ }).check();
+      cy.findByRole("link", { name: /Data set details/ }).click();
+      cy.findByTestId("modal-confirmation-placeholder").should("exist");
+    });
+  });
+
+  describe("when user selects items and clicks Continue", () => {
+    it("goes to correct page", () => {
+      setup();
+      cy.findByRole("checkbox", { name: /Calculate total pupil mass/ }).check();
+      cy.findByRole("checkbox", { name: /Sport allowance/ }).check();
+      cy.findByRole("button", { name: /Continue to summary/ }).click();
+      cy.findByTestId("modal-confirmation-placeholder").should("not.exist");
+      cy.url().should("include", `/Datasets/Create/ConfirmDatasetToCreate/${data.spec1.id}`);
+    });
+  });
+
+  function setup() {
+    server?.shutdown();
     server = makeServer({ environment: "test" });
     server.get("/specs/*", () => {
       return {
@@ -70,57 +136,5 @@ context("Select template items for a new dataset", () => {
     specifyDatasetTypeToCreate_Released(server, data);
     selectReferenceSpecification(server, data);
     specifyDatasetDetails(server, data);
-  });
-  after(() => {
-    server.shutdown();
-  });
-
-  describe("when page has loaded", () => {
-    it("has correct title", () => {
-      cy.findByRole("heading", { name: /Select funding lines and calculations/ }).should("exist");
-    });
-    it("has link to spec", () => {
-      cy.findByRole("link", { name: data.spec1.name }).should("exist");
-    });
-    it("has Funding stream", () => {
-      cy.findByRole("definition", { name: /Funding stream/ }).should("exist");
-    });
-    it("has Funding period", () => {
-      cy.findByRole("definition", { name: /Funding period/ }).should("exist");
-    });
-    it("has Reference specification", () => {
-      cy.findByRole("definition", { name: /Reference specification/ }).should("exist");
-    });
-    it("has table with correct column headings", () => {
-      cy.findByRole("table", { name: /Template items to select/ }).should("exist");
-    });
-    it("has table with correct column values", () => {
-      cy.findByRole("cell", { name: /Calculate total pupil mass/ }).should("exist");
-      cy.findByRole("cell", { name: /162/ }).should("exist");
-      cy.findByRole("cell", { name: /Calculation/ }).should("exist");
-      cy.findByRole("cell", { name: /Sport allowance/ }).should("exist");
-      cy.findByRole("cell", { name: /342/ }).should("exist");
-      cy.findByRole("cell", { name: /Funding Line/ }).should("exist");
-    });
-    it("has Continue button", () => {
-      cy.findByRole("button", { name: /Continue to summary/ }).should("exist");
-    });
-  });
-
-  describe("when user clicks Continue without valid options", () => {
-    it("shows error message", () => {
-      cy.findByRole("button", { name: /Continue to summary/ }).click();
-
-      cy.findByText(/Please make a selection/).should("exist");
-    });
-  });
-
-  describe("when user selects items and clicks Continue", () => {
-    it("goes to correct page", () => {
-      cy.findByRole("checkbox", { name: /Calculate total pupil mass/ }).check();
-      cy.findByRole("checkbox", { name: /Sport allowance/ }).check();
-      cy.findByRole("button", { name: /Continue to summary/ }).click();
-      cy.url().should("include", `/Datasets/Create/ConfirmDatasetToCreate/${data.spec1.id}`);
-    });
-  });
+  }
 });

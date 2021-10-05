@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import _ from "lodash";
+import { equals } from "ramda";
 import React, { MouseEvent, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
@@ -29,7 +29,7 @@ import { Section } from "../../types/Sections";
 import { UserSearchResult, UserSearchResultItem } from "../../types/Users/UserSearchResult";
 import { FundingStream } from "../../types/viewFundingTypes";
 
-export function IndividualPermissionsAdmin() {
+export function IndividualPermissionsAdmin(): JSX.Element {
   const pageTitle = (document.title = "Set and view user permissions");
   const myPermissions: FundingStreamPermissions[] = useSelector(
     (state: IStoreState) => state.userState.fundingStreamPermissions
@@ -87,7 +87,7 @@ export function IndividualPermissionsAdmin() {
   const [originalPermissions, setOriginalPermissions] = useState<Permission[]>();
   const [editedPermissions, setEditedPermissions] = useState<Permission[]>();
   const history = useHistory();
-  useConfirmLeavePage(!_.isEqual(originalPermissions, editedPermissions));
+  useConfirmLeavePage(!equals(originalPermissions, editedPermissions));
 
   const onUserSelected = (name: string) => {
     clearErrorMessages();
@@ -217,7 +217,7 @@ export function IndividualPermissionsAdmin() {
     clearErrorMessages();
     setNotification(undefined);
 
-    if (!_.isEqual(originalPermissions, editedPermissions)) {
+    if (!equals(originalPermissions, editedPermissions)) {
       ConfirmationModal(
         <div className="govuk-row govuk-!-width-full">
           Are you sure you want to leave without saving your changes?

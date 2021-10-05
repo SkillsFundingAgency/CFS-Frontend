@@ -1,6 +1,5 @@
 ﻿import { UnregisterCallback } from "history";
 import { useEffect, useRef } from "react";
-import * as React from "react";
 import { useHistory } from "react-router";
 
 export const useConfirmLeavePage = (
@@ -9,6 +8,15 @@ export const useConfirmLeavePage = (
 ) => {
   const self = useRef<UnregisterCallback | null>();
   const history = useHistory();
+
+  const disableMe = () => {
+    if (self.current) {
+      self.current();
+      self.current = null;
+    }
+
+    window.removeEventListener("beforeunload", onWindowOrTabClose);
+  };
 
   const onWindowOrTabClose = (event: BeforeUnloadEvent) => {
     if (!preventDefault) {
@@ -33,12 +41,7 @@ export const useConfirmLeavePage = (
     window.addEventListener("beforeunload", onWindowOrTabClose);
 
     return () => {
-      if (self.current) {
-        self.current();
-        self.current = null;
-      }
-
-      window.removeEventListener("beforeunload", onWindowOrTabClose);
+      disableMe();
     };
   }, [message, preventDefault]);
 
@@ -47,5 +50,6 @@ export const useConfirmLeavePage = (
     onWindowOrTabClose,
     preventDefault,
     self,
+    disableMe,
   };
 };

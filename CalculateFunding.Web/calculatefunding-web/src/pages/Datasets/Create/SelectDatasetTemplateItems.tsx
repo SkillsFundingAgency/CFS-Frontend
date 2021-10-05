@@ -8,13 +8,14 @@ import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import Form from "../../../components/Form";
-import { LoadingStatus } from "../../../components/LoadingStatus";
+import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
 import { useAppContext } from "../../../context/useAppContext";
 import { convertCamelCaseToSpaceDelimited } from "../../../helpers/stringHelper";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
+import { useConfirmLeavePage } from "../../../hooks/useConfirmLeavePage";
 import { useErrors } from "../../../hooks/useErrors";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import * as datasetService from "../../../services/datasetService";
@@ -24,12 +25,15 @@ import { Permission } from "../../../types/Permission";
 import { Section } from "../../../types/Sections";
 import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 
-export function SelectDatasetTemplateItems({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
+export function SelectDatasetTemplateItems({
+  match,
+}: RouteComponentProps<CreateDatasetRouteProps>): JSX.Element {
   const forSpecId: string = match.params.forSpecId;
   const { errors, addError, clearErrorMessages } = useErrors();
   const { state, dispatch } = useAppContext();
   const criteria = state.createDatasetWorkflowState;
   const refSpec = criteria?.referencingSpec;
+  const [isDirty, setIsDirty] = useState<boolean>(false);
   const [selectedItems, setSelectedItems] = useState<PublishedSpecificationTemplateMetadata[]>([]);
   const [hideUnselected, setHideUnselected] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string | undefined>(undefined);
@@ -55,6 +59,7 @@ export function SelectDatasetTemplateItems({ match }: RouteComponentProps<Create
     }
   );
   const history = useHistory();
+  const { disableMe: disableConfirmLeaveModal } = useConfirmLeavePage(isDirty);
 
   const filteredItems = useMemo(() => {
     if (!templateItems?.length) return [];
@@ -108,7 +113,7 @@ export function SelectDatasetTemplateItems({ match }: RouteComponentProps<Create
     setHideUnselected(false);
   }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     clearErrorMessages();
     if (!selectedItems?.length) {
@@ -119,6 +124,8 @@ export function SelectDatasetTemplateItems({ match }: RouteComponentProps<Create
       type: "setCreateDatasetWorkflowState",
       payload: { ...criteria, selectedItems: selectedItems },
     });
+    setIsDirty(false);
+    disableConfirmLeaveModal();
     history.push(`/Datasets/Create/ConfirmDatasetToCreate/${forSpecId}`);
   };
 
@@ -128,6 +135,7 @@ export function SelectDatasetTemplateItems({ match }: RouteComponentProps<Create
         ? existing.filter((i) => i.templateId !== item.templateId)
         : [...existing, item]
     );
+    setIsDirty(true);
   }
 
   function onToggleHideUnselected() {
@@ -154,11 +162,7 @@ export function SelectDatasetTemplateItems({ match }: RouteComponentProps<Create
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <section>
-        <Form
-          token="select-template-items"
-          heading="Select funding lines and calculations"
-          onSubmit={onSubmit}
-        >
+        <Form token="select-template-items" heading="Select funding lines and calculations">
           <ReferenceSpecificationDetails referenceSpecification={refSpec} />
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-third position-sticky">
@@ -289,7 +293,8 @@ const TemplateItemGrid = (props: {
   selectedItems: PublishedSpecificationTemplateMetadata[] | undefined;
   onItemToggle: (item: PublishedSpecificationTemplateMetadata) => void;
 }) => {
-  if (props.isLoading) return <LoadingStatus title="Loading template items to select" />;
+  if (props.isLoading)
+    return <LoadingStatusNotifier notifications={[{ title: "Loading template items to select" }]} />;
 
   if (!props.items?.length)
     return (
@@ -367,12 +372,14 @@ const TemplateItemRow = (props: {
   );
 };
 
-const Actions = (props: { onContinue: (e: React.MouseEvent<HTMLButtonElement>) => void }) => (
-  <button
-    className="govuk-button govuk-!-margin-top-3"
-    data-module="govuk-button"
-    onClick={(e) => props.onContinue(e as React.MouseEvent<HTMLButtonElement>)}
-  >
-    Continue to summary
-  </button>
-);
+const Actions = (props: { onContinue: (e: React.MouseEvent<HTMLButtonElement>) => void }) => {
+  const onClickHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    props.onContinue(e);
+  };
+  return (
+    <button className="govuk-button govuk-!-margin-top-3" data-module="govuk-button" onClick={onClickHandler}>
+      Continue to summary
+    </button>
+  );
+};
