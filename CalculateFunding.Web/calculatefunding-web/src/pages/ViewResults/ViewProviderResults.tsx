@@ -31,7 +31,9 @@ export interface ViewProviderResultsRouteProps {
   fundingStreamId: string;
 }
 
-export function ViewProviderResults({ match }: RouteComponentProps<ViewProviderResultsRouteProps>) {
+export function ViewProviderResults({
+  match,
+}: RouteComponentProps<ViewProviderResultsRouteProps>): JSX.Element {
   const [providerResults, setProviderResults] = useState<SpecificationInformation[]>();
   const [specificationSummary, setSpecificationSummary] = useState<SpecificationSummary>();
   const [isLoadingProviderData, setIsLoadingProviderData] = useState<boolean>(true);
@@ -317,6 +319,18 @@ export function ViewProviderResults({ match }: RouteComponentProps<ViewProviderR
                       <div className="govuk-summary-list__row">
                         <dt className="govuk-summary-list__key">Provider profile type</dt>
                         <dd className="govuk-summary-list__value">{providerDetails.providerType}</dd>
+                      </div>
+                      <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">Further education type code</dt>
+                        <dd className="govuk-summary-list__value">
+                          {providerDetails.furtherEducationTypeCode}
+                        </dd>
+                      </div>
+                      <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">Further education type name</dt>
+                        <dd className="govuk-summary-list__value">
+                          {providerDetails.furtherEducationTypeName}
+                        </dd>
                       </div>
                     </dl>
                     <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />

@@ -101,6 +101,8 @@ const testProvider: ProviderSummary = {
   crmAccountId: "",
   dfeEstablishmentNumber: "",
   establishmentNumber: "",
+  furtherEducationTypeCode: "",
+  furtherEducationTypeName: "",
   id: "Hog-1",
   laCode: "",
   legalName: "",

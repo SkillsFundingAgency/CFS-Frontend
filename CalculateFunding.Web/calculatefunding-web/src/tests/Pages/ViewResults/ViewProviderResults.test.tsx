@@ -5,7 +5,6 @@ import { MemoryRouter, Route, Switch } from "react-router";
 
 import { ProviderVersionQueryResult } from "../../../hooks/Providers/useProviderVersion";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
-import { ViewProviderResults } from "../../../pages/ViewResults/ViewProviderResults";
 import { ProviderSummary } from "../../../types/ProviderSummary";
 
 describe("<ViewProviderResults />", () => {
@@ -65,6 +64,8 @@ const testProvider: ProviderSummary = {
   crmAccountId: "",
   dfeEstablishmentNumber: "",
   establishmentNumber: "establishmentNumberTest",
+  furtherEducationTypeCode: "",
+  furtherEducationTypeName: "",
   id: "Hog-1",
   laCode: "",
   legalName: "",

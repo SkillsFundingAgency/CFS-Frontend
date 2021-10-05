@@ -8,6 +8,8 @@ export interface ProviderSummary {
   upin: string;
   establishmentNumber: string;
   dfeEstablishmentNumber: string;
+  furtherEducationTypeCode: string;
+  furtherEducationTypeName: string;
   authority: string;
   providerType: string;
   providerTypeCode: string;
