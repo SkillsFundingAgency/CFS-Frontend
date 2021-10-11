@@ -13,12 +13,11 @@ import { AdditionalCalculations } from "../../components/Calculations/Additional
 import { CalculationErrors } from "../../components/Calculations/CalculationErrors";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { Details } from "../../components/Details";
-import { Footer } from "../../components/Footer";
 import { FundingLineResults } from "../../components/fundingLineStructure/FundingLineResults";
-import { Header } from "../../components/Header";
-import { JobProgressNotificationBanner } from "../../components/Jobs/JobProgressNotificationBanner";
+import JobBanner from "../../components/Jobs/JobBanner";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { Datasets } from "../../components/Specifications/Datasets";
@@ -55,7 +54,7 @@ export interface ViewSpecificationRoute {
   specificationId: string;
 }
 
-export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificationRoute>) {
+export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificationRoute>): JSX.Element {
   const jobObserverState: JobObserverState = useSelector<IStoreState, JobObserverState>(
     (state) => state.jobObserverState
   );
@@ -92,11 +91,11 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
   );
   const canApproveAllCalculations: boolean = useMemo(
     () => !!(hasPermission && hasPermission(Permission.CanApproveAllCalculations)),
-    [isPermissionsFetched]
+    [hasPermission, isPermissionsFetched]
   );
   const canChooseForFunding: boolean = useMemo(
     () => hasPermission(Permission.CanChooseFunding) === true,
-    [isPermissionsFetched]
+    [hasPermission, isPermissionsFetched]
   );
   const [observedJobSubscription, setObservedJobSubscription] = useState<JobSubscription>();
   const [converterWizardJob, setConverterWizardJob] = useState<JobDetails>();
@@ -506,203 +505,201 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
   };
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-          <Breadcrumb name={specification?.name} />
-        </Breadcrumbs>
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
+        <Breadcrumb name={specification?.name} />
+      </Breadcrumbs>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+      <MultipleErrorSummary errors={errors} />
+      <LoadingStatusNotifier
+        notifications={[
+          {
+            isActive: isApproveCalcsJobMonitoring,
+            title: "Background job is running",
+            subTitle: "Approving calculations",
+            description: "Please wait, this could take several minutes",
+          },
+          {
+            isActive: isRefreshJobMonitoring,
+            title: "Background job is running",
+            subTitle: "Refreshing funding",
+            description: "Please wait, this could take several minutes",
+          },
+        ]}
+      />
+      {(isRefreshJobMonitoring ||
+        (converterWizardJob && !converterWizardJob.isSuccessful) ||
+        isApproveCalcsJobMonitoring) && (
+        <div className="govuk-form-group">
+          {(isRefreshJobMonitoring || isApproveCalcsJobMonitoring) && (
+            <LoadingFieldStatus title={"Checking for running jobs..."} />
+          )}
+          {isApproveCalcsJobRunning && (
+            <JobBanner
+              job={approveAllCalculationsJob}
+              notificationSettings={[
+                {
+                  showSuccessful: true,
+                  jobTypes: [JobType.ApproveAllCalculationsJob],
+                },
+              ]}
+            />
+          )}
+          {converterWizardJob && <JobBanner job={converterWizardJob} />}
+        </div>
+      )}
+      <div className="govuk-grid-row" hidden={isApproveCalcsJobMonitoring || isRefreshJobMonitoring}>
+        <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
+          <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
+          <span className="govuk-caption-l">
+            {fundingStream?.name} for {specification?.fundingPeriod?.name}
+          </span>
+          {!isLoadingSelectedForFunding && specification.isSelectedForFunding && (
+            <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+          )}
+          {fundingConfiguration && fundingConfiguration.enableConverterDataMerge && (
+            <p className="govuk-body govuk-!-margin-top-2">
+              <strong className="govuk-tag govuk-tag--green">In year opener enabled</strong>
+            </p>
+          )}
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          <Details title={`What is ${specification.name}`} body={specification.description} />
+        </div>
+        <div className="govuk-grid-column-one-third">
+          <ul className="govuk-list">
+            <li>
+              <Link to={`/Specifications/EditSpecification/${specificationId}`} className="govuk-link">
+                Edit specification
+              </Link>
+            </li>
 
-        <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
-
-        <MultipleErrorSummary errors={errors} />
-
-        <LoadingStatusNotifier
-          notifications={[
-            {
-              isActive: isApproveCalcsJobMonitoring,
-              title: "Background job is running",
-              subTitle: "Approving calculations",
-              description: "Please wait, this could take several minutes",
-            },
-            {
-              isActive: isRefreshJobMonitoring,
-              title: "Background job is running",
-              subTitle: "Refreshing funding",
-              description: "Please wait, this could take several minutes",
-            },
-          ]}
-        />
-
-        {(isRefreshJobMonitoring ||
-          (converterWizardJob && !converterWizardJob.isSuccessful) ||
-          isApproveCalcsJobMonitoring) && (
-          <div className="govuk-form-group">
-            {(isRefreshJobMonitoring || isApproveCalcsJobMonitoring) && (
-              <LoadingFieldStatus title={"Checking for running jobs..."} />
-            )}
-            {isApproveCalcsJobRunning && (
-              <JobProgressNotificationBanner job={approveAllCalculationsJob} displaySuccessfulJob={true} />
-            )}
-            {converterWizardJob && <JobProgressNotificationBanner job={converterWizardJob} />}
-          </div>
-        )}
-
-        <div className="govuk-grid-row" hidden={isApproveCalcsJobMonitoring || isRefreshJobMonitoring}>
-          <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
-            <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
-            <span className="govuk-caption-l">
-              {fundingStream?.name} for {specification?.fundingPeriod?.name}
-            </span>
-            {!isLoadingSelectedForFunding && specification.isSelectedForFunding && (
-              <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
-            )}
-            {fundingConfiguration && fundingConfiguration.enableConverterDataMerge && (
-              <p className="govuk-body govuk-!-margin-top-2">
-                <strong className="govuk-tag govuk-tag--green">In year opener enabled</strong>
-              </p>
-            )}
-          </div>
-          <div className="govuk-grid-column-two-thirds">
-            <Details title={`What is ${specification.name}`} body={specification.description} />
-          </div>
-          <div className="govuk-grid-column-one-third">
-            <ul className="govuk-list">
+            <li>
+              <button
+                type="button"
+                className="govuk-link"
+                onClick={approveAllCalculations}
+                data-testid="approve-calculations"
+              >
+                Approve all calculations
+              </button>
+            </li>
+            {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."} />}
+            {!isLoadingSelectedForFunding && (
               <li>
-                <Link to={`/Specifications/EditSpecification/${specificationId}`} className="govuk-link">
-                  Edit specification
+                {specification.isSelectedForFunding || selectedForFundingSpecId ? (
+                  <Link
+                    className="govuk-link govuk-link--no-visited-state"
+                    to={`/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}
+                  >
+                    View funding
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="govuk-link"
+                    onClick={chooseForFunding}
+                    data-testid="choose-for-funding"
+                  >
+                    Choose for funding
+                  </button>
+                )}
+              </li>
+            )}
+            {!isLoadingSpecificationResults && specificationHasCalculationResults && (
+              <li>
+                <Link className={"govuk-link"} to={`/ViewSpecificationResults/${specificationId}`}>
+                  View specification results
                 </Link>
               </li>
-
-              <li>
-                <button
-                  type="button"
-                  className="govuk-link"
-                  onClick={approveAllCalculations}
-                  data-testid="approve-calculations"
-                >
-                  Approve all calculations
-                </button>
-              </li>
-              {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."} />}
-              {!isLoadingSelectedForFunding && (
-                <li>
-                  {specification.isSelectedForFunding || selectedForFundingSpecId ? (
-                    <Link
-                      className="govuk-link govuk-link--no-visited-state"
-                      to={`/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification.fundingPeriod.id}/${selectedForFundingSpecId}`}
-                    >
-                      View funding
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      className="govuk-link"
-                      onClick={chooseForFunding}
-                      data-testid="choose-for-funding"
-                    >
-                      Choose for funding
-                    </button>
-                  )}
-                </li>
-              )}
-              {!isLoadingSpecificationResults && specificationHasCalculationResults && (
-                <li>
-                  <Link className={"govuk-link"} to={`/ViewSpecificationResults/${specificationId}`}>
-                    View specification results
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
+            )}
+          </ul>
         </div>
-        {initialTab.length > 0 &&
-          !isApproveCalcsJobMonitoring &&
-          specification.id?.length > 0 &&
-          !isRefreshJobMonitoring && (
-            <div className="govuk-main-wrapper  govuk-!-padding-top-2">
-              <div className="govuk-grid-row" data-testid="hi">
-                <Tabs initialTab={"fundingline-structure"}>
-                  <ul className="govuk-tabs__list">
-                    <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
-                    <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
-                    {isLoadingCalculationErrors || calculationErrorCount === 0 ? (
-                      ""
-                    ) : (
-                      <Tabs.Tab label="calculation-errors">
-                        Calculations errors
-                        <Badge errorCount={calculationErrorCount} />
-                      </Tabs.Tab>
-                    )}
-                    <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
-                    <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
-                    <Tabs.Tab
-                      hidden={!specification.isSelectedForFunding}
-                      data-testid={"variations-tab"}
-                      label="variations"
-                    >
-                      Variations
-                    </Tabs.Tab>
-                  </ul>
-                  <Tabs.Panel label="fundingline-structure">
-                    <FundingLineResults
-                      specificationId={specification.id}
-                      fundingStreamId={specification.fundingStreams[0].id}
-                      fundingPeriodId={specification.fundingPeriod.id}
-                      status={specification.approvalStatus as PublishStatus}
-                      addError={addError}
-                      clearErrorMessages={clearErrorMessages}
-                      setStatusToApproved={setApprovalStatusToApproved}
-                      refreshFundingLines={approveAllCalculationsJob?.isSuccessful}
-                      showApproveButton={true}
-                      useCalcEngine={true}
-                      jobTypes={[JobType.AssignTemplateCalculationsJob]}
-                    />
-                  </Tabs.Panel>
-                  <Tabs.Panel label="additional-calculations">
-                    <AdditionalCalculations
-                      specificationId={specificationId}
-                      addError={addError}
-                      showCreateButton={true}
-                    />
-                  </Tabs.Panel>
-                  <Tabs.Panel label="calculation-errors">
-                    <CalculationErrors calculationErrors={calculationErrors} />
-                  </Tabs.Panel>
-                  <Tabs.Panel label="datasets">
-                    <Datasets
-                      specificationId={specificationId}
-                      lastConverterWizardReportDate={lastConverterWizardReportDate}
-                    />
-                  </Tabs.Panel>
-                  <Tabs.Panel label="release-timetable">
-                    <section className="govuk-tabs__panel">
-                      <ReleaseTimetable
-                        specificationId={specificationId}
-                        addErrorMessage={addError}
-                        clearErrorMessages={clearErrorMessages}
-                        errors={errors}
-                      />
-                    </section>
-                  </Tabs.Panel>
-                  <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variations"}>
-                    <VariationManagement
-                      specificationId={specificationId}
-                      fundingPeriodId={specification.fundingPeriod.id}
-                      fundingStreamId={specification.fundingStreams[0].id}
-                      addError={addError}
-                      clearErrorMessages={clearErrorMessages}
-                    />
-                  </Tabs.Panel>
-                </Tabs>
-              </div>
-            </div>
-          )}
       </div>
-      &nbsp;
-      <Footer />
-    </div>
+      {initialTab.length > 0 &&
+        !isApproveCalcsJobMonitoring &&
+        specification.id?.length > 0 &&
+        !isRefreshJobMonitoring && (
+          <div className="govuk-main-wrapper  govuk-!-padding-top-2">
+            <div className="govuk-grid-row" data-testid="hi">
+              <Tabs initialTab={"fundingline-structure"}>
+                <ul className="govuk-tabs__list">
+                  <Tabs.Tab label="fundingline-structure">Funding line structure</Tabs.Tab>
+                  <Tabs.Tab label="additional-calculations">Additional calculations</Tabs.Tab>
+                  {isLoadingCalculationErrors || calculationErrorCount === 0 ? (
+                    ""
+                  ) : (
+                    <Tabs.Tab label="calculation-errors">
+                      Calculations errors
+                      <Badge errorCount={calculationErrorCount} />
+                    </Tabs.Tab>
+                  )}
+                  <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
+                  <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
+                  <Tabs.Tab
+                    hidden={!specification.isSelectedForFunding}
+                    data-testid={"variations-tab"}
+                    label="variations"
+                  >
+                    Variations
+                  </Tabs.Tab>
+                </ul>
+                <Tabs.Panel label="fundingline-structure">
+                  <FundingLineResults
+                    specificationId={specification.id}
+                    fundingStreamId={specification.fundingStreams[0].id}
+                    fundingPeriodId={specification.fundingPeriod.id}
+                    status={specification.approvalStatus as PublishStatus}
+                    addError={addError}
+                    clearErrorMessages={clearErrorMessages}
+                    setStatusToApproved={setApprovalStatusToApproved}
+                    refreshFundingLines={approveAllCalculationsJob?.isSuccessful}
+                    showApproveButton={true}
+                    useCalcEngine={true}
+                    jobTypes={[JobType.AssignTemplateCalculationsJob]}
+                  />
+                </Tabs.Panel>
+                <Tabs.Panel label="additional-calculations">
+                  <AdditionalCalculations
+                    specificationId={specificationId}
+                    addError={addError}
+                    showCreateButton={true}
+                  />
+                </Tabs.Panel>
+                <Tabs.Panel label="calculation-errors">
+                  <CalculationErrors calculationErrors={calculationErrors} />
+                </Tabs.Panel>
+                <Tabs.Panel label="datasets">
+                  <Datasets
+                    specificationId={specificationId}
+                    lastConverterWizardReportDate={lastConverterWizardReportDate}
+                  />
+                </Tabs.Panel>
+                <Tabs.Panel label="release-timetable">
+                  <section className="govuk-tabs__panel">
+                    <ReleaseTimetable
+                      specificationId={specificationId}
+                      addErrorMessage={addError}
+                      clearErrorMessages={clearErrorMessages}
+                      errors={errors}
+                    />
+                  </section>
+                </Tabs.Panel>
+                <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variations"}>
+                  <VariationManagement
+                    specificationId={specificationId}
+                    fundingPeriodId={specification.fundingPeriod.id}
+                    fundingStreamId={specification.fundingStreams[0].id}
+                    addError={addError}
+                    clearErrorMessages={clearErrorMessages}
+                  />
+                </Tabs.Panel>
+              </Tabs>
+            </div>
+          </div>
+        )}
+    </Main>
   );
 }

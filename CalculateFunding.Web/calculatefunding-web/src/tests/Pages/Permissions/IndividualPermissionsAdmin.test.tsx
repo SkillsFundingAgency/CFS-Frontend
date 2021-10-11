@@ -4,7 +4,6 @@ import React from "react";
 import * as redux from "react-redux";
 import { MemoryRouter, Route, Switch } from "react-router";
 
-import { findUsers } from "../../../services/userService";
 import { Permission } from "../../../types/Permission";
 import { UserSearchResult, UserSearchResultItem } from "../../../types/Users/UserSearchResult";
 import { FundingStream } from "../../../types/viewFundingTypes";
@@ -157,7 +156,7 @@ describe("<IndividualPermissionsAdmin/>", () => {
 
             const banner = await screen.findByTestId("notification-banner");
             expect(banner).toBeInTheDocument();
-            expect(within(banner).getByRole("heading", { name: "Success" })).toBeInTheDocument();
+            expect(within(banner).getByText(/Success/)).toBeInTheDocument();
             expect(within(banner).getByText(/Permissions updated for/)).toBeInTheDocument();
             expect(within(banner).getByText(/user 537/)).toBeInTheDocument();
             expect(within(banner).getByText(/for Lalala funding stream/)).toBeInTheDocument();
@@ -229,7 +228,7 @@ describe("<IndividualPermissionsAdmin/>", () => {
 
             const banner = await screen.findByTestId("notification-banner");
             expect(banner).toBeInTheDocument();
-            expect(within(banner).getByRole("heading", { name: "Success" })).toBeInTheDocument();
+            expect(within(banner).getByText(/Success/)).toBeInTheDocument();
             expect(within(banner).getByText(/Removed/)).toBeInTheDocument();
             expect(within(banner).getByText(/user 537/)).toBeInTheDocument();
             expect(within(banner).getByText(/from Lalala funding stream/)).toBeInTheDocument();

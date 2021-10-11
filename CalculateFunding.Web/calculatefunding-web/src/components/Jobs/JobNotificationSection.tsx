@@ -23,9 +23,12 @@ export interface JobTypeNotificationSetting {
   showActive?: boolean;
   showFailed?: boolean;
   showSuccessful?: boolean;
+  activeTitle?: string;
   activeDescription?: string;
+  failTitle?: string;
   failDescription?: string;
   failureOutcomeDescription?: string;
+  successTitle?: string;
   successDescription?: string;
   spinner?: SpinnerSettings;
 }

@@ -7,7 +7,7 @@ import { DateFormatter } from "../../components/DateFormatter";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
-import { JobProgressNotificationBanner } from "../../components/Jobs/JobProgressNotificationBanner";
+import JobBanner from "../../components/Jobs/JobBanner";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
@@ -37,7 +37,9 @@ export interface UpdateDataSourceFileRouteProps {
   datasetId: string;
 }
 
-export function UpdateDataSourceFile({ match }: RouteComponentProps<UpdateDataSourceFileRouteProps>) {
+export function UpdateDataSourceFile({
+  match,
+}: RouteComponentProps<UpdateDataSourceFileRouteProps>): JSX.Element {
   const [dataset, setDataset] = useState<DatasetVersionDetails>({
     fundingStreamId: "",
     fundingStreamName: "",
@@ -416,15 +418,35 @@ export function UpdateDataSourceFile({ match }: RouteComponentProps<UpdateDataSo
           </legend>
 
           {converterWizardJobInProgress && (
-            <JobProgressNotificationBanner
+            <JobBanner
               job={converterWizardJobInProgress.latestJob}
-              jobInProgressOverride={{
-                heading: "Converter wizard in progress",
-                description:
-                  "You will not be able to update this data source file until the converter wizard is complete.",
-              }}
-              displaySuccessfulJob={false}
-              displayFailedJob={false}
+              notificationSettings={[
+                {
+                  showActive: true,
+                  jobTypes: [],
+                  activeTitle: "Converter wizard in progress",
+                  activeDescription:
+                    "You will not be able to update this data source file until the converter wizard is complete.",
+                  showSuccessful: false,
+                  showFailed: false,
+                },
+              ]}
+            />
+          )}
+          {converterWizardJobInProgress && (
+            <JobBanner
+              job={converterWizardJobInProgress.latestJob}
+              notificationSettings={[
+                {
+                  showActive: true,
+                  jobTypes: [],
+                  activeTitle: "Converter wizard in progress",
+                  activeDescription:
+                    "You will not be able to update this data source file until the converter wizard is complete.",
+                  showSuccessful: false,
+                  showFailed: false,
+                },
+              ]}
             />
           )}
 

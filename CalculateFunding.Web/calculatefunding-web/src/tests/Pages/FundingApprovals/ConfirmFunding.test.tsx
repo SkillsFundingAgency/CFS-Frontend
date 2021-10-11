@@ -94,9 +94,8 @@ describe("<ConfirmFunding />", () => {
       afterEach(() => jest.clearAllMocks());
 
       it("renders job progress message", async () => {
-        expect(await screen.findByTestId("job-notification-banner")).toBeInTheDocument();
-        const alert = await screen.findByRole("alert", { name: /job-notification/ });
-        expect(within(alert).getByRole("alert", { name: /Monitoring job/ })).toBeInTheDocument();
+        const alert = await screen.findByTestId("job-notification-banner");
+        expect(alert).toBeInTheDocument();
         expect(
           within(alert).getByText(
             `Job ${config.activeJob?.statusDescription}: ${config.activeJob?.jobDescription}`

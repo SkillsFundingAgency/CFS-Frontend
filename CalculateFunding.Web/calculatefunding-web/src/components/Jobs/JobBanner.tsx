@@ -1,8 +1,8 @@
 ﻿import React from "react";
 
 import { JobDetails } from "../../types/jobDetails";
-import { RunningStatus } from "../../types/RunningStatus";
 import { DateTimeFormatter } from "../DateTimeFormatter";
+import { NotificationBanner, NotificationStatus } from "../NotificationBanner";
 import { JobTypeNotificationSetting } from "./JobNotificationSection";
 
 export interface JobBannerProps {
@@ -31,96 +31,129 @@ const JobBanner = ({ job, notificationSettings }: JobBannerProps): JSX.Element |
     return null;
   }
 
+  const isFailed = job.isFailed || (job.isComplete && job.failures.length > 0);
+  const status = isFailed
+    ? NotificationStatus.Failed
+    : job.isSuccessful
+    ? NotificationStatus.Success
+    : job.isActive
+    ? NotificationStatus.Attention
+    : NotificationStatus.Information;
+
+  const { title } = getTitle(job, setting);
+
   return (
-    <div
-      data-testid="job-notification-banner"
-      className={
-        job.isFailed || (job.isComplete && job.failures.length > 0)
-          ? "govuk-error-summary"
-          : job.isActive
-          ? "govuk-error-summary-orange"
-          : "govuk-error-summary-green"
-      }
-      aria-labelledby="error-summary-title"
-      aria-label="job-notification"
-      role="alert"
-      data-module="govuk-error-summary"
-    >
-      <h2 className="govuk-error-summary__title">
-        {(job.isFailed || job.failures.length > 0) && <div>There is a problem</div>}
-        <div>
-          Job {job.statusDescription}: {job.jobDescription}
-          {job.outcome != null && job.outcome.length > 0 ? ": " + job.outcome : ""}
-        </div>
-        {job.isActive && (
-          <div
-            className="loader loader-small"
-            role="alert"
-            aria-live="assertive"
-            aria-label="Monitoring job"
-          />
+    <NotificationBanner token={"job-notification-banner"} title={title} isCollapsible={true} status={status}>
+      <ul className="govuk-list">
+        {job.isFailed && <FailureDetails job={job} notificationSetting={setting} />}
+        <li aria-label="Job initiated by">
+          <p className="govuk-body">
+            <span>Job initiated by {job.invokerUserDisplayName} on </span>
+            <span>
+              <DateTimeFormatter date={job.created as Date} />
+            </span>
+          </p>
+        </li>
+        {isFailed && (
+          <li aria-label="Job ID">
+            <p className="govuk-body-s">Job ID: {job.jobId}</p>
+          </li>
         )}
-        {job.failures.length > 0 && (
-          <ul className="govuk-list govuk-error-summary__list">
-            {job.failures.map((f, i) => (
-              <li key={i}>
-                <p className="govuk-body">
-                  {f.jobDescription}: {f.description}
-                </p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </h2>
-      <div className="govuk-error-summary__body">
-        <ul className="govuk-list govuk-error-summary__list">
-          {job.isFailed && <FailureDetails job={job} notificationSetting={setting} />}
-          <li>
-            <p className="govuk-body">
-              <span>Job initiated by {job.invokerUserDisplayName} on </span>
-              <span>
-                <DateTimeFormatter date={job.created as Date} />
-              </span>
+        {(job.isActive || job.isComplete) && (
+          <li aria-label="Job last update">
+            <p className="govuk-body-s">
+              <strong>{job.isComplete ? "Completed: " : "Last update: "}</strong>
+              <DateTimeFormatter date={job.lastUpdated as Date} />
             </p>
           </li>
-          {(job.runningStatus === RunningStatus.InProgress || job.isComplete) && (
-            <li>
-              <p className="govuk-body-s">
-                <strong>Results updated: </strong>
-                <DateTimeFormatter date={job.lastUpdated as Date} />
-              </p>
-            </li>
-          )}
-        </ul>
-      </div>
-    </div>
+        )}
+      </ul>
+    </NotificationBanner>
   );
 };
+
+const CustomFailureMessage = ({
+  failDescription,
+  failureOutcomeDescription,
+}: {
+  failDescription?: string;
+  failureOutcomeDescription?: string;
+}) => (
+  <>
+    {failDescription?.length && <h3 role="alert">{failDescription}</h3>}
+    {failureOutcomeDescription && <p className="govuk-body">{failureOutcomeDescription}</p>}
+  </>
+);
 
 const FailureDetails = (props: {
   job: JobDetails;
   notificationSetting: JobTypeNotificationSetting | undefined;
-}) => {
-  return (
-    <>
-      {props.notificationSetting && props.notificationSetting.failDescription && (
-        <li>
-          <p className="govuk-body">{props.notificationSetting.failDescription}</p>
-          Try again later.
+}) => (
+  <>
+    {props.notificationSetting &&
+    (props.notificationSetting.failDescription?.length ||
+      props.notificationSetting?.failureOutcomeDescription?.length) ? (
+      <CustomFailureMessage
+        failDescription={props.notificationSetting.failDescription}
+        failureOutcomeDescription={props.notificationSetting.failureOutcomeDescription}
+      />
+    ) : (
+      !!props.job.failures?.length &&
+      props.job.failures.map((f, i) => (
+        <li key={i}>
+          <p className="govuk-body-s">
+            {f.jobDescription}: {f.description}
+          </p>
         </li>
-      )}
-      {props.notificationSetting?.failureOutcomeDescription && (
-        <li>
-          <p className="govuk-body">{props.notificationSetting?.failureOutcomeDescription}</p>
-        </li>
-      )}
-      <li>
-        <p className="govuk-body-s">
-          <span>Job ID: {props.job.jobId}</span>
-        </p>
-      </li>
-    </>
-  );
+      ))
+    )}
+  </>
+);
+
+const getTitle = (
+  job: JobDetails,
+  setting: JobTypeNotificationSetting | undefined
+): { outcome: string; title: string } => {
+  if (!job.isFailed) {
+    const title = [`Job ${job.statusDescription}`, job.jobDescription, job.outcome]
+      .filter((s) => s?.length)
+      .join(": ");
+    if (job.isSuccessful && setting && (setting.successTitle?.length || setting.successDescription?.length))
+      return {
+        outcome: job.outcome ?? "",
+        title: setting.successTitle ?? setting.successDescription ?? title,
+      };
+    if (job.isActive && setting && (setting.activeTitle?.length || setting.activeDescription?.length))
+      return {
+        outcome: job.outcome ?? "",
+        title: setting.activeTitle ?? setting.activeDescription ?? title,
+      };
+    return { outcome: job.outcome ?? "", title: title };
+  }
+
+  // failed scenario
+
+  let outcome = job.outcome?.length ? job.outcome : "Something went wrong";
+  if (setting?.failTitle?.length) {
+    outcome = setting.failTitle;
+  } else if (setting?.failDescription?.length) {
+    outcome = setting.failDescription;
+  } else if (setting?.failureOutcomeDescription?.length) {
+    outcome = setting.failureOutcomeDescription;
+  } else {
+    const failures = job.failures.map((f) => `Job ${f.jobDescription}: ${f.description}`);
+    if (failures.length) {
+      outcome = failures.join(", ");
+    } else if (outcome?.length) {
+      outcome = "Something went wrong";
+    }
+  }
+
+  const failTitle = setting?.failTitle?.length
+    ? setting.failTitle
+    : [`Job ${job.statusDescription}`, job.jobDescription, outcome].filter((s) => s?.length).join(": ");
+
+  return { outcome, title: failTitle };
 };
 
 export default JobBanner;

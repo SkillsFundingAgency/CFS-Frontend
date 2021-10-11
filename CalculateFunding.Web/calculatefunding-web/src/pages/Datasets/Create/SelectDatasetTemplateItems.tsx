@@ -113,7 +113,7 @@ export function SelectDatasetTemplateItems({
     setHideUnselected(false);
   }
 
-  const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
     clearErrorMessages();
     if (!selectedItems?.length) {
@@ -372,11 +372,14 @@ const TemplateItemRow = (props: {
   );
 };
 
-const Actions = (props: { onContinue: (e: React.MouseEvent<HTMLButtonElement>) => void }) => {
-  const onClickHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    props.onContinue(e);
+const Actions = (props: { onContinue: (e: React.MouseEvent) => void }) => {
+  const onClickHandler = () => {
+    return (event: React.MouseEvent) => {
+      event.preventDefault();
+      props.onContinue(event);
+    };
   };
+
   return (
     <button className="govuk-button govuk-!-margin-top-3" data-module="govuk-button" onClick={onClickHandler}>
       Continue to summary

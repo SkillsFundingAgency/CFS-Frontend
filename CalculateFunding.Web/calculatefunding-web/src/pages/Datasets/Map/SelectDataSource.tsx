@@ -3,7 +3,7 @@ import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { DataSourceSelectionForm } from "../../../components/DatasetMapping/DataSourceSelectionForm";
-import { JobProgressNotificationBanner } from "../../../components/Jobs/JobProgressNotificationBanner";
+import JobBanner from "../../../components/Jobs/JobBanner";
 import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
@@ -331,7 +331,7 @@ const JobNotifications = (props: { jobNotifications: JobNotification[] | undefin
       {props.jobNotifications
         .filter((n) => n.latestJob?.isActive)
         .map((n, idx) => (
-          <JobProgressNotificationBanner key={idx} job={n.latestJob} />
+          <JobBanner key={idx} job={n.latestJob} />
         ))}
       {props.jobNotifications.some(
         (n) => n.latestJob?.isActive && n.latestJob.jobType === JobType.RunConverterDatasetMergeJob

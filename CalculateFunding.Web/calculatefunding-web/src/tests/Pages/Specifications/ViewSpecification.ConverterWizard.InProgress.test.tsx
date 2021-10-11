@@ -30,7 +30,7 @@ describe("<ViewSpecification /> ", () => {
         testData.getNotificationCallback()(notification);
       });
 
-      expect(await screen.findByTestId("job-notification")).toBeInTheDocument();
+      expect(await screen.findByTestId("job-notification-banner")).toBeInTheDocument();
     });
   });
 });

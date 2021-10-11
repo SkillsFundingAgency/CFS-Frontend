@@ -1,4 +1,5 @@
 import React from "react";
+import styled from "styled-components";
 
 export enum TagTypes {
   default = "govuk-tag",
@@ -18,6 +19,11 @@ export interface TagProps {
   type: TagTypes;
 }
 
-export function Tag({ text, type }: TagProps) {
-  return <strong className={type}>{text}</strong>;
+export function Tag({ text, type }: TagProps): JSX.Element {
+  return <TagContainer className={type}>{text}</TagContainer>;
 }
+
+const TagContainer = styled.strong`
+  vertical-align: bottom;
+  margin: 0 12px 5px 0;
+`;
