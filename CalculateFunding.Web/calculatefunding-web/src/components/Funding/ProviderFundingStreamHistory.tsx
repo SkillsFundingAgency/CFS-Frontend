@@ -45,7 +45,7 @@ export const ProviderFundingStreamHistory = (props: ProviderFundingStreamHistory
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.author}</td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.dateChanged}</td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">
-                  {fsh.variationReasons.map((vr) => (
+                  {fsh.variationReasons?.map((vr) => (
                     <span key={vr}>
                       {convertCamelCaseToSpaceDelimited(vr)}
                       <br />
