@@ -1,12 +1,13 @@
 ﻿import "../../../styles/search-filters.scss";
 
 import { prop, sortBy } from "ramda";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import Form from "../../../components/Form";
+import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
@@ -28,6 +29,7 @@ import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
   const forSpecId: string = match.params.forSpecId;
   const { errors, addError, clearErrorMessages } = useErrors();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const { state } = useAppContext();
   const { isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions } =
     useSpecificationPermissions(forSpecId as string, [Permission.CanEditSpecification]);
@@ -53,8 +55,11 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
       !model.datasetName ||
       !model.datasetDescription ||
       !model.selectedItems
-    )
+    ) {
       return false;
+    }
+
+    setIsSaving(true);
     try {
       const request = {
         specificationId: model.forSpecId,
@@ -76,6 +81,8 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
         error: e,
         description: "Unexpected error while creating data set",
       });
+    } finally {
+      setIsSaving(false);
     }
     return false;
   }
@@ -128,21 +135,27 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <section>
-        <Form
-          token="confirm-dataset"
-          heading="Check funding lines/calculations before creating data set"
-          onSubmit={onSave}
-        >
-          <DatasetDetails
-            name={state.createDatasetWorkflowState?.datasetName}
-            description={state.createDatasetWorkflowState?.datasetDescription}
-            forSpecId={forSpecId}
+        {isSaving ? (
+          <LoadingStatusNotifier
+            notifications={[{ title: "Creating data set", description: "Please wait" }]}
           />
-          {state.createDatasetWorkflowState?.selectedItems && (
-            <DatasetTemplateItemSelections items={state.createDatasetWorkflowState?.selectedItems} />
-          )}
-          <Actions forSpecId={forSpecId} onSave={onSave} />
-        </Form>
+        ) : (
+          <Form
+            token="confirm-dataset"
+            heading="Check funding lines/calculations before creating data set"
+            onSubmit={onSave}
+          >
+            <DatasetDetails
+              name={state.createDatasetWorkflowState?.datasetName}
+              description={state.createDatasetWorkflowState?.datasetDescription}
+              forSpecId={forSpecId}
+            />
+            {state.createDatasetWorkflowState?.selectedItems && (
+              <DatasetTemplateItemSelections items={state.createDatasetWorkflowState?.selectedItems} />
+            )}
+            <Actions forSpecId={forSpecId} onSave={onSave} />
+          </Form>
+        )}
       </section>
     </Main>
   );

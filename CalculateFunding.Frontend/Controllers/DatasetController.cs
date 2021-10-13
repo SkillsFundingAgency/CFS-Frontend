@@ -272,7 +272,7 @@ namespace CalculateFunding.Frontend.Controllers
                 return new OkObjectResult(true);
             }
 
-            return new StatusCodeResult(500);
+            return new InternalServerErrorResult(newAssignDatasetResponse?.Message);
         }
 
         [HttpPut]

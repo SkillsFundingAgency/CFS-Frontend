@@ -50,7 +50,7 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
     setDatasetDescription(e.target.value);
   };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
     clearErrorMessages();
     if (!datasetName?.length) {
@@ -109,21 +109,16 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
   );
 }
 
-const Actions = (props: {
-  onContinue: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onCancel: () => void;
-}) => (
+const Actions = (props: { onContinue: (e: React.MouseEvent) => void; onCancel: () => void }) => (
   <div className="govuk-grid-row">
     <div className="govuk-grid-column-two-thirds">
       <button
-        className="govuk-button"
+        className="govuk-button govuk-!-margin-right-1"
         data-module="govuk-button"
-        onClick={(e) => props.onContinue(e as React.MouseEvent<HTMLButtonElement>)}
+        onClick={props.onContinue}
       >
         Continue
       </button>
-    </div>
-    <div className="govuk-grid-column-two-thirds">
       <button
         className="govuk-button govuk-button--secondary"
         data-module="govuk-button"

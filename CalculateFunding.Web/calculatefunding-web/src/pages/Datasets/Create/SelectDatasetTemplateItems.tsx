@@ -113,6 +113,11 @@ export function SelectDatasetTemplateItems({
     setHideUnselected(false);
   }
 
+  const onCancel = (e: React.MouseEvent) => {
+    e.preventDefault();
+    history.push(`/ViewSpecification/${forSpecId}`);
+  };
+
   const onSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
     clearErrorMessages();
@@ -168,7 +173,7 @@ export function SelectDatasetTemplateItems({
             <div className="govuk-grid-column-one-third position-sticky">
               <SearchBox onSearchTextChange={filterByName} />
               <FilterSelection onToggleHideUnselected={onToggleHideUnselected} isChecked={hideUnselected} />
-              <Actions onContinue={onSubmit} />
+              <Actions onContinue={onSubmit} onCancel={onCancel} />
             </div>
             <div className="govuk-grid-column-two-thirds">
               <TemplateItemGrid
@@ -372,17 +377,27 @@ const TemplateItemRow = (props: {
   );
 };
 
-const Actions = (props: { onContinue: (e: React.MouseEvent) => void }) => {
-  const onClickHandler = () => {
-    return (event: React.MouseEvent) => {
-      event.preventDefault();
-      props.onContinue(event);
-    };
-  };
+const Actions = (props: {
+  onContinue: (e: React.MouseEvent) => void;
+  onCancel: (e: React.MouseEvent) => void;
+}) => {
 
   return (
-    <button className="govuk-button govuk-!-margin-top-3" data-module="govuk-button" onClick={onClickHandler}>
-      Continue to summary
-    </button>
+    <div>
+      <button
+        className="govuk-button govuk-!-margin-right-1"
+        data-module="govuk-button"
+        onClick={props.onContinue}
+      >
+        Continue to summary
+      </button>
+      <button
+        className="govuk-button govuk-button--secondary"
+        data-module="govuk-button"
+        onClick={props.onCancel}
+      >
+        Cancel
+      </button>
+    </div>
   );
 };

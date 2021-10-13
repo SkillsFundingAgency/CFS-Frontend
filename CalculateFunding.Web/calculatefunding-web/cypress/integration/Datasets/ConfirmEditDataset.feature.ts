@@ -1,4 +1,4 @@
-﻿import { Response,Server } from "miragejs";
+﻿import { Response, Server } from "miragejs";
 
 import { makeServer, mockApiData } from "../../../src/mirage";
 import { ReferencedSpecificationRelationshipMetadata } from "../../../src/types/Datasets/ReferencedSpecificationRelationshipMetadata";
@@ -22,8 +22,7 @@ context("Confirm changes when editing a dataset from released data", () => {
       }
     );
 
-    server.put("/specifications/*/dataset-relationship/*", (schema, request) => {
-      console.log("PUT", request);
+    server.put("/specifications/*", (schema, request) => {
       if (request.url.includes("/dataset-relationship/")) {
         return new Response(200, {}, {});
       } else {

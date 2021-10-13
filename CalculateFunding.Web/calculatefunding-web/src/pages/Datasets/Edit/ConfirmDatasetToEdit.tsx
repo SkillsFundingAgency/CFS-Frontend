@@ -8,6 +8,7 @@ import { ErrorMessage } from "types/ErrorMessage";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import Form from "../../../components/Form";
+import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { EditDescriptionModal } from "../../../components/TemplateBuilder/EditDescriptionModal";
@@ -27,6 +28,7 @@ export function ConfirmDatasetToEdit({
   const updatingSpecId: string = match.params.specificationId;
   const { errors, addError, clearErrorMessages } = useErrors();
   const { state, dispatch } = useAppContext();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const settings = state.editDatasetWorkflowState;
   const [relationshipDescription, setRelationshipDescription] = useState<string | undefined>(
     settings?.relationshipDescription
@@ -49,6 +51,7 @@ export function ConfirmDatasetToEdit({
       !settings.relationshipMetadata ||
       !settings.selectedItems
     ) {
+      addError({ error: "An unexpected error occurred. Missing parameters!" });
       return false;
     }
     try {
@@ -72,11 +75,12 @@ export function ConfirmDatasetToEdit({
         error: e,
         description: "Unexpected error while updating data set",
       });
+      console.log("There's a problem with updating the server", e, settings, relationshipDescription);
+      return false;
     }
-    return false;
   }
 
-  const onSave = async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const onSave = async (e: React.MouseEvent) => {
     e.preventDefault();
     clearErrorMessages();
 
@@ -96,16 +100,25 @@ export function ConfirmDatasetToEdit({
       return;
     }
 
-    const success = await updateDatasetRelationship();
+    setIsSaving(true);
+    try {
+      const success = await updateDatasetRelationship();
 
-    if (success) {
-      dispatch({
-        type: "resetEditDatasetWorkflowState",
-      });
+      if (success) {
+        dispatch({
+          type: "resetEditDatasetWorkflowState",
+        });
 
-      history.push(
-        `/ViewSpecification/${settings.relationshipMetadata.currentSpecificationId}?showDatasets=true`
-      );
+        history.push(
+          `/ViewSpecification/${settings.relationshipMetadata.currentSpecificationId}?showDatasets=true`
+        );
+      } else {
+        addError({ error: "The update failed for an unknown reason." });
+      }
+    } catch (e: any) {
+      addError({ error: e, description: "An error occurred while trying to update." });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -131,16 +144,22 @@ export function ConfirmDatasetToEdit({
         <Breadcrumb name="Check data set" />
       </Breadcrumbs>
       <section>
-        <Form token="confirm-dataset-changes" heading="Check funding lines and calculations">
-          <RelationshipDetails
-            name={settings?.relationshipMetadata?.relationshipName}
-            description={relationshipDescription}
-            setDescription={onRelationshipDescriptionChange}
-            errors={errors.filter((e) => e.fieldName === "relationship-description")}
+        {isSaving ? (
+          <LoadingStatusNotifier
+            notifications={[{ title: "Updating data set", description: "Please wait" }]}
           />
-          {settings?.selectedItems && <DatasetTemplateItemSelections items={settings.selectedItems} />}
-          <Actions relationshipId={relationshipId} forSpecId={updatingSpecId} onSave={onSave} />
-        </Form>
+        ) : (
+          <Form token="confirm-dataset-changes" heading="Check funding lines and calculations">
+            <RelationshipDetails
+              name={settings?.relationshipMetadata?.relationshipName}
+              description={relationshipDescription}
+              setDescription={onRelationshipDescriptionChange}
+              errors={errors.filter((e) => e.fieldName === "relationship-description")}
+            />
+            {settings?.selectedItems && <DatasetTemplateItemSelections items={settings.selectedItems} />}
+            <Actions relationshipId={relationshipId} forSpecId={updatingSpecId} onSave={onSave} />
+          </Form>
+        )}
       </section>
     </Main>
   );
@@ -245,32 +264,39 @@ const DatasetTemplateItemSelections = (props: { items: DatasetTemplateMetadataWi
 const Actions = (props: {
   relationshipId: string;
   forSpecId: string;
-  onSave: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}) => (
-  <div className="govuk-grid-row">
-    <div className="govuk-grid-column-two-thirds">
-      <h2 className="govuk-heading-m">Now update your data set</h2>
-      <p className="govuk-body">
-        By updating the data set the above funding line and calculations will be available for reference from
-        this specification in your calculation scripts.
-      </p>
-      <p className="govuk-body">Those removed will no longer be available</p>
-      <div className="govuk-button-group">
-        <button
-          className="govuk-button govuk-!-margin-top-3"
-          data-module="govuk-button"
-          onClick={(e) => props.onSave(e as React.MouseEvent<HTMLButtonElement>)}
-        >
-          Update data set
-        </button>
-        <Link
-          to={`/Datasets/${props.relationshipId}/Edit/${props.forSpecId}`}
-          className="govuk-button govuk-!-margin-top-3"
-          data-module="govuk-button"
-        >
-          Change selection
-        </Link>
+  onSave: (e: React.MouseEvent) => void;
+}) => {
+  const onClickHandler = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Actions.onClick");
+    props.onSave(e);
+  };
+  return (
+    <div className="govuk-grid-row">
+      <div className="govuk-grid-column-two-thirds">
+        <h2 className="govuk-heading-m">Now update your data set</h2>
+        <p className="govuk-body">
+          By updating the data set the above funding line and calculations will be available for reference
+          from this specification in your calculation scripts.
+        </p>
+        <p className="govuk-body">Those removed will no longer be available</p>
+        <div className="govuk-button-group">
+          <button
+            className="govuk-button govuk-!-margin-top-3"
+            data-module="govuk-button"
+            onClick={onClickHandler}
+          >
+            Update data set
+          </button>
+          <Link
+            to={`/Datasets/${props.relationshipId}/Edit/${props.forSpecId}`}
+            className="govuk-button govuk-!-margin-top-3"
+            data-module="govuk-button"
+          >
+            Change selection
+          </Link>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
