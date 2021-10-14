@@ -112,8 +112,12 @@ namespace CalculateFunding.Frontend.Controllers
                 FundingLineName = _.FundingLineName,
                 FundingStreamId = _.FundingStreamId,
                 TemplateCalculationId = _.TemplateCalculationId,
-                TemplateCalculations = AsCalculationSummaries(_.CalculationIds.Intersect(templateCalculations.Keys), templateCalculations),
-                AdditionalCalculations = AsCalculationSummaries(_.CalculationIds.Intersect(additionalCalculations.Keys), additionalCalculations),
+                TemplateCalculations = _.CalculationIds != null ?
+                    AsCalculationSummaries(_.CalculationIds.Intersect(templateCalculations.Keys), templateCalculations)
+                    : ArraySegment<CalculationSummaryViewModel>.Empty,
+                AdditionalCalculations = _.CalculationIds != null ?
+                    AsCalculationSummaries(_.CalculationIds.Intersect(additionalCalculations.Keys), additionalCalculations)
+                    : ArraySegment<CalculationSummaryViewModel>.Empty,
                 Title = GenerateTitleForObsoleteItem(_, policyContents),
             });
 
@@ -138,11 +142,8 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 switch (obsoleteItem.ItemType)
                 {
-                    case ObsoleteItemType.FundingLine:
-                        return $"Missing Released Data - Funding Line: {obsoleteItem.FundingLineName}";
-                    case ObsoleteItemType.Calculation:
-                        TemplateMetadataCalculation calcInTemplate = policyContents.Calculations.Single(c => c.TemplateCalculationId == obsoleteItem.TemplateCalculationId);
-                        return $"Missing Released Data - Calculation: {calcInTemplate.Name}";
+                    case ObsoleteItemType.DatasetField:
+                        return $"Missing Released Data - Dataset Name: {obsoleteItem.DatasetRelationshipName} Dataset Field: {obsoleteItem.DatasetFieldName}";
                     default:
                         throw new InvalidOperationException($"Unknown obsolete item type {obsoleteItem.ItemType}");
                 }

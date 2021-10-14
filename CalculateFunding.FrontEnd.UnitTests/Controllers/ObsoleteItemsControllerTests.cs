@@ -196,7 +196,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             {
                 Id = NewRandomString(),
                 CodeReference = NewRandomString(),
-                ItemType = ObsoleteItemType.FundingLine,
+                ItemType = isReleasedData? ObsoleteItemType.DatasetField : ObsoleteItemType.FundingLine,
                 EnumValueName = NewRandomString(),
                 TemplateCalculationId = NewRandomUint(),
                 SpecificationId = specificationId,
