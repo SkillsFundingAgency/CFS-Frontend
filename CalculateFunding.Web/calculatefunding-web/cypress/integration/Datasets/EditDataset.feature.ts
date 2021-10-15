@@ -9,19 +9,7 @@ context("Select template items for a new dataset", () => {
   let server: Server;
 
   before(() => {
-    server = makeServer({ environment: "test" });
-    server.get(
-      "/specifications/*",
-      (schema, request): ReferencedSpecificationRelationshipMetadata | Record<string, unknown> => {
-        if (request.url.includes("/dataset-relationship/")) {
-          return data.relationshipMetadata1;
-        } else {
-          return {};
-        }
-      }
-    );
-
-    cy.visit(`/Datasets/${data.relationshipMetadata1.relationshipId}/Edit/${data.spec1.id}`);
+    setup();
   });
   after(() => {
     server.shutdown();
@@ -75,8 +63,17 @@ context("Select template items for a new dataset", () => {
     });
   });
 
+  describe("when user selects items and clicks away to another page", () => {
+    it("renders confirm leave modal popup", () => {
+      cy.findByRole("checkbox", { name: data.calc1.name }).check();
+      cy.findByRole("link", { name: /Data set details/ }).click();
+      cy.findByTestId("modal-confirmation-placeholder").should("exist");
+    });
+  });
+
   describe("when user selects extra item and clicks Continue", () => {
     it("goes to correct page", () => {
+      setup();
       cy.findByRole("checkbox", { name: /calc b OBSOLETE/i }).check();
       cy.findByRole("button", { name: /Continue to summary/ }).click();
       cy.url().should(
@@ -85,4 +82,21 @@ context("Select template items for a new dataset", () => {
       );
     });
   });
+
+  function setup() {
+    server?.shutdown();
+    server = makeServer({ environment: "test" });
+    server.get(
+      "/specifications/*",
+      (schema, request): ReferencedSpecificationRelationshipMetadata | Record<string, unknown> => {
+        if (request.url.includes("/dataset-relationship/")) {
+          return data.relationshipMetadata1;
+        } else {
+          return {};
+        }
+      }
+    );
+
+    cy.visit(`/Datasets/${data.relationshipMetadata1.relationshipId}/Edit/${data.spec1.id}`);
+  }
 });

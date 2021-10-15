@@ -1,5 +1,6 @@
 ﻿import "../../../styles/search-filters.scss";
 
+import { AxiosError } from "axios";
 import { prop, sortBy } from "ramda";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
@@ -26,7 +27,7 @@ export function ConfirmDatasetToEdit({
 }: RouteComponentProps<{ relationshipId: string; specificationId: string }>) {
   const relationshipId: string = match.params.relationshipId;
   const updatingSpecId: string = match.params.specificationId;
-  const { errors, addError, clearErrorMessages } = useErrors();
+  const { errors, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const { state, dispatch } = useAppContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const settings = state.editDatasetWorkflowState;
@@ -70,12 +71,16 @@ export function ConfirmDatasetToEdit({
       await datasetService.updateDatasetFromReleased(request);
 
       return true;
-    } catch (e: any) {
-      addError({
-        error: e,
-        description: "Unexpected error while updating data set",
-      });
-      console.log("There's a problem with updating the server", e, settings, relationshipDescription);
+    } catch (error: any) {
+      const axiosError = error as AxiosError;
+      if (axiosError && axiosError.response && axiosError.response.status === 400) {
+        addValidationErrors({
+          validationErrors: axiosError.response.data,
+          message: "Validation failure occurred during update",
+        });
+      } else {
+        addError({ error: error, description: "Unexpected error while updating data set" });
+      }
       return false;
     }
   }

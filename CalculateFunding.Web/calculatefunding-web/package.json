@@ -68,7 +68,7 @@
   },
   "scripts": {
     "start": "set HTTPS=true&&react-app-rewired start",
-    "start:test": "cross-env BROWSER=none set HTTPS=false react-app-rewired start",
+    "start:test": "set HTTPS=false react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "cross-env DEBUG_PRINT_LIMIT=30000 react-app-rewired test --testResultsProcessor ./node_modules/jest-junit-reporter",
     "eject": "react-scripts eject",
@@ -78,7 +78,7 @@
     "pre-commit": "prettier:fix && lint:fix && ts:compile && test",
     "cypress": "npx cypress open",
     "cypress:runAllTests": "npx cypress run",
-    "test:cypress:ci": "start-server-and-test start:test http-get://localhost:3000/app cypress:ci",
+    "test:cypress:ci": "cross-env BROWSER=none start-server-and-test start:test http-get://localhost:3000/app cypress:ci",
     "test:cypress:ui": "start-server-and-test start:test http-get://localhost:3000/app cypress:runAllTests",
     "cypress:ci": "cypress run --headless",
     "storybook": "start-storybook -p 6006 -s public",

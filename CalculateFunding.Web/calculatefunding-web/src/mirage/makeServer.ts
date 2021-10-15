@@ -61,20 +61,20 @@ export const makeServer = ({ environment = "test" }) => {
     routes() {
       this.namespace = "/api";
 
-      this.get("/specs/*", (schema, request) => {
+      this.get("/specs/*", () => {
         return data.getSpecifications();
       });
       this.get("/account/IsAuthenticated", () => ({}));
-      this.get("/account/hasConfirmedSkills", (schema, request) => {
+      this.get("/account/hasConfirmedSkills", () => {
         return {};
       });
-      this.get("/getConfirmedSkills", (schema, request) => {
+      this.get("/getConfirmedSkills", () => {
         return {};
       });
-      this.get("/api/specification/:id/obsoleteitems", (schema, request) => {
+      this.get("/api/specification/:id/obsoleteitems", () => {
         return {};
       });
-      this.get("/api/policy/configuration/:fundingStreamId/:fundingPeriodId", (schema, request) => {
+      this.get("/api/policy/configuration/:fundingStreamId/:fundingPeriodId", () => {
         return {
           fundingPeriodId: data.fundingPeriod1.id,
           fundingStreamId: data.fundingStream1.id,
@@ -85,13 +85,13 @@ export const makeServer = ({ environment = "test" }) => {
           approvalMode: ApprovalMode.All,
         } as FundingConfiguration;
       });
-      this.post("/jobs/*", (schema, request) => {
+      this.post("/jobs/*", () => {
         return {};
       });
-      this.post("/notifications/*", (schema, request) => {
+      this.post("/notifications/*", () => {
         return {};
       });
-      this.get("/featureflags", (schema, request) => {
+      this.get("/featureflags", () => {
         return [
           { name: "EnableReactQueryDevTool", isEnabled: true },
           { name: "EnableSwagger", isEnabled: true },
@@ -100,7 +100,7 @@ export const makeServer = ({ environment = "test" }) => {
           { name: "TemplateBuilderVisible", isEnabled: true },
         ];
       });
-      this.post("/users/*", (schema, request) => {
+      this.post("/users/*", () => {
         return {};
       });
       this.get(
@@ -226,28 +226,21 @@ export const mockApiData = () => {
     name: "funding line 1",
     templateId: 97,
     isObsolete: false,
-    IsUsedInCalculation: false,
+    isUsedInCalculation: false,
     isSelected: true,
   };
   const calc1: DatasetTemplateMetadata = {
     name: "calc a",
     templateId: 51,
     isObsolete: false,
-    IsUsedInCalculation: false,
+    isUsedInCalculation: false,
     isSelected: true,
   };
   const calc2: DatasetTemplateMetadata = {
     name: "calc b",
     templateId: 433,
     isObsolete: true,
-    IsUsedInCalculation: false,
-    isSelected: false,
-  };
-  const calc3: DatasetTemplateMetadata = {
-    name: "calc c",
-    templateId: 784,
-    isObsolete: false,
-    IsUsedInCalculation: true,
+    isUsedInCalculation: false,
     isSelected: false,
   };
   const datasetMetadata1 = {

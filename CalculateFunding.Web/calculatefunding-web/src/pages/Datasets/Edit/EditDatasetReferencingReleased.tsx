@@ -16,6 +16,7 @@ import { EditDescriptionModal } from "../../../components/TemplateBuilder/EditDe
 import { useAppContext } from "../../../context/useAppContext";
 import { convertCamelCaseToSpaceDelimited } from "../../../helpers/stringHelper";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
+import { useConfirmLeavePage } from "../../../hooks/useConfirmLeavePage";
 import { useErrors } from "../../../hooks/useErrors";
 import * as datasetService from "../../../services/datasetService";
 import {
@@ -35,6 +36,7 @@ export function EditDatasetReferencingReleased({
   const { errors, addError, clearErrorMessages } = useErrors();
   const { dispatch } = useAppContext();
   const [selectedItems, setSelectedItems] = useState<DatasetTemplateMetadataWithType[]>([]);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
   const [hideUnselected, setHideUnselected] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string | undefined>(undefined);
   const [relationshipDescription, setRelationshipDescription] = useState<string | undefined>();
@@ -59,6 +61,7 @@ export function EditDatasetReferencingReleased({
   const { isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions } =
     useSpecificationPermissions(updatingSpecId as string, [Permission.CanEditSpecification]);
   const history = useHistory();
+  const { disableMe: disableConfirmLeaveModal } = useConfirmLeavePage(isDirty);
 
   const setTemplateType = curry(
     (items: DatasetTemplateMetadata[], type: TemplateItemType): DatasetTemplateMetadataWithType[] =>
@@ -120,7 +123,7 @@ export function EditDatasetReferencingReleased({
     setHideUnselected(false);
   }
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
     clearErrorMessages();
 
@@ -139,6 +142,9 @@ export function EditDatasetReferencingReleased({
         selectedItems: selectedItems,
       },
     });
+
+    setIsDirty(false);
+    disableConfirmLeaveModal();
     history.push(`/Datasets/${relationshipId}/ConfirmEdit/${updatingSpecId}`);
   };
 
@@ -148,6 +154,7 @@ export function EditDatasetReferencingReleased({
         ? existing.filter((i) => i.templateId !== item.templateId)
         : [...existing, item]
     );
+    setIsDirty(true);
   }
 
   function onToggleHideUnselected() {
@@ -157,6 +164,7 @@ export function EditDatasetReferencingReleased({
   const onRelationshipDescriptionChange = async (description: string) => {
     clearErrorMessages(["relationship-description"]);
     setRelationshipDescription(description);
+    setIsDirty(true);
   };
 
   return (
@@ -424,7 +432,7 @@ const TemplateItemRow = (props: {
       <td className="govuk-table__cell">
         <div className="govuk-checkboxes govuk-checkboxes--small">
           <div className="govuk-checkboxes__item">
-            {!props.item.IsUsedInCalculation && (
+            {!props.item.isUsedInCalculation && (
               <input
                 className="govuk-checkboxes__input provider-checked table-input"
                 id={props.token}
@@ -437,7 +445,7 @@ const TemplateItemRow = (props: {
             <label className="govuk-label govuk-checkboxes__label" htmlFor={props.token}>
               {props.item.name}{" "}
               {props.item.isObsolete && <strong className="govuk-tag govuk-tag--red">Obsolete</strong>}
-              {props.item.IsUsedInCalculation && (
+              {props.item.isUsedInCalculation && (
                 <strong className="govuk-tag govuk-tag--red">Used in Calculation</strong>
               )}
             </label>
@@ -450,12 +458,8 @@ const TemplateItemRow = (props: {
   );
 };
 
-const Actions = React.memo((props: { onContinue: (e: React.MouseEvent<HTMLButtonElement>) => void }) => (
-  <button
-    className="govuk-button govuk-!-margin-top-3"
-    data-module="govuk-button"
-    onClick={(e) => props.onContinue(e as React.MouseEvent<HTMLButtonElement>)}
-  >
+const Actions = React.memo((props: { onContinue: (e: React.MouseEvent) => void }) => (
+  <button className="govuk-button govuk-!-margin-top-3" data-module="govuk-button" onClick={props.onContinue}>
     Continue to summary
   </button>
 ));

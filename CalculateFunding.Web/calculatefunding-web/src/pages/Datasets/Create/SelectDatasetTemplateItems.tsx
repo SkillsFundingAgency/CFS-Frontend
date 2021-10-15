@@ -381,7 +381,6 @@ const Actions = (props: {
   onContinue: (e: React.MouseEvent) => void;
   onCancel: (e: React.MouseEvent) => void;
 }) => {
-
   return (
     <div>
       <button

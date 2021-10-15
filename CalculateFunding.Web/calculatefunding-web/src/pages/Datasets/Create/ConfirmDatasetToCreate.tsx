@@ -1,5 +1,6 @@
 ﻿import "../../../styles/search-filters.scss";
 
+import { AxiosError } from "axios";
 import { prop, sortBy } from "ramda";
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
@@ -28,7 +29,7 @@ import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 
 export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
   const forSpecId: string = match.params.forSpecId;
-  const { errors, addError, clearErrorMessages } = useErrors();
+  const { errors, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const { state } = useAppContext();
   const { isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions } =
@@ -76,14 +77,20 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
       } as CreateDatasetSpecificationRelationshipRequest;
       await datasetService.createDatasetFromReleased(request);
       return true;
-    } catch (e: any) {
-      addError({
-        error: e,
-        description: "Unexpected error while creating data set",
-      });
+    } catch (error: any) {
+      const axiosError = error as AxiosError;
+      if (axiosError && axiosError.response && axiosError.response.status === 400) {
+        addValidationErrors({
+          validationErrors: axiosError.response.data,
+          message: "Validation failure occurred during update",
+        });
+      } else {
+        addError({ error: error, description: "Unexpected error while creating data set" });
+      }
     } finally {
       setIsSaving(false);
     }
+
     return false;
   }
 

@@ -13,7 +13,7 @@ export interface DatasetTemplateMetadata {
   name: string;
   isObsolete: boolean;
   isSelected: boolean;
-  IsUsedInCalculation: boolean;
+  isUsedInCalculation: boolean;
 }
 
 export interface DatasetTemplateMetadataWithType extends DatasetTemplateMetadata {
