@@ -246,30 +246,6 @@ input:disabled {
     &:hover {
       color: govuk-colour("dark-grey");
     }
-
-    .govuk-collapsiblepanel-heading-expander {
-      &:after {
-        font-family: "Material Icons";
-        content: "keyboard_arrow_down";
-        align-content: end;
-        cursor: pointer;
-        font-size: 28px;
-        line-height: 18px;
-        float: right;
-      }
-    }
-
-    .govuk-collapsiblepanel-heading-collapser {
-      &:after {
-        font-family: "Material Icons";
-        content: "keyboard_arrow_up";
-        align-content: end;
-        cursor: pointer;
-        font-size: 28px;
-        line-height: 18px;
-        float: right;
-      }
-    }
   }
 
   .govuk-collapsiblepanel-body-collapsed {
@@ -551,13 +527,26 @@ ul.autocomplete {
     font-weight: bold;
   }
 
-  .govuk-collapsiblepanel-heading-expander:after {
-    content: "+";
-    align-content: end;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 30px;
-    line-height: 12px;
+  .govuk-collapsiblepanel-heading-expander {
+    &:after {
+      content: "\002B";
+      align-content: end;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 30px;
+      line-height: 12px;
+    }
+  }
+  .govuk-collapsiblepanel-heading-collapser {
+    &:after {
+      content: "\2212";
+      top: -10px;
+      align-content: end;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 30px;
+      line-height: 12px;
+    }
   }
 }
 
