@@ -38,5 +38,9 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         public bool HasErrors { get; set; }
 
         public string[] Errors { get; set; }
+
+        public int? MajorVersion { get; set; }
+
+        public int? MinorVersion { get; set; }
     }
 }

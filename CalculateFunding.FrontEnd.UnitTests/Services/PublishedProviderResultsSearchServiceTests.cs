@@ -107,6 +107,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
             result.TotalProvidersToApprove.Should().Be(numberOfItems);
             result.Facets.Count().Should().Be(4);
         }
+
         SearchResults<PublishedProviderSearchItem> GenerateSearchResults(int numberOfItems)
         {
             List<PublishedProviderSearchItem> items = new List<PublishedProviderSearchItem>();
