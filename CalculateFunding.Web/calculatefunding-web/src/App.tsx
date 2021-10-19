@@ -49,6 +49,7 @@ import { ProviderFundingOverview } from "./pages/FundingApprovals/ProviderFundin
 import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
 import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
 import { ViewEditFundingLineProfile } from "./pages/FundingApprovals/ViewEditFundingLineProfile";
+import FundingManagement from "./pages/FundingManagement/FundingManagement";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
 import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
@@ -166,6 +167,7 @@ const App: React.FunctionComponent = () => {
                 path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId"
                 component={ViewProviderResults}
               />
+              <Route path="/FundingManagement" component={FundingManagement} />
               <Route path="/SelectSpecification" component={SelectSpecification} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
               <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
@@ -280,6 +282,7 @@ const App: React.FunctionComponent = () => {
                   />
                 </>
               )}
+
               <Route path="*">
                 <NoMatch />
               </Route>
