@@ -24,7 +24,7 @@ import { IStoreState } from "../../reducers/rootReducer";
 import * as userService from "../../services/userService";
 import { buildPermissions } from "../../tests/fakes/testFactories";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
-import { Permission } from "../../types/Permission";
+import { Permission, PermissionsCategories } from "../../types/Permission";
 import { Section } from "../../types/Sections";
 import { UserSearchResult, UserSearchResultItem } from "../../types/Users/UserSearchResult";
 import { FundingStream } from "../../types/viewFundingTypes";
@@ -423,12 +423,27 @@ export function IndividualPermissionsAdmin(): JSX.Element {
                     Assign and view permissions for {user?.name} for {selectedFundingStream?.name} funding
                     stream.
                   </div>
-                  {permissionsToShow.map((p, index) => (
-                    <UserPermissionDisplay
-                      key={index}
-                      permission={p}
-                      enabledPermissions={editedPermissions}
-                    />
+                  {Object.keys(PermissionsCategories).map((categoryName, idx) => (
+                    <div key={idx} className="govuk-form-group">
+                      <fieldset
+                        className="govuk-fieldset govuk-!-margin-bottom-6"
+                        aria-describedby="permissions-category-hint"
+                      >
+                        <legend
+                          id="permissions-category-hint"
+                          className="govuk-fieldset__legend govuk-fieldset__legend--m"
+                        >
+                          {categoryName}
+                        </legend>
+                        {PermissionsCategories[categoryName].map((p) => (
+                          <UserPermissionDisplay
+                            key={p.toString()}
+                            permission={p}
+                            enabledPermissions={editedPermissions}
+                          />
+                        ))}
+                      </fieldset>
+                    </div>
                   ))}
                 </fieldset>
               </div>

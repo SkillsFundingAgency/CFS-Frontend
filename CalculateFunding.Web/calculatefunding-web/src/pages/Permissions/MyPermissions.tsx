@@ -11,10 +11,10 @@ import { useErrors } from "../../hooks/useErrors";
 import { IStoreState } from "../../reducers/rootReducer";
 import { getAdminUsersForFundingStream } from "../../services/userService";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
-import { Permission } from "../../types/Permission";
+import { Permission, PermissionsCategories } from "../../types/Permission";
 import { Section } from "../../types/Sections";
 
-export function MyPermissions() {
+export function MyPermissions(): JSX.Element {
   const permissions: FundingStreamPermissions[] = useSelector(
     (state: IStoreState) => state.userState.fundingStreamPermissions
   );
@@ -22,7 +22,6 @@ export function MyPermissions() {
   const [currentFundingStream, setCurrentFundingStreamId] = useState<FundingStreamPermissions>();
   const [adminUsers, setAdminUsers] = useState<string[] | undefined>(undefined);
   const permitted: Permission[] = useFundingStreamPermissions(currentFundingStream);
-  const permissionsToShow: Permission[] = Object.values(Permission);
   const { errors, addError } = useErrors();
 
   function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -104,7 +103,7 @@ export function MyPermissions() {
                 aria-describedby="funding-stream-hint"
                 aria-label="select funding stream"
               >
-                <option> </option>
+                <option></option>
                 {permissions
                   .sort((a, b) =>
                     (a.fundingStreamName ? a.fundingStreamName : a.fundingStreamId).localeCompare(
@@ -129,45 +128,14 @@ export function MyPermissions() {
                 You have these permissions for the {currentFundingStream.fundingStreamName} funding stream in
                 the Calculate Funding Service
               </h2>
-              <table className="govuk-table govuk-!-margin-top-5">
-                <caption className="govuk-table__caption">
-                  <h1>Calculate Funding Service permissions</h1>
-                </caption>
-                <thead className="govuk-table__head">
-                  <tr className="govuk-table__row">
-                    <th scope="col" className="govuk-table__header ">
-                      Permission
-                    </th>
-                    <th scope="col" className="govuk-table__header">
-                      My permissions
-                    </th>
-                    <th scope="col" className="govuk-table__header govuk-!-width-one-half">
-                      Permission description
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="govuk-table__body">
-                  {permissionsToShow
-                    .sort((a, b) => a.localeCompare(b))
-                    .map((p, index) => (
-                      <tr key={index} className="govuk-table__row">
-                        <th scope="row" className="govuk-table__header">
-                          {p}
-                        </th>
-                        {permitted.includes(p) ? (
-                          <td className="govuk-table__cell center-align">
-                            <span className="govuk-visually-hidden">Yes</span>&#x2714;
-                          </td>
-                        ) : (
-                          <td className="govuk-table__cell permissionsIcon">
-                            <span className="govuk-visually-hidden">No</span>
-                          </td>
-                        )}
-                        <td className="govuk-table__cell">{getPermissionDescription(p)}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+              {Object.keys(PermissionsCategories).map((cat, idx) => (
+                <PermissionCategoryContainer
+                  key={idx}
+                  categoryName={cat}
+                  categoryPermissions={PermissionsCategories[cat]}
+                  enabledPermissions={permitted}
+                />
+              ))}
             </div>
           </div>
         </section>
@@ -177,3 +145,53 @@ export function MyPermissions() {
     </Main>
   );
 }
+
+const PermissionCategoryContainer = ({
+  categoryName,
+  categoryPermissions,
+  enabledPermissions,
+}: {
+  categoryName: string;
+  categoryPermissions: Permission[];
+  enabledPermissions: Permission[];
+}) => {
+  return (
+    <table className="govuk-table govuk-!-margin-top-5">
+      <caption className="govuk-table__caption">
+        <h2>{categoryName}</h2>
+      </caption>
+      <thead className="govuk-table__head">
+        <tr className="govuk-table__row">
+          <th scope="col" className="govuk-table__header ">
+            Permission
+          </th>
+          <th scope="col" className="govuk-table__header">
+            My permissions
+          </th>
+          <th scope="col" className="govuk-table__header govuk-!-width-one-half">
+            Permission description
+          </th>
+        </tr>
+      </thead>
+      <tbody className="govuk-table__body">
+        {categoryPermissions.map((p, index) => (
+          <tr key={index} className="govuk-table__row">
+            <th scope="row" className="govuk-table__header">
+              {p}
+            </th>
+            {enabledPermissions.includes(p) ? (
+              <td className="govuk-table__cell">
+                <span className="govuk-visually-hidden">Yes</span>&#x2714;
+              </td>
+            ) : (
+              <td className="govuk-table__cell permissionsIcon">
+                <span className="govuk-visually-hidden">No</span>
+              </td>
+            )}
+            <td className="govuk-table__cell">{getPermissionDescription(p)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};

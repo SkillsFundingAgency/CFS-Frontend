@@ -68,7 +68,7 @@
   },
   "scripts": {
     "start": "set HTTPS=true&&react-app-rewired start",
-    "start:test": "set HTTPS=false react-app-rewired start",
+    "start:test": "set HTTPS=false&&react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "cross-env DEBUG_PRINT_LIMIT=30000 react-app-rewired test --testResultsProcessor ./node_modules/jest-junit-reporter",
     "eject": "react-scripts eject",

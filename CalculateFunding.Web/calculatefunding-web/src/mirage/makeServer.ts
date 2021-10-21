@@ -5,9 +5,7 @@ import { ApprovalMode } from "../types/ApprovalMode";
 import { ProviderSource } from "../types/CoreProviderSummary";
 import { DatasetMetadata, DatasetTemplateMetadata } from "../types/Datasets/DatasetMetadata";
 import { ReferencedSpecificationRelationshipMetadata } from "../types/Datasets/ReferencedSpecificationRelationshipMetadata";
-import { EffectiveSpecificationPermission } from "../types/EffectiveSpecificationPermission";
 import { FundingConfiguration } from "../types/FundingConfiguration";
-import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
 import { UpdateCoreProviderVersion } from "../types/Provider/UpdateCoreProviderVersion";
 import { PublishedProviderSearchFacet } from "../types/publishedProviderSearchRequest";
 import { ProviderDataTrackingMode } from "../types/Specifications/ProviderDataTrackingMode";
@@ -103,36 +101,48 @@ export const makeServer = ({ environment = "test" }) => {
       this.post("/users/*", () => {
         return {};
       });
-      this.get(
-        "/users/*",
-        (schema, request): FundingStreamPermissions[] | EffectiveSpecificationPermission => {
-          if (request.url.includes("effectivepermissions")) {
-            return buildEffectiveSpecificationPermission({
-              specificationId: request.url.includes(spec1.id)
-                ? spec1.id
-                : request.url.includes(spec2.id)
-                ? spec2.id
-                : "?",
+      this.get("/users/*", (schema, request) => {
+        if (request.url.includes("effectivepermissions")) {
+          return buildEffectiveSpecificationPermission({
+            specificationId: request.url.includes(spec1.id)
+              ? spec1.id
+              : request.url.includes(spec2.id)
+              ? spec2.id
+              : "?",
+            setAllPermsEnabled: true,
+          });
+        } else if (request.url.includes("admin")) {
+          return [
+            {
+              username: "Admin User",
+              hasConfirmedSkills: false,
+            },
+          ];
+        } else if (request.url.includes("search")) {
+          return [
+            {
+              id: "user-id-111",
+              name: "user 111",
+              username: "Lulu Farquar",
+            },
+          ];
+        } else if (request.url.includes("fundingstreams")) {
+          return [
+            buildPermissions({
+              fundingStreamId: "DSG",
+              fundingStreamName: "Dedicated Schools Grant",
               setAllPermsEnabled: true,
-            });
-          } else if (request.url.includes("fundingstreams")) {
-            return [
-              buildPermissions({
-                fundingStreamId: "DSG",
-                fundingStreamName: "Dedicated Schools Grant",
-                setAllPermsEnabled: true,
-              }),
-              buildPermissions({
-                fundingStreamId: "PSG",
-                fundingStreamName: "PE and Sport Premium Grant",
-                setAllPermsEnabled: true,
-              }),
-            ];
-          } else {
-            return [];
-          }
+            }),
+            buildPermissions({
+              fundingStreamId: "PSG",
+              fundingStreamName: "PE and Sport Premium Grant",
+              setAllPermsEnabled: true,
+            }),
+          ];
+        } else {
+          return [];
         }
-      );
+      });
     },
   });
 };

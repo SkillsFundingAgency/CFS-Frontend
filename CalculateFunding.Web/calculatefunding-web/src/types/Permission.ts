@@ -22,3 +22,40 @@
   CanRefreshPublishedQa = "Can push CFS data into SQL for QA",
   CanUploadDataSourceFiles = "Can upload data source files",
 }
+
+export const PermissionsCategories: { [key: string]: Permission[] } = {
+  "Administration permissions": [Permission.CanAdministerFundingStream],
+  "Calculation permissions": [
+    Permission.CanApproveAllCalculations,
+    Permission.CanApproveAnyCalculations,
+    Permission.CanApproveCalculations,
+    Permission.CanEditCalculations,
+  ],
+  "Data permissions": [
+    Permission.CanMapDatasets,
+    Permission.CanRefreshPublishedQa,
+    Permission.CanUploadDataSourceFiles,
+  ],
+  "Funding permissions": [
+    Permission.CanApproveFunding,
+    Permission.CanChooseFunding,
+    Permission.CanRefreshFunding,
+    Permission.CanReleaseFunding,
+  ],
+  "Profile permissions": [
+    Permission.CanApplyCustomProfilePattern,
+    Permission.CanAssignProfilePattern,
+    Permission.CanCreateProfilePattern,
+    Permission.CanEditProfilePattern,
+  ],
+  "Specification permissions": [
+    Permission.CanApproveSpecification,
+    Permission.CanCreateSpecification,
+    Permission.CanEditSpecification,
+  ],
+  "Template permissions": [
+    Permission.CanApproveTemplates,
+    Permission.CanCreateTemplates,
+    Permission.CanEditTemplates,
+  ],
+};
