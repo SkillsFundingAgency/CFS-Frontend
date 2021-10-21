@@ -619,7 +619,7 @@ export function UpdateDataSourceFile({
                   Description
                 </label>
                 <span className="govuk-hint"></span>
-                <textarea
+                <textarea id="more-detail"
                   className="govuk-textarea"
                   rows={5}
                   aria-describedby="more-detail-hint"
@@ -634,7 +634,7 @@ export function UpdateDataSourceFile({
                   "govuk-form-group" + (!validation.changeNoteValid ? " govuk-form-group--error" : "")
                 }
               >
-                <label className="govuk-label" htmlFor="more-detail">
+                <label className="govuk-label" htmlFor="update-datasource-changenote">
                   Change note
                 </label>
                 <span className="govuk-hint"></span>
@@ -647,6 +647,7 @@ export function UpdateDataSourceFile({
                   ""
                 )}
                 <textarea
+                    id="update-datasource-changenote"
                   className={"govuk-textarea" + (!validation.changeNoteValid ? " govuk-textarea--error" : "")}
                   rows={5}
                   aria-describedby="more-detail-hint"
