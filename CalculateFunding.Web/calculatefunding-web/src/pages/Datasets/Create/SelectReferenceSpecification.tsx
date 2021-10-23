@@ -171,8 +171,8 @@ export function SelectReferenceSpecification({
           onChange={onFundingStreamSelection}
         >
           <option></option>
-          {fundingStreams.map((stream) => (
-            <option key={`funding-stream-${stream.id}`} value={stream.id}>
+          {fundingStreams.map((stream, idx) => (
+            <option key={`funding-stream-${stream.id}-${idx}`} value={stream.id}>
               {stream.name}
             </option>
           ))}
@@ -224,8 +224,8 @@ export function SelectReferenceSpecification({
           onChange={onFundingPeriodSelection}
         >
           <option></option>
-          {fundingPeriods.map((p) => (
-            <option key={`funding-period-${p.id}`} value={p.id}>
+          {fundingPeriods.map((p, idx) => (
+            <option key={`funding-period-${p.id}-${idx}`} value={p.id}>
               {p.name}
             </option>
           ))}

@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import { AxiosError } from "axios";
+import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
@@ -10,6 +11,7 @@ import { useAppContext } from "../../../context/useAppContext";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../../hooks/useErrors";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
+import * as datasetApi from "../../../services/datasetService";
 import { ErrorMessage } from "../../../types/ErrorMessage";
 import { Permission } from "../../../types/Permission";
 import { Section } from "../../../types/Sections";
@@ -17,7 +19,7 @@ import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 
 export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatasetRouteProps>): JSX.Element {
   const forSpecId: string = match.params.forSpecId;
-  const { errors, addError, clearErrorMessages } = useErrors();
+  const { errors, addError, addValidationErrorsAsIndividualErrors, clearErrorMessages } = useErrors();
   const { state, dispatch } = useAppContext();
   const criteria = state.createDatasetWorkflowState;
   const [datasetName, setDatasetName] = useState<string | undefined>(criteria?.datasetName);
@@ -40,26 +42,67 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
     }
   }, [state, forSpecId]);
 
+  const validateName = async (name: string | undefined) => {
+    clearErrorMessages(["Name"]);
+
+    if (!name?.length) {
+      addError({ error: "Provide a data set name", fieldName: "Name" });
+      return false;
+    }
+
+    try {
+      await datasetApi.validateDefinitionForCreatingNewDataset({
+        name: name as string,
+        targetSpecificationId: criteria?.referencingSpec?.specificationId as string,
+        specificationId: criteria?.forSpecId as string,
+      });
+    } catch (error: any) {
+      const axiosError = error as AxiosError;
+      if (axiosError && axiosError.response && axiosError.response.status === 400) {
+        addValidationErrorsAsIndividualErrors({
+          validationErrors: axiosError.response.data,
+        });
+      } else {
+        addError({ error: error, description: "Unexpected error while validating data set name" });
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const validateDescription = (description: string | undefined) => {
+    clearErrorMessages(["dataset-description"]);
+
+    if (description?.length) {
+      return true;
+    }
+
+    addError({ error: "Provide a data set description", fieldName: "dataset-description" });
+    return false;
+  };
+
   const onDatasetNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    clearErrorMessages(["dataset-name"]);
+    if (errors.some((e) => e.fieldName === "Name")) {
+      clearErrorMessages(["Name"]);
+    }
     setDatasetName(e.target.value);
   };
 
   const onDatasetDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    clearErrorMessages(["dataset-description"]);
+    if (errors.some((e) => e.fieldName === "dataset-description")) {
+      clearErrorMessages(["dataset-description"]);
+    }
     setDatasetDescription(e.target.value);
   };
 
-  const onSubmit = (e: React.MouseEvent) => {
+  const onSubmit = async (e: React.MouseEvent) => {
     e.preventDefault();
     clearErrorMessages();
-    if (!datasetName?.length) {
-      addError({ error: "Provide a data set name", fieldName: "dataset-name" });
-    }
-    if (!datasetDescription?.length) {
-      addError({ error: "Provide a data set description", fieldName: "dataset-description" });
-    }
-    if (datasetName?.length && datasetDescription?.length) {
+
+    const isDatasetNameValid = await validateName(datasetName);
+    const isDatasetDescriptionValid = validateDescription(datasetDescription);
+
+    if (isDatasetNameValid && isDatasetDescriptionValid) {
       dispatch({
         type: "setCreateDatasetWorkflowState",
         payload: { ...criteria, datasetName: datasetName, datasetDescription: datasetDescription },
@@ -95,12 +138,12 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
           <DatasetName
             datasetName={datasetName || ""}
             onDatasetNameChange={onDatasetNameChange}
-            error={errors.find((e) => e.fieldName === "dataset-name")}
+            error={errors.find((e) => e.fieldName === "Name")}
           />
           <DatasetDescription
             datasetDescription={datasetDescription || ""}
             onDatasetDescriptionChange={onDatasetDescriptionChange}
-            error={errors.find((e) => e.fieldName === "dataset-name")}
+            error={errors.find((e) => e.fieldName === "dataset-description")}
           />
           <Actions onContinue={onSubmit} onCancel={onCancel} />
         </Form>

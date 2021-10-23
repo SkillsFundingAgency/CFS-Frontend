@@ -19,10 +19,7 @@ import { TextField } from "../../../components/TextField";
 import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
-import {
-  assignDatasetSchemaService,
-  getDatasetsForFundingStreamService,
-} from "../../../services/datasetService";
+import * as datasetApi from "../../../services/datasetService";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { AssignDatasetSchemaRequest } from "../../../types/Datasets/AssignDatasetSchemaRequest";
 import { DataschemaDetailsViewModel } from "../../../types/Datasets/DataschemaDetailsViewModel";
@@ -32,7 +29,9 @@ export interface CreateDatasetFromUploadRouteProps {
   specificationId: string;
 }
 
-export function CreateDatasetFromUpload({ match }: RouteComponentProps<CreateDatasetFromUploadRouteProps>) {
+export function CreateDatasetFromUpload({
+  match,
+}: RouteComponentProps<CreateDatasetFromUploadRouteProps>): JSX.Element {
   const specificationId = match.params.specificationId;
   const history = useHistory();
   const { errors, addError, addValidationErrorsAsIndividualErrors, clearErrorMessages } = useErrors();
@@ -55,7 +54,8 @@ export function CreateDatasetFromUpload({ match }: RouteComponentProps<CreateDat
     AxiosError
   >(
     `data-schemas-for-stream-${fundingStreamId}`,
-    async () => (await getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")).data,
+    async () =>
+      (await datasetApi.getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")).data,
     {
       enabled: fundingStreamId !== undefined,
       onError: (err) =>
@@ -70,7 +70,7 @@ export function CreateDatasetFromUpload({ match }: RouteComponentProps<CreateDat
     isLoading: isUpdating,
     isSuccess,
   } = useMutation<boolean, AxiosError, AssignDatasetSchemaRequest>(
-    async (request) => (await assignDatasetSchemaService(request)).data,
+    async (request) => (await datasetApi.assignDatasetSchemaService(request)).data,
     {
       onError: (err) => {
         if (err?.response?.status === 400) {
@@ -79,7 +79,7 @@ export function CreateDatasetFromUpload({ match }: RouteComponentProps<CreateDat
           addError({ error: err, description: "Error while trying to assign dataset schema" });
         }
       },
-      onSuccess: (data) => {
+      onSuccess: () => {
         if (andAnother) {
           clearFormData();
         } else {
@@ -210,11 +210,9 @@ export function CreateDatasetFromUpload({ match }: RouteComponentProps<CreateDat
           <Breadcrumb name={"Create dataset"} />
         </Breadcrumbs>
 
-        <ConfirmationPanel
-          title={"Dataset created"}
-          children={`Dataset ${selectedDatasetName} has been created.`}
-          hidden={!isSuccess}
-        />
+        <ConfirmationPanel title={"Dataset created"} hidden={!isSuccess}>
+          Dataset {selectedDatasetName} has been created.
+        </ConfirmationPanel>
 
         <MultipleErrorSummary errors={errors} />
 

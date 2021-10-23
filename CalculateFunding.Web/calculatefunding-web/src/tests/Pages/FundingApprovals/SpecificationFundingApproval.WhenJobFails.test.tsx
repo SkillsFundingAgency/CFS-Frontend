@@ -1,7 +1,6 @@
 ﻿import { screen } from "@testing-library/react";
 import * as redux from "react-redux";
 
-import { showDebugMain } from "../../reactTestingLibraryHelpers";
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
 
 const useSelectorSpy = jest.spyOn(redux, "useSelector");
@@ -37,7 +36,6 @@ describe("<SpecificationFundingApproval />", () => {
 
     it("renders job error", async () => {
       expect(await screen.findByTestId("job-notification-banner")).toBeInTheDocument();
-      showDebugMain();
       expect(screen.getByText(/Job Refreshing funding: Something went wrong/)).toBeInTheDocument();
     });
 

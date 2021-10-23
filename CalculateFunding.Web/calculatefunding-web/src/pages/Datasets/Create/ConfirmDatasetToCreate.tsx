@@ -27,9 +27,9 @@ import { Permission } from "../../../types/Permission";
 import { Section } from "../../../types/Sections";
 import { CreateDatasetRouteProps } from "./SelectDatasetTypeToCreate";
 
-export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateDatasetRouteProps>) {
+export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateDatasetRouteProps>): JSX.Element {
   const forSpecId: string = match.params.forSpecId;
-  const { errors, addError, addValidationErrors, clearErrorMessages } = useErrors();
+  const { errors, addError, addValidationErrorsAsIndividualErrors, clearErrorMessages } = useErrors();
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const { state } = useAppContext();
   const { isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions } =
@@ -80,9 +80,8 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
     } catch (error: any) {
       const axiosError = error as AxiosError;
       if (axiosError && axiosError.response && axiosError.response.status === 400) {
-        addValidationErrors({
+        addValidationErrorsAsIndividualErrors({
           validationErrors: axiosError.response.data,
-          message: "Validation failure occurred during update",
         });
       } else {
         addError({ error: error, description: "Unexpected error while creating data set" });
