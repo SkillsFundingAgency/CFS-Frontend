@@ -80,11 +80,13 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
           jobDescription: getJobProgressMessage(x.jobType),
         };
       });
-    const hasValidationError = result.failures.some((e) => e.type === JobOutcomeType.ValidationError);
-    result.outcome =
-      result.failures.length === 1 ? "One of the job steps failed" : "Some of the job steps failed";
-    if (hasValidationError) {
-      result.outcome += " due to validation";
+    if (result.failures?.length) {
+      const hasValidationError = result.failures.some((e) => e.type === JobOutcomeType.ValidationError);
+      result.outcome =
+        result.failures.length === 1 ? "One of the job steps failed" : "Some of the job steps failed";
+      if (hasValidationError) {
+        result.outcome += " due to validation";
+      }
     }
   }
 
