@@ -70,10 +70,10 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                             <tr className="govuk-table__row">
                                 <th scope="row" className="govuk-table__header">
                                     {batchSize === 0 ? <div className="govuk-form-group--error">Providers selected<span
-                                        className={"govuk-error-message"}>No eligible providers to be
-                                        {props.routingParams.mode === FundingActionType.Release ?
+                                        className={"govuk-error-message"}>
+                                        {`No eligible providers to be ${props.routingParams.mode === FundingActionType.Release ?
                                             "released" :
-                                            "approved"}</span>
+                                            "approved"}`}</span>
                                     </div> : "Providers selected"}
 
                                 </th>
