@@ -25,7 +25,7 @@ export default function FundingManagement() {
                             <div className="govuk-grid-row">
                                 <div className="govuk-grid-column-one-third">
                                     <div className="govuk-heading-m">
-                                        <Link to={"/"}>Funding approvals</Link>
+                                        <Link to={"/FundingManagementApprovalSelection"}>Funding approvals</Link>
                                     </div>
                                     <p className="govuk-body">
                                         Approve allocations for funding.

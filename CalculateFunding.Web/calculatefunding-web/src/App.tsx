@@ -50,6 +50,7 @@ import { SpecificationFundingApproval } from "./pages/FundingApprovals/Specifica
 import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
 import { ViewEditFundingLineProfile } from "./pages/FundingApprovals/ViewEditFundingLineProfile";
 import FundingManagement from "./pages/FundingManagement/FundingManagement";
+import { FundingManagementApprovalSelection } from "./pages/FundingManagement/FundingManagementApprovalSelection";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
 import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
@@ -168,6 +169,8 @@ const App: React.FunctionComponent = () => {
                 component={ViewProviderResults}
               />
               <Route path="/FundingManagement" component={FundingManagement} />
+              <Route path="/FundingManagementApprovalSelection" component={FundingManagementApprovalSelection} />
+
               <Route path="/SelectSpecification" component={SelectSpecification} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
               <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />

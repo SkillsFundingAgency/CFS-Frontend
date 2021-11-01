@@ -1,7 +1,17 @@
+import { Server } from "miragejs";
+
+import { makeServer } from "../../../src/mirage";
+
 context("Funding management landing page", () => {
-    before(() => {
+    let server: Server;
+
+    before(() => setup());
+
+    function setup(){
+        server?.shutdown();
+        server = makeServer({ environment: "test" });
         cy.visit("/FundingManagement");
-    });
+    }
 
     describe("when page has loaded", () => {
         it("has correct title", () => {
