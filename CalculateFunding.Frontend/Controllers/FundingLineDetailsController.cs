@@ -17,6 +17,7 @@ using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.ViewModels.Profiles;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
+using CalculateFunding.Common.ApiClient.Policies.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -59,7 +60,13 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(fundingLineCode, nameof(fundingLineCode));
             Guard.IsNullOrWhiteSpace(fundingPeriodId, nameof(fundingPeriodId));
 
-            ApiResponse<FundingConfiguration> fundingConfig = await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
+            ApiResponse<FundingConfiguration> fundingConfigResponse = await _policiesApiClient.GetFundingConfiguration(fundingStreamId, fundingPeriodId);
+            IActionResult fundingConfigErrorResponse =
+                fundingConfigResponse.IsSuccessOrReturnFailureResult(nameof(FundingConfiguration));
+            if (fundingConfigErrorResponse != null)
+            {
+                return fundingConfigErrorResponse;
+            }
 
             ApiResponse<FundingLineProfile> fundingLineApiResponse = await _publishingApiClient
                 .GetFundingLinePublishedProviderDetails(
@@ -68,22 +75,53 @@ namespace CalculateFunding.Frontend.Controllers
                     fundingStreamId,
                     fundingLineCode);
 
-            IActionResult errorResult =
-                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(PublishedProviderVersion));
-            if (errorResult != null)
+            IActionResult fundingLineApiErrorResponse =
+                fundingLineApiResponse.IsSuccessOrReturnFailureResult(nameof(FundingLineProfile));
+            if (fundingLineApiErrorResponse != null)
             {
-                return errorResult;
+                return fundingLineApiErrorResponse;
             }
+
+            ApiResponse<SpecificationSummary> specificationResponse = await _specificationsApiClient.GetSpecificationSummaryById(specificationId);
+            IActionResult specificationErrorResult =
+                specificationResponse.IsSuccessOrReturnFailureResult(nameof(SpecificationSummary));
+            if (specificationErrorResult != null)
+            {
+                return specificationErrorResult;
+            }
+
+            ApiResponse<ProviderVersionSearchResult> providerResponse =
+                await _providersApiClient.GetProviderByIdFromProviderVersion(specificationResponse.Content.ProviderVersionId, providerId);
+            IActionResult providerErrorResult =
+                providerResponse.IsSuccessOrReturnFailureResult(nameof(ProviderVersionSearchResult));
+            if (providerErrorResult != null)
+            {
+                return providerErrorResult;
+            }
+
+            FundingConfiguration fundingConfiguration = fundingConfigResponse.Content;
 
             FundingLineProfileViewModel fundingLineProfileViewModel = new FundingLineProfileViewModel()
             {
                 FundingLineProfile = fundingLineApiResponse.Content,
-                EnableUserEditableCustomProfiles = fundingConfig.Content.EnableUserEditableCustomProfiles,
-                EnableUserEditableRuleBasedProfiles = fundingConfig.Content.EnableUserEditableRuleBasedProfiles
+                EnableUserEditableCustomProfiles = fundingConfiguration.EnableUserEditableCustomProfiles,
+                EnableUserEditableRuleBasedProfiles = fundingConfiguration.EnableUserEditableRuleBasedProfiles,
+                ContractedProvider = IsContractedProvider(fundingConfiguration, providerResponse.Content)
             };
 
             return Ok(fundingLineProfileViewModel);
         }
+
+        private bool IsContractedProvider(FundingConfiguration fundingConfiguration, ProviderVersionSearchResult providerVersionSearchResult)
+        {
+            IEnumerable<string> contractedTypes = fundingConfiguration.OrganisationGroupings
+                .Where(_ => _.GroupingReason == GroupingReason.Contracting)
+                .SelectMany(s => s.ProviderTypeMatch)
+                .Select(s => s.ProviderType);
+
+            return contractedTypes.Contains(providerVersionSearchResult.ProviderType);
+        }
+
 
         [HttpGet]
         [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}/{fundingLineCode}/change-exists")]

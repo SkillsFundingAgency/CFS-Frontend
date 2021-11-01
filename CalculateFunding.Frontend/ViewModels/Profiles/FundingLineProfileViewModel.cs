@@ -13,5 +13,8 @@ namespace CalculateFunding.Frontend.ViewModels.Profiles
 
         [JsonProperty("enableUserEditableRuleBasedProfiles")]
         public bool EnableUserEditableRuleBasedProfiles { get; set; }
+
+        [JsonProperty("contractedProvider")]
+        public bool ContractedProvider { get; set; }
     }
 }

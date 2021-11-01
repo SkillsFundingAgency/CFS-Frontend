@@ -38,6 +38,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private string _fundingStreamId;
         private string _fundingLineCode;
         private string _fundingPeriodId;
+        private string _providerVersionId;
 
 
         [TestInitialize]
@@ -63,9 +64,11 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         {
             GivenGetFundingLinePublishedProviderDetailsForFundingLine(
                 HttpStatusCode.InternalServerError);
-            GivenFundingConfiguration(HttpStatusCode.OK);
+            GivenFundingConfiguration(HttpStatusCode.OK, new FundingConfiguration());
+            GivenProviderVersionExists();
+            GivenSpecificationExists();
 
-                        IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
+            IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
 
             actualResult.Should().BeOfType<InternalServerErrorResult>();
         }
@@ -73,10 +76,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public async Task ReturnsPublishedProviderDetailsWhenPreviousProfileExists()
         {
-            GivenGetFundingLinePublishedProviderDetailsForFundingLine(
-                HttpStatusCode.OK, new FundingLineProfile());
-            GivenFundingConfiguration(
-                HttpStatusCode.OK, new FundingConfiguration());
+            GivenGetFundingLinePublishedProviderDetailsForFundingLine(HttpStatusCode.OK, new FundingLineProfile());
+            GivenFundingConfiguration(HttpStatusCode.OK, new FundingConfiguration());
+            GivenProviderVersionExists();
+            GivenSpecificationExists();
 
             IActionResult actualResult = await WhenGetFundingLinePublishedProviderDetails();
 
@@ -254,7 +257,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     FundingPeriod = new FundingPeriod
                     {
                         Name = "Funding period name"
-                    }
+                    },
+                    ProviderVersionId = _providerVersionId
                 }));
         }
 
@@ -267,6 +271,19 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 {
                     Id = _providerId,
                     Name = "Provider name"
+                }));
+        }
+
+        private void GivenProviderVersionExists()
+        {
+            _providersApiClient
+                .Setup(_ => _.GetProviderByIdFromProviderVersion(
+                    _providerVersionId, _providerId))
+                .ReturnsAsync(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, new ProviderVersionSearchResult
+                {
+                    Id = _providerId,
+                    Name = "Provider name",
+                    ProviderType = "Schoo"
                 }));
         }
 

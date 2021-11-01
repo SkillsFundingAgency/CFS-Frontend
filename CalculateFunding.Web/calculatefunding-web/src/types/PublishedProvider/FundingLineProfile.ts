@@ -1,5 +1,3 @@
-import { ProfileError } from "../FundingLineProfile";
-
 export interface FundingLineProfile {
   fundingLineCode: string;
   fundingLineName: string;
@@ -24,6 +22,7 @@ export interface FundingLineProfileViewModel {
   fundingLineProfile: FundingLineProfile;
   enableUserEditableCustomProfiles: boolean;
   enableUserEditableRuleBasedProfiles: boolean;
+  contractedProvider: boolean;
 }
 
 export interface ProfileTotal {
