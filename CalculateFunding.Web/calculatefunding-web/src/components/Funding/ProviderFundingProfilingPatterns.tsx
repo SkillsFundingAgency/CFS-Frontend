@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import { Link } from "react-router-dom";
 
+import { isNumber } from "../../helpers/numberHelper";
 import { ProviderFundingOverviewRoute } from "../../pages/FundingApprovals/ProviderFundingOverview";
 import { FundingLineProfile } from "../../types/FundingLineProfile";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
@@ -11,7 +12,7 @@ export interface ProviderFundingProfilingProps {
   profilingPatterns: FundingLineProfile[];
 }
 
-export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfilingProps) => {
+export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfilingProps): JSX.Element => {
   const params = props.routeParams;
   return (
     <section className="govuk-tabs__panel" id="profiling">
@@ -59,10 +60,10 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                             )}
                           </th>
                           <td className="govuk-table__cell">
-                            {profile.fundingLineAmount !== undefined ? profile.profilePatternName : ""}
+                            {isNumber(profile.fundingLineAmount) ? profile.profilePatternName : ""}
                           </td>
                           <td className="govuk-table__cell">
-                            {profile.fundingLineAmount !== undefined ? (
+                            {isNumber(profile.fundingLineAmount) ? (
                               <FormattedNumber
                                 value={profile.fundingLineAmount}
                                 type={NumberType.FormattedMoney}
@@ -72,7 +73,7 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                             )}
                           </td>
                           <td className="govuk-table__cell">
-                            {profile.fundingLineAmount !== undefined && (
+                            {isNumber(profile.fundingLineAmount) && (
                               <>
                                 <Link
                                   className="govuk-link right-align"

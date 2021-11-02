@@ -1,13 +1,8 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-
-import { render, screen, within } from "@testing-library/react";
+﻿import { render, screen, within } from "@testing-library/react";
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
 
-import {
-  ProviderFundingProfilingPatterns,
-  ProviderFundingProfilingProps,
-} from "../../../components/Funding/ProviderFundingProfilingPatterns";
+import { ProviderFundingProfilingProps } from "../../../components/Funding/ProviderFundingProfilingPatterns";
 import { FundingApprovalTestData } from "../../Pages/FundingApprovals/FundingApprovalTestData";
 
 const renderComponent = (inputs: ProviderFundingProfilingProps) => {
@@ -27,8 +22,6 @@ const renderComponent = (inputs: ProviderFundingProfilingProps) => {
 const test = FundingApprovalTestData();
 
 describe("<ProviderFundingProfilingPatterns/> tests", () => {
-  beforeAll(() => {});
-
   describe("with full profiling data", () => {
     const props: ProviderFundingProfilingProps = {
       routeParams: {
@@ -40,6 +33,7 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
       },
       profilingPatterns: [test.fundingLineProfile1],
     };
+
     beforeEach(() => {
       renderComponent(props);
     });
