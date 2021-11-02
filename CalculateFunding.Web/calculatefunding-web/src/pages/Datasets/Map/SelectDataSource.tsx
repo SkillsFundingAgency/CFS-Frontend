@@ -95,11 +95,13 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
         version:
           preSelected.versions.length === 1 ? preSelected.versions[0].version : preSelected.selectedVersion,
       });
-      setOriginalSelection({
-        dataset: preSelected,
-        version:
-          preSelected.versions.length === 1 ? preSelected.versions[0].version : preSelected.selectedVersion,
-      });
+
+      if (preSelected.selectedVersion) {
+        setOriginalSelection({
+          dataset: preSelected,
+          version: preSelected.selectedVersion,
+        });
+      }
     }
 
     if (!relationshipData.datasets.length) {
