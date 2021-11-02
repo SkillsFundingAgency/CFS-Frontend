@@ -1,4 +1,7 @@
-﻿.hidden {
+@import "./govuk-frontend/govuk/helpers/colour";
+@import "./govuk-frontend/govuk/base";
+
+.hidden {
   display: none;
 }
 
@@ -12,12 +15,12 @@
 
 .hiddenCheckboxes:hover {
   background: #f8f8f8;
-  outline: 3px solid #ffbf47;
+  outline: 3px solid govuk-colour("yellow");
 }
 
 .hiddenCheckboxes:focus {
   background: #f8f8f8;
-  outline: 3px solid #ffbf47;
+  outline: 3px solid govuk-colour("yellow");
 }
 
 .checkboxExpand {
@@ -25,9 +28,6 @@
 }
 
 .checkboxExpanded {
-  -ms-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
 }
 
@@ -35,18 +35,23 @@
   text-align: left;
   border: none;
   box-shadow: none;
+  background-color: govuk-shade(govuk-colour("light-grey", $legacy: "grey-3"), 10);
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 0;
+  cursor: pointer;
 }
 
 .filterbyHeading:hover {
-  background-color: #dbdad9;
+  background-color: govuk-shade(govuk-colour("light-grey", $legacy: "grey-3"), 5);
   text-align: left;
-  border-color: #fd0;
+  border-color: govuk-colour("yellow");
 }
 
 .filterbyHeading:active {
-  background-color: #dbdad9;
+  background-color: govuk-colour("mid-grey", $legacy: "grey-4");
   text-align: left;
-  border-color: #fd0;
+  border-color: govuk-colour("yellow");
 }
 
 dd {
@@ -60,13 +65,14 @@ dd {
 }
 
 .filterLabel {
-  font-size: 16px;
-  color: grey;
+  @include govuk-font($size: 16, $line-height: 2.4rem);
+
+  color: govuk-colour("dark-grey");
   margin-top: 10px;
 }
 
 .filterSearchInput {
-  border-color: grey;
+  border-color: govuk-colour("mid-grey", $legacy: "grey-4");
 }
 
 div.filter-content {
@@ -74,19 +80,7 @@ div.filter-content {
 }
 
 .filterbyContainer {
-  border: solid 1px lightgrey;
-}
-
-.filterbyHeading {
-  background-color: lightgrey;
-  width: 100%;
-  padding: 6px;
-  margin-bottom: 0px;
-  cursor: pointer;
-
-  h4 {
-    margin-bottom: 0px;
-  }
+  border: solid 1px govuk-shade(govuk-colour("light-grey", $legacy: "grey-3"), 10);
 }
 
 .filterbyCheckbox {
@@ -99,104 +93,8 @@ div.filter-content {
   padding-left: 20px;
 }
 
-.hidden {
-  display: none;
-}
-
-.hiddenCheckboxes {
-  cursor: pointer;
-}
-
-.hiddenCheckboxes:hover {
-  background: #f8f8f8;
-  outline: 3px solid #ffbf47;
-}
-
-.hiddenCheckboxes:focus {
-  background: #f8f8f8;
-  outline: 3px solid #ffbf47;
-}
-
-.checkboxExpand {
-  margin-top: 10px;
-}
-
-.checkboxExpanded {
-  -ms-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-  transform: rotate(180deg);
-}
-
-.filterbyHeading {
-  text-align: left;
-  border: none;
-  box-shadow: none;
-}
-
-.filterbyHeading:hover {
-  background-color: #dbdad9;
-  text-align: left;
-  border-color: #fd0;
-}
-
-.filterbyHeading:active {
-  background-color: #dbdad9;
-  text-align: left;
-  border-color: #fd0;
-}
-
-dd {
-  margin-inline-start: 10px;
-}
-
-.hidden {
-  display: none;
-}
-
-.hiddenCheckboxes {
-  cursor: pointer;
-}
-
-.hiddenCheckboxes:hover {
-  background: #f8f8f8;
-  outline: 3px solid #ffbf47;
-}
-
-.hiddenCheckboxes:focus {
-  background: #f8f8f8;
-  outline: 3px solid #ffbf47;
-}
-
-.checkboxExpand {
-  margin-top: 10px;
-}
-
-.checkboxExpanded {
-  -ms-transform: rotate(180deg);
-  -moz-transform: rotate(180deg);
-  -webkit-transform: rotate(180deg);
-  transform: rotate(180deg);
-}
-
-.filterbyHeading {
-  text-align: left;
-  border: none;
-  box-shadow: none;
-}
-
-.filterbyHeading:hover {
-  background-color: #dbdad9;
-  text-align: left;
-  border-color: #fd0;
-}
-
-.filterbyHeading:active {
-  background-color: #dbdad9;
-  text-align: left;
-  border-color: #fd0;
-}
-
-dd {
-  margin-inline-start: 10px;
+.position-sticky {
+  position: sticky;
+  top: 1rem;
+  z-index: 1020;
 }

@@ -245,10 +245,10 @@ const SearchBox = (props: { onSearchTextChange: (text: string) => void }) => {
     <div className="govuk-form-group filterbyContainer">
       <fieldset className="govuk-fieldset">
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0"> Search</h4>
+          <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Search</h4>
         </legend>
         <div className="govuk-form-group filterSearch">
-          <label className="govuk-label filterLabel" htmlFor="filter-by-type">
+          <label className="filterLabel" htmlFor="filter-by-type">
             Search added funding lines or calculations
           </label>
           <input
@@ -269,7 +269,7 @@ const FilterSelection = (props: { isChecked: boolean; onToggleHideUnselected: ()
   <div className="govuk-form-group filterbyContainer">
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
-        <h4 className="govuk-heading-s govuk-!-margin-bottom-0"> Filter selection</h4>
+        <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Filter selection</h4>
       </legend>
       <div className="govuk-checkboxes govuk-checkboxes--small govuk-!-padding-2">
         <div className="govuk-checkboxes__item">

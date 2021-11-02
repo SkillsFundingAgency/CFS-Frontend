@@ -30,14 +30,14 @@ import { Section } from "../../../types/Sections";
 
 export function EditDatasetReferencingReleased({
   match,
-}: RouteComponentProps<{ relationshipId: string; specificationId: string }>) {
+}: RouteComponentProps<{ relationshipId: string; specificationId: string }>): JSX.Element {
   const relationshipId: string = match.params.relationshipId;
   const updatingSpecId: string = match.params.specificationId;
   const { errors, addError, clearErrorMessages } = useErrors();
   const { dispatch } = useAppContext();
   const [selectedItems, setSelectedItems] = useState<DatasetTemplateMetadataWithType[]>([]);
   const [isDirty, setIsDirty] = useState<boolean>(false);
-  const [hideUnselected, setHideUnselected] = useState<boolean>(false);
+  const [hideUnselected, setHideUnselected] = useState<boolean>(true);
   const [searchText, setSearchText] = useState<string | undefined>(undefined);
   const [relationshipDescription, setRelationshipDescription] = useState<string | undefined>();
   const { data: relationshipMetadata, isLoading: isLoadingRelationshipMetadata } = useQuery<
@@ -322,10 +322,10 @@ const SearchBox = React.memo((props: { onSearchTextChange: (text: string) => voi
     <div className="govuk-form-group filterbyContainer">
       <fieldset className="govuk-fieldset">
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0"> Search</h4>
+          <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Search</h4>
         </legend>
         <div className="govuk-form-group filterSearch">
-          <label className="govuk-label filterLabel" htmlFor="filter-by-type">
+          <label className="filterLabel" htmlFor="filter-by-type">
             Search added funding lines or calculations
           </label>
           <input
@@ -346,7 +346,7 @@ const FilterSelection = React.memo((props: { isChecked: boolean; onToggleHideUns
   <div className="govuk-form-group filterbyContainer">
     <fieldset className="govuk-fieldset">
       <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
-        <h4 className="govuk-heading-s govuk-!-margin-bottom-0"> Filter selection</h4>
+        <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Filter selection</h4>
       </legend>
       <div className="govuk-checkboxes govuk-checkboxes--small govuk-!-padding-2">
         <div className="govuk-checkboxes__item">
