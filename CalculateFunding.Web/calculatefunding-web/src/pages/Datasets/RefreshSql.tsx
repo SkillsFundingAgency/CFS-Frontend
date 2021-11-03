@@ -481,7 +481,7 @@ export function RefreshSql() {
             </div>
             {!isErrorCheckingForOptions && (
               <div className="govuk-form-group">
-                <label className="govuk-label" htmlFor="sort">
+                <label className="govuk-label" htmlFor="funding-streams">
                   Funding stream
                 </label>
                 {!isLoadingOptions && fundingStreams && fundingStreams.length > 0 ? (
@@ -506,7 +506,7 @@ export function RefreshSql() {
             )}
             {!isLoadingOptions && selectedFundingStream && (
               <div className="govuk-form-group">
-                <label className="govuk-label" htmlFor="sort">
+                <label className="govuk-label" htmlFor="funding-periods">
                   Funding period
                 </label>
                 <select
