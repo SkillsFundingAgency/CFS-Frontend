@@ -1,6 +1,5 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
@@ -16,8 +15,8 @@ describe("<ViewSpecification /> ", () => {
       testData.mockDatasetBySpecificationIdService();
       testData.mockCalculationWithDraftCalculationsService();
       testData.mockPublishService();
-      testData.hasNoLatestJob();
       testData.haveNoJobNotification();
+      testData.setupJobSubscriptionSpy();
 
       await testData.renderViewApprovedSpecificationPage();
     });

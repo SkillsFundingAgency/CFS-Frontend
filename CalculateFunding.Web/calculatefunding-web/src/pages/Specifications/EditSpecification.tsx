@@ -10,10 +10,10 @@ import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
-import { LoadingStatus } from "../../components/LoadingStatus";
+import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
-import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
@@ -24,6 +24,7 @@ import * as providerVersionService from "../../services/providerVersionService";
 import * as specificationService from "../../services/specificationService";
 import { CoreProviderSummary, ProviderSnapshot, ProviderSource } from "../../types/CoreProviderSummary";
 import { JobMonitoringFilter } from "../../types/Jobs/JobMonitoringFilter";
+import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { UpdateCoreProviderVersion } from "../../types/Provider/UpdateCoreProviderVersion";
@@ -41,7 +42,7 @@ interface NameValuePair {
   value: string;
 }
 
-export function EditSpecification({ match }: RouteComponentProps<EditSpecificationRouteProps>) {
+export function EditSpecification({ match }: RouteComponentProps<EditSpecificationRouteProps>): JSX.Element {
   const specificationId = match.params.specificationId;
 
   const [selectedName, setSelectedName] = useState<string>("");
@@ -78,17 +79,14 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
   const providerSource = fundingConfiguration?.providerSource;
   const [coreProviderData, setCoreProviderData] = useState<NameValuePair[]>([]);
 
-  const { hasJob, latestJob } = useLatestSpecificationJobWithMonitoring(
-    specificationId,
-    [
-      JobType.RefreshFundingJob,
-      JobType.ApproveAllProviderFundingJob,
-      JobType.ApproveBatchProviderFundingJob,
-      JobType.PublishAllProviderFundingJob,
-      JobType.PublishBatchProviderFundingJob,
-    ],
-    (err) => addError({ error: err, description: "Error while checking for specification jobs" })
-  );
+  const {
+    addSub,
+    removeAllSubs,
+    results: jobNotifications,
+  } = useJobSubscription({
+    onError: (err) =>
+      addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
 
   const { data: coreProviders, isLoading: isLoadingCoreProviders } = useQuery<
     CoreProviderSummary[],
@@ -99,8 +97,6 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
       (await providerVersionService.getCoreProvidersByFundingStream(fundingStreamId as string)).data,
     {
       enabled: providerSource === ProviderSource.CFS,
-      retry: false,
-      refetchOnWindowFocus: false,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -119,8 +115,6 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
     async () => (await providerService.getProviderSnapshotsByFundingStream(fundingStreamId as string)).data,
     {
       enabled: providerSource === ProviderSource.FDZ,
-      retry: false,
-      refetchOnWindowFocus: false,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -128,7 +122,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
           description: "Could not find a provider data source",
           fieldName: "selectCoreProvider",
         }),
-      onSuccess: (results) => {
+      onSuccess: () => {
         clearErrorMessages(["selectCoreProvider"]);
       },
     }
@@ -151,8 +145,6 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
       enabled:
         (fundingStreamId && fundingStreamId.length > 0 && fundingPeriodId && fundingPeriodId.length > 0) ===
         true,
-      retry: false,
-      refetchOnWindowFocus: false,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -160,7 +152,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
           description: "Could not find any published funding templates",
           fieldName: "selectTemplateVersion",
         }),
-      onSuccess: (results) => {
+      onSuccess: () => {
         clearErrorMessages(["selectTemplateVersion"]);
       },
     }
@@ -381,6 +373,29 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
     }
   }, [providerSource, coreProviders, providerSnapshots]);
 
+  useEffect(() => {
+    // monitor background jobs
+    console.log("setting up background job monitoring", specificationId);
+    addSub({
+      filterBy: {
+        specificationId: specificationId,
+        jobTypes: [
+          JobType.RefreshFundingJob,
+          JobType.ApproveAllProviderFundingJob,
+          JobType.ApproveBatchProviderFundingJob,
+          JobType.PublishAllProviderFundingJob,
+          JobType.PublishBatchProviderFundingJob,
+        ],
+      },
+      monitorMode: MonitorMode.SignalR,
+      monitorFallback: MonitorFallback.Polling,
+      onError: (err) => addError({ error: err, description: "Error while checking for specification jobs" }),
+    });
+    return () => removeAllSubs();
+  }, []);
+
+  const blockingActiveJob = jobNotifications?.find((n) => !!n.latestJob?.isActive)?.latestJob;
+
   const isLoading: boolean =
     isLoadingPublishedFundingTemplates ||
     isLoadingFundingConfiguration ||
@@ -405,32 +420,47 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
 
           <MultipleErrorSummary errors={errors} />
 
-          {(isLoading || isUpdating || (hasJob && !latestJob?.isComplete)) && (
-            <LoadingStatus
-              title={
-                isUpdating
-                  ? "Updating Specification"
-                  : `Loading ${
-                      hasJob && !latestJob?.isComplete
-                        ? "specification jobs"
-                        : isLoadingSpecification
-                        ? "specification"
-                        : isLoadingFundingConfiguration
-                        ? "funding configuration"
-                        : isLoadingPublishedFundingTemplates
-                        ? "templates"
-                        : isLoadingProviderSnapshots
-                        ? "provider snapshots"
-                        : isLoadingCoreProviders
-                        ? "core providers"
-                        : ""
-                    }`
-              }
-              subTitle="Please wait"
-              description={isUpdating ? "This can take a few minutes" : ""}
-            />
-          )}
-          {!isLoading && !isUpdating && (!hasJob || latestJob?.isComplete) && (
+          <LoadingStatusNotifier
+            notifications={[
+              {
+                isActive: !!blockingActiveJob,
+                title: "Specification is being updated in the background",
+                subTitle: `Job running: ${blockingActiveJob?.jobDescription}`,
+                description: "Please wait until the background job has finished",
+              },
+              {
+                isActive: isUpdating,
+                title: "Updating Specification",
+                subTitle: "Waiting for job to run",
+              },
+              {
+                isActive: isLoadingSpecification,
+                title: "Loading specification",
+              },
+              {
+                isActive: isLoadingFundingConfiguration,
+                title: "Loading funding configuration",
+              },
+              {
+                isActive: isLoadingPublishedFundingTemplates,
+                title: "Loading templates",
+              },
+              {
+                isActive: isLoadingProviderSnapshots,
+                title: "Loading provider snapshots",
+              },
+              {
+                isActive: isLoadingCoreProviders,
+                title: "Loading core providers",
+              },
+              {
+                isActive: !isPermissionsFetched,
+                title: "Loading permissions",
+              },
+            ]}
+          />
+
+          {!isLoading && !isUpdating && !blockingActiveJob && (
             <fieldset
               className="govuk-fieldset"
               id="update-specification-fieldset"

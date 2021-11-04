@@ -1,8 +1,5 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
@@ -23,7 +20,7 @@ describe("<CreateSpecification />", () => {
       test.mockSpecificationService();
       test.mockProviderService();
       test.mockProviderVersionService();
-      test.haveNoJobRunning();
+      test.haveNoJobNotification();
 
       await test.renderCreateSpecificationPage();
     });

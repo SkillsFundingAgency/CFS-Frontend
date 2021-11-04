@@ -10,7 +10,6 @@ import { createStore, Store } from "redux";
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
 import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
-import * as latestJobHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
@@ -281,58 +280,47 @@ export function ViewSpecificationTestData() {
     return notificationCallback;
   };
 
-  const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
-  jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
-    if (onNewNotification && !hasNotificationCallback) {
-      notificationCallback = onNewNotification;
-      hasNotificationCallback = true;
-    }
-    return {
-      addSub: (request: AddJobSubscription) => {
-        const sub: JobSubscription = {
-          filterBy: {
-            jobId: request?.filterBy.jobId,
-            specificationId: request?.filterBy.specificationId,
-            jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
-          },
-          isEnabled: true,
-          id: "sertdhw4e5t",
-          onError: () => request.onError,
-          startDate: DateTime.now(),
-        };
-        subscription = sub;
-        return Promise.resolve(sub);
-      },
-      replaceSubs: () => {
-        const sub: JobSubscription = {
-          filterBy: {},
-          id: "sertdhw4e5t",
-          onError: () => null,
-          isEnabled: true,
-          startDate: DateTime.now(),
-        };
-        subscription = sub;
-        return [sub];
-      },
-      removeSub: () => null,
-      removeAllSubs: () => null,
-      subs: [],
-      results: notification ? [notification] : [],
-    };
-  });
-
-  const jobMonitorSpy = jest.spyOn(latestJobHook, "useLatestSpecificationJobWithMonitoring");
-  const hasNoLatestJob = () => {
-    jobMonitorSpy.mockImplementation(() => {
+  const setupJobSubscriptionSpy = () => {
+    const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
+    jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
+      if (onNewNotification && !hasNotificationCallback) {
+        notificationCallback = onNewNotification;
+        hasNotificationCallback = true;
+      }
       return {
-        hasJob: false,
-        isCheckingForJob: false,
-        latestJob: undefined,
-        isFetched: true,
-        isFetching: false,
-        isMonitoring: true,
+        addSub: (request: AddJobSubscription) => {
+          const sub: JobSubscription = {
+            filterBy: {
+              jobId: request?.filterBy.jobId,
+              specificationId: request?.filterBy.specificationId,
+              jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
+            },
+            isEnabled: true,
+            id: "sertdhw4e5t",
+            onError: () => request.onError,
+            startDate: DateTime.now(),
+          };
+          subscription = sub;
+          return Promise.resolve(sub);
+        },
+        replaceSubs: () => {
+          const sub: JobSubscription = {
+            filterBy: {},
+            id: "sertdhw4e5t",
+            onError: () => null,
+            isEnabled: true,
+            startDate: DateTime.now(),
+          };
+          subscription = sub;
+          return [sub];
+        },
+        removeSub: () => null,
+        removeAllSubs: () => null,
+        subs: [],
+        results: notification ? [notification] : [],
       };
     });
+    return { jobSubscriptionSpy, notificationCallback };
   };
 
   function mockSpecificationPermissions(
@@ -612,7 +600,7 @@ export function ViewSpecificationTestData() {
     haveReportJobCompleteNotification,
     haveNoJobNotification,
     hasNoCalcErrors,
-    hasNoLatestJob,
+    setupJobSubscriptionSpy,
     fundingConfigurationSpy,
     mockSpecificationPermissions,
     renderViewSpecificationPage,

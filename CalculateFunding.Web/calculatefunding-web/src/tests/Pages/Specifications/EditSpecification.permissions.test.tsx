@@ -1,4 +1,4 @@
-﻿import { screen, waitFor, within } from "@testing-library/react";
+﻿import { screen, within } from "@testing-library/react";
 
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
@@ -16,7 +16,7 @@ describe("<EditSpecification /> ", () => {
         test.mockProviderService();
         test.mockProviderVersionService();
         test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-        test.haveNoJobRunning();
+        test.haveNoJobNotification();
 
         await test.renderEditSpecificationPage(test.specificationCfs.id);
       });

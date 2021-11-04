@@ -7,13 +7,12 @@ import { Link } from "react-router-dom";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
-import { SpinnerDisplaySetting } from "../../components/Jobs/JobLoadingSpinner";
-import { JobNotificationBanner } from "../../components/Jobs/JobNotificationBanner";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
+import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { milliseconds } from "../../helpers/TimeInMs";
-import { useJobMonitor } from "../../hooks/Jobs/useJobMonitor";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { usePermittedFundingStreams } from "../../hooks/Permissions/usePermittedFundingStreams";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
@@ -23,6 +22,7 @@ import * as providerService from "../../services/providerService";
 import * as providerVersionService from "../../services/providerVersionService";
 import * as specificationService from "../../services/specificationService";
 import { CoreProviderSummary, ProviderSnapshot, ProviderSource } from "../../types/CoreProviderSummary";
+import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { Permission } from "../../types/Permission";
 import { UpdateCoreProviderVersion } from "../../types/Provider/UpdateCoreProviderVersion";
 import { Section } from "../../types/Sections";
@@ -32,7 +32,7 @@ import { PublishedFundingTemplate } from "../../types/TemplateBuilderDefinitions
 import { UserPermission } from "../../types/UserPermission";
 import { FundingPeriod } from "../../types/viewFundingTypes";
 
-export function CreateSpecification() {
+export function CreateSpecification(): JSX.Element {
   const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(true);
   const [selectedName, setSelectedName] = useState<string>("");
   const [selectedFundingStreamId, setSelectedFundingStreamId] = useState<string | undefined>();
@@ -92,7 +92,6 @@ export function CreateSpecification() {
           selectedFundingStreamId.length > 0 &&
           selectedFundingPeriodId &&
           selectedFundingPeriodId.length > 0) === true,
-      retry: false,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -168,7 +167,7 @@ export function CreateSpecification() {
     }
   );
   const [isSaving, setIsSaving] = useState(false);
-  const [newSpecificationId, setNewSpecificationId] = useState<string>("");
+  const [newSpecificationId, setNewSpecificationId] = useState<string>();
   const history = useHistory();
   const { errors, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const errorSuggestion = (
@@ -180,20 +179,21 @@ export function CreateSpecification() {
     </p>
   );
 
-  const { newJob } = useJobMonitor({
-    filterBy: { specificationId: newSpecificationId },
-    isEnabled: isSaving && newSpecificationId.length > 0,
+  const { addSub, results: jobNotifications } = useJobSubscription({
     onError: (err) =>
       addError({ error: err, description: "An error occurred while creating this specification" }),
   });
 
   useEffect(() => {
-    if (!newJob) return;
-
-    if (newJob.isSuccessful) {
+    if (
+      newSpecificationId?.length &&
+      jobNotifications?.some(
+        (n) => n.latestJob?.specificationId === newSpecificationId && n.latestJob.isSuccessful
+      )
+    ) {
       history.push(`/ViewSpecification/${newSpecificationId}`);
     }
-  }, [newJob]);
+  }, [newSpecificationId, jobNotifications]);
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     const specificationName = e.target.value;
@@ -337,7 +337,20 @@ export function CreateSpecification() {
         const createSpecificationResult = await specificationService.createSpecificationService(
           createSpecificationViewModel
         );
-        setNewSpecificationId(createSpecificationResult.data.id);
+
+        const newSpecId = createSpecificationResult.data.id;
+        setNewSpecificationId(newSpecId);
+
+        await addSub({
+          filterBy: { specificationId: newSpecId, jobTypes: [] },
+          monitorMode: MonitorMode.SignalR,
+          monitorFallback: MonitorFallback.Polling,
+          onError: (err) =>
+            addError({
+              error: err,
+              description: "An error occurred while monitoring the job for creating the specification",
+            }),
+        });
       } catch (error: any) {
         setIsSaving(false);
         if (error.response && error.response.data["Name"]) {
@@ -357,6 +370,8 @@ export function CreateSpecification() {
     }
   }
 
+  const activeJob = jobNotifications.find((n) => n.latestJob?.isActive)?.latestJob;
+
   return (
     <div>
       <Header location={Section.Specifications} />
@@ -374,14 +389,17 @@ export function CreateSpecification() {
 
           <MultipleErrorSummary errors={errors} />
 
-          <JobNotificationBanner
-            job={newJob}
-            isCheckingForJob={isSaving && newJob === undefined}
-            spinner={{
-              display: SpinnerDisplaySetting.ShowPageSpinner,
-              loadingText: "Creating Specification",
-              loadingDescription: "This can take a few minutes",
-            }}
+          <LoadingStatusNotifier
+            notifications={[
+              {
+                isActive: isSaving,
+                title: "Creating Specification",
+                subTitle: activeJob
+                  ? `Job ${activeJob.statusDescription}: ${activeJob.jobDescription}`
+                  : "Waiting for update...",
+                description: "This can take a few minutes",
+              },
+            ]}
           />
 
           <fieldset hidden={isSaving} className="govuk-fieldset" id="create-specification-fieldset">

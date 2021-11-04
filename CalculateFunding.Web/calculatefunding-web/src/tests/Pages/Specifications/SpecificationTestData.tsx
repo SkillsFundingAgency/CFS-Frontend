@@ -1,14 +1,13 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { render, screen, waitFor } from "@testing-library/react";
+import { DateTime } from "luxon";
 import React from "react";
 import { Provider } from "react-redux";
 import * as redux from "react-redux";
 import { MemoryRouter, Route, Switch } from "react-router";
 import { createStore, Store } from "redux";
 
-import * as monitorHook from "../../../hooks/Jobs/useJobMonitor";
-import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as useSpecificationPermissionsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
@@ -16,8 +15,8 @@ import { ApprovalMode } from "../../../types/ApprovalMode";
 import { CompletionStatus } from "../../../types/CompletionStatus";
 import { CoreProviderSummary, ProviderSnapshot, ProviderSource } from "../../../types/CoreProviderSummary";
 import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
-import { JobDetails } from "../../../types/jobDetails";
 import { JobMonitoringFilter } from "../../../types/Jobs/JobMonitoringFilter";
+import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
@@ -97,66 +96,6 @@ export function SpecificationTestData() {
     });
     return component;
   };
-
-  const jobMonitorResult: JobDetails = {
-    failures: [],
-    isComplete: false,
-    isFailed: false,
-    jobDescription: "Creating Specification",
-    jobId: "5re34ygw534e",
-    statusDescription: "Complete",
-    completionStatus: CompletionStatus.Succeeded,
-    outcome: "",
-    isSuccessful: true,
-    isActive: false,
-    runningStatus: RunningStatus.Completing,
-  };
-
-  const mockJobMonitorHookWithSuccessfulJob = () =>
-    jest
-      .spyOn(monitorHook, "useJobMonitor")
-      .mockImplementation(() => ({ newJob: jobMonitorResult, isMonitoring: true }));
-
-  const mockJobMonitorHookWithNoJob = () =>
-    jest
-      .spyOn(monitorHook, "useJobMonitor")
-      .mockImplementation(() => ({ newJob: undefined, isMonitoring: false }));
-
-  const mockLatestSpecJobMonitorHookWithNoJob = () =>
-    jest
-      .spyOn(useLatestSpecificationJobWithMonitoringHook, "useLatestSpecificationJobWithMonitoring")
-      .mockImplementation(() => ({
-        hasJob: false,
-        latestJob: undefined,
-        isMonitoring: false,
-        isFetching: true,
-        isFetched: true,
-        isCheckingForJob: true,
-      }));
-
-  const mockLatestSpecJobMonitorHookWithARunningJob = () =>
-    jest
-      .spyOn(useLatestSpecificationJobWithMonitoringHook, "useLatestSpecificationJobWithMonitoring")
-      .mockImplementation(() => ({
-        hasJob: true,
-        latestJob: {
-          jobId: "aValidJobId",
-          statusDescription: "",
-          jobDescription: "",
-          runningStatus: RunningStatus.InProgress,
-          failures: [],
-          isSuccessful: false,
-          isFailed: false,
-          isActive: false,
-          isComplete: false,
-          completionStatus: CompletionStatus.Succeeded,
-          outcome: "ValidationFailed",
-        },
-        isMonitoring: false,
-        isFetching: true,
-        isFetched: true,
-        isCheckingForJob: true,
-      }));
 
   const mockFundingStream: FundingStream = {
     id: "stream-547",
@@ -406,10 +345,197 @@ export function SpecificationTestData() {
     });
   };
 
-  const withJobMonitoringState: JobMonitoringFilter = {
-    jobTypes: [JobType.RefreshFundingJob],
-    specificationId: "1234",
+  let notification: JobNotification | undefined;
+  let subscription: JobSubscription = {
+    filterBy: {
+      jobId: "jobId",
+      jobTypes: [],
+      specificationId: mockCfsSpec.id,
+    },
+    id: "sertdhw4e5t",
+    isEnabled: true,
+    onError: () => null,
+    startDate: DateTime.local(),
   };
+
+  const haveNoJobNotification = () => {
+    notification = undefined;
+  };
+
+  const haveRefreshFailedJobNotification = () => {
+    const job = {
+      jobId: "jobId-generatedByRefresh",
+      jobType: JobType.RefreshFundingJob,
+      statusDescription: "",
+      jobDescription: "",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Failed,
+      failures: [],
+      isSuccessful: false,
+      isFailed: true,
+      isActive: false,
+      isComplete: true,
+      outcome: "Refresh failed",
+    };
+    subscription.id = "refresh";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: mockCfsSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+
+  const haveEditSpecificationFailedJobNotification = () => {
+    const job = {
+      jobId: "jobId-EditSpecification",
+      jobType: JobType.EditSpecificationJob,
+      statusDescription: "Updating specification",
+      jobDescription: "",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Failed,
+      failures: [],
+      isSuccessful: false,
+      isFailed: true,
+      isActive: false,
+      isComplete: true,
+      outcome: "EditSpecification failed",
+    };
+    subscription.id = "EditSpecification-sub-id";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      specificationId: mockCfsSpec.id,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+
+    return notification;
+  };
+
+  const haveCreateSpecJobInProgressNotification = () => {
+    subscription.id = "new-spec-sub";
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: {
+        isComplete: false,
+        jobId: "new-spec-job",
+        jobType: JobType.CreateSpecificationJob,
+        statusDescription: "Create Specification job is in progress",
+        jobDescription: "Create Specification Job",
+        runningStatus: RunningStatus.InProgress,
+        failures: [],
+        isSuccessful: false,
+        isFailed: false,
+        isActive: true,
+        outcome: "",
+      },
+    };
+    return notification;
+  };
+
+  const haveDatasetMergeJobInProgressNotification = () => {
+    subscription.id = "DatasetMerge-sub";
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: {
+        isComplete: false,
+        jobId: "DatasetMerge-job",
+        jobType: JobType.RunConverterDatasetMergeJob,
+        statusDescription: "Dataset Merge job is in progress",
+        jobDescription: "Dataset Merge Job",
+        runningStatus: RunningStatus.InProgress,
+        failures: [],
+        isSuccessful: false,
+        isFailed: false,
+        isActive: true,
+        outcome: "",
+      },
+    };
+    return notification;
+  };
+
+  const haveCreateSpecJobCompleteNotification = () => {
+    const job = {
+      isComplete: true,
+      jobId: "new-spec-job",
+      jobType: JobType.CreateSpecificationJob,
+      statusDescription: "Create Specification job completed successfully",
+      jobDescription: "Create Specification Job",
+      runningStatus: RunningStatus.Completed,
+      completionStatus: CompletionStatus.Succeeded,
+      lastUpdate: new Date(),
+      failures: [],
+      isSuccessful: true,
+      isFailed: false,
+      isActive: false,
+      outcome: "",
+    };
+    subscription.id = "new-spec-sub";
+    subscription.filterBy = {
+      jobId: job.jobId,
+      jobTypes: [job.jobType],
+    };
+    notification = {
+      subscription: subscription as JobSubscription,
+      latestJob: job,
+    };
+    return notification;
+  };
+
+  let notificationCallback: (n: JobNotification) => void = () => null;
+  let hasNotificationCallback = false;
+
+  const getNotificationCallback = () => {
+    return notificationCallback;
+  };
+
+  const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
+  jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
+    if (onNewNotification && !hasNotificationCallback) {
+      notificationCallback = onNewNotification;
+      hasNotificationCallback = true;
+    }
+    return {
+      addSub: (request: AddJobSubscription) => {
+        const sub: JobSubscription = {
+          filterBy: {
+            jobId: request?.filterBy.jobId,
+            specificationId: request?.filterBy.specificationId,
+            jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
+          },
+          isEnabled: true,
+          id: "sertdhw4e5t",
+          onError: () => request.onError,
+          startDate: DateTime.now(),
+        };
+        subscription = sub;
+        return Promise.resolve(sub);
+      },
+      replaceSubs: () => {
+        const sub: JobSubscription = {
+          filterBy: {},
+          id: "sertdhw4e5t",
+          onError: () => null,
+          isEnabled: true,
+          startDate: DateTime.now(),
+        };
+        subscription = sub;
+        return [sub];
+      },
+      removeSub: () => null,
+      removeAllSubs: () => null,
+      subs: [],
+      results: notification ? [notification] : [],
+    };
+  });
 
   const withNoPermissions: FundingStreamPermissions[] = [
     buildPermissions({
@@ -506,10 +632,17 @@ export function SpecificationTestData() {
     mockSpecificationServiceWithDuplicateNameResponse,
     mockProviderVersionService,
     mockProviderService,
-    haveSuccessfulJobCompletion: mockJobMonitorHookWithSuccessfulJob,
-    haveSpecificationMonitorHookWithNoJob: mockLatestSpecJobMonitorHookWithNoJob,
-    haveRunningSpecificationMonitorJob: mockLatestSpecJobMonitorHookWithARunningJob,
-    haveNoJobRunning: mockJobMonitorHookWithNoJob,
+    haveNoJobNotification,
+    haveCreateSpecJobCompleteNotification,
+    haveCreateSpecJobInProgressNotification,
+    haveEditSpecificationFailedJobNotification,
+    haveRefreshFailedJobNotification,
+    haveDatasetMergeJobInProgressNotification,
+    // haveSuccessfulJobCompletion: mockJobMonitorHookWithSuccessfulJob,
+    // haveSpecificationMonitorHookWithNoJob: mockLatestSpecJobMonitorHookWithNoJob,
+    // haveRunningSpecificationMonitorJob: mockLatestSpecJobMonitorHookWithARunningJob,
+    // haveNoJobRunning: mockJobMonitorHookWithNoJob,
+    getNotificationCallback,
     specificationCfs: mockCfsSpec,
     specificationFdzWithoutTracking: mockFdzSpecWithoutTracking,
     specificationFdzWithTrackingLatest: mockFdzSpecWithTrackingLatest,
@@ -529,7 +662,6 @@ export function SpecificationTestData() {
     mockGetFundingStreamsCall,
     mockGetPublishedTemplatesByStreamAndPeriodCall,
     waitForPageToLoad,
-    withJobMonitoringState,
     hasReduxState,
   };
 }

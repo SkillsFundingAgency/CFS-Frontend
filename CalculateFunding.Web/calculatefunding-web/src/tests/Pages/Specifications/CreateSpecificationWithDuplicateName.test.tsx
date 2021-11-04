@@ -1,8 +1,5 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import React from "react";
 
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
@@ -21,6 +18,7 @@ describe("<CreateSpecification /> with duplicated specification name", () => {
     test.mockSpecificationServiceWithDuplicateNameResponse();
     test.mockProviderService();
     test.mockProviderVersionService();
+    test.haveNoJobNotification();
 
     await test.renderCreateSpecificationPage();
   });

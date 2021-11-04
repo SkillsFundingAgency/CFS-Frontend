@@ -17,8 +17,8 @@ describe("<ViewSpecification /> ", () => {
       testData.mockPublishService();
       testData.fundingConfigurationSpy();
       testData.haveNoJobNotification();
-      testData.hasNoLatestJob();
       testData.hasNoCalcErrors();
+      testData.setupJobSubscriptionSpy();
       await testData.renderViewApprovedSpecificationPage();
     });
 

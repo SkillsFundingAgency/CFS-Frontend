@@ -19,7 +19,7 @@ describe("<CreateSpecification />", () => {
         test.mockSpecificationService();
         test.mockProviderService();
         test.mockProviderVersionService();
-        test.haveNoJobRunning();
+        test.haveNoJobNotification();
 
         await test.renderCreateSpecificationPage();
       });
@@ -46,7 +46,7 @@ describe("<CreateSpecification />", () => {
         test.mockSpecificationService();
         test.mockProviderService();
         test.mockProviderVersionService();
-        test.haveNoJobRunning();
+        test.haveNoJobNotification();
 
         await test.renderCreateSpecificationPage();
       });

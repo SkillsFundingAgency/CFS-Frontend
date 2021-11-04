@@ -1,7 +1,6 @@
-﻿import { act, screen, waitFor, within } from "@testing-library/react";
+﻿import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { getSpecificationSummaryService } from "../../../services/specificationService";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
@@ -17,7 +16,7 @@ describe("<EditSpecification />", () => {
       test.mockProviderService();
       test.mockProviderVersionService();
       test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-      test.haveSpecificationMonitorHookWithNoJob();
+      test.haveNoJobNotification();
 
       await test.renderEditSpecificationPage(test.specificationCfs.id);
     });

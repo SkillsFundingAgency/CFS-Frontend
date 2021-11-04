@@ -1,4 +1,4 @@
-﻿import { act, screen, waitFor } from "@testing-library/react";
+﻿import { screen } from "@testing-library/react";
 
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
@@ -15,15 +15,15 @@ describe("<EditSpecification /> ", () => {
       test.mockProviderService();
       test.mockProviderVersionService();
       test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-      test.haveRunningSpecificationMonitorJob();
+      test.haveDatasetMergeJobInProgressNotification();
 
       await test.renderEditSpecificationPageWithJobRunning(test.specificationCfs.id);
     });
 
     afterEach(() => jest.clearAllMocks());
 
-    it("displays loading specification job", async () => {
-      expect(screen.getByText("Loading specification jobs")).toBeInTheDocument();
+    it("displays specification job running", async () => {
+      expect(screen.getByText(/Specification is being updated in the background/)).toBeInTheDocument();
     });
 
     it("does not display form", async () => {
