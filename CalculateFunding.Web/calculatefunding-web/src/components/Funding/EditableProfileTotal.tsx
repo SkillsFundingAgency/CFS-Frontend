@@ -8,9 +8,15 @@ import { ErrorMessage } from "../../types/ErrorMessage";
 import { ProfileTotal } from "../../types/PublishedProvider/FundingLineProfile";
 import { formatNumber, FormattedNumber, NumberType, toDecimal } from "../FormattedNumber";
 
+export enum ProfileEditMode {
+  View = "View",
+  EditUnpaid = "EditUnpaid",
+  EditAll = "EditAll",
+}
+
 interface EditableProfileTotalProps {
   index: number;
-  isEditMode: boolean;
+  mode: ProfileEditMode;
   remainingAmount: number;
   profileTotal: ProfileTotal;
   setProfileTotal: (instalmentNumber: number, profileTotal: ProfileTotal) => void;
@@ -22,7 +28,7 @@ interface EditableProfileTotalProps {
 
 export function EditableProfileTotal({
   index,
-  isEditMode,
+  mode,
   remainingAmount,
   profileTotal,
   setProfileTotal,
@@ -30,7 +36,7 @@ export function EditableProfileTotal({
   errors,
   addError,
   clearErrorMessages,
-}: EditableProfileTotalProps) {
+}: EditableProfileTotalProps): JSX.Element {
   const [value, setValue] = useState<string>("");
   const [percent, setPercent] = useState<string>("");
 
@@ -122,7 +128,7 @@ export function EditableProfileTotal({
   return (
     <>
       <td className="govuk-table__cell" data-testid={`remaining-percentage-${index}`}>
-        {!isEditMode || isPaid ? (
+        {mode === ProfileEditMode.View || (mode === ProfileEditMode.EditUnpaid && isPaid) ? (
           <FormattedNumber
             value={profileTotal.profileRemainingPercentage}
             type={NumberType.FormattedPercentage}
@@ -167,7 +173,7 @@ export function EditableProfileTotal({
         )}
       </td>
       <td className="govuk-table__cell" data-testid={`remaining-value-${index}`}>
-        {!isEditMode || isPaid ? (
+        {mode === ProfileEditMode.View || (mode === ProfileEditMode.EditUnpaid && isPaid) ? (
           <FormattedNumber value={profileTotal.value} type={NumberType.FormattedMoney} />
         ) : (
           <div

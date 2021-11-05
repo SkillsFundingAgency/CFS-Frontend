@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
 import "@testing-library/jest-dom";
 
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -54,7 +53,7 @@ describe("<ViewEditFundingLineProfile in VIEW mode />", () => {
 
     it("fields are all in read only view", async () => {
       await waitFor(() => {
-        expect(screen.queryAllByRole("input")).toHaveLength(0);
+        expect(screen.queryAllByRole("textbox")).toHaveLength(0);
       });
     });
 
@@ -150,7 +149,7 @@ describe("<ViewEditFundingLineProfile in VIEW mode />", () => {
 
     it("fields initially load in read (not edit) view", async () => {
       await waitFor(() => {
-        expect(screen.queryAllByRole("input")).toHaveLength(0);
+        expect(screen.queryAllByRole("textbox")).toHaveLength(0);
       });
     });
   });

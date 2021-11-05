@@ -1,5 +1,4 @@
-﻿import "@testing-library/jest-dom/extend-expect";
-import "@testing-library/jest-dom";
+﻿import "@testing-library/jest-dom";
 
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -39,6 +38,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
           fundingLineProfile: testFundingLineProfile,
           enableUserEditableCustomProfiles: true,
           enableUserEditableRuleBasedProfiles: true,
+          contractedProvider: true,
         },
       });
       hasSpecPermissions(withPermissions);
@@ -50,13 +50,22 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
       expect(screen.queryByTestId("permission-alert-message")).not.toBeInTheDocument();
     });
 
+    it("edit historical payments link is rendered", async () => {
+      expect(await screen.findByRole("button", { name: /Edit historic instalments/ })).toBeInTheDocument();
+    });
+
     it("edit profile button is not rendered", async () => {
       expect(await screen.queryByRole("button", { name: /Edit profile/ })).not.toBeInTheDocument();
     });
 
-    it("fields are all in read only view", async () => {
+    it("paid records are in readonly view", async () => {
+      expect(screen.queryByTestId("value-1")).not.toBeInTheDocument();
+    });
+
+    it("unpaid records are in edit view", async () => {
       await waitFor(() => {
-        expect(screen.queryAllByRole("input")).toHaveLength(0);
+        expect(screen.getByTestId("value-2")).toBeInTheDocument();
+        expect(screen.getAllByRole("textbox")).toHaveLength(2);
       });
     });
 
@@ -117,6 +126,23 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
       userEvent.click(cancelButton);
 
       expect(mockHistoryBlock).toBeCalled();
+    });
+
+    describe("when user clicks on edit historic payments", () => {
+      it("allows editing of paid profile totals ", async () => {
+        const button = await screen.findByRole("button", { name: /Edit historic instalments/ });
+        expect(button).toBeInTheDocument();
+
+        userEvent.click(button);
+
+        await waitFor(() => {
+          expect(screen.queryByRole("button", { name: /Edit historic instalments/ })).not.toBeInTheDocument();
+          expect(screen.getByTestId("value-1")).toBeInTheDocument();
+          expect(screen.getByTestId("value-2")).toBeInTheDocument();
+          expect(screen.getAllByRole("textbox")).toHaveLength(4);
+          expect(screen.getByText(/You are editing historic instalments/)).toBeInTheDocument();
+        });
+      });
     });
 
     it("posts custom profile to api when apply profile button clicked", async () => {
@@ -231,7 +257,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
 
     it("fields initially load in read (not edit) view", async () => {
       await waitFor(() => {
-        expect(screen.queryAllByRole("input")).toHaveLength(0);
+        expect(screen.queryAllByRole("textbox")).toHaveLength(0);
       });
     });
   });
