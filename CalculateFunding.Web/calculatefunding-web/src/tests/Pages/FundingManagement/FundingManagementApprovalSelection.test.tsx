@@ -9,7 +9,9 @@ import * as hook from "../../../hooks/FundingApproval/useOptionsForSpecification
 import { FundingManagementTestSetup } from "./FundingManagementTestSetup";
 
 const renderPage = () => {
-  const { FundingManagementApprovalSelection } = require("../../../pages/FundingManagement/FundingManagementApprovalSelection");
+  const {
+    FundingManagementApprovalSelection,
+  } = require("../../../pages/FundingManagement/FundingManagementApprovalSelection");
   return render(
     <MemoryRouter>
       <FundingManagementApprovalSelection />
@@ -36,7 +38,7 @@ describe("Renders <FundingManagementApprovalSelection /> correctly when selectin
   });
 
   it("renders Funding approvals label", async () => {
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Funding approvals");
+    expect(screen.getByRole("heading", { level: 1, name: /Funding approvals/ })).toBeInTheDocument();
   });
 
   it("renders Funding streams", async () => {
@@ -91,6 +93,15 @@ describe("Renders <FundingManagementApprovalSelection /> correctly when selectin
 
   it("renders Funding approvals heading", async () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Funding approvals");
+  });
+
+  it("should have the correct subtitle", () => {
+    expect(
+      screen.getByRole("heading", {
+        level: 3,
+        name: /Select a funding stream and funding period./,
+      })
+    ).toBeInTheDocument();
   });
 
   it("renders Funding streams", async () => {
