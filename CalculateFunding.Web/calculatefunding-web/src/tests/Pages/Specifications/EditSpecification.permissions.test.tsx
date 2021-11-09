@@ -3,22 +3,33 @@
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { SpecificationTestData } from "./SpecificationTestData";
 
-const test = SpecificationTestData();
+const {
+  specificationCfs,
+  hasMissingPermissionToEdit,
+  mockSpecificationService,
+  mockProviderService,
+  mockProviderVersionService,
+  mockPolicyService,
+  renderEditSpecificationPage,
+} = SpecificationTestData();
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({});
 
 describe("<EditSpecification /> ", () => {
   describe("<EditSpecification /> permissions tests", () => {
     describe("when user doesn't have edit spec permissions", () => {
       beforeEach(async () => {
-        test.hasMissingPermissionToEdit();
-        test.mockSpecificationService(test.specificationCfs);
-        test.mockProviderService();
-        test.mockProviderVersionService();
-        test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-        test.haveNoJobNotification();
+        haveNoJobNotification();
+        setupJobSpy();
+        hasMissingPermissionToEdit();
+        mockSpecificationService(specificationCfs);
+        mockProviderService();
+        mockProviderVersionService();
+        mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
 
-        await test.renderEditSpecificationPage(test.specificationCfs.id);
+        await renderEditSpecificationPage(specificationCfs.id);
       });
 
       afterEach(() => jest.clearAllMocks());

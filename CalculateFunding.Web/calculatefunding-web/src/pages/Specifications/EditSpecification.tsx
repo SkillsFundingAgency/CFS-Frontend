@@ -375,7 +375,6 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
 
   useEffect(() => {
     // monitor background jobs
-    console.log("setting up background job monitoring", specificationId);
     addSub({
       filterBy: {
         specificationId: specificationId,

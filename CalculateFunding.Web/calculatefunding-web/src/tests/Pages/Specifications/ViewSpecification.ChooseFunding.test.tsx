@@ -2,24 +2,44 @@ import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { JobNotification } from "../../../types/Jobs/JobSubscriptionModels";
+import { JobType } from "../../../types/jobType";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
 describe("<ViewSpecification /> ", () => {
-  const testData = ViewSpecificationTestData();
+  const {
+    hasNoJobObserverState,
+    mockSpecificationPermissions,
+    mockApprovedSpecificationService,
+    mockFundingLineStructureService,
+    mockDatasetBySpecificationIdService,
+    mockCalculationService,
+    mockPublishService,
+    fundingConfigurationSpy,
+    hasNoCalcErrors,
+    renderViewApprovedSpecificationPage,
+  } = ViewSpecificationTestData();
+  const { haveFailedJobNotification, haveNoJobNotification, setupJobSpy, getNotificationCallback } =
+    jobSubscriptionTestHelper({});
+
   describe("choosing approved specification for funding ", () => {
+    let notification: JobNotification;
+
     beforeEach(async () => {
-      testData.hasNoJobObserverState();
-      testData.mockSpecificationPermissions();
-      testData.mockApprovedSpecificationService();
-      testData.mockFundingLineStructureService();
-      testData.mockDatasetBySpecificationIdService();
-      testData.mockCalculationService();
-      testData.mockPublishService();
-      testData.fundingConfigurationSpy();
-      testData.haveNoJobNotification();
-      testData.hasNoCalcErrors();
-      testData.setupJobSubscriptionSpy();
-      await testData.renderViewApprovedSpecificationPage();
+      haveNoJobNotification();
+      hasNoJobObserverState();
+      setupJobSpy();
+
+      mockSpecificationPermissions();
+      mockApprovedSpecificationService();
+      mockFundingLineStructureService();
+      mockDatasetBySpecificationIdService();
+      mockCalculationService();
+      mockPublishService();
+      fundingConfigurationSpy();
+      hasNoCalcErrors();
+
+      await renderViewApprovedSpecificationPage();
     });
 
     afterEach(() => {
@@ -38,9 +58,10 @@ describe("<ViewSpecification /> ", () => {
 
       await waitFor(() => expect(refreshSpecificationFundingService).toBeCalledTimes(1));
 
+      notification = haveFailedJobNotification({ jobType: JobType.RefreshFundingJob }, {});
+      setupJobSpy();
       act(() => {
-        const notification: JobNotification = testData.haveRefreshFailedJobNotification();
-        testData.getNotificationCallback()(notification);
+        getNotificationCallback()(notification);
       });
 
       const errorNotification = await screen.findByTestId("error-summary");

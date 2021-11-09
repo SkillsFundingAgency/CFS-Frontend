@@ -8,7 +8,6 @@ import {
   CalculationCompilePreviewResponse,
   PreviewCompileRequestViewModel,
 } from "../types/Calculations/CalculationCompilePreviewResponse";
-import { CalculationError } from "../types/Calculations/CalculationError";
 import { CalculationVersionHistorySummary } from "../types/Calculations/CalculationVersionHistorySummary";
 import { CircularReferenceError } from "../types/Calculations/CircularReferenceError";
 import {
@@ -20,6 +19,7 @@ import {
   CalculationSearchResponse,
   CalculationSearchResultResponse,
 } from "../types/CalculationSearchResponse";
+import { JobCreatedResponse } from "../types/JobCreatedResponse";
 import { PublishStatus } from "../types/PublishStatusModel";
 
 export async function searchForCalculationsService(
@@ -112,6 +112,7 @@ export interface UpdateCalculationRequest {
   specificationId: string;
   calculationId: string;
 }
+
 export async function updateCalculationService(
   request: UpdateCalculationRequest
 ): Promise<AxiosResponse<CalculationDetails>> {
@@ -196,7 +197,9 @@ export async function approveAllCalculationsService(specificationId: string) {
   });
 }
 
-export async function runGenerateCalculationCsvResultsJob(specificationId: string) {
+export async function runGenerateCalculationCsvResultsJob(
+  specificationId: string
+): Promise<AxiosResponse<JobCreatedResponse>> {
   return axios(`/api/calcs/specifications/${specificationId}/generate-calculation-csv-results`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

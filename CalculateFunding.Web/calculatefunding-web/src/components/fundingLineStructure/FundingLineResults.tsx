@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { useCalculationCircularDependencies } from "../../hooks/Calculations/useCalculationCircularDependencies";
-import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { ErrorProps } from "../../hooks/useErrors";
 import { getCalculationSummaryBySpecificationId } from "../../services/calculationService";
 import { getFundingLineStructureService } from "../../services/fundingStructuresService";
@@ -10,6 +10,7 @@ import { getFundingStructureResultsForProviderAndSpecification } from "../../ser
 import { approveFundingLineStructureService } from "../../services/specificationService";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { FundingStructureItemViewModel, FundingStructureType } from "../../types/FundingStructureItem";
+import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { ProviderResultForSpecification } from "../../types/Provider/ProviderResultForSpecification";
 import { PublishStatus } from "../../types/PublishStatusModel";
@@ -74,15 +75,21 @@ export function FundingLineResults({
   const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
   const fundingLineStepReactRef = useRef(null);
   const nullReactRef = useRef(null);
+  const refreshFundingLinesRef = React.useRef(false);
 
   const { circularReferenceErrors, isLoadingCircularDependencies } = useCalculationCircularDependencies(
     specificationId,
     (err) => addError({ error: err, description: "Error while checking for circular reference errors" })
   );
 
-  const { latestJob } = useLatestSpecificationJobWithMonitoring(specificationId, jobTypes, (err) =>
-    addError({ error: err, description: "Error while checking for assign template calculations job" })
-  );
+  const {
+    addSub,
+    removeAllSubs,
+    results: jobNotifications,
+  } = useJobSubscription({
+    onError: (err) =>
+      addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
 
   const handleApproveFundingLineStructure = async (specificationId: string) => {
     const response = await approveFundingLineStructureService(specificationId);
@@ -100,14 +107,6 @@ export function FundingLineResults({
       setFundingLinePublishStatus(status);
     }
   };
-
-  const refreshFundingLinesRef = React.useRef(false);
-
-  useEffect(() => {
-    if (!refreshFundingLinesRef.current && refreshFundingLines) {
-      fetchData();
-    }
-  }, [refreshFundingLines]);
 
   function searchFundingLines(calculationName: string) {
     const fundingLinesCopy: FundingStructureItemViewModel[] =
@@ -142,49 +141,6 @@ export function FundingLineResults({
     }
   }
 
-  useEffect(() => {
-    setFundingLineRenderInternalState(true);
-    if (fundingLines.length !== 0) {
-      if (fundingStructureViewModelItems.length === 0) {
-        setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
-        setFundingStructureViewModelItems(fundingLines);
-      }
-    }
-  }, [fundingLines]);
-
-  useEffect(() => {
-    if (!fundingLineRenderInternalState) {
-      return;
-    }
-    if (fundingLineStepReactRef !== null && fundingLineStepReactRef.current !== null) {
-      // @ts-ignore
-      fundingLineStepReactRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    setFundingLineRenderInternalState(false);
-  }, [fundingLineRenderInternalState]);
-
-  useEffect(() => {
-    if (!rerenderFundingLineSteps) {
-      return;
-    }
-    setFundingLineRenderInternalState(true);
-    setRerenderFundingLineSteps(false);
-  }, [rerenderFundingLineSteps]);
-
-  useEffect(() => {
-    fetchData();
-  }, [specificationId]);
-
-  useEffect(() => {
-    if (
-      fundingLines === undefined ||
-      calculationSummaries === undefined ||
-      circularReferenceErrors === undefined
-    )
-      return;
-    appendData(fundingLines, calculationSummaries, providerResults);
-  }, [providerResults, circularReferenceErrors, calculationSummaries, fundingLines]);
-
   function appendData(
     fundingStructureItems: FundingStructureItemViewModel[],
     calculationSummaries: CalculationSummary[],
@@ -205,13 +161,13 @@ export function FundingLineResults({
             for (let i: number = node.fundingStructureItems.length - 1; i >= 0; i--) {
               stack.push(node.fundingStructureItems[i]);
             }
+
+            node && visitNode(node, hashMap, calculationSummaries, providerResults);
           }
         }
-
-        node && visitNode(node, hashMap, calculationSummaries, providerResults);
+        setIsLoadingFundingLineStructure(false);
       }
     }
-    setIsLoadingFundingLineStructure(false);
   }
 
   function renderValue(value: number, calculationType: ValueFormatType): string {
@@ -339,9 +295,75 @@ export function FundingLineResults({
     return "";
   }
 
+  useEffect(() => {
+    fetchData();
+
+    // monitor background jobs
+    if (jobTypes?.length) {
+      addSub({
+        filterBy: {
+          specificationId: specificationId,
+          jobTypes: jobTypes,
+        },
+        monitorMode: MonitorMode.SignalR,
+        monitorFallback: MonitorFallback.Polling,
+        onError: (err) => addError({ error: err, description: "Error while checking for background jobs" }),
+      });
+    }
+
+    return () => removeAllSubs();
+  }, []);
+
+  useEffect(() => {
+    if (!refreshFundingLinesRef.current && refreshFundingLines) {
+      fetchData();
+    }
+  }, [refreshFundingLines]);
+
+  useEffect(() => {
+    setFundingLineRenderInternalState(true);
+    if (fundingLines.length !== 0) {
+      if (fundingStructureViewModelItems.length === 0) {
+        setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
+        setFundingStructureViewModelItems(fundingLines);
+      }
+    }
+  }, [fundingLines]);
+
+  useEffect(() => {
+    if (!fundingLineRenderInternalState) {
+      return;
+    }
+    if (fundingLineStepReactRef !== null && fundingLineStepReactRef.current !== null) {
+      // @ts-ignore
+      fundingLineStepReactRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    setFundingLineRenderInternalState(false);
+  }, [fundingLineRenderInternalState]);
+
+  useEffect(() => {
+    if (!rerenderFundingLineSteps) {
+      return;
+    }
+    setFundingLineRenderInternalState(true);
+    setRerenderFundingLineSteps(false);
+  }, [rerenderFundingLineSteps]);
+
+  useEffect(() => {
+    if (
+      fundingLines === undefined ||
+      calculationSummaries === undefined ||
+      circularReferenceErrors === undefined
+    )
+      return;
+    appendData(fundingLines, calculationSummaries, providerResults);
+  }, [providerResults, circularReferenceErrors, calculationSummaries, fundingLines]);
+
+  const activeJob = jobNotifications.find((n) => n.latestJob?.isActive)?.latestJob;
+
   return (
     <section className="govuk-tabs__panel" id="fundingline-structure">
-      {(isLoadingFundingLineStructure || (latestJob && latestJob.isActive)) && (
+      {(isLoadingFundingLineStructure || !!activeJob) && (
         <LoadingStatus
           title={"Loading funding line structure"}
           description={`${
@@ -359,7 +381,7 @@ export function FundingLineResults({
       {!isLoadingFundingLineStructure &&
         !isLoadingCircularDependencies &&
         !fundingLineStructureError &&
-        !(latestJob && latestJob.isActive) && (
+        !activeJob && (
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">

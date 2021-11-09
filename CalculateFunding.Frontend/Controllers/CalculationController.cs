@@ -476,7 +476,9 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<ResultsJob> result =
                 await _resultsApiClient.RunGenerateCalculationCsvResultsJob(specificationId);
 
-            return result.IsSuccessOrReturnFailureResult(nameof(specificationId)) ?? Ok(result.Content);
+            return result.IsSuccessOrReturnFailureResult(nameof(specificationId)) ?? Ok(new {
+                jobId = result.Content?.Id
+            });
         }
 
         [HttpGet]

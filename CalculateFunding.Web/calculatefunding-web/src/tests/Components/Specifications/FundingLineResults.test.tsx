@@ -1,19 +1,18 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MemoryRouter, Route, Switch } from "react-router";
 
-import { LatestSpecificationJobWithMonitoringResult } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { CalculationValueType } from "../../../types/CalculationDetails";
 import { CalculationType } from "../../../types/CalculationSearchResponse";
 import { FundingStructureItemViewModel, FundingStructureType } from "../../../types/FundingStructureItem";
 import { LegacyCalculationType } from "../../../types/Provider/ProviderResultForSpecification";
 import { PublishStatus } from "../../../types/PublishStatusModel";
-import { RunningStatus } from "../../../types/RunningStatus";
 import { ValueFormatType } from "../../../types/TemplateBuilderDefinitions";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
+
+const { haveJobSuccessfulNotification, haveJobInProgressNotification, setupJobSpy } =
+  jobSubscriptionTestHelper({});
 
 describe("<FundingLineResults/> tests", () => {
   beforeAll(() => {
@@ -24,12 +23,12 @@ describe("<FundingLineResults/> tests", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-    jobMonitorSpy.mockReset();
   });
 
   describe("<FundingLineResults /> loading checks", () => {
     beforeEach(() => {
-      jobMonitorSpy.mockImplementation(() => runningLatestJob);
+      haveJobInProgressNotification({}, {});
+      setupJobSpy();
     });
 
     it("shows loading panel when another job is running", async () => {
@@ -47,7 +46,8 @@ describe("<FundingLineResults/> tests", () => {
 
   describe("<FundingLineResults service checks />  ", () => {
     beforeEach(() => {
-      jobMonitorSpy.mockImplementation(() => completedLatestJob);
+      haveJobSuccessfulNotification({}, {});
+      setupJobSpy();
     });
 
     it("calls getFundingLineStructureService, getCalculationSummaryBySpecificationId and getCalculationCircularDependencies", async () => {
@@ -89,7 +89,8 @@ describe("<FundingLineResults/> tests", () => {
 
   describe("<FundingLineResults /> page renders correctly ", () => {
     beforeEach(() => {
-      jobMonitorSpy.mockImplementation(() => completedLatestJob);
+      haveJobSuccessfulNotification({}, {});
+      setupJobSpy();
     });
 
     it("shows approve status in funding line structure tab", async () => {
@@ -156,7 +157,8 @@ describe("<FundingLineResults/> tests", () => {
 
   describe("<FundingLineResults /> when providerId provided", () => {
     beforeEach(async () => {
-      jobMonitorSpy.mockImplementation(() => completedLatestJob);
+      haveJobSuccessfulNotification({}, {});
+      setupJobSpy();
 
       const { getFundingLineStructureService } = require("../../../services/fundingStructuresService");
       const { getCalculationSummaryBySpecificationId } = require("../../../services/calculationService");
@@ -240,47 +242,6 @@ const renderProviderFundingLineResults = () => {
     </MemoryRouter>
   );
 };
-
-const completedLatestJob: LatestSpecificationJobWithMonitoringResult = {
-  hasJob: true,
-  isCheckingForJob: false,
-  isFetched: true,
-  isFetching: false,
-  latestJob: {
-    isComplete: true,
-    jobId: "123",
-    statusDescription: "string",
-    jobDescription: "string",
-    runningStatus: RunningStatus.Completed,
-    failures: [],
-    isSuccessful: true,
-    isFailed: false,
-    isActive: false,
-  },
-};
-
-const runningLatestJob: LatestSpecificationJobWithMonitoringResult = {
-  hasJob: true,
-  isCheckingForJob: false,
-  isFetched: true,
-  isFetching: false,
-  latestJob: {
-    isComplete: false,
-    jobId: "123",
-    statusDescription: "string",
-    jobDescription: "string",
-    runningStatus: RunningStatus.Completed,
-    failures: [],
-    isSuccessful: true,
-    isFailed: false,
-    isActive: true,
-  },
-};
-
-const jobMonitorSpy = jest.spyOn(
-  useLatestSpecificationJobWithMonitoringHook,
-  "useLatestSpecificationJobWithMonitoring"
-);
 
 const mockFundingLineStructureService = () => {
   const fundingLineStructureService = jest.requireActual("../../../services/fundingStructuresService");

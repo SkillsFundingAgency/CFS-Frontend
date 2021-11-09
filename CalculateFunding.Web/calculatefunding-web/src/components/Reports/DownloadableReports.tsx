@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../../hooks/useErrors";
 import { runGenerateCalculationCsvResultsJob } from "../../services/calculationService";
 import { getDownloadableReportsService } from "../../services/specificationService";
@@ -20,7 +20,12 @@ import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { MultipleErrorSummary } from "../MultipleErrorSummary";
 import { DownloadableReportItem } from "./DownloadableReportItem";
 
-export function DownloadableReports(props: { specificationId: string; fundingPeriodId: string }) {
+const LIVE_REPORTS = "live-reports";
+
+export function DownloadableReports(props: {
+  specificationId: string;
+  fundingPeriodId: string;
+}): JSX.Element {
   const [allExpanded, setAllExpanded] = useState<boolean>(false);
   const [reportsSearchSuggestions, setReportsSearchSuggestions] = useState<string[]>([]);
   const [downloadableReports, setDownloadableReports] = useState<ReportMetadataViewModel[]>([]);
@@ -28,56 +33,93 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
   const [reportsRenderInternalState, setReportsRenderInternalState] = useState<boolean>();
   const reportAccordionReactRef = useRef(null);
   const nullReactRef = useRef(null);
-  const {
-    errors: liveReportErrors,
-    addErrorMessage: addLiveReportErrors,
-    clearErrorMessages: clearLiveReportErrorMessages,
-  } = useErrors();
-  const {
-    hasJob: hasCalculationJob,
-    latestJob: latestCalculationJob,
-    isCheckingForJob: isCheckingForCalculationJob,
-  } = useLatestSpecificationJobWithMonitoring(
-    props.specificationId,
-    [
-      JobType.CreateInstructAllocationJob,
-      JobType.GenerateGraphAndInstructAllocationJob,
-      JobType.CreateInstructGenerateAggregationsAllocationJob,
-      JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-    ],
-    (err) => addLiveReportErrors(`Error checking for calculation job ${err}`)
-  );
-  const {
-    hasJob: hasReportJob,
-    latestJob: latestReportJob,
-    isCheckingForJob: isCheckingForReportJob,
-  } = useLatestSpecificationJobWithMonitoring(
-    props.specificationId,
-    [JobType.GenerateCalcCsvResultsJob],
-    (err) => addLiveReportErrors(`Error checking for CSV results job ${err}`)
-  );
+  const { errors, addError, clearErrorMessages } = useErrors();
+
+  const { addSub, results: jobNotifications } = useJobSubscription({
+    onError: (err) =>
+      addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
   const [isRefreshingReports, setIsRefreshingReports] = useState<boolean>(false);
-  const [liveReportStatusMessage, setLiveReportStatusMessage] = useState<string>("");
+  const [reportJobId, setReportJobId] = useState<string>();
+  const latestCalculationJob = useMemo(
+    () =>
+      jobNotifications.find(
+        (n) =>
+          n.latestJob &&
+          [
+            JobType.CreateInstructAllocationJob,
+            JobType.GenerateGraphAndInstructAllocationJob,
+            JobType.CreateInstructGenerateAggregationsAllocationJob,
+            JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+          ].includes(n.latestJob.jobType as JobType)
+      )?.latestJob,
+    [jobNotifications]
+  );
 
-  useEffect(() => {
-    jobStatusReport();
-  }, [hasCalculationJob, hasReportJob]);
+  const latestReportJob = useMemo(
+    () => jobNotifications.find((n) => n.latestJob?.jobType === JobType.GenerateCalcCsvResultsJob)?.latestJob,
+    [jobNotifications]
+  );
 
-  useEffect(() => {
-    getDownloadableReportsService(props.specificationId, props.fundingPeriodId)
-      .then((result) => {
-        const response = result.data as ReportMetadataViewModel[];
-        setDownloadableReports(response);
-        setInitialExpandedStatus(response, false);
-        setDownloadableReportsGrouping([
-          ...new Set(response.filter((r) => r.grouping !== ReportGrouping.Live).map((p) => p.grouping)),
-        ]);
-        setReportsSearchSuggestions([...getDistinctPublishedReports(response)]);
-      })
-      .catch((err) => {
-        addLiveReportErrors(`Error fetching downloadable reports. ${err}`);
+  const getReportsInfo = async () => {
+    try {
+      const result = await getDownloadableReportsService(props.specificationId, props.fundingPeriodId);
+      const response = result.data as ReportMetadataViewModel[];
+      setDownloadableReports(response);
+      setInitialExpandedStatus(response, false);
+      setDownloadableReportsGrouping([
+        ...new Set(response.filter((r) => r.grouping !== ReportGrouping.Live).map((p) => p.grouping)),
+      ]);
+      setReportsSearchSuggestions([...getDistinctPublishedReports(response)]);
+    } catch (err: any) {
+      addError({
+        error: `Error fetching downloadable reports. ${err}`,
+        fieldName: LIVE_REPORTS,
       });
+    }
+  };
+
+  useEffect(() => {
+    const setupCalculationJobMonitoring = async () => {
+      await addSub({
+        filterBy: {
+          specificationId: props.specificationId,
+          jobTypes: [
+            JobType.CreateInstructAllocationJob,
+            JobType.GenerateGraphAndInstructAllocationJob,
+            JobType.CreateInstructGenerateAggregationsAllocationJob,
+            JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+          ],
+        },
+        onError: (err) =>
+          addError({
+            error: `Error checking for calculation job ${err}`,
+            fieldName: LIVE_REPORTS,
+          }),
+      });
+    };
+
+    const setupResultsJobMonitoring = async () => {
+      await addSub({
+        filterBy: {
+          specificationId: props.specificationId,
+          jobTypes: [JobType.GenerateCalcCsvResultsJob],
+        },
+        onError: (err) =>
+          addError({
+            error: `Error checking for CSV results job ${err}`,
+            fieldName: LIVE_REPORTS,
+          }),
+      });
+    };
+
+    setupCalculationJobMonitoring();
+    setupResultsJobMonitoring();
   }, [props.specificationId]);
+
+  useEffect(() => {
+    getReportsInfo();
+  }, [props.specificationId, props.fundingPeriodId]);
 
   useEffect(() => {
     if (!reportsRenderInternalState) {
@@ -90,42 +132,22 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
     setReportsRenderInternalState(false);
   }, [reportsRenderInternalState]);
 
-  function jobStatusReport() {
-    if (!latestCalculationJob && !latestReportJob) return;
-
-    if (
-      latestCalculationJob?.isActive &&
-      (latestCalculationJob?.runningStatus !== RunningStatus.Completed ||
-        latestCalculationJob?.parentJobId !== undefined) &&
-      latestReportJob?.created === undefined
-    ) {
-      setLiveReportStatusMessage(
-        "Initial calculations in progress, live data reports will be available soon."
-      );
-    } else if (
-      latestCalculationJob?.isActive &&
-      (latestCalculationJob?.runningStatus !== RunningStatus.Completed ||
-        latestCalculationJob?.parentJobId !== undefined) &&
-      latestReportJob?.runningStatus === RunningStatus.Completed &&
-      latestReportJob?.isSuccessful &&
-      latestReportJob?.parentJobId === undefined
-    ) {
-      setLiveReportStatusMessage("Calculation run in progress. Please wait.");
-    } else if (
-      latestCalculationJob?.runningStatus === RunningStatus.Completed &&
-      latestCalculationJob?.parentJobId === undefined &&
-      latestReportJob?.isActive &&
-      (latestReportJob?.runningStatus !== RunningStatus.Completed ||
-        latestReportJob?.parentJobId !== undefined)
-    ) {
-      setLiveReportStatusMessage("Live report refresh in progress, please wait.");
-    } else if (latestReportJob?.isFailed) {
-      addLiveReportErrors("The live report refresh failed - try again");
-    } else {
-      setLiveReportStatusMessage("");
+  useEffect(() => {
+    if (latestReportJob?.isFailed && isRefreshingReports) {
+      addError({
+        error: "The live report refresh failed",
+        description: latestReportJob.outcome,
+        suggestion: "Please try again",
+        fieldName: LIVE_REPORTS,
+      });
+      setIsRefreshingReports(false);
+    } else if (latestReportJob?.isActive && !isRefreshingReports) {
+      setIsRefreshingReports(true);
+    } else if (latestReportJob?.isSuccessful && isRefreshingReports) {
+      getReportsInfo();
+      setIsRefreshingReports(false);
     }
-  }
-
+  }, [latestCalculationJob, latestReportJob]);
   function setInitialExpandedStatus(reports: ReportMetadataViewModel[], expanded: boolean) {
     reports.map((fundingStructureItem: ReportMetadataViewModel) => {
       fundingStructureItem.expanded = expanded;
@@ -149,20 +171,6 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
     expandReportByName(downloadableReportsCopy, reportName, reportAccordionReactRef, nullReactRef);
     setDownloadableReports(downloadableReportsCopy);
     setReportsRenderInternalState(true);
-  }
-
-  function openCloseAllReports(isOpen: boolean) {
-    setAllExpanded(isOpen);
-    updateDownloadableReportsExpandStatus(downloadableReports, isOpen);
-  }
-
-  function updateDownloadableReportsExpandStatus(
-    downloadableReports: ReportMetadataViewModel[],
-    expandedStatus: boolean
-  ) {
-    downloadableReports.map((downloadableReport: ReportMetadataViewModel) => {
-      downloadableReport.expanded = expandedStatus;
-    });
   }
 
   function expandReportByName(
@@ -189,17 +197,22 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
   }
 
   function submitRefresh() {
-    clearLiveReportErrorMessages();
+    clearErrorMessages(["live-reports"]);
     runCalculationRefresh();
   }
 
   const runCalculationRefresh = async () => {
     setIsRefreshingReports(true);
     try {
-      await runGenerateCalculationCsvResultsJob(props.specificationId);
-      setIsRefreshingReports(false);
-    } catch (err) {
-      addLiveReportErrors(`Live reports couldn't refresh, please try again. ${err}`);
+      const response = await runGenerateCalculationCsvResultsJob(props.specificationId);
+      setReportJobId(response.data.jobId);
+    } catch (err: any) {
+      addError({
+        error: err,
+        description: "Live reports couldn't be refreshed",
+        suggestion: "Please try again",
+        fieldName: LIVE_REPORTS,
+      });
       setIsRefreshingReports(false);
     }
   };
@@ -211,7 +224,9 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
   return (
     <section className="govuk-tabs__panel" id="downloadable-reports">
       <h2 className="govuk-heading-l">Downloadable reports</h2>
-      <MultipleErrorSummary errors={liveReportErrors} />
+
+      <MultipleErrorSummary errors={errors} />
+
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-full">
           <div className="govuk-body-l" hidden={downloadableReports.length > 0}>
@@ -223,7 +238,9 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
               Live reports
             </h3>
             <div
-              className={`govuk-form-group ${liveReportErrors.length > 0 ? "govuk-form-group--error" : ""}`}
+              className={`govuk-form-group ${
+                errors.filter((e) => e.fieldName === LIVE_REPORTS).length > 0 ? "govuk-form-group--error" : ""
+              }`}
             >
               {downloadableReports
                 .filter((dr) => dr.grouping === ReportGrouping.Live)
@@ -277,31 +294,31 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
                     <strong>Generating new report</strong>
                   </p>
 
-                  {(isCheckingForReportJob ||
-                    isCheckingForCalculationJob ||
-                    hasReportJob ||
-                    hasCalculationJob ||
-                    isRefreshingReports) && (
+                  {(latestReportJob?.isActive || latestCalculationJob?.isActive || isRefreshingReports) && (
                     <div className="govuk-form-group">
-                      <LoadingFieldStatus
-                        title={"Checking for running jobs..."}
-                        hidden={
-                          !isCheckingForReportJob && !isCheckingForCalculationJob && !isRefreshingReports
-                        }
-                      />
+                      <LoadingFieldStatus title={"Checking for running jobs..."} hidden={false} />
 
                       <LoadingFieldStatus
-                        title={liveReportStatusMessage}
-                        hidden={liveReportStatusMessage === ""}
+                        title={
+                          latestCalculationJob?.isActive
+                            ? !latestReportJob
+                              ? "Initial calculations in progress, live data reports will be available soon."
+                              : "Calculation run in progress. Please wait."
+                            : latestReportJob?.isActive
+                            ? latestReportJob.jobId === reportJobId
+                              ? "Your report refresh is running now, please wait"
+                              : "A live report refresh is currently in progress, please wait."
+                            : ""
+                        }
                       />
                     </div>
                   )}
                 </h4>
               </div>
-              {liveReportErrors.length > 0 ? (
+              {errors.filter((e) => e.fieldName === LIVE_REPORTS).length > 0 ? (
                 <span className="govuk-error-message">
-                  <span className="govuk-visually-hidden">Error:</span> Live reports couldn't refresh, please
-                  try again.
+                  <span className="govuk-visually-hidden">Error:</span> Live reports couldn&apos;t refresh,
+                  please try again.
                 </span>
               ) : null}
             </div>
@@ -312,7 +329,9 @@ export function DownloadableReports(props: { specificationId: string; fundingPer
                   className="govuk-button"
                   type="button"
                   aria-label="Refresh"
-                  disabled={isRefreshingReports}
+                  disabled={
+                    isRefreshingReports || latestCalculationJob?.isActive || latestReportJob?.isActive
+                  }
                   onClick={submitRefresh}
                 >
                   Refresh

@@ -1,16 +1,14 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 
 import { CalculationSearchRequestViewModel } from "../types/CalculationSearchRequestViewModel";
-import {
-  CalculationSearchResponse,
-  CalculationSearchResultResponse,
-} from "../types/CalculationSearchResponse";
+import { CalculationSearchResultResponse } from "../types/CalculationSearchResponse";
 import { PublishStatus, PublishStatusModel } from "../types/PublishStatusModel";
 import { CreateSpecificationModel } from "../types/Specifications/CreateSpecificationModel";
 import {
   FundingLineProfileVariationPointer,
   ProfileVariationPointer,
 } from "../types/Specifications/ProfileVariationPointer";
+import { ReportMetadataViewModel } from "../types/Specifications/ReportMetadataViewModel";
 import { SpecificationListResults } from "../types/Specifications/SpecificationListResults";
 import { UpdateSpecificationModel } from "../types/Specifications/UpdateSpecificationModel";
 import { SpecificationSearchRequestViewModel } from "../types/SpecificationSearchRequestViewModel";
@@ -149,7 +147,10 @@ export async function updateSpecificationService(
   });
 }
 
-export async function getDownloadableReportsService(specificationId: string, fundingPeriodId = "") {
+export async function getDownloadableReportsService(
+  specificationId: string,
+  fundingPeriodId = ""
+): Promise<AxiosResponse<ReportMetadataViewModel[]>> {
   return axios(`${baseURL}/${specificationId}/get-report-metadata/${fundingPeriodId}`, {
     method: "GET",
     headers: {

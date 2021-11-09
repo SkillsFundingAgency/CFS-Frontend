@@ -4,49 +4,57 @@ import userEvent from "@testing-library/user-event";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { SpecificationTestData } from "./SpecificationTestData";
 
-const test = SpecificationTestData();
+const {
+  waitForPageToLoad,
+  fundingStream,
+  fundingPeriod,
+  template1,
+  template2,
+  specificationCfs,
+  hasEditPermissions,
+  mockSpecificationService,
+  mockProviderService,
+  mockProviderVersionService,
+  mockPolicyService,
+  renderEditSpecificationPage,
+  coreProvider1,
+  coreProvider2,
+} = SpecificationTestData();
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({
+  mockSpecId: specificationCfs.id,
+});
 
 describe("<EditSpecification />", () => {
   describe("<EditSpecification /> with CFS", () => {
     beforeEach(async () => {
-      test.hasEditPermissions();
-      test.mockSpecificationService(test.specificationCfs);
-      test.mockProviderService();
-      test.mockProviderVersionService();
-      test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-      test.haveNoJobNotification();
+      haveNoJobNotification();
+      setupJobSpy();
+      hasEditPermissions();
+      mockSpecificationService(specificationCfs);
+      mockProviderService();
+      mockProviderVersionService();
+      mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
 
-      await test.renderEditSpecificationPage(test.specificationCfs.id);
+      await renderEditSpecificationPage(specificationCfs.id);
     });
 
     afterEach(() => jest.clearAllMocks());
 
     describe("service call tests", () => {
-      it("it calls the specificationService", async () => {
+      it("it makes all the expected calls to the API", async () => {
         const { getSpecificationSummaryService } = require("../../../services/specificationService");
-        await waitFor(() => expect(getSpecificationSummaryService).toBeCalledTimes(1));
-      });
-
-      it("it calls the policyService getPublishedTemplatesByStreamAndPeriod", async () => {
         const { getPublishedTemplatesByStreamAndPeriod } = require("../../../services/policyService");
-        await waitFor(() => expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1));
-      });
-
-      it("it calls the policyService getFundingConfiguration", async () => {
         const { getFundingConfiguration } = require("../../../services/policyService");
-        await waitFor(() => expect(getFundingConfiguration).toBeCalledTimes(1));
-      });
-
-      it("it calls the providerVersionService getProviderByFundingStreamIdService", async () => {
         const { getCoreProvidersByFundingStream } = require("../../../services/providerVersionService");
-        await waitFor(() => expect(getCoreProvidersByFundingStream).toBeCalledTimes(1));
-      });
-
-      it("it does not call the providerService getProviderSnapshotsForFundingStreamService", async () => {
-        const { getProviderSnapshotsByFundingStream } = require("../../../services/providerService");
-        await waitFor(() => expect(getProviderSnapshotsByFundingStream).not.toBeCalled());
+        await waitFor(() => {
+          expect(getSpecificationSummaryService).toBeCalledTimes(1);
+          expect(getPublishedTemplatesByStreamAndPeriod).toBeCalledTimes(1);
+          expect(getFundingConfiguration).toBeCalledTimes(1);
+          expect(getCoreProvidersByFundingStream).toBeCalledTimes(1);
+        });
       });
     });
 
@@ -80,22 +88,22 @@ describe("<EditSpecification />", () => {
 
       it("renders the specification name", async () => {
         const specNameInput = screen.getByRole("textbox", { name: /Specification name/ });
-        expect(specNameInput).toHaveValue(test.specificationCfs.name);
+        expect(specNameInput).toHaveValue(specificationCfs.name);
       });
 
       it("renders the specification description", async () => {
         const specNameInput = screen.getByRole("textbox", { name: /Can you provide more detail?/ });
-        expect(specNameInput).toHaveValue(test.specificationCfs.description);
+        expect(specNameInput).toHaveValue(specificationCfs.description);
       });
 
       it("renders the funding stream name", async () => {
         expect(screen.getByText("Funding stream")).toBeInTheDocument();
-        expect(screen.getByRole("heading", { name: test.specificationCfs.fundingStreams[0].id }));
+        expect(screen.getByRole("heading", { name: specificationCfs.fundingStreams[0].id }));
       });
 
       it("renders the funding period name", async () => {
         expect(screen.getByText("Funding period")).toBeInTheDocument();
-        expect(screen.getByRole("heading", { name: test.specificationCfs.fundingPeriod.name }));
+        expect(screen.getByRole("heading", { name: specificationCfs.fundingPeriod.name }));
       });
 
       it("renders the Core provider options", async () => {
@@ -106,9 +114,9 @@ describe("<EditSpecification />", () => {
           name: /Core provider data/,
         }) as HTMLSelectElement;
         expect(within(coreProviderSelect).getByRole("option", { name: /Select core provider/ }));
-        expect(within(coreProviderSelect).getByRole("option", { name: test.coreProvider1.name }));
+        expect(within(coreProviderSelect).getByRole("option", { name: coreProvider1.name }));
         const option2 = within(coreProviderSelect).getByRole("option", {
-          name: test.coreProvider2.name,
+          name: coreProvider2.name,
         }) as HTMLOptionElement;
         expect(option2.selected).toBeTruthy();
       });
@@ -121,11 +129,11 @@ describe("<EditSpecification />", () => {
         expect(templateVersionSelect).toHaveLength(3);
         expect(within(templateVersionSelect).getByRole("option", { name: /Select template version/ }));
         const option1 = within(templateVersionSelect).getByRole("option", {
-          name: test.template1.templateVersion,
+          name: template1.templateVersion,
         }) as HTMLOptionElement;
         expect(option1.selected).toBeFalsy();
         const option2 = within(templateVersionSelect).getByRole("option", {
-          name: test.template2.templateVersion,
+          name: template2.templateVersion,
         }) as HTMLOptionElement;
         await waitFor(() => expect(option2.selected).toBeTruthy());
       });
@@ -140,7 +148,7 @@ describe("<EditSpecification />", () => {
       it("it submits form successfully given nothing is changed", async () => {
         const { updateSpecificationService } = require("../../../services/specificationService");
 
-        await test.waitForPageToLoad();
+        await waitForPageToLoad();
 
         const button = screen.getByRole("button", { name: /Save and continue/ });
         expect(button).toBeEnabled();
@@ -148,27 +156,27 @@ describe("<EditSpecification />", () => {
 
         expect(updateSpecificationService).toHaveBeenCalledWith(
           {
-            assignedTemplateIds: { "stream-547": test.template2.templateVersion },
+            assignedTemplateIds: { "stream-547": template2.templateVersion },
             description: "Lorem ipsum lalala",
-            fundingPeriodId: test.fundingPeriod.id,
-            fundingStreamId: test.fundingStream.id,
-            name: test.specificationCfs.name,
-            providerVersionId: test.coreProvider2.providerVersionId,
+            fundingPeriodId: fundingPeriod.id,
+            fundingStreamId: fundingStream.id,
+            name: specificationCfs.name,
+            providerVersionId: coreProvider2.providerVersionId,
           },
-          test.specificationCfs.id
+          specificationCfs.id
         );
         expect(screen.queryByText("error-summary")).not.toBeInTheDocument();
       });
 
       it("it submits form given all fields are provided", async () => {
-        await test.waitForPageToLoad();
+        await waitForPageToLoad();
 
         const coreProviderSelect = screen.getByRole("combobox", {
           name: /Core provider data/,
         }) as HTMLSelectElement;
         expect(coreProviderSelect).toHaveLength(3);
 
-        userEvent.selectOptions(coreProviderSelect, test.coreProvider1.name);
+        userEvent.selectOptions(coreProviderSelect, coreProvider1.name);
 
         const templateVersionSelect = screen.getByRole("combobox", { name: /Template version/ });
         expect(templateVersionSelect).toHaveLength(3);
@@ -177,7 +185,7 @@ describe("<EditSpecification />", () => {
         expect((templateVersionOptions[0] as HTMLOptionElement).value).toEqual("3.2");
         expect((templateVersionOptions[1] as HTMLOptionElement).value).toEqual("9.9");
 
-        userEvent.selectOptions(templateVersionSelect, test.template1.templateVersion);
+        userEvent.selectOptions(templateVersionSelect, template1.templateVersion);
 
         const descriptionTextArea = screen.getByRole("textbox", { name: /Can you provide more detail?/ });
         userEvent.clear(descriptionTextArea);
@@ -190,14 +198,14 @@ describe("<EditSpecification />", () => {
         const { updateSpecificationService } = require("../../../services/specificationService");
         expect(updateSpecificationService).toHaveBeenCalledWith(
           {
-            assignedTemplateIds: { "stream-547": test.template1.templateVersion },
+            assignedTemplateIds: { "stream-547": template1.templateVersion },
             description: "new description",
-            fundingPeriodId: test.fundingPeriod.id,
-            fundingStreamId: test.fundingStream.id,
-            name: test.specificationCfs.name,
-            providerVersionId: test.coreProvider1.providerVersionId,
+            fundingPeriodId: fundingPeriod.id,
+            fundingStreamId: fundingStream.id,
+            name: specificationCfs.name,
+            providerVersionId: coreProvider1.providerVersionId,
           },
-          test.specificationCfs.id
+          specificationCfs.id
         );
 
         expect(screen.queryByText("error-summary")).not.toBeInTheDocument();

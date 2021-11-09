@@ -5,7 +5,6 @@ import React from "react";
 import { MemoryRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
 
-import * as monitor from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as errorHook from "../../../hooks/useErrors";
 import { ErrorHookResult } from "../../../hooks/useErrors";
 import {
@@ -13,19 +12,9 @@ import {
   ReportGroupingLevel,
   ReportType,
 } from "../../../types/Specifications/ReportMetadataViewModel";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 
-const jobMonitorSpy = jest.spyOn(monitor, "useLatestSpecificationJobWithMonitoring");
-jobMonitorSpy.mockImplementation(() => {
-  return {
-    isMonitoring: false,
-    isFetching: false,
-    isFetched: false,
-    hasJob: false,
-    isCheckingForJob: false,
-    latestJob: undefined,
-  };
-});
-
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({});
 const mockErrorHook = jest.spyOn(errorHook, "useErrors");
 const err: ErrorHookResult = {
   errors: [],
@@ -35,12 +24,14 @@ const err: ErrorHookResult = {
   validate: () => true,
   addValidationErrorsAsIndividualErrors: () => null,
   addValidationErrors: () => null,
-}
+};
 mockErrorHook.mockImplementation(() => {
   return err;
 });
 describe("<DownloadableReports /> ", () => {
   beforeEach(async () => {
+    haveNoJobNotification();
+    setupJobSpy();
     mockSpecificationService();
     mockCalculationService();
     await renderDownloadableReports();

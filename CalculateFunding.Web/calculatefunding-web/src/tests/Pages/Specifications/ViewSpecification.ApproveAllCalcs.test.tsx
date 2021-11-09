@@ -1,24 +1,35 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
-const testData = ViewSpecificationTestData();
+const {
+  hasNoJobObserverState,
+  mockSpecificationPermissions,
+  mockApprovedSpecificationService,
+  mockFundingLineStructureService,
+  mockDatasetBySpecificationIdService,
+  mockCalculationWithDraftCalculationsService,
+  mockPublishService,
+  renderViewApprovedSpecificationPage,
+} = ViewSpecificationTestData();
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({});
 
 describe("<ViewSpecification /> ", () => {
   describe("approving all calcs", () => {
     beforeEach(async () => {
-      testData.hasNoJobObserverState();
-      testData.mockSpecificationPermissions();
-      testData.mockApprovedSpecificationService();
-      testData.mockFundingLineStructureService();
-      testData.mockDatasetBySpecificationIdService();
-      testData.mockCalculationWithDraftCalculationsService();
-      testData.mockPublishService();
-      testData.haveNoJobNotification();
-      testData.setupJobSubscriptionSpy();
+      haveNoJobNotification();
+      setupJobSpy();
+      hasNoJobObserverState();
+      mockSpecificationPermissions();
+      mockApprovedSpecificationService();
+      mockFundingLineStructureService();
+      mockDatasetBySpecificationIdService();
+      mockCalculationWithDraftCalculationsService();
+      mockPublishService();
 
-      await testData.renderViewApprovedSpecificationPage();
+      await renderViewApprovedSpecificationPage();
     });
 
     afterEach(() => {

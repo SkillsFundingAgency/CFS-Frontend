@@ -4,22 +4,39 @@ import userEvent from "@testing-library/user-event";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { SpecificationTestData } from "./SpecificationTestData";
 
-const test = SpecificationTestData();
+const {
+  specificationFdzWithoutTracking,
+  hasEditPermissions,
+  mockSpecificationService,
+  mockProviderService,
+  mockProviderVersionService,
+  mockPolicyService,
+  renderEditSpecificationPage,
+  providerSnapshot1,
+  providerSnapshot2,
+  template1,
+  template2,
+  fundingStream,
+  fundingPeriod,
+} = SpecificationTestData();
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({});
 
 describe("<EditSpecification />", () => {
-  const spec = test.specificationFdzWithoutTracking;
+  const spec = specificationFdzWithoutTracking;
   describe("<EditSpecification /> with FDZ without Tracking Latest Provider Data", () => {
     beforeEach(async () => {
-      test.hasEditPermissions();
-      test.mockSpecificationService(spec);
-      test.mockProviderService();
-      test.mockProviderVersionService();
-      test.mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.ToLatest);
-      test.haveNoJobNotification();
+      setupJobSpy();
+      haveNoJobNotification();
+      hasEditPermissions();
+      mockSpecificationService(spec);
+      mockProviderService();
+      mockProviderVersionService();
+      mockPolicyService(ProviderSource.FDZ, ApprovalMode.All, UpdateCoreProviderVersion.ToLatest);
 
-      await test.renderEditSpecificationPage(spec.id);
+      await renderEditSpecificationPage(spec.id);
 
       await waitFor(() => {
         expect(screen.queryByTestId("loader")).not.toBeInTheDocument();
@@ -115,11 +132,11 @@ describe("<EditSpecification />", () => {
           name: /Core provider data/,
         }) as HTMLSelectElement;
         expect(within(coreProviderSelect).getByRole("option", { name: /Select core provider/ }));
-        expect(within(coreProviderSelect).getByRole("option", { name: test.providerSnapshot1.name }));
-        expect(within(coreProviderSelect).getByRole("option", { name: test.providerSnapshot2.name }));
+        expect(within(coreProviderSelect).getByRole("option", { name: providerSnapshot1.name }));
+        expect(within(coreProviderSelect).getByRole("option", { name: providerSnapshot2.name }));
 
         const option = within(coreProviderSelect).getByRole("option", {
-          name: test.providerSnapshot2.name,
+          name: providerSnapshot2.name,
         }) as HTMLOptionElement;
         expect(option.selected).toBeTruthy();
       });
@@ -136,7 +153,7 @@ describe("<EditSpecification />", () => {
         expect((templateVersionOptions[1] as HTMLOptionElement).value).toEqual("9.9");
 
         const option = within(templateVersionSelect).getByRole("option", {
-          name: test.template2.templateVersion,
+          name: template2.templateVersion,
         }) as HTMLOptionElement;
         expect(option.selected).toBeTruthy();
       });
@@ -171,12 +188,12 @@ describe("<EditSpecification />", () => {
 
         expect(updateSpecificationService).toHaveBeenCalledWith(
           {
-            assignedTemplateIds: { "stream-547": test.template2.templateVersion },
-            description: test.specificationFdzWithoutTracking.description,
-            fundingPeriodId: test.fundingPeriod.id,
-            fundingStreamId: test.fundingStream.id,
+            assignedTemplateIds: { "stream-547": template2.templateVersion },
+            description: specificationFdzWithoutTracking.description,
+            fundingPeriodId: fundingPeriod.id,
+            fundingStreamId: fundingStream.id,
             name: spec.name,
-            providerSnapshotId: test.providerSnapshot2.providerSnapshotId,
+            providerSnapshotId: providerSnapshot2.providerSnapshotId,
             providerVersionId: undefined,
             coreProviderVersionUpdates: "Manual",
           },
@@ -198,7 +215,7 @@ describe("<EditSpecification />", () => {
         const templateVersionSelect = screen.getByRole("combobox", { name: /Template version/ });
         expect(templateVersionSelect).toHaveLength(3);
 
-        userEvent.selectOptions(templateVersionSelect, test.template1.templateVersion);
+        userEvent.selectOptions(templateVersionSelect, template1.templateVersion);
 
         const descriptionTextArea = screen.getByRole("textbox", { name: /Can you provide more detail?/ });
         userEvent.clear(descriptionTextArea);
@@ -211,10 +228,10 @@ describe("<EditSpecification />", () => {
         const { updateSpecificationService } = require("../../../services/specificationService");
         expect(updateSpecificationService).toHaveBeenCalledWith(
           {
-            assignedTemplateIds: { "stream-547": test.template1.templateVersion },
+            assignedTemplateIds: { "stream-547": template1.templateVersion },
             description: "new description",
-            fundingPeriodId: test.fundingPeriod.id,
-            fundingStreamId: test.fundingStream.id,
+            fundingPeriodId: fundingPeriod.id,
+            fundingStreamId: fundingStream.id,
             name: spec.name,
             providerSnapshotId: undefined,
             providerVersionId: undefined,

@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { DateTime } from "luxon";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
@@ -8,8 +7,6 @@ import { MemoryRouter, Route, Switch } from "react-router";
 import { createStore, Store } from "redux";
 
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
-import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
-import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
@@ -22,14 +19,10 @@ import {
   DatasetDataType,
   ObsoleteItemType,
 } from "../../../types/Calculations/CalculationError";
-import { CompletionStatus } from "../../../types/CompletionStatus";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { DatasetRelationship } from "../../../types/DatasetRelationship";
 import { FundingConfiguration } from "../../../types/FundingConfiguration";
-import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../../types/jobType";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
-import { RunningStatus } from "../../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
@@ -150,7 +143,7 @@ export function ViewSpecificationTestData() {
       .mockImplementation(() => calculationErrorsResult);
   };
 
-  let notification: JobNotification | undefined;
+  /*let notification: JobNotification | undefined;
   let subscription: JobSubscription = {
     filterBy: {
       jobId: "jobId",
@@ -321,7 +314,7 @@ export function ViewSpecificationTestData() {
       };
     });
     return { jobSubscriptionSpy, notificationCallback };
-  };
+  };*/
 
   function mockSpecificationPermissions(
     expectedSpecificationPermissionsResult?: SpecificationPermissionsResult
@@ -592,15 +585,8 @@ export function ViewSpecificationTestData() {
 
   return {
     mockSpec,
-    notification,
-    getNotificationCallback,
     hasCalcErrors,
-    haveRefreshFailedJobNotification,
-    haveConverterJobInProgressNotification,
-    haveReportJobCompleteNotification,
-    haveNoJobNotification,
     hasNoCalcErrors,
-    setupJobSubscriptionSpy,
     fundingConfigurationSpy,
     mockSpecificationPermissions,
     renderViewSpecificationPage,
@@ -613,6 +599,5 @@ export function ViewSpecificationTestData() {
     mockCalculationService,
     mockCalculationWithDraftCalculationsService,
     hasNoJobObserverState,
-    haveEditSpecificationFailedJobNotification,
   };
 }

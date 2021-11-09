@@ -2,22 +2,34 @@
 
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
+import { JobType } from "../../../types/jobType";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { SpecificationTestData } from "./SpecificationTestData";
 
-const test = SpecificationTestData();
+const {
+  specificationCfs,
+  hasEditPermissions,
+  mockSpecificationService,
+  mockProviderService,
+  mockProviderVersionService,
+  mockPolicyService,
+  renderEditSpecificationPageWithJobRunning,
+} = SpecificationTestData();
+const { haveJobInProgressNotification, setupJobSpy } = jobSubscriptionTestHelper({});
 
-describe("<EditSpecification /> ", () => {
+describe("<EditSpecification />", () => {
   describe("<EditSpecification /> with specification jobs running", () => {
     beforeEach(async () => {
-      test.hasEditPermissions();
-      test.mockSpecificationService(test.specificationCfs);
-      test.mockProviderService();
-      test.mockProviderVersionService();
-      test.mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
-      test.haveDatasetMergeJobInProgressNotification();
+      haveJobInProgressNotification({ jobType: JobType.RunConverterDatasetMergeJob }, {});
+      setupJobSpy();
+      hasEditPermissions();
+      mockSpecificationService(specificationCfs);
+      mockProviderService();
+      mockProviderVersionService();
+      mockPolicyService(ProviderSource.CFS, ApprovalMode.All, UpdateCoreProviderVersion.Manual);
 
-      await test.renderEditSpecificationPageWithJobRunning(test.specificationCfs.id);
+      await renderEditSpecificationPageWithJobRunning(specificationCfs.id);
     });
 
     afterEach(() => jest.clearAllMocks());

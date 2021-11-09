@@ -3,25 +3,42 @@ import userEvent from "@testing-library/user-event";
 
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { Permission } from "../../../types/Permission";
+import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
-let testData = ViewSpecificationTestData();
+const {
+  mockSpec,
+  mockSpecificationService,
+  mockSpecificationPermissions,
+  fundingConfigurationSpy,
+  mockFundingLineStructureService,
+  mockDatasetBySpecificationIdService,
+  mockCalculationService,
+  mockPublishService,
+  hasNoCalcErrors,
+  renderViewSpecificationPage,
+} = ViewSpecificationTestData();
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({
+  mockSpecId: mockSpec.id,
+});
 
 describe("<ViewSpecification /> ", () => {
   async function setup() {
-    testData = ViewSpecificationTestData();
-    testData.setupJobSubscriptionSpy();
-    testData.mockSpecificationPermissions();
-    testData.mockSpecificationService();
-    testData.mockFundingLineStructureService();
-    testData.mockDatasetBySpecificationIdService();
-    testData.mockCalculationService();
-    testData.mockPublishService();
-    testData.fundingConfigurationSpy();
-    testData.haveNoJobNotification();
-    testData.hasNoCalcErrors();
-    await testData.renderViewSpecificationPage();
+    haveNoJobNotification();
+    setupJobSpy();
+
+    mockSpecificationPermissions();
+    mockSpecificationService();
+    mockFundingLineStructureService();
+    mockDatasetBySpecificationIdService();
+    mockCalculationService();
+    mockPublishService();
+    fundingConfigurationSpy();
+    hasNoCalcErrors();
+
+    await renderViewSpecificationPage();
   }
+
   describe("initial page load ", () => {
     describe("Service call checks ", () => {
       it("it calls the specificationService", async () => {
@@ -41,7 +58,7 @@ describe("<ViewSpecification /> ", () => {
         await setup();
         const link = (await screen.findByRole("link", { name: /Edit specification/ })) as HTMLAnchorElement;
         expect(link).toBeInTheDocument();
-        expect(link.getAttribute("href")).toBe(`/Specifications/EditSpecification/${testData.mockSpec.id}`);
+        expect(link.getAttribute("href")).toBe(`/Specifications/EditSpecification/${mockSpec.id}`);
       });
 
       it.skip("shows Variations tab given specification is not chosen for funding", async () => {
@@ -90,7 +107,7 @@ describe("<ViewSpecification /> ", () => {
         missingPermissions: [Permission.CanApproveAllCalculations],
       };
       await setup();
-      testData.mockSpecificationPermissions(withoutPermissions);
+      mockSpecificationPermissions(withoutPermissions);
 
       const approveAllCalcsButton = await screen.findByTestId("approve-calculations");
       userEvent.click(approveAllCalcsButton);
