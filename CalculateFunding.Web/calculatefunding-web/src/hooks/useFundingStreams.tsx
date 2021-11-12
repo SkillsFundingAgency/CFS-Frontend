@@ -15,7 +15,10 @@ export const useFundingStreams = (
   const { data, isLoading } = useQuery(
     "funding-streams",
     async () => (await policyService.getFundingStreamsService(securityTrimmed)).data,
-    queryConfig
+      {
+          cacheTime: queryConfig.cacheTime,
+          staleTime: queryConfig.staleTime
+      }
   );
   return { fundingStreams: data, isLoadingFundingStreams: isLoading };
 };

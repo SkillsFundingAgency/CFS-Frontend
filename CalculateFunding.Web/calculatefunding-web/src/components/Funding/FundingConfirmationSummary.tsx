@@ -52,7 +52,6 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                 <div className="govuk-grid-row">
                     <div className="govuk-grid-column-three-quarters">
                         <table className="govuk-table" aria-label="funding-summary-table">
-                            <caption className="govuk-table__caption">Funding approval information</caption>
                             <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
                                 <th scope="col" className="govuk-table__header">
