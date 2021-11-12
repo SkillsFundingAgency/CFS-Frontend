@@ -51,9 +51,7 @@ export function ViewEditFundingLineProfile({
   const providerId = match.params.providerId;
   const providerVersionId = match.params.specCoreProviderVersionId;
   const [hasAcknowledgedHistoricEdit, setHasAcknowledgedHistoricEdit] = useState<boolean>(false);
-  const [editMode, setEditMode] = useState<ProfileEditMode>(
-    match.params.editMode === "edit" ? ProfileEditMode.EditUnpaid : ProfileEditMode.View
-  );
+  const [editMode, setEditMode] = useState<ProfileEditMode>(ProfileEditMode.View);
 
   const history = useHistory();
 
@@ -92,6 +90,14 @@ export function ViewEditFundingLineProfile({
   const [canEditCustomProfile, setCanEditCustomProfile] = useState<boolean>(false);
   const [canChangeToRuleBasedProfile, setCanChangeToRuleBasedProfile] = useState<boolean>(false);
   const [isContractedProvider, setIsContractedProvider] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (match.params.editMode === "edit") {
+      setEditMode(ProfileEditMode.EditUnpaid);
+    } else {
+      setEditMode(ProfileEditMode.View);
+    }
+  }, [match.params.editMode]);
 
   useEffect(() => {
     getFundingLineProfile();
