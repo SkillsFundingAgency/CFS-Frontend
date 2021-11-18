@@ -6,7 +6,11 @@ interface TableResultsProps {
   totalResults: number;
 }
 
-export const TableResults = ({ startItemNumber, endItemNumber, totalResults }: TableResultsProps) => {
+export const TableResultsSummary = ({
+  startItemNumber,
+  endItemNumber,
+  totalResults,
+}: TableResultsProps): JSX.Element => {
   return (
     <div className="pagination__summary">
       Showing {startItemNumber} - {endItemNumber} of {totalResults} results

@@ -12,10 +12,8 @@ const configurationPromise: Promise<Config> = (window as any)["configuration"];
 const isAlreadyOnAuthPage = () => window.location.href.includes(".auth/");
 const isLocalDevEnv = () => process.env.NODE_ENV === "development";
 
-export function initialiseAxios() {
-  configurationPromise.then((response) => {
-    const configuration = response;
-
+export const initialiseAxios = () => {
+  configurationPromise.then((config) => {
     axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
     axios.interceptors.response.use(
@@ -27,7 +25,7 @@ export function initialiseAxios() {
 
         // no authentication provided so need to login
         if (error.response.status === 403) {
-          window.location.href = `${configuration.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
+          window.location.href = `${config.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
           return Promise.reject(error);
         }
 
@@ -43,7 +41,7 @@ export function initialiseAxios() {
         // Do something with request error
         if (error.response.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-          fetch(`${configuration.baseUrl}/.auth/refresh`, {
+          fetch(`${config.baseUrl}/.auth/refresh`, {
             method: "GET",
           })
             .then((response) => {
@@ -52,9 +50,9 @@ export function initialiseAxios() {
             .then(() => {
               axios(originalRequest);
             })
-            .catch((error) => {
+            .catch(() => {
               // do login redirect
-              window.location.href = `${configuration.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
+              window.location.href = `${config.baseUrl}/.auth/login/aad?post_login_redirect_url=${window.location.href}`;
             });
         } else {
           return Promise.reject(error);
@@ -62,4 +60,4 @@ export function initialiseAxios() {
       }
     );
   });
-}
+};

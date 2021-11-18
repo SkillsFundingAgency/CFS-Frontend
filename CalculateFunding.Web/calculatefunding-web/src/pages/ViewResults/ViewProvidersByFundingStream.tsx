@@ -5,12 +5,12 @@ import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import Pagination from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
+import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { getFundingStreamByIdService } from "../../services/policyService";
 import { getProvidersByFundingStreamService } from "../../services/providerService";
@@ -31,7 +31,7 @@ export interface ViewProvidersByFundingStreamRouteProps {
 
 export function ViewProvidersByFundingStream({
   match,
-}: RouteComponentProps<ViewProvidersByFundingStreamRouteProps>) {
+}: RouteComponentProps<ViewProvidersByFundingStreamRouteProps>): JSX.Element {
   const initialSearchRequest: ProviderVersionSearchModel = {
     pageNumber: 1,
     top: 100,
@@ -141,9 +141,9 @@ export function ViewProvidersByFundingStream({
     }
   }
 
-  function pageChange(pageNumber: string) {
+  function pageChange(pageNumber: number) {
     setSearchRequest((prevState) => {
-      return { ...prevState, pageNumber: parseInt(pageNumber) };
+      return { ...prevState, pageNumber: pageNumber };
     });
   }
 
@@ -203,305 +203,290 @@ export function ViewProvidersByFundingStream({
   }
 
   return (
-    <div>
-      <Header location={Section.Results} />
-      <div className="govuk-width-container">
-        <div className={"govuk-grid-row  govuk-!-margin-bottom-9"}>
-          <div className={"govuk-grid-column-full"}>
-            <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"View results"} url={"/results"} />
-              <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
-              <Breadcrumb name={"View provider results"} />
-            </Breadcrumbs>
-            <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">View provider results</h1>
-            {fundingStreamName !== "" ? <span className="govuk-caption-m">Funding stream</span> : null}
-            <h3 className="govuk-heading-m">{fundingStreamName}</h3>
-          </div>
-        </div>
-        <div className="grid-row">
-          <div className="govuk-grid-column-full">
-            <MultipleErrorSummary errors={errors} />
-          </div>
-        </div>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-third">
-            <form id="searchProviders">
-              <CollapsiblePanel title={"Search"} isExpanded={true}>
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <span className="govuk-caption-m govuk-!-margin-bottom-4">Select one option</span>
-                    <div className="radios">
-                      <RadioSearch
-                        text="Provider name"
-                        timeout={900}
-                        radioId={"provider-name"}
-                        characterRestrictions={CharacterRestrictions.AlphaNumeric}
-                        radioName={"search-providers-radios"}
-                        searchType={"name"}
-                        minimumChars={3}
-                        callback={searchText}
-                        selectedSearchType={searchType}
+    <Main location={Section.Results}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View results"} url={"/results"} />
+        <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
+        <Breadcrumb name={"View provider results"} />
+      </Breadcrumbs>
+
+      <Title title="View provider results" titleCaption={fundingStreamName} />
+
+      <MultipleErrorSummary errors={errors} />
+
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          <form id="searchProviders">
+            <CollapsiblePanel title={"Search"} isExpanded={true}>
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <span className="govuk-caption-m govuk-!-margin-bottom-4">Select one option</span>
+                  <div className="radios">
+                    <RadioSearch
+                      text="Provider name"
+                      timeout={900}
+                      radioId={"provider-name"}
+                      characterRestrictions={CharacterRestrictions.AlphaNumeric}
+                      radioName={"search-providers-radios"}
+                      searchType={"name"}
+                      minimumChars={3}
+                      callback={searchText}
+                      selectedSearchType={searchType}
+                    />
+                    <RadioSearch
+                      text="UKPRN"
+                      timeout={900}
+                      radioId={"ukprn"}
+                      characterRestrictions={CharacterRestrictions.NumericOnly}
+                      radioName={"search-providers-radios"}
+                      searchType={"ukprn"}
+                      minimumChars={3}
+                      maximumChars={8}
+                      callback={searchText}
+                      selectedSearchType={searchType}
+                    />
+                    <RadioSearch
+                      text="UPIN"
+                      timeout={900}
+                      radioId={"upin"}
+                      characterRestrictions={CharacterRestrictions.NumericOnly}
+                      radioName={"search-providers-radios"}
+                      searchType={"upin"}
+                      minimumChars={3}
+                      maximumChars={6}
+                      callback={searchText}
+                      selectedSearchType={searchType}
+                    />
+                    <RadioSearch
+                      text="URN"
+                      timeout={900}
+                      radioId={"urn"}
+                      characterRestrictions={CharacterRestrictions.NumericOnly}
+                      radioName={"search-providers-radios"}
+                      searchType={"urn"}
+                      minimumChars={3}
+                      maximumChars={6}
+                      callback={searchText}
+                      selectedSearchType={searchType}
+                    />
+                  </div>
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title={"Filter by provider type"}
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={searchRequest.filters["providerType"]?.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input className="govuk-input" type="text" onChange={(e) => searchProviderTypeFilters(e)} />
+                </div>
+                <div className="govuk-checkboxes">
+                  {filterProviderType.map((s, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        key={`providerType-${s.name}`}
+                        id={`providerType-${s.name}`}
+                        name={`providerType-${s.name}`}
+                        type="checkbox"
+                        value={s.name}
+                        onChange={(e) => filterByProviderType(e)}
                       />
-                      <RadioSearch
-                        text="UKPRN"
-                        timeout={900}
-                        radioId={"ukprn"}
-                        characterRestrictions={CharacterRestrictions.NumericOnly}
-                        radioName={"search-providers-radios"}
-                        searchType={"ukprn"}
-                        minimumChars={3}
-                        maximumChars={8}
-                        callback={searchText}
-                        selectedSearchType={searchType}
-                      />
-                      <RadioSearch
-                        text="UPIN"
-                        timeout={900}
-                        radioId={"upin"}
-                        characterRestrictions={CharacterRestrictions.NumericOnly}
-                        radioName={"search-providers-radios"}
-                        searchType={"upin"}
-                        minimumChars={3}
-                        maximumChars={6}
-                        callback={searchText}
-                        selectedSearchType={searchType}
-                      />
-                      <RadioSearch
-                        text="URN"
-                        timeout={900}
-                        radioId={"urn"}
-                        characterRestrictions={CharacterRestrictions.NumericOnly}
-                        radioName={"search-providers-radios"}
-                        searchType={"urn"}
-                        minimumChars={3}
-                        maximumChars={6}
-                        callback={searchText}
-                        selectedSearchType={searchType}
-                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`providerType-${s.name}`}
+                      >
+                        {s.name}
+                      </label>
                     </div>
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by provider type"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchRequest.filters["providerType"]?.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input
-                      className="govuk-input"
-                      type="text"
-                      onChange={(e) => searchProviderTypeFilters(e)}
-                    />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterProviderType.map((s, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          key={`providerType-${s.name}`}
-                          id={`providerType-${s.name}`}
-                          name={`providerType-${s.name}`}
-                          type="checkbox"
-                          value={s.name}
-                          onChange={(e) => filterByProviderType(e)}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`providerType-${s.name}`}
-                        >
-                          {s.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by provider sub type"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchRequest.filters["providerSubType"]?.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input
-                      className="govuk-input"
-                      type="text"
-                      onChange={(e) => searchProviderSubTypeFilters(e)}
-                    />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterProviderSubType.map((s, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          key={`providerSubType-${s.name}`}
-                          id={`providerSubType-${s.name}`}
-                          name={`providerSubType-${s.name}`}
-                          type="checkbox"
-                          value={s.name}
-                          onChange={(e) => filterByProviderSubType(e)}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`providerType-${s.name}`}
-                        >
-                          {s.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by local authority (LA)"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchRequest.filters["authority"]?.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input
-                      className="govuk-input"
-                      type="text"
-                      onChange={(e) => searchLocalAuthorityFilters(e)}
-                    />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterLocalAuthority.map((s, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          key={`authority-${s.name}`}
-                          id={`authority-${s.name}`}
-                          name={`authority-${s.name}`}
-                          type="checkbox"
-                          value={s.name}
-                          onChange={(e) => filterByLocalAuthority(e)}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`providerType-${s.name}`}
-                        >
-                          {s.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-                Clear filters
-              </button>
-            </form>
-          </div>
-          <div className="govuk-grid-column-two-thirds">
-            {!isLoading ? (
-              providerVersionSearchResults.items.map((providerVersionSearchResult) => (
-                <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
-                  <h3 className="govuk-heading-m">
-                    <Link
-                      to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}/${match.params.fundingStreamId}`}
-                    >
-                      {providerVersionSearchResult.name}
-                    </Link>
-                  </h3>
-                  <p className="govuk-body-s govuk-!-margin-bottom-3">
-                    <span>
-                      UKPRN:{" "}
-                      <strong>
-                        {providerVersionSearchResult.ukprn !== ""
-                          ? providerVersionSearchResult.ukprn
-                          : "No data found"}
-                      </strong>
-                    </span>
-                    <span>
-                      UPIN:{" "}
-                      <strong>
-                        {providerVersionSearchResult.upin !== ""
-                          ? providerVersionSearchResult.upin
-                          : "No data found"}
-                      </strong>
-                    </span>
-                    <span>
-                      URN:{" "}
-                      <strong>
-                        {providerVersionSearchResult.urn !== ""
-                          ? providerVersionSearchResult.urn
-                          : "No data found"}
-                      </strong>
-                    </span>
-                    <span>
-                      Establishment number:{" "}
-                      <strong>
-                        {providerVersionSearchResult.establishmentNumber !== ""
-                          ? providerVersionSearchResult.establishmentNumber
-                          : "No data found"}
-                      </strong>
-                    </span>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title={"Filter by provider sub type"}
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={searchRequest.filters["providerSubType"]?.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input
+                    className="govuk-input"
+                    type="text"
+                    onChange={(e) => searchProviderSubTypeFilters(e)}
+                  />
+                </div>
+                <div className="govuk-checkboxes">
+                  {filterProviderSubType.map((s, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        key={`providerSubType-${s.name}`}
+                        id={`providerSubType-${s.name}`}
+                        name={`providerSubType-${s.name}`}
+                        type="checkbox"
+                        value={s.name}
+                        onChange={(e) => filterByProviderSubType(e)}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`providerType-${s.name}`}
+                      >
+                        {s.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title={"Filter by local authority (LA)"}
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={searchRequest.filters["authority"]?.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input
+                    className="govuk-input"
+                    type="text"
+                    onChange={(e) => searchLocalAuthorityFilters(e)}
+                  />
+                </div>
+                <div className="govuk-checkboxes">
+                  {filterLocalAuthority.map((s, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        key={`authority-${s.name}`}
+                        id={`authority-${s.name}`}
+                        name={`authority-${s.name}`}
+                        type="checkbox"
+                        value={s.name}
+                        onChange={(e) => filterByLocalAuthority(e)}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`providerType-${s.name}`}
+                      >
+                        {s.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
+              Clear filters
+            </button>
+          </form>
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          {!isLoading ? (
+            providerVersionSearchResults.items.map((providerVersionSearchResult) => (
+              <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
+                <h3 className="govuk-heading-m">
+                  <Link
+                    className="govuk-link govuk-link--no-visited-state"
+                    to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}/${match.params.fundingStreamId}`}
+                  >
+                    {providerVersionSearchResult.name}
+                  </Link>
+                </h3>
+                <p className="govuk-body-s govuk-!-margin-bottom-3govuk-!-margin-top-2">
+                  <span>
+                    UKPRN:{" "}
+                    <strong>
+                      {providerVersionSearchResult.ukprn !== ""
+                        ? providerVersionSearchResult.ukprn
+                        : "No data found"}
+                    </strong>
+                  </span>
+                  <span>
+                    UPIN:{" "}
+                    <strong>
+                      {providerVersionSearchResult.upin !== ""
+                        ? providerVersionSearchResult.upin
+                        : "No data found"}
+                    </strong>
+                  </span>
+                  <span>
+                    URN:{" "}
+                    <strong>
+                      {providerVersionSearchResult.urn !== ""
+                        ? providerVersionSearchResult.urn
+                        : "No data found"}
+                    </strong>
+                  </span>
+                </p>
+
+                <details
+                  className="govuk-details govuk-!-margin-top-2 govuk-!-margin-bottom-2"
+                  data-module="govuk-details"
+                >
+                  <summary className="govuk-details__summary">
+                    <span className="govuk-details__summary-text">Provider details</span>
+                  </summary>
+                  <p className="govuk-body-s govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+                    Establishment number: <strong>4249</strong>
                   </p>
-                  <p className="govuk-body-s govuk-!-margin-bottom-3">
+                  <p className="govuk-body-s govuk-!-margin-bottom-2">
                     Provider type: <strong>{providerVersionSearchResult.providerType}</strong>
                   </p>
-                  <p className="govuk-body-s govuk-!-margin-bottom-3">
+                  <p className="govuk-body-s govuk-!-margin-bottom-2">
                     Provider subtype: <strong>{providerVersionSearchResult.providerSubType}</strong>
                   </p>
-
-                  <p className="govuk-body-s govuk-!-margin-bottom-3">
+                  <p className="govuk-body-s govuk-!-margin-bottom-2">
                     <span>
                       Local authority: <strong>{providerVersionSearchResult.authority}</strong>
                     </span>
                     <span>
-                      Date opened:
+                      Date opened:{" "}
                       <strong>
-                        {providerVersionSearchResult.dateOpened == null ? (
-                          " Unknown"
-                        ) : (
+                        {providerVersionSearchResult.dateOpened ? (
                           <DateTimeFormatter date={providerVersionSearchResult.dateOpened} />
+                        ) : (
+                          "Unknown"
                         )}
                       </strong>
                     </span>
                   </p>
-                  <hr className="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
-                </div>
-              ))
-            ) : (
-              <LoadingStatus title={"Loading providers"} />
-            )}
-            <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading} />
-            <BackToTop id="top" />
-            {!isLoading && providerVersionSearchResults.totalCount > 0 && (
-              <nav
-                className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
-                role="navigation"
-                aria-label="Pagination"
-              >
-                <div className="pagination__summary">
-                  Showing {providerVersionSearchResults.startItemNumber} -{" "}
-                  {providerVersionSearchResults.endItemNumber} of {providerVersionSearchResults.totalCount}{" "}
-                  results
-                </div>
-                <Pagination
-                  currentPage={providerVersionSearchResults.pagerState.currentPage}
-                  lastPage={providerVersionSearchResults.pagerState.lastPage}
-                  callback={pageChange}
-                />
-              </nav>
-            )}
-          </div>
+                </details>
+                <hr className="govuk-section-break govuk-!-margin-top-0 govuk-section-break--l govuk-section-break--visible" />
+              </div>
+            ))
+          ) : (
+            <LoadingStatus title={"Loading providers"} />
+          )}
+
+          <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading} />
+
+          <BackToTop id="top" />
+
+          {!isLoading && (
+            <TableNavBottom
+              currentPage={providerVersionSearchResults?.pagerState?.currentPage}
+              lastPage={providerVersionSearchResults?.pagerState?.lastPage}
+              totalCount={providerVersionSearchResults?.totalCount}
+              totalResults={providerVersionSearchResults?.totalCount}
+              startItemNumber={providerVersionSearchResults?.startItemNumber}
+              endItemNumber={providerVersionSearchResults?.endItemNumber}
+              onPageChange={pageChange}
+            />
+          )}
         </div>
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 }

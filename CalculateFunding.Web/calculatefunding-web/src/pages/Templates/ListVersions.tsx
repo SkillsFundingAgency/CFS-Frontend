@@ -10,7 +10,7 @@ import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import Pagination from "../../components/Pagination";
+import { Pagination } from "../../components/Pagination";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { getTemplateById, getVersionsOfTemplate } from "../../services/templateBuilderDatasourceService";
 import { ErrorMessage } from "../../types/ErrorMessage";

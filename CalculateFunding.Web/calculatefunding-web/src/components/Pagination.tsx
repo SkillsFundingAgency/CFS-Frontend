@@ -3,10 +3,10 @@ import React from "react";
 interface PaginationProps {
   currentPage: number;
   lastPage: number;
-  callback: Function;
+  callback: (page: number) => void;
 }
 
-export default function Pagination({ currentPage, lastPage, callback }: PaginationProps) {
+export const Pagination = ({ currentPage, lastPage, callback }: PaginationProps): JSX.Element => {
   return (
     <ul className="pagination" hidden={currentPage === 1 && lastPage === 0}>
       {currentPage - 1 < 1 ? (
@@ -14,7 +14,10 @@ export default function Pagination({ currentPage, lastPage, callback }: Paginati
       ) : (
         <li className="pagination__item">
           <button className="pagination__link" id="btnPreviousPage" onClick={() => callback(currentPage - 1)}>
-            « Previous Page
+            <span aria-hidden="true" role="presentation">
+              «
+            </span>{" "}
+            Previous Page
           </button>
         </li>
       )}
@@ -40,7 +43,9 @@ export default function Pagination({ currentPage, lastPage, callback }: Paginati
         ""
       ) : (
         <li className="pagination__item">
-          <button className="pagination__link current">{currentPage}</button>
+          <button className="pagination__link current" aria-current="true">
+            {currentPage}
+          </button>
         </li>
       )}
       {currentPage + 1 <= lastPage ? (
@@ -71,10 +76,13 @@ export default function Pagination({ currentPage, lastPage, callback }: Paginati
             title="View Next Page"
             onClick={() => callback(currentPage + 1)}
           >
-            Next Page »
+            Next Page{" "}
+            <span aria-hidden="true" role="presentation">
+              »
+            </span>
           </button>
         </li>
       )}
     </ul>
   );
-}
+};

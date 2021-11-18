@@ -15,10 +15,10 @@ import { CalculationSearchResultResponse, CalculationType } from "../../types/Ca
 import { Permission } from "../../types/Permission";
 import { ValueType } from "../../types/ValueType";
 import { DateTimeFormatter } from "../DateTimeFormatter";
-import { formatNumber,NumberType } from "../FormattedNumber";
+import { formatNumber, NumberType } from "../FormattedNumber";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { LoadingStatus } from "../LoadingStatus";
-import Pagination from "../Pagination";
+import { TableNavBottom } from "../TableNavBottom";
 
 export interface AdditionalCalculationsProps {
   specificationId: string;
@@ -167,7 +167,7 @@ export function AdditionalCalculations({
           <div className="govuk-grid-column-one-third">
             <Link
               to={`/Specifications/CreateAdditionalCalculation/${specificationId}`}
-              className="govuk-link"
+              className="govuk-link govuk-link--no-visited-state"
             >
               Create additional calculation
             </Link>
@@ -243,7 +243,12 @@ export function AdditionalCalculations({
               return (
                 <tr className="govuk-table__row" key={index}>
                   <td className="govuk-table__cell text-overflow">
-                    <Link className={ac.exceptionMessage ? "govuk-form-group--error" : ""} to={linkUrl}>
+                    <Link
+                      className={`govuk-link govuk-link--no-visited-state ${
+                        ac.exceptionMessage ? "govuk-form-group--error" : ""
+                      }`}
+                      to={linkUrl}
+                    >
                       {ac.name}
                     </Link>
                     {ac.exceptionMessage ? (
@@ -303,7 +308,10 @@ export function AdditionalCalculations({
                 <span className="govuk-warning-text__assistive">Warning</span>
                 No additional calculations available. &nbsp;
                 {isPermissionsFetched && !hasMissingPermissions && showCreateButton && (
-                  <Link to={`/specifications/CreateAdditionalCalculation/${specificationId}`}>
+                  <Link
+                    className="govuk-link govuk-link--no-visited-state"
+                    to={`/specifications/CreateAdditionalCalculation/${specificationId}`}
+                  >
                     Create a calculation
                   </Link>
                 )}
@@ -327,26 +335,15 @@ export function AdditionalCalculations({
             )}
         </>
       )}
-      {additionalCalculations && additionalCalculations.totalResults > 0 && (
-        <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-          <div
-            className="pagination__summary"
-            hidden={
-              additionalCalculations.currentPage === 1 && additionalCalculations.pagerState.lastPage <= 1
-            }
-          >
-            <p className="govuk-body right-align">
-              {`Showing ${additionalCalculations.startItemNumber} - ${additionalCalculations.endItemNumber} of 
-                        ${additionalCalculations.totalResults} calculations`}
-            </p>
-          </div>
-          <Pagination
-            currentPage={additionalCalculations.currentPage}
-            lastPage={additionalCalculations.pagerState.lastPage}
-            callback={movePage}
-          />
-        </nav>
-      )}
+      <TableNavBottom
+        currentPage={additionalCalculations?.currentPage}
+        lastPage={additionalCalculations?.lastPage}
+        totalCount={additionalCalculations?.totalCount}
+        totalResults={additionalCalculations?.totalResults}
+        startItemNumber={additionalCalculations?.startItemNumber}
+        endItemNumber={additionalCalculations?.endItemNumber}
+        onPageChange={movePage}
+      />
     </section>
   );
 }

@@ -9,7 +9,7 @@ import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import Pagination from "../../components/Pagination";
+import { Pagination } from "../../components/Pagination";
 import { useErrors } from "../../hooks/useErrors";
 import { searchDatasetDefinitionsService } from "../../services/datasetService";
 import { DatasetDefinitionRequestViewModel } from "../../types/Datasets/DatasetDefinitionRequestViewModel";

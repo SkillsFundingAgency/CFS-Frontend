@@ -10,7 +10,7 @@ import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import Pagination from "../../components/Pagination";
+import { Pagination } from "../../components/Pagination";
 import { useErrors } from "../../hooks/useErrors";
 import { searchDatasetRelationshipsService } from "../../services/datasetService";
 import { DatasetDefinitionRequestViewModel } from "../../types/Datasets/DatasetDefinitionRequestViewModel";
@@ -114,9 +114,9 @@ export function MapDataSourceFiles() {
       });
   }
 
-  function pageChange(pageNumber: string) {
+  function pageChange(page: number) {
     setSearchRequest((prevState) => {
-      return { ...prevState, pageNumber: parseInt(pageNumber) };
+      return { ...prevState, pageNumber: page };
     });
   }
 

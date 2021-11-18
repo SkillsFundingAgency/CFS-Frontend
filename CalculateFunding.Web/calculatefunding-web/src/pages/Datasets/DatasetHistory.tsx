@@ -5,7 +5,7 @@ import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import Pagination from "../../components/Pagination";
+import { Pagination } from "../../components/Pagination";
 import { Title } from "../../components/Title";
 import { convertCamelCaseToSpaceDelimited } from "../../helpers/stringHelper";
 import { useErrors } from "../../hooks/useErrors";

@@ -9,7 +9,7 @@ import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import Pagination from "../../components/Pagination";
+import { Pagination } from "../../components/Pagination";
 import { convertToSlug } from "../../helpers/stringHelper";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useErrors } from "../../hooks/useErrors";

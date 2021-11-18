@@ -21,7 +21,7 @@ export const Tab: React.FC<ITabProps> = (props) => {
       hidden={props.hidden}
       className={
         activeTab === props.label
-          ? "govuk-tabs__list-item govuk-tabs__list-item--selected"
+          ? "govuk-tabs__list-item govuk-tabs__list-item--selected govuk-!-padding-bottom-2"
           : "govuk-tabs__list-item"
       }
     >

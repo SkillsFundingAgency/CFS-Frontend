@@ -8,7 +8,7 @@ import { PublishedProviderSearchResults } from "../../types/PublishedProvider/Pu
 import { BackToTop } from "../BackToTop";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
 import { NoData } from "../NoData";
-import Pagination from "../Pagination";
+import { Pagination } from "../Pagination";
 import { PublishedProviderRow } from "./PublishedProviderRow";
 
 export interface IPublishedProviderResultsProps {
@@ -67,8 +67,8 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
     );
   };
 
-  async function handlePageChange(pageNumber: string) {
-    dispatch(actions.setPage(parseInt(pageNumber)));
+  async function handlePageChange(page: number) {
+    dispatch(actions.setPage(page));
   }
 
   return (

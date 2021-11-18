@@ -10,10 +10,9 @@ import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import Pagination from "../../components/Pagination";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { SearchBox } from "../../components/SearchBox";
-import { TableResults } from "../../components/TableResults";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { useTemplatePermissions } from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { searchForTemplates } from "../../services/templateBuilderDatasourceService";
@@ -161,9 +160,7 @@ export const ListTemplates = () => {
                       <th scope="row" className="govuk-table__header">
                         <Link
                           to={""}
-                          onClick={(e) =>
-                            handleTemplateLinkClick(e as MouseEvent, `${template.id}`)
-                          }
+                          onClick={(e) => handleTemplateLinkClick(e as MouseEvent, `${template.id}`)}
                         >
                           {template.name}
                         </Link>
@@ -230,23 +227,17 @@ export const ListTemplates = () => {
             )}
             {!haveResults && <p className="govuk-body">There are no records to match your search</p>}
             <BackToTop id={"listTemplates"} />
-            {templateListResults?.pagerState !== undefined && (
-              <Pagination
-                currentPage={templateListResults.pagerState.currentPage}
-                lastPage={templateListResults.pagerState.lastPage}
-                callback={setPagination}
-              />
-            )}
-            {templateListResults?.pagerState !== undefined && (
-              <TableResults
-                startItemNumber={templateListResults.startItemNumber}
-                endItemNumber={templateListResults.endItemNumber}
-                totalResults={templateListResults.totalCount}
-              />
-            )}
 
+            <TableNavBottom
+              currentPage={templateListResults?.pagerState?.currentPage}
+              lastPage={templateListResults?.pagerState?.lastPage}
+              totalCount={templateListResults?.totalCount}
+              totalResults={templateListResults?.totalCount}
+              startItemNumber={templateListResults?.startItemNumber}
+              endItemNumber={templateListResults?.endItemNumber}
+              onPageChange={setPagination}
+            />
           </div>
-
         </div>
       </div>
       <Footer />

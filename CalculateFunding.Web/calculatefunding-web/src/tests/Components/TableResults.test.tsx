@@ -1,16 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import React from "react";
 
-import { TableResults } from "../../components/TableResults";
+import { TableResultsSummary } from "../../components/TableResultsSummary";
 
-describe("<TableResults /> ", () => {
+describe("<TableResultsSummary /> ", () => {
   it("renders correctly", () => {
-    render(<TableResults totalResults={100} startItemNumber={1} endItemNumber={10} />);
+    render(<TableResultsSummary totalResults={100} startItemNumber={1} endItemNumber={10} />);
     expect(screen.getByText("Showing 1 - 10 of 100 results")).toBeInTheDocument();
   });
 
   it("has the correct styling rule", () => {
-    const { container } = render(<TableResults totalResults={100} startItemNumber={1} endItemNumber={10} />);
+    const { container } = render(
+      <TableResultsSummary totalResults={100} startItemNumber={1} endItemNumber={10} />
+    );
     expect(container.querySelector(".pagination__summary")).toBeInTheDocument();
   });
 });

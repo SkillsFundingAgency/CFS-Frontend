@@ -7,7 +7,7 @@ import { DateTimeFormatter } from "../DateTimeFormatter";
 import { InlineFieldset } from "../Fieldset";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { NoData } from "../NoData";
-import Pagination from "../Pagination";
+import { Pagination } from "../Pagination";
 
 export interface DatasetVersionSelectorProps {
   dataset: DatasetWithVersions;

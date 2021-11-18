@@ -1,14 +1,11 @@
 import { mount } from "enzyme";
 import React from "react";
 
-import { AccordionPanel } from "../../components/AccordionPanel";
 import { Details } from "../../components/Details";
-import Pagination from "../../components/Pagination";
 
 const Adapter = require("enzyme-adapter-react-16");
 const enzyme = require("enzyme");
 enzyme.configure({ adapter: new Adapter() });
-const { shallow } = enzyme;
 
 describe("<Details />", () => {
   it(" renders a panel", () => {

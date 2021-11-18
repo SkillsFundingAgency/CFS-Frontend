@@ -13,7 +13,7 @@ import { JobNotificationBanner } from "../components/Jobs/JobNotificationBanner"
 import { LoadingFieldStatus } from "../components/LoadingFieldStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
-import Pagination from "../components/Pagination";
+import { Pagination } from "../components/Pagination";
 import { TagTypes } from "../components/Tag";
 import { useCalculation } from "../hooks/Calculations/useCalculation";
 import { useLatestSpecificationJobWithMonitoring } from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
