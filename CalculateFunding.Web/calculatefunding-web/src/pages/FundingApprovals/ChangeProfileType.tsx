@@ -227,10 +227,6 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
       addErrorMessage("More than one national profile found for this funding line.");
       setMissingData(true);
     }
-    if (nationalPattern.length === 0) {
-      addErrorMessage("No national profile pattern found for this funding line.");
-      setMissingData(true);
-    }
     return undefined;
   }, [profilePatterns]);
 
@@ -313,25 +309,27 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
                 Select one option.
               </span>
               <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                <div className="govuk-radios__item">
-                  <input
-                    className="govuk-radios__input"
-                    name="national"
-                    type="radio"
-                    data-aria-controls="national-pattern"
-                    value={PatternType.National}
-                    checked={patternType === PatternType.National}
-                    onChange={handleProfilePatternSelected}
-                    aria-labelledby="national-type"
-                  />
-                  <label className="govuk-label govuk-radios__label" htmlFor="national" id="national-type">
-                    {getNationalPatternName()}
-                    <span className="govuk-hint">{getNationalPatternDescription()}</span>
-                    <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>
-                      Preview profile
-                    </button>
-                  </label>
-                </div>
+                {getNationalPattern && (
+                  <div className="govuk-radios__item">
+                    <input
+                      className="govuk-radios__input"
+                      name="national"
+                      type="radio"
+                      data-aria-controls="national-pattern"
+                      value={PatternType.National}
+                      checked={patternType === PatternType.National}
+                      onChange={handleProfilePatternSelected}
+                      aria-labelledby="national-type"
+                    />
+                    <label className="govuk-label govuk-radios__label" htmlFor="national" id="national-type">
+                      {getNationalPatternName()}
+                      <span className="govuk-hint">{getNationalPatternDescription()}</span>
+                      <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>
+                        Preview profile
+                      </button>
+                    </label>
+                  </div>
+                )}
                 <div className="govuk-form-group">
                   <fieldset className="govuk-fieldset" aria-describedby="rule-based-hint">
                     <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
