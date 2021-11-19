@@ -1,18 +1,17 @@
 import { AxiosError } from "axios";
+import { Main } from "components/Main";
 import * as QueryString from "query-string";
 import React, { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
-import { RouteComponentProps, useHistory, useLocation } from "react-router";
+import { RouteComponentProps, useLocation } from "react-router";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
 import { ProviderFundingProfilingPatterns } from "../../components/Funding/ProviderFundingProfilingPatterns";
 import { ProviderFundingProfilingSummary } from "../../components/Funding/ProviderFundingProfilingSummary";
 import { ProviderFundingStreamHistory } from "../../components/Funding/ProviderFundingStreamHistory";
 import { FundingLineResults } from "../../components/fundingLineStructure/FundingLineResults";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { ProviderSummarySection } from "../../components/Providers/ProviderSummarySection";
@@ -55,7 +54,6 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
   const [initialTab, setInitialTab] = useState<string>("");
   const location = useLocation();
   const { errors, addError, clearErrorMessages } = useErrors();
-  const history = useHistory();
 
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
     addError({ error: err, description: "Error while loading specification" })
@@ -140,103 +138,99 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
   }, [location]);
 
   return (
-    <div>
-      <Header location={Section.Approvals} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"Approvals"} />
-          <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
-          <Breadcrumb
-            name={"Funding approval results"}
-            url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-          />
-          <Breadcrumb name={"Provider funding overview"} />
-        </Breadcrumbs>
-
-        <MultipleErrorSummary errors={errors} />
-
-        <ProviderSummarySection
-          specification={specification}
-          isLoadingSpecification={isLoadingSpecification}
-          providerVersion={providerVersion}
-          publishedProviderVersion={publishedProviderVersion}
-          isLoadingProviderVersion={isLoadingProviderVersion}
-          isLoadingPublishedProviderVersion={isLoadingPublishedProviderVersion}
-          status={isLoadingTransactions ? "" : transactions ? transactions.latestStatus : ""}
-          fundingTotal={isLoadingTransactions ? "" : transactions ? transactions.fundingTotal : ""}
+    <Main location={Section.Approvals}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Approvals"} />
+        <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
+        <Breadcrumb
+          name={"Funding approval results"}
+          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
         />
+        <Breadcrumb name={"Provider funding overview"} />
+      </Breadcrumbs>
 
-        {initialTab.length > 0 && (
-          <div className="govuk-grid-row govuk-!-padding-top-5">
-            <div className="govuk-grid-column-full">
-              <Tabs initialTab={initialTab}>
-                <ul className="govuk-tabs__list">
-                  <Tabs.Tab label="funding-stream-history">Funding stream history</Tabs.Tab>
-                  <Tabs.Tab label="profiling">Profiling</Tabs.Tab>
-                  <Tabs.Tab label="calculations">Calculations</Tabs.Tab>
-                </ul>
-                <Tabs.Panel label="funding-stream-history">
-                  {isLoadingTransactions && <LoadingStatus title="Loading..." />}
-                  {!isLoadingTransactions && transactions && (
-                    <ProviderFundingStreamHistory transactions={transactions} />
+      <MultipleErrorSummary errors={errors} />
+
+      <ProviderSummarySection
+        specification={specification}
+        isLoadingSpecification={isLoadingSpecification}
+        providerVersion={providerVersion}
+        publishedProviderVersion={publishedProviderVersion}
+        isLoadingProviderVersion={isLoadingProviderVersion}
+        isLoadingPublishedProviderVersion={isLoadingPublishedProviderVersion}
+        status={isLoadingTransactions ? "" : transactions ? transactions.latestStatus : ""}
+        fundingTotal={isLoadingTransactions ? "" : transactions ? transactions.fundingTotal : ""}
+      />
+
+      {initialTab.length > 0 && (
+        <div className="govuk-grid-row govuk-!-padding-top-5">
+          <div className="govuk-grid-column-full">
+            <Tabs initialTab={initialTab}>
+              <ul className="govuk-tabs__list">
+                <Tabs.Tab label="funding-stream-history">Funding stream history</Tabs.Tab>
+                <Tabs.Tab label="profiling">Profiling</Tabs.Tab>
+                <Tabs.Tab label="calculations">Calculations</Tabs.Tab>
+              </ul>
+              <Tabs.Panel label="funding-stream-history">
+                {isLoadingTransactions && <LoadingStatus title="Loading..." />}
+                {!isLoadingTransactions && transactions && (
+                  <ProviderFundingStreamHistory transactions={transactions} />
+                )}
+              </Tabs.Panel>
+              <Tabs.Panel label="profiling">
+                {featureFlagsState.profilingPatternVisible
+                  ? isLoadingProfilingPatterns
+                  : (isLoadingSpecification || isLoadingProfileTotals) && (
+                      <LoadingStatus title={"Loading..."} />
+                    )}
+                {!featureFlagsState.profilingPatternVisible &&
+                  !isLoadingSpecification &&
+                  specification &&
+                  profileTotals &&
+                  !isLoadingProfileTotals && (
+                    <ProviderFundingProfilingSummary
+                      routeParams={match.params}
+                      specification={specification}
+                      profileTotals={profileTotals}
+                    />
                   )}
-                </Tabs.Panel>
-                <Tabs.Panel label="profiling">
-                  {featureFlagsState.profilingPatternVisible
-                    ? isLoadingProfilingPatterns
-                    : (isLoadingSpecification || isLoadingProfileTotals) && (
-                        <LoadingStatus title={"Loading..."} />
-                      )}
-                  {!featureFlagsState.profilingPatternVisible &&
-                    !isLoadingSpecification &&
-                    specification &&
-                    profileTotals &&
-                    !isLoadingProfileTotals && (
-                      <ProviderFundingProfilingSummary
-                        routeParams={match.params}
-                        specification={specification}
-                        profileTotals={profileTotals}
-                      />
-                    )}
-                  {featureFlagsState.profilingPatternVisible &&
-                    !isLoadingProfilingPatterns &&
-                    profilingPatterns && (
-                      <ProviderFundingProfilingPatterns
-                        routeParams={match.params}
-                        profilingPatterns={profilingPatterns}
-                      />
-                    )}
-                </Tabs.Panel>
-                <Tabs.Panel label="calculations">
-                  <FundingLineResults
-                    specificationId={specificationId}
-                    fundingStreamId={fundingStreamId}
-                    fundingPeriodId={fundingPeriodId}
-                    status={PublishStatus.Approved}
-                    providerId={providerId}
-                    addError={addError}
-                    showApproveButton={false}
-                    useCalcEngine={false}
-                    jobTypes={[
-                      JobType.RefreshFundingJob,
-                      JobType.ApproveAllProviderFundingJob,
-                      JobType.ApproveBatchProviderFundingJob,
-                      JobType.PublishAllProviderFundingJob,
-                      JobType.PublishBatchProviderFundingJob,
-                      JobType.PublishedFundingUndoJob,
-                    ]}
-                    clearErrorMessages={clearErrorMessages}
-                  />
-                </Tabs.Panel>
-              </Tabs>
-            </div>
+                {featureFlagsState.profilingPatternVisible &&
+                  !isLoadingProfilingPatterns &&
+                  profilingPatterns && (
+                    <ProviderFundingProfilingPatterns
+                      routeParams={match.params}
+                      profilingPatterns={profilingPatterns}
+                    />
+                  )}
+              </Tabs.Panel>
+              <Tabs.Panel label="calculations">
+                <FundingLineResults
+                  specificationId={specificationId}
+                  fundingStreamId={fundingStreamId}
+                  fundingPeriodId={fundingPeriodId}
+                  status={PublishStatus.Approved}
+                  providerId={providerId}
+                  addError={addError}
+                  showApproveButton={false}
+                  useCalcEngine={false}
+                  jobTypes={[
+                    JobType.RefreshFundingJob,
+                    JobType.ApproveAllProviderFundingJob,
+                    JobType.ApproveBatchProviderFundingJob,
+                    JobType.PublishAllProviderFundingJob,
+                    JobType.PublishBatchProviderFundingJob,
+                    JobType.PublishedFundingUndoJob,
+                  ]}
+                  clearErrorMessages={clearErrorMessages}
+                />
+              </Tabs.Panel>
+            </Tabs>
           </div>
-        )}
-        <div className="govuk-clearfix"></div>
-        <BackLink />
-      </div>
-      <Footer />
-    </div>
+        </div>
+      )}
+      <div className="govuk-clearfix"></div>
+      <BackLink />
+    </Main>
   );
 }

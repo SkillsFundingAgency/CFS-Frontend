@@ -48,7 +48,8 @@ describe("<ViewEditFundingLineProfile in VIEW mode />", () => {
     });
 
     it("edit profile button is enabled", async () => {
-      expect(await screen.findByRole("button", { name: /Edit profile/ })).not.toBeDisabled();
+      const button = await screen.findByRole("button", { name: /Edit profile/ });
+      expect(button).not.toBeDisabled();
     });
 
     it("fields are all in read only view", async () => {

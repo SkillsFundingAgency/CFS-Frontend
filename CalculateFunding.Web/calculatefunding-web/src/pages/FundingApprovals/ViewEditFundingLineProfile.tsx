@@ -167,6 +167,7 @@ export function ViewEditFundingLineProfile({
       );
     } else {
       if (editMode === ProfileEditMode.EditAll && !hasAcknowledgedHistoricEdit) {
+        window.scrollTo(0, 0);
         addError({ error: "You must acknowledge", fieldName: "acknowledge" });
         return;
       }
@@ -176,6 +177,7 @@ export function ViewEditFundingLineProfile({
         const totalUnpaidAllocationPercent = calculateUnpaidTotalAllocationPercent();
 
         if (!isFormValid(totalUnpaidAllocationAmount, totalUnpaidAllocationPercent)) {
+          window.scrollTo(0, 0);
           return;
         }
 
@@ -207,6 +209,7 @@ export function ViewEditFundingLineProfile({
           `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`
         );
       } catch (err: any) {
+        window.scrollTo(0, 0);
         if (err.response.status === 400) {
           const errResponse = err.response.data;
           addValidationErrors({ validationErrors: { errResponse }, message: "Validation failed" });
