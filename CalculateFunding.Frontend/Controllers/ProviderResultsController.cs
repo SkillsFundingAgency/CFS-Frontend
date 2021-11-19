@@ -10,9 +10,11 @@ using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
+using CalculateFunding.Common.ApiClient.Users.Models;
 using CalculateFunding.Common.Helpers;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.ProviderResults;
 using Microsoft.AspNetCore.Mvc;
 using CalculationMetadata = CalculateFunding.Common.ApiClient.Calcs.Models.CalculationMetadata;
@@ -30,24 +32,28 @@ namespace CalculateFunding.Frontend.Controllers
         private readonly IPoliciesApiClient _policiesClient;
         private readonly ICalculationsApiClient _calculationsClient;
         private readonly IPublishingApiClient _publishingApiClient;
+        private readonly IAuthorizationHelper _authHelper;
 
         public ProviderResultsController(ISpecificationsApiClient specificationsApiClient,
             IResultsApiClient resultsApiClient,
             IPoliciesApiClient policiesApiClient,
             ICalculationsApiClient calculationsApiClient,
-            IPublishingApiClient publishingApiClient)
+            IPublishingApiClient publishingApiClient,
+            IAuthorizationHelper authHelper)
         {
             Guard.ArgumentNotNull(specificationsApiClient, nameof(specificationsApiClient));
             Guard.ArgumentNotNull(resultsApiClient, nameof(resultsApiClient));
             Guard.ArgumentNotNull(policiesApiClient, nameof(policiesApiClient));
             Guard.ArgumentNotNull(calculationsApiClient, nameof(calculationsApiClient));
             Guard.ArgumentNotNull(publishingApiClient, nameof(publishingApiClient));
+            Guard.ArgumentNotNull(authHelper, nameof(authHelper));
 
             _specsClient = specificationsApiClient;
             _resultsClient = resultsApiClient;
             _policiesClient = policiesApiClient;
             _calculationsClient = calculationsApiClient;
             _publishingApiClient = publishingApiClient;
+            _authHelper = authHelper;
         }
 
         [HttpGet("api/results/specifications/{specificationId}/providers/{providerId}/template-results/{useCalcEngine}")]
@@ -189,6 +195,35 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("GetSpecificationCalculationResultsMetadata");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return new OkObjectResult(response.Content);
+        }
+
+        [HttpPost]
+        [Route("api/results/specifications/{specificationId}/run-populate-calculation-results-qa-database-job")]
+        public async Task<IActionResult> RunGenerateCalculationResultQADatabasePopulationJob([FromRoute] string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            EffectiveSpecificationPermission effectiveSpecificationPermission = await _authHelper.GetEffectivePermissionsForUser(User, specificationId);
+
+            if (!effectiveSpecificationPermission.CanRefreshPublishedQa)
+            {
+                return new ForbidResult();
+            }
+
+            PopulateCalculationResultQADatabaseRequest populateCalculationResultQADatabaseRequest = new PopulateCalculationResultQADatabaseRequest
+            {
+                SpecificationId = specificationId
+            };
+
+            ApiResponse<Job> response = await _resultsClient.RunGenerateCalculationResultQADatabasePopulationJob(populateCalculationResultQADatabaseRequest);
+
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(RunGenerateCalculationResultQADatabasePopulationJob));
             if (errorResult != null)
             {
                 return errorResult;

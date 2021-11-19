@@ -15,6 +15,7 @@ using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Frontend.Controllers;
 using CalculateFunding.Frontend.Extensions;
+using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.ProviderResults;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private Mock<IPoliciesApiClient> _policiesApiClient;
         private Mock<ICalculationsApiClient> _calculationsApiClient;
         private Mock<IPublishingApiClient> _pubishingApiClient;
+        private Mock<IAuthorizationHelper> _authorizationHelper;
 
         private string _providerId;
         private string _specificationId;
@@ -54,9 +56,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _policiesApiClient = new Mock<IPoliciesApiClient>();
             _calculationsApiClient = new Mock<ICalculationsApiClient>();
             _pubishingApiClient = new Mock<IPublishingApiClient>();
+            _authorizationHelper = new Mock<IAuthorizationHelper>();
 
             _providerResultsController = new ProviderResultsController(_specificationApiClient.Object,
-                _resultsApiClient.Object, _policiesApiClient.Object, _calculationsApiClient.Object, _pubishingApiClient.Object);
+                                                                       _resultsApiClient.Object,
+                                                                       _policiesApiClient.Object,
+                                                                       _calculationsApiClient.Object,
+                                                                       _pubishingApiClient.Object,
+                                                                       _authorizationHelper.Object);
 
             _providerId = "providerId";
             _specificationId = "specificationId";
