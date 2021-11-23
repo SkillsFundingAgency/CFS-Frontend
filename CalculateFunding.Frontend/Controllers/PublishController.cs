@@ -618,6 +618,21 @@ namespace CalculateFunding.Frontend.Controllers
             return BadRequest();
         }
 
+        [HttpPost("api/specifications/{specificationId}/publishedproviders/release-funding-summary")]
+        public async Task<IActionResult> GetApprovedPublishedProvidersReleaseFundingSummary(
+            [FromBody] ReleaseFundingPublishProvidersRequest request,
+            [FromRoute] string specificationId)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<ReleaseFundingPublishedProvidersSummary> response =
+                await _publishingApiClient.GetApprovedPublishedProvidersReleaseFundingSummary(specificationId, request);
+
+            return response.Handle(nameof(GetApprovedPublishedProvidersReleaseFundingSummary),
+                onSuccess: x => Ok(x.Content));
+        }
+
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)
         {
             if (!await _authorizationHelper.DoesUserHavePermission(
