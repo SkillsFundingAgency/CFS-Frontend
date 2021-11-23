@@ -54,6 +54,7 @@ import { FundingManagementApprovalResults } from "./pages/FundingManagement/Fund
 import { FundingManagementApprovalsConfirmFunding } from "./pages/FundingManagement/FundingManagementApprovalsConfirmFunding";
 import { FundingManagementApprovalSelection } from "./pages/FundingManagement/FundingManagementApprovalSelection";
 import { FundingManagementApprovalsUploadBatch } from "./pages/FundingManagement/FundingManagementApprovalsUploadBatch";
+import { FundingManagementReleaseSelection } from "./pages/FundingManagement/FundingManagementReleaseSelection";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
 import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
@@ -186,6 +187,7 @@ const App: React.FunctionComponent = () => {
                                 component={FundingManagementApprovalsUploadBatch}
                             />
 
+                            <Route path="/FundingManagementReleaseSelection" component={FundingManagementReleaseSelection}/>
 
                             <Route path="/SelectSpecification" component={SelectSpecification} />
                             <Route path="/SpecificationsList" component={SpecificationsList} />

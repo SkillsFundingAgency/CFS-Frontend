@@ -6,11 +6,13 @@ context("Funding management approval selection page", () => {
     let server: Server;
 
     before(() => {
+
         // @ts-ignore
         server = makeServer("test");
 
-        cy.visit("/FundingManagementApprovalSelection");
+        cy.visit("/FundingManagementReleaseSelection");
     });
+
 
     after(() => {
         server.shutdown();
@@ -18,7 +20,7 @@ context("Funding management approval selection page", () => {
 
     describe("when page has loaded", () => {
         it("has correct title", () => {
-            cy.findByRole("heading", { name: /Funding approvals/, level: 1 }).should(
+            cy.findByRole("heading", { name: /Release management/, level: 1 }).should(
                 "exist"
             );
         });
@@ -32,4 +34,5 @@ context("Funding management approval selection page", () => {
         });
     });
 
-});
+})
+;
