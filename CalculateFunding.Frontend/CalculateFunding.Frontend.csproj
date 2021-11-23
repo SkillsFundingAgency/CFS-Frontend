@@ -29,14 +29,14 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient" Version="2.9.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="8.3.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="7.4.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="2.0.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="2.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.4.22" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="5.3.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.13.4" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.17.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="4.4.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.11.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="6.3.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="7.5.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="7.5.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.22.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="3.0.3" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Calcs" Version="5.3.2" />
