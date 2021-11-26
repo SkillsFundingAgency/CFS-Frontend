@@ -16,13 +16,11 @@ import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import * as publishedProviderService from "../../services/publishedProviderService";
 import { HistoryPage } from "../../types/HistoryPage";
 import { JobCreatedResponse } from "../../types/JobCreatedResponse";
-import { JobDetails } from "../../types/jobDetails";
 import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { BatchUploadResponse } from "../../types/PublishedProvider/BatchUploadResponse";
 import { BatchValidationRequest } from "../../types/PublishedProvider/BatchValidationRequest";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { RunningStatus } from "../../types/RunningStatus";
 import { Section } from "../../types/Sections";
 
 export interface UploadBatchRouteProps {
@@ -50,27 +48,8 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
         path: history.location.pathname,
     };
 
-    let latestJob: JobDetails = {
-        failures: [],
-        isActive: false,
-        isComplete: false,
-        isFailed: false,
-        jobDescription: "",
-        jobId: "",
-        runningStatus: RunningStatus.QueuedWithService,
-        statusDescription: "",
-        isSuccessful: false
-    };
-
-    const { addSub } = useJobSubscription({
+    const { addSub, results: jobNotifications } = useJobSubscription({
         isEnabled: true,
-        onNewNotification: (newNotification) => {
-            if (newNotification.latestJob) {
-                if (latestJob !== newNotification.latestJob) {
-                    latestJob = newNotification.latestJob
-                }
-            }
-        },
         onError: (err) => addError({ error: err, description: "Error checking for background jobs running" })
     })
 
@@ -122,14 +101,13 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
         {
             enabled:
                 (batchId !== undefined &&
-                    jobId &&
-                    latestJob !== undefined &&
-                    latestJob.jobId === jobId &&
-                    latestJob?.isSuccessful) === true,
+                    jobId !== undefined &&
+                    jobNotifications.some(j => j.latestJob?.jobId === jobId && j.latestJob?.isSuccessful)),
             cacheTime: 0,
             staleTime: 0,
         }
     );
+    
     const { mutate: createValidationJob, isLoading: isCreatingValidationJob } = useMutation<JobCreatedResponse,
         AxiosError,
         BatchValidationRequest>(
@@ -161,8 +139,10 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
         await uploadBatchFile(theFile as File);
     };
 
+    const latestJob = jobNotifications.find(j => j.latestJob && j.latestJob.jobId === jobId)?.latestJob;
+
     useEffect(() => {
-        if (!latestJob || latestJob.jobId !== jobId) return;
+        if (!latestJob) return;
 
         if (isWaitingForJob) {
             setIsWaitingForJob(false);
@@ -181,7 +161,7 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
                 { previousPage: currentPage }
             );
         }
-    }, [latestJob, publishedProviderIds]);
+    }, [jobNotifications, publishedProviderIds]);
 
     const { specification } = useSpecificationSummary(specificationId, () =>
         addError({ error: "Error while loading specification" })
@@ -209,8 +189,8 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
                 <div className="govuk-grid-column-full">
                     <Breadcrumbs>
                         <Breadcrumb name="Calculate funding" url="/"/>
-                        <Breadcrumb name="Approvals"/>
-                        <Breadcrumb name="Select specification" url="/Approvals/Select"/>
+                        <Breadcrumb name="Funding management" url="/FundingManagement"/>
+                        <Breadcrumb name="Funding approvals" url="/FundingManagementApprovalSelection"/>
                         <Breadcrumb name={currentPage.title}/>
                     </Breadcrumbs>
                 </div>

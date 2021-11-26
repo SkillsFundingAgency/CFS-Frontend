@@ -20,7 +20,22 @@ context("Funding management approval selection page", () => {
         server.shutdown();
     })
 
-    describe("when page has loaded", () => {
+    describe("when page has loaded it ", () => {
+
+        it("has the correct breadcrumbs", () => {
+            cy.get("#breadcrumbs").findByRole("link", {
+                name: /Calculate funding/
+            }).should("exist");
+
+            cy.get("#breadcrumbs").findByRole("link", {
+                name: /Funding management/
+            }).should("exist");
+
+            cy.get("#breadcrumbs").findByRole("link", {
+                name: /Funding approvals/
+            }).should("exist");
+        });
+
         it("has correct title", () => {
             cy.findByRole("heading", { name: /Upload batch file/, level: 1 }).should(
                 "exist"
