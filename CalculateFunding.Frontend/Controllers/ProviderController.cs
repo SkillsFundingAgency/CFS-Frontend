@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.FundingDataZone;
 using CalculateFunding.Common.ApiClient.FundingDataZone.Models;
@@ -37,32 +38,18 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/provider/getproviderbyversionandid/{providerVersionId}/{providerId}")]
+        [Route("api/provider/getProviderByVersionAndId/{providerVersionId}/{providerId}")]
         public async Task<IActionResult> GetProviderById(string providerVersionId, string providerId)
         {
             Guard.IsNullOrWhiteSpace(providerVersionId, nameof(providerVersionId));
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            ApiResponse<ProviderVersionSearchResult> result =
+            ApiResponse<ProviderVersionSearchResult> response =
                 await _providersApiClient.GetProviderByIdFromProviderVersion(providerVersionId, providerId);
 
-
-            if (result.StatusCode == HttpStatusCode.OK)
-            {
-                return Ok(result.Content);
-            }
-
-            if (result.StatusCode == HttpStatusCode.BadRequest)
-            {
-                return BadRequest(result.Content);
-            }
-
-            if (result.StatusCode == HttpStatusCode.NotFound)
-            {
-                return new NotFoundObjectResult("Provider was not found");
-            }
-
-            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+            return response.Handle("ProviderVersion",
+                onSuccess: x => Ok(x.Content),
+                onNotFound: x => NotFound("Provider was not found"));
         }
 
         [HttpPost]

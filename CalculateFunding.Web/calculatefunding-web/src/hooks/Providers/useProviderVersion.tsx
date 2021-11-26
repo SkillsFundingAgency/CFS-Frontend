@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import { useQuery } from "react-query";
+import { useQuery, UseQueryOptions } from "react-query";
 
 import { milliseconds } from "../../helpers/TimeInMs";
 import { getProviderByIdAndVersionService } from "../../services/providerService";
@@ -16,18 +16,21 @@ export type ProviderVersionQueryResult = {
 export const useProviderVersion = (
   providerId: string,
   providerVersionId: string,
-  onError: (err: AxiosError) => void
+  onError: (err: AxiosError) => void,
+  options: Partial<UseQueryOptions<ProviderSummary, AxiosError>> = {}
 ): ProviderVersionQueryResult => {
   const { data, isLoading, isError, error, isFetching } = useQuery<ProviderSummary, AxiosError>(
     `provider-${providerId}-version-${providerVersionId}`,
     async () => (await getProviderByIdAndVersionService(providerId, providerVersionId)).data,
     {
       onError: onError,
+
       cacheTime: milliseconds.OneDay,
       staleTime: milliseconds.OneDay,
       refetchOnWindowFocus: false,
       enabled:
         (providerId && providerVersionId && providerId.length > 0 && providerVersionId.length > 0) === true,
+      ...options,
     }
   );
 

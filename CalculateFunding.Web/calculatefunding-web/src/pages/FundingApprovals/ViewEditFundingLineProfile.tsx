@@ -44,12 +44,14 @@ export interface ViewEditFundingLineProfileProps {
 export function ViewEditFundingLineProfile({
   match,
 }: RouteComponentProps<ViewEditFundingLineProfileProps>): JSX.Element {
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specificationId = match.params.specificationId;
-  const fundingLineId = match.params.fundingLineId;
-  const providerId = match.params.providerId;
-  const providerVersionId = match.params.specCoreProviderVersionId;
+  const {
+    fundingStreamId,
+    fundingPeriodId,
+    specificationId,
+    fundingLineId,
+    providerId,
+    specCoreProviderVersionId: providerVersionId,
+  } = match.params;
   const [hasAcknowledgedHistoricEdit, setHasAcknowledgedHistoricEdit] = useState<boolean>(false);
   const [editMode, setEditMode] = useState<ProfileEditMode>(ProfileEditMode.View);
 

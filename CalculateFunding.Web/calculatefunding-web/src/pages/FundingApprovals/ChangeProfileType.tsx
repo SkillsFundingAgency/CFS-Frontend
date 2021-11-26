@@ -40,16 +40,12 @@ enum PatternType {
 }
 
 export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTypeProps>) {
+  const { fundingStreamId, fundingPeriodId, specificationId, fundingLineId, providerId, providerVersionId } =
+    match.params;
   const permissions: FundingStreamPermissions[] = useSelector(
     (state: IStoreState) => state.userState.fundingStreamPermissions
   );
-  const { errors, addErrorMessage, clearErrorMessages } = useErrors();
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specificationId = match.params.specificationId;
-  const fundingLineId = match.params.fundingLineId;
-  const providerId = match.params.providerId;
-  const providerVersionId = match.params.providerVersionId;
+  const { errors, addError, clearErrorMessages } = useErrors();
 
   const history = useHistory();
 
@@ -60,7 +56,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
     `profile-patterns-${fundingStreamId}-${fundingPeriodId}`,
     async () => (await getAllProfilePatterns(fundingStreamId, fundingPeriodId)).data,
     {
-      onError: (err) => addErrorMessage(err.message, "Error while loading profile patterns"),
+      onError: (err) => addError({ error: err, description: "Error while loading profile patterns" }),
       refetchOnWindowFocus: false,
     }
   );
@@ -68,7 +64,17 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   const { providerVersion, isFetchingProviderVersion } = useProviderVersion(
     providerId,
     providerVersionId,
-    (err: AxiosError) => addErrorMessage(err.message, "Error while loading provider")
+    (err: AxiosError) => addError({ error: err, description: "Error while loading provider" }),
+    {
+      onSettled: (data) => {
+        if (data?.providerId !== providerId) {
+          addError({ error: "Provider version could not be found" });
+        }
+        if (!data?.name?.length) {
+          addError({ error: "Provider version name could not be found" });
+        }
+      },
+    }
   );
 
   const { data: fundingLineProfileViewModel, isFetching: isFetchingFundingLineProfile } = useQuery<
@@ -87,7 +93,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
         )
       ).data,
     {
-      onError: (err) => addErrorMessage(err.message, "Error while loading funding line profile"),
+      onError: (err) => addError({ error: err, description: "Error while loading funding line profile" }),
       refetchOnWindowFocus: false,
     }
   );
@@ -108,31 +114,6 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   const [noRuleBasedPatterns, setNoRuleBasedPatterns] = useState<boolean>(false);
   const [previewProfilePatternKey, setPreviewProfilePatternKey] = useState<string | null | undefined>();
 
-  useEffect(() => {
-    setMissingPermissions([]);
-    const fundingStreamPermission = permissions.find((p) => p.fundingStreamId === fundingStreamId);
-    if (!fundingStreamPermission || !fundingStreamPermission.canApplyCustomProfilePattern) {
-      setMissingPermissions(["apply custom profile pattern"]);
-    } else {
-      setCanChangeProfileType(true);
-    }
-  }, [permissions]);
-
-  useEffect(() => {
-    if (!fundingLineProfile || fundingLineProfile.profilePatternKey === undefined) return;
-    if (fundingLineProfile.isCustomProfile) {
-      setPatternType(PatternType.Custom);
-    } else {
-      if (fundingLineProfile.profilePatternKey === null) {
-        setPatternType(PatternType.National);
-      } else {
-        setPatternType(PatternType.RuleBased);
-        setRuleBasedPatternKey(fundingLineProfile.profilePatternKey);
-      }
-    }
-    setProfilePatternKey(fundingLineProfile.profilePatternKey);
-  }, [fundingLineProfile]);
-
   const isPageLoading =
     isFetchingProfilePatterns || isFetchingProviderVersion || isFetchingFundingLineProfile;
   const providerName = providerVersion && providerVersion.name ? providerVersion.name : "Unknown provider";
@@ -150,11 +131,11 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   const isValidForm = () => {
     setValidated(true);
     if (!patternType) {
-      addErrorMessage("No pattern type selected");
+      addError({ error: "No pattern type selected" });
       return false;
     }
     if (patternType === PatternType.RuleBased && (!profilePatternKey || profilePatternKey.length === 0)) {
-      addErrorMessage("A rule based pattern must be selected");
+      addError({ error: "A rule based pattern must be selected" });
       return false;
     }
     return true;
@@ -177,7 +158,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
       if (error.response.status === 304) {
         redirectToFundingLineProfile();
       } else {
-        addErrorMessage(error.message);
+        addError({ error: error.message });
       }
     } finally {
       setIsSaving(false);
@@ -204,12 +185,6 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
     setProfilePatternKey(newValue);
   };
 
-  useEffect(() => {
-    if (previewProfilePatternKey !== undefined) {
-      setShowModal(true);
-    }
-  }, [previewProfilePatternKey]);
-
   const handlePreviewProfile = (key: string | null) => {
     clearErrorMessages(["preview-profile"]);
     setPreviewProfilePatternKey(key);
@@ -224,7 +199,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
       return nationalPattern[0];
     }
     if (nationalPattern.length > 1) {
-      addErrorMessage("More than one national profile found for this funding line.");
+      addError({ error: "More than one national profile found for this funding line." });
       setMissingData(true);
     }
     return undefined;
@@ -254,6 +229,57 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
     setMissingData(true);
     return [];
   }, [profilePatterns]);
+
+  useEffect(() => {
+    setMissingPermissions([]);
+    const fundingStreamPermission = permissions.find((p) => p.fundingStreamId === fundingStreamId);
+    if (!fundingStreamPermission || !fundingStreamPermission.canApplyCustomProfilePattern) {
+      setMissingPermissions(["apply custom profile pattern"]);
+    } else {
+      setCanChangeProfileType(true);
+    }
+  }, [permissions]);
+
+  useEffect(() => {
+    if (!fundingLineProfile || fundingLineProfile.profilePatternKey === undefined) return;
+    if (fundingLineProfile.isCustomProfile) {
+      setPatternType(PatternType.Custom);
+    } else {
+      if (fundingLineProfile.profilePatternKey === null) {
+        setPatternType(PatternType.National);
+      } else {
+        setPatternType(PatternType.RuleBased);
+        setRuleBasedPatternKey(fundingLineProfile.profilePatternKey);
+      }
+    }
+    setProfilePatternKey(fundingLineProfile.profilePatternKey);
+  }, [fundingLineProfile]);
+
+  useEffect(() => {
+    if (previewProfilePatternKey !== undefined) {
+      setShowModal(true);
+    }
+  }, [previewProfilePatternKey]);
+
+  useEffect(() => {
+    clearErrorMessages();
+
+    if (!fundingStreamId?.length) {
+      addError({ error: "Undefined funding stream id" });
+    }
+    if (!fundingPeriodId?.length) {
+      addError({ error: "Undefined funding period id" });
+    }
+    if (!providerId?.length) {
+      addError({ error: "Undefined provider id" });
+    }
+    if (!providerVersionId?.length) {
+      addError({ error: "Undefined provider version id" });
+    }
+    if (!fundingLineId?.length) {
+      addError({ error: "Undefined funding line id" });
+    }
+  }, [fundingStreamId, providerId, providerVersionId, fundingLineId, fundingPeriodId]);
 
   return (
     <div>
@@ -448,7 +474,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
           providerId={providerId}
           fundingLineId={fundingLineId}
           previewProfilePatternKey={previewProfilePatternKey}
-          addErrorMessage={addErrorMessage}
+          addError={addError}
           showModal={showModal}
           toggleModal={setShowModal}
           setPreviewProfilePatternKey={setPreviewProfilePatternKey}

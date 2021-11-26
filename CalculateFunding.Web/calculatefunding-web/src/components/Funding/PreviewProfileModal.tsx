@@ -2,6 +2,7 @@ import "../../styles/PreviewProfileModal.scss";
 
 import React, { useEffect, useState } from "react";
 
+import { ErrorProps } from "../../hooks/useErrors";
 import { previewProfile } from "../../services/profilingService";
 import { ProfileTotal } from "../../types/FundingLineProfile";
 import { DateTimeFormatter } from "../DateTimeFormatter";
@@ -17,7 +18,7 @@ export interface PreviewProfileModalProps {
   previewProfilePatternKey: string | null;
   showModal: boolean;
   toggleModal: React.Dispatch<React.SetStateAction<boolean>>;
-  addErrorMessage: (errorMessage: string, description?: string, fieldName?: string) => void;
+  addError: (error: ErrorProps) => void;
   setPreviewProfilePatternKey: React.Dispatch<React.SetStateAction<string | null | undefined>>;
 }
 
@@ -30,7 +31,7 @@ export function PreviewProfileModal({
   previewProfilePatternKey,
   showModal,
   toggleModal,
-  addErrorMessage,
+  addError,
   setPreviewProfilePatternKey,
 }: PreviewProfileModalProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -53,11 +54,15 @@ export function PreviewProfileModal({
         setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
-        addErrorMessage("Could not retrieve preview data. Please try again.", undefined, "preview-profile");
+        addError({
+          error: "Could not retrieve preview data. Please try again.",
+          fieldName: "preview-profile",
+        });
         toggleModal(false);
         setPreviewProfilePatternKey(undefined);
       }
     }
+
     getPreviewProfile();
   }, [previewProfilePatternKey]);
 
