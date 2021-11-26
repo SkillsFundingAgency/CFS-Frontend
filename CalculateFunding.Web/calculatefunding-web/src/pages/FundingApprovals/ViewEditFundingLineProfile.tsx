@@ -214,7 +214,7 @@ export function ViewEditFundingLineProfile({
         window.scrollTo(0, 0);
         if (err.response.status === 400) {
           const errResponse = err.response.data;
-          addValidationErrors({ validationErrors: { errResponse }, message: "Validation failed" });
+          addValidationErrors({ validationErrors: errResponse, message: "Validation failed" });
         } else {
           addError({ error: err });
         }
