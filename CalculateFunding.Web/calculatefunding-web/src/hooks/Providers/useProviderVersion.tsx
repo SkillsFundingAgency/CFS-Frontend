@@ -24,12 +24,10 @@ export const useProviderVersion = (
     async () => (await getProviderByIdAndVersionService(providerId, providerVersionId)).data,
     {
       onError: onError,
-
       cacheTime: milliseconds.OneDay,
       staleTime: milliseconds.OneDay,
       refetchOnWindowFocus: false,
-      enabled:
-        (providerId && providerVersionId && providerId.length > 0 && providerVersionId.length > 0) === true,
+      enabled: providerId?.length > 0 && providerVersionId?.length > 0,
       ...options,
     }
   );

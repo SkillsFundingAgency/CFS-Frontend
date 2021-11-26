@@ -30,7 +30,7 @@ export interface ChangeProfileTypeProps {
   fundingPeriodId: string;
   specificationId: string;
   fundingLineId: string;
-  providerVersionId: string;
+  specCoreProviderVersionId: string;
 }
 
 enum PatternType {
@@ -40,8 +40,14 @@ enum PatternType {
 }
 
 export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTypeProps>) {
-  const { fundingStreamId, fundingPeriodId, specificationId, fundingLineId, providerId, providerVersionId } =
-    match.params;
+  const {
+    fundingStreamId,
+    fundingPeriodId,
+    specificationId,
+    fundingLineId,
+    providerId,
+    specCoreProviderVersionId: providerVersionId,
+  } = match.params;
   const permissions: FundingStreamPermissions[] = useSelector(
     (state: IStoreState) => state.userState.fundingStreamPermissions
   );

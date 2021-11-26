@@ -548,7 +548,7 @@ const matchMock: match<ChangeProfileTypeProps> = {
   params: {
     specificationId: "specId",
     providerId: "10005143",
-    providerVersionId: "dsg-2019-12-16",
+    specCoreProviderVersionId: "dsg-2019-12-16",
     fundingLineId: "DSG-004",
     fundingPeriodId: "FY-2021",
     fundingStreamId: "DSG",
