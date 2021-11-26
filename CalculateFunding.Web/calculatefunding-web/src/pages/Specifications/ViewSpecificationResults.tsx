@@ -16,7 +16,6 @@ import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLat
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import { JobType } from "../../types/jobType";
-import { PublishStatus } from "../../types/PublishStatusModel";
 import { Section } from "../../types/Sections";
 
 export interface ViewSpecificationResultsRoute {
@@ -38,7 +37,7 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
   const { latestJob: latestReportJob } = useLatestSpecificationJobWithMonitoring(
     specificationId,
     [JobType.GenerateCalcCsvResultsJob],
-    (err) => addErrorMessage("Error while checking for latest CSV generation job")
+    () => addErrorMessage("Error while checking for latest CSV generation job")
   );
 
   useEffect(() => {
@@ -119,27 +118,20 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
                     </Tabs.Tab>
                   </ul>
                   <Tabs.Panel label="fundingline-structure">
-                    {specification !== undefined && specification.fundingStreams?.length > 0 ? (
+                    {specification && (
                       <FundingLineResults
-                        specificationId={specification.id}
-                        fundingStreamId={specification.fundingStreams[0].id}
-                        fundingPeriodId={specification.fundingPeriod.id}
-                        status={specification.approvalStatus as PublishStatus}
+                        specification={specification}
                         addError={addError}
                         clearErrorMessages={clearErrorMessages}
-                        showApproveButton={false}
-                        useCalcEngine={true}
                         jobTypes={[JobType.AssignTemplateCalculationsJob]}
                       />
-                    ) : (
-                      ""
                     )}
                   </Tabs.Panel>
                   <Tabs.Panel label="additional-calculations">
                     <AdditionalCalculations
                       specificationId={specificationId}
-                      addError={addErrorMessage}
                       showCreateButton={false}
+                      addError={addError}
                     />
                   </Tabs.Panel>
                   <Tabs.Panel label="downloadable-reports">

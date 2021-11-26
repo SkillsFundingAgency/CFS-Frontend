@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { MemoryRouter, Route, Switch } from "react-router";
 import { createStore, Store } from "redux";
 
+import { ErrorContextWrapper } from "../../../context/ErrorContext";
 import * as useCalculationErrorsHook from "../../../hooks/Calculations/useCalculationErrors";
 import * as specPermsHook from "../../../hooks/Permissions/useSpecificationPermissions";
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
@@ -352,7 +353,9 @@ export function ViewSpecificationTestData() {
         <QueryClientProvider client={new QueryClient()}>
           <Provider store={store}>
             <Switch>
-              <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
+              <ErrorContextWrapper>
+                <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
+              </ErrorContextWrapper>
             </Switch>
           </Provider>
         </QueryClientProvider>
@@ -371,7 +374,9 @@ export function ViewSpecificationTestData() {
         <QueryClientProvider client={new QueryClient()}>
           <Provider store={store}>
             <Switch>
-              <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
+              <ErrorContextWrapper>
+                <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />
+              </ErrorContextWrapper>
             </Switch>
           </Provider>
         </QueryClientProvider>

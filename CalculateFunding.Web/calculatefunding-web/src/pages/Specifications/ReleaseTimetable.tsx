@@ -5,27 +5,20 @@ import { ConfirmationPanel } from "../../components/ConfirmationPanel";
 import { DateInput } from "../../components/DateInput";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { TimeInput } from "../../components/TimeInput";
+import { useErrorContext } from "../../context/ErrorContext";
 import {
   getReleaseTimetableForSpecificationService,
   saveReleaseTimetableForSpecificationService,
 } from "../../services/publishService";
-import { ErrorMessage } from "../../types/ErrorMessage";
 import { ReleaseTimetableSummary, ReleaseTimetableViewModel } from "../../types/ReleaseTimetableSummary";
 import { SaveReleaseTimetableViewModel } from "../../types/SaveReleaseTimetableViewModel";
 
 export interface ReleaseTimetableProps {
   specificationId: string;
-  addErrorMessage: (errorMessage: any, description?: string, fieldName?: string) => void;
-  clearErrorMessages: (fieldNames?: string[]) => void;
-  errors: ErrorMessage[];
 }
 
-export function ReleaseTimetable({
-  specificationId,
-  addErrorMessage,
-  clearErrorMessages,
-  errors,
-}: ReleaseTimetableProps) {
+export function ReleaseTimetable({ specificationId }: ReleaseTimetableProps) {
+  const { state: errors, addErrorToContext, clearErrorsFromContext: clearErrorMessages } = useErrorContext();
   const [navisionDate, setNavisionDate] = useState<Date>(new Date(0));
   const [releaseDate, setReleaseDate] = useState<Date>(new Date(0));
   const [navisionTime, setNavisionTime] = useState<string>("");
@@ -48,7 +41,7 @@ export function ReleaseTimetable({
           setNavisionDate(DateTime.fromISO(result.content.externalPublicationDate).toJSDate());
         }
       } catch (error: any) {
-        addErrorMessage(error.message, undefined, "release-timetable");
+        addErrorToContext({ error: error, fieldName: "release-timetable" });
       }
     }
 
@@ -107,38 +100,34 @@ export function ReleaseTimetable({
     const now = new Date();
 
     if (!navisionDate || navisionTime.length === 0) {
-      addErrorMessage(
-        "Please enter a release date and time for funding",
-        undefined,
-        "release-timetable-funding"
-      );
+      addErrorToContext({
+        error: "Please enter a release date and time for funding",
+        fieldName: "release-timetable-funding",
+      });
       isValid = false;
     }
 
     if (!releaseDate || releaseTime.length === 0) {
-      addErrorMessage(
-        "Please enter a release date and time for statement",
-        undefined,
-        "release-timetable-statement"
-      );
+      addErrorToContext({
+        error: "Please enter a release date and time for statement",
+        fieldName: "release-timetable-statement",
+      });
       isValid = false;
     }
 
     if (navisionDate < now && navisionDate.getFullYear() !== DateTime.fromMillis(0).year) {
-      addErrorMessage(
-        "Release date of funding cannot be in the past",
-        undefined,
-        "release-timetable-funding"
-      );
+      addErrorToContext({
+        error: "Release date of funding cannot be in the past",
+        fieldName: "release-timetable-funding",
+      });
       isValid = false;
     }
 
     if (releaseDate < now && releaseDate.getFullYear() !== DateTime.fromMillis(0).year) {
-      addErrorMessage(
-        "Release date of statement cannot be in the past",
-        undefined,
-        "release-timetable-statement"
-      );
+      addErrorToContext({
+        error: "Release date of statement cannot be in the past",
+        fieldName: "release-timetable-statement",
+      });
       isValid = false;
     }
 
@@ -172,7 +161,7 @@ export function ReleaseTimetable({
       setSaveSuccessful(true);
       clearErrorMessages(["release-timetable-funding", "release-timetable-statement", "release-timetable"]);
     } catch (error: any) {
-      addErrorMessage(error.message, undefined, "release-timetable");
+      addErrorToContext({ error, fieldName: "release-timetable" });
       window.scrollTo(0, 0);
     } finally {
       setIsSavingReleaseTimetable(false);
@@ -188,51 +177,51 @@ export function ReleaseTimetable({
           </h2>
         </div>
       </div>
-      <LoadingStatus
-        title={"Saving Release Timetable"}
-        description={"Please wait whilst we save your changes"}
-        hidden={!isSavingReleaseTimetable}
-      />
-      <ConfirmationPanel
-        title={"Save successful"}
-        children={"Your changes have been saved"}
-        hidden={!saveSuccessful}
-      />
-      <div
-        className={`govuk-form-group ${
-          errors.filter((e) => e.fieldName === "release-timetable-funding").length > 0
-            ? "govuk-form-group--error"
-            : ""
-        }`}
-        hidden={isSavingReleaseTimetable}
-      >
-        <fieldset className="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
-          <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-            <h3 id="business-central-title" className="govuk-heading-m">
-              Release date of funding to Business Central?
-            </h3>
-          </legend>
-          {errors.filter((e) => e.fieldName === "release-timetable-funding").length === 0 ? (
-            <span id="release-timetable-funding-hint" className="govuk-hint">
-              The name of the calculation
+      {isSavingReleaseTimetable && (
+        <LoadingStatus
+          title={"Saving Release Timetable"}
+          description={"Please wait whilst we save your changes"}
+        />
+      )}
+      {saveSuccessful && (
+        <ConfirmationPanel title={"Save successful"}>Your changes have been saved</ConfirmationPanel>
+      )}
+      {isSavingReleaseTimetable && (
+        <div
+          className={`govuk-form-group ${
+            errors.filter((e) => e.fieldName === "release-timetable-funding").length > 0
+              ? "govuk-form-group--error"
+              : ""
+          }`}
+        >
+          <fieldset className="govuk-fieldset" role="group" aria-describedby="passport-issued-hint">
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+              <h3 id="business-central-title" className="govuk-heading-m">
+                Release date of funding to Business Central?
+              </h3>
+            </legend>
+            {errors.filter((e) => e.fieldName === "release-timetable-funding").length === 0 ? (
+              <span id="release-timetable-funding-hint" className="govuk-hint">
+                The name of the calculation
+              </span>
+            ) : (
+              errors.map(
+                (error) =>
+                  error.fieldName === "release-timetable-funding" && (
+                    <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                      <span className="govuk-visually-hidden">Error:</span> {error.message}
+                    </span>
+                  )
+              )
+            )}
+            <span id="business-central-date-hint" className="govuk-hint">
+              Set the date and time that the statement will be published externally for this funding stream.
+              <br />
+              For example, 12 11 2019
             </span>
-          ) : (
-            errors.map(
-              (error) =>
-                error.fieldName === "release-timetable-funding" && (
-                  <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                    <span className="govuk-visually-hidden">Error:</span> {error.message}
-                  </span>
-                )
-            )
-          )}
-          <span id="business-central-date-hint" className="govuk-hint">
-            Set the date and time that the statement will be published externally for this funding stream.
-            <br />
-            For example, 12 11 2019
-          </span>
-        </fieldset>
-      </div>
+          </fieldset>
+        </div>
+      )}
       <div className="govuk-form-group govuk-!-margin-bottom-9" hidden={isSavingReleaseTimetable}>
         <DateInput date={navisionDate} callback={updateNavisionDate} />
       </div>

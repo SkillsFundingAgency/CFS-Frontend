@@ -234,7 +234,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/publishedproviderfundinglinedetails/customprofiles")]
+        [Route("api/publishedProviderFundingLineDetails/customProfiles")]
         public async Task<IActionResult> ApplyCustomProfile([FromBody] ApplyCustomProfileRequest request)
         {
             Guard.ArgumentNotNull(request, nameof(request));

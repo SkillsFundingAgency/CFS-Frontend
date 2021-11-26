@@ -1,25 +1,19 @@
-import * as React from "react";
+﻿import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { useErrorContext } from "../../context/ErrorContext";
 import { useCalculationCircularDependencies } from "../../hooks/Calculations/useCalculationCircularDependencies";
-import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
-import { ErrorProps } from "../../hooks/useErrors";
 import { getCalculationSummaryBySpecificationId } from "../../services/calculationService";
 import { getFundingLineStructureService } from "../../services/fundingStructuresService";
-import { getFundingStructureResultsForProviderAndSpecification } from "../../services/providerService";
+import { approveFundingLineStructureService } from "../../services/specificationService";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { FundingStructureItemViewModel, FundingStructureType } from "../../types/FundingStructureItem";
-import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../types/jobType";
-import { ProviderResultForSpecification } from "../../types/Provider/ProviderResultForSpecification";
+import { JobDetails } from "../../types/jobDetails";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
-import { ValueFormatType } from "../../types/TemplateBuilderDefinitions";
+import { ApproveStatusButton } from "../ApproveStatusButton";
 import { BackToTop } from "../BackToTop";
 import { CollapsibleSteps, setCollapsibleStepsAllStepsStatus } from "../CollapsibleSteps";
-import { formatNumber, NumberType } from "../FormattedNumber";
-import { InputSearch } from "../InputSearch";
-import { LoadingStatus } from "../LoadingStatus";
-import { FundingLineStep } from "./FundingLineStep";
+import { FundingLineStep } from "../fundingLineStructure/FundingLineStep";
 import {
   checkIfShouldOpenAllSteps,
   expandCalculationsByName,
@@ -27,31 +21,31 @@ import {
   setExpandStatusByFundingLineName,
   setInitialExpandedStatus,
   updateFundingLineExpandStatus,
-} from "./FundingLineStructureHelper";
+} from "../fundingLineStructure/FundingLineStructureHelper";
+import { InputSearch } from "../InputSearch";
+import { LoadingStatus } from "../LoadingStatus";
 
-export interface FundingLineResultsProps {
+export interface SpecificationFundingLineResultsProps {
   specification: SpecificationSummary;
-  providerId?: string;
-  addError: (props: ErrorProps) => void;
-  clearErrorMessages: (fieldNames?: string[]) => void;
   refreshFundingLines?: boolean | undefined;
-  jobTypes: JobType[];
+  activeJob?: JobDetails;
+  clearSpecificationFromCache: () => Promise<void>;
+  monitorAssignTemplateCalculationsJob: () => Promise<void>;
 }
 
-export function FundingLineResults({
+export function SpecificationFundingLineResults({
   specification,
-  providerId,
-  addError,
-  clearErrorMessages,
   refreshFundingLines,
-  jobTypes,
-}: FundingLineResultsProps) {
+  clearSpecificationFromCache,
+  monitorAssignTemplateCalculationsJob,
+  activeJob,
+}: SpecificationFundingLineResultsProps) {
+  const { addErrorToContext: addError, clearErrorsFromContext: clearErrorMessages } = useErrorContext();
   const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
   const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
   const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
   const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
   const [fundingLines, setFundingLines] = useState<FundingStructureItemViewModel[]>([]);
-  const [providerResults, setProviderResults] = useState<ProviderResultForSpecification>();
   const [calculationSummaries, setCalculationSummaries] = useState<CalculationSummary[]>();
   const [fundingStructureViewModelItems, setFundingStructureViewModelItems] = useState<
     FundingStructureItemViewModel[]
@@ -67,14 +61,18 @@ export function FundingLineResults({
     (err) => addError({ error: err, description: "Error while checking for circular reference errors" })
   );
 
-  const {
-    addSub,
-    removeAllSubs,
-    results: jobNotifications,
-  } = useJobSubscription({
-    onError: (err) =>
-      addError({ error: err, description: "An error occurred while monitoring background jobs" }),
-  });
+  const handleApproveFundingLineStructure = async (specificationId: string) => {
+    const response = await approveFundingLineStructureService(specificationId);
+    if (response.status === 200) {
+      clearSpecificationFromCache();
+    } else {
+      addError({
+        error: `${response.statusText} ${response.data}`,
+        description: "Error whilst approving funding line structure",
+        fieldName: "funding-line-results",
+      });
+    }
+  };
 
   function searchFundingLines(calculationName: string) {
     const fundingLinesCopy: FundingStructureItemViewModel[] =
@@ -111,8 +109,7 @@ export function FundingLineResults({
 
   function appendData(
     fundingStructureItems: FundingStructureItemViewModel[],
-    calculationSummaries: CalculationSummary[],
-    providerResults: ProviderResultForSpecification | undefined
+    calculationSummaries: CalculationSummary[]
   ) {
     for (let item = 0; item < fundingStructureItems.length; item++) {
       const stack: FundingStructureItemViewModel[] = [];
@@ -123,14 +120,14 @@ export function FundingLineResults({
       while (stack.length !== 0) {
         const node = stack.pop();
         if (node && (node.fundingStructureItems === null || node.fundingStructureItems.length === 0)) {
-          visitNode(node, hashMap, calculationSummaries, providerResults);
+          visitNode(node, hashMap, calculationSummaries);
         } else {
           if (node && node.fundingStructureItems && node.fundingStructureItems.length > 0) {
             for (let i: number = node.fundingStructureItems.length - 1; i >= 0; i--) {
               stack.push(node.fundingStructureItems[i]);
             }
 
-            node && visitNode(node, hashMap, calculationSummaries, providerResults);
+            node && visitNode(node, hashMap, calculationSummaries);
           }
         }
         setIsLoadingFundingLineStructure(false);
@@ -138,81 +135,14 @@ export function FundingLineResults({
     }
   }
 
-  function renderValue(value: number, calculationType: ValueFormatType): string {
-    switch (calculationType) {
-      case ValueFormatType.Currency:
-        return formatNumber(value, NumberType.FormattedMoney, 2, true);
-      case ValueFormatType.Percentage:
-        return formatNumber(value, NumberType.FormattedPercentage, 0, true);
-      case ValueFormatType.Number:
-        return formatNumber(value, NumberType.FormattedDecimalNumber, 0, true);
-    }
-    return `${value}`;
-  }
-
-  function getCalculationErrorMessage(
-    calculationId: string | null | undefined,
-    exceptionMessage: string | null
-  ): string {
-    if (calculationId && circularReferenceErrors) {
-      const circularReferenceErrorMessage = "Circular reference detected in calculation script";
-      const hasCircularReferenceErrors: boolean = circularReferenceErrors.some(
-        (error) => error.node.calculationid === calculationId
-      );
-      if (hasCircularReferenceErrors) {
-        return exceptionMessage !== null && exceptionMessage.length > 0
-          ? `${circularReferenceErrorMessage}. ${exceptionMessage}`
-          : circularReferenceErrorMessage;
-      }
-    }
-    return exceptionMessage !== null ? exceptionMessage : "";
-  }
-
   function visitNode(
     node: FundingStructureItemViewModel,
     hashMap: any,
-    calculationSummaries: CalculationSummary[],
-    providerResults: ProviderResultForSpecification | undefined
+    calculationSummaries: CalculationSummary[]
   ) {
     if (node.calculationId) {
       const calculationSummary = calculationSummaries.find((c) => c.id === node.calculationId);
       node.calculationPublishStatus = calculationSummary?.status;
-      if (providerResults) {
-        const templateCalculationResult = providerResults.calculationResults[node.templateId];
-        if (templateCalculationResult) {
-          node.errorMessage = getCalculationErrorMessage(
-            node.calculationId,
-            templateCalculationResult.exceptionMessage
-          );
-          node.value =
-            templateCalculationResult.value !== null
-              ? renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat)
-              : providerId
-              ? "Excluded"
-              : "";
-        }
-      } else {
-        node.errorMessage = getCalculationErrorMessage(node.calculationId, "");
-      }
-    }
-    if (
-      providerResults &&
-      node.type === FundingStructureType.FundingLine &&
-      !hashMap[`fun-${node.templateId}`]
-    ) {
-      hashMap[`fun-${node.templateId}`] = true;
-      node.errorMessage = "";
-      const fundingLineResult = providerResults.fundingLineResults[node.templateId];
-      if (fundingLineResult) {
-        node.errorMessage =
-          fundingLineResult.exceptionMessage !== null ? fundingLineResult.exceptionMessage : undefined;
-        node.value =
-          fundingLineResult.value !== null
-            ? renderValue(fundingLineResult.value, ValueFormatType.Currency)
-            : providerId
-            ? "Excluded"
-            : "";
-      }
     }
   }
 
@@ -230,15 +160,6 @@ export function FundingLineResults({
       const calculationSummariesResponse = await getCalculationSummaryBySpecificationId(specification.id);
       setCalculationSummaries(calculationSummariesResponse.data);
 
-      if (providerId) {
-        const providerResultsResponse = await getFundingStructureResultsForProviderAndSpecification(
-          specification.id,
-          providerId,
-          true
-        );
-        setProviderResults(providerResultsResponse.data);
-      }
-
       clearErrorMessages(["funding-line-results"]);
     } catch (err: any) {
       setIsLoadingFundingLineStructure(false);
@@ -254,20 +175,9 @@ export function FundingLineResults({
   useEffect(() => {
     fetchData();
 
-    // monitor background jobs
-    if (jobTypes?.length) {
-      addSub({
-        filterBy: {
-          specificationId: specification.id,
-          jobTypes: jobTypes,
-        },
-        monitorMode: MonitorMode.SignalR,
-        monitorFallback: MonitorFallback.Polling,
-        onError: (err) => addError({ error: err, description: "Error while checking for background jobs" }),
-      });
-    }
+    monitorAssignTemplateCalculationsJob();
 
-    return () => removeAllSubs();
+    return () => clearErrorMessages(["funding-line-results"]);
   }, []);
 
   useEffect(() => {
@@ -312,10 +222,8 @@ export function FundingLineResults({
       circularReferenceErrors === undefined
     )
       return;
-    appendData(fundingLines, calculationSummaries, providerResults);
-  }, [providerResults, circularReferenceErrors, calculationSummaries, fundingLines]);
-
-  const activeJob = jobNotifications.find((n) => n.latestJob?.isActive)?.latestJob;
+    appendData(fundingLines, calculationSummaries);
+  }, [circularReferenceErrors, calculationSummaries, fundingLines]);
 
   return (
     <section className="govuk-tabs__panel" id="fundingline-structure">
@@ -341,7 +249,14 @@ export function FundingLineResults({
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
-                <h2 className="govuk-heading-l">Funding line structure</h2>
+                <h2 className="govuk-heading-l">
+                  Funding line structure
+                  <ApproveStatusButton
+                    id={specification.id}
+                    status={specification.approvalStatus}
+                    callback={handleApproveFundingLineStructure}
+                  />
+                </h2>
               </div>
               <div className="govuk-grid-column-one-third"></div>
               <div className="govuk-grid-column-two-thirds">
@@ -383,24 +298,22 @@ export function FundingLineResults({
                     key={"collapsible-steps" + index}
                     uniqueKey={index.toString()}
                     title={f.type === FundingStructureType.FundingLine ? "Funding Line" : f.type}
-                    value={f.value != null ? f.value : ""}
+                    value={f.value ?? ""}
                     description={f.name}
                     status={f.calculationPublishStatus}
                     step={f.level.toString()}
                     expanded={fundingLinesExpandedStatus || f.expanded === true}
-                    link={f.calculationId ? `/app/ViewCalculationResults/${f.calculationId}` : ""}
+                    link={f.calculationId ? `/app/Specifications/EditCalculation/${f.calculationId}` : ""}
                     hasChildren={f.fundingStructureItems != null}
                     callback={collapsibleStepsChanged}
                     calculationErrorMessage={f.errorMessage}
-                    providerId={providerId}
                   >
                     <FundingLineStep
                       key={f.name.replace(" ", "") + index}
-                      showResults={true}
+                      showResults={false}
                       expanded={fundingLinesExpandedStatus}
                       fundingStructureItem={f}
                       callback={collapsibleStepsChanged}
-                      providerId={providerId}
                     />
                   </CollapsibleSteps>
                 </li>

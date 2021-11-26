@@ -34,11 +34,7 @@ export const useSpecificationSummary = (
   const { data, error, isFetching, isLoading, isError, isFetched } = useQuery<
     SpecificationSummary,
     AxiosError
-  >(
-    `specification-${specificationId}-summary`,
-    async () => (await getSpecificationSummaryService(specificationId)).data,
-    config
-  );
+  >(key, async () => (await getSpecificationSummaryService(specificationId)).data, config);
 
   const clearSpecificationFromCache = async () => {
     await queryClient.invalidateQueries(key);

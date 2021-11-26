@@ -3,18 +3,22 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { MemoryRouter, Route, Switch } from "react-router";
 
+import { ErrorContextWrapper } from "../../../context/ErrorContext";
 import { CalculationValueType } from "../../../types/CalculationDetails";
 import { CalculationType } from "../../../types/CalculationSearchResponse";
 import { FundingStructureItemViewModel, FundingStructureType } from "../../../types/FundingStructureItem";
+import { JobDetails } from "../../../types/jobDetails";
 import { LegacyCalculationType } from "../../../types/Provider/ProviderResultForSpecification";
 import { PublishStatus } from "../../../types/PublishStatusModel";
+import { ProviderDataTrackingMode } from "../../../types/Specifications/ProviderDataTrackingMode";
+import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { ValueFormatType } from "../../../types/TemplateBuilderDefinitions";
 import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 
 const { haveJobSuccessfulNotification, haveJobInProgressNotification, setupJobSpy } =
   jobSubscriptionTestHelper({});
 
-describe("<FundingLineResults/> tests", () => {
+describe("<SpecificationFundingLineResults/> tests", () => {
   beforeAll(() => {
     jest.mock("../../../services/providerService", () => mockProviderService());
     jest.mock("../../../services/fundingStructuresService", () => mockFundingLineStructureService());
@@ -25,14 +29,15 @@ describe("<FundingLineResults/> tests", () => {
     jest.clearAllMocks();
   });
 
-  describe("<FundingLineResults /> loading checks", () => {
+  describe("<SpecificationFundingLineResults /> loading checks", () => {
     beforeEach(() => {
       haveJobInProgressNotification({}, {});
       setupJobSpy();
     });
 
     it("shows loading panel when another job is running", async () => {
-      renderProviderFundingLineResults();
+      const activeJob = haveJobInProgressNotification({}, {}).latestJob as JobDetails;
+      renderView({ activeJob: activeJob });
       await waitFor(() =>
         expect(
           screen.queryByText(/Please wait whilst funding line structure is loading/i)
@@ -44,7 +49,7 @@ describe("<FundingLineResults/> tests", () => {
     });
   });
 
-  describe("<FundingLineResults service checks />  ", () => {
+  describe("<SpecificationFundingLineResults service checks />  ", () => {
     beforeEach(() => {
       haveJobSuccessfulNotification({}, {});
       setupJobSpy();
@@ -58,7 +63,7 @@ describe("<FundingLineResults/> tests", () => {
         getFundingStructureResultsForProviderAndSpecification,
       } = require("../../../services/providerService");
 
-      renderViewSpecificationFundingLineResults();
+      renderView();
 
       await waitFor(() => {
         expect(getFundingLineStructureService).toBeCalledTimes(1);
@@ -76,35 +81,35 @@ describe("<FundingLineResults/> tests", () => {
         getFundingStructureResultsForProviderAndSpecification,
       } = require("../../../services/providerService");
 
-      renderProviderFundingLineResults();
+      renderView();
 
       await waitFor(() => {
         expect(getFundingLineStructureService).toBeCalledTimes(1);
         expect(getCalculationSummaryBySpecificationId).toBeCalledTimes(1);
         expect(getCalculationCircularDependencies).toBeCalledTimes(1);
-        expect(getFundingStructureResultsForProviderAndSpecification).toBeCalledTimes(1);
+        expect(getFundingStructureResultsForProviderAndSpecification).toBeCalledTimes(0);
       });
     });
   });
 
-  describe("<FundingLineResults /> page renders correctly ", () => {
+  describe("<SpecificationFundingLineResults /> page renders correctly ", () => {
     beforeEach(() => {
       haveJobSuccessfulNotification({}, {});
       setupJobSpy();
     });
 
     it("shows approve status in funding line structure tab", async () => {
-      const { queryAllByText } = renderViewSpecificationFundingLineResults();
+      const { queryAllByText } = renderView();
       await waitFor(() => expect(queryAllByText("Draft")[0]).toHaveClass("govuk-tag"));
     });
 
     it("renders collapsible steps", async () => {
-      const { container } = renderViewSpecificationFundingLineResults();
+      const { container } = renderView();
       await waitFor(() => expect(container.querySelectorAll(".collapsible-steps")).toHaveLength(1));
     });
 
     it("shows search box with an autocomplete input in funding line structure tab", async () => {
-      const { container } = renderViewSpecificationFundingLineResults();
+      const { container } = renderView();
       await waitFor(() =>
         expect(container.querySelectorAll("#fundingline-structure .search-container")).toHaveLength(1)
       );
@@ -116,7 +121,7 @@ describe("<FundingLineResults/> tests", () => {
     });
 
     it("shows open-close all buttons correctly", async () => {
-      const { container } = renderViewSpecificationFundingLineResults();
+      const { container } = renderView();
       await waitFor(() =>
         expect(
           container.querySelectorAll("#fundingline-structure .govuk-accordion__open-all")[0]
@@ -141,106 +146,76 @@ describe("<FundingLineResults/> tests", () => {
         ).toBeVisible()
       );
     });
-
-    it("does not show calculation errors when providerId not provided", async () => {
-      renderViewSpecificationFundingLineResults();
-      await waitFor(() => expect(screen.queryByText("exception")).not.toBeInTheDocument());
-    });
-
-    it("shows circular reference errors when providerId not provided", async () => {
-      renderViewSpecificationFundingLineResults();
-      await waitFor(() =>
-        expect(screen.queryByText(/Circular reference detected in calculation script/i)).toBeInTheDocument()
-      );
-    });
   });
 
-  describe("<FundingLineResults /> when providerId provided", () => {
-    beforeEach(async () => {
+  describe("<SpecificationFundingLineResults /> when providerId provided", () => {
+    it("renders calculation value and format correctly", async () => {
       haveJobSuccessfulNotification({}, {});
       setupJobSpy();
 
       const { getFundingLineStructureService } = require("../../../services/fundingStructuresService");
       const { getCalculationSummaryBySpecificationId } = require("../../../services/calculationService");
-      const { getCalculationCircularDependencies } = require("../../../services/calculationService");
-      const {
-        getFundingStructureResultsForProviderAndSpecification,
-      } = require("../../../services/providerService");
 
-      renderProviderFundingLineResults();
+      renderView();
 
       await waitFor(() => {
         expect(getFundingLineStructureService).toBeCalled();
         expect(getCalculationSummaryBySpecificationId).toBeCalled();
-        expect(getCalculationCircularDependencies).toBeCalled();
-        expect(getFundingStructureResultsForProviderAndSpecification).toBeCalled();
       });
-    });
 
-    it("renders calculation value and format correctly", async () => {
       expect(await screen.findByText(/100/)).toBeInTheDocument();
       expect(screen.getByText(/200/)).toBeInTheDocument();
       expect(screen.getByText(/Number/)).toBeInTheDocument();
       expect(screen.getByText(/Currency/)).toBeInTheDocument();
     });
-
-    it("shows calculation errors when providerId provided", async () => {
-      expect(await screen.findByText(/Error:/)).toBeInTheDocument();
-    });
-
-    it("shows circular reference errors when providerId provided", async () => {
-      expect(
-        await screen.findByText(/Circular reference detected in calculation script/)
-      ).toBeInTheDocument();
-    });
   });
 });
 
-const renderViewSpecificationFundingLineResults = () => {
-  const { FundingLineResults } = require("../../../components/FundingLineStructure/FundingLineResults");
+const renderView = ({ activeJob }: { activeJob?: JobDetails } = {}) => {
+  const {
+    SpecificationFundingLineResults,
+  } = require("../../../components/Specifications/SpecificationFundingLineResults");
   return render(
-    <MemoryRouter initialEntries={["/FundingLineResults/SPEC123/FS1/FP1/Completed"]}>
+    <MemoryRouter initialEntries={["/SpecificationFundingLineResults/SPEC123/FS1/FP1/Completed"]}>
       <QueryClientProvider client={new QueryClient()}>
         <Switch>
-          <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
-            <FundingLineResults
-              status={PublishStatus.Draft}
-              fundingPeriodId={"test fundingPeriodId"}
-              fundingStreamId={"test fundingStreamId"}
-              specificationId={"test spec id"}
-              addError={jest.fn()}
-              clearErrorMessages={jest.fn()}
-              showApproveButton={true}
-            />
-          </Route>
+          <ErrorContextWrapper>
+            <Route path="/SpecificationFundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
+              <SpecificationFundingLineResults
+                specification={testSpec}
+                providerId={"test provider id"}
+                activeJob={activeJob}
+                clearSpecificationFromCache={jest.fn()}
+                monitorAssignTemplateCalculationsJob={jest.fn()}
+              />
+            </Route>
+          </ErrorContextWrapper>
         </Switch>
       </QueryClientProvider>
     </MemoryRouter>
   );
 };
 
-const renderProviderFundingLineResults = () => {
-  const { FundingLineResults } = require("../../../components/FundingLineStructure/FundingLineResults");
-  return render(
-    <MemoryRouter initialEntries={["/FundingLineResults/SPEC123/FS1/FP1/Completed"]}>
-      <QueryClientProvider client={new QueryClient()}>
-        <Switch>
-          <Route path="/FundingLineResults/:specificationId/:fundingStreamId/:fundingPeriodId/:publishStatus">
-            <FundingLineResults
-              status={undefined}
-              fundingPeriodId={"test fundingPeriodId"}
-              fundingStreamId={"test fundingStreamId"}
-              specificationId={"test spec id"}
-              providerId={"test provider id"}
-              addError={jest.fn()}
-              clearErrorMessages={jest.fn()}
-              showApproveButton={false}
-            />
-          </Route>
-        </Switch>
-      </QueryClientProvider>
-    </MemoryRouter>
-  );
+const testSpec: SpecificationSummary = {
+  coreProviderVersionUpdates: ProviderDataTrackingMode.Manual,
+  name: "Wizard Training",
+  approvalStatus: "Draft",
+  description: "",
+  fundingPeriod: {
+    id: "FP123",
+    name: "2019-20",
+  },
+  fundingStreams: [
+    {
+      name: "FS123",
+      id: "Wizard Training Scheme",
+    },
+  ],
+  id: "ABC123",
+  isSelectedForFunding: true,
+  providerVersionId: "",
+  templateIds: {},
+  dataDefinitionRelationshipIds: [],
 };
 
 const mockFundingLineStructureService = () => {
@@ -306,7 +281,7 @@ const mockProviderService = () => {
           specificationName: "spec name",
           fundingStreamId: "fundingStreamId",
           fundingStreamName: "fundingStreamName",
-          fundingLineResults: {
+          SpecificationFundingLineResults: {
             1: {
               templateLineId: 1,
               fundingLineCode: null,

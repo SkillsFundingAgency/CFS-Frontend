@@ -38,17 +38,16 @@ export function Datasets(props: {
     }
   );
 
-  const { mutate: handleToggleConverter, isLoading: isTogglingConverter } = useMutation<
-    boolean,
-    AxiosError,
-    ToggleDatasetSchemaRequest
-  >(async (request) => (await datasetService.toggleDatasetRelationshipService(request)).data, {
-    onError: (err) =>
-      addError({
-        error: err,
-        description: "Error whilst setting enable copy data for provider",
-      }),
-  });
+  const { mutate: handleToggleConverter } = useMutation<boolean, AxiosError, ToggleDatasetSchemaRequest>(
+    async (request) => (await datasetService.toggleDatasetRelationshipService(request)).data,
+    {
+      onError: (err) =>
+        addError({
+          error: err,
+          description: "Error whilst setting enable copy data for provider",
+        }),
+    }
+  );
 
   const { errors, addError } = useErrors();
 

@@ -3,7 +3,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useQuery } from "react-query";
 
-import { ErrorProps } from "../../hooks/useErrors";
+import { useErrorContext } from "../../context/ErrorContext";
 import { useProfileVariationPointers } from "../../hooks/Variation/useProfileVariationPointers";
 import { getAvailableFundingLinePeriods } from "../../services/publishService";
 import { mergeProfileVariationPointersService } from "../../services/specificationService";
@@ -17,16 +17,10 @@ export interface VariationManagementProps {
   specificationId: string;
   fundingPeriodId: string;
   fundingStreamId: string;
-  addError: (props: ErrorProps) => void;
-  clearErrorMessages: (fieldNames?: string[]) => void;
 }
 
-export function VariationManagement({
-  specificationId,
-  fundingStreamId,
-  addError,
-  clearErrorMessages,
-}: VariationManagementProps) {
+export function VariationManagement({ specificationId, fundingStreamId }: VariationManagementProps) {
+  const { addErrorToContext: addError, clearErrorsFromContext: clearErrorMessages } = useErrorContext();
   const [updatedPointers, setUpdatedPointers] = useState<ProfileVariationPointer[] | undefined>();
 
   const { profileVariationPointers, isFetchingVariationManagement } = useProfileVariationPointers({

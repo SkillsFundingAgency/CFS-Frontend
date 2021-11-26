@@ -21,7 +21,6 @@ import { getProviderResultsService } from "../../services/providerService";
 import { getSpecificationSummaryService } from "../../services/specificationService";
 import { JobType } from "../../types/jobType";
 import { SpecificationInformation } from "../../types/Provider/SpecificationInformation";
-import { PublishStatus } from "../../types/PublishStatusModel";
 import { Section } from "../../types/Sections";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FundingStream } from "../../types/viewFundingTypes";
@@ -212,15 +211,10 @@ export function ViewProviderResults({
               <Tabs.Panel label={"funding-line-structure"}>
                 {specificationSummary && (
                   <FundingLineResults
-                    specificationId={specificationSummary.id}
-                    fundingStreamId={specificationSummary.fundingStreams[0].id}
-                    fundingPeriodId={specificationSummary.fundingPeriod.id}
-                    status={specificationSummary.approvalStatus as PublishStatus}
+                    specification={specificationSummary}
                     providerId={providerId}
                     addError={addError}
                     clearErrorMessages={clearErrorMessages}
-                    showApproveButton={false}
-                    useCalcEngine={true}
                     jobTypes={[JobType.AssignTemplateCalculationsJob]}
                   />
                 )}

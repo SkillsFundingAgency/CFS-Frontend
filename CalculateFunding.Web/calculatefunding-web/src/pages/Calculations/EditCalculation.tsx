@@ -54,13 +54,13 @@ export function EditCalculation({
   const calculationId = match.params.calculationId;
   const [specificationId, setSpecificationId] = useState<string>("");
   const [calculation, setCalculation] = useState<CalculationDetails | undefined>();
-  const { errors, addErrorMessage, addError, clearErrorMessages } = useErrors();
+  const { errors, addError, clearErrorMessages } = useErrors();
   const { userId, hasPermission, missingPermissions, isPermissionsFetched } = useSpecificationPermissions(
     specificationId,
     [Permission.CanEditCalculations, Permission.CanApproveCalculations, Permission.CanApproveAnyCalculations]
   );
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
-    addErrorMessage(err.message, "Error while loading specification")
+    addError({ error: err, description: "Error while loading specification" })
   );
 
   const canCreateAdditionalCalculation = useMemo(
@@ -89,14 +89,14 @@ export function EditCalculation({
       },
     }
   );
-  const {} = useCalculation(
+  const { isLoadingCalculation } = useCalculation(
     calculationId,
-    (err) => addErrorMessage(err.message, "Error while loading calculation"),
+    (err) => addError({ error: err, description: "Error while loading calculation" }),
     (data) => setCalculation(data)
   );
   const { circularReferenceErrors, isLoadingCircularDependencies } = useCalculationCircularDependencies(
     specificationId,
-    (err) => addErrorMessage(err.message, "Error while checking for circular reference errors")
+    (err) => addError({ error: err, description: "Error while checking for circular reference errors" })
   );
   const [isApproving, setIsApproving] = useState(false);
   const [calculationState, setCalculationState] = useState<CalculationSourceCodeState | undefined>();
@@ -107,11 +107,10 @@ export function EditCalculation({
   const onCalculationChange = async (state: CalculationSourceCodeState) => {
     setCalculationState(state);
     if (state.errorMessage.length > 0) {
-      addErrorMessage(
-        state.errorMessage,
-        "An error occured related to the calculation source code",
-        "source-code"
-      );
+      addError({
+        error: "An error occured related to the calculation source code",
+        fieldName: "source-code",
+      });
     }
   };
 
@@ -119,11 +118,11 @@ export function EditCalculation({
     if (!calculationState || !calculation || !calculation.valueType) {
       return;
     } else if (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) {
-      addErrorMessage(
-        "Please build your calculation source code to check it is valid",
-        "Unvalidated source code",
-        "source-code"
-      );
+      addError({
+        error: "Please build your calculation source code to check it is valid",
+        description: "Unvalidated source code",
+        fieldName: "source-code",
+      });
       return;
     }
 
@@ -153,17 +152,20 @@ export function EditCalculation({
         if (response.status === 200) {
           setCalculationPublishStatus((response.data as PublishStatusModel).publishStatus);
         } else {
-          addErrorMessage(response.data, "Calculation approval was rejected");
+          addError({ error: response.data, description: "Calculation approval was rejected" });
         }
       } else {
-        addErrorMessage(
-          "Permissions",
-          "Calculation can not be approved by calculation writer",
-          "calculation-status"
-        );
+        addError({
+          error: "Permissions",
+          description: "Calculation can not be approved by calculation writer",
+          fieldName: "calculation-status",
+        });
       }
-    } catch (e) {
-      addErrorMessage("There is a problem, calculation can not be approved, please try again. " + e);
+    } catch (e: any) {
+      addError({
+        error: e,
+        description: "There is a problem, calculation can not be approved, please try again. ",
+      });
     } finally {
       setIsApproving(false);
     }
@@ -208,20 +210,23 @@ export function EditCalculation({
         {(isApproving || updateCalculation.isLoading) && calculation && (
           <LoadingStatus
             title={
-              updateCalculation.isLoading
+              isLoadingSpecification || isLoadingCalculation
+                ? "Loading"
+                : updateCalculation.isLoading
                 ? `Saving ${calculation.calculationType} calculation`
                 : `Approving ${calculation.calculationType} calculation`
             }
-            subTitle="Please wait whilst the calculation is updated"
+            subTitle={
+              isLoadingSpecification ? "Please wait" : "Please wait whilst the calculation is updated"
+            }
           />
         )}
 
         <MultipleErrorSummary errors={errors} />
-        <ConfirmationPanel
-          title={"Save successful"}
-          children={"Your changes have been saved"}
-          hidden={!updateCalculation.isSuccess || isApproving}
-        />
+
+        <ConfirmationPanel title={"Save successful"} hidden={!updateCalculation.isSuccess || isApproving}>
+          Your changes have been saved
+        </ConfirmationPanel>
 
         <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>
           <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">

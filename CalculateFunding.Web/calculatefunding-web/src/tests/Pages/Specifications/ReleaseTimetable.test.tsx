@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 
+import { ErrorContext } from "../../../context/ErrorContext";
 import { ReleaseTimetableSummary } from "../../../types/ReleaseTimetableSummary";
 
 const testDate = "2050-01-01T00:00:00+00:00";
@@ -14,14 +15,20 @@ const clearErrorMessagesMock = jest.fn();
 const renderReleaseTimetable = () => {
   const { ReleaseTimetable } = require("../../../pages/Specifications/ReleaseTimetable");
   return render(
-    <ReleaseTimetable
-      specificationId={"Spec123"}
-      addErrorMessage={addErrorMock}
-      clearErrorMessages={clearErrorMessagesMock}
-      errors={[]}
-    />
+    <ErrorContext.Provider
+      value={{
+        state: [],
+        dispatch: jest.fn(),
+        addErrorToContext: addErrorMock,
+        clearErrorsFromContext: clearErrorMessagesMock,
+        addValidationErrorToContext: jest.fn(),
+      }}
+    >
+      <ReleaseTimetable specificationId={"Spec123"} />
+    </ErrorContext.Provider>
   );
 };
+
 function mockPublishService(earliestPaymentAvailableDate?: string, externalPublicationDate?: string) {
   const { getReleaseTimetableForSpecificationService } = require("../../../services/publishService");
   getReleaseTimetableForSpecificationService.mockImplementation(() =>
@@ -58,12 +65,7 @@ describe("<ReleaseTimetable /> renders ", () => {
       expect(screen.getByText("Release timetable")).toBeInTheDocument();
     });
   });
-  it("the release title", async () => {
-    renderReleaseTimetable();
-    await waitFor(() => {
-      expect(screen.getByText("Release date of funding to Business Central?")).toBeInTheDocument();
-    });
-  });
+
   it("the navision title", async () => {
     renderReleaseTimetable();
     await waitFor(() => {
@@ -79,66 +81,62 @@ describe("<ReleaseTimetable /> validates ", () => {
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() => {
-      expect(addErrorMock).toHaveBeenNthCalledWith(
-        1,
-        "Please enter a release date and time for funding",
-        undefined,
-        "release-timetable-funding"
-      );
-      expect(addErrorMock).toHaveBeenNthCalledWith(
-        2,
-        "Please enter a release date and time for statement",
-        undefined,
-        "release-timetable-statement"
-      );
+
+    expect(addErrorMock).toHaveBeenNthCalledWith(1, {
+      error: "Please enter a release date and time for funding",
+      fieldName: "release-timetable-funding",
+    });
+    expect(addErrorMock).toHaveBeenNthCalledWith(2, {
+      error: "Please enter a release date and time for statement",
+      fieldName: "release-timetable-statement",
     });
   });
+
   it("when earliest payment date missing", async () => {
     mockPublishService(undefined, testDate);
     renderReleaseTimetable();
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() =>
-      expect(addErrorMock).toBeCalledWith(
-        "Please enter a release date and time for statement",
-        undefined,
-        "release-timetable-statement"
-      )
-    );
+
+    expect(addErrorMock).toBeCalledWith({
+      error: "Please enter a release date and time for statement",
+      fieldName: "release-timetable-statement",
+    });
   });
+
   it("when external publication date missing", async () => {
     mockPublishService(testDate, undefined);
     renderReleaseTimetable();
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() =>
-      expect(addErrorMock).toBeCalledWith(
-        "Please enter a release date and time for funding",
-        undefined,
-        "release-timetable-funding"
-      )
-    );
+
+    expect(addErrorMock).toBeCalledWith({
+      error: "Please enter a release date and time for funding",
+      fieldName: "release-timetable-funding",
+    });
   });
+
   it("when earliest payment date is in past", async () => {
     mockPublishService(dateInPast, testDate);
     renderReleaseTimetable();
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() =>
-      expect(addErrorMock).toBeCalledWith(
-        "Release date of statement cannot be in the past",
-        undefined,
-        "release-timetable-statement"
-      )
-    );
+
+    expect(addErrorMock).toBeCalledWith({
+      error: "Release date of statement cannot be in the past",
+      fieldName: "release-timetable-statement",
+    });
   });
   it("when publication date is in past", async () => {
     mockPublishService(testDate, dateInPast);
@@ -146,14 +144,13 @@ describe("<ReleaseTimetable /> validates ", () => {
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() =>
-      expect(addErrorMock).toBeCalledWith(
-        "Release date of funding cannot be in the past",
-        undefined,
-        "release-timetable-funding"
-      )
-    );
+
+    expect(addErrorMock).toBeCalledWith({
+      error: "Release date of funding cannot be in the past",
+      fieldName: "release-timetable-funding",
+    });
   });
   it("when publication date is in past and earliest payment date is missing", async () => {
     mockPublishService(undefined, dateInPast);
@@ -161,20 +158,16 @@ describe("<ReleaseTimetable /> validates ", () => {
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() => {
-      expect(addErrorMock).toHaveBeenNthCalledWith(
-        1,
-        "Please enter a release date and time for statement",
-        undefined,
-        "release-timetable-statement"
-      );
-      expect(addErrorMock).toHaveBeenNthCalledWith(
-        2,
-        "Release date of funding cannot be in the past",
-        undefined,
-        "release-timetable-funding"
-      );
+
+    expect(addErrorMock).toHaveBeenNthCalledWith(1, {
+      error: "Please enter a release date and time for statement",
+      fieldName: "release-timetable-statement",
+    });
+    expect(addErrorMock).toHaveBeenNthCalledWith(2, {
+      error: "Release date of funding cannot be in the past",
+      fieldName: "release-timetable-funding",
     });
   });
   it("when earliest payment date is in past and publication date is missing", async () => {
@@ -183,20 +176,16 @@ describe("<ReleaseTimetable /> validates ", () => {
     await waitFor(() => {
       expect(screen.getByText("Confirm changes").closest("button")).not.toBeDisabled();
     });
+
     fireEvent.click(screen.getByText("Confirm changes"));
-    await waitFor(() => {
-      expect(addErrorMock).toHaveBeenNthCalledWith(
-        1,
-        "Please enter a release date and time for funding",
-        undefined,
-        "release-timetable-funding"
-      );
-      expect(addErrorMock).toHaveBeenNthCalledWith(
-        2,
-        "Release date of statement cannot be in the past",
-        undefined,
-        "release-timetable-statement"
-      );
+
+    expect(addErrorMock).toHaveBeenNthCalledWith(1, {
+      error: "Please enter a release date and time for funding",
+      fieldName: "release-timetable-funding",
+    });
+    expect(addErrorMock).toHaveBeenNthCalledWith(2, {
+      error: "Release date of statement cannot be in the past",
+      fieldName: "release-timetable-statement",
     });
   });
 });

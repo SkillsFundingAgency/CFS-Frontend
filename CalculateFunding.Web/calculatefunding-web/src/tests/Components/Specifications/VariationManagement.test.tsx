@@ -7,6 +7,7 @@ import { UseQueryResult } from "react-query/types/react/types";
 import { MemoryRouter, Route, Switch } from "react-router";
 
 import { VariationManagement } from "../../../components/Specifications/VariationManagement";
+import { ErrorContextWrapper } from "../../../context/ErrorContext";
 import * as pointersHook from "../../../hooks/Variation/useProfileVariationPointers";
 import { ProfileVariationPointersResult } from "../../../hooks/Variation/useProfileVariationPointers";
 import { AvailableVariationPointerFundingLine } from "../../../types/Publishing/AvailableVariationPointerFundingLine";
@@ -19,15 +20,15 @@ const renderVariationManagement = async () => {
     <MemoryRouter initialEntries={[`/VariationManagement/${specificationId}`]}>
       <QueryClientProvider client={new QueryClient()}>
         <Switch>
-          <Route path={`/VariationManagement/${specificationId}`}>
-            <VariationManagement
-              specificationId={specificationId}
-              addError={jest.fn()}
-              clearErrorMessages={jest.fn()}
-              fundingPeriodId={"aaa"}
-              fundingStreamId={"bbb"}
-            />
-          </Route>
+          <ErrorContextWrapper>
+            <Route path={`/VariationManagement/${specificationId}`}>
+              <VariationManagement
+                specificationId={specificationId}
+                fundingPeriodId={"aaa"}
+                fundingStreamId={"bbb"}
+              />
+            </Route>
+          </ErrorContextWrapper>
         </Switch>
       </QueryClientProvider>
     </MemoryRouter>

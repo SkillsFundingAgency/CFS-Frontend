@@ -12,6 +12,7 @@ import { ProviderFundingProfilingPatterns } from "../../components/Funding/Provi
 import { ProviderFundingProfilingSummary } from "../../components/Funding/ProviderFundingProfilingSummary";
 import { ProviderFundingStreamHistory } from "../../components/Funding/ProviderFundingStreamHistory";
 import { FundingLineResults } from "../../components/fundingLineStructure/FundingLineResults";
+import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { ProviderSummarySection } from "../../components/Providers/ProviderSummarySection";
@@ -31,7 +32,6 @@ import { FundingLineProfile } from "../../types/FundingLineProfile";
 import { JobType } from "../../types/jobType";
 import { ProviderProfileTotalsForStreamAndPeriod } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import { ProviderTransactionSummary } from "../../types/ProviderSummary";
-import { PublishStatus } from "../../types/PublishStatusModel";
 import { Section } from "../../types/Sections";
 
 export interface ProviderFundingOverviewRoute {
@@ -205,25 +205,23 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
                   )}
               </Tabs.Panel>
               <Tabs.Panel label="calculations">
-                <FundingLineResults
-                  specificationId={specificationId}
-                  fundingStreamId={fundingStreamId}
-                  fundingPeriodId={fundingPeriodId}
-                  status={PublishStatus.Approved}
-                  providerId={providerId}
-                  addError={addError}
-                  showApproveButton={false}
-                  useCalcEngine={false}
-                  jobTypes={[
-                    JobType.RefreshFundingJob,
-                    JobType.ApproveAllProviderFundingJob,
-                    JobType.ApproveBatchProviderFundingJob,
-                    JobType.PublishAllProviderFundingJob,
-                    JobType.PublishBatchProviderFundingJob,
-                    JobType.PublishedFundingUndoJob,
-                  ]}
-                  clearErrorMessages={clearErrorMessages}
-                />
+                  {isLoadingSpecification && <LoadingFieldStatus title="Loading specification..." />}
+                  {specification && (
+                    <FundingLineResults
+                      specification={specification}
+                      providerId={providerId}
+                      addError={addError}
+                      jobTypes={[
+                        JobType.RefreshFundingJob,
+                        JobType.ApproveAllProviderFundingJob,
+                        JobType.ApproveBatchProviderFundingJob,
+                        JobType.PublishAllProviderFundingJob,
+                        JobType.PublishBatchProviderFundingJob,
+                        JobType.PublishedFundingUndoJob,
+                      ]}
+                      clearErrorMessages={clearErrorMessages}
+                    />
+                  )}
               </Tabs.Panel>
             </Tabs>
           </div>

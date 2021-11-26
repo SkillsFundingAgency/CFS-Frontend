@@ -14,7 +14,7 @@ export const useCalculationErrors = (
     cacheTime: milliseconds.OneHour,
     staleTime: staleTime,
     refetchOnWindowFocus: false,
-    enabled: (specificationId && specificationId.length > 0) === true,
+    enabled: specificationId?.length > 0,
     onError: onError,
   };
 
@@ -22,7 +22,7 @@ export const useCalculationErrors = (
   const queryClient = useQueryClient();
 
   const { data, error, isFetching, isLoading, isError, isFetched } = useQuery<CalculationError[], AxiosError>(
-    `specification-${specificationId}-summary`,
+    `calculation-errors-for-spec-${specificationId}`,
     async () => (await getCalculationErrorsBySpecificationId(specificationId)).data,
     config
   );

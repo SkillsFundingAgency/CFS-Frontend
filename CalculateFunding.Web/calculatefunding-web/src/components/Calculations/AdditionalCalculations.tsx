@@ -23,15 +23,15 @@ import { TableNavBottom } from "../TableNavBottom";
 export interface AdditionalCalculationsProps {
   specificationId: string;
   providerId?: string;
-  addError: (props: ErrorProps) => void;
   showCreateButton: boolean;
+  addError: (err: ErrorProps) => void;
 }
 
 export function AdditionalCalculations({
   specificationId,
   providerId,
-  addError,
   showCreateButton,
+  addError,
 }: AdditionalCalculationsProps) {
   const [additionalCalculations, setAdditionalCalculations] = useState<CalculationSearchResultResponse>();
   const [additionalCalculationsSearchTerm, setAdditionalCalculationSearchTerm] = useState("");
