@@ -132,7 +132,7 @@ export function FundingManagementApprovalSelection(): JSX.Element {
                   {fundingConfiguration.approvalMode === ApprovalMode.Batches && (
                     <div className="govuk-radios govuk-radios--inline">
                       <label className="govuk-label govuk-!-margin-bottom-2" htmlFor="file-upload-1">
-                        Select yes if you wish to process a preselected batch of providers
+                        Select yes if you wish to approve a preselected batch of providers
                       </label>
                       <div className="govuk-radios__item">
                         <input

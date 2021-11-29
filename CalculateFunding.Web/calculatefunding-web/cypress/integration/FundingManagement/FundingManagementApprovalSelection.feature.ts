@@ -22,6 +22,7 @@ context("Funding management approval selection page", () => {
                 "exist"
             );
         });
+
         it("has correct subtitle", () => {
             cy.findByRole("heading", {
                 name: /Select a funding stream and funding period./,
@@ -31,5 +32,4 @@ context("Funding management approval selection page", () => {
             );
         });
     });
-
 });
