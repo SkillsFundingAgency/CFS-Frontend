@@ -33,7 +33,6 @@ import { JobDetails } from "../../types/jobDetails";
 import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../types/Sections";
 
 export interface FundingManagementApprovalResultsProps {

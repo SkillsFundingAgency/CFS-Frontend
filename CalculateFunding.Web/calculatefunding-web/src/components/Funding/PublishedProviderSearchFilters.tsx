@@ -1,4 +1,5 @@
-﻿import React, { useEffect, useState } from "react";
+﻿import { debounce } from "lodash";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import * as actions from "../../actions/FundingSearchSelectionActions";
@@ -15,14 +16,15 @@ import { FilterAllocationType } from "../Search/FilterAllocationType";
 import { FilterCheckboxFieldset } from "../Search/FilterCheckboxFieldset";
 import { FilterOptionProps } from "../Search/FilterCheckboxOption";
 
-
 export interface PublishedProviderSearchFiltersProps {
   facets: Facet[];
   numberOfProvidersWithErrors: number;
   clearFundingSearchSelection: () => void;
 }
 
-export function PublishedProviderSearchFilters(props: PublishedProviderSearchFiltersProps) {
+export const PublishedProviderSearchFilters = React.memo(function (
+  props: PublishedProviderSearchFiltersProps
+) {
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
@@ -47,6 +49,20 @@ export function PublishedProviderSearchFilters(props: PublishedProviderSearchFil
 
   const sortFacetDateValues = (array: FacetValue[]) =>
     array.sort((a: FacetValue, b: FacetValue) => new Date(a.name).getTime() - new Date(b.name).getTime());
+
+  const updateSearchText = (searchTerm: string, searchField: string | undefined) => {
+    console.log(
+      `ProviderSearchBox.updateSearchText... Dispatching: Field: ${searchField}. Text: ${searchTerm}`
+    );
+    dispatch(
+      actions.updateSearchTextFilter({
+        searchTerm: searchTerm,
+        searchFields: [searchField],
+      })
+    );
+  };
+
+  const debounceUpdateSearchText = useRef(debounce(updateSearchText, 500)).current;
 
   useEffect(() => {
     props.facets.forEach((facet) => {
@@ -76,12 +92,7 @@ export function PublishedProviderSearchFilters(props: PublishedProviderSearchFil
       selectedTextSearch.searchTerm.length > 2 ||
       (selectedTextSearch.searchTerm.length === 0 && searchCriteria.searchTerm.length !== 0)
     ) {
-      dispatch(
-        actions.updateSearchTextFilter({
-          searchTerm: selectedTextSearch.searchTerm,
-          searchFields: [selectedTextSearch.searchField],
-        })
-      );
+      debounceUpdateSearchText(selectedTextSearch.searchTerm, selectedTextSearch.searchField);
     }
   }, [selectedTextSearch]);
 
@@ -273,4 +284,4 @@ export function PublishedProviderSearchFilters(props: PublishedProviderSearchFil
       </button>
     </>
   );
-}
+});

@@ -14,7 +14,7 @@ export function ConditionalTextSearchInput({
   handleChange,
 }: ConditionalTextSearchInputProps) {
   return (
-    <div className={"govuk-radios__conditional"}>
+    <div className="govuk-radios__conditional">
       <div className="govuk-form-group">
         <input
           type="text"

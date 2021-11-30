@@ -341,7 +341,7 @@ export const SpecificationFundingApproval = ({
 
       <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
-      {!isLoading && !activeActionJobs?.length && (
+      {!activeActionJobs?.length && (
         <JobNotificationSection
           jobNotifications={jobNotifications}
           notificationSettings={[
@@ -432,16 +432,15 @@ export const SpecificationFundingApproval = ({
       )}
 
       <div className="govuk-grid-row">
-        <div
-          className="govuk-grid-column-one-third"
-          hidden={hasActiveActionJobs || isLoadingRefresh || !publishedProviderSearchResults}
-        >
-          <PublishedProviderSearchFilters
-            facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
-            numberOfProvidersWithErrors={0}
-            clearFundingSearchSelection={clearFundingSearchSelection}
-          />
-        </div>
+        {!hasActiveActionJobs && (
+          <div className="govuk-grid-column-one-third">
+            <PublishedProviderSearchFilters
+              facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
+              numberOfProvidersWithErrors={0}
+              clearFundingSearchSelection={clearFundingSearchSelection}
+            />
+          </div>
+        )}
         <div className="govuk-grid-column-two-thirds">
           {(isLoading || hasActiveActionJobs) && (
             <div>
