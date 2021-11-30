@@ -1,5 +1,6 @@
 import "../../styles/EditTemplate.scss";
 
+import { toNumber } from "lodash";
 import deepClone from "lodash/cloneDeep";
 import * as QueryString from "query-string";
 import React, { MouseEvent, useEffect, useRef, useState } from "react";
@@ -68,6 +69,7 @@ import {
   TemplateResponse,
   TemplateStatus,
 } from "../../types/TemplateBuilderDefinitions";
+import { TemplateVersionRoute } from "./CloneTemplate";
 
 enum Mode {
   View = "view",
@@ -78,7 +80,7 @@ export function EditTemplate() {
   const orgchart = useRef<HTMLDivElement>(null);
   const descriptionRef = useRef<HTMLSpanElement>(null);
   const itemRefs = useRef({});
-  const { templateId, version } = useParams();
+  const { templateId, version } = useParams<TemplateVersionRoute>();
   const [enableUndo, setEnableUndo] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDirty, setIsDirty] = useState<boolean>(false);
@@ -208,7 +210,7 @@ export function EditTemplate() {
       setIsLoading(true);
       const templateResult = !version
         ? await getTemplateById(templateId)
-        : await getTemplateVersion(templateId, version);
+        : await getTemplateVersion(templateId, toNumber(version));
       const templateResponse = templateResult.data as TemplateResponse;
       setTemplate(templateResponse);
       if (templateResponse.templateJson) {

@@ -32,6 +32,7 @@ import {
   TemplateFundingLine,
   TemplateResponse,
 } from "../../types/TemplateBuilderDefinitions";
+import { TemplateRoute } from "./ListVersions";
 
 export const PublishTemplate = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -50,7 +51,7 @@ export const PublishTemplate = () => {
     template ? [template.fundingStreamId] : []
   );
   let errorCount = 0;
-  const { templateId } = useParams();
+  const { templateId } = useParams<TemplateRoute>();
 
   useEffectOnce(() => {
     window.scrollTo(0, 0);

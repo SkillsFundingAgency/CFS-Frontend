@@ -22,8 +22,12 @@ import {
   TemplateVersionSummary,
 } from "../../types/TemplateBuilderDefinitions";
 
+export interface TemplateRoute {
+  templateId: string;
+}
+
 export const ListVersions = () => {
-  const { templateId } = useParams();
+  const { templateId } = useParams<TemplateRoute>();
   const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(true);
   const [isLoadingTemplate, setIsLoadingTemplate] = useState<boolean>(true);
   const [template, setTemplate] = useState<TemplateResponse>();

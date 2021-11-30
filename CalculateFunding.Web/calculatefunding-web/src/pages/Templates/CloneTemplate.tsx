@@ -1,7 +1,7 @@
-﻿import React, { useState } from "react";
+﻿import { toNumber } from "lodash";
+import React, { useState } from "react";
 import { useHistory } from "react-router";
-// @ts-ignore
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
@@ -23,8 +23,13 @@ import { Section } from "../../types/Sections";
 import { TemplatePermissions, TemplateResponse } from "../../types/TemplateBuilderDefinitions";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
 
+export interface TemplateVersionRoute {
+  templateId: string;
+  version: string;
+}
+
 export const CloneTemplate = () => {
-  const { templateId, version } = useParams();
+  const { templateId, version } = useParams<TemplateVersionRoute>();
   const [fundingStream, setFundingStream] = useState<FundingStream>();
   const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
   const [templateToClone, setTemplateToClone] = useState<TemplateResponse>();
@@ -97,7 +102,7 @@ export const CloneTemplate = () => {
     };
 
     try {
-      fetchTemplateToClone(templateId, version);
+      fetchTemplateToClone(templateId, toNumber(version));
     } catch (err: any) {
       addErrorMessage(`Template options could not be loaded: ${err.message}.`);
       setIsLoading(false);
