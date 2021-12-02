@@ -38,6 +38,7 @@ export function ViewProviderResults({
   const [isLoadingProviderData, setIsLoadingProviderData] = useState<boolean>(true);
   const [selectedSpecificationId, setSelectedSpecificationId] = useState<string>("");
   const [defaultFundingStreamName, setDefaultFundingStreamName] = useState<string>("");
+  const [refreshFundingLines, setRefreshFundingLines] = useState<boolean>(false);
   const location = useLocation();
   const { errors, addError, clearErrorMessages } = useErrors();
 
@@ -119,9 +120,13 @@ export function ViewProviderResults({
         const result = response.data as SpecificationSummary;
         setSelectedSpecificationId(result.id);
         setSpecificationSummary(response.data);
+        setRefreshFundingLines(true);
       })
       .catch((e) => {
         addError({ error: e });
+      })
+      .finally(() => {
+        setRefreshFundingLines(false);
       });
   }
 
@@ -215,6 +220,7 @@ export function ViewProviderResults({
                     providerId={providerId}
                     addError={addError}
                     clearErrorMessages={clearErrorMessages}
+                    refreshFundingLines={refreshFundingLines}
                     jobTypes={[JobType.AssignTemplateCalculationsJob]}
                   />
                 )}

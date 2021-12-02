@@ -279,10 +279,8 @@ export function FundingLineResults({
   useEffect(() => {
     setFundingLineRenderInternalState(true);
     if (fundingLines.length !== 0) {
-      if (fundingStructureViewModelItems.length === 0) {
-        setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
-        setFundingStructureViewModelItems(fundingLines);
-      }
+      setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
+      setFundingStructureViewModelItems(fundingLines);
     }
   }, [fundingLines]);
 

@@ -150,6 +150,7 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.DataDefinitionRelationshipIds, opt => opt.Ignore())
                 .ForMember(m => m.LastEditedDate, opt => opt.Ignore())
                 .ForMember(m => m.ProviderSource, opt => opt.Ignore())
+                .ForMember(m => m.ForceUpdateOnNextRefresh, opt => opt.Ignore())
                 .ForMember(m => m.CoreProviderVersionUpdates, opt => opt.Ignore());
 
             CreateMap<CreateSpecificationModel, CreateSpecificationViewModel>()

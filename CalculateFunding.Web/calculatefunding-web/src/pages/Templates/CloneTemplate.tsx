@@ -1,6 +1,7 @@
 ﻿import { toNumber } from "lodash";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
+// @ts-ignore
 import { useParams } from "react-router-dom";
 
 import { BackLink } from "../../components/BackLink";
