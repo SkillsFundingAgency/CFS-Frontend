@@ -94,7 +94,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
     fetch();
     monitorConverterWizardJob();
     clearErrorMessages();
-  }, [specificationId]);
+  }, [specification?.id]);
 
   async function onSuccessfulRefreshFunding() {
     clearErrorMessages();
