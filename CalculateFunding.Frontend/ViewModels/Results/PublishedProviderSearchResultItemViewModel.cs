@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using CalculateFunding.Common.ApiClient.Publishing.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace CalculateFunding.Frontend.ViewModels.Results
 {
@@ -42,5 +44,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         public int? MajorVersion { get; set; }
 
         public int? MinorVersion { get; set; }
+
+        public IEnumerable<ReleaseChannel> ReleaseChannels { get; set; }
     }
 }
