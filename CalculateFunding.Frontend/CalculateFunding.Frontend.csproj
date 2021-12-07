@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <UserSecretsId>3eb82587-ead7-4379-9be6-35fe8f84dbda</UserSecretsId>
     <TypeScriptToolsVersion>3.8</TypeScriptToolsVersion>
     <CodeAnalysisRuleSet>CalculateFunding.ruleset</CodeAnalysisRuleSet>
@@ -62,8 +62,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.2.0" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="3.0.2" />
     <PackageReference Include="Microsoft.Azure.SignalR" Version="1.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.0" />
     <PackageReference Include="Microsoft.FeatureManagement" Version="2.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" PrivateAssets="All" />
     <PackageReference Include="MvcSiteMapProvider.Web" Version="4.6.26" />

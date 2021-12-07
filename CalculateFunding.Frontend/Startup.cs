@@ -31,7 +31,6 @@
 
     public class Startup
     {
-        private IWebHostEnvironment _hostingEnvironment;
         private AuthenticationMode _authenticationMode;
         private bool _authenticationEnabled;
 
@@ -40,15 +39,12 @@
         public Startup(IConfiguration configuration, IWebHostEnvironment hostingEnvironment)
         {
             Guard.ArgumentNotNull(configuration, nameof(configuration));
-            Guard.ArgumentNotNull(hostingEnvironment, nameof(hostingEnvironment));
 
             Configuration = configuration;
-            _hostingEnvironment = hostingEnvironment;
-
             GetConfigAuthenticationMode();
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services, IWebHostEnvironment hostingEnvironment)
         {
             services.AddControllers()
                 .AddNewtonsoftJson(options =>
@@ -69,7 +65,7 @@
 
             if (_authenticationMode == AuthenticationMode.PlatformAuth)
             {
-                services.AddModule<AuthModule>(Configuration, _hostingEnvironment);
+                services.AddModule<AuthModule>(Configuration, hostingEnvironment);
             }
             else if (_authenticationMode == AuthenticationMode.IdentityServer)
             {
@@ -118,9 +114,9 @@
                 options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
 
-            services.AddModule<ApiModule>(Configuration, _hostingEnvironment);
+            services.AddModule<ApiModule>(Configuration, hostingEnvironment);
 
-            if (!_hostingEnvironment.IsDevelopment())
+            if (!hostingEnvironment.IsDevelopment())
             {
                 services.AddModule<LoggingModule>(Configuration);
             }

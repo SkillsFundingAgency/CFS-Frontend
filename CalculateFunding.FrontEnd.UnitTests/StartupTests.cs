@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.UnitTests
             services.ReplaceAllRegistrationsWith(Substitute.For<IConfigureOptions<ApplicationInsightsServiceOptions>>(), ServiceLifetime.Singleton);
 
             // Act
-            target.ConfigureServices(services);
+            target.ConfigureServices(services, hostingEnv);
             services.AddSingleton(httpContextAccessor);
 
             // Assert

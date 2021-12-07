@@ -344,7 +344,7 @@ namespace System.Collections.Generic
             };
 
             // Act
-            IEnumerable<dynamic> nonDuplicatedItems = items.DistinctBy(m => m.Id);
+            IEnumerable<dynamic> nonDuplicatedItems = Enumerable.DistinctBy(items, m => m.Id);
 
             // Assert
             nonDuplicatedItems

@@ -50,23 +50,21 @@ namespace CalculateFunding.Frontend.Controllers
             if (apiResponse.StatusCode == HttpStatusCode.OK)
             {
                 List<SpecificationSummary> specifications = apiResponse.Content.ToList();
-                List<FundingStreamWithSpecificationSelectedForFundingModel> fundingStreams = specifications
+                List<FundingStreamWithSpecificationSelectedForFundingModel> fundingStreams = Enumerable.DistinctBy(specifications
                     .SelectMany(x =>
                         x.FundingStreams.Select(fs =>
                             new FundingStreamWithSpecificationSelectedForFundingModel
                             {
                                 Id = fs.Id,
                                 Name = fs.Name
-                            }))
-                    .DistinctBy(x => x.Id)
-                    .ToList();
+                            })), x => x.Id)
+                     .ToList();
                 foreach (FundingStreamWithSpecificationSelectedForFundingModel fundingStream in fundingStreams)
                 {
                     List<SpecificationSummary> streamSpecs = specifications
                         .Where(x => x.FundingStreams.Any(s => s.Id == fundingStream.Id)).ToList();
-                    IEnumerable<Reference> fundingPeriods = streamSpecs
-                        .Select(y => y.FundingPeriod)
-                        .DistinctBy(x => x.Id);
+                    IEnumerable<Reference> fundingPeriods = Enumerable.DistinctBy(streamSpecs
+                        .Select(y => y.FundingPeriod), x => x.Id);
                     foreach (Reference fundingPeriod in fundingPeriods)
                     {
                         IEnumerable<SpecificationSummary> periodSpecs = streamSpecs
@@ -76,13 +74,12 @@ namespace CalculateFunding.Frontend.Controllers
                         {
                             Id = fundingPeriod.Id,
                             Name = fundingPeriod.Name,
-                            Specifications = periodSpecs
+                            Specifications = Enumerable.DistinctBy(periodSpecs
                                 .Select(s => new SpecificationSelectedForFundingModel
                                 {
                                     Id = s.Id,
                                     Name = s.Name
-                                })
-                                .DistinctBy(x => x.Id)
+                                }), x => x.Id)
                         });
                     }
                 }
