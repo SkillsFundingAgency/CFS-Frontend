@@ -127,11 +127,11 @@ export function SelectSpecification() {
           </fieldset>
           <fieldset className="govuk-fieldset">
             <div className="govuk-form-group">
-              <label htmlFor="select-provider" className="govuk-label">
+              <label htmlFor="select-funding-period" className="govuk-label">
                 Select funding period:
               </label>
               <select
-                id="select-provider"
+                id="select-funding-period"
                 className="govuk-select"
                 placeholder="Please select"
                 disabled={fundingPeriods.length === 0}
@@ -169,11 +169,11 @@ export function SelectSpecification() {
             }
           >
             <div className="govuk-form-group">
-              <label htmlFor="select-provider" className="govuk-label">
+              <label htmlFor="select-specification" className="govuk-label">
                 Select specification:
               </label>
               <select
-                id="select-provider"
+                id="select-specification"
                 className="govuk-select"
                 placeholder="Please select"
                 disabled={specifications.length === 0}
