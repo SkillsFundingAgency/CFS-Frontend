@@ -130,7 +130,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
 
   const redirectToFundingLineProfile = () => {
     history.push(
-      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}`
+      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit`
     );
   };
 

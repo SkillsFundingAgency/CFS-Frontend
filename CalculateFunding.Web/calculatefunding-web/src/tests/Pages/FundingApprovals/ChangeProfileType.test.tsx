@@ -219,7 +219,7 @@ describe("<ChangeProfileType /> ", () => {
             "pattern key 1"
           );
           expect(mockHistoryPush).toBeCalledWith(
-            "/Approvals/ProviderFundingOverview/specId/10005143/dsg-2019-12-16/DSG/FY-2021/DSG-004"
+            "/Approvals/ProviderFundingOverview/specId/10005143/dsg-2019-12-16/DSG/FY-2021/DSG-004/edit"
           );
         });
       });
@@ -234,7 +234,7 @@ describe("<ChangeProfileType /> ", () => {
         await waitFor(() => {
           expect(assignProfilePatternKeyToPublishedProvider).not.toBeCalled();
           expect(mockHistoryPush).toBeCalledWith(
-            "/Approvals/ProviderFundingOverview/specId/10005143/dsg-2019-12-16/DSG/FY-2021/DSG-004"
+            "/Approvals/ProviderFundingOverview/specId/10005143/dsg-2019-12-16/DSG/FY-2021/DSG-004/edit"
           );
         });
       });

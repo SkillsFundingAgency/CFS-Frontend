@@ -262,14 +262,17 @@ const fundingApprovalRoutes = (
       component={UploadBatch}
     />
     <Route
-      path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/change-profile-type"
+      exact
+      path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/edit/change-profile-type"
       component={ChangeProfileType}
     />
     <Route
+      exact
       path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/:editMode"
       component={ViewEditFundingLineProfile}
     />
     <Route
+      exact
       path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
       component={ProviderFundingOverview}
     />

@@ -233,7 +233,7 @@ export function ViewEditFundingLineProfile({
 
   const handleChangeToRuleBasedProfileClick = () => {
     history.push(
-      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/change-profile-type`
+      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit/change-profile-type`
     );
   };
 
