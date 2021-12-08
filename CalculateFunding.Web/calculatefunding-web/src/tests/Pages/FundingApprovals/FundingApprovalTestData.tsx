@@ -120,6 +120,8 @@ export function FundingApprovalTestData() {
     ukprn: "23932035",
     upin: "43634",
     urn: "851305",
+    majorVersion: 1,
+    minorVersion: 1,
   };
   const providerWithError1: PublishedProviderResult = {
     isIndicative: false,
@@ -138,6 +140,8 @@ export function FundingApprovalTestData() {
     ukprn: "9641960",
     upin: "785220",
     urn: "82096",
+    majorVersion: 1,
+    minorVersion: 1
   };
   const profileTotal: ProfileTotal = {
     distributionPeriodId: "",

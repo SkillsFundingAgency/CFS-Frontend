@@ -506,6 +506,8 @@ function setupTestConfig() {
     ukprn: "23932035",
     upin: "43634",
     urn: "851305",
+    majorVersion: 1,
+    minorVersion: 1,
   };
   const provider2: PublishedProviderResult = {
     isIndicative: false,
@@ -524,6 +526,8 @@ function setupTestConfig() {
     ukprn: "9641960",
     upin: "785220",
     urn: "82096",
+    majorVersion: 1,
+    minorVersion: 1,
   };
 
   const mockConfirmApprovalRoute: match<ConfirmFundingRouteProps> = {

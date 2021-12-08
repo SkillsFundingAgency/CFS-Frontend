@@ -19,6 +19,8 @@ export interface PublishedProviderResult {
   hasErrors: boolean;
   errors: string[];
   isIndicative: boolean;
+  majorVersion: number;
+  minorVersion: number;
 }
 
 export interface PublishedProviderSearchResults {
