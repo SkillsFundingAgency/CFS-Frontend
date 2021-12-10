@@ -24,15 +24,7 @@ export const TableNavBottom = ({
   navCss,
   onPageChange,
 }: TableNavBottomProps): JSX.Element | null => {
-  if (
-    !totalResults ||
-    !totalCount ||
-    !startItemNumber ||
-    !endItemNumber ||
-    !currentPage ||
-    !lastPage ||
-    (currentPage === 1 && lastPage <= 1)
-  )
+  if (!totalResults || !totalCount || !startItemNumber || !endItemNumber || !currentPage || !lastPage)
     return null;
 
   return (
