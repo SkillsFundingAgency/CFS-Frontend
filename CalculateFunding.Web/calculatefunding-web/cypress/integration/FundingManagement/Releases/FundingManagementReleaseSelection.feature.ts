@@ -1,6 +1,6 @@
 import { Server } from "miragejs";
 
-import { makeServer } from "../../../src/mirage";
+import { makeServer } from "../../../../src/mirage";
 
 context("Funding management approval selection page", () => {
     let server: Server;
@@ -10,7 +10,7 @@ context("Funding management approval selection page", () => {
         // @ts-ignore
         server = makeServer("test");
 
-        cy.visit("/FundingManagementReleaseSelection");
+        cy.visit("/FundingManagement/Release/Selection");
     });
 
 

@@ -2,19 +2,19 @@ import { Main } from "components/Main";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { Title } from "../../components/Title";
-import { useOptionsForSpecificationsSelectedForFunding } from "../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
-import { useErrors } from "../../hooks/useErrors";
-import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
-import { ApprovalMode } from "../../types/ApprovalMode";
-import { Section } from "../../types/Sections";
+import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { LoadingFieldStatus } from "../../../components/LoadingFieldStatus";
+import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { Title } from "../../../components/Title";
+import { useOptionsForSpecificationsSelectedForFunding } from "../../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
+import { useErrors } from "../../../hooks/useErrors";
+import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
+import { ApprovalMode } from "../../../types/ApprovalMode";
+import { Section } from "../../../types/Sections";
 import {
   FundingPeriodWithSpecificationSelectedForFunding,
   FundingStreamWithSpecificationSelectedForFunding,
-} from "../../types/SpecificationSelectedForFunding";
+} from "../../../types/SpecificationSelectedForFunding";
 
 export function FundingManagementReleaseSelection(): JSX.Element {
   const [selectedFundingStream, setSelectedFundingStream] =
@@ -60,8 +60,8 @@ export function FundingManagementReleaseSelection(): JSX.Element {
 
     history.push(
       batchUpload
-        ? `/FundingManagementReleaseUploadBatch/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
-        : `/FundingManagementReleaseResults/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
+        ? `/FundingManagement/Release/UploadBatch/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
+        : `/FundingManagement/Release/Results/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
     );
   };
 
@@ -71,7 +71,7 @@ export function FundingManagementReleaseSelection(): JSX.Element {
 
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"Funding management"} url={"FundingManagement"} />
+        <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
         <Breadcrumb name={"Release management"} />
       </Breadcrumbs>
 
@@ -81,14 +81,14 @@ export function FundingManagementReleaseSelection(): JSX.Element {
         <div className="govuk-grid-column-full">
           {!isErrorCheckingForOptions && (
             <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="sort">
+              <label className="govuk-label" aria-label="funding-stream" htmlFor="funding-streams">
                 Funding stream
               </label>
               {!isLoadingOptions && fundingStreams && fundingStreams.length > 0 ? (
                 <select
                   className="govuk-select"
                   id="funding-streams"
-                  name="sort"
+                  name="funding-streams"
                   onChange={changeFundingStream}
                   data-testid={"funding-stream-dropdown"}
                 >
@@ -106,12 +106,13 @@ export function FundingManagementReleaseSelection(): JSX.Element {
           )}
           {!isLoadingOptions && selectedFundingStream && (
             <div className="govuk-form-group">
-              <label className="govuk-label" htmlFor="sort">
+              <label className="govuk-label" aria-label="funding-period" htmlFor="funding-periods">
                 Funding period
               </label>
               <select
                 className="govuk-select"
                 id="funding-periods"
+                name="funding-periods"
                 data-testid={"funding-period-dropdown"}
                 onChange={changeFundingPeriod}
               >

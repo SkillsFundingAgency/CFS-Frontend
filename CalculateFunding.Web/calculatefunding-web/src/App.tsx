@@ -56,8 +56,9 @@ import { FundingManagementApprovalResults } from "./pages/FundingManagement/Fund
 import { FundingManagementApprovalsConfirmFunding } from "./pages/FundingManagement/FundingManagementApprovalsConfirmFunding";
 import { FundingManagementApprovalSelection } from "./pages/FundingManagement/FundingManagementApprovalSelection";
 import { FundingManagementApprovalsUploadBatch } from "./pages/FundingManagement/FundingManagementApprovalsUploadBatch";
-import { FundingManagementReleaseSelection } from "./pages/FundingManagement/FundingManagementReleaseSelection";
-import { FundingManagementReleaseUploadBatch } from "./pages/FundingManagement/FundingManagementReleaseUploadBatch";
+import { FundingManagementReleaseSelection } from "./pages/FundingManagement/Releases/FundingManagementReleaseSelection";
+import { FundingManagementReleaseUploadBatch } from "./pages/FundingManagement/Releases/FundingManagementReleaseUploadBatch";
+import { ReleaseResults } from "./pages/FundingManagement/Releases/ReleaseResults";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
 import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
@@ -186,12 +187,18 @@ const App: React.FunctionComponent = () => {
                 component={FundingManagementApprovalsUploadBatch}
               />
               <Route
-                path="/FundingManagementReleaseUploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
+                path="/FundingManagement/Release/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
+                exact={true}
                 component={FundingManagementReleaseUploadBatch}
+              />
+              <Route
+                path="/FundingManagement/Release/Results/:fundingStreamId/:fundingPeriodId/:specificationId"
+                exact={true}
+                component={ReleaseResults}
               />
 
               <Route
-                path="/FundingManagementReleaseSelection"
+                path="/FundingManagement/Release/Select"
                 component={FundingManagementReleaseSelection}
               />
               <Route path="/SelectSpecification" component={SelectSpecification} />

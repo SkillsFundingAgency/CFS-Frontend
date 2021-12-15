@@ -508,6 +508,7 @@ function setupTestConfig() {
     urn: "851305",
     majorVersion: 1,
     minorVersion: 1,
+    releases:[]
   };
   const provider2: PublishedProviderResult = {
     isIndicative: false,
@@ -528,6 +529,7 @@ function setupTestConfig() {
     urn: "82096",
     majorVersion: 1,
     minorVersion: 1,
+    releases:[]
   };
 
   const mockConfirmApprovalRoute: match<ConfirmFundingRouteProps> = {

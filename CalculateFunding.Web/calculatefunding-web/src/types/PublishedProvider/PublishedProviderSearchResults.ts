@@ -21,6 +21,7 @@ export interface PublishedProviderResult {
   isIndicative: boolean;
   majorVersion: number;
   minorVersion: number;
+  releases: PublishedProviderRelease[]
 }
 
 export interface PublishedProviderSearchResults {
@@ -37,4 +38,11 @@ export interface PublishedProviderSearchResults {
   endItemNumber: number;
   pagerState: PagerState;
   facets: Facet[];
+}
+
+export interface PublishedProviderRelease{
+  channelName: string;
+  channelCode: string;
+  majorVersion: number;
+  minorVersion: number;
 }

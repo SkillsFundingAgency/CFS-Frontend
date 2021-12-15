@@ -1,6 +1,6 @@
 import { Server } from "miragejs";
 
-import { makeServer } from "../../../src/mirage";
+import { makeServer } from "../../../../src/mirage";
 
 context("Funding management for release batch full journey", () => {
     let server: Server;
@@ -508,6 +508,108 @@ context("Funding management for release batch full journey", () => {
                     }]
                 }]
         })
+        server.get("/policy/configuration/DSG/FY-2021", () => {
+            return {
+                "organisationGroupings": [
+                    {
+                        "groupTypeIdentifier": "UKPRN",
+                        "groupingReason": 0,
+                        "groupTypeClassification": "LegalEntity",
+                        "organisationGroupTypeCode": "LocalAuthority",
+                        "providerTypeMatch": [],
+                        "providerStatus": null
+                    },
+                    {
+                        "groupTypeIdentifier": "LACode",
+                        "groupingReason": 1,
+                        "groupTypeClassification": "GeographicalBoundary",
+                        "organisationGroupTypeCode": "LocalAuthority",
+                        "providerTypeMatch": [],
+                        "providerStatus": null
+                    },
+                    {
+                        "groupTypeIdentifier": "LocalAuthorityClassificationTypeCode",
+                        "groupingReason": 1,
+                        "groupTypeClassification": "GeographicalBoundary",
+                        "organisationGroupTypeCode": "LocalGovernmentGroup",
+                        "providerTypeMatch": [],
+                        "providerStatus": null
+                    },
+                    {
+                        "groupTypeIdentifier": "GovernmentOfficeRegionCode",
+                        "groupingReason": 1,
+                        "groupTypeClassification": "GeographicalBoundary",
+                        "organisationGroupTypeCode": "GovernmentOfficeRegion",
+                        "providerTypeMatch": [],
+                        "providerStatus": null
+                    },
+                    {
+                        "groupTypeIdentifier": "CountryCode",
+                        "groupingReason": 1,
+                        "groupTypeClassification": "GeographicalBoundary",
+                        "organisationGroupTypeCode": "Country",
+                        "providerTypeMatch": [],
+                        "providerStatus": null
+                    }
+                ],
+                "id": "config-DSG-FY-2021",
+                "fundingStreamId": "DSG",
+                "fundingPeriodId": "FY-2021",
+                "defaultTemplateVersion": "1.1",
+                "variations": [
+                    {
+                        "name": "TemplateUpdated",
+                        "order": 0,
+                        "fundingLineCodes": null
+                    },
+                    {
+                        "name": "FundingSchemaUpdated",
+                        "order": 1,
+                        "fundingLineCodes": null
+                    },
+                    {
+                        "name": "ProviderMetadata",
+                        "order": 2,
+                        "fundingLineCodes": null
+                    },
+                    {
+                        "name": "FundingUpdated",
+                        "order": 4,
+                        "fundingLineCodes": null
+                    },
+                    {
+                        "name": "ProfilingUpdated",
+                        "order": 5,
+                        "fundingLineCodes": null
+                    },
+                    {
+                        "name": "ReProfiling",
+                        "order": 6,
+                        "fundingLineCodes": null
+                    }
+                ],
+                "errorDetectors": [
+                    "TrustIdMismatchErrorDetector",
+                    "FundingLineValueProfileMismatchErrorDetector",
+                    "PostPaymentOutOfScopeProviderErrorDetector",
+                    "ProviderNotFundedErrorDetector"
+                ],
+                "approvalMode": "All",
+                "providerSource": "CFS",
+                "paymentOrganisationSource": "PaymentOrganisationAsProvider",
+                "updateCoreProviderVersion": "Manual",
+                "enableUserEditableCustomProfiles": false,
+                "enableUserEditableRuleBasedProfiles": false,
+                "runCalculationEngineAfterCoreProviderUpdate": true,
+                "enableConverterDataMerge": false,
+                "successorCheck": false,
+                "indicativeOpenerProviderStatus": [],
+                "allowedPublishedFundingStreamsIdsToReference": [],
+                "releaseManagementVariations": [],
+                "releaseChannels": [],
+                "releaseActionGroups": []
+            }
+        });
 
         cy.visit("/");
     }
@@ -518,22 +620,27 @@ context("Funding management for release batch full journey", () => {
         server.shutdown();
     })
 
-    it("navigates to Release Management using the link", ()=>{
+    it("navigates to Release Management using the link", () => {
         //todo: when the page is live then change to findByRole and use page link from root
-        cy.visit("/FundingManagement")
+        cy.visit("/FundingManagement");
 
-        cy.findByRole("link", {
-            name: /Release management/
-        }).click();
+        cy.findByRole("link", { name: /Release management/ }).should("exist").click();
 
         cy.findByRole("heading", {
             level: 1,
             name: /Release management/
-        })
+        }).should("exist");
 
         cy.findByRole("heading", {
             level: 3,
             name: /Select a funding stream and funding period./
-        })
+        }).should("exist");
+    });
+
+    it("selects the funding stream and funding period and continues to the next screen", () =>{
+        cy.findByLabelText("Funding stream").should("exist").select(1);
+        cy.findByLabelText("Funding period").should("exist").select(1);
+
+        cy.findByRole("button", { name: /Continue/i }).should("exist").click();
     })
 })

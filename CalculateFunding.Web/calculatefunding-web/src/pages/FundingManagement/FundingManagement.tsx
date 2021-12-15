@@ -29,7 +29,7 @@ export default function FundingManagement(): JSX.Element {
           </div>
           <div className="govuk-grid-column-one-third">
             <div className="govuk-heading-m">
-              <Link to="/FundingManagementReleaseSelection" className="govuk-link">
+              <Link to="/FundingManagement/Release/Select" className="govuk-link">
                 Release management
               </Link>
             </div>

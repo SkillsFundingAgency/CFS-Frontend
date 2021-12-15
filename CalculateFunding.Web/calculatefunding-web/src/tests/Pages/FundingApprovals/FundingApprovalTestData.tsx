@@ -122,6 +122,7 @@ export function FundingApprovalTestData() {
     urn: "851305",
     majorVersion: 1,
     minorVersion: 1,
+    releases: []
   };
   const providerWithError1: PublishedProviderResult = {
     isIndicative: false,
@@ -141,7 +142,8 @@ export function FundingApprovalTestData() {
     upin: "785220",
     urn: "82096",
     majorVersion: 1,
-    minorVersion: 1
+    minorVersion: 1,
+    releases:[]
   };
   const profileTotal: ProfileTotal = {
     distributionPeriodId: "",

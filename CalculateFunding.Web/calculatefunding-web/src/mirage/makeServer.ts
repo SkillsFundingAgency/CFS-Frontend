@@ -887,6 +887,124 @@ export const makeServer = ({ environment = "test" }) => {
         ]
       })
 
+      this.post("/api/publishedProviders/search", () =>{
+        return {
+          "providers":[
+            {
+              "publishedProviderVersionId":"DSG-FY-2021-10005143",
+              "providerType":"Local Authority",
+              "providerSubType":"Local Authority",
+              "localAuthority":"Bournemouth Christchurch and Poole",
+              "fundingStatus":"Draft",
+              "providerName":"BOURNEMOUTH, CHRISTCHURCH AND POOLE COUNCIL",
+              "ukprn":"10005143",
+              "upin":"",
+              "urn":"",
+              "fundingValue":92540428.0,
+              "specificationId":"4aeb22b6-50e1-48b6-9f53-613234b78a55",
+              "fundingStreamId":"DSG",
+              "fundingPeriodId":"FY-2021",
+              "indicative":"Hide indicative allocations",
+              "isIndicative":false,
+              "hasErrors":false,
+              "errors":[
+
+              ],
+              "majorVersion":0,
+              "minorVersion":7,
+              "releaseChannels":[
+
+              ]
+            }
+          ],
+          "filteredFundingAmount":92540428.0,
+          "canPublish":false,
+          "canApprove":true,
+          "totalFundingAmount":92540428.0,
+          "totalProvidersToApprove":1,
+          "totalProvidersToPublish":0,
+          "totalErrorResults":0,
+          "totalResults":1,
+          "currentPage":1,
+          "startItemNumber":1,
+          "endItemNumber":1,
+          "pagerState":{
+            "displayNumberOfPages":4,
+            "previousPage":null,
+            "nextPage":null,
+            "lastPage":1,
+            "pages":[
+              1
+            ],
+            "currentPage":1
+          },
+          "facets":[
+            {
+              "name":"providerType",
+              "facetValues":[
+                {
+                  "name":"Local Authority",
+                  "count":1
+                }
+              ]
+            },
+            {
+              "name":"providerSubType",
+              "facetValues":[
+                {
+                  "name":"Local Authority",
+                  "count":1
+                }
+              ]
+            },
+            {
+              "name":"localAuthority",
+              "facetValues":[
+                {
+                  "name":"Bournemouth Christchurch and Poole",
+                  "count":1
+                }
+              ]
+            },
+            {
+              "name":"fundingStatus",
+              "facetValues":[
+                {
+                  "name":"Draft",
+                  "count":1
+                }
+              ]
+            },
+            {
+              "name":"indicative",
+              "facetValues":[
+                {
+                  "name":"Hide indicative allocations",
+                  "count":1
+                }
+              ]
+            },
+            {
+              "name":"monthYearOpened",
+              "facetValues":[
+                {
+                  "name":"Any other",
+                  "count":1
+                }
+              ]
+            },
+            {
+              "name":"hasErrors",
+              "facetValues":[
+                {
+                  "name":"False",
+                  "count":1
+                }
+              ]
+            }
+          ]
+        }
+      })
     },
   });
 };
