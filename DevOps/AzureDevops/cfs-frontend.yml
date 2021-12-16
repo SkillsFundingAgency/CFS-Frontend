@@ -103,9 +103,9 @@ jobs:
         TargetFolder: CalculateFunding.Frontend/wwwroot/app
 
     - task: UseDotNet@2
-      displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersion)'
+      displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersionNet6)'
       inputs:
-        version: '6.0.100'
+        version: '$(DotnetCoreSdkVersionNet6)'
 
     - task: DotNetCoreCLI@2
       displayName: Restore
