@@ -390,6 +390,10 @@
                                 "value": "GMT Standard Time"
                             },
                             {
+                                "name": "WEBSITE_RUN_FROM_PACKAGE",
+                                "value": "1"
+                            },
+                            {
                                 "name": "specificationsClient:ApiKey",
                                 "value": "[concat('@Microsoft.KeyVault(SecretUri=', reference(resourceId('Microsoft.KeyVault/vaults/secrets', parameters('sharedKeyVaultName'),'svcapispecs'),'2018-02-14').secretUriWithVersion, ')')]"
                             },
