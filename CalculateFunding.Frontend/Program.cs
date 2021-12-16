@@ -26,7 +26,7 @@
                         options.Connect(AppConfigConnectionString)
                         .UseFeatureFlags(featureFlagOptions =>
                         {
-                            featureFlagOptions.CacheExpirationTime = TimeSpan.FromMinutes(5);
+                            featureFlagOptions.CacheExpirationInterval = TimeSpan.FromMinutes(5);
                         });
                     });
                 })
