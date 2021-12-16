@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
 
 import { Main } from "../components/Main";
+import { TextLink } from "../components/TextLink";
 import { FeatureFlagsState } from "../states/FeatureFlagsState";
 import { Section } from "../types/Sections";
 
@@ -22,17 +22,15 @@ export function Home(props: { featureFlags: FeatureFlagsState }) {
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-third">
                 <div className="govuk-heading-m">
-                  <Link to="/SpecificationsList" className="govuk-link">
+                  <TextLink to="/SpecificationsList">
                     Specifications
-                  </Link>
+                  </TextLink>
                 </div>
                 <p className="govuk-body">Create and manage the specifications used to calculate funding.</p>
               </div>
               <div className="govuk-grid-column-one-third">
                 <div className="govuk-heading-m">
-                  <Link to="/datasets/managedata" className="govuk-link">
-                    Manage data
-                  </Link>
+                  <TextLink to="/datasets/managedata">Manage data</TextLink>
                 </div>
                 <p className="govuk-body">
                   Manage data source files or map them to datasets for a specification.
@@ -40,9 +38,9 @@ export function Home(props: { featureFlags: FeatureFlagsState }) {
               </div>
               <div className="govuk-grid-column-one-third">
                 <div className="govuk-heading-m">
-                  <Link to="/results" className="govuk-link">
+                  <TextLink to="/results">
                     View results
-                  </Link>
+                  </TextLink>
                 </div>
                 <p className="govuk-body">View results for providers and calculations.</p>
               </div>
@@ -50,18 +48,18 @@ export function Home(props: { featureFlags: FeatureFlagsState }) {
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-third">
                 <div className="govuk-heading-m">
-                  <Link to="/Approvals/Select" className="govuk-link">
+                  <TextLink to="/Approvals/Select">
                     Funding approvals
-                  </Link>
+                  </TextLink>
                 </div>
                 <p className="govuk-body">Approve funding for providers and view how it's been calculated.</p>
               </div>
               {props.featureFlags.templateBuilderVisible && (
                 <div className="govuk-grid-column-one-third">
                   <div className="govuk-heading-m">
-                    <Link to="/Templates/List" className="govuk-link">
+                    <TextLink to="/Templates/List">
                       Templates
-                    </Link>
+                    </TextLink>
                   </div>
                   <p className="govuk-body">View and create funding templates.</p>
                 </div>

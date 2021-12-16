@@ -2,5 +2,6 @@
 import { QueryClient, QueryClientProvider } from "react-query";
 
 export const QueryClientProviderTestWrapper: React.FC = ({ children }) => {
-  return <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>;
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };

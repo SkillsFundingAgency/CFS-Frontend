@@ -1,4 +1,4 @@
-﻿import { screen } from "@testing-library/react";
+﻿import { screen, waitForElementToBeRemoved } from "@testing-library/react";
 import { DateTime } from "luxon";
 
 import * as jobSubscriptionHook from "../hooks/Jobs/useJobSubscription";
@@ -10,6 +10,17 @@ import { JobType } from "../types/jobType";
 import { RunningStatus } from "../types/RunningStatus";
 
 export const showDebugMain = (): void => screen.debug(screen.getByTestId("main-content"), 20000);
+
+export const waitForLoadingToFinish = async ({ timeout = 4000 } = {}) => {
+  if (screen.queryAllByTestId("loader")?.length || screen.queryAllByText(/loading/, { exact: false })?.length)
+    await waitForElementToBeRemoved(
+      () => [
+        ...screen.queryAllByTestId("loader", { exact: false }),
+        ...screen.queryAllByText(/loading/, { exact: false }),
+      ],
+      { timeout }
+    );
+};
 
 export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string | undefined }) => {
   let notification: JobNotification | undefined;
@@ -176,5 +187,6 @@ export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string 
     haveJobSuccessfulNotification,
     haveFailedJobNotification,
     haveJobInProgressNotification,
+    waitForLoadingToFinish
   };
 };

@@ -6,6 +6,7 @@ export function LoadingFieldStatus(props: { id?: string; title: string; hidden?:
       className="loader-inline"
       id={props.id}
       role="alert"
+      aria-label={props.title}
       data-testid={`loader-inline${props.token?.length ? "-" + props.token : ""}`}
     >
       <span hidden={props.hidden}>

@@ -90,6 +90,7 @@ jobs:
     - powershell: |
         cd '${{ variables.projectFolder }}'
         Write-host "========================= Yarn build ========================="
+        $env:NODE_OPTIONS = "--max-old-space-size=4096"
         $env:CI = "false"
         yarn run build
         Write-host "========================= Finished build ========================="

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Calcs;
+using CalculateFunding.Common.ApiClient.Datasets.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
@@ -204,32 +205,27 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpPost]
-        [Route("api/results/specifications/{specificationId}/run-populate-calculation-results-qa-database-job")]
-        public async Task<IActionResult> RunGenerateCalculationResultQADatabasePopulationJob([FromRoute] string specificationId)
+        [Route("api/results/specifications/{specificationId}/calculation-results/export-to-sql")]
+        public async Task<IActionResult> RunCalculationResultsExportToSqlJob([FromRoute] string specificationId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            EffectiveSpecificationPermission effectiveSpecificationPermission = await _authHelper.GetEffectivePermissionsForUser(User, specificationId);
+            EffectiveSpecificationPermission permissionsResult = await _authHelper.GetEffectivePermissionsForUser(User, specificationId);
 
-            if (!effectiveSpecificationPermission.CanRefreshPublishedQa)
+            if (!permissionsResult.CanRefreshPublishedQa)
             {
                 return new ForbidResult();
             }
-
-            PopulateCalculationResultQADatabaseRequest populateCalculationResultQADatabaseRequest = new PopulateCalculationResultQADatabaseRequest
+            
+            PopulateCalculationResultQADatabaseRequest request = new PopulateCalculationResultQADatabaseRequest
             {
                 SpecificationId = specificationId
             };
 
-            ApiResponse<Job> response = await _resultsClient.RunGenerateCalculationResultQADatabasePopulationJob(populateCalculationResultQADatabaseRequest);
+            ApiResponse<Job> result = await _resultsClient.RunGenerateCalculationResultQADatabasePopulationJob(request);
 
-            IActionResult errorResult = response.IsSuccessOrReturnFailureResult(nameof(RunGenerateCalculationResultQADatabasePopulationJob));
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(response.Content);
+            return result.Handle(nameof(RunCalculationResultsExportToSqlJob),
+                onSuccess: x => Ok(new JobCreationResponse { JobId = result.Content.Id }));
         }
 
         private Dictionary<uint, TemplateCalculationResult> GenerateCalculationResults(

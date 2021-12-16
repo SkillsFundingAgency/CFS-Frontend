@@ -10,7 +10,7 @@ import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { getFundingStreamsService } from "../../services/policyService";
 import {
   getFundingPeriodsByFundingStreamIdService,
-  getSpecificationsByFundingPeriodAndStreamIdWithResultsService,
+  getSpecificationsWithResultsService,
 } from "../../services/specificationService";
 import { Section } from "../../types/Sections";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
@@ -68,10 +68,7 @@ export function SelectSpecification() {
       },
     });
     setSpecificationId("");
-    getSpecificationsByFundingPeriodAndStreamIdWithResultsService(
-      selectedFundingStreamId,
-      selectedFundingPeriodId
-    ).then((response) => {
+    getSpecificationsWithResultsService(selectedFundingStreamId, selectedFundingPeriodId).then((response) => {
       setSpecifications(response.data as SpecificationSummary[]);
       setLoadingState({
         specification: {

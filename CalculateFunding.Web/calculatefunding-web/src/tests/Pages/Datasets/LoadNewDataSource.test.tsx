@@ -11,6 +11,7 @@ import * as monitor from "../../../hooks/Jobs/useJobSubscription";
 import { CompletionStatus } from "../../../types/CompletionStatus";
 import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { RunningStatus } from "../../../types/RunningStatus";
+import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
 
 describe("<LoadNewDataSource />", () => {
   beforeEach(async () => {
@@ -187,7 +188,9 @@ const renderPage = async () => {
   const { LoadNewDataSource } = require("../../../pages/Datasets/LoadNewDataSource");
   const component = render(
     <MemoryRouter>
-      <LoadNewDataSource />
+      <QueryClientProviderTestWrapper>
+        <LoadNewDataSource />
+      </QueryClientProviderTestWrapper>
     </MemoryRouter>
   );
   await waitFor(() => {

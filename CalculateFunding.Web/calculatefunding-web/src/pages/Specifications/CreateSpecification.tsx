@@ -11,11 +11,11 @@ import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
-import { milliseconds } from "../../helpers/TimeInMs";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { usePermittedFundingStreams } from "../../hooks/Permissions/usePermittedFundingStreams";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
+import { useFundingPeriodsByFundingStreamId } from "../../hooks/useFundingPeriodsByFundingStreamId";
 import { useFundingStreams } from "../../hooks/useFundingStreams";
 import * as policyService from "../../services/policyService";
 import * as providerService from "../../services/providerService";
@@ -30,7 +30,6 @@ import { CreateSpecificationModel } from "../../types/Specifications/CreateSpeci
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { PublishedFundingTemplate } from "../../types/TemplateBuilderDefinitions";
 import { UserPermission } from "../../types/UserPermission";
-import { FundingPeriod } from "../../types/viewFundingTypes";
 
 export function CreateSpecification(): JSX.Element {
   const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(true);
@@ -48,19 +47,9 @@ export function CreateSpecification(): JSX.Element {
 
   const permittedFundingStreams = usePermittedFundingStreams(UserPermission.CanCreateSpecification);
 
-  const { data: fundingPeriods, isLoading: isLoadingFundingPeriods } = useQuery<FundingPeriod[], AxiosError>(
-    `funding-periods-for-stream-${selectedFundingStreamId}`,
-    async () =>
-      (
-        await specificationService.getFundingPeriodsByFundingStreamIdService(
-          selectedFundingStreamId as string
-        )
-      ).data,
+  const { fundingPeriods, isLoadingFundingPeriods } = useFundingPeriodsByFundingStreamId(
+    selectedFundingStreamId,
     {
-      enabled: (selectedFundingStreamId && selectedFundingStreamId.length > 0) === true,
-      cacheTime: milliseconds.OneDay,
-      staleTime: milliseconds.OneDay,
-      retry: false,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -74,6 +63,7 @@ export function CreateSpecification(): JSX.Element {
           : clearErrorMessages(["funding-period"]),
     }
   );
+
   const { data: publishedFundingTemplates, isLoading: isLoadingPublishedFundingTemplates } = useQuery<
     PublishedFundingTemplate[],
     AxiosError

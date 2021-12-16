@@ -417,8 +417,9 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content?.Where(err => err != null).ToList()));
         }
 
-        [HttpGet("/api/sqlqa/specifications/{specificationId}/funding-streams/{fundingStreamId}/import/queue")]
-        public async Task<IActionResult> RunSqlImportJob([FromRoute] string specificationId,
+        [HttpGet("/api/sqlqa/specifications/{specificationId}/funding-streams/{fundingStreamId}/export-to-sql")]
+        public async Task<IActionResult> RunSqlExportToSqlJob(
+            [FromRoute] string specificationId,
             [FromRoute] string fundingStreamId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
@@ -432,9 +433,9 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            ApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
+            ApiResponse<JobCreationResponse> result = await _publishingApiClient.QueueSpecificationFundingStreamSqlImport(specificationId, fundingStreamId);
 
-            return response.Handle(nameof(Specification),
+            return result.Handle(nameof(RunSqlExportToSqlJob),
                 onSuccess: x => Ok(x.Content));
         }
 

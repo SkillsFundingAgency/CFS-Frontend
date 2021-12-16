@@ -14,6 +14,7 @@ import { PermissionStatus } from "../../components/PermissionStatus";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { usePermittedFundingStreams } from "../../hooks/Permissions/usePermittedFundingStreams";
 import { useErrors } from "../../hooks/useErrors";
+import { useFundingStreams } from "../../hooks/useFundingStreams";
 import {
   createDatasetService,
   downloadValidateDatasetValidationErrorSasUrl,
@@ -21,7 +22,6 @@ import {
   uploadDataSourceService,
   validateDatasetService,
 } from "../../services/datasetService";
-import { getFundingStreamsService } from "../../services/policyService";
 import { getCurrentProviderVersionForFundingStream } from "../../services/providerService";
 import { CreateDatasetRequestViewModel } from "../../types/Datasets/CreateDatasetRequestViewModel";
 import { DataschemaDetailsViewModel } from "../../types/Datasets/DataschemaDetailsViewModel";
@@ -47,7 +47,6 @@ export function LoadNewDataSource() {
   const [datasetSourceFileName, setDatasetSourceFileName] = useState<string>("");
   const [uploadFileName, setUploadFileName] = useState<string>("");
   const [uploadFile, setUploadFile] = useState<File>();
-  const [fundingStreamIsLoading, setFundingStreamIsLoading] = useState<boolean>(false);
   const [dataSchemaIsLoading, setDataSchemaIsLoading] = useState<boolean>(false);
   const [coreProviderTargetDate, setCoreProviderTargetDate] = useState<Date>();
   const [fundingStreamsIsFiltered, setFundingStreamsIsFiltered] = useState<boolean>(false);
@@ -73,8 +72,11 @@ export function LoadNewDataSource() {
   });
   const [validateDatasetJobId, setValidateDatasetJobId] = useState<string>("");
   const [jobSubscription, setJobSubscription] = useState<JobSubscription>();
-  const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
   const isOutcomeValidationFailedWithReport = (outcome: string) => outcome === "ValidationFailed";
+
+  const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(false, {
+    onError: (err) => addError({ error: err, description: "Error while getting funding streams" }),
+  });
 
   function onDatasetValidated() {
     history.push("/Datasets/ManageDataSourceFiles");
@@ -110,9 +112,12 @@ export function LoadNewDataSource() {
   }
 
   function filterFundingStreamsByPermittedStreams() {
+    if (!fundingStreams) return;
+
     const permittedStreams = fundingStreams.filter((fs) =>
       permittedFundingStreams.some((permitted) => permitted === fs.id)
     );
+
     if (fundingStreamSuggestions.length !== permittedStreams.length) {
       setFundingStreamSuggestions(permittedStreams);
     }
@@ -173,16 +178,6 @@ export function LoadNewDataSource() {
           description: `Error while getting current provider version for funding stream ${fundingStreamId}`,
         })
       );
-  }
-
-  async function populateFundingStreamSuggestions() {
-    setFundingStreamIsLoading(true);
-    getFundingStreamsService(false)
-      .then((response) => {
-        setFundingStreams(response.data);
-      })
-      .catch((err) => addError({ error: err, description: "Error while getting funding streams" }))
-      .finally(() => setFundingStreamIsLoading(false));
   }
 
   async function uploadFileToBlob(request: NewDatasetVersionResponseViewModel) {
@@ -411,7 +406,6 @@ export function LoadNewDataSource() {
   }
 
   useEffect(() => {
-    populateFundingStreamSuggestions();
     populateDataSchemaSuggestions();
 
     return () => {
@@ -443,7 +437,7 @@ export function LoadNewDataSource() {
   }, [permittedFundingStreams]);
 
   useEffect(() => {
-    if (fundingStreams.length > 0 && !fundingStreamsIsFiltered) {
+    if (fundingStreams?.length && !fundingStreamsIsFiltered) {
       filterFundingStreamsByPermittedStreams();
       setFundingStreamsIsFiltered(true);
     }
@@ -577,7 +571,7 @@ export function LoadNewDataSource() {
           <div className="govuk-grid-column-full">
             <PermissionStatus
               requiredPermissions={[requiredPermission]}
-              hidden={permittedFundingStreams.length > 0 || dataSchemaIsLoading || fundingStreamIsLoading}
+              hidden={permittedFundingStreams.length > 0 || dataSchemaIsLoading || isLoadingFundingStreams}
             />
           </div>
         </div>
@@ -596,7 +590,7 @@ export function LoadNewDataSource() {
                 Funding stream
               </label>
               <span className="govuk-hint">Select a funding stream you have permissions for</span>
-              {fundingStreamIsLoading ? (
+              {isLoadingFundingStreams ? (
                 <div className="loader-inline">
                   <LoadingFieldStatus title={"loading funding streams"} />
                 </div>
@@ -604,7 +598,7 @@ export function LoadNewDataSource() {
                 <AutoComplete
                   suggestions={fundingStreamSuggestions.map((fs) => fs.name)}
                   callback={updateFundingStreamSelection}
-                  disabled={fundingStreamIsLoading}
+                  disabled={isLoadingFundingStreams}
                   componentId={"autocomplete-funding-stream"}
                 />
               )}

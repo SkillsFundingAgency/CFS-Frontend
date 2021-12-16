@@ -143,190 +143,7 @@ export function ViewSpecificationTestData() {
       .spyOn(useCalculationErrorsHook, "useCalculationErrors")
       .mockImplementation(() => calculationErrorsResult);
   };
-
-  /*let notification: JobNotification | undefined;
-  let subscription: JobSubscription = {
-    filterBy: {
-      jobId: "jobId",
-      jobTypes: [],
-      specificationId: mockSpec.id,
-    },
-    id: "sertdhw4e5t",
-    isEnabled: true,
-    onError: () => null,
-    startDate: DateTime.local(),
-  };
-
-  const haveNoJobNotification = () => {
-    notification = undefined;
-  };
-
-  const haveRefreshFailedJobNotification = () => {
-    const job = {
-      jobId: "jobId-generatedByRefresh",
-      jobType: JobType.RefreshFundingJob,
-      statusDescription: "",
-      jobDescription: "",
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Failed,
-      failures: [],
-      isSuccessful: false,
-      isFailed: true,
-      isActive: false,
-      isComplete: true,
-      outcome: "Refresh failed",
-    };
-    subscription.id = "refresh";
-    subscription.filterBy = {
-      jobId: job.jobId,
-      specificationId: mockSpec.id,
-      jobTypes: [job.jobType],
-    };
-    notification = {
-      subscription: subscription as JobSubscription,
-      latestJob: job,
-    };
-
-    return notification;
-  };
-
-  const haveEditSpecificationFailedJobNotification = () => {
-    const job = {
-      jobId: "jobId-EditSpecification",
-      jobType: JobType.EditSpecificationJob,
-      statusDescription: "Updating specification",
-      jobDescription: "",
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Failed,
-      failures: [],
-      isSuccessful: false,
-      isFailed: true,
-      isActive: false,
-      isComplete: true,
-      outcome: "EditSpecification failed",
-    };
-    subscription.id = "EditSpecification-sub-id";
-    subscription.filterBy = {
-      jobId: job.jobId,
-      specificationId: mockSpec.id,
-      jobTypes: [job.jobType],
-    };
-    notification = {
-      subscription: subscription as JobSubscription,
-      latestJob: job,
-    };
-
-    return notification;
-  };
-
-  const haveConverterJobInProgressNotification = () => {
-    subscription.id = "converter";
-    notification = {
-      subscription: subscription as JobSubscription,
-      latestJob: {
-        isComplete: false,
-        jobId: "123",
-        jobType: JobType.RunConverterDatasetMergeJob,
-        statusDescription: "Converter job is in progress",
-        jobDescription: "Converter Job",
-        runningStatus: RunningStatus.InProgress,
-        failures: [],
-        isSuccessful: false,
-        isFailed: false,
-        isActive: true,
-        outcome: "",
-      },
-    };
-    return notification;
-  };
-
-  const haveReportJobCompleteNotification = () => {
-    const job = {
-      isComplete: true,
-      jobId: "123",
-      jobType: JobType.ConverterWizardActivityCsvGenerationJob,
-      statusDescription: "Converter report generation job completed successfully",
-      jobDescription: "Converter Wizard Report Job",
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Succeeded,
-      lastUpdate: new Date(),
-      failures: [],
-      isSuccessful: true,
-      isFailed: false,
-      isActive: false,
-      outcome: "",
-    };
-    subscription.id = "report";
-    subscription.filterBy = {
-      jobId: job.jobId,
-      jobTypes: [job.jobType],
-    };
-    notification = {
-      subscription: subscription as JobSubscription,
-      latestJob: job,
-    };
-    return notification;
-  };
-
-  let notificationCallback: (n: JobNotification) => void = () => null;
-  let hasNotificationCallback = false;
-  const getNotificationCallback = () => {
-    return notificationCallback;
-  };
-
-  const setupJobSubscriptionSpy = () => {
-    const jobSubscriptionSpy = jest.spyOn(jobSubscriptionHook, "useJobSubscription");
-    jobSubscriptionSpy.mockImplementation(({ onNewNotification }) => {
-      if (onNewNotification && !hasNotificationCallback) {
-        notificationCallback = onNewNotification;
-        hasNotificationCallback = true;
-      }
-      return {
-        addSub: (request: AddJobSubscription) => {
-          const sub: JobSubscription = {
-            filterBy: {
-              jobId: request?.filterBy.jobId,
-              specificationId: request?.filterBy.specificationId,
-              jobTypes: request?.filterBy.jobTypes ? request?.filterBy.jobTypes : undefined,
-            },
-            isEnabled: true,
-            id: "sertdhw4e5t",
-            onError: () => request.onError,
-            startDate: DateTime.now(),
-          };
-          subscription = sub;
-          return Promise.resolve(sub);
-        },
-        replaceSubs: () => {
-          const sub: JobSubscription = {
-            filterBy: {},
-            id: "sertdhw4e5t",
-            onError: () => null,
-            isEnabled: true,
-            startDate: DateTime.now(),
-          };
-          subscription = sub;
-          return [sub];
-        },
-        removeSub: () => null,
-        removeAllSubs: () => null,
-        subs: [],
-        results: notification ? [notification] : [],
-      };
-    });
-    return { jobSubscriptionSpy, notificationCallback };
-  };*/
-
-  function mockSpecificationPermissions(
-    expectedSpecificationPermissionsResult?: SpecificationPermissionsResult
-  ) {
-    jest
-      .spyOn(specPermsHook, "useSpecificationPermissions")
-      .mockImplementation(() =>
-        expectedSpecificationPermissionsResult ? expectedSpecificationPermissionsResult : fullSpecPermissions
-      );
-  }
-
+  
   const mockFundingConfiguration: FundingConfiguration = {
     fundingStreamId: mockFundingStream.id,
     fundingPeriodId: mockFundingPeriod.id,
@@ -344,6 +161,16 @@ export function ViewSpecificationTestData() {
       isErrorLoadingFundingConfiguration: false,
       errorLoadingFundingConfiguration: "",
     }));
+  }
+  
+  function mockSpecificationPermissions(
+    expectedSpecificationPermissionsResult?: SpecificationPermissionsResult
+  ) {
+    jest
+      .spyOn(specPermsHook, "useSpecificationPermissions")
+      .mockImplementation(() =>
+        expectedSpecificationPermissionsResult ? expectedSpecificationPermissionsResult : fullSpecPermissions
+      );
   }
 
   const renderViewSpecificationPage = async () => {

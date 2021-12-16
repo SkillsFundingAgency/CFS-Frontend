@@ -57,14 +57,11 @@ export async function getFundingStreamIdsWithSpecsService(): Promise<AxiosRespon
   });
 }
 
-export async function getFundingPeriodsByFundingStreamIdService(
-  fundingStreamId: string
-): Promise<AxiosResponse<FundingPeriod[]>> {
-  return axios(`/api/policy/fundingperiods/${fundingStreamId}`, {
+export async function getFundingPeriodsByFundingStreamIdService(fundingStreamId: string) {
+  return axios.request<FundingPeriod[]>({
+    url: `/api/policy/fundingPeriods/${fundingStreamId}`,
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
   });
 }
 
@@ -83,19 +80,15 @@ export async function getSpecificationsByFundingPeriodAndStreamIdService(
   );
 }
 
-export async function getSpecificationsByFundingPeriodAndStreamIdWithResultsService(
+export async function getSpecificationsWithResultsService(
   fundingStreamId: string,
   fundingPeriodId: string
-): Promise<AxiosResponse<SpecificationSummary[]>> {
-  return axios(
-    `${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}/with-results`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+) {
+  return axios.request<SpecificationSummary[]>({
+    url: `${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}/with-results`,
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 export async function getAllSpecificationsService(

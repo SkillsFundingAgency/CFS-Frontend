@@ -4,7 +4,7 @@ import * as redux from "react-redux";
 
 import * as publishService from "../../../services/publishService";
 import { ValidationErrors } from "../../../types/ErrorMessage";
-import { createMockAxiosError } from "../../fakes/fakeAxios";
+import { fakeAxiosResponse } from "../../fakes/fakeAxios";
 import { FundingApprovalTestData } from "./FundingApprovalTestData";
 
 const useSelectorSpy = jest.spyOn(redux, "useSelector");
@@ -21,7 +21,7 @@ describe("<SpecificationFundingApproval />", () => {
       };
       const mockValidationError = jest
         .fn()
-        .mockRejectedValue(createMockAxiosError(mockValidationErrors, 400));
+        .mockRejectedValue(fakeAxiosResponse.error(mockValidationErrors, 400));
 
       beforeEach(async () => {
         useSelectorSpy.mockReturnValue(test.fundingSearchSelectionState);

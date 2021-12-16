@@ -5,7 +5,6 @@ import { act } from "react-test-renderer";
 
 import { useSpecificationResults } from "../../../hooks/Specifications/useSpecificationResults";
 import { ProviderDataTrackingMode } from "../../../types/Specifications/ProviderDataTrackingMode";
-import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 import { QueryClientProviderTestWrapper } from "../QueryClientProviderTestWrapper";
 
 describe("useSpecificationResults hook", () => {
@@ -53,7 +52,7 @@ describe("useSpecificationResults hook", () => {
 
   it("should return true for specification results", async () => {
     const { result, waitForValueToChange } = renderHook(
-      () => useSpecificationResults(specificationId, fundingStreamId, fundingPeriodId, (err) => {}),
+      () => useSpecificationResults(specificationId, fundingStreamId, fundingPeriodId, () => Promise.resolve()),
       {
         wrapper: QueryClientProviderTestWrapper,
       }

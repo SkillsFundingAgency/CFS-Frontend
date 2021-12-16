@@ -1,7 +1,8 @@
-﻿import { AxiosError } from "axios";
+﻿import { AxiosError, AxiosResponse } from "axios";
 
-export function createMockAxiosError(data: any, status = 400, message = "This is a mock Axios error") {
+const error = (data: any, status = 400, message = "This is a mock Axios error") => {
   const mockError: AxiosError = {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     toJSON(): object {
       return {};
     },
@@ -19,4 +20,23 @@ export function createMockAxiosError(data: any, status = 400, message = "This is
     },
   };
   return mockError;
+};
+
+type AxiosResponsePartialWithDataRequired<T> = Omit<Partial<AxiosResponse<T>>, "data"> & Pick<AxiosResponse<T>, "data">;
+
+function success<T>(
+  values: AxiosResponsePartialWithDataRequired<T>
+): Promise<AxiosResponse<T>> {
+  return Promise.resolve({
+    config: {},
+    headers: {},
+    status: 200,
+    statusText: "OK",
+    ...values,
+  });
 }
+
+export const fakeAxiosResponse = {
+  error,
+  success,
+};

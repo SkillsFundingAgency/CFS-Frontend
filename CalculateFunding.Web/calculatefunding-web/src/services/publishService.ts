@@ -107,24 +107,10 @@ export async function releaseProvidersFundingService(
   });
 }
 
-export async function runSqlImportJob(
-  specificationId: string,
-  fundingStreamId: string
-): Promise<AxiosResponse<JobCreatedResponse>> {
-  return axios(
-    `/api/sqlqa/specifications/${specificationId}/funding-streams/${fundingStreamId}/import/queue`,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }
-  );
-}
-
-export async function getLatestPublishedDate(
-  fundingStreamId: string,
-  fundingPeriodId: string
-): Promise<AxiosResponse<LatestPublishedDate>> {
-  return axios(`/api/publishedproviders/${fundingStreamId}/${fundingPeriodId}/lastupdated`, {
+/// last time funding data was modified (e.g. refresh, approved, released)
+export async function getLatestPublishedDate(fundingStreamId: string, fundingPeriodId: string) {
+  return axios.request<LatestPublishedDate>({
+    url: `/api/publishedproviders/${fundingStreamId}/${fundingPeriodId}/lastupdated`,
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

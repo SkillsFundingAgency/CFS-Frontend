@@ -762,7 +762,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
 
         private async Task<IActionResult> WhenTheRunSqlJobIsCreated(string specificationId,
             string fundingStreamId)
-            => await _publishController.RunSqlImportJob(specificationId, fundingStreamId);
+            => await _publishController.RunSqlExportToSqlJob(specificationId, fundingStreamId);
 
         private async Task<IActionResult> WhenTheLatestPublishedDateIsQueried(string fundingStreamId,
             string fundingPeriodId)

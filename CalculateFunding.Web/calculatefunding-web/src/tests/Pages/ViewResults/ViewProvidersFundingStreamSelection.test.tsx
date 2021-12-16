@@ -6,6 +6,7 @@ import React from "react";
 import { MemoryRouter } from "react-router";
 
 import * as policyService from "../../../services/policyService";
+import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
 
 jest.mock("../../../components/AdminNav");
 
@@ -44,7 +45,9 @@ const renderPage = async () => {
   } = require("../../../pages/ViewResults/ViewProvidersFundingStreamSelection");
   const component = render(
     <MemoryRouter>
-      <ViewProvidersFundingStreamSelection />
+      <QueryClientProviderTestWrapper>
+        <ViewProvidersFundingStreamSelection />
+      </QueryClientProviderTestWrapper>
     </MemoryRouter>
   );
   await waitFor(() => {

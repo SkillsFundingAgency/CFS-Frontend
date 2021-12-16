@@ -40,7 +40,8 @@ import { ManageData } from "./pages/Datasets/ManageData";
 import { ManageDataSourceFiles } from "./pages/Datasets/ManageDataSourceFiles";
 import { SelectDataSource } from "./pages/Datasets/Map/SelectDataSource";
 import { MapDataSourceFiles } from "./pages/Datasets/MapDataSourceFiles";
-import { RefreshSql } from "./pages/Datasets/RefreshSql";
+import { RunExportToSql } from "./pages/Datasets/SqlDataExport/RunExportToSql";
+import { SelectSpecificationForExport } from "./pages/Datasets/SqlDataExport/SelectSpecificationForExport";
 import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
 import { ChangeProfileType } from "./pages/FundingApprovals/ChangeProfileType";
 import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
@@ -331,7 +332,7 @@ const spec2specDatasetRoutes = (
     <Route path="/Datasets/:relationshipId/ConfirmEdit/:specificationId" component={ConfirmDatasetToEdit} />
   </Route>
 );
-const datasetRoutes = (featureFlags: FeatureFlagsState) => (
+export const datasetRoutes = (featureFlags?: FeatureFlagsState) => (
   <Route path="/Datasets">
     <Route path="/Datasets/CreateDataset/:specificationId" component={CreateDatasetFromUpload} />
     <Route path="/Datasets/ManageData" component={ManageData} />
@@ -346,8 +347,9 @@ const datasetRoutes = (featureFlags: FeatureFlagsState) => (
     <Route path="/Datasets/DataRelationships/:specificationId" component={DataRelationships} />
     <Route path="/Datasets/MapDataSourceFiles" component={MapDataSourceFiles} />
     <Route path="/Datasets/SelectDataSource/:datasetRelationshipId" component={SelectDataSource} />
-    <Route path="/Datasets/RefreshSql" component={RefreshSql} />
-    {featureFlags.specToSpec && spec2specDatasetRoutes}
+    <Route path="/Datasets/Export/SelectSpecificationForExport" component={SelectSpecificationForExport} />
+    <Route path="/Datasets/Export/RunExportToSql/:specificationId" component={RunExportToSql} />
+    {featureFlags?.specToSpec && spec2specDatasetRoutes}
   </Route>
 );
 

@@ -9,37 +9,24 @@ import { Header } from "../../components/Header";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useErrors } from "../../hooks/useErrors";
-import { getFundingStreamsService } from "../../services/policyService";
+import { useFundingStreams } from "../../hooks/useFundingStreams";
 import { Section } from "../../types/Sections";
 import { FundingStream } from "../../types/viewFundingTypes";
 
 export function ViewProvidersFundingStreamSelection() {
   const { errors, addError } = useErrors();
-  const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
   const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream | undefined>();
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState(false);
   const history = useHistory();
 
-  useEffectOnce(() => {
-    async function loadFundingStreams() {
-      try {
-        setIsLoading(true);
-        const result = await getFundingStreamsService(false);
-        setFundingStreams(result.data);
-      } catch (err: any) {
-        addError({ error: err, description: "An error occurred while loading funding streams." });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadFundingStreams();
+  const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(false, {
+    onError: (err) => addError({ error: err, description: "Error while getting funding streams" }),
   });
 
   function updateFundingStreamSelection(e: string) {
+    if (!fundingStreams) return;
+
     const result = fundingStreams.filter((x) => x.name === e)[0];
     if (result) {
       setSelectedFundingStream(result);
@@ -75,13 +62,13 @@ export function ViewProvidersFundingStreamSelection() {
             <MultipleErrorSummary errors={errors} />
           </div>
         </div>
-        {isLoading && (
+        {isLoadingFundingStreams && (
           <LoadingStatus
             title={"Loading funding streams"}
             description={"Please wait whilst funding streams are loading"}
           />
         )}
-        {!isLoading && (
+        {!isLoadingFundingStreams && (
           <div className="govuk-main-wrapper">
             <div className={"govuk-form-group" + (!isFormValid ? " govuk-form-group--error" : "")}>
               <fieldset className="govuk-fieldset">
@@ -94,15 +81,15 @@ export function ViewProvidersFundingStreamSelection() {
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-third">
                     <label className="govuk-label">Select a funding stream</label>
-                    {isLoading ? (
+                    {isLoadingFundingStreams || !fundingStreams ? (
                       <div className="loader-inline">
-                        <LoadingFieldStatus title={"loading funding streams"} />
+                        <LoadingFieldStatus title="loading funding streams" />
                       </div>
                     ) : (
                       <AutoComplete
                         suggestions={fundingStreams.map((fs) => fs.name)}
                         callback={updateFundingStreamSelection}
-                        disabled={isLoading}
+                        disabled={isLoadingFundingStreams}
                       />
                     )}
                     {!isFormValid && (

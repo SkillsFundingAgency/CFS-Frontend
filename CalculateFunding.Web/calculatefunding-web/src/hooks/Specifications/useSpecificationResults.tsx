@@ -1,8 +1,7 @@
 import { AxiosError } from "axios";
-import { useQuery } from "react-query";
 
-import { getSpecificationsByFundingPeriodAndStreamIdWithResultsService } from "../../services/specificationService";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
+import { useFindSpecificationsWithResults } from "../useFindSpecificationsWithResults";
 
 export type SpecificationSummaryQueryResult = {
   specificationHasCalculationResults: boolean;
@@ -16,21 +15,18 @@ export const useSpecificationResults = (
   onError: (err: AxiosError) => void,
   onSuccess?: (data: SpecificationSummary[]) => void
 ): SpecificationSummaryQueryResult => {
-  const { data, isLoading } = useQuery<SpecificationSummary[], AxiosError>(
-    `specificationResults-${fundingStreamId}-${fundingPeriodId}`,
-    async () =>
-      (await getSpecificationsByFundingPeriodAndStreamIdWithResultsService(fundingStreamId, fundingPeriodId))
-        .data,
+  const { specificationsWithResults, isLoadingSpecificationsWithResults } = useFindSpecificationsWithResults(
+    fundingStreamId,
+    fundingPeriodId,
     {
       onError: onError,
       onSuccess: onSuccess,
-      refetchOnWindowFocus: false,
-      enabled: fundingStreamId !== "" && fundingPeriodId !== "" && specificationId !== "",
     }
   );
 
   return {
-    specificationHasCalculationResults: !!data?.filter((d) => d.id === specificationId)?.length,
-    isLoadingSpecificationResults: isLoading,
+    specificationHasCalculationResults: !!specificationsWithResults?.filter((d) => d.id === specificationId)
+      ?.length,
+    isLoadingSpecificationResults: isLoadingSpecificationsWithResults,
   };
 };

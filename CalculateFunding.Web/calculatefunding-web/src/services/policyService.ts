@@ -8,8 +8,9 @@ const baseURL = "/api/policy";
 
 export async function getFundingStreamsService(
   securityTrimmed = false
-): Promise<AxiosResponse<FundingStream[]>> {
-  return axios(`${baseURL}/fundingstreams/${securityTrimmed}`, {
+) {
+  return axios.request<FundingStream[]>({
+    url: `${baseURL}/fundingstreams/${securityTrimmed}`,
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

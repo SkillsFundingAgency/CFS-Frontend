@@ -1,20 +1,18 @@
+import { Main } from "components/Main";
 import React from "react";
-import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
+import { TextLink } from "../../components/TextLink";
 import { Section } from "../../types/Sections";
 
 export function ManageData() {
   return (
-    <div>
-      <Header location={Section.Datasets} />
-      <div className="govuk-width-container">
+    <Main location={Section.Datasets}>
         <Breadcrumbs>
           <Breadcrumb name={"Calculate funding"} url={"/"} />
           <Breadcrumb name={"Manage data"} />
         </Breadcrumbs>
+  
         <div className="govuk-main-wrapper">
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-full">
@@ -26,37 +24,39 @@ export function ManageData() {
           </div>
           <div className="govuk-grid-row govuk-!-margin-top-9">
             <div className="govuk-grid-column-one-third">
-              <h3 id={"manage-data-source-files-title"} className="govuk-heading-m">
-                <Link to={"/Datasets/ManageDataSourceFiles"}>Manage data source files</Link>
+              <h3 id="manage-data-source-files-title" className="govuk-heading-m">
+                <TextLink to="/Datasets/ManageDataSourceFiles" describedBy="upload-data-source-desc">Manage data source files</TextLink>
               </h3>
-              <p className="govuk-body">Upload new or updated data source files</p>
+              <p id="upload-data-source-desc" className="govuk-body">Upload new or updated data source files</p>
             </div>
             <div className="govuk-grid-column-one-third">
-              <h3 id={"map-data-source-files-title"} className="govuk-heading-m">
-                <Link to={"/Datasets/MapDataSourceFiles"}>
+              <h3 id="map-data-source-files-title" className="govuk-heading-m">
+                <TextLink to="/Datasets/MapDataSourceFiles" describedBy="map-data-sources-desc">
                   Map data source files to datasets for a specification
-                </Link>
+                </TextLink>
               </h3>
-              <p className="govuk-body">Select the data source file a dataset uses</p>
+              <p id="map-data-sources-desc" className="govuk-body">Select the data source file a dataset uses</p>
             </div>
             <div className="govuk-grid-column-one-third">
               <h3 id={"download-data-schemas-title"} className="govuk-heading-m">
-                <Link to="/Datasets/DownloadDataSchema">Download data schemas</Link>
+                <TextLink to="/Datasets/DownloadDataSchema" describedBy="download-schemas-desc">Download data schemas</TextLink>
               </h3>
-              <p className="govuk-body">Download the data schema for data source</p>
+              <p id="download-schemas-desc" className="govuk-body">Download the data schema for data source</p>
             </div>
           </div>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-third">
-              <h3 id={"refresh-sql-title"} className="govuk-heading-m">
-                <Link to={"/Datasets/RefreshSql"}>Refresh SQL</Link>
+              <h3 className="govuk-heading-m">
+                <TextLink to="/Datasets/Export/SelectSpecificationForExport" describedBy="sql-export-desc">
+                  Refresh SQL
+                </TextLink>
               </h3>
-              <p className="govuk-body">Refresh SQL funding</p>
+              <p id="sql-export-desc" className="govuk-body">
+                Refresh SQL funding
+              </p>
             </div>
           </div>
         </div>
-      </div>
-      <Footer />
-    </div>
+      </Main>
   );
 }

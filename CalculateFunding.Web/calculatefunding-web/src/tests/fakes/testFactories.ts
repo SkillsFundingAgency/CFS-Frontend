@@ -48,6 +48,33 @@ export const noSpecPermissions: SpecificationPermissionsResult = {
   missingPermissions: allPermissions(),
 };
 
+export const withSpecPermissions = (withPermissions: Permission[]): SpecificationPermissionsResult => {
+  return {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => true,
+    hasMissingPermissions: false,
+    isPermissionsFetched: true,
+    permissionsEnabled: withPermissions,
+    permissionsDisabled: allPermissions().filter((p) => !withPermissions.includes(p)),
+    missingPermissions: allPermissions().filter((p) => !withPermissions.includes(p)),
+  };
+};
+export const withMissingSpecPermissions = (
+  missingPermissions: Permission[]
+): SpecificationPermissionsResult => {
+  return {
+    userId: "3456",
+    isCheckingForPermissions: false,
+    hasPermission: () => false,
+    hasMissingPermissions: true,
+    isPermissionsFetched: true,
+    permissionsEnabled: allPermissions().filter((p) => !missingPermissions.includes(p)),
+    permissionsDisabled: missingPermissions,
+    missingPermissions: missingPermissions,
+  };
+};
+
 export const fullSpecPermissions: SpecificationPermissionsResult = {
   userId: "3456",
   isCheckingForPermissions: false,
@@ -172,6 +199,7 @@ export function buildPermissions(props: {
   }
   return perm;
 }
+
 export function buildEffectiveSpecificationPermission(props: {
   specificationId: string;
   setAllPermsEnabled?: boolean;

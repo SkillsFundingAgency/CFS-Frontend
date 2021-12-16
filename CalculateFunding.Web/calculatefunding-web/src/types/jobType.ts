@@ -51,4 +51,8 @@
   EditSpecificationJob = "EditSpecificationJob",
   TrackLatestJob = "TrackLatestJob",
   ReferencedSpecificationReMapJob = "ReferencedSpecificationReMapJob",
+  ProcessDatasetObsoleteItemsJob = "ProcessDatasetObsoleteItemsJob",
+  ReleaseManagementDataMigrationJob = "ReleaseManagementDataMigrationJob",
+  ReleaseProvidersToChannelsJob = "ReleaseProvidersToChannelsJob",
+  PopulateCalculationResultsQaDatabaseJob = "PopulateCalculationResultsQaDatabaseJob",
 }
