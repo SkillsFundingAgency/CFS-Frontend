@@ -26,18 +26,18 @@
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="2.9.1" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="2.9.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="8.3.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="7.5.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="2.1.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="4.4.22" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Jobs" Version="5.3.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.18.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Policies" Version="6.18.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Profiling" Version="4.5.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="4.11.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="6.4.0" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="7.7.0" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.23.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="6.23.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="3.0.3" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Calcs" Version="5.3.2" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Datasets" Version="5.14.0" />

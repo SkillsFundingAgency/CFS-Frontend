@@ -51,6 +51,7 @@
                 {
                     options.SerializerSettings.ReferenceLoopHandling =
                         Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.MaxDepth = null;
                 });
 
             services.AddRazorPages(options =>
