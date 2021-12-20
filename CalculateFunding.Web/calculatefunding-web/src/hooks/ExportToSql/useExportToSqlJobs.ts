@@ -126,7 +126,7 @@ export const useExportToSqlJobs = ({
     [jobNotifications]
   );
 
-  function handleJobNotification(notification: JobNotification) {
+  async function handleJobNotification(notification: JobNotification) {
     if (!notification.latestJob?.jobType) return;
     if (
       notification.latestJob.jobType === JobType.RunSqlImportJob ||
@@ -134,7 +134,7 @@ export const useExportToSqlJobs = ({
     ) {
       handleExportToSqlJob(notification);
     } else {
-      handleOtherJobs(notification);
+      await handleOtherJobs(notification);
     }
   }
 
@@ -146,6 +146,7 @@ export const useExportToSqlJobs = ({
     console.log(
       `SQL import job with id: ${notification.latestJob.jobId}, status: ${notification.latestJob.statusDescription}, type: ${notification.latestJob.jobType}, invoked by: ${notification.latestJob.invokerUserDisplayName}`
     );
+    clearErrorMessages();
     switch (notification.latestJob.runningStatus) {
       case RunningStatus.Queued:
       case RunningStatus.QueuedWithService:
@@ -176,7 +177,7 @@ export const useExportToSqlJobs = ({
     }
   }
 
-  function handleOtherJobs(notification: JobNotification) {
+  async function handleOtherJobs(notification: JobNotification) {
     if (!notification.latestJob) return;
     if (!isAnotherUserRunningFundingJob) {
       setIsAnotherUserRunningFundingJob(true);
@@ -198,7 +199,7 @@ export const useExportToSqlJobs = ({
       case RunningStatus.Completed:
         setFundingJobStatusMessage("Job completed");
         setIsAnotherUserRunningFundingJob(false);
-        refetchLatestPubDate();
+        await refetchLatestPubDate();
         break;
     }
   }
