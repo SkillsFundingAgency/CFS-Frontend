@@ -32,7 +32,6 @@ import { JobDetails } from "../../../types/jobDetails";
 import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
-import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
 
 export interface ReleaseResultsProps {
@@ -140,8 +139,8 @@ export const ReleaseResults = ({
         [isPermissionsFetched]
     );
 
-    const hasPermissionToRelease: boolean = useMemo(
-        () => hasPermission && !!hasPermission(Permission.CanReleaseFunding),
+    const hasPermissionToRelease = useMemo(
+        () => hasPermission && hasPermission(Permission.CanReleaseFunding),
         [isPermissionsFetched]
     );
 
@@ -303,7 +302,7 @@ export const ReleaseResults = ({
                 );
             } else {
                 history.push(
-                    `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}}`
+                    `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
                 );
             }
         }

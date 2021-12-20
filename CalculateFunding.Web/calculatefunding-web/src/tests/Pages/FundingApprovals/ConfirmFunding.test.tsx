@@ -437,6 +437,7 @@ function setupTestConfig() {
       fundingStreamId: fundingStream.id,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       enableConverterDataMerge: false,
+      releaseChannels:[]
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -451,6 +452,7 @@ function setupTestConfig() {
       fundingStreamId: fundingStream.id,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       enableConverterDataMerge: false,
+      releaseChannels:[]
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,

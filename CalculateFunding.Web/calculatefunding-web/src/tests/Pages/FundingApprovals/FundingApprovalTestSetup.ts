@@ -103,6 +103,7 @@ export const FundingApprovalTestSetup = () => {
       fundingStreamId: fundingStream2.id,
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
+      releaseChannels:[]
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -117,6 +118,7 @@ export const FundingApprovalTestSetup = () => {
       fundingStreamId: fundingStream1.id,
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
+      releaseChannels:[]
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,

@@ -12,6 +12,7 @@ import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../../../hooks/useErrors";
+import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import * as publishedProviderService from "../../../services/publishedProviderService";
 import { HistoryPage } from "../../../types/HistoryPage";
@@ -29,7 +30,7 @@ export interface UploadBatchRouteProps {
     specificationId: string;
 }
 
-export function FundingManagementReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
+export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
     const fundingStreamId = match.params.fundingStreamId;
     const fundingPeriodId = match.params.fundingPeriodId;
     const specificationId = match.params.specificationId;
@@ -47,6 +48,13 @@ export function FundingManagementReleaseUploadBatch({ match }: RouteComponentPro
         title: "Upload batch file",
         path: history.location.pathname,
     };
+
+
+    const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
+        fundingStreamId,
+        fundingPeriodId,
+        (err) => addError({ error: err, description: "Error while loading funding configuration" })
+    );
 
     const { addSub, results: jobNotifications } = useJobSubscription({
         isEnabled: true,
@@ -156,10 +164,20 @@ export function FundingManagementReleaseUploadBatch({ match }: RouteComponentPro
             dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
             dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
-            history.push(
-                `/FundingManagementReleaseConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
-                { previousPage: currentPage }
-            );
+            if(fundingConfiguration !== undefined && fundingConfiguration.releaseChannels !== undefined && fundingConfiguration.releaseChannels.length > 1)
+            {
+                history.push(
+                    `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
+                    { previousPage: currentPage }
+                );
+            }
+            else
+            {
+                history.push(
+                    `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
+                    { previousPage: currentPage }
+                );
+            }
         }
     }, [jobNotifications, publishedProviderIds]);
 
@@ -179,6 +197,7 @@ export function FundingManagementReleaseUploadBatch({ match }: RouteComponentPro
     const isValidatingOrUploading =
         isUpdating ||
         isUploadingBatchFile ||
+        isLoadingFundingConfiguration ||
         isCreatingValidationJob ||
         isWaitingForJob ||
         hasUsersValidationJobActive;

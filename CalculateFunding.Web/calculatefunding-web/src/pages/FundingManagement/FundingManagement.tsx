@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { Main } from "../../components/Main";
+import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
 import { Section } from "../../types/Sections";
 
@@ -23,15 +24,15 @@ export default function FundingManagement(): JSX.Element {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
             <div className="govuk-heading-m">
-              <Link to={"/FundingManagementApprovalSelection"}>Funding approvals</Link>
+              <TextLink to={"/FundingManagement/Approval/Selection"}>Funding approvals</TextLink>
             </div>
             <p className="govuk-body">Approve allocations for funding.</p>
           </div>
           <div className="govuk-grid-column-one-third">
             <div className="govuk-heading-m">
-              <Link to="/FundingManagement/Release/Select" className="govuk-link">
+              <TextLink to="/FundingManagement/Release/Select">
                 Release management
-              </Link>
+              </TextLink>
             </div>
             <p className="govuk-body">Release allocations for statement of funding.</p>
           </div>

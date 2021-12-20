@@ -71,6 +71,8 @@ export function ReleaseResultsTable(props: ReleaseResultsTableProps) {
     dispatch(actions.setPage(page));
   }
 
+
+
   return (
     <>
       <NoData hidden={havePageResults} />

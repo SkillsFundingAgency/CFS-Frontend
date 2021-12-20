@@ -36,6 +36,7 @@ export function createDatasetTestSetup() {
     fundingPeriodId: fundingPeriod.id,
     fundingStreamId: fundingStream.id,
     enableConverterDataMerge: false,
+    releaseChannels:[]
   };
   const mockFdzFundingConfiguration: FundingConfiguration = {
     updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
@@ -45,6 +46,7 @@ export function createDatasetTestSetup() {
     fundingPeriodId: fundingPeriod.id,
     fundingStreamId: fundingStream.id,
     enableConverterDataMerge: false,
+    releaseChannels:[]
   };
   const testSpec: SpecificationSummary = {
     coreProviderVersionUpdates: ProviderDataTrackingMode.UseLatest,

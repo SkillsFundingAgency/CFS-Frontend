@@ -49,7 +49,6 @@ import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprov
 import { ProfileHistory } from "./pages/FundingApprovals/ProfileHistory";
 import { ProviderFundingOverview } from "./pages/FundingApprovals/ProviderFundingOverview";
 import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
-import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
 import { ViewEditFundingLineProfile } from "./pages/FundingApprovals/ViewEditFundingLineProfile";
 import { ApprovalResults } from "./pages/FundingManagement/Approvals/ApprovalResults";
 import FundingManagement from "./pages/FundingManagement/FundingManagement";
@@ -58,8 +57,9 @@ import { FundingManagementApprovalsConfirmFunding } from "./pages/FundingManagem
 import { FundingManagementApprovalSelection } from "./pages/FundingManagement/FundingManagementApprovalSelection";
 import { FundingManagementApprovalsUploadBatch } from "./pages/FundingManagement/FundingManagementApprovalsUploadBatch";
 import { FundingManagementReleaseSelection } from "./pages/FundingManagement/Releases/FundingManagementReleaseSelection";
-import { FundingManagementReleaseUploadBatch } from "./pages/FundingManagement/Releases/FundingManagementReleaseUploadBatch";
+import { ReleasePurpose } from "./pages/FundingManagement/Releases/ReleasePurpose";
 import { ReleaseResults } from "./pages/FundingManagement/Releases/ReleaseResults";
+import { ReleaseUploadBatch } from "./pages/FundingManagement/Releases/ReleaseUploadBatch";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
 import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
@@ -172,9 +172,11 @@ const App: React.FunctionComponent = () => {
               <Route path="/FundingManagement" exact={true} component={FundingManagement} />
                 <Route path="/FundingManagement/Approvals/Results/:fundingStreamId/:fundingPeriodId/:specificationId" exact={true} component={ApprovalResults} />
                 <Route
-                path="/FundingManagementApprovalSelection"
+                path="/FundingManagement/Approval/Selection"
+                exact={true}
                 component={FundingManagementApprovalSelection}
               />
+
               <Route
                 path="/FundingManagementApprovalResults/:fundingStreamId/:fundingPeriodId/:specificationId"
                 component={FundingManagementApprovalResults}
@@ -190,18 +192,22 @@ const App: React.FunctionComponent = () => {
               <Route
                 path="/FundingManagement/Release/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
                 exact={true}
-                component={FundingManagementReleaseUploadBatch}
+                component={ReleaseUploadBatch}
               />
               <Route
                 path="/FundingManagement/Release/Results/:fundingStreamId/:fundingPeriodId/:specificationId"
                 exact={true}
                 component={ReleaseResults}
               />
-
               <Route
                 path="/FundingManagement/Release/Select"
                 component={FundingManagementReleaseSelection}
               />
+                <Route
+                    path="/FundingManagement/Release/Purpose/:fundingStreamId/:fundingPeriodId/:specificationId"
+                    exact={true}
+                    component={ReleasePurpose}
+                />
               <Route path="/SelectSpecification" component={SelectSpecification} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
               <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
@@ -269,7 +275,7 @@ const fundingApprovalRoutes = (
     />
     <Route
       path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={UploadBatch}
+      component={ReleaseUploadBatch}
     />
     <Route
       exact
