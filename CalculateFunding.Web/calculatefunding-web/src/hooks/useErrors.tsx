@@ -44,6 +44,7 @@ export const useErrors = (): ErrorHookResult => {
     setErrors((errors) => [...errors, ...newErrors]);
   };
 
+  /** @deprecated - pls use {@link addError} instead */
   const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) =>
     addErrorToState(errorHelper.createErrorMessage(errors, errorMessage, description, fieldName, suggestion));
 

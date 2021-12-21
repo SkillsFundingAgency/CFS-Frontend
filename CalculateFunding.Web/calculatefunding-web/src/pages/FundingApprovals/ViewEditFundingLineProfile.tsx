@@ -30,6 +30,7 @@ import {
 } from "../../types/PublishedProvider/FundingLineProfile";
 import { Section } from "../../types/Sections";
 import { ProfileHistoryPanel } from "./ProfileHistoryPanel";
+import { Title } from "../../components/Title";
 
 export interface ViewEditFundingLineProfileProps {
   editMode?: string;
@@ -343,24 +344,20 @@ export function ViewEditFundingLineProfile({
             </div>
           </div>
           <section>
-            <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-margin-top-5">
-              <div className="govuk-grid-column-full">
-                <h1 className="govuk-heading-xl govuk-!-margin-bottom-2" data-testid="funding-line-name">
-                  {pageTitle}
-                </h1>
-                <h3 className="govuk-heading-m govuk-!-margin-bottom-2" data-testid="provider-name">
-                  {fundingLineProfile.providerName}
-                </h3>
-                <p className="govuk-body-s" data-testid="last-updated-by">
-                  {`Last updated by ${fundingLineProfile.lastUpdatedUser.name} on `}
-                  {fundingLineProfile.lastUpdatedDate && (
-                    <DateTimeFormatter date={fundingLineProfile.lastUpdatedDate} />
-                  )}
-                </p>
-              </div>
-            </div>
+            <Title
+              title={pageTitle ?? "Funding line profile"}
+              preTitleCaption={`Funding line code: ${fundingLineProfile.fundingLineCode}`}
+              titleCaption={fundingLineProfile.providerName}
+            >
+              <p className="govuk-body-s govuk-!-margin-top-3" data-testid="last-updated-by">
+                {`Last updated by ${fundingLineProfile.lastUpdatedUser.name} on `}
+                {fundingLineProfile.lastUpdatedDate && (
+                  <DateTimeFormatter date={fundingLineProfile.lastUpdatedDate} />
+                )}
+              </p>
+            </Title>
             <div className="govuk-grid-row">
-              <div className="govuk-grid-column-two-thirds">
+              <div className="govuk-grid-column-full">
                 <dl className="govuk-summary-list govuk-summary-list--no-border">
                   <RowItem id={"ukprn"} title={"UKPRN"}>
                     {fundingLineProfile.ukprn}

@@ -37,22 +37,24 @@ export const ProviderFundingStreamHistory = (props: ProviderFundingStreamHistory
             <td colSpan={4}>There are no results that match your search</td>
           </tr>
           {props.transactions.results &&
-            props.transactions.results.map((fsh, i) => (
+            props.transactions.results.map((transaction, i) => (
               <tr className="govuk-table__row" key={`transaction-${i}`}>
                 <th scope="row" className="govuk-table__header">
-                  {fsh.status}
+                  {transaction.status}
                 </th>
-                <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.author}</td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.dateChanged}</td>
+                <td className="govuk-table__cell govuk-table__cell--numeric">{transaction.author}</td>
+                <td className="govuk-table__cell govuk-table__cell--numeric">{transaction.dateChanged}</td>
                 <td className="govuk-table__cell govuk-table__cell--numeric">
-                  {fsh.variationReasons?.map((vr) => (
+                  {transaction.variationReasons?.map((vr) => (
                     <span key={vr}>
                       {convertCamelCaseToSpaceDelimited(vr)}
                       <br />
                     </span>
                   ))}
                 </td>
-                <td className="govuk-table__cell govuk-table__cell--numeric">{fsh.fundingStreamValue}</td>
+                <td className="govuk-table__cell govuk-table__cell--numeric">
+                  {transaction.fundingStreamValue}
+                </td>
               </tr>
             ))}
         </tbody>

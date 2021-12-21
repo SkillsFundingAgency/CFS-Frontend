@@ -1,11 +1,11 @@
 ﻿import React from "react";
-import { Link } from "react-router-dom";
 
 import { isNumber } from "../../helpers/numberHelper";
 import { ProviderFundingOverviewRoute } from "../../pages/FundingApprovals/ProviderFundingOverview";
 import { FundingLineProfile } from "../../types/FundingLineProfile";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
 import { NoData } from "../NoData";
+import { TextLink } from "../TextLink";
 
 export interface ProviderFundingProfilingProps {
   routeParams: ProviderFundingOverviewRoute;
@@ -38,56 +38,38 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                       <th scope="col" className="govuk-table__header">
                         Total allocation
                       </th>
-                      <th scope="col" className="govuk-table__header">
-                        &nbsp;
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="govuk-table__body">
-                    {props.profilingPatterns.map((profile, key) => {
-                      return (
-                        <tr className="govuk-table__row" key={key}>
-                          <th scope="row" className="govuk-table__header">
-                            {profile.errors?.length > 0 ? (
-                              <div className="govuk-form-group--error">
-                                {profile.fundingLineName}
-                                <span className="govuk-error-message">
-                                  {profile.errors[0].detailedErrorMessage}
-                                </span>
-                              </div>
-                            ) : (
-                              profile.fundingLineName
-                            )}
-                          </th>
-                          <td className="govuk-table__cell">
-                            {isNumber(profile.fundingLineAmount) ? profile.profilePatternName : ""}
-                          </td>
-                          <td className="govuk-table__cell">
-                            {isNumber(profile.fundingLineAmount) ? (
-                              <FormattedNumber
-                                value={profile.fundingLineAmount}
-                                type={NumberType.FormattedMoney}
-                              />
-                            ) : (
-                              "Excluded"
-                            )}
-                          </td>
-                          <td className="govuk-table__cell">
-                            {isNumber(profile.fundingLineAmount) && (
-                              <>
-                                <Link
-                                  className="govuk-link right-align"
-                                  to={`/Approvals/ProviderFundingOverview/${params.specificationId}/${params.providerId}/${params.specCoreProviderVersionId}/${params.fundingStreamId}/${params.fundingPeriodId}/${profile.fundingLineCode}/view`}
-                                >
-                                  View
-                                </Link>
-                                <span className="govuk-visually-hidden">{profile.fundingLineName}</span>
-                              </>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {props.profilingPatterns.map((profile, key) => (
+                      <tr className="govuk-table__row" key={key}>
+                        <th scope="row" className="govuk-table__header">
+                          {profile.errors?.length > 0 ? (
+                            <div className="govuk-form-group--error">
+                              <ProviderFundingOverviewLink profile={profile} params={params} />
+                              <span className="govuk-error-message">
+                                {profile.errors[0].detailedErrorMessage}
+                              </span>
+                            </div>
+                          ) : (
+                            <ProviderFundingOverviewLink profile={profile} params={params} />
+                          )}
+                        </th>
+                        <td className="govuk-table__cell">
+                          {isNumber(profile.fundingLineAmount) ? profile.profilePatternName : ""}
+                        </td>
+                        <td className="govuk-table__cell">
+                          {isNumber(profile.fundingLineAmount) ? (
+                            <FormattedNumber
+                              value={profile.fundingLineAmount}
+                              type={NumberType.FormattedMoney}
+                            />
+                          ) : (
+                            "Excluded"
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -96,5 +78,25 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
         </div>
       </div>
     </section>
+  );
+};
+
+const ProviderFundingOverviewLink = ({
+  profile,
+  params,
+}: {
+  profile: FundingLineProfile;
+  params: ProviderFundingOverviewRoute;
+}) => {
+  const { specificationId, providerId, specCoreProviderVersionId, fundingStreamId, fundingPeriodId } = params;
+  const fundingLineTitle = `${profile.fundingLineName} (${profile.fundingLineCode})`;
+  return isNumber(profile.fundingLineAmount) ? (
+    <TextLink
+      to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${specCoreProviderVersionId}/${fundingStreamId}/${fundingPeriodId}/${profile.fundingLineCode}/view`}
+    >
+      {fundingLineTitle}
+    </TextLink>
+  ) : (
+    <>{fundingLineTitle}</>
   );
 };

@@ -44,7 +44,7 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
 
     it("renders funding line name", async () => {
       expect(
-        screen.getByRole("rowheader", { name: props.profilingPatterns[0].fundingLineName })
+        screen.getByRole("rowheader", { name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})`, exact: false })
       ).toBeInTheDocument();
     });
 
@@ -59,7 +59,7 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
     });
 
     it("renders link", async () => {
-      const link = screen.getByRole("link", { name: /View/ }) as HTMLAnchorElement;
+      const link = screen.getByRole("link", { name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})` }) as HTMLAnchorElement;
       expect(link).toBeInTheDocument();
       expect(link.getAttribute("href")).toBe(
         `/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${props.profilingPatterns[0].fundingLineCode}/view`
@@ -86,7 +86,7 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
       const table = screen.getByTestId("profiling-table");
       expect(table).toBeInTheDocument();
       expect(
-        within(table).getByRole("rowheader", { name: props.profilingPatterns[0].fundingLineName })
+        within(table).getByRole("rowheader", { name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})` })
       ).toBeInTheDocument();
     });
 
