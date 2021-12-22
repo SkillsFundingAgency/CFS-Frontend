@@ -116,7 +116,7 @@ export function EditDatasetReferencingReleased({
     );
 
     return sortBy(prop("name"))(searchFiltered);
-  }, [hideUnselected, templateItems, searchText]);
+  }, [hideUnselected, templateItems, searchText, selectedItems]);
 
   function filterByName(text: string) {
     setSearchText(text.length > 0 ? text : undefined);
