@@ -704,3 +704,9 @@ a.govuk-link-red {
   text-align: center;
   white-space: nowrap;
 }
+
+.govuk-scroll-window{
+  overflow-y: auto;
+  min-height: 60px;
+  max-height: 400px;
+}

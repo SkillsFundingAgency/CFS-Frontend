@@ -222,7 +222,7 @@ export function SpecificationsList() {
                       <label className="govuk-label">Search</label>
                       <input className="govuk-input" type="text" onChange={searchFundingPeriods} />
                     </div>
-                    <div className="govuk-checkboxes">
+                    <div className="govuk-checkboxes govuk-scroll-window">
                       {filterFundingPeriods.map((fp, index) => (
                         <div key={index} className="govuk-checkboxes__item">
                           <input
@@ -256,7 +256,7 @@ export function SpecificationsList() {
                       <label className="govuk-label">Search</label>
                       <input className="govuk-input" type="text" onChange={searchFundingStreams} />
                     </div>
-                    <div className="govuk-checkboxes">
+                    <div className="govuk-checkboxes govuk-scroll-window">
                       {filterFundingStreams.map((fs, index) => (
                         <div key={index} className="govuk-checkboxes__item">
                           <input
