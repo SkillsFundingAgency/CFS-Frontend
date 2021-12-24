@@ -69,7 +69,7 @@ export const ViewSpecificationTabs = ({
               </Tabs.Tab>
             )}
             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
-            <Tabs.Tab label="release-timetable">Release timetable</Tabs.Tab>
+            <Tabs.Tab label="release-timetable" hidden={true}>Release timetable</Tabs.Tab>
             <Tabs.Tab
               hidden={!specification.isSelectedForFunding}
               data-testid={"variations-tab"}
