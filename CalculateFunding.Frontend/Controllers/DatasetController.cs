@@ -367,12 +367,13 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<IEnumerable<DatasetDefinitionByFundingStream>> result =
                 await _datasetApiClient.GetDatasetDefinitionsByFundingStreamId(fundingStreamId);
 
-            if (result.StatusCode == HttpStatusCode.OK)
+            IActionResult errorResult = result.IsSuccessOrReturnFailureResult(nameof(DatasetDefinitionByFundingStream));
+            if (errorResult != null)
             {
-                return new OkObjectResult(result.Content);
+                return errorResult;
             }
 
-            return result.StatusCode == HttpStatusCode.BadRequest ? new BadRequestResult() : new StatusCodeResult(500);
+            return new OkObjectResult(result.Content);
         }
 
         [HttpGet]

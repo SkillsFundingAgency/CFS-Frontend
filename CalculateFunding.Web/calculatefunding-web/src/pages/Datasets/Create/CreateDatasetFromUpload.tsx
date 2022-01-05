@@ -57,7 +57,7 @@ export function CreateDatasetFromUpload({
     async () =>
       (await datasetApi.getDatasetsForFundingStreamService(fundingStreamId ? fundingStreamId : "")).data,
     {
-      enabled: fundingStreamId !== undefined,
+      enabled: fundingStreamId !== "",
       onError: (err) =>
         addError({
           error: err as AxiosError,
