@@ -1,10 +1,11 @@
+import { CompletionStatus } from "../../types/CompletionStatus";
+import { JobDetails } from "../../types/jobDetails";
+import { JobType } from "../../types/jobType";
+import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
+import { RunningStatus } from "../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
-import {JobDetails} from "../../types/jobDetails";
-import {JobType} from "../../types/jobType";
-import {RunningStatus} from "../../types/RunningStatus";
-import {CompletionStatus} from "../../types/CompletionStatus";
 
 const makeSpecificationSummary = (overrides: Partial<SpecificationSummary> = {}): SpecificationSummary => {
   return {
@@ -50,19 +51,19 @@ const makeFundingPeriod = (overrides: Partial<FundingPeriod>): FundingPeriod => 
 const makeSuccessfulJob = (overrides: Partial<JobDetails>): JobDetails => {
   return {
     jobId: "successful-job-id",
-      jobType: JobType.RunConverterDatasetMergeJob,
-      statusDescription: "Create Specification job completed successfully",
-      jobDescription: "Create Specification Job",
-      runningStatus: RunningStatus.Completed,
-      completionStatus: CompletionStatus.Succeeded,
-      lastUpdated: new Date(),
-      failures: [],
-      isComplete: true,
-      isSuccessful: true,
-      isFailed: false,
-      isActive: false,
-      outcome: "Job succeeded",
-    ...overrides
+    jobType: JobType.RunConverterDatasetMergeJob,
+    statusDescription: "Create Specification job completed successfully",
+    jobDescription: "Create Specification Job",
+    runningStatus: RunningStatus.Completed,
+    completionStatus: CompletionStatus.Succeeded,
+    lastUpdated: new Date(),
+    failures: [],
+    isComplete: true,
+    isSuccessful: true,
+    isFailed: false,
+    isActive: false,
+    outcome: "Job succeeded",
+    ...overrides,
   };
 };
 const makeFailedJob = (overrides: Partial<JobDetails>): JobDetails => {
@@ -79,8 +80,38 @@ const makeFailedJob = (overrides: Partial<JobDetails>): JobDetails => {
     isActive: false,
     isComplete: true,
     outcome: "Job failed",
-    ...overrides
+    ...overrides,
   };
 };
 
-export const fakery = { makeSpecificationSummary, makeFundingStream, makeFundingPeriod, makeSuccessfulJob, makeFailedJob };
+const makeFundingStreamPeriodProfilePattern = (
+  overrides: Partial<FundingStreamPeriodProfilePattern>
+): FundingStreamPeriodProfilePattern => {
+  return {
+    id: "Period-111-Stream-111-Line-111-Key-111",
+    fundingPeriodId: "Period-111",
+    fundingStreamId: "Stream-111",
+    fundingLineId: "Line-111",
+    profilePatternKey: "Key-111",
+    profilePatternDisplayName: "Period-111 funding",
+    profilePatternDescription: "description-111",
+    roundingStrategy: "rounding",
+    fundingStreamPeriodStartDate: new Date(),
+    fundingStreamPeriodEndDate: new Date(),
+    profilePattern: [],
+    providerTypeSubTypes: [],
+    reProfilePastPeriods: false,
+    calculateBalancingPayment: false,
+    allowUserToEditProfilePattern: false,
+    ...overrides,
+  };
+};
+
+export const fakery = {
+  makeSpecificationSummary,
+  makeFundingStream,
+  makeFundingPeriod,
+  makeSuccessfulJob,
+  makeFailedJob,
+  makeFundingStreamPeriodProfilePattern,
+};

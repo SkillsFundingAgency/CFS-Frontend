@@ -1,10 +1,13 @@
-﻿import * as policyService from "../../services/policyService";
+﻿import { FundingStreamPeriodProfilePattern } from "types/ProviderProfileTotalsForStreamAndPeriod";
+
+import * as policyService from "../../services/policyService";
+import * as profilingService from "../../services/profilingService";
 import * as publishService from "../../services/publishService";
 import * as specificationService from "../../services/specificationService";
+import { LatestPublishedDate } from "../../types/PublishedProvider/LatestPublishedDate";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
 import { fakeAxiosResponse } from "./fakeAxios";
-import { LatestPublishedDate } from "../../types/PublishedProvider/LatestPublishedDate";
 
 export type JestSpy = jest.SpyInstance<Promise<unknown>>;
 
@@ -65,10 +68,25 @@ const makeGetLatestPublishDateSpy = (lastPublishDate: LatestPublishedDate): Jest
   return getLatestPublishedDateSpy;
 };
 
+const makeProfilePatternsSpy = (
+  fundingStreamPeriodProfilePatterns: FundingStreamPeriodProfilePattern[]
+): JestSpy => {
+  const getAllProfilePatternsSpy: jest.SpyInstance<Promise<unknown>> = jest.spyOn(
+    profilingService,
+    "getAllProfilePatterns"
+  );
+  getAllProfilePatternsSpy.mockResolvedValue(
+    fakeAxiosResponse.success({ data: fundingStreamPeriodProfilePatterns })
+  );
+
+  return getAllProfilePatternsSpy;
+};
+
 export const mockApiService = {
   makeSpecificationSummarySpy,
   makeFundingStreamsSpy,
   makeFundingPeriodsSpy,
   makeFindSpecsWithResultsSpy,
   makeGetLatestPublishDateSpy,
+  makeProfilePatternsSpy,
 };

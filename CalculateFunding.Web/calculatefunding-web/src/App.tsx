@@ -23,6 +23,8 @@ import { CalculationVersionHistory } from "./pages/Calculations/CalculationVersi
 import { CompareCalculationVersions } from "./pages/Calculations/CompareCalculationVersions";
 import { CreateAdditionalCalculation } from "./pages/Calculations/CreateAdditionalCalculation";
 import { EditCalculation } from "./pages/Calculations/EditCalculation";
+import { ConfigurationDownloads } from "./pages/Configuration/ConfigurationDownloads";
+import { SelectConfiguration } from "./pages/Configuration/SelectConfiguration";
 import { ConfirmSkills } from "./pages/ConfirmSkills";
 import { ConfirmDatasetToCreate } from "./pages/Datasets/Create/ConfirmDatasetToCreate";
 import { CreateDatasetFromUpload } from "./pages/Datasets/Create/CreateDatasetFromUpload";
@@ -170,8 +172,12 @@ const App: React.FunctionComponent = () => {
               <Route path="/Results" component={ViewResults} />
               {resultsRoutes}
               <Route path="/FundingManagement" exact={true} component={FundingManagement} />
-                <Route path="/FundingManagement/Approvals/Results/:fundingStreamId/:fundingPeriodId/:specificationId" exact={true} component={ApprovalResults} />
-                <Route
+              <Route
+                path="/FundingManagement/Approvals/Results/:fundingStreamId/:fundingPeriodId/:specificationId"
+                exact={true}
+                component={ApprovalResults}
+              />
+              <Route
                 path="/FundingManagement/Approval/Selection"
                 exact={true}
                 component={FundingManagementApprovalSelection}
@@ -199,15 +205,12 @@ const App: React.FunctionComponent = () => {
                 exact={true}
                 component={ReleaseResults}
               />
+              <Route path="/FundingManagement/Release/Select" component={FundingManagementReleaseSelection} />
               <Route
-                path="/FundingManagement/Release/Select"
-                component={FundingManagementReleaseSelection}
+                path="/FundingManagement/Release/Purpose/:fundingStreamId/:fundingPeriodId/:specificationId"
+                exact={true}
+                component={ReleasePurpose}
               />
-                <Route
-                    path="/FundingManagement/Release/Purpose/:fundingStreamId/:fundingPeriodId/:specificationId"
-                    exact={true}
-                    component={ReleasePurpose}
-                />
               <Route path="/SelectSpecification" component={SelectSpecification} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
               <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
@@ -217,6 +220,11 @@ const App: React.FunctionComponent = () => {
               <Route
                 path="/Specifications/EditSpecification/:specificationId"
                 component={EditSpecification}
+              />
+              <Route path="/Configuration/SelectConfiguration" component={SelectConfiguration} />
+              <Route
+                path="/Configuration/ConfigurationDownloads/:fundingStreamId/:fundingPeriodId"
+                component={ConfigurationDownloads}
               />
               {featureFlagsState.templateBuilderVisible && templateRoutes}
               <Route

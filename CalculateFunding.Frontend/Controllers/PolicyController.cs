@@ -3,15 +3,19 @@ using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
 using CalculateFunding.Common.ApiClient.Policies.Models.FundingConfig;
 using CalculateFunding.Common.ApiClient.Users.Models;
+using CalculateFunding.Common.Extensions;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CalculateFunding.Frontend.Controllers
@@ -76,6 +80,35 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             return new OkObjectResult(apiResponse.Content);
+        }
+
+        [HttpGet]
+        [Route("api/policy/configuration/{fundingStreamId}/{fundingPeriodId}/download-file")]
+        public async Task<IActionResult> GetFundingConfigurationDownload(string fundingStreamId, string fundingPeriodId)
+        {
+            IActionResult fundingConfigurationResult = await GetFundingConfiguration(fundingStreamId, fundingPeriodId);
+
+            if(!(fundingConfigurationResult is OkObjectResult))
+            {
+                return fundingConfigurationResult;
+            }
+
+            string fundingConfigurationJson = ((FundingConfiguration)((OkObjectResult)fundingConfigurationResult).Value).AsJson();
+
+            byte[] configurationBytes = !string.IsNullOrEmpty(fundingConfigurationJson) ?
+                                            Encoding.ASCII.GetBytes(fundingConfigurationJson) :
+                                            Array.Empty<byte>();
+
+            string filename = $"{fundingStreamId}-{fundingPeriodId}-configuration.json";
+
+            Response.Headers[HeaderNames.ContentDisposition] = new ContentDisposition
+            {
+                FileName = filename,
+                DispositionType = DispositionTypeNames.Inline,
+                Inline = true
+            }.ToString();
+
+            return new FileContentResult(configurationBytes, "application/json");
         }
 
         [HttpGet]
