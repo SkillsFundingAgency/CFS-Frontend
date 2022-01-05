@@ -1,3 +1,4 @@
+@use "sass:math";
 ////
 /// @group settings/measurements
 ////
@@ -39,7 +40,7 @@ $govuk-gutter: 30px !default;
 /// @type Number
 /// @access public
 
-$govuk-gutter-half: $govuk-gutter / 2;
+$govuk-gutter-half: math.div($govuk-gutter, 2);
 
 // =========================================================
 // Borders

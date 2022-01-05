@@ -10,11 +10,12 @@
 /// @param {Number} $value - Length in pixels
 /// @return {Number} Length in rems
 /// @access public
+@use "sass:math";
 
 @function govuk-px-to-rem($value) {
   @if (unitless($value)) {
     $value: $value * 1px;
   }
 
-  @return $value / $govuk-root-font-size * 1rem;
+  @return math.div($value, $govuk-root-font-size) * 1rem;
 }
