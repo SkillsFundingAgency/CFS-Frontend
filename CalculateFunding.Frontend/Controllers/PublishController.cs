@@ -200,28 +200,38 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
-            ApiResponse<IEnumerable<PublishedProviderTransaction>> result =
+            ApiResponse<IEnumerable<ReleasePublishedProviderTransaction>> result =
                 await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
 
             if (result == null || !result.Content.Any())
+            {
                 return new NotFoundObjectResult(Content("Error. Not Found."));
+            }
 
-            ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel
-            { Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>() };
+            ProviderTransactionResultsViewModel output = new()
+            {
+                Status = result.StatusCode,
+                Results = new List<ProviderTransactionResultsItemViewModel>()
+            };
 
-            foreach (PublishedProviderTransaction item in result.Content)
+            foreach (ReleasePublishedProviderTransaction item in result.Content)
             {
                 output.Results.Add(new ProviderTransactionResultsItemViewModel
                 {
                     Status = item.Status.ToString(),
+                    ProviderId = item.ProviderId,
+                    MajorVersion = item.MajorVersion,
+                    MinorVersion = item.MinorVersion,
+                    ChannelCode = item.ChannelCode,
+                    ChannelName = item.ChannelName,
                     Author = item.Author.Name,
                     DateChanged = $"{item.Date:M} {item.Date.Year} at {item.Date.DateTime:h:mm tt}",
-                    FundingStreamValue = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : "",
+                    TotalFunding = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : "",
                     VariationReasons = item.VariationReasons
                 });
             }
 
-            PublishedProviderTransaction latestPublishedProvider = result.Content.OrderByDescending(x => x.Date).First();
+            ReleasePublishedProviderTransaction latestPublishedProvider = result.Content.OrderByDescending(x => x.Date).First();
 
             output.FundingTotal = latestPublishedProvider?.TotalFunding != null
                 ? $"£{latestPublishedProvider.TotalFunding.Value:N2}"

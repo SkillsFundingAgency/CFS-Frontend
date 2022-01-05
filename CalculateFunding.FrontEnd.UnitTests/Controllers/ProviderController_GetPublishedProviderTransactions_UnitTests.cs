@@ -22,27 +22,27 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
     public class ProviderController_GetPublishedProviderTransactions_UnitTests
     {
         private PublishController _sut;
-        private readonly Mock<IPublishingApiClient> _mockProvidersApiClient = new Mock<IPublishingApiClient>();
+        private readonly Mock<IPublishingApiClient> _mockPublishingApiClient = new Mock<IPublishingApiClient>();
         private readonly Mock<ISpecificationsApiClient> _mockSpecificationsApiClient = new Mock<ISpecificationsApiClient>();
         private readonly Mock<IAuthorizationHelper> _mockAuthorizatonHelper = new Mock<IAuthorizationHelper>();
 
         [TestMethod]
         public void Should_GetProviderById_ValidId_Success()
         {
-            ApiResponse<IEnumerable<PublishedProviderTransaction>> data =
-                new ApiResponse<IEnumerable<PublishedProviderTransaction>>(HttpStatusCode.OK,
-                    Builder<PublishedProviderTransaction>
+            ApiResponse<IEnumerable<ReleasePublishedProviderTransaction>> data =
+                new ApiResponse<IEnumerable<ReleasePublishedProviderTransaction>>(HttpStatusCode.OK,
+                    Builder<ReleasePublishedProviderTransaction>
                         .CreateListOfSize(10)
                         .All()
                         .Do(x => x.Author = new Reference("1", "Test Bot"))
                         .Build().AsEnumerable()
                 );
-            _mockProvidersApiClient.Setup(x =>
+            _mockPublishingApiClient.Setup(x =>
                     x.GetPublishedProviderTransactions("ABC123", "providerId"))
                 .ReturnsAsync(data);
             _sut = new PublishController(
                 _mockSpecificationsApiClient.Object, 
-                _mockProvidersApiClient.Object, 
+                _mockPublishingApiClient.Object, 
                 _mockAuthorizatonHelper.Object);
 
             Task<IActionResult> actual = _sut.GetPublishedProviderTransactions("ABC123", "providerId");
@@ -55,7 +55,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         [TestMethod]
         public void Should_ReturnNotFoundObjectResult_GivenNoResultReturnsFromPublishingApi()
         {
-            _sut = new PublishController(_mockSpecificationsApiClient.Object, _mockProvidersApiClient.Object, _mockAuthorizatonHelper.Object);
+            _sut = new PublishController(_mockSpecificationsApiClient.Object, _mockPublishingApiClient.Object, _mockAuthorizatonHelper.Object);
 
             Task<IActionResult> actual = _sut.GetPublishedProviderTransactions("ABC123", "providerId");
 

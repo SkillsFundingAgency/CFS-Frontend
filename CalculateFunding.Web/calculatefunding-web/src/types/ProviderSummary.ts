@@ -84,8 +84,13 @@ export interface ProviderTransactionSummary {
 
 export interface Result {
   status: string;
+  providerId: string;
+  majorVersion: number;
+  minorVersion: number;
+  channelCode: string;
+  channelName: string;
   author: string;
   dateChanged: string;
-  fundingStreamValue: string;
+  totalFunding: string;
   variationReasons: string[];
 }
