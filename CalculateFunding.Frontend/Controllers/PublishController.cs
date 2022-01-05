@@ -43,60 +43,6 @@ namespace CalculateFunding.Frontend.Controllers
             _authorizationHelper = authorizationHelper;
         }
 
-        [Route("api/publish/savetimetable")]
-        [HttpPost]
-        public async Task<IActionResult> SaveTimetable([FromBody] ReleaseTimetableViewModel viewModel)
-        {
-            Guard.ArgumentNotNull(viewModel, nameof(viewModel));
-
-            if (!await _authorizationHelper.DoesUserHavePermission(
-                User,
-                viewModel.SpecificationId,
-                SpecificationActionTypes.CanEditSpecification))
-            {
-                return new ForbidResult();
-            }
-
-            SpecificationPublishDateModel publishData = new SpecificationPublishDateModel
-            {
-                EarliestPaymentAvailableDate = viewModel.FundingDate,
-                ExternalPublicationDate = viewModel.StatementDate
-            };
-
-            HttpStatusCode publish =
-                await _specificationsApiClient.SetPublishDates(viewModel.SpecificationId, publishData);
-
-            if (publish == HttpStatusCode.OK)
-            {
-                return new OkObjectResult(publishData);
-            }
-
-            if (publish == HttpStatusCode.BadRequest)
-            {
-                return new BadRequestObjectResult(
-                    Content("There was a problem with the data submitted. Please check and try again."));
-            }
-
-            return new NotFoundObjectResult(Content("Error. Not Found."));
-        }
-
-        [Route("api/publish/gettimetable/{specificationId}")]
-        [HttpGet]
-        public async Task<IActionResult> GetTimetable(string specificationId)
-        {
-            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-
-            ApiResponse<SpecificationPublishDateModel> result =
-                await _specificationsApiClient.GetPublishDates(specificationId);
-
-            if (result != null)
-            {
-                return new OkObjectResult(result);
-            }
-
-            return new NotFoundObjectResult(Content("Error. Not Found."));
-        }
-
         [HttpPost]
         [Route("api/specs/{specificationId}/selectforfunding")]
         public async Task<IActionResult> SelectSpecificationForFunding(string specificationId)

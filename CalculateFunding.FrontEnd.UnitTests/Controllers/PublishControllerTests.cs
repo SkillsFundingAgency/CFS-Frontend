@@ -57,37 +57,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public async Task SaveTimetable_Returns_Forbid_Result_Given_User_Does_Not_Have_Edit_Specification_Permission()
-        {
-            IActionResult result = await _publishController.SaveTimetable(new ReleaseTimetableViewModel());
-
-            result.Should().BeAssignableTo<ForbidResult>();
-        }
-
-        [TestMethod]
-        public async Task SaveTimetable_Returns_OK_Result_Given_User_Has_Required_Permission()
-        {
-            SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
-            _specificationsApiClient.SetPublishDates(Arg.Any<string>(), Arg.Any<SpecificationPublishDateModel>())
-                .Returns(HttpStatusCode.OK);
-
-            DateTime fundingDate = DateTime.Now.AddDays(-1);
-            DateTime statementDate = DateTime.Now.AddMonths(-1);
-            ReleaseTimetableViewModel releaseTimetableViewModel = new ReleaseTimetableViewModel
-            {
-                SpecificationId = "XYZ",
-                FundingDate = fundingDate,
-                StatementDate = statementDate
-            };
-            IActionResult result = await _publishController.SaveTimetable(releaseTimetableViewModel);
-
-            result.Should().BeAssignableTo<OkObjectResult>();
-            SpecificationPublishDateModel specificationPublishDateModelResult = result.As<OkObjectResult>().Value.As<SpecificationPublishDateModel>();
-            specificationPublishDateModelResult.EarliestPaymentAvailableDate.Should().Be(fundingDate);
-            specificationPublishDateModelResult.ExternalPublicationDate.Should().Be(statementDate);
-        }
-
-        [TestMethod]
         public async Task RefreshFunding_Returns_Forbid_Result_Given_User_Does_Not_Have_Refresh_Funding_Permission()
         {
             IActionResult result = await _publishController.RefreshFunding(ValidSpecificationId);
