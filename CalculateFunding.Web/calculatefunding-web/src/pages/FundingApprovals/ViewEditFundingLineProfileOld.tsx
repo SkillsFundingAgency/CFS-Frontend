@@ -7,10 +7,12 @@ import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { FormattedNumber, NumberType, toDecimal } from "../../components/FormattedNumber";
 import { EditableProfileTotal, ProfileEditMode } from "../../components/Funding/EditableProfileTotal";
+import { ProfileHistoryPanel } from "../../components/Funding/ProfileHistoryPanel";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
+import { Title } from "../../components/Title";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useConfirmLeavePage } from "../../hooks/useConfirmLeavePage";
 import { useErrors } from "../../hooks/useErrors";
@@ -29,10 +31,8 @@ import {
   FundingLineProfileViewModel,
 } from "../../types/PublishedProvider/FundingLineProfile";
 import { Section } from "../../types/Sections";
-import { ProfileHistoryPanel } from "./ProfileHistoryPanel";
-import { Title } from "../../components/Title";
 
-export interface ViewEditFundingLineProfileProps {
+export interface ViewEditFundingLineProfilePropsOld {
   editMode?: string;
   providerId: string;
   fundingStreamId: string;
@@ -42,9 +42,11 @@ export interface ViewEditFundingLineProfileProps {
   specCoreProviderVersionId: string;
 }
 
-export function ViewEditFundingLineProfile({
+/** @deprecated - pls use {@link ../FundingManagement/ViewEditFundingLineProfile} instead
+ * TODO: remove this version once Approve/Release Funding goes live */
+export function ViewEditFundingLineProfileOld({
   match,
-}: RouteComponentProps<ViewEditFundingLineProfileProps>): JSX.Element {
+}: RouteComponentProps<ViewEditFundingLineProfilePropsOld>): JSX.Element {
   const {
     fundingStreamId,
     fundingPeriodId,
@@ -318,7 +320,7 @@ export function ViewEditFundingLineProfile({
   const newCarryForwardAmount = calculateNewCarryForwardAmount(totalUnpaidAllocationAmount);
 
   return (
-    <Main location={Section.Approvals}>
+    <Main location={Section.FundingManagement}>
       <MultipleErrorSummary errors={errors} />
       {isLoading || isSaving ? (
         <LoadingStatus title={`${isLoading ? "Loading" : "Saving"} funding line profile`} />

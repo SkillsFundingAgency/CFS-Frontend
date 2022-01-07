@@ -1,20 +1,28 @@
 ﻿import { render, screen, within } from "@testing-library/react";
 import React from "react";
+import * as redux from "react-redux";
+import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
+import { createStore, Store } from "redux";
 
-import { ProviderFundingProfilingProps } from "../../../components/Funding/ProviderFundingProfilingPatterns";
+import { ProviderFundingProfilingPatternsProps } from "../../../components/Funding/ProviderFundingProfilingPatterns";
+import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
+import { FeatureFlagsState } from "../../../states/FeatureFlagsState";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { FundingApprovalTestData } from "../../Pages/FundingApprovals/FundingApprovalTestData";
 
-const renderComponent = (inputs: ProviderFundingProfilingProps) => {
+const useSelectorSpy = jest.spyOn(redux, "useSelector");
+const store: Store<IStoreState> = createStore(rootReducer);
+const renderComponent = (inputs: ProviderFundingProfilingPatternsProps) => {
   const {
     ProviderFundingProfilingPatterns,
   } = require("../../../components/Funding/ProviderFundingProfilingPatterns");
+  store.dispatch = jest.fn();
   return render(
     <MemoryRouter>
-      <ProviderFundingProfilingPatterns
-        routeParams={inputs.routeParams}
-        profilingPatterns={inputs.profilingPatterns}
-      />
+      <Provider store={store}>
+        <ProviderFundingProfilingPatterns {...inputs} />
+      </Provider>
     </MemoryRouter>
   );
 };
@@ -23,18 +31,24 @@ const test = FundingApprovalTestData();
 
 describe("<ProviderFundingProfilingPatterns/> tests", () => {
   describe("with full profiling data", () => {
-    const props: ProviderFundingProfilingProps = {
-      routeParams: {
-        specificationId: test.provider1.specificationId,
-        fundingStreamId: test.provider1.fundingStreamId,
-        fundingPeriodId: test.provider1.fundingPeriodId,
-        providerId: test.provider1.publishedProviderVersionId,
-        specCoreProviderVersionId: test.testSpec.providerVersionId,
-      },
+    const props: ProviderFundingProfilingPatternsProps = {
+      actionType: FundingActionType.Approve,
+      specification: test.testSpec,
+      providerId: test.provider1.publishedProviderVersionId,
+      specCoreProviderVersionId: test.testSpec.providerVersionId,
       profilingPatterns: [test.fundingLineProfile1],
     };
 
     beforeEach(() => {
+      const featureFlagsState: FeatureFlagsState = {
+        profilingPatternVisible: false,
+        releaseTimetableVisible: false,
+        templateBuilderVisible: false,
+        enableReactQueryDevTool: false,
+        specToSpec: false,
+        enableNewFundingManagement: false,
+      };
+      useSelectorSpy.mockReturnValue(featureFlagsState);
       renderComponent(props);
     });
 
@@ -44,7 +58,10 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
 
     it("renders funding line name", async () => {
       expect(
-        screen.getByRole("rowheader", { name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})`, exact: false })
+        screen.getByRole("rowheader", {
+          name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})`,
+          exact: false,
+        })
       ).toBeInTheDocument();
     });
 
@@ -59,26 +76,34 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
     });
 
     it("renders link", async () => {
-      const link = screen.getByRole("link", { name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})` }) as HTMLAnchorElement;
+      const link = screen.getByRole("link", {
+        name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})`,
+      }) as HTMLAnchorElement;
       expect(link).toBeInTheDocument();
       expect(link.getAttribute("href")).toBe(
-        `/Approvals/ProviderFundingOverview/${props.routeParams.specificationId}/${props.routeParams.providerId}/${props.routeParams.specCoreProviderVersionId}/${props.routeParams.fundingStreamId}/${props.routeParams.fundingPeriodId}/${props.profilingPatterns[0].fundingLineCode}/view`
+        `/Approvals/ProviderFundingOverview/${props.specification.id}/${props.providerId}/${props.specCoreProviderVersionId}/${props.specification.fundingStreams[0].id}/${props.specification.fundingPeriod.id}/${props.profilingPatterns[0].fundingLineCode}/view`
       );
     });
   });
 
   describe("with null total allocation", () => {
-    const props: ProviderFundingProfilingProps = {
-      routeParams: {
-        specificationId: test.provider1.specificationId,
-        fundingStreamId: test.provider1.fundingStreamId,
-        fundingPeriodId: test.provider1.fundingPeriodId,
-        providerId: test.provider1.publishedProviderVersionId,
-        specCoreProviderVersionId: test.testSpec.providerVersionId,
-      },
+    const props: ProviderFundingProfilingPatternsProps = {
+      actionType: FundingActionType.Approve,
+      specification: test.testSpec,
+      providerId: test.provider1.publishedProviderVersionId,
+      specCoreProviderVersionId: test.testSpec.providerVersionId,
       profilingPatterns: [test.fundingLineProfileWithMissingTotalAllocation],
     };
     beforeEach(() => {
+      const featureFlagsState: FeatureFlagsState = {
+        profilingPatternVisible: false,
+        releaseTimetableVisible: false,
+        templateBuilderVisible: false,
+        enableReactQueryDevTool: false,
+        specToSpec: false,
+        enableNewFundingManagement: false,
+      };
+      useSelectorSpy.mockReturnValue(featureFlagsState);
       renderComponent(props);
     });
 
@@ -86,7 +111,9 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
       const table = screen.getByTestId("profiling-table");
       expect(table).toBeInTheDocument();
       expect(
-        within(table).getByRole("rowheader", { name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})` })
+        within(table).getByRole("rowheader", {
+          name: `${props.profilingPatterns[0].fundingLineName} (${props.profilingPatterns[0].fundingLineCode})`,
+        })
       ).toBeInTheDocument();
     });
 
@@ -106,17 +133,23 @@ describe("<ProviderFundingProfilingPatterns/> tests", () => {
   });
 
   describe("with profiling funding line error", () => {
-    const props: ProviderFundingProfilingProps = {
-      routeParams: {
-        specificationId: test.provider1.specificationId,
-        fundingStreamId: test.provider1.fundingStreamId,
-        fundingPeriodId: test.provider1.fundingPeriodId,
-        providerId: test.provider1.publishedProviderVersionId,
-        specCoreProviderVersionId: test.testSpec.providerVersionId,
-      },
+    const props: ProviderFundingProfilingPatternsProps = {
+      actionType: FundingActionType.Approve,
+      specification: test.testSpec,
+      providerId: test.provider1.publishedProviderVersionId,
+      specCoreProviderVersionId: test.testSpec.providerVersionId,
       profilingPatterns: [test.fundingLineWithError],
     };
     beforeEach(() => {
+      const featureFlagsState: FeatureFlagsState = {
+        profilingPatternVisible: false,
+        releaseTimetableVisible: false,
+        templateBuilderVisible: false,
+        enableReactQueryDevTool: false,
+        specToSpec: false,
+        enableNewFundingManagement: false,
+      };
+      useSelectorSpy.mockReturnValue(featureFlagsState);
       renderComponent(props);
     });
 

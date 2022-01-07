@@ -273,7 +273,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
   const actionIsComplete = jobId && jobId.length > 0 && latestJob && latestJob.isComplete;
 
   return (
-    <Main location={Section.Approvals}>
+    <Main location={Section.FundingManagement}>
       <MultipleErrorSummary errors={errors} />
 
       <Breadcrumbs>

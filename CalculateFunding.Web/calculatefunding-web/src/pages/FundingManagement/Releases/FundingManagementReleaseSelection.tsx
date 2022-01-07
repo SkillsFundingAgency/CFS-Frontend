@@ -66,7 +66,7 @@ export function FundingManagementReleaseSelection(): JSX.Element {
   };
 
   return (
-    <Main location={Section.Approvals}>
+    <Main location={Section.FundingManagement}>
       <MultipleErrorSummary errors={errors} />
 
       <Breadcrumbs>

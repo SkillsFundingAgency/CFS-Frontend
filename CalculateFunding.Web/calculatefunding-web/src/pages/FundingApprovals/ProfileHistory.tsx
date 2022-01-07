@@ -72,7 +72,7 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
 
   return (
     <div>
-      <Header location={Section.Approvals} />
+      <Header location={Section.FundingManagement} />
       <div className="govuk-width-container">
         {isLoading ? (
           <LoadingStatus title="Loading profiling history" />

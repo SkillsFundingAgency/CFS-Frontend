@@ -67,7 +67,7 @@ export function FundingApprovalSelection() {
 
   return (
     <div>
-      <Header location={Section.Approvals} />
+      <Header location={Section.FundingManagement} />
       <div className="govuk-width-container">
         <div className="govuk-grid-row  govuk-!-margin-bottom-9">
           <div className="govuk-grid-column-full">

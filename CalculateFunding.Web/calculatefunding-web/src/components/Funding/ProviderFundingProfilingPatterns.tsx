@@ -1,19 +1,28 @@
 ﻿import React from "react";
 
 import { isNumber } from "../../helpers/numberHelper";
-import { ProviderFundingOverviewRoute } from "../../pages/FundingApprovals/ProviderFundingOverview";
 import { FundingLineProfile } from "../../types/FundingLineProfile";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
 import { NoData } from "../NoData";
-import { TextLink } from "../TextLink";
+import { ProviderFundingLineProfileLink } from "./ProviderFundingLineProfileLink";
 
-export interface ProviderFundingProfilingProps {
-  routeParams: ProviderFundingOverviewRoute;
+export interface ProviderFundingProfilingPatternsProps {
+  actionType?: FundingActionType;
   profilingPatterns: FundingLineProfile[];
+  specification: SpecificationSummary;
+  providerId: string;
+  specCoreProviderVersionId?: string;
 }
 
-export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfilingProps): JSX.Element => {
-  const params = props.routeParams;
+export const ProviderFundingProfilingPatterns = ({
+  actionType = FundingActionType.Approve,
+  profilingPatterns,
+  specification,
+  providerId,
+  specCoreProviderVersionId,
+}: ProviderFundingProfilingPatternsProps): JSX.Element => {
   return (
     <section className="govuk-tabs__panel" id="profiling">
       <div className="govuk-grid-row">
@@ -21,9 +30,9 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
           <h2 className="govuk-heading-l">Profiling</h2>
           <p className="govuk-body">View and make changes to profile patterns by funding line.</p>
 
-          {(!props.profilingPatterns || props.profilingPatterns.length === 0) && <NoData hidden={false} />}
+          {(!profilingPatterns || profilingPatterns.length === 0) && <NoData hidden={false} />}
 
-          {props.profilingPatterns && props.profilingPatterns.length > 0 && (
+          {profilingPatterns && profilingPatterns.length > 0 && (
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-full">
                 <table className="govuk-table" data-testid={"profiling-table"}>
@@ -41,19 +50,18 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
                     </tr>
                   </thead>
                   <tbody className="govuk-table__body">
-                    {props.profilingPatterns.map((profile, key) => (
+                    {profilingPatterns.map((profile, key) => (
                       <tr className="govuk-table__row" key={key}>
                         <th scope="row" className="govuk-table__header">
-                          {profile.errors?.length > 0 ? (
-                            <div className="govuk-form-group--error">
-                              <ProviderFundingOverviewLink profile={profile} params={params} />
-                              <span className="govuk-error-message">
-                                {profile.errors[0].detailedErrorMessage}
-                              </span>
-                            </div>
-                          ) : (
-                            <ProviderFundingOverviewLink profile={profile} params={params} />
-                          )}
+                          <FundingLineProfileNameContainer
+                            actionType={actionType}
+                            profile={profile}
+                            specificationId={specification.id}
+                            providerId={providerId}
+                            specCoreProviderVersionId={specCoreProviderVersionId}
+                            fundingStreamId={specification.fundingStreams[0].id}
+                            fundingPeriodId={specification.fundingPeriod.id}
+                          />
                         </th>
                         <td className="govuk-table__cell">
                           {isNumber(profile.fundingLineAmount) ? profile.profilePatternName : ""}
@@ -81,22 +89,32 @@ export const ProviderFundingProfilingPatterns = (props: ProviderFundingProfiling
   );
 };
 
-const ProviderFundingOverviewLink = ({
-  profile,
-  params,
-}: {
+const FundingLineProfileNameContainer = (props: {
+  actionType: FundingActionType;
   profile: FundingLineProfile;
-  params: ProviderFundingOverviewRoute;
+  specificationId: string;
+  providerId: string;
+  specCoreProviderVersionId?: string;
+  fundingStreamId: string;
+  fundingPeriodId: string;
 }) => {
-  const { specificationId, providerId, specCoreProviderVersionId, fundingStreamId, fundingPeriodId } = params;
-  const fundingLineTitle = `${profile.fundingLineName} (${profile.fundingLineCode})`;
-  return isNumber(profile.fundingLineAmount) ? (
-    <TextLink
-      to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${specCoreProviderVersionId}/${fundingStreamId}/${fundingPeriodId}/${profile.fundingLineCode}/view`}
-    >
-      {fundingLineTitle}
-    </TextLink>
+  const fundingLineTitle = `${props.profile.fundingLineName} (${props.profile.fundingLineCode})`;
+
+  const FundingLineProfileLinkOrNot = () =>
+    isNumber(props.profile.fundingLineAmount) ? (
+      <ProviderFundingLineProfileLink editMode="view" {...props}>
+        {fundingLineTitle}
+      </ProviderFundingLineProfileLink>
+    ) : (
+      <>{fundingLineTitle}</>
+    );
+
+  return props.profile.errors?.length > 0 ? (
+    <div className="govuk-form-group--error">
+      <FundingLineProfileLinkOrNot />
+      <span className="govuk-error-message">{props.profile.errors[0].detailedErrorMessage}</span>
+    </div>
   ) : (
-    <>{fundingLineTitle}</>
+    <FundingLineProfileLinkOrNot />
   );
 };

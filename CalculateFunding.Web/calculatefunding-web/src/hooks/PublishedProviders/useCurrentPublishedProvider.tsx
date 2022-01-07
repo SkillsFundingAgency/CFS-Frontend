@@ -15,13 +15,13 @@ export type CurrentPublishedProviderVersionQueryResult = {
 
 export const useCurrentPublishedProvider = (
   specificationId: string,
-  fundingStreamId: string,
+  fundingStreamId: string | undefined,
   providerId: string,
   onError: (err: AxiosError) => void
 ): CurrentPublishedProviderVersionQueryResult => {
   const { data, isLoading, isError, error, isFetching } = useQuery<PublishedProviderVersion, AxiosError>(
     `current-published-provider-${providerId}-specification-${specificationId}-fundingStreamId-${fundingStreamId}`,
-    async () => (await getCurrentPublishedProvider(specificationId, fundingStreamId, providerId)).data,
+    async () => (await getCurrentPublishedProvider(specificationId, fundingStreamId as string, providerId)).data,
     {
       onError: onError,
       cacheTime: milliseconds.OneDay,

@@ -11,7 +11,7 @@ import * as providerVersionHook from "../../../hooks/Providers/useProviderVersio
 import { ProviderVersionQueryResult } from "../../../hooks/Providers/useProviderVersion";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
-import { ProviderFundingOverviewRoute } from "../../../pages/FundingApprovals/ProviderFundingOverview";
+import { ProviderFundingOverviewRouteOld } from "../../../pages/FundingApprovals/ProviderFundingOverviewOld";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FeatureFlagsState } from "../../../states/FeatureFlagsState";
 import { ProviderSummary } from "../../../types/ProviderSummary";
@@ -173,7 +173,7 @@ const providerResult: ProviderVersionQueryResult = {
   isErrorLoadingProviderVersion: false,
   isFetchingProviderVersion: false,
 };
-const matchMock: match<ProviderFundingOverviewRoute> = {
+const matchMock: match<ProviderFundingOverviewRouteOld> = {
   params: {
     providerId: testProvider.providerId,
     specificationId: testSpec.id,
@@ -186,13 +186,15 @@ const matchMock: match<ProviderFundingOverviewRoute> = {
   url: "",
 };
 const renderPage = () => {
-  const { ProviderFundingOverview } = require("../../../pages/FundingApprovals/ProviderFundingOverview");
+  const {
+    ProviderFundingOverviewOld,
+  } = require("../../../pages/FundingApprovals/ProviderFundingOverviewOld");
   store.dispatch = jest.fn();
   return render(
     <MemoryRouter>
       <QueryClientProvider client={new QueryClient()}>
         <Provider store={store}>
-          <ProviderFundingOverview location={location} history={history} match={matchMock} />
+          <ProviderFundingOverviewOld location={location} history={history} match={matchMock} />
         </Provider>
       </QueryClientProvider>
     </MemoryRouter>
@@ -214,6 +216,7 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible false", () => 
       templateBuilderVisible: false,
       enableReactQueryDevTool: false,
       specToSpec: false,
+      enableNewFundingManagement: false,
     };
     useSelectorSpy.mockReturnValue(featureFlagsState);
 
@@ -281,6 +284,7 @@ describe("<ProviderFundingOverview/> when profilingPatternVisible true", () => {
       templateBuilderVisible: false,
       enableReactQueryDevTool: false,
       specToSpec: false,
+      enableNewFundingManagement: false,
     };
     useSelectorSpy.mockReturnValue(featureFlagsState);
 

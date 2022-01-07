@@ -8,7 +8,7 @@ import * as redux from "react-redux";
 import { match, MemoryRouter } from "react-router";
 
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
-import { ViewEditFundingLineProfileProps } from "../../../pages/FundingApprovals/ViewEditFundingLineProfile";
+import { ViewEditFundingLineProfilePropsOld } from "../../../pages/FundingApprovals/ViewEditFundingLineProfileOld";
 import { Permission } from "../../../types/Permission";
 import { hasSpecPermissions } from "../../fakes/testFactories";
 
@@ -220,12 +220,12 @@ jest.mock("react-router", () => ({
 
 const renderPage = async () => {
   const {
-    ViewEditFundingLineProfile,
-  } = require("../../../pages/FundingApprovals/ViewEditFundingLineProfile");
+    ViewEditFundingLineProfileOld,
+  } = require("../../../pages/FundingApprovals/ViewEditFundingLineProfileOld");
   const page = render(
     <MemoryRouter>
       <QueryClientProvider client={new QueryClient()}>
-        <ViewEditFundingLineProfile match={matchMock} location={location} history={history} />
+        <ViewEditFundingLineProfileOld match={matchMock} location={location} history={history} />
       </QueryClientProvider>
     </MemoryRouter>
   );
@@ -237,7 +237,7 @@ const renderPage = async () => {
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
-const matchMock: match<ViewEditFundingLineProfileProps> = {
+const matchMock: match<ViewEditFundingLineProfilePropsOld> = {
   params: {
     specificationId: "specId",
     providerId: "providerId",

@@ -1,8 +1,8 @@
 import React from "react";
 import { useQuery } from "react-query";
-import { Link } from "react-router-dom";
 
 import { getPreviousProfileExistsForSpecificationForProviderForFundingLine } from "../../services/fundingLineDetailsService";
+import { TextLink } from "../TextLink";
 
 export interface ProfileHistoryPanelProps {
   providerId: string;
@@ -52,12 +52,11 @@ export function ProfileHistoryPanel({
       ) : null}
       {data !== undefined && data ? (
         <div className="govuk-body">
-          <Link
+          <TextLink
             to={`/Approvals/ProfilingHistory/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}
-            className="govuk-link"
           >
             History of previous profiles
-          </Link>
+          </TextLink>
         </div>
       ) : null}
     </>

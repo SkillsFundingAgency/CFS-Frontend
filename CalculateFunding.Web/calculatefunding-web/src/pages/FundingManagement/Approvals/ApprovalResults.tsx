@@ -296,7 +296,7 @@ export const ApprovalResults = ({
         return undefined;
     }
 
-    return <Main location={Section.Approvals}>
+    return <Main location={Section.FundingManagement}>
         <Breadcrumbs>
             <Breadcrumb name="Calculate funding" url={"/"}/>
             <Breadcrumb name="Funding management" url={"/FundingManagement"}/>

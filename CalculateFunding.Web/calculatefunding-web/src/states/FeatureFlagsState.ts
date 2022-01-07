@@ -4,4 +4,5 @@ export interface FeatureFlagsState {
   profilingPatternVisible: boolean | undefined;
   specToSpec: boolean;
   enableReactQueryDevTool: boolean;
+  enableNewFundingManagement: boolean;
 }

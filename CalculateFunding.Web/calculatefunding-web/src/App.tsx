@@ -49,19 +49,21 @@ import { ChangeProfileType } from "./pages/FundingApprovals/ChangeProfileType";
 import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
 import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprovalSelection";
 import { ProfileHistory } from "./pages/FundingApprovals/ProfileHistory";
-import { ProviderFundingOverview } from "./pages/FundingApprovals/ProviderFundingOverview";
+import { ProviderFundingOverviewOld } from "./pages/FundingApprovals/ProviderFundingOverviewOld";
 import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
-import { ViewEditFundingLineProfile } from "./pages/FundingApprovals/ViewEditFundingLineProfile";
+import { ViewEditFundingLineProfileOld } from "./pages/FundingApprovals/ViewEditFundingLineProfileOld";
 import { ApprovalResults } from "./pages/FundingManagement/Approvals/ApprovalResults";
 import FundingManagement from "./pages/FundingManagement/FundingManagement";
 import { FundingManagementApprovalResults } from "./pages/FundingManagement/FundingManagementApprovalResults";
 import { FundingManagementApprovalsConfirmFunding } from "./pages/FundingManagement/FundingManagementApprovalsConfirmFunding";
 import { FundingManagementApprovalSelection } from "./pages/FundingManagement/FundingManagementApprovalSelection";
 import { FundingManagementApprovalsUploadBatch } from "./pages/FundingManagement/FundingManagementApprovalsUploadBatch";
+import { ProviderFundingOverview } from "./pages/FundingManagement/ProviderFundingOverview";
 import { FundingManagementReleaseSelection } from "./pages/FundingManagement/Releases/FundingManagementReleaseSelection";
 import { ReleasePurpose } from "./pages/FundingManagement/Releases/ReleasePurpose";
 import { ReleaseResults } from "./pages/FundingManagement/Releases/ReleaseResults";
 import { ReleaseUploadBatch } from "./pages/FundingManagement/Releases/ReleaseUploadBatch";
+import { ViewEditFundingLineProfile } from "./pages/FundingManagement/ViewEditFundingLineProfile";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
 import { FundingStreamPermissionsAdmin } from "./pages/Permissions/FundingStreamPermissionsAdmin";
@@ -211,6 +213,18 @@ const App: React.FunctionComponent = () => {
                 exact={true}
                 component={ReleasePurpose}
               />
+              <Route
+                path="/FundingManagement/:actionType/Provider/:providerId/Specification/:specificationId/Version/:specCoreProviderVersionId"
+                exact={true}
+                sensitive={false}
+                component={ProviderFundingOverview}
+              />
+              <Route
+                path="/FundingManagement/:actionType/Provider/:providerId/Specification/:specificationId/Version/:specCoreProviderVersionId/FundingLine/:fundingLineId/:editMode"
+                exact={true}
+                sensitive={false}
+                component={ViewEditFundingLineProfile}
+              />
               <Route path="/SelectSpecification" component={SelectSpecification} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
               <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
@@ -293,12 +307,12 @@ const fundingApprovalRoutes = (
     <Route
       exact
       path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/:editMode"
-      component={ViewEditFundingLineProfile}
+      component={ViewEditFundingLineProfileOld}
     />
     <Route
       exact
       path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
-      component={ProviderFundingOverview}
+      component={ProviderFundingOverviewOld}
     />
     <Route
       path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode"

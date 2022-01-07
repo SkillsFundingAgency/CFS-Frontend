@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+﻿import { AxiosError } from "axios";
 import { Main } from "components/Main";
 import * as QueryString from "query-string";
 import React, { useEffect, useState } from "react";
@@ -8,6 +8,8 @@ import { RouteComponentProps, useLocation } from "react-router";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { FundingResultsBreadcrumb } from "../../components/Funding/FundingResultsBreadcrumb";
+import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
 import { ProviderFundingProfilingPatterns } from "../../components/Funding/ProviderFundingProfilingPatterns";
 import { ProviderFundingProfilingSummary } from "../../components/Funding/ProviderFundingProfilingSummary";
 import { ProviderFundingStreamHistory } from "../../components/Funding/ProviderFundingStreamHistory";
@@ -32,22 +34,18 @@ import { FundingLineProfile } from "../../types/FundingLineProfile";
 import { JobType } from "../../types/jobType";
 import { ProviderProfileTotalsForStreamAndPeriod } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import { ProviderTransactionSummary } from "../../types/ProviderSummary";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../types/Sections";
 
 export interface ProviderFundingOverviewRoute {
+  actionType: FundingActionType;
   specificationId: string;
   providerId: string;
   specCoreProviderVersionId?: string;
-  fundingStreamId: string;
-  fundingPeriodId: string;
 }
 
 export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderFundingOverviewRoute>) {
-  const specificationId = match.params.specificationId;
-  const providerId = match.params.providerId;
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specCoreProviderVersionId = match.params.specCoreProviderVersionId;
+  const { actionType, specificationId, providerId, specCoreProviderVersionId } = match.params;
   const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
     (state) => state.featureFlags
   );
@@ -58,6 +56,9 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
     addError({ error: err, description: "Error while loading specification" })
   );
+
+  const fundingStreamId = specification && specification.fundingStreams[0]?.id;
+  const fundingPeriodId = specification && specification.fundingPeriod?.id;
 
   const { providerVersion, isLoadingProviderVersion } = useProviderVersion(
     providerId,
@@ -87,9 +88,10 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
     AxiosError
   >(
     `provider-profiling-pattern-for-spec-${specificationId}-provider-${providerId}-stream-${fundingStreamId}`,
-    async () => (await getCurrentProfileConfigService(specificationId, providerId, fundingStreamId)).data,
+    async () =>
+      (await getCurrentProfileConfigService(specificationId, providerId, fundingStreamId as string)).data,
     {
-      enabled: featureFlagsState.profilingPatternVisible,
+      enabled: !!fundingStreamId && featureFlagsState.profilingPatternVisible,
       onError: (err) =>
         err.response?.status === 404
           ? addError({
@@ -112,10 +114,20 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
     AxiosError
   >(
     `provider-profile-for-stream-${fundingStreamId}-period-${fundingPeriodId}-provider-${providerId}`,
-    async () => (await getReleasedProfileTotalsService(fundingStreamId, fundingPeriodId, providerId)).data,
+    async () =>
+      (
+        await getReleasedProfileTotalsService(
+          fundingStreamId as string,
+          fundingPeriodId as string,
+          providerId
+        )
+      ).data,
     {
       enabled:
-        featureFlagsState.profilingPatternVisible !== undefined && !featureFlagsState.profilingPatternVisible,
+        !!fundingStreamId &&
+        !!fundingPeriodId &&
+        featureFlagsState.profilingPatternVisible !== undefined &&
+        !featureFlagsState.profilingPatternVisible,
       retry: 1,
       onError: (err) =>
         err.response?.status === 404
@@ -138,14 +150,17 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
   }, [location]);
 
   return (
-    <Main location={Section.Approvals}>
+    <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"Approvals"} />
-        <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
-        <Breadcrumb
-          name={"Funding approval results"}
-          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Funding Management" url={"/FundingManagement"} />
+        <FundingSelectionBreadcrumb actionType={actionType} />
+        <FundingResultsBreadcrumb
+          actionType={actionType}
+          specificationId={specificationId}
+          specificationName={specification?.name}
+          fundingPeriodId={fundingPeriodId}
+          fundingStreamId={fundingStreamId}
         />
         <Breadcrumb name={"Provider funding overview"} />
       </Breadcrumbs>
@@ -187,41 +202,45 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
                 {!featureFlagsState.profilingPatternVisible &&
                   !isLoadingSpecification &&
                   specification &&
+                  fundingStreamId &&
+                  fundingPeriodId &&
                   profileTotals &&
                   !isLoadingProfileTotals && (
                     <ProviderFundingProfilingSummary
-                      routeParams={match.params}
+                      {...match.params}
                       specification={specification}
                       profileTotals={profileTotals}
                     />
                   )}
                 {featureFlagsState.profilingPatternVisible &&
                   !isLoadingProfilingPatterns &&
+                  specification &&
                   profilingPatterns && (
                     <ProviderFundingProfilingPatterns
-                      routeParams={match.params}
+                      {...match.params}
+                      specification={specification}
                       profilingPatterns={profilingPatterns}
                     />
                   )}
               </Tabs.Panel>
               <Tabs.Panel label="calculations">
-                  {isLoadingSpecification && <LoadingFieldStatus title="Loading specification..." />}
-                  {specification && (
-                    <FundingLineResults
-                      specification={specification}
-                      providerId={providerId}
-                      addError={addError}
-                      jobTypes={[
-                        JobType.RefreshFundingJob,
-                        JobType.ApproveAllProviderFundingJob,
-                        JobType.ApproveBatchProviderFundingJob,
-                        JobType.PublishAllProviderFundingJob,
-                        JobType.PublishBatchProviderFundingJob,
-                        JobType.PublishedFundingUndoJob,
-                      ]}
-                      clearErrorMessages={clearErrorMessages}
-                    />
-                  )}
+                {isLoadingSpecification && <LoadingFieldStatus title="Loading specification..." />}
+                {specification && (
+                  <FundingLineResults
+                    specification={specification}
+                    providerId={providerId}
+                    addError={addError}
+                    jobTypes={[
+                      JobType.RefreshFundingJob,
+                      JobType.ApproveAllProviderFundingJob,
+                      JobType.ApproveBatchProviderFundingJob,
+                      JobType.PublishAllProviderFundingJob,
+                      JobType.PublishBatchProviderFundingJob,
+                      JobType.PublishedFundingUndoJob,
+                    ]}
+                    clearErrorMessages={clearErrorMessages}
+                  />
+                )}
               </Tabs.Panel>
             </Tabs>
           </div>

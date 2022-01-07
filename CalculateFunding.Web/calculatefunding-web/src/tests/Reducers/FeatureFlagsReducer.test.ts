@@ -14,6 +14,7 @@ describe("FeatureFlagsReducer", () => {
       releaseTimetableVisible: false,
       specToSpec: false,
       profilingPatternVisible: false,
+      enableNewFundingManagement: false,
     });
   });
 
@@ -26,6 +27,7 @@ describe("FeatureFlagsReducer", () => {
           profilingPatternVisible: false,
           specToSpec: false,
           enableReactQueryDevTool: false,
+          enableNewFundingManagement: false,
         },
         {
           type: FeatureFlagsActionTypes.GET_FEATUREFLAGS,
@@ -41,6 +43,7 @@ describe("FeatureFlagsReducer", () => {
       releaseTimetableVisible: false,
       specToSpec: false,
       profilingPatternVisible: false,
+      enableNewFundingManagement: false,
     });
   });
 });

@@ -50,6 +50,7 @@ describe("<Datasets /> ", () => {
         enableReactQueryDevTool: false,
         releaseTimetableVisible: false,
         templateBuilderVisible: false,
+        enableNewFundingManagement: false,
       },
     });
     await renderDatasets();
@@ -99,6 +100,7 @@ const hasReduxState = (mocks: {
       enableReactQueryDevTool: false,
       specToSpec: false,
       profilingPatternVisible: undefined,
+      enableNewFundingManagement: false,
     },
     fundingSearchSelection: { searchCriteria: undefined, selectedProviderIds: [] },
     userState: {

@@ -181,7 +181,7 @@ export function UploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps
 
   return (
     <div>
-      <Header location={Section.Approvals} />
+      <Header location={Section.FundingManagement} />
       <div className="govuk-width-container">
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">

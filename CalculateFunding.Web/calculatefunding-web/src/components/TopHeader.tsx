@@ -103,7 +103,9 @@ export const TopHeader = React.memo(function (props: { location: Section }) {
               <li
                 className={
                   "govuk-header__navigation-item" +
-                  (props.location === Section.Approvals ? " govuk-header__navigation-item--active" : "")
+                  (props.location === Section.FundingManagement
+                    ? " govuk-header__navigation-item--active"
+                    : "")
                 }
               >
                 <Link className="govuk-header__link" to="/Approvals/Select">

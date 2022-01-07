@@ -289,7 +289,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
 
   return (
     <div>
-      <Header location={Section.Approvals} />
+      <Header location={Section.FundingManagement} />
       <div className="govuk-width-container">
         {isPageLoading || isSaving ? (
           <LoadingStatus title={`${isPageLoading ? "Loading profile patterns" : "Saving profile pattern"}`} />

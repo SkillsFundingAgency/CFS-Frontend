@@ -10,6 +10,7 @@ const initialState: FeatureFlagsState = {
   enableReactQueryDevTool: false,
   specToSpec: false,
   profilingPatternVisible: undefined,
+  enableNewFundingManagement: false
 };
 
 function isFeatureEnabled(featureFlags: FeatureFlag[], targetFeature: FeatureFlagKey): boolean {
@@ -30,6 +31,7 @@ export const reduceFeatureFlagsState: Reducer<FeatureFlagsState, GetFeatureFlags
         enableReactQueryDevTool: isFeatureEnabled(action.payload, FeatureFlagKey.EnableReactQueryDevTool),
         profilingPatternVisible: isFeatureEnabled(action.payload, FeatureFlagKey.ProfilingPatternVisible),
         specToSpec: isFeatureEnabled(action.payload, FeatureFlagKey.SpecToSpec),
+        enableNewFundingManagement: isFeatureEnabled(action.payload, FeatureFlagKey.EnableNewFundingManagement),
       };
     default:
       return state;

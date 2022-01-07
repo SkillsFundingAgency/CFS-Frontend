@@ -4,6 +4,7 @@ export enum FeatureFlagKey {
   EnableReactQueryDevTool = "EnableReactQueryDevTool",
   ProfilingPatternVisible = "ProfilingPatternVisible",
   SpecToSpec = "SpecToSpec",
+  EnableNewFundingManagement = "EnableNewFundingManagement",
 }
 
 export interface FeatureFlag {

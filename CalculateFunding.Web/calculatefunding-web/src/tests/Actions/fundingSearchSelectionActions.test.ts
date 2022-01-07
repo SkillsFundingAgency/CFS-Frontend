@@ -48,6 +48,7 @@ const storeWithData: IStoreState = {
     releaseTimetableVisible: false,
     profilingPatternVisible: false,
     specToSpec: false,
+    enableNewFundingManagement: false,
   },
   fundingSearchSelection: {
     selectedProviderIds: [],

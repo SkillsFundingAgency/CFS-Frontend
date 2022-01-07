@@ -4,6 +4,6 @@ export enum Section {
   Datasets,
   Tests,
   Results,
-  Approvals,
+  FundingManagement,
   Templates,
 }

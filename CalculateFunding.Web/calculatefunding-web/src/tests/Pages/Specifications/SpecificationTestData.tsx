@@ -596,6 +596,7 @@ export function SpecificationTestData() {
         enableReactQueryDevTool: false,
         specToSpec: false,
         profilingPatternVisible: undefined,
+        enableNewFundingManagement: false,
       },
       fundingSearchSelection: { searchCriteria: undefined, selectedProviderIds: [] },
       userState: {

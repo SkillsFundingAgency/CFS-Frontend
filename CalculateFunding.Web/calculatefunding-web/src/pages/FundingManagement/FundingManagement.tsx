@@ -9,7 +9,7 @@ import { Section } from "../../types/Sections";
 
 export default function FundingManagement(): JSX.Element {
   return (
-    <Main location={Section.Approvals}>
+    <Main location={Section.FundingManagement}>
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Funding management"} />
@@ -30,9 +30,7 @@ export default function FundingManagement(): JSX.Element {
           </div>
           <div className="govuk-grid-column-one-third">
             <div className="govuk-heading-m">
-              <TextLink to="/FundingManagement/Release/Select">
-                Release management
-              </TextLink>
+              <TextLink to="/FundingManagement/Release/Select">Release management</TextLink>
             </div>
             <p className="govuk-body">Release allocations for statement of funding.</p>
           </div>
