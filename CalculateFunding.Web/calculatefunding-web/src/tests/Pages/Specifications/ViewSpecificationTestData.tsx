@@ -36,8 +36,6 @@ store.dispatch = jest.fn();
 export function ViewSpecificationTestData() {
     const useSelectorSpy = jest.spyOn(redux, "useSelector");
 
-    jest.mock("../../../components/AdminNav");
-
     jest.mock("react-redux", () => ({
         ...jest.requireActual("react-redux"),
         useSelector: jest.fn(() => ({

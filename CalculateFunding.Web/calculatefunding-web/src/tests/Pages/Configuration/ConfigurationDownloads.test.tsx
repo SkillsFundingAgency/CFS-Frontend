@@ -9,8 +9,6 @@ import { fakery } from "../../fakes/fakery";
 import { mockApiService } from "../../fakes/mockApiServices";
 import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
 
-jest.mock("../../../components/AdminNav");
-
 describe("<ConfigurationDownloads /> tests", () => {
   let getProfilePatternsSpy: jest.SpyInstance<Promise<unknown>>;
 

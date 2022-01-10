@@ -11,7 +11,6 @@ import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscri
 import { RunningStatus } from "../../../types/RunningStatus";
 
 export function UpdateDataSourceFileTestData() {
-  jest.mock("../../../components/AdminNav");
 
   const givenFormIsCompleted = async () => {
     const createNewVersionButton = await screen.findByTestId("update-datasource-new");

@@ -8,8 +8,6 @@ import { EditVariationPointsRouteProps } from "../../../pages/Specifications/Edi
 import * as profilingService from "../../../services/profilingService";
 import * as specificationService from "../../../services/specificationService";
 
-jest.mock("../../../components/AdminNav");
-
 describe("<EditVariationPoints />", () => {
   afterEach(() => {
     getProfileVariationPointersServiceSpy.mockReset();

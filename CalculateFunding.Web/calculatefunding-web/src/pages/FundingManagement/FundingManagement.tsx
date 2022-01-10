@@ -24,7 +24,7 @@ export default function FundingManagement(): JSX.Element {
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
             <div className="govuk-heading-m">
-              <TextLink to={"/FundingManagement/Approval/Selection"}>Funding approvals</TextLink>
+              <TextLink to={"/FundingManagement/Approve/Selection"}>Funding approvals</TextLink>
             </div>
             <p className="govuk-body">Approve allocations for funding.</p>
           </div>

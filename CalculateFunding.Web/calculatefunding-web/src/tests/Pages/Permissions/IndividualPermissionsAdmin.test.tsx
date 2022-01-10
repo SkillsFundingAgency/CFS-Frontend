@@ -23,6 +23,7 @@ describe("<IndividualPermissionsAdmin/>", () => {
         }),
       ];
       useSelectorSpy.mockReturnValue(permissions);
+      jest.unmock("../../../components/TopHeader");
 
       renderPage();
     });

@@ -1,13 +1,12 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import React from "react";
 import { MemoryRouter } from "react-router";
 
-import { SpecificationsList } from "../../../pages/Specifications/SpecificationsList";
 import { SpecificationListResults } from "../../../types/Specifications/SpecificationListResults";
 
 // ToDo: These tests need sorting properly so no errors occur
 jest.spyOn(global.console, "error").mockImplementation(() => jest.fn());
-jest.mock("../../../components/AdminNav");
+jest.mock("../../../components/Header");
 
 const mockSpecSearchResult: SpecificationListResults = {
   items: [
@@ -51,11 +50,6 @@ const mockSpecService = () => {
       ),
     };
   });
-};
-
-const hasCalledApi = async () => {
-  const { getAllSpecificationsService } = require("../../../services/specificationService");
-  await waitFor(() => expect(getAllSpecificationsService).toBeCalledTimes(1));
 };
 
 async function renderPage() {

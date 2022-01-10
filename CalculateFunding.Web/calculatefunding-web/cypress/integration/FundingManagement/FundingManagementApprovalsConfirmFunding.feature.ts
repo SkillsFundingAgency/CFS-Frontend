@@ -1736,7 +1736,7 @@ context("Funding management approval confirmation page", () => {
         });
 
 
-        cy.visit("/FundingManagementApprovalsConfirmFunding/DSG/FY-2021/4aeb22b6-50e1-48b6-9f53-613234b78a55/")
+        cy.visit("/FundingManagement/Approve/Confirm/DSG/FY-2021/4aeb22b6-50e1-48b6-9f53-613234b78a55/")
     });
 
     afterEach(() => {

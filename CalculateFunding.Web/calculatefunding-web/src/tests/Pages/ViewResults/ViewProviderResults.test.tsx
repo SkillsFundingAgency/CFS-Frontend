@@ -142,7 +142,6 @@ const providerResult: ProviderVersionQueryResult = {
 };
 jest.spyOn(providerVersionHook, "useProviderVersion").mockImplementation(() => providerResult);
 jest.spyOn(global.console, "error").mockImplementation(() => jest.fn());
-jest.mock("../../../components/AdminNav");
 
 const mockProviderService = () => {
   jest.mock("../../../services/providerService", () => {

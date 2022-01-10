@@ -11,7 +11,7 @@ context("Funding management release selection page", () => {
             return { status: 201 }
         })
 
-        cy.visit("/FundingManagementReleaseUploadBatch/GAG/AC-2122/84f7cc6c-648e-4947-82e6-22ee1776fa1b");
+        cy.visit("/FundingManagement/Release/UploadBatch/GAG/AC-2122/84f7cc6c-648e-4947-82e6-22ee1776fa1b");
     }
 
     before(() => setup());

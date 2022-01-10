@@ -18,7 +18,9 @@ export interface FundingManagementReleasePurposeProps {
   specificationId: string;
 }
 
-export const ReleasePurpose = ({ match }: RouteComponentProps<FundingManagementReleasePurposeProps>) => {
+export const FundingManagementReleasePurpose = ({
+  match,
+}: RouteComponentProps<FundingManagementReleasePurposeProps>) => {
   const history = useHistory();
   const fundingStreamId = match.params.fundingStreamId;
   const fundingPeriodId = match.params.fundingPeriodId;

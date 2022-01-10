@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../actions/FundingSearchSelectionActions";
 import { IStoreState } from "../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import { BackToTop } from "../BackToTop";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
@@ -126,6 +127,7 @@ export function FundingManagementApprovalResults(props: FundingManagementApprova
             {props.providerSearchResults.providers.map((provider, i) => (
               <PublishedProviderRow
                 key={`provider-${i}`}
+                actionType={FundingActionType.Approve}
                 publishedProvider={provider}
                 specCoreProviderVersionId={props.specCoreProviderVersionId}
                 enableSelection={props.enableBatchSelection}

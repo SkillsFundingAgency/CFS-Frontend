@@ -1,3 +1,4 @@
+/* eslint-disable no-undef, no-alert, no-console, @typescript-eslint/no-empty-function */
 import "@testing-library/jest-dom/extend-expect";
 
 import MutationObserver from "@sheerun/mutationobserver-shim";
@@ -32,3 +33,7 @@ global.console.error = function (...args) {
   error(message);
   throw new Error(message);
 };
+
+// mock these by default to avoid having to mock the redux provider in every page test
+jest.mock("./components/TopHeader");
+jest.mock("./components/AdminNav");

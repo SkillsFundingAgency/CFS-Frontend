@@ -186,7 +186,6 @@ const specResult = (spec: SpecificationSummary): SpecificationSummaryQueryResult
 const hasSpecification = (spec: SpecificationSummary) =>
   jest.spyOn(specHook, "useSpecificationSummary").mockImplementation(() => specResult(spec));
 
-jest.mock("../../../components/AdminNav");
 jest.mock("../../../components/fundingLineStructure/FundingLineResults");
 jest.mock("../../../components/Calculations/AdditionalCalculations");
 jest.mock("../../../components/Reports/DownloadableReports");

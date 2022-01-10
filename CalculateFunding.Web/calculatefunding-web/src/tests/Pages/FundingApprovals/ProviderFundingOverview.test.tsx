@@ -19,8 +19,6 @@ import { ProviderDataTrackingMode } from "../../../types/Specifications/Provider
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
-jest.mock("../../../components/AdminNav");
-
 jest.mock("../../../services/fundingLineDetailsService", () => ({
   getCurrentProfileConfigService: jest.fn(),
 }));

@@ -34,7 +34,6 @@ store.dispatch = jest.fn();
 
 export function SpecificationTestData() {
   const useSelectorSpy = jest.spyOn(redux, "useSelector");
-  jest.mock("../../../components/AdminNav");
 
   const renderCreateSpecificationPage = async () => {
     const { CreateSpecification } = require("../../../pages/Specifications/CreateSpecification");

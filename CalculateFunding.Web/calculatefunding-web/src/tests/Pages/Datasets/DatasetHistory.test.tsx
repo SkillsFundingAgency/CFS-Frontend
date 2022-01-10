@@ -21,7 +21,7 @@ const mockRoute: match<DatasetHistoryRouteProps> = {
   path: "",
   isExact: true,
 };
-jest.mock("../../../components/AdminNav");
+
 const renderPage = () => {
   const { DatasetHistory } = require("../../../pages/Datasets/DatasetHistory");
   return render(

@@ -1,9 +1,16 @@
 ﻿import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+import { IStoreState } from "../reducers/rootReducer";
+import { FeatureFlagsState } from "../states/FeatureFlagsState";
 import { Section } from "../types/Sections";
 
 export const TopHeader = React.memo(function (props: { location: Section }) {
+  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
+    (state) => state.featureFlags
+  );
+
   const windowLocation = window.location.href;
   let environment = "";
 
@@ -108,9 +115,15 @@ export const TopHeader = React.memo(function (props: { location: Section }) {
                     : "")
                 }
               >
-                <Link className="govuk-header__link" to="/Approvals/Select">
-                  Funding approvals
-                </Link>
+                {featureFlagsState.enableNewFundingManagement ? (
+                  <Link className="govuk-header__link" to="/FundingManagement">
+                    Funding management
+                  </Link>
+                ) : (
+                  <Link className="govuk-header__link" to="/Approvals/Select">
+                    Funding approvals
+                  </Link>
+                )}
               </li>
               <li
                 className={

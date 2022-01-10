@@ -34,8 +34,6 @@ function renderPage() {
   );
 }
 
-jest.mock("../../../components/AdminNav");
-
 describe("<CreateAdditionalCalculation> tests", () => {
   describe("<CreateAdditionalCalculation> when user builds invalid source code", () => {
     beforeEach(() => {

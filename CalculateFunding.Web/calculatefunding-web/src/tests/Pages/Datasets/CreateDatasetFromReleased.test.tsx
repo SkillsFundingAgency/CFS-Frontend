@@ -26,8 +26,6 @@ const mockHistoryPush = jest.fn();
 const location = createLocation("", "", "");
 const store: Store<IStoreState> = createStore(rootReducer);
 
-jest.mock("../../../components/AdminNav");
-
 jest.mock("react-router", () => ({
   ...jest.requireActual("react-router"),
   useHistory: () => ({

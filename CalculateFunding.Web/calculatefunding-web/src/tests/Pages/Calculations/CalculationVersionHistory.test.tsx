@@ -22,7 +22,6 @@ import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
 const history = createBrowserHistory();
 const location = createLocation("", "", "", { search: "", pathname: "", hash: "", key: "", state: "" });
-jest.mock("../../../components/AdminNav");
 
 function renderPage() {
   const { CalculationVersionHistory } = require("../../../pages/Calculations/CalculationVersionHistory");

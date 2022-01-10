@@ -9,8 +9,6 @@ import { SelectSpecificationForExport } from "../../../pages/Datasets/SqlDataExp
 import { fakery } from "../../fakes/fakery";
 import { mockApiService } from "../../fakes/mockApiServices";
 
-jest.mock("../../../components/AdminNav");
-
 describe("<SelectSpecificationForExport /> tests", () => {
   let getFundingStreamsSpy: jest.SpyInstance<Promise<unknown>>;
   let getFundingPeriodsSpy: jest.SpyInstance<Promise<unknown>>;

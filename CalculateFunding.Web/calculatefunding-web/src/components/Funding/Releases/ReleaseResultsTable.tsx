@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../../actions/FundingSearchSelectionActions";
 import { IStoreState } from "../../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { PublishedProviderSearchResults } from "../../../types/PublishedProvider/PublishedProviderSearchResults";
 import { BackToTop } from "../../BackToTop";
 import { FormattedNumber, NumberType } from "../../FormattedNumber";
 import { NoData } from "../../NoData";
 import { Pagination } from "../../Pagination";
-import { PublishedProviderRow } from "./PublishedProviderRow";
+import { PublishedProviderRow } from "../PublishedProviderRow";
 
 
 export interface ReleaseResultsTableProps {
@@ -128,6 +129,7 @@ export function ReleaseResultsTable(props: ReleaseResultsTableProps) {
             {props.providerSearchResults.providers.map((provider, i) => (
               <PublishedProviderRow
                 key={`provider-${i}`}
+                actionType={FundingActionType.Release}
                 publishedProvider={provider}
                 specCoreProviderVersionId={props.specCoreProviderVersionId}
                 enableSelection={props.enableBatchSelection}

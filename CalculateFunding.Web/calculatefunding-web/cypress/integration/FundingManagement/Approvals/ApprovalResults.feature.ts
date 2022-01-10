@@ -467,10 +467,7 @@ server.get(`specs/specification-summary-by-id/${specificationId}`, () =>{
             return [];
         })
 
-
-
-
-        cy.visit(`/FundingManagement/Approvals/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`);
+        cy.visit(`/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`);
     }
 
     describe("when page has loaded ", () => {

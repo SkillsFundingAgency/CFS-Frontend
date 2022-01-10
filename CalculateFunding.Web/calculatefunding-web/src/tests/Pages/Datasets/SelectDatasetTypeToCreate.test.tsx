@@ -20,7 +20,6 @@ const mockHistory = { push: jest.fn() };
 const location = createLocation("", "", "");
 const store: Store<IStoreState> = createStore(rootReducer);
 
-jest.mock("../../../components/AdminNav");
 const fundingStream1: FundingStream = {
   name: "WIZZ1",
   id: "Wizard Training Scheme",

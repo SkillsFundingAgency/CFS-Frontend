@@ -40,7 +40,9 @@ export interface ReleaseResultsProps {
   specificationId: string;
 }
 
-export const ReleaseResults = ({ match }: RouteComponentProps<ReleaseResultsProps>): JSX.Element => {
+export const FundingManagementReleaseProviderSearch = ({
+  match,
+}: RouteComponentProps<ReleaseResultsProps>): JSX.Element => {
   const fundingStreamId = match.params.fundingStreamId;
   const fundingPeriodId = match.params.fundingPeriodId;
   const specificationId = match.params.specificationId;

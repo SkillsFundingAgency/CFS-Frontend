@@ -11,7 +11,6 @@ import { ProfileHistoryProps } from "../../../pages/FundingApprovals/ProfileHist
 import { FundingLineChangeViewModel } from "../../../types/PublishedProvider/FundingLineProfile";
 
 const useQuerySpy = jest.spyOn(ReactQuery, "useQuery");
-jest.mock("../../../components/AdminNav");
 
 describe("<ProfileHistory />", () => {
   afterAll(() => {

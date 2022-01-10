@@ -25,7 +25,6 @@ const store: Store<IStoreState> = createStore(rootReducer);
 store.dispatch = jest.fn();
 
 export const FundingApprovalTestSetup = () => {
-  jest.mock("../../../components/AdminNav");
   const fundingStream1: FundingStream = {
     name: "WIZZ1",
     id: "Wizard Training Scheme",

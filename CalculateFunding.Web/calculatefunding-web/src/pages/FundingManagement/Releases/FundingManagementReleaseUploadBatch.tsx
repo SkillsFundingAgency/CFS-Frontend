@@ -5,23 +5,23 @@ import { useDispatch } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
-import * as actions from "../../actions/FundingSearchSelectionActions";
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
-import { Main } from "../../components/Main";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
-import { useErrors } from "../../hooks/useErrors";
-import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import * as publishedProviderService from "../../services/publishedProviderService";
-import { HistoryPage } from "../../types/HistoryPage";
-import { JobCreatedResponse } from "../../types/JobCreatedResponse";
-import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../types/jobType";
-import { BatchUploadResponse } from "../../types/PublishedProvider/BatchUploadResponse";
-import { BatchValidationRequest } from "../../types/PublishedProvider/BatchValidationRequest";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { Section } from "../../types/Sections";
+import * as actions from "../../../actions/FundingSearchSelectionActions";
+import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
+import { Main } from "../../../components/Main";
+import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
+import { useErrors } from "../../../hooks/useErrors";
+import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
+import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
+import * as publishedProviderService from "../../../services/publishedProviderService";
+import { HistoryPage } from "../../../types/HistoryPage";
+import { JobCreatedResponse } from "../../../types/JobCreatedResponse";
+import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
+import { JobType } from "../../../types/jobType";
+import { BatchUploadResponse } from "../../../types/PublishedProvider/BatchUploadResponse";
+import { BatchValidationRequest } from "../../../types/PublishedProvider/BatchValidationRequest";
+import { Section } from "../../../types/Sections";
 
 export interface UploadBatchRouteProps {
   fundingStreamId: string;
@@ -29,7 +29,7 @@ export interface UploadBatchRouteProps {
   specificationId: string;
 }
 
-export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
+export function FundingManagementReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
   const fundingStreamId = match.params.fundingStreamId;
   const fundingPeriodId = match.params.fundingPeriodId;
   const specificationId = match.params.specificationId;
@@ -39,7 +39,6 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
   const [batchId, setBatchId] = useState<string | undefined>();
   const [isUpdating, setIsUpdating] = useState<boolean>();
   const [isWaitingForJob, setIsWaitingForJob] = useState<boolean>();
-  const [actionType, setActionType] = useState<FundingActionType | undefined>();
   const history = useHistory();
   const dispatch = useDispatch();
   const { errors, addError, clearErrorMessages } = useErrors();
@@ -47,6 +46,12 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
     title: "Upload batch file",
     path: history.location.pathname,
   };
+
+  const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
+    fundingStreamId,
+    fundingPeriodId,
+    (err) => addError({ error: err, description: "Error while loading funding configuration" })
+  );
 
   const { addSub, results: jobNotifications } = useJobSubscription({
     isEnabled: true,
@@ -139,7 +144,6 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
   const uploadForApprove = async () => {
     setIsUpdating(true);
     clearErrorMessages();
-    setActionType(FundingActionType.Approve);
     await uploadBatchFile(theFile as File);
   };
 
@@ -160,10 +164,21 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
       dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
-      history.push(
-        `/FundingManagementApprovalsConfirmFunding/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${actionType}`,
-        { previousPage: currentPage }
-      );
+      if (
+        fundingConfiguration !== undefined &&
+        fundingConfiguration.releaseChannels !== undefined &&
+        fundingConfiguration.releaseChannels.length > 1
+      ) {
+        history.push(
+          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
+          { previousPage: currentPage }
+        );
+      } else {
+        history.push(
+          `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
+          { previousPage: currentPage }
+        );
+      }
     }
   }, [jobNotifications, publishedProviderIds]);
 
@@ -183,6 +198,7 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
   const isValidatingOrUploading =
     isUpdating ||
     isUploadingBatchFile ||
+    isLoadingFundingConfiguration ||
     isCreatingValidationJob ||
     isWaitingForJob ||
     hasUsersValidationJobActive;
@@ -194,7 +210,7 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
           <Breadcrumbs>
             <Breadcrumb name="Calculate funding" url="/" />
             <Breadcrumb name="Funding management" url="/FundingManagement" />
-            <Breadcrumb name="Funding approvals" url="/FundingManagementApprovalSelection" />
+            <Breadcrumb name="Release management" url="/FundingManagementReleaseSelection" />
             <Breadcrumb name={currentPage.title} />
           </Breadcrumbs>
         </div>
@@ -292,12 +308,12 @@ export function FundingManagementApprovalsUploadBatch({ match }: RouteComponentP
               disabled={fileName.length === 0 || isBlocked}
               data-module="govuk-button"
             >
-              Approve funding
+              Continue
             </button>
             <Link
               className="govuk-button govuk-button--secondary"
               data-module="govuk-button"
-              to={"/Approvals/Select"}
+              to={"/FundingManagementReleaseSelection"}
             >
               Cancel
             </Link>

@@ -5,43 +5,35 @@ import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
-import { initialiseFundingSearchSelection } from "../../actions/FundingSearchSelectionActions";
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { ConfirmationModal } from "../../components/ConfirmationModal";
-import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { PublishedProviderResults } from "../../components/Funding/PublishedProviderResults";
-import { PublishedProviderSearchFilters } from "../../components/Funding/PublishedProviderSearchFilters";
-import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
-import { LoadingNotification, LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
-import { Main } from "../../components/Main";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { PermissionStatus } from "../../components/PermissionStatus";
-import { activeJobs, getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
-import { usePublishedProviderErrorSearch } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
-import { usePublishedProviderSearch } from "../../hooks/FundingApproval/usePublishedProviderSearch";
-import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
-import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
-import { useErrors } from "../../hooks/useErrors";
-import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
-import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import { IStoreState } from "../../reducers/rootReducer";
-import { getLatestSuccessfulJob } from "../../services/jobService";
-import * as publishService from "../../services/publishService";
-import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
-import { ApprovalMode } from "../../types/ApprovalMode";
-import { JobDetails } from "../../types/jobDetails";
-import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../types/jobType";
-import { Permission } from "../../types/Permission";
-import { Section } from "../../types/Sections";
+import { initialiseFundingSearchSelection } from "../../../actions/FundingSearchSelectionActions";
+import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { ConfirmationModal } from "../../../components/ConfirmationModal";
+import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
+import { ApprovalResultsTable } from "../../../components/Funding/Approvals/ApprovalResultsTable";
+import { PublishedProviderSearchFilters } from "../../../components/Funding/PublishedProviderSearchFilters";
+import { LoadingStatus } from "../../../components/LoadingStatus";
+import { Main } from "../../../components/Main";
+import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
+import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
+import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
+import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
+import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
+import { useErrors } from "../../../hooks/useErrors";
+import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
+import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
+import { IStoreState } from "../../../reducers/rootReducer";
+import { getLatestSuccessfulJob } from "../../../services/jobService";
+import * as publishService from "../../../services/publishService";
+import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
+import { ApprovalMode } from "../../../types/ApprovalMode";
+import { JobDetails } from "../../../types/jobDetails";
+import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
+import { JobType } from "../../../types/jobType";
+import { Permission } from "../../../types/Permission";
+import { Section } from "../../../types/Sections";
+import { FundingManagementApprovalResultsProps } from "../FundingManagementApprovalResults";
 
-export interface FundingManagementApprovalResultsProps {
-  fundingStreamId: string;
-  fundingPeriodId: string;
-  specificationId: string;
-}
-
-export const FundingManagementApprovalResults = ({
+export const ApprovalResultsDUPLICATE = ({
   match,
 }: RouteComponentProps<FundingManagementApprovalResultsProps>): JSX.Element => {
   const fundingStreamId = match.params.fundingStreamId;
@@ -125,6 +117,7 @@ export const FundingManagementApprovalResults = ({
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
+  const [selectAll, setSelectAll] = useState<boolean>(false);
   const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const hasPermissionToRefresh: boolean = useMemo(
     () => hasPermission && !!hasPermission(Permission.CanRefreshFunding),
@@ -294,114 +287,70 @@ export const FundingManagementApprovalResults = ({
 
   const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh || hasActiveActionJobs;
 
+  function handleToggleAllProviders() {
+    return undefined;
+  }
+
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
-        <Breadcrumb name={"Funding approvals"} url={"/FundingManagementApprovalSelection"} />
+        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Funding management" url={"/FundingManagement"} />
+        <Breadcrumb name="Funding approvals" url={"/FundingManagementApprovalSelection"} />
         <Breadcrumb name={specification?.fundingStreams[0].name ?? ""} />
       </Breadcrumbs>
 
-      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
-
-      <MultipleErrorSummary errors={errors} specificationId={specificationId} />
-
-      {!isLoading && !activeActionJobs?.length && (
-        <JobNotificationSection
-          jobNotifications={jobNotifications}
-          notificationSettings={[
-            {
-              jobTypes: [
-                JobType.CreateInstructAllocationJob,
-                JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-                JobType.GenerateGraphAndInstructAllocationJob,
-              ],
-              showActive: true,
-              showFailed: true,
-              showSuccessful: false,
-              activeDescription: "Calculation run in progress",
-              failDescription: "Calculation run failed",
-            },
-            {
-              jobTypes: [
-                JobType.RefreshFundingJob,
-                JobType.ApproveAllProviderFundingJob,
-                JobType.ApproveBatchProviderFundingJob,
-                JobType.PublishBatchProviderFundingJob,
-                JobType.PublishAllProviderFundingJob,
-                JobType.ReIndexPublishedProvidersJob,
-              ],
-              showActive: false, // we show a spinner separately
-              showFailed: true,
-              showSuccessful: true,
-            },
-          ]}
-        />
-      )}
-
-      {!isLoadingSpecification && specification && (
-        <div className="govuk-grid-row govuk-!-margin-bottom-5">
-          <div className="govuk-grid-column-two-thirds">
-            <h1 className="govuk-heading-xl govuk-!-margin-bottom-1" data-testid="specName">
-              {specification.name}
-            </h1>
-            {specification?.fundingStreams?.length > 0 && specification?.fundingPeriod?.name && (
-              <span className="govuk-caption-l" data-testid="fundingDetails">
-                {specification.fundingStreams[0].name} for {specification && specification.fundingPeriod.name}
-              </span>
-            )}
-          </div>
-          <div className="govuk-grid-column-one-third">
-            <ul className="govuk-list right-align">
-              <li>
-                <Link className={"govuk-link"} to={`/ViewSpecification/${specification?.id}`}>
-                  Manage specification
-                </Link>
-              </li>
-              {fundingConfiguration && fundingConfiguration.approvalMode === ApprovalMode.Batches && (
-                <li>
-                  <Link
-                    className="govuk-link govuk-link--no-visited-state"
-                    to={`/Approvals/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-                  >
-                    Upload batch file of providers
-                  </Link>
-                </li>
-              )}
-              <li>
-                <Link
-                  className="govuk-link govuk-link--no-visited-state"
-                  to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}
-                >
-                  Specification reports
-                </Link>
-              </li>
-              <li>
-                <button
-                  className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
-                  disabled={disableRefresh}
-                  onClick={handleRefresh}
-                >
-                  Refresh funding
-                </button>
-              </li>
-
-              {lastRefresh && (
-                <p className="govuk-body-s govuk-!-margin-bottom-0">
-                  Last refresh <DateTimeFormatter date={lastRefresh as Date} />
-                </p>
-              )}
-            </ul>
-          </div>
+      <div className="govuk-grid-row govuk-!-margin-bottom-5">
+        <div className="govuk-grid-column-two-thirds">
+          <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification?.name}</h1>
+          {specification && specification?.fundingStreams?.length > 0 && specification?.fundingPeriod?.name && (
+            <h2 className="govuk-caption-l">
+              {specification.fundingStreams[0].name} for {specification && specification.fundingPeriod.name}
+            </h2>
+          )}
         </div>
-      )}
+        <div className="govuk-grid-column-one-third">
+          <ul className="govuk-list right-align">
+            <li>
+              <Link className={"govuk-link"} to={`/ViewSpecification/${specification?.id}`}>
+                Manage specification
+              </Link>
+            </li>
+            <li>
+              <Link
+                className="govuk-link govuk-link--no-visited-state"
+                to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}
+              >
+                Specification reports
+              </Link>
+            </li>
+            <li>
+              <Link to="/">Approve batch of providers</Link>
+            </li>
 
+            <li>
+              <Link to="/">Release management</Link>
+            </li>
+            <li>
+              <button
+                className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
+                disabled={disableRefresh}
+                onClick={handleRefresh}
+              >
+                Refresh funding
+              </button>
+            </li>
+
+            {lastRefresh && (
+              <p className="govuk-body-s govuk-!-margin-bottom-0">
+                Last refresh <DateTimeFormatter date={lastRefresh as Date} />
+              </p>
+            )}
+          </ul>
+        </div>
+      </div>
       <div className="govuk-grid-row">
-        <div
-          className="govuk-grid-column-one-third"
-          hidden={hasActiveActionJobs || isLoadingRefresh || !publishedProviderSearchResults}
-        >
+        <div className="govuk-grid-column-one-third">
           <PublishedProviderSearchFilters
             facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
             numberOfProvidersWithErrors={0}
@@ -409,95 +358,32 @@ export const FundingManagementApprovalResults = ({
           />
         </div>
         <div className="govuk-grid-column-two-thirds">
-          {(isLoading || hasActiveActionJobs) && (
-            <div>
-              <LoadingStatusNotifier
-                notifications={[
-                  {
-                    isActive: isLoadingSpecification,
-                    title: "Loading specification...",
-                    description: "Updating, please wait",
-                  },
-                  {
-                    isActive: isLoadingRefresh,
-                    title: "Requesting refresh of funding...",
-                    description: "Updating, please wait",
-                  },
-                  ...activeActionJobs.map<LoadingNotification>((job) => {
-                    return {
-                      title: `Job ${job.statusDescription}: ${job.jobDescription}`,
-                      description: job.isActive
-                        ? "Monitoring job progress. Please wait, this could take several minutes"
-                        : "",
-                    };
-                  }),
-                  {
-                    isActive: isLoadingSearchResults,
-                    title: "Loading provider funding data...",
-                  },
-                  {
-                    isActive: isLoadingFundingConfiguration,
-                    title: "Loading funding configuration...",
-                  },
-                ]}
-              />
-            </div>
-          )}
-          {!hasActiveActionJobs &&
-            !isLoadingRefresh &&
-            !isLoadingSearchResults &&
-            !isLoadingSpecification &&
-            specification && (
-              <PublishedProviderResults
-                specificationId={specificationId}
-                fundingStreamId={fundingStreamId}
-                fundingPeriodId={fundingPeriodId}
-                specCoreProviderVersionId={specification.providerVersionId}
-                enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
-                providerSearchResults={publishedProviderSearchResults}
-                canRefreshFunding={hasPermissionToRefresh}
-                canApproveFunding={hasPermissionToApprove}
-                canReleaseFunding={false}
-                totalResults={
-                  publishedProviderIds
-                    ? publishedProviderIds.length
-                    : publishedProviderSearchResults
-                    ? publishedProviderSearchResults.totalResults
-                    : 0
-                }
-                allPublishedProviderIds={publishedProviderIds}
-                setIsLoadingRefresh={setIsLoadingRefresh}
-                addError={addErrorMessage}
-                clearErrorMessages={clearErrorMessages}
-              />
-            )}
-        </div>
-      </div>
-
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-full right-align">
-          <div className="right-align">
-            <button
-              className="govuk-button govuk-!-margin-right-1"
-              disabled={disableRefresh}
-              onClick={handleRefresh}
-            >
-              Refresh funding
-            </button>
-            <button
-              className="govuk-button"
-              disabled={
-                hasActiveActionJobs ||
-                !publishedProviderSearchResults?.canApprove ||
-                !hasPermissionToApprove ||
-                isLoadingRefresh ||
-                blockActionBasedOnProviderErrors
+          {isLoading ? (
+            <LoadingStatus title={"Loading provider results"} />
+          ) : (
+            <ApprovalResultsTable
+              specificationId={specificationId}
+              fundingStreamId={fundingStreamId}
+              fundingPeriodId={fundingPeriodId}
+              specCoreProviderVersionId={specification?.providerVersionId}
+              enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
+              providerSearchResults={publishedProviderSearchResults}
+              canRefreshFunding={hasPermissionToRefresh}
+              canApproveFunding={hasPermissionToApprove}
+              canReleaseFunding={false}
+              totalResults={
+                publishedProviderIds
+                  ? publishedProviderIds.length
+                  : publishedProviderSearchResults
+                  ? publishedProviderSearchResults.totalResults
+                  : 0
               }
-              onClick={handleApprove}
-            >
-              Approve funding
-            </button>
-          </div>
+              allPublishedProviderIds={publishedProviderIds}
+              setIsLoadingRefresh={setIsLoadingRefresh}
+              addError={addErrorMessage}
+              clearErrorMessages={clearErrorMessages}
+            />
+          )}
         </div>
       </div>
     </Main>

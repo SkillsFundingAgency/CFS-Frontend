@@ -8,8 +8,6 @@ import { MemoryRouter } from "react-router";
 import * as policyService from "../../../services/policyService";
 import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
 
-jest.mock("../../../components/AdminNav");
-
 describe("<ViewProvidersFundingStreamSelection />", () => {
   it("renders funding streams in autocomplete drop-down", async () => {
     await renderPage();

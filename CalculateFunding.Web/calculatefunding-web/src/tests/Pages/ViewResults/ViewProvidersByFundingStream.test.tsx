@@ -2,9 +2,6 @@ import { render, waitFor } from "@testing-library/react";
 import React from "react";
 import { MemoryRouter, Route, Switch } from "react-router";
 
-import { getFundingStreamByIdService } from "../../../services/policyService";
-import { getProvidersByFundingStreamService } from "../../../services/providerService";
-
 function renderComponent() {
   const { ViewProvidersByFundingStream } = require("../../../pages/ViewResults/ViewProvidersByFundingStream");
   return render(
@@ -18,7 +15,6 @@ function renderComponent() {
     </MemoryRouter>
   );
 }
-jest.mock("../../../components/AdminNav");
 
 function mockPolicyService() {
   const policyService = jest.requireActual("../../../services/policyService");

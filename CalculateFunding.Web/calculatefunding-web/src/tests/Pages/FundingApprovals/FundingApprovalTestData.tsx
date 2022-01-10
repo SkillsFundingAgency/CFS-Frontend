@@ -43,7 +43,6 @@ import {
 } from "../../fakes/testFactories";
 
 export function FundingApprovalTestData() {
-  jest.mock("../../../components/AdminNav");
 
   const fundingStream: FundingStream = {
     name: "FS123",

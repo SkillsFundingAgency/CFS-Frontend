@@ -21,7 +21,6 @@ import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../../types/viewFundingTypes";
 
 jest.spyOn(global.console, "info").mockImplementation(() => jest.fn());
-jest.mock("../../../components/AdminNav");
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");

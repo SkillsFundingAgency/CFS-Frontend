@@ -55,7 +55,6 @@ const mockSpecification = () =>
     isFetchingSpecification: false,
     isSpecificationFetched: true,
   }));
-jest.mock("../../../components/AdminNav");
 
 describe("<ViewSpecificationResults /> with failed CSV Generate job  ", () => {
   it("renders error notification badge", async () => {

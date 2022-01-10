@@ -22,7 +22,7 @@ export const FundingResultsBreadcrumb = ({
       actionType === FundingActionType.Release
         ? `/FundingManagement/Release/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
         : actionType === FundingActionType.Approve
-        ? `/FundingManagementApprovalResults/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
+        ? `/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
         : ""
     }
   />

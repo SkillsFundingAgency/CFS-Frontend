@@ -9,7 +9,7 @@ export const FundingSelectionBreadcrumb = ({ actionType }: { actionType: Funding
     url={
       actionType === FundingActionType.Release
         ? "/FundingManagement/Release/Select"
-        : "/FundingManagement/Approval/Selection"
+        : "/FundingManagement/Approve/Selection"
     }
   />
 );

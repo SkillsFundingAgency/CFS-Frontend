@@ -42,7 +42,7 @@ export interface FundingManagementApprovalsConfirmFundingRouteProps {
   mode: FundingActionType;
 }
 
-export function FundingManagementApprovalsConfirmFunding({
+export function FundingManagementApprovalConfirm({
   match,
 }: RouteComponentProps<FundingManagementApprovalsConfirmFundingRouteProps>) {
   const history = useHistory();
@@ -55,7 +55,7 @@ export function FundingManagementApprovalsConfirmFunding({
       ? (history.location.state as any).previousPage
       : {
           title: "Funding approval results",
-          path: `/FundingManagementApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`,
+          path: `/FundingManagement/Approve/Results/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`,
         };
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
@@ -193,7 +193,7 @@ export function FundingManagementApprovalsConfirmFunding({
         if (latestJob.isSuccessful) {
           clearFundingSearchSelection();
           history.push(
-            `/FundingManagementApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`
+            `/FundingManagement/Approve/Results/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`
           );
         }
       }
@@ -257,7 +257,7 @@ export function FundingManagementApprovalsConfirmFunding({
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
         <Breadcrumb name="Funding approvals" url={"/FundingManagementApprovalSelection"} />
         <Breadcrumb
-          url={`/FundingManagementApprovalResults/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`}
+          url={`/FundingManagement/Approve/Results/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`}
           name={specification?.fundingStreams[0].name ?? ""}
         />
         <Breadcrumb name={"Confirm funding"} />

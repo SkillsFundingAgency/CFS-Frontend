@@ -75,7 +75,6 @@ const renderPageAndWaitUntilLoaded = async () => {
 };
 
 const useSelectorSpy = jest.spyOn(redux, "useSelector");
-jest.mock("../../../components/AdminNav");
 const config = setupTestConfig();
 
 describe("<ConfirmFunding />", () => {

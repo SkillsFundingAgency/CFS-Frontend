@@ -60,8 +60,8 @@ export function FundingManagementApprovalSelection(): JSX.Element {
 
     history.push(
       batchUpload
-        ? `/FundingManagementApprovalsUploadBatch/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
-        : `/FundingManagement/Approvals/Results/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
+        ? `/FundingManagement/Approve/UploadBatch/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
+        : `/FundingManagement/Approve/Results/${selectedFundingStream.id}/${selectedFundingPeriod.id}/${selectedFundingPeriod.specifications[0].id}`
     );
   };
 

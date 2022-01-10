@@ -9,7 +9,7 @@ context("Funding management approval selection page", () => {
         // @ts-ignore
         server = makeServer("test");
 
-        cy.visit("/FundingManagementApprovalSelection");
+        cy.visit("/FundingManagement/Approve/Selection");
     });
 
     after(() => {

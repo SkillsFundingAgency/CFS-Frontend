@@ -5,24 +5,23 @@ import { useDispatch } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
-import * as actions from "../../../actions/FundingSearchSelectionActions";
-import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
-import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
-import { Main } from "../../../components/Main";
-import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
-import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
-import { useErrors } from "../../../hooks/useErrors";
-import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
-import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
-import * as publishedProviderService from "../../../services/publishedProviderService";
-import { HistoryPage } from "../../../types/HistoryPage";
-import { JobCreatedResponse } from "../../../types/JobCreatedResponse";
-import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../../types/jobType";
-import { BatchUploadResponse } from "../../../types/PublishedProvider/BatchUploadResponse";
-import { BatchValidationRequest } from "../../../types/PublishedProvider/BatchValidationRequest";
-import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
-import { Section } from "../../../types/Sections";
+import * as actions from "../../actions/FundingSearchSelectionActions";
+import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
+import { Main } from "../../components/Main";
+import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
+import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import { useErrors } from "../../hooks/useErrors";
+import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
+import * as publishedProviderService from "../../services/publishedProviderService";
+import { HistoryPage } from "../../types/HistoryPage";
+import { JobCreatedResponse } from "../../types/JobCreatedResponse";
+import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
+import { JobType } from "../../types/jobType";
+import { BatchUploadResponse } from "../../types/PublishedProvider/BatchUploadResponse";
+import { BatchValidationRequest } from "../../types/PublishedProvider/BatchValidationRequest";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import { Section } from "../../types/Sections";
 
 export interface UploadBatchRouteProps {
   fundingStreamId: string;
@@ -30,7 +29,7 @@ export interface UploadBatchRouteProps {
   specificationId: string;
 }
 
-export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
+export function FundingManagementApprovalUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
   const fundingStreamId = match.params.fundingStreamId;
   const fundingPeriodId = match.params.fundingPeriodId;
   const specificationId = match.params.specificationId;
@@ -48,12 +47,6 @@ export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRou
     title: "Upload batch file",
     path: history.location.pathname,
   };
-
-  const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
-    fundingStreamId,
-    fundingPeriodId,
-    (err) => addError({ error: err, description: "Error while loading funding configuration" })
-  );
 
   const { addSub, results: jobNotifications } = useJobSubscription({
     isEnabled: true,
@@ -167,21 +160,10 @@ export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRou
       dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
-      if (
-        fundingConfiguration !== undefined &&
-        fundingConfiguration.releaseChannels !== undefined &&
-        fundingConfiguration.releaseChannels.length > 1
-      ) {
-        history.push(
-          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
-          { previousPage: currentPage }
-        );
-      } else {
-        history.push(
-          `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
-          { previousPage: currentPage }
-        );
-      }
+      history.push(
+        `/FundingManagement/Approve/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/${actionType}`,
+        { previousPage: currentPage }
+      );
     }
   }, [jobNotifications, publishedProviderIds]);
 
@@ -201,7 +183,6 @@ export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRou
   const isValidatingOrUploading =
     isUpdating ||
     isUploadingBatchFile ||
-    isLoadingFundingConfiguration ||
     isCreatingValidationJob ||
     isWaitingForJob ||
     hasUsersValidationJobActive;
@@ -213,7 +194,7 @@ export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRou
           <Breadcrumbs>
             <Breadcrumb name="Calculate funding" url="/" />
             <Breadcrumb name="Funding management" url="/FundingManagement" />
-            <Breadcrumb name="Release management" url="/FundingManagementReleaseSelection" />
+            <Breadcrumb name="Funding approvals" url="/FundingManagementApprovalSelection" />
             <Breadcrumb name={currentPage.title} />
           </Breadcrumbs>
         </div>
@@ -311,12 +292,12 @@ export function ReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRou
               disabled={fileName.length === 0 || isBlocked}
               data-module="govuk-button"
             >
-              Continue
+              Approve funding
             </button>
             <Link
               className="govuk-button govuk-button--secondary"
               data-module="govuk-button"
-              to={"/FundingManagementReleaseSelection"}
+              to={"/Approvals/Select"}
             >
               Cancel
             </Link>

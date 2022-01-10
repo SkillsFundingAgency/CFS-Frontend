@@ -16,8 +16,6 @@ import { mockApiService } from "../../fakes/mockApiServices";
 import { withMissingSpecPermissions } from "../../fakes/testFactories";
 import { waitForLoadingToFinish } from "../../reactTestingLibraryHelpers";
 
-jest.mock("../../../components/AdminNav");
-
 describe("<RunExportToSql /> tests", () => {
   afterEach(() => {
     jest.resetAllMocks();
