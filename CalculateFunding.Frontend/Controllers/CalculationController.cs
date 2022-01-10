@@ -600,6 +600,24 @@ namespace CalculateFunding.Frontend.Controllers
             return Ok(response.Content);
         }
 
+        [Route("api/calcs/generate-identifier")]
+        [HttpGet]
+        public async Task<IActionResult> GenerateCalculationIdentifier([FromQuery] string calculationName)
+        {
+            Guard.IsNullOrWhiteSpace(calculationName, nameof(calculationName));
+
+            ApiResponse<CalculationIdentifier> response = await _calcClient.GenerateCalculationIdentifier(new GenerateIdentifierModel { CalculationName = calculationName });
+
+            IActionResult errorResult =
+                response.IsSuccessOrReturnFailureResult(nameof(GenerateCalculationIdentifier));
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(response.Content);
+        }
+
         private async Task<bool> CanUserApproveCalculation(Calculation calculation)
         {
             Guard.ArgumentNotNull(calculation, nameof(calculation));
