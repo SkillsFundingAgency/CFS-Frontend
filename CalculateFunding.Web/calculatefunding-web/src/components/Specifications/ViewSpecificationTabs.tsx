@@ -4,7 +4,6 @@ import { useLocation } from "react-router";
 
 import { useErrorContext } from "../../context/ErrorContext";
 import { useCalculationErrors } from "../../hooks/Calculations/useCalculationErrors";
-import { ReleaseTimetable } from "../../pages/Specifications/ReleaseTimetable";
 import { JobDetails } from "../../types/jobDetails";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { Badge } from "../Badge";
@@ -69,7 +68,6 @@ export const ViewSpecificationTabs = ({
               </Tabs.Tab>
             )}
             <Tabs.Tab label="datasets">Datasets</Tabs.Tab>
-            <Tabs.Tab label="release-timetable" hidden={true}>Release timetable</Tabs.Tab>
             <Tabs.Tab
               hidden={!specification.isSelectedForFunding}
               data-testid={"variations-tab"}
@@ -101,11 +99,6 @@ export const ViewSpecificationTabs = ({
               specificationId={specification.id}
               lastConverterWizardReportDate={lastConverterWizardReportDate}
             />
-          </Tabs.Panel>
-          <Tabs.Panel label="release-timetable">
-            <section className="govuk-tabs__panel">
-              <ReleaseTimetable specificationId={specification.id} />
-            </section>
           </Tabs.Panel>
           <Tabs.Panel hidden={!specification.isSelectedForFunding} label={"variations"}>
             <VariationManagement

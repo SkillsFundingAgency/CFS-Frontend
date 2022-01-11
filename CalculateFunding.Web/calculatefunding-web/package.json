@@ -3,6 +3,59 @@
   "version": "0.1.0",
   "homepage": "/app",
   "private": true,
+  "scripts": {
+    "start": "set HTTPS=true&&react-app-rewired start",
+    "start:test": "set HTTPS=false&&react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "cross-env DEBUG_PRINT_LIMIT=30000 react-app-rewired test --testResultsProcessor ./node_modules/jest-junit-reporter",
+    "eject": "react-scripts eject",
+    "ts:compile": "tsc --noEmit",
+    "lint:fix": "eslint src/**/*.ts{,x} --quiet --fix",
+    "prettier:fix": "prettier --write .",
+    "pre-commit": "prettier:fix && lint:fix && ts:compile && test",
+    "cypress": "npx cypress open",
+    "cypress:runAllTests": "npx cypress run",
+    "test:cypress:ci": "cross-env BROWSER=none start-server-and-test start:test http-get://localhost:3000/app cypress:ci",
+    "test:cypress:ui": "start-server-and-test start:test http-get://localhost:3000/app cypress:runAllTests",
+    "cypress:ci": "cypress run --headless",
+    "storybook": "start-storybook -p 6006 -s public",
+    "build-storybook": "build-storybook -s public",
+    "prepare": "cd ../.. && husky install CalculateFunding.Web/calculatefunding-web/.husky"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged --allow-empty"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "tsc-files --noEmit",
+      "pretty-quick --staged",
+      "eslint --fix"
+    ],
+    "*.{css,scss}": [
+      "pretty-quick --staged",
+      "stylelint --fix"
+    ]
+  },
+  "resolutions": {
+    "babel-loader": "8.1.0",
+    "eslint": "6.8.0",
+    "webpack": "4.42.0",
+    "react-router-dom": "5.2.1"
+  },
   "dependencies": {
     "@dabeng/react-orgchart": "^1.0.0",
     "@microsoft/applicationinsights-web": "^2.6.5",
@@ -66,61 +119,6 @@
     "typescript": "^4.2.4",
     "uuid": "^7.0.3"
   },
-  "scripts": {
-    "start": "set HTTPS=true&&react-app-rewired start",
-    "start:test": "set HTTPS=false&&react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "cross-env DEBUG_PRINT_LIMIT=30000 react-app-rewired test --testResultsProcessor ./node_modules/jest-junit-reporter",
-    "eject": "react-scripts eject",
-    "ts:compile": "tsc --noEmit",
-    "lint:fix": "eslint src/**/*.ts{,x} --quiet --fix",
-    "prettier:fix": "prettier --write .",
-    "pre-commit": "prettier:fix && lint:fix && ts:compile && test",
-    "cypress": "npx cypress open",
-    "cypress:runAllTests": "npx cypress run",
-    "test:cypress:ci": "cross-env BROWSER=none start-server-and-test start:test http-get://localhost:3000/app cypress:ci",
-    "test:cypress:ui": "start-server-and-test start:test http-get://localhost:3000/app cypress:runAllTests",
-    "cypress:ci": "cypress run --headless",
-    "storybook": "start-storybook -p 6006 -s public",
-    "build-storybook": "build-storybook -s public",
-    "prepare": "cd ../.. && husky install CalculateFunding.Web/calculatefunding-web/.husky"
-  },
-  "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": true
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged --allow-empty"
-    }
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "tsc-files --noEmit",
-      "pretty-quick --staged",
-      "eslint --fix"
-    ],
-    "*.{css,scss}": [
-      "pretty-quick --staged",
-      "stylelint --fix"
-    ]
-  },
-  "resolutions": {
-    "babel-loader": "8.1.0",
-    "eslint": "6.8.0",
-    "webpack": "4.42.0"
-  },
   "devDependencies": {
     "@sheerun/mutationobserver-shim": "^0.3.3",
     "@storybook/addon-actions": "^6.2.9",
@@ -146,7 +144,6 @@
     "@typescript-eslint/parser": "^4.30.0",
     "axios-mock-adapter": "^1.19.0",
     "cypress": "^8.7.0",
-    "cypress-cucumber-preprocessor": "^4.1.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest": "^24.4.3",

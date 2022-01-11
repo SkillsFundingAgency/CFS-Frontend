@@ -5,8 +5,6 @@ import { LatestPublishedDate } from "../types/PublishedProvider/LatestPublishedD
 import { PublishedProviderFundingCount } from "../types/PublishedProvider/PublishedProviderFundingCount";
 import { PublishProviderDataDownload } from "../types/PublishedProvider/PublishProviderDataDownload";
 import { AvailableVariationPointerFundingLine } from "../types/Publishing/AvailableVariationPointerFundingLine";
-import { ReleaseTimetableSummary } from "../types/ReleaseTimetableSummary";
-import { SaveReleaseTimetableViewModel } from "../types/SaveReleaseTimetableViewModel";
 
 export async function getFundingSummaryForApprovingService(
   specificationId: string,
@@ -27,25 +25,6 @@ export async function getFundingSummaryForReleasingService(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: { publishedProviderIds: publishedProviderIds },
-  });
-}
-
-export async function getReleaseTimetableForSpecificationService(
-  specificationId: string
-): Promise<AxiosResponse<ReleaseTimetableSummary>> {
-  return axios(`/api/publish/getTimetable/${specificationId}`, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-  });
-}
-
-export async function saveReleaseTimetableForSpecificationService(
-  saveReleaseTimetable: SaveReleaseTimetableViewModel
-) {
-  return axios("/api/publish/saveTimetable", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: saveReleaseTimetable,
   });
 }
 
