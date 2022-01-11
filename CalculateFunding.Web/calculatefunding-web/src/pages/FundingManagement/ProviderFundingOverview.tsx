@@ -227,6 +227,7 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
                 {isLoadingSpecification && <LoadingFieldStatus title="Loading specification..." />}
                 {specification && (
                   <FundingLineResults
+                    actionType={actionType}
                     specification={specification}
                     providerId={providerId}
                     addError={addError}

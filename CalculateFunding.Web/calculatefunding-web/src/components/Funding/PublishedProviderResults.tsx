@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import * as actions from "../../actions/FundingSearchSelectionActions";
 import { IStoreState } from "../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
-import {FundingActionType} from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import { BackToTop } from "../BackToTop";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
@@ -13,6 +13,7 @@ import { Pagination } from "../Pagination";
 import { PublishedProviderRow } from "./PublishedProviderRow";
 
 export interface IPublishedProviderResultsProps {
+  actionType?: FundingActionType;
   specificationId: string;
   fundingStreamId: string;
   fundingPeriodId: string;
@@ -109,8 +110,11 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                   </>
                 )}
               </th>
-              <th className="govuk-table__header govuk-body">UKPRN</th>
+              {!props.actionType && <th className="govuk-table__header govuk-body">UKPRN</th>}
               <th className="govuk-table__header govuk-body">Status</th>
+              {props.actionType === FundingActionType.Release && (
+                <th className="govuk-table__header govuk-body">Released version</th>
+              )}
               <th className="govuk-table__header govuk-body">
                 Funding total
                 <br />
@@ -127,7 +131,7 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
             {props.providerSearchResults.providers.map((provider, i) => (
               <PublishedProviderRow
                 key={`provider-${i}`}
-                actionType={FundingActionType.Approve}
+                actionType={props.actionType}
                 publishedProvider={provider}
                 specCoreProviderVersionId={props.specCoreProviderVersionId}
                 enableSelection={props.enableBatchSelection}

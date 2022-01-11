@@ -19,12 +19,13 @@ export const useProviderVersion = (
   onError: (err: AxiosError) => void,
   options: Partial<UseQueryOptions<ProviderSummary, AxiosError>> = {}
 ): ProviderVersionQueryResult => {
+  const versionId = !providerVersionId || providerVersionId === "undefined" ? "" : providerVersionId;
   const { data, isLoading, isError, error, isFetching } = useQuery<ProviderSummary, AxiosError>(
-    `provider-${providerId}-version-${providerVersionId}`,
-    async () => (await getProviderByIdAndVersionService(providerId, providerVersionId)).data,
+    `provider-${providerId}-version-${versionId}`,
+    async () => (await getProviderByIdAndVersionService(providerId, versionId)).data,
     {
       onError: onError,
-      cacheTime: milliseconds.OneDay,
+      cacheTime: milliseconds.TenSeconds,
       staleTime: milliseconds.OneDay,
       refetchOnWindowFocus: false,
       enabled: providerId?.length > 0 && providerVersionId?.length > 0,

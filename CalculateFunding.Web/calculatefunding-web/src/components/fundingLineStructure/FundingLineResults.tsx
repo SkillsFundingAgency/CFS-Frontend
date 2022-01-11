@@ -12,6 +12,7 @@ import { FundingStructureItemViewModel, FundingStructureType } from "../../types
 import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { ProviderResultForSpecification } from "../../types/Provider/ProviderResultForSpecification";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { ValueFormatType } from "../../types/TemplateBuilderDefinitions";
 import { BackToTop } from "../BackToTop";
@@ -30,6 +31,7 @@ import {
 } from "./FundingLineStructureHelper";
 
 export interface FundingLineResultsProps {
+  actionType?: FundingActionType;
   specification: SpecificationSummary;
   providerId?: string;
   addError: (props: ErrorProps) => void;
@@ -39,6 +41,7 @@ export interface FundingLineResultsProps {
 }
 
 export function FundingLineResults({
+  actionType,
   specification,
   providerId,
   addError,

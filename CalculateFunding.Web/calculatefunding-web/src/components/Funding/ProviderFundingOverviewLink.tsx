@@ -14,7 +14,7 @@ export const ProviderFundingOverviewUri = ({
   fundingStreamId,
   fundingPeriodId,
 }: {
-  actionType: FundingActionType;
+  actionType?: FundingActionType;
   specificationId: string;
   providerId: string;
   specCoreProviderVersionId?: string;
@@ -30,7 +30,7 @@ export const ProviderFundingOverviewUri = ({
 };
 
 export const ProviderFundingOverviewLink = (props: {
-  actionType: FundingActionType;
+  actionType?: FundingActionType;
   specificationId: string;
   providerId: string;
   specCoreProviderVersionId?: string;
