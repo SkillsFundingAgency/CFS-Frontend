@@ -139,7 +139,7 @@ export function ViewEditFundingLineProfile({
 
   const isFormValid = (totalAllocationAmount: number, totalAllocationPercent: number) => {
     let isErrors = false;
-    if (totalAllocationAmount > remainingAmount) {
+    if (totalAllocationAmount > profilingAmount) {
       addError({ error: "Total allocation greater than balance available", fieldName: "totalAllocation" });
       isErrors = true;
     }
@@ -161,6 +161,11 @@ export function ViewEditFundingLineProfile({
         fundingPeriodId as string
       );
       const profile = response.data as FundingLineProfileViewModel;
+      profile.fundingLineProfile.profileTotals.forEach(
+        (p) =>
+          (p.profileRemainingPercentage =
+            editMode === ProfileEditMode.EditAll ? p.profilePercentage : p.profileRemainingPercentage)
+      );
       setEditedFundingLineProfile(profile.fundingLineProfile);
       setFundingLineProfile(profile.fundingLineProfile);
       setCanEditCustomProfile(profile.enableUserEditableCustomProfiles);
@@ -185,17 +190,17 @@ export function ViewEditFundingLineProfile({
       }
       try {
         clearErrorMessages(["totalPercent", "totalAllocation"]);
-        const totalUnpaidAllocationAmount = calculateTotalUnpaidAllocationAmount();
-        const totalUnpaidAllocationPercent = calculateUnpaidTotalAllocationPercent();
+        const totalProfilingAllocationAmount = calculateTotalProfilingAllocationAmount();
+        const totalProfilingAllocationPercent = calculateProfilingTotalAllocationPercent();
 
-        if (!isFormValid(totalUnpaidAllocationAmount, totalUnpaidAllocationPercent)) {
+        if (!isFormValid(totalProfilingAllocationAmount, totalProfilingAllocationPercent)) {
           window.scrollTo(0, 0);
           return;
         }
 
         setIsSaving(true);
 
-        const carryForwardValue = calculateNewCarryForwardAmount(totalUnpaidAllocationAmount);
+        const carryForwardValue = calculateNewCarryForwardAmount(totalProfilingAllocationAmount);
         const request: ApplyCustomProfileRequest = {
           fundingStreamId: fundingStreamId as string,
           fundingPeriodId: fundingPeriodId as string,
@@ -251,20 +256,24 @@ export function ViewEditFundingLineProfile({
     setEditedFundingLineProfile(cloneOfFundingLineProfile);
   }
 
-  function calculateUnpaidTotalAllocationPercent(): number {
+  function calculateProfilingTotalAllocationPercent(): number {
     if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
     const totalPercentage = editedFundingLineProfile.profileTotals
-      .filter((p) => p.profileRemainingPercentage !== undefined && !p.isPaid)
+      .filter(
+        (p) =>
+          p.profileRemainingPercentage !== undefined &&
+          (editMode == ProfileEditMode.EditAll ? true : !p.isPaid)
+      )
       .map((p) => p.profileRemainingPercentage)
       .reduce((a, c) => (a !== undefined && c !== undefined ? a + c : 0), 0);
 
     return toDecimal(totalPercentage || 0, 2);
   }
 
-  function calculateTotalUnpaidAllocationAmount(): number {
+  function calculateTotalProfilingAllocationAmount(): number {
     if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
     const totalAllocation = editedFundingLineProfile.profileTotals
-      .filter((p) => !p.isPaid)
+      .filter((p) => (editMode == ProfileEditMode.EditAll ? true : !p.isPaid))
       .map((p) => p.value)
       .reduce((a, c) => a + c, 0);
 
@@ -281,7 +290,7 @@ export function ViewEditFundingLineProfile({
   }
 
   function calculateNewCarryForwardAmount(totalUnpaidAllocationAmount: number): number {
-    return toDecimal(remainingAmount - totalUnpaidAllocationAmount || 0, 2);
+    return toDecimal(profilingAmount - totalUnpaidAllocationAmount || 0, 2);
   }
 
   function RowItem(props: { id: string; title: string; children: any }) {
@@ -315,10 +324,17 @@ export function ViewEditFundingLineProfile({
     fundingLineProfile.remainingAmount !== null
       ? fundingLineProfile.remainingAmount
       : 0;
-  const totalUnpaidAllocationAmount = calculateTotalUnpaidAllocationAmount();
-  const totalUnpaidAllocationPercent = calculateUnpaidTotalAllocationPercent();
+  const profilingAmount =
+    editMode === ProfileEditMode.EditAll &&
+    fundingLineProfile &&
+    fundingLineProfile.fundingLineAmount !== undefined &&
+    fundingLineProfile.fundingLineAmount !== null
+      ? fundingLineProfile.fundingLineAmount
+      : remainingAmount;
+  const totalProfilingAllocationAmount = calculateTotalProfilingAllocationAmount();
+  const totalProfilingAllocationPercent = calculateProfilingTotalAllocationPercent();
   const totalAllocationAmount = calculateTotalPaidAndUnpaidAllocationAmount();
-  const newCarryForwardAmount = calculateNewCarryForwardAmount(totalUnpaidAllocationAmount);
+  const newCarryForwardAmount = calculateNewCarryForwardAmount(totalProfilingAllocationAmount);
 
   return (
     <Main location={Section.FundingManagement}>
@@ -451,7 +467,7 @@ export function ViewEditFundingLineProfile({
                             <EditableProfileTotal
                               index={i}
                               profileTotal={p}
-                              remainingAmount={editedFundingLineProfile.remainingAmount || 0}
+                              remainingAmount={profilingAmount || 0}
                               setProfileTotal={updateProfileTotal}
                               mode={editMode}
                               setIsDirty={setIsDirty}
@@ -504,9 +520,9 @@ export function ViewEditFundingLineProfile({
                             : null}
                           <strong data-testid="total-allocation-percent">
                             <FormattedNumber
-                              value={totalUnpaidAllocationPercent}
+                              value={totalProfilingAllocationPercent}
                               type={NumberType.FormattedPercentage}
-                              decimalPlaces={totalUnpaidAllocationPercent === 100 ? 0 : 2}
+                              decimalPlaces={totalProfilingAllocationPercent === 100 ? 0 : 2}
                             />
                           </strong>
                         </div>

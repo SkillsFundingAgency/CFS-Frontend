@@ -67,7 +67,8 @@ export const useErrors = (): ErrorHookResult => {
   const addValidationErrorsAsIndividualErrors = (props: { validationErrors: ValidationErrors }) =>
     addErrorsToState(errorHelper.createValidationErrorsAsIndividualErrors(errors, props.validationErrors));
 
-  const clearErrorMessages = (fieldNames?: string[]) => errorHelper.clearErrorMessages(errors, fieldNames);
+  const clearErrorMessages = (fieldNames?: string[]) =>
+    setErrors(errorHelper.clearErrorMessages(errors, fieldNames));
 
   return {
     errors,
