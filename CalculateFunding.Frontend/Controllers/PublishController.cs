@@ -395,6 +395,28 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
+        [HttpGet("/api/sqlqa/specifications/{specificationId}/funding-streams/{fundingStreamId}/released/export-to-sql")]
+        public async Task<IActionResult> RunReleasedSqlExportToSqlJob(
+            [FromRoute] string specificationId,
+            [FromRoute] string fundingStreamId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
+
+            if (!await _authorizationHelper.DoesUserHavePermission(
+                User,
+                specificationId,
+                SpecificationActionTypes.CanRefreshPublishedQa))
+            {
+                return new ForbidResult();
+            }
+
+            ApiResponse<JobCreationResponse> result = await _publishingApiClient.QueueSpecificationFundingStreamReleasedSqlImport(specificationId, fundingStreamId);
+
+            return result.Handle(nameof(RunReleasedSqlExportToSqlJob),
+                onSuccess: x => Ok(x.Content));
+        }
+
         [HttpGet("/api/publishedProviders/{fundingStreamId}/{fundingPeriodId}/lastupdated")]
         public async Task<IActionResult> GetLatestPublishedDate(
             [FromRoute] string fundingStreamId,

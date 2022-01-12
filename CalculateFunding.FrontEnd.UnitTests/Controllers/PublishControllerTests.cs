@@ -503,6 +503,78 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
+        public void RunReleasedSqlImportJobGuardsAgainstMissingSpecificationId()
+        {
+            Func<Task<IActionResult>> invocation = () => WhenTheRunReleasedSqlJobIsCreated(null, "something");
+
+            invocation
+                .Should()
+                .ThrowAsync<ArgumentNullException>()
+                .Result
+                .Which
+                .ParamName
+                .Should()
+                .Be("specificationId");
+        }
+
+        [TestMethod]
+        public void RunReleasedSqlImportJobGuardsAgainstMissingFundingStreamId()
+        {
+            Func<Task<IActionResult>> invocation = () => WhenTheRunReleasedSqlJobIsCreated("something", null);
+
+            invocation
+                .Should()
+                .ThrowAsync<ArgumentNullException>()
+                .Result
+                .Which
+                .ParamName
+                .Should()
+                .Be("fundingStreamId");
+        }
+
+        [TestMethod]
+        public async Task RunReleasedSqlImportJobDelegatesToPublishingEndPointAndReturnsJobDetails()
+        {
+            string specificationId = NewRandomString();
+            string fundingStreamId = NewRandomString();
+
+            JobCreationResponse expectedJob = new JobCreationResponse();
+
+            _authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(),
+                    specificationId,
+                    SpecificationActionTypes.CanRefreshPublishedQa)
+                .Returns(Task.FromResult(true));
+
+            _publishingApiClient
+                .QueueSpecificationFundingStreamReleasedSqlImport(specificationId, fundingStreamId)
+                .Returns(new ApiResponse<JobCreationResponse>(HttpStatusCode.OK, expectedJob));
+
+            OkObjectResult result = await WhenTheRunReleasedSqlJobIsCreated(specificationId, fundingStreamId) as OkObjectResult;
+
+            result?
+                .Value
+                .Should()
+                .BeSameAs(expectedJob);
+        }
+
+        [TestMethod]
+        public async Task RunReleasedSqlImportJobGuardedByCanRefreshPublishedQaPermission()
+        {
+            string specificationId = NewRandomString();
+            string fundingStreamId = NewRandomString();
+
+            ForbidResult result = await WhenTheRunReleasedSqlJobIsCreated(specificationId, fundingStreamId) as ForbidResult;
+
+            result
+                .Should()
+                .NotBeNull();
+
+            await _publishingApiClient
+                .Received(0)
+                .QueueSpecificationFundingStreamReleasedSqlImport(specificationId, fundingStreamId);
+        }
+
+        [TestMethod]
         public async Task GetLatestPublishedDateDelegatesToPublishingEndPointAndReturnsLatestDate()
         {
             string fundingPeriodId = NewRandomString();
@@ -732,6 +804,10 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private async Task<IActionResult> WhenTheRunSqlJobIsCreated(string specificationId,
             string fundingStreamId)
             => await _publishController.RunSqlExportToSqlJob(specificationId, fundingStreamId);
+
+        private async Task<IActionResult> WhenTheRunReleasedSqlJobIsCreated(string specificationId,
+        string fundingStreamId)
+        => await _publishController.RunReleasedSqlExportToSqlJob(specificationId, fundingStreamId);
 
         private async Task<IActionResult> WhenTheLatestPublishedDateIsQueried(string fundingStreamId,
             string fundingPeriodId)
