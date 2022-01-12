@@ -143,9 +143,7 @@ const getTitle = (
   } else {
     const failures = job.failures.map((f) => `Job ${f.jobDescription}: ${f.description}`);
     if (failures.length) {
-      outcome = failures.join(", ");
-    } else if (outcome?.length) {
-      outcome = "Something went wrong";
+      outcome = outcome.concat(". ", failures.join(", "));
     }
   }
 

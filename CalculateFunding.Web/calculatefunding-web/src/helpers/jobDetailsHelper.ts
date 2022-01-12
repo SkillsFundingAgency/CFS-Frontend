@@ -80,7 +80,7 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
           jobDescription: getJobProgressMessage(x.jobType),
         };
       });
-    if (result.failures?.length) {
+    if (result.failures?.length && (!result.outcome || result.outcome.length === 0)) {
       const hasValidationError = result.failures.some((e) => e.type === JobOutcomeType.ValidationError);
       result.outcome =
         result.failures.length === 1 ? "One of the job steps failed" : "Some of the job steps failed";

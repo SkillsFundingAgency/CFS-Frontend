@@ -228,7 +228,7 @@ describe("<JobNotificationBanner />", () => {
 
         expect(
           await screen.findByText(
-            /Job failed: Refreshing funding: Job Approving batch provider funding: Invalid preconditions!, Job Deleting calculations: Hard disc failure!/
+            /Job failed: Refreshing funding: Some of the job steps failed. Job Approving batch provider funding: Invalid preconditions!, Job Deleting calculations: Hard disc failure!/
           )
         ).toBeInTheDocument();
         expect(
@@ -245,6 +245,97 @@ describe("<JobNotificationBanner />", () => {
         expect(screen.getByText(/Completed:/)).toBeInTheDocument();
         expect(screen.getByText(/2 May 2020 6:00 AM/)).toBeInTheDocument();
         expect(screen.getByText(`Job ID: ${mockFailedJobResult.jobId}`)).toBeInTheDocument();
+      });
+    });
+
+    describe("without a jobFailedMessage provided and no failed child jobs", () => {
+      it("renders error summary messages correctly ", async () => {
+        const props: JobNotificationBannerProps = {
+          job: mockFailedJobWithNoChildFailedOutcomesResult,
+          isCheckingForJob: false,
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              showFailed: true,
+            },
+          ],
+        };
+
+        renderComponent(props);
+
+        expect(
+          await screen.findByText(
+            /Job failed: Refreshing funding: Something went wrong/
+          )
+        ).toBeInTheDocument();
+        expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
+        expect(screen.getByText(/Completed:/)).toBeInTheDocument();
+        expect(screen.getByText(/1 February 2020 9:00 AM/)).toBeInTheDocument();
+        expect(screen.getByText(`Job ID: ${mockFailedJobWithNoChildFailedOutcomesResult.jobId}`)).toBeInTheDocument();
+      });
+    });
+
+    describe("with a job outcome message provided ", () => {
+      it("renders error summary messages correctly ", async () => {
+        const props: JobNotificationBannerProps = {
+          job: mockFailedJobWithNoChildFailedOutcomesResultAndOutcome,
+          isCheckingForJob: false,
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              showFailed: true,
+            },
+          ],
+        };
+
+        renderComponent(props);
+
+        expect(
+          await screen.findByText(
+            /Job failed: Refreshing funding: An outcome level message/
+          )
+        ).toBeInTheDocument();
+        expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
+        expect(screen.getByText(/Completed:/)).toBeInTheDocument();
+        expect(screen.getByText(/1 February 2020 9:00 AM/)).toBeInTheDocument();
+        expect(screen.getByText(`Job ID: ${mockFailedJobWithNoChildFailedOutcomesResultAndOutcome.jobId}`)).toBeInTheDocument();
+      });
+    });
+
+    describe("with failed child jobs and a job outcome message provided ", () => {
+      it("renders error summary messages correctly ", async () => {
+        const props: JobNotificationBannerProps = {
+          job: mockFailedJobWithChildFailedOutcomesResultAndOutcome,
+          isCheckingForJob: false,
+          notificationSettings: [
+            {
+              jobTypes: [JobType.RefreshFundingJob],
+              showFailed: true,
+            },
+          ],
+        };
+
+        renderComponent(props);
+
+        expect(
+          await screen.findByText(
+            /Job failed: Refreshing funding: An outcome level message/
+          )
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText(
+            `${mockFailedJobWithChildFailedOutcomesResultAndOutcome.failures[0].jobDescription}: ${mockFailedJobWithChildFailedOutcomesResultAndOutcome.failures[0].description}`
+          )
+        ).toBeInTheDocument();
+        expect(
+          screen.getByText(
+            `${mockFailedJobWithChildFailedOutcomesResultAndOutcome.failures[1].jobDescription}: ${mockFailedJobWithChildFailedOutcomesResultAndOutcome.failures[1].description}`
+          )
+        ).toBeInTheDocument();
+        expect(screen.getByText(/Job initiated/)).toBeInTheDocument();
+        expect(screen.getByText(/Completed:/)).toBeInTheDocument();
+        expect(screen.getByText(/1 February 2020 9:00 AM/)).toBeInTheDocument();
+        expect(screen.getByText(`Job ID: ${mockFailedJobWithChildFailedOutcomesResultAndOutcome.jobId}`)).toBeInTheDocument();
       });
     });
   });
@@ -320,4 +411,45 @@ const mockFailedJobResult: JobDetails = getJobDetailsFromJobResponse({
       isSuccessful: false,
     },
   ],
+}) as JobDetails;
+
+const mockFailedJobWithNoChildFailedOutcomesResultAndOutcome: JobDetails = getJobDetailsFromJobResponse({
+  jobId: "345768293546",
+  jobType: JobType.RefreshFundingJob,
+  specificationId: "spec 342",
+  runningStatus: RunningStatus.Completed,
+  completionStatus: CompletionStatus.Failed,
+  lastUpdated: new Date(Date.UTC(2020, 1, 2, 10, 0, 0)),
+  created: new Date(Date.UTC(2020, 1, 1, 9, 0, 0)),
+  invokerUserDisplayName: "a valid invoker user",
+  trigger: emptyTrigger,
+  outcomes: [],
+  outcome: "An outcome level message"
+}) as JobDetails;
+
+const mockFailedJobWithChildFailedOutcomesResultAndOutcome: JobDetails = getJobDetailsFromJobResponse({
+  jobId: "345768293546",
+  jobType: JobType.RefreshFundingJob,
+  specificationId: "spec 342",
+  runningStatus: RunningStatus.Completed,
+  completionStatus: CompletionStatus.Failed,
+  lastUpdated: new Date(Date.UTC(2020, 1, 2, 10, 0, 0)),
+  created: new Date(Date.UTC(2020, 1, 1, 9, 0, 0)),
+  invokerUserDisplayName: "a valid invoker user",
+  trigger: emptyTrigger,
+  outcomes: [
+    {
+      jobType: JobType.ApproveBatchProviderFundingJob,
+      type: JobOutcomeType.Failed,
+      description: "Invalid preconditions!",
+      isSuccessful: false,
+    },
+    {
+      jobType: JobType.DeleteCalculationsJob,
+      type: JobOutcomeType.Failed,
+      description: "Hard disc failure!",
+      isSuccessful: false,
+    },
+  ],
+  outcome: "An outcome level message"
 }) as JobDetails;

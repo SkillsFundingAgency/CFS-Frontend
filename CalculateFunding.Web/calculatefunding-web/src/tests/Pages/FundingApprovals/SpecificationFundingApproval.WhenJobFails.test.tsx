@@ -36,7 +36,7 @@ describe("<SpecificationFundingApproval />", () => {
 
     it("renders job error", async () => {
       expect(await screen.findByTestId("job-notification-banner")).toBeInTheDocument();
-      expect(screen.getByText(/Job Refreshing funding: Something went wrong/)).toBeInTheDocument();
+      expect(screen.getByText(/Job Refreshing funding: Refresh failed/)).toBeInTheDocument();
     });
 
     it("renders filters", async () => {
