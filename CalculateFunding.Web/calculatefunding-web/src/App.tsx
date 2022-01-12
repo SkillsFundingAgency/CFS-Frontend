@@ -51,6 +51,7 @@ import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprov
 import { ProfileHistory } from "./pages/FundingApprovals/ProfileHistory";
 import { ProviderFundingOverviewOld } from "./pages/FundingApprovals/ProviderFundingOverviewOld";
 import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
+import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
 import { ViewEditFundingLineProfileOld } from "./pages/FundingApprovals/ViewEditFundingLineProfileOld";
 import FundingManagement from "./pages/FundingManagement/FundingManagement";
 import { FundingManagementApprovalConfirm } from "./pages/FundingManagement/FundingManagementApprovalConfirm";
@@ -303,7 +304,7 @@ const oldFundingApprovalRoutes = (
     />
     <Route
       path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={FundingManagementReleaseUploadBatch}
+      component={UploadBatch}
     />
     <Route
       exact
