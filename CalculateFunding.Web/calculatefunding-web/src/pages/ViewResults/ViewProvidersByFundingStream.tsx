@@ -34,7 +34,7 @@ export function ViewProvidersByFundingStream({
 }: RouteComponentProps<ViewProvidersByFundingStreamRouteProps>): JSX.Element {
   const initialSearchRequest: ProviderVersionSearchModel = {
     pageNumber: 1,
-    top: 100,
+    top: 50,
     searchTerm: "",
     errorToggle: false,
     orderBy: [],
