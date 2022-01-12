@@ -367,13 +367,9 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<IEnumerable<DatasetDefinitionByFundingStream>> result =
                 await _datasetApiClient.GetDatasetDefinitionsByFundingStreamId(fundingStreamId);
 
-            IActionResult errorResult = result.IsSuccessOrReturnFailureResult(nameof(DatasetDefinitionByFundingStream));
-            if (errorResult != null)
-            {
-                return errorResult;
-            }
-
-            return new OkObjectResult(result.Content);
+            return result.Handle(nameof(DatasetDefinitionByFundingStream),
+                onSuccess: x => Ok(x.Content),
+                onNotFound: x => NotFound("No data schemas exist for the selected funding stream"));
         }
 
         [HttpGet]

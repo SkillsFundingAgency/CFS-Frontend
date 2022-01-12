@@ -152,21 +152,25 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<CurrentProviderVersionMetadata> currentProviderMetadataResponse =
                 await _providersApiClient.GetCurrentProviderMetadataForFundingStream(fundingStreamId);
-            IActionResult currentProviderMetadataErrorResult =
-                currentProviderMetadataResponse.IsSuccessOrReturnFailureResult(
-                    "GetCurrentProviderMetadataForFundingStream");
-            if (currentProviderMetadataErrorResult != null)
+            IActionResult currentProviderMetadataResult =
+                currentProviderMetadataResponse.Handle(
+                    "GetCurrentProviderMetadataForFundingStream",
+                    onSuccess: x => Ok(x.Content),
+                    onNotFound: x => NotFound("No current provider metadata exists for the selected funding stream"));
+            if (currentProviderMetadataResult is not OkObjectResult)
             {
-                return currentProviderMetadataErrorResult;
+                return currentProviderMetadataResult;
             }
 
             ApiResponse<ProviderVersionMetadata> providerVersionMetadataResponse =
                 await _providersApiClient.GetProviderVersionMetadata(currentProviderMetadataResponse.Content.ProviderVersionId);
-            IActionResult providerVersionMetadataErrorResult =
-                providerVersionMetadataResponse.IsSuccessOrReturnFailureResult("GetProviderVersionMetadata");
-            if (providerVersionMetadataErrorResult != null)
+            IActionResult providerVersionMetadataResult =
+                providerVersionMetadataResponse.Handle("GetProviderVersionMetadata",
+                    onSuccess: x => Ok(x.Content),
+                    onNotFound: x => NotFound("No provider version metadata exists for the selected funding stream"));
+            if (providerVersionMetadataResult is not OkObjectResult)
             {
-                return providerVersionMetadataErrorResult;
+                return providerVersionMetadataResult;
             }
 
             return Ok(new CurrentProviderVersionForFundingStream
