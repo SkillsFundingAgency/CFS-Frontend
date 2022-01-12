@@ -36,7 +36,7 @@ export function CreateAdditionalCalculation({
   excludeMonacoEditor,
 }: RouteComponentProps<CreateAdditionalCalculationRouteProps> & CreateAdditionalCalculationProps) {
   const specificationId = match.params.specificationId;
-  const { errors, addError, addErrorMessage, clearErrorMessages } = useErrors();
+  const { errors, addError, clearErrorMessages } = useErrors();
   const { isPermissionsFetched, hasMissingPermissions, missingPermissions } = useSpecificationPermissions(
     specificationId,
     [Permission.CanEditCalculations]
@@ -55,10 +55,12 @@ export function CreateAdditionalCalculation({
   const onCalculationChange = async (state: CalculationSourceCodeState) => {
     setCalculationState(state);
     if (state.errorMessage.length > 0) {
-      addErrorMessage(
-        state.errorMessage,
-        "An error occured related to the calculation source code",
-        "source-code"
+      addError(
+          {
+            error: state.errorMessage,
+            description: "An error occured related to the calculation source code",
+            fieldName: "source-code"
+          }
       );
     }
   };
@@ -67,10 +69,12 @@ export function CreateAdditionalCalculation({
     if (!calculationState) {
       return;
     } else if (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) {
-      addErrorMessage(
-        "Please build your calculation source code to check it is valid",
-        "Unvalidated source code",
-        "source-code"
+      addError(
+          {
+            error: "Please build your calculation source code to check it is valid",
+            description: "Unvalidated source code",
+            fieldName: "source-code"
+          }
       );
       return;
     } else if (
@@ -78,7 +82,7 @@ export function CreateAdditionalCalculation({
       additionalCalculationName.length < 4 ||
       additionalCalculationName.length > 180
     ) {
-      addErrorMessage("Please use a name between 4 and 180 characters", "Invalid name", "calculation-name");
+      addError({ error: "Please use a name between 4 and 180 characters", description: "Invalid name", fieldName: "calculation-name" });
       return;
     } else {
       clearErrorMessages();
@@ -91,11 +95,11 @@ export function CreateAdditionalCalculation({
       };
 
       createAdditionalCalculationService(createAdditionalCalculationViewModel, specificationId)
-        .then((result) => {
+        .then(() => {
           history.push(`/ViewSpecification/${specificationId}`);
         })
-        .catch((ex) => {
-          addErrorMessage(ex.response.data);
+        .catch((err) => {
+          addError({ error: err.response.data.Name });
           setIsSaving(false);
         });
     }
