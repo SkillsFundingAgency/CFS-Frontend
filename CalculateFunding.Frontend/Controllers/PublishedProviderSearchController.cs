@@ -14,6 +14,7 @@ using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
 using System;
 using Microsoft.AspNetCore.Http;
+using CalculateFunding.Common.ApiClient.Publishing.Models;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -44,6 +45,30 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetPublishedProviderIds(specificationId);
+
+            IActionResult errorResult = response.IsSuccessOrReturnFailureResult("search");
+            if (errorResult != null)
+            {
+                return errorResult;
+            }
+
+            return Ok(response.Content);
+        }
+
+        [HttpPost]
+        [Route("api/publishedProviders/search/ids")]
+        public async Task<IActionResult> SearchProviderIds([FromBody] SearchPublishedProvidersRequest request)
+        {
+            Guard.ArgumentNotNull(request, nameof(request));
+
+            PublishedProviderIdSearchModel searchModel = new PublishedProviderIdSearchModel
+            {
+                Filters = ExtractFilters(request),
+                SearchTerm = request.SearchTerm,
+                SearchFields = request.SearchFields
+            };
+
+            ApiResponse<IEnumerable<string>> response = await _publishingApiClient.SearchPublishedProviderIds(searchModel);
 
             IActionResult errorResult = response.IsSuccessOrReturnFailureResult("search");
             if (errorResult != null)
