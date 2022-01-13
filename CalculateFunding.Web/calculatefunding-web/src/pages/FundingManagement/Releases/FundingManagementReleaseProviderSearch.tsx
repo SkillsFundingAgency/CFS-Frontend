@@ -73,6 +73,7 @@ export const FundingManagementReleaseProviderSearch = ({
     refetchSearchResults,
   } = usePublishedProviderSearch(
     state.searchCriteria,
+    specificationId,
     fundingConfiguration && fundingConfiguration.approvalMode,
     {
       onError: (err) =>

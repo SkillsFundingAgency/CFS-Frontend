@@ -2,7 +2,7 @@ import { AxiosError } from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { RouteComponentProps, useHistory } from "react-router";
+import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
 import { initialiseFundingSearchSelection } from "../../../actions/FundingSearchSelectionActions";
@@ -66,6 +66,7 @@ export const ApprovalResultsDUPLICATE = ({
     refetchSearchResults,
   } = usePublishedProviderSearch(
     state.searchCriteria,
+    specificationId,
     fundingConfiguration && fundingConfiguration.approvalMode,
     {
       onError: (err) => addError({ error: err, description: "Error while searching for providers" }),
@@ -92,14 +93,13 @@ export const ApprovalResultsDUPLICATE = ({
     [jobNotifications]
   );
 
-  const { publishedProvidersWithErrors, isLoadingPublishedProviderErrors } = usePublishedProviderErrorSearch(
-    specificationId,
-    (err) => addError({ error: err, description: "Error while loading provider funding errors" })
+  const { publishedProvidersWithErrors } = usePublishedProviderErrorSearch(specificationId, (err) =>
+    addError({ error: err, description: "Error while loading provider funding errors" })
   );
-  const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
-    match.params.specificationId,
-    [Permission.CanRefreshFunding, Permission.CanApproveFunding]
-  );
+  const { hasPermission } = useSpecificationPermissions(match.params.specificationId, [
+    Permission.CanRefreshFunding,
+    Permission.CanApproveFunding,
+  ]);
   useQuery<JobDetails | undefined, AxiosError>(
     `last-spec-${specificationId}-refresh`,
     async () =>
@@ -117,19 +117,17 @@ export const ApprovalResultsDUPLICATE = ({
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
-  const [selectAll, setSelectAll] = useState<boolean>(false);
-  const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
+  const { addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const hasPermissionToRefresh: boolean = useMemo(
     () => hasPermission && !!hasPermission(Permission.CanRefreshFunding),
-    [isPermissionsFetched]
+    [hasPermission]
   );
   const hasPermissionToApprove: boolean = useMemo(
     () => hasPermission && !!hasPermission(Permission.CanApproveFunding),
-    [isPermissionsFetched]
+    [hasPermission]
   );
 
   const dispatch = useDispatch();
-  const history = useHistory();
 
   useEffect(() => {
     if (!isSearchCriteriaInitialised) {
@@ -149,7 +147,7 @@ export const ApprovalResultsDUPLICATE = ({
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
       JobType.GenerateGraphAndInstructAllocationJob,
     ]);
-  }, [match, isSearchCriteriaInitialised]);
+  }, [match, isSearchCriteriaInitialised, dispatch, addJobTypeSubscription]);
 
   useEffect(() => {
     const completedRefreshJob = jobNotifications.find(
@@ -167,7 +165,7 @@ export const ApprovalResultsDUPLICATE = ({
       setJobId("");
       refetchSearchResults();
     }
-  }, [jobNotifications, jobId]);
+  }, [jobNotifications, jobId, refetchSearchResults]);
 
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
@@ -181,31 +179,6 @@ export const ApprovalResultsDUPLICATE = ({
       onError: (err) =>
         addError({ error: err, description: "An error occurred while monitoring a background job" }),
     });
-  }
-
-  function handleApprove() {
-    if (
-      publishedProviderSearchResults &&
-      hasPermissionToApprove &&
-      publishedProviderSearchResults.canApprove
-    ) {
-      if (
-        fundingConfiguration?.approvalMode === ApprovalMode.All &&
-        publishedProvidersWithErrors &&
-        publishedProvidersWithErrors.length > 0
-      ) {
-        addErrorMessage(
-          "Funding cannot be approved as there are providers in error",
-          undefined,
-          undefined,
-          "Please filter by error status to identify affected providers"
-        );
-      } else {
-        history.push(
-          `/FundingManagement/Approve/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`
-        );
-      }
-    }
   }
 
   async function handleRefresh() {
@@ -275,21 +248,10 @@ export const ApprovalResultsDUPLICATE = ({
     isLoadingSearchResults ||
     isLoadingRefresh;
 
-  const haveAnyProviderErrors =
-    isLoadingPublishedProviderErrors ||
-    (publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0);
-
-  const blockActionBasedOnProviderErrors =
-    fundingConfiguration?.approvalMode === ApprovalMode.All && haveAnyProviderErrors;
-
   const activeActionJobs = activeJobs(actionJobs);
   const hasActiveActionJobs = !!activeActionJobs.length;
 
   const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh || hasActiveActionJobs;
-
-  function handleToggleAllProviders() {
-    return undefined;
-  }
 
   return (
     <Main location={Section.FundingManagement}>

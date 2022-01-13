@@ -58,6 +58,10 @@ export async function getAllProviderVersionIdsForSearch(
   });
 }
 
+export async function getAllProviderVersionIds(specificationId: string): Promise<AxiosResponse<string[]>> {
+  return axios.get<string[]>(`${baseUrl}/publishedprovider-ids/${specificationId}`);
+}
+
 export async function getPublishedProviderErrors(specificationId: string): Promise<AxiosResponse<string[]>> {
   return axios.get<string[]>(`/api/specs/${specificationId}/provider-errors`);
 }

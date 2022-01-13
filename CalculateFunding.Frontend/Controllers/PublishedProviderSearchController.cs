@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
-using CalculateFunding.Common.ApiClient.Publishing.Models;
 using System.Text.Json;
 using CalculateFunding.Common.ApiClient.Jobs;
 using CalculateFunding.Common.ApiClient.Jobs.Models;
@@ -38,20 +37,13 @@ namespace CalculateFunding.Frontend.Controllers
             _jobsApiClient = jobsApiClient;
         }
 
-        [HttpPost]
-        [Route("api/publishedProviders/search/ids")]
-        public async Task<IActionResult> GetProviderIds([FromBody] SearchPublishedProvidersRequest request)
+        [HttpGet]
+        [Route("api/publishedProviders/publishedprovider-ids/{specificationId}")]
+        public async Task<IActionResult> GetProviderIds([FromRoute] string specificationId)
         {
-            Guard.ArgumentNotNull(request, nameof(request));
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
-            PublishedProviderIdSearchModel searchModel = new PublishedProviderIdSearchModel
-            {
-                Filters = ExtractFilters(request),
-                SearchTerm = request.SearchTerm,
-                SearchFields = request.SearchFields
-            };
-
-            ApiResponse<IEnumerable<string>> response = await _publishingApiClient.SearchPublishedProviderIds(searchModel);
+            ApiResponse<IEnumerable<string>> response = await _publishingApiClient.GetPublishedProviderIds(specificationId);
 
             IActionResult errorResult = response.IsSuccessOrReturnFailureResult("search");
             if (errorResult != null)

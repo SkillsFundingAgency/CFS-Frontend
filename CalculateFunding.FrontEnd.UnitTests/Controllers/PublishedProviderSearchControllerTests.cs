@@ -51,18 +51,14 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         public async Task GetProviderIds_Returns_OK()
         {
             _publishingApiClient.Setup(x =>
-                    x.SearchPublishedProviderIds(It.Is<PublishedProviderIdSearchModel>(_ =>
-                        _.Filters.Count == 3 &&
-                        _.Filters["fundingStreamId"][0] == _fundingStreamId &&
-                        _.Filters["fundingPeriodId"][0] == _fundingPeriodId &&
-                        _.Filters["specificationId"][0] == _specificationId)))
+                    x.GetPublishedProviderIds(_specificationId))
                 .ReturnsAsync(new ApiResponse<IEnumerable<string>>(System.Net.HttpStatusCode.OK, new[] {"provider1"}));
             _publishedProviderSearchController =
                 new PublishedProviderSearchController(_publishedProviderSearchService.Object, 
                     _publishingApiClient.Object,
                     _jobsApiClient.Object);
 
-            IActionResult result = await _publishedProviderSearchController.GetProviderIds(GetSearchRequest());
+            IActionResult result = await _publishedProviderSearchController.GetProviderIds(_specificationId);
 
             result.Should().BeOfType<OkObjectResult>();
         }

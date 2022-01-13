@@ -16,6 +16,7 @@ export type PublishedProviderSearchQueryResult = {
 
 export const usePublishedProviderSearch = (
   searchRequest: PublishedProviderSearchRequest | undefined,
+  specificationId: string,
   approvalMode: ApprovalMode | undefined,
   queryConfig: UseQueryOptions<PublishedProviderSearchResults, AxiosError>
 ): PublishedProviderSearchQueryResult => {
@@ -35,7 +36,7 @@ export const usePublishedProviderSearch = (
   );
 
   const { publishedProviderIds, isLoadingPublishedProviderIds, refetchPublishedProviderIds } =
-    usePublishedProviderIds(searchRequest, {
+    usePublishedProviderIds(specificationId, {
       enabled: queryConfig.enabled,
       onError: queryConfig.onError,
       refetchOnWindowFocus: false,

@@ -3,7 +3,6 @@ import { useQuery, UseQueryOptions } from "react-query";
 import { QueryObserverResult, RefetchOptions } from "react-query/types/core/types";
 
 import * as publishedProviderService from "../../services/publishedProviderService";
-import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 
 export type PublishedProviderIdsQueryResult = {
   publishedProviderIds: string[] | undefined;
@@ -13,27 +12,18 @@ export type PublishedProviderIdsQueryResult = {
   ) => Promise<QueryObserverResult<string[], AxiosError>>;
 };
 export const usePublishedProviderIds = (
-  searchRequest: PublishedProviderSearchRequest | undefined,
+  specificationId: string,
   queryConfig: UseQueryOptions<string[], AxiosError>
 ): PublishedProviderIdsQueryResult => {
-  const providerIdSearchRequest: PublishedProviderSearchRequest | undefined = searchRequest
-    ? { ...(searchRequest as PublishedProviderSearchRequest), ...{ pageSize: 30000, pageNumber: 1 } }
-    : undefined;
-
   const {
     data: publishedProviderIds,
     isLoading: isLoadingPublishedProviderIds,
     refetch: refetchPublishedProviderIds,
   } = useQuery<string[], AxiosError>(
-    ["published-provider-ids-for-search", providerIdSearchRequest],
-    async () =>
-      (
-        await publishedProviderService.getAllProviderVersionIdsForSearch(
-          providerIdSearchRequest as PublishedProviderSearchRequest
-        )
-      ).data,
+    ["published-provider-id/{specificationId}"],
+    async () => (await publishedProviderService.getAllProviderVersionIds(specificationId)).data,
     {
-      enabled: queryConfig.enabled && searchRequest !== undefined,
+      enabled: queryConfig.enabled,
       onError: queryConfig.onError,
     }
   );
