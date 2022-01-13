@@ -61,7 +61,7 @@ describe("<EditCalculation> tests ", () => {
     it("renders the calculation summary", async () => {
       expect(screen.getByText("Calculation ID: 100")).toBeInTheDocument();
       expect(screen.getByText("Pupil Number")).toBeInTheDocument();
-      expect(screen.getByText(testData.calcData.name)).toBeInTheDocument();
+      expect(screen.getByDisplayValue(testData.calcData.name)).toBeInTheDocument();
     });
 
     it("renders the calculation status", async () => {

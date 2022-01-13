@@ -14,6 +14,7 @@ import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
+import { useCharacterSubstitution } from "../../hooks/useCharacterSubstitution";
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import { createAdditionalCalculationService } from "../../services/calculationService";
@@ -105,6 +106,8 @@ export function CreateAdditionalCalculation({
     }
   }
 
+  const { substitution, substituteCharacters } = useCharacterSubstitution();
+
   const loadingTitle = isLoadingSpecification
     ? "Loading specification"
     : isSaving
@@ -157,8 +160,12 @@ export function CreateAdditionalCalculation({
               name="calculation-name"
               type="text"
               pattern="[A-Za-z0-9]+"
-              onChange={(e) => setAdditionalCalculationName(e.target.value)}
+              onChange={(e) => {
+                setAdditionalCalculationName(e.target.value);
+                substituteCharacters(e.target.value);
+              }}
             />
+            {substitution.length > 0 && <span className="govuk-caption-m">Source code name: {substitution}</span>}
             <InlineError fieldName={"calculation-name"} errors={errors} />
           </div>
 
