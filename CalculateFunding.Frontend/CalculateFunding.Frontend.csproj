@@ -26,8 +26,8 @@
     <PackageReference Include="Autofac" Version="5.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="3.0.3" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="9.1.0" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient" Version="3.0.4" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Calcs" Version="9.1.1" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Datasets" Version="8.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.FundingDataZone" Version="3.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Graph" Version="5.0.2" />
@@ -37,7 +37,7 @@
     <PackageReference Include="CalculateFunding.Common.ApiClient.Providers" Version="5.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Results" Version="7.0.2" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Publishing" Version="8.1.1" />
-    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="7.0.2" />
+    <PackageReference Include="CalculateFunding.Common.ApiClient.Specifications" Version="7.0.3" />
     <PackageReference Include="CalculateFunding.Common.ApiClient.Users" Version="4.0.2" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Calcs" Version="6.0.2" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Datasets" Version="6.0.2" />
@@ -48,7 +48,7 @@
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Providers" Version="5.0.2" />
     
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Results" Version="6.0.2" />
-    <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Specifications" Version="4.0.2" />
+    <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Specifications" Version="4.0.3" />
     <PackageReference Include="CalculateFunding.Common.Config.ApiClient.Profiling" Version="3.0.2" />
     <PackageReference Include="CalculateFunding.Common.Identity" Version="4.0.1" />
     <PackageReference Include="CalculateFunding.Common.Models" Version="3.0.0" />

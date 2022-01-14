@@ -1,3 +1,7 @@
 .govuk-tabs__tab {
   cursor: pointer;
 }
+
+.govuk-tabs__panel {
+  display: flow-root;
+}

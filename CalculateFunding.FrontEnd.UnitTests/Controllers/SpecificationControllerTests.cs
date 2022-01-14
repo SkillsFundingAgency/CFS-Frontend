@@ -13,6 +13,7 @@ using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Models;
 using CalculateFunding.Common.TemplateMetadata.Enums;
 using CalculateFunding.Frontend.Controllers;
+using CalculateFunding.Frontend.Extensions;
 using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Specs;
 using CalculateFunding.Frontend.ViewModels.Users;
@@ -375,7 +376,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             List<ProfileVariationPointer> aValidProfileVariationPointers = CreateTestProfileVariationPointers().ToList();
             _specificationsApiClient
                 .SetProfileVariationPointers(aValidSpecificationId, aValidProfileVariationPointers)
-                .Returns(HttpStatusCode.OK);
+                .Returns(new ValidatedApiResponse<HttpStatusCode>(HttpStatusCode.OK, HttpStatusCode.OK));
 
             IActionResult result = await _specificationController.SetProfileVariationPointers(
                 aValidSpecificationId,
@@ -398,17 +399,20 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         }
 
         [TestMethod]
-        public void SetProfileVariationPointers_Throws_InvalidOperationException_Given_An_Error_Occurred_While_Updating()
+        public async Task SetProfileVariationPointers_Returns_PreconditionFailedResult_Given_An_PreconditionFailure_Updating()
         {
             SetupAuthorizedUser(SpecificationActionTypes.CanEditSpecification);
             string aValidSpecificationId = "ABC";
             IEnumerable<ProfileVariationPointer> aValidProfileVariationPointers = CreateTestProfileVariationPointers();
+            _specificationsApiClient
+                .SetProfileVariationPointers(aValidSpecificationId, aValidProfileVariationPointers)
+                .Returns(new ValidatedApiResponse<HttpStatusCode>(HttpStatusCode.PreconditionFailed));
 
-            Func<Task> action = async () => await _specificationController.SetProfileVariationPointers(
+            IActionResult result = await _specificationController.SetProfileVariationPointers(
                 aValidSpecificationId,
                 aValidProfileVariationPointers);
 
-            action.Should().Throw<InvalidOperationException>();
+            result.Should().BeOfType<PreconditionFailedResult>();
         }
 
         [TestMethod]

@@ -575,10 +575,10 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPut]
         public async Task<IActionResult> SetProfileVariationPointers(
             [FromRoute] string specificationId,
-            [FromBody] IEnumerable<ProfileVariationPointer> profileVariationPointer)
+            [FromBody] IEnumerable<ProfileVariationPointer> profileVariationPointers)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
-            Guard.ArgumentNotNull(profileVariationPointer, nameof(profileVariationPointer));
+            Guard.ArgumentNotNull(profileVariationPointers, nameof(profileVariationPointers));
 
             if (!await _authorizationHelper.DoesUserHavePermission(
                 User,
@@ -588,15 +588,16 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            HttpStatusCode response =
-                await _specificationsApiClient.SetProfileVariationPointers(specificationId, profileVariationPointer);
+            ValidatedApiResponse<HttpStatusCode> response =
+                await _specificationsApiClient.SetProfileVariationPointers(specificationId, profileVariationPointers);
 
-            if (response == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.PreconditionFailed)
             {
-                return new OkObjectResult(response);
+                return new PreconditionFailedResult("Preconditions for setting variation pointers have not been met.");
             }
 
-            throw new InvalidOperationException($"An error occurred while updating profile variation pointers. Status code={response}");
+            return response.Handle("Variation pointers",
+                x => Ok(x.Content));
         }
 
         [Route("api/specs/{specificationId}/profile-variation-pointers")]
@@ -616,15 +617,16 @@ namespace CalculateFunding.Frontend.Controllers
                 return new ForbidResult();
             }
 
-            HttpStatusCode response =
+            ValidatedApiResponse<HttpStatusCode> response =
                 await _specificationsApiClient.MergeProfileVariationPointers(specificationId, profileVariationPointers);
 
-            if (response == HttpStatusCode.OK)
+            if (response.StatusCode == HttpStatusCode.PreconditionFailed)
             {
-                return new OkObjectResult(response);
+                return new PreconditionFailedResult("Preconditions for setting variation pointers have not been met.");
             }
 
-            throw new InvalidOperationException($"An error occurred while updating profile variation pointers. Status code={response}");
-        }
+            return response.Handle("Variation pointers",
+                x => Ok(x.Content));
+            }
     }
 }

@@ -9,7 +9,6 @@ using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
 using CalculateFunding.Common.ApiClient.Specifications;
-using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Identity.Authorization.Models;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
@@ -17,7 +16,6 @@ using CalculateFunding.Frontend.Helpers;
 using CalculateFunding.Frontend.ViewModels.Provider;
 using CalculateFunding.Frontend.ViewModels.Publish;
 using CalculateFunding.Frontend.ViewModels.Results;
-using CalculateFunding.Frontend.ViewModels.Specs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

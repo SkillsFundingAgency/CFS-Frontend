@@ -72,10 +72,19 @@ export function VariationManagement({ specificationId, fundingStreamId }: Variat
     setUpdatedPointers(updatedCollection);
   }
 
-  async function updatePointers() {
-    if (updatedPointers) {
-      await mergeProfileVariationPointersService(specificationId, updatedPointers).then(() => {
-        refetch();
+  async function updatePointers(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    clearErrorMessages();
+    e.preventDefault();
+    try {
+      if (updatedPointers) {
+        await mergeProfileVariationPointersService(specificationId, updatedPointers).then(() => {
+          refetch();
+        });
+      }
+    } catch (e: any) {
+      addError({
+        error: e,
+        description: "Error while trying to update variation pointers",
       });
     }
   }
@@ -156,7 +165,7 @@ export function VariationManagement({ specificationId, fundingStreamId }: Variat
                     <td colSpan={2}>
                       <button
                         className={"govuk-button govuk-!-margin-right-2"}
-                        onClick={() => updatePointers()}
+                        onClick={(e) => updatePointers(e)}
                       >
                         Save
                       </button>
