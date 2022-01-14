@@ -2,6 +2,7 @@ import { CompletionStatus } from "../../types/CompletionStatus";
 import { JobDetails } from "../../types/jobDetails";
 import { JobType } from "../../types/jobType";
 import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
+import { ProviderTransactionSummary } from "../../types/ProviderSummary";
 import { RunningStatus } from "../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
@@ -107,6 +108,31 @@ const makeFundingStreamPeriodProfilePattern = (
   };
 };
 
+const makeProviderTransactionSummary = (
+  overrides: Partial<ProviderTransactionSummary>
+): ProviderTransactionSummary => {
+  return {
+    status: 2,
+    results: [
+      {
+        providerId: "provider-id",
+        status: "Approved",
+        majorVersion: 0,
+        minorVersion: 1,
+        totalFunding: "123",
+        channelCode: "",
+        channelName: "Channel",
+        dateChanged: new Date().toLocaleDateString(),
+        author: "author",
+        variationReasons: ["variation-reason-1"],
+      },
+    ],
+    fundingTotal: "123,000",
+    latestStatus: "Approved",
+    ...overrides,
+  };
+};
+
 export const fakery = {
   makeSpecificationSummary,
   makeFundingStream,
@@ -114,4 +140,5 @@ export const fakery = {
   makeSuccessfulJob,
   makeFailedJob,
   makeFundingStreamPeriodProfilePattern,
+  makeProviderTransactionSummary,
 };

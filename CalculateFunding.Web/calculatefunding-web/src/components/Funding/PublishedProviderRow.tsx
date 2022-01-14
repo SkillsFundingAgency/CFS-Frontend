@@ -50,7 +50,7 @@ export const PublishedProviderRow = (props: IPublishedProviderRowProps) => {
             {provider.fundingStatus}{" "}
             {provider.majorVersion > 0 && <span>{`v${provider.majorVersion}.${provider.minorVersion}`}</span>}
           </td>
-          {actionType === FundingActionType.Release && (
+          {!!actionType && (
             <td className="govuk-table__cell govuk-body">
               {provider.releases?.map((release, idx) => (
                 <div

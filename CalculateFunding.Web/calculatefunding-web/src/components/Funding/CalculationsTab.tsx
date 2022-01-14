@@ -1,9 +1,9 @@
-import * as React from "react";
+﻿import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 
+import { useErrorContext } from "../../context/ErrorContext";
 import { useCalculationCircularDependencies } from "../../hooks/Calculations/useCalculationCircularDependencies";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
-import { ErrorProps } from "../../hooks/useErrors";
 import { getCalculationSummaryBySpecificationId } from "../../services/calculationService";
 import { getFundingLineStructureService } from "../../services/fundingStructuresService";
 import { getFundingStructureResultsForProviderAndSpecification } from "../../services/providerService";
@@ -12,14 +12,13 @@ import { FundingStructureItemViewModel, FundingStructureType } from "../../types
 import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { ProviderResultForSpecification } from "../../types/Provider/ProviderResultForSpecification";
+import { ProviderTransactionSummary } from "../../types/ProviderSummary";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { ValueFormatType } from "../../types/TemplateBuilderDefinitions";
 import { BackToTop } from "../BackToTop";
 import { CollapsibleSteps, setCollapsibleStepsAllStepsStatus } from "../CollapsibleSteps";
 import { formatNumber, NumberType } from "../FormattedNumber";
-import { InputSearch } from "../InputSearch";
-import { LoadingStatus } from "../LoadingStatus";
-import { FundingLineStep } from "./FundingLineStep";
+import { FundingLineStep } from "../fundingLineStructure/FundingLineStep";
 import {
   checkIfShouldOpenAllSteps,
   expandCalculationsByName,
@@ -27,25 +26,18 @@ import {
   setExpandStatusByFundingLineName,
   setInitialExpandedStatus,
   updateFundingLineExpandStatus,
-} from "./FundingLineStructureHelper";
+} from "../fundingLineStructure/FundingLineStructureHelper";
+import { InputSearch } from "../InputSearch";
+import { LoadingStatus } from "../LoadingStatus";
 
-export interface FundingLineResultsProps {
+export interface CalculationsTabProps {
   specification: SpecificationSummary;
-  providerId?: string;
-  addError: (props: ErrorProps) => void;
-  clearErrorMessages: (fieldNames?: string[]) => void;
-  refreshFundingLines?: boolean | undefined;
-  jobTypes: JobType[];
+  providerId: string;
+  transactions: ProviderTransactionSummary | undefined;
 }
 
-export function FundingLineResults({
-  specification,
-  providerId,
-  addError,
-  clearErrorMessages,
-  refreshFundingLines,
-  jobTypes,
-}: FundingLineResultsProps) {
+export function CalculationsTab({ specification, providerId, transactions }: CalculationsTabProps) {
+  const { addErrorToContext: addError, clearErrorsFromContext: clearErrorMessages } = useErrorContext();
   const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
   const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
   const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
@@ -60,7 +52,6 @@ export function FundingLineResults({
   const [fundingLineRenderInternalState, setFundingLineRenderInternalState] = useState<boolean>();
   const fundingLineStepReactRef = useRef(null);
   const nullReactRef = useRef(null);
-  const refreshFundingLinesRef = React.useRef(false);
 
   const { circularReferenceErrors, isLoadingCircularDependencies } = useCalculationCircularDependencies(
     specification.id,
@@ -255,26 +246,25 @@ export function FundingLineResults({
     fetchData();
 
     // monitor background jobs
-    if (jobTypes?.length) {
-      addSub({
-        filterBy: {
-          specificationId: specification.id,
-          jobTypes: jobTypes,
-        },
-        monitorMode: MonitorMode.SignalR,
-        monitorFallback: MonitorFallback.Polling,
-        onError: (err) => addError({ error: err, description: "Error while checking for background jobs" }),
-      });
-    }
+    addSub({
+      filterBy: {
+        specificationId: specification.id,
+        jobTypes: [
+          JobType.RefreshFundingJob,
+          JobType.ApproveAllProviderFundingJob,
+          JobType.ApproveBatchProviderFundingJob,
+          JobType.PublishAllProviderFundingJob,
+          JobType.PublishBatchProviderFundingJob,
+          JobType.PublishedFundingUndoJob,
+        ],
+      },
+      monitorMode: MonitorMode.SignalR,
+      monitorFallback: MonitorFallback.Polling,
+      onError: (err) => addError({ error: err, description: "Error while checking for background jobs" }),
+    });
 
     return () => removeAllSubs();
   }, []);
-
-  useEffect(() => {
-    if (!refreshFundingLinesRef.current && refreshFundingLines) {
-      fetchData();
-    }
-  }, [refreshFundingLines]);
 
   useEffect(() => {
     setFundingLineRenderInternalState(true);
@@ -322,7 +312,7 @@ export function FundingLineResults({
           title={"Loading funding line structure"}
           description={`${
             isLoadingFundingLineStructure
-              ? "Please wait whilst funding line structure is loading"
+              ? "Please wait whilst calculations are loading"
               : "Please wait. A funding job is running."
           }`}
         />
@@ -339,7 +329,14 @@ export function FundingLineResults({
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
-                <h2 className="govuk-heading-l">Funding line structure</h2>
+                <h2 className="govuk-heading-l govuk-!-margin-bottom-1">Calculations</h2>
+                {!!transactions?.results?.length && (
+                  <span className="govuk-caption-m govuk-!-margin-bottom-7">
+                    {`Showing calculation results for version 
+                  ${transactions.results[0].majorVersion}.${transactions.results[0].minorVersion} 
+                  (${transactions.latestStatus})`}
+                  </span>
+                )}
               </div>
               <div className="govuk-grid-column-one-third"></div>
               <div className="govuk-grid-column-two-thirds">

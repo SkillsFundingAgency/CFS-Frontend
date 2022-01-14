@@ -8,20 +8,20 @@ import { RouteComponentProps, useLocation } from "react-router";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { CalculationsTab } from "../../components/Funding/CalculationsTab";
 import { FundingResultsBreadcrumb } from "../../components/Funding/FundingResultsBreadcrumb";
 import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
 import { ProviderFundingProfilingPatterns } from "../../components/Funding/ProviderFundingProfilingPatterns";
 import { ProviderFundingProfilingSummary } from "../../components/Funding/ProviderFundingProfilingSummary";
 import { ProviderFundingStreamHistory } from "../../components/Funding/ProviderFundingStreamHistory";
-import { FundingLineResults } from "../../components/fundingLineStructure/FundingLineResults";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { ProviderSummarySection } from "../../components/Providers/ProviderSummarySection";
 import { Tabs } from "../../components/Tabs";
+import { useErrorContext } from "../../context/ErrorContext";
 import { useProviderVersion } from "../../hooks/Providers/useProviderVersion";
 import { useCurrentPublishedProvider } from "../../hooks/PublishedProviders/useCurrentPublishedProvider";
-import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import { IStoreState } from "../../reducers/rootReducer";
 import { getCurrentProfileConfigService } from "../../services/fundingLineDetailsService";
@@ -31,7 +31,6 @@ import {
 } from "../../services/providerService";
 import { FeatureFlagsState } from "../../states/FeatureFlagsState";
 import { FundingLineProfile } from "../../types/FundingLineProfile";
-import { JobType } from "../../types/jobType";
 import { ProviderProfileTotalsForStreamAndPeriod } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import { ProviderTransactionSummary } from "../../types/ProviderSummary";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
@@ -51,7 +50,7 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
   );
   const [initialTab, setInitialTab] = useState<string>("");
   const location = useLocation();
-  const { errors, addError, clearErrorMessages } = useErrors();
+  const { state: errors, addErrorToContext: addError, clearErrorsFromContext } = useErrorContext();
 
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
     addError({ error: err, description: "Error while loading specification" })
@@ -149,6 +148,10 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
     }
   }, [location]);
 
+  useEffect(() => {
+    return clearErrorsFromContext;
+  }, []);
+
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
@@ -226,20 +229,10 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
               <Tabs.Panel label="calculations">
                 {isLoadingSpecification && <LoadingFieldStatus title="Loading specification..." />}
                 {specification && (
-                  <FundingLineResults
-                    actionType={actionType}
+                  <CalculationsTab
                     specification={specification}
                     providerId={providerId}
-                    addError={addError}
-                    jobTypes={[
-                      JobType.RefreshFundingJob,
-                      JobType.ApproveAllProviderFundingJob,
-                      JobType.ApproveBatchProviderFundingJob,
-                      JobType.PublishAllProviderFundingJob,
-                      JobType.PublishBatchProviderFundingJob,
-                      JobType.PublishedFundingUndoJob,
-                    ]}
-                    clearErrorMessages={clearErrorMessages}
+                    transactions={transactions}
                   />
                 )}
               </Tabs.Panel>

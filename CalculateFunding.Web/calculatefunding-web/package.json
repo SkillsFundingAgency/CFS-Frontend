@@ -41,7 +41,6 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "tsc-files --noEmit",
       "pretty-quick --staged",
       "eslint --fix"
     ],

@@ -12,7 +12,6 @@ import { NoData } from "../../NoData";
 import { Pagination } from "../../Pagination";
 import { PublishedProviderRow } from "../PublishedProviderRow";
 
-
 export interface ApprovalResultsTableProps {
   specificationId: string;
   fundingStreamId: string;
@@ -111,6 +110,7 @@ export function ApprovalResultsTable(props: ApprovalResultsTableProps) {
                 )}
               </th>
               <th className="govuk-table__header govuk-body">Status</th>
+              <th className="govuk-table__header govuk-body">Released version</th>
               <th className="govuk-table__header govuk-body">
                 Funding total
                 <br />

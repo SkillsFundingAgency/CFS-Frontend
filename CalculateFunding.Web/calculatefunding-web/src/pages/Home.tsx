@@ -46,11 +46,9 @@ export function Home(props: { featureFlags: FeatureFlagsState }) {
               {props.featureFlags.enableNewFundingManagement ? (
                 <div className="govuk-grid-column-one-third">
                   <div className="govuk-heading-m">
-                    <TextLink to="/Approvals/Select">Funding management</TextLink>
+                    <TextLink to="/FundingManagement">Funding management</TextLink>
                   </div>
-                  <p className="govuk-body">
-                    Approve and release allocations for statement and funding.
-                  </p>
+                  <p className="govuk-body">Approve and release allocations for statement and funding.</p>
                 </div>
               ) : (
                 <div className="govuk-grid-column-one-third">
