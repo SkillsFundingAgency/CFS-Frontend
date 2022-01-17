@@ -2,7 +2,7 @@ import { CompletionStatus } from "../../types/CompletionStatus";
 import { JobDetails } from "../../types/jobDetails";
 import { JobType } from "../../types/jobType";
 import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
-import { ProviderTransactionSummary } from "../../types/ProviderSummary";
+import { ProviderSummary, ProviderTransactionSummary } from "../../types/ProviderSummary";
 import { RunningStatus } from "../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
@@ -133,6 +133,86 @@ const makeProviderTransactionSummary = (
   };
 };
 
+const makeProviderSummary = (overrides: Partial<ProviderSummary>): ProviderSummary => {
+  return {
+    authority: "",
+    countryCode: "",
+    countryName: "",
+    crmAccountId: "",
+    dfeEstablishmentNumber: "",
+    establishmentNumber: "establishmentNumberTest",
+    furtherEducationTypeCode: "",
+    furtherEducationTypeName: "",
+    id: "Hog-1",
+    laCode: "",
+    legalName: "",
+    name: "Hogwarts School of Witchcraft and Wizardry",
+    navVendorNo: "",
+    phaseOfEducation: "",
+    postcode: "",
+    providerId: "Hog",
+    providerProfileIdType: "",
+    providerSubType: "",
+    providerType: "",
+    providerVersionId: "",
+    reasonEstablishmentClosedCode: "",
+    reasonEstablishmentOpenedCode: "",
+    rscRegionCode: "",
+    rscRegionName: "",
+    status: "",
+    successor: "",
+    town: "",
+    trustCode: "",
+    trustName: "",
+    trustStatus: "",
+    ukprn: "ukprn test",
+    upin: "",
+    urn: "",
+    paymentOrganisationIdentifier: "",
+    paymentOrganisationName: "",
+    censusWardCode: "",
+    censusWardName: "",
+    companiesHouseNumber: "",
+    dateClosed: "",
+    dateOpened: "",
+    districtCode: "",
+    districtName: "",
+    governmentOfficeRegionCode: "",
+    governmentOfficeRegionName: "",
+    groupIdNumber: "",
+    localAuthorityName: "",
+    localGovernmentGroupTypeCode: "",
+    localGovernmentGroupTypeName: "",
+    middleSuperOutputAreaCode: "",
+    middleSuperOutputAreaName: "",
+    officialSixthFormCode: "",
+    officialSixthFormName: "",
+    parliamentaryConstituencyCode: "",
+    parliamentaryConstituencyName: "",
+    paymentOrganisationCompanyHouseNumber: "",
+    paymentOrganisationLaCode: "",
+    paymentOrganisationTrustCode: "",
+    paymentOrganisationType: "",
+    paymentOrganisationUkprn: "",
+    paymentOrganisationUpin: "",
+    paymentOrganisationUrn: "",
+    phaseOfEducationCode: "",
+    previousEstablishmentNumber: "",
+    previousLaCode: "",
+    previousLaName: "",
+    providerSubTypeCode: "",
+    providerTypeCode: "",
+    statusCode: "",
+    statutoryHighAge: "",
+    statutoryLowAge: "",
+    wardCode: "",
+    wardName: "",
+    predecessors: ["predecessors1", "predecessors2"],
+    successors: ["successors1", "successors2"],
+    ...overrides,
+  };
+};
+
 export const fakery = {
   makeSpecificationSummary,
   makeFundingStream,
@@ -141,4 +221,5 @@ export const fakery = {
   makeFailedJob,
   makeFundingStreamPeriodProfilePattern,
   makeProviderTransactionSummary,
+  makeProviderSummary,
 };

@@ -15,7 +15,7 @@ export type ProviderVersionQueryResult = {
 
 export const useProviderVersion = (
   providerId: string,
-  providerVersionId: string,
+  providerVersionId: string | undefined,
   onError: (err: AxiosError) => void,
   options: Partial<UseQueryOptions<ProviderSummary, AxiosError>> = {}
 ): ProviderVersionQueryResult => {
@@ -28,7 +28,7 @@ export const useProviderVersion = (
       cacheTime: milliseconds.TenSeconds,
       staleTime: milliseconds.OneDay,
       refetchOnWindowFocus: false,
-      enabled: providerId?.length > 0 && providerVersionId?.length > 0,
+      enabled: providerId?.length > 0 && versionId?.length > 0,
       ...options,
     }
   );

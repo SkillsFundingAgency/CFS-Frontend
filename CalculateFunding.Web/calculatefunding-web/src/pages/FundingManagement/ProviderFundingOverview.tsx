@@ -11,6 +11,7 @@ import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CalculationsTab } from "../../components/Funding/CalculationsTab";
 import { FundingResultsBreadcrumb } from "../../components/Funding/FundingResultsBreadcrumb";
 import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
+import { ProviderDataTab } from "../../components/Funding/ProviderDataTab";
 import { ProviderFundingProfilingPatterns } from "../../components/Funding/ProviderFundingProfilingPatterns";
 import { ProviderFundingProfilingSummary } from "../../components/Funding/ProviderFundingProfilingSummary";
 import { ProviderFundingStreamHistory } from "../../components/Funding/ProviderFundingStreamHistory";
@@ -156,7 +157,7 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
-        <Breadcrumb name="Funding Management" url={"/FundingManagement"} />
+        <Breadcrumb name="Funding Management" url="/FundingManagement" />
         <FundingSelectionBreadcrumb actionType={actionType} />
         <FundingResultsBreadcrumb
           actionType={actionType}
@@ -189,6 +190,7 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
                 <Tabs.Tab label="funding-stream-history">Funding stream history</Tabs.Tab>
                 <Tabs.Tab label="profiling">Profiling</Tabs.Tab>
                 <Tabs.Tab label="calculations">Calculations</Tabs.Tab>
+                <Tabs.Tab label="provider-data">Provider data</Tabs.Tab>
               </ul>
               <Tabs.Panel label="funding-stream-history">
                 {isLoadingTransactions && <LoadingStatus title="Loading..." />}
@@ -200,7 +202,7 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
                 {featureFlagsState.profilingPatternVisible
                   ? isLoadingProfilingPatterns
                   : (isLoadingSpecification || isLoadingProfileTotals) && (
-                      <LoadingStatus title={"Loading..."} />
+                      <LoadingStatus title="Loading..." />
                     )}
                 {!featureFlagsState.profilingPatternVisible &&
                   !isLoadingSpecification &&
@@ -235,6 +237,9 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
                     transactions={transactions}
                   />
                 )}
+              </Tabs.Panel>
+              <Tabs.Panel label="provider-data">
+                <ProviderDataTab providerId={providerId} providerVersionId={specCoreProviderVersionId} />
               </Tabs.Panel>
             </Tabs>
           </div>

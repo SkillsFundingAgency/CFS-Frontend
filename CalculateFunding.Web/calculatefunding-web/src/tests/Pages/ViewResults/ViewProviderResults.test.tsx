@@ -3,9 +3,10 @@ import userEvent from "@testing-library/user-event";
 import React from "react";
 import { MemoryRouter, Route, Switch } from "react-router";
 
+import { ErrorContextWrapper } from "../../../context/ErrorContext";
 import { ProviderVersionQueryResult } from "../../../hooks/Providers/useProviderVersion";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
-import { ProviderSummary } from "../../../types/ProviderSummary";
+import { fakery } from "../../fakes/fakery";
 
 describe("<ViewProviderResults />", () => {
   beforeEach(async () => {
@@ -42,10 +43,12 @@ const renderPage = async () => {
   const page = render(
     <MemoryRouter initialEntries={["/ViewResults/ViewProviderResults/Hog/1619"]}>
       <Switch>
-        <Route
-          path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId"
-          component={ViewProviderResults}
-        />
+        <ErrorContextWrapper>
+          <Route
+            path="/ViewResults/ViewProviderResults/:providerId/:fundingStreamId"
+            component={ViewProviderResults}
+          />
+        </ErrorContextWrapper>
       </Switch>
     </MemoryRouter>
   );
@@ -57,82 +60,7 @@ const renderPage = async () => {
   return page;
 };
 
-const testProvider: ProviderSummary = {
-  authority: "",
-  countryCode: "",
-  countryName: "",
-  crmAccountId: "",
-  dfeEstablishmentNumber: "",
-  establishmentNumber: "establishmentNumberTest",
-  furtherEducationTypeCode: "",
-  furtherEducationTypeName: "",
-  id: "Hog-1",
-  laCode: "",
-  legalName: "",
-  name: "Hogwarts School of Witchcraft and Wizardry",
-  navVendorNo: "",
-  phaseOfEducation: "",
-  postcode: "",
-  providerId: "Hog",
-  providerProfileIdType: "",
-  providerSubType: "",
-  providerType: "",
-  providerVersionId: "",
-  reasonEstablishmentClosedCode: "",
-  reasonEstablishmentOpenedCode: "",
-  rscRegionCode: "",
-  rscRegionName: "",
-  status: "",
-  successor: "",
-  town: "",
-  trustCode: "",
-  trustName: "",
-  trustStatus: "",
-  ukprn: "ukprn test",
-  upin: "",
-  urn: "",
-  paymentOrganisationIdentifier: "",
-  paymentOrganisationName: "",
-  censusWardCode: "",
-  censusWardName: "",
-  companiesHouseNumber: "",
-  dateClosed: "",
-  dateOpened: "",
-  districtCode: "",
-  districtName: "",
-  governmentOfficeRegionCode: "",
-  governmentOfficeRegionName: "",
-  groupIdNumber: "",
-  localAuthorityName: "",
-  localGovernmentGroupTypeCode: "",
-  localGovernmentGroupTypeName: "",
-  middleSuperOutputAreaCode: "",
-  middleSuperOutputAreaName: "",
-  officialSixthFormCode: "",
-  officialSixthFormName: "",
-  parliamentaryConstituencyCode: "",
-  parliamentaryConstituencyName: "",
-  paymentOrganisationCompanyHouseNumber: "",
-  paymentOrganisationLaCode: "",
-  paymentOrganisationTrustCode: "",
-  paymentOrganisationType: "",
-  paymentOrganisationUkprn: "",
-  paymentOrganisationUpin: "",
-  paymentOrganisationUrn: "",
-  phaseOfEducationCode: "",
-  previousEstablishmentNumber: "",
-  previousLaCode: "",
-  previousLaName: "",
-  providerSubTypeCode: "",
-  providerTypeCode: "",
-  statusCode: "",
-  statutoryHighAge: "",
-  statutoryLowAge: "",
-  wardCode: "",
-  wardName: "",
-  predecessors: ["predecessors1", "predecessors2"],
-  successors: ["successors1", "successors2"],
-};
+const testProvider = fakery.makeProviderSummary({});
 const providerResult: ProviderVersionQueryResult = {
   providerVersion: testProvider,
   isLoadingProviderVersion: false,

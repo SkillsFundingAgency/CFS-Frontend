@@ -49,8 +49,20 @@ export function ProviderSummarySection(props: ProviderSummarySectionProps) {
         <div className="govuk-grid-column-one-half">
           <dl className="govuk-summary-list govuk-summary-list--no-border">
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">UKPRN</dt>
-              <dd className="govuk-summary-list__value">
+              {/*<div className="govuk-summary-list__row">
+        <dt className="govuk-summary-list__key">
+          <label id={`${props.id}-label`} htmlFor={props.id}>
+            {props.title}
+          </label>
+        </dt>
+        <dd className="govuk-summary-list__value" id={props.id} aria-labelledby={`${props.id}-label`}>
+          {props.children}
+        </dd>
+      </div>*/}
+              <dt className="govuk-summary-list__key">
+                <label id="ukprn-label">UKPRN</label>
+              </dt>
+              <dd className="govuk-summary-list__value" aria-labelledby="ukprn-label">
                 {props.isLoadingProviderVersion ? (
                   <LoadingFieldStatus title="Loading..." />
                 ) : props.providerVersion?.ukprn ? (
@@ -61,8 +73,10 @@ export function ProviderSummarySection(props: ProviderSummarySectionProps) {
               </dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Specification</dt>
-              <dd className="govuk-summary-list__value">
+              <dt className="govuk-summary-list__key">
+                <label id="specification-label">Specification</label>
+              </dt>
+              <dd className="govuk-summary-list__value" aria-labelledby="specification-label">
                 {props.isLoadingSpecification ? (
                   <LoadingFieldStatus title="Loading..." />
                 ) : props.specification ? (
@@ -73,14 +87,18 @@ export function ProviderSummarySection(props: ProviderSummarySectionProps) {
               </dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Latest status</dt>
-              <dd className="govuk-summary-list__value">
+              <dt className="govuk-summary-list__key">
+                <label id="status-label">Latest status</label>
+              </dt>
+              <dd className="govuk-summary-list__value" aria-labelledby="status-label">
                 {props.status === "" ? <LoadingFieldStatus title="Loading..." /> : props.status}
               </dd>
             </div>
             <div className="govuk-summary-list__row">
-              <dt className="govuk-summary-list__key">Funding total</dt>
-              <dd className="govuk-summary-list__value">
+              <dt className="govuk-summary-list__key">
+                <label id="funding-label">Funding total</label>
+              </dt>
+              <dd className="govuk-summary-list__value" aria-labelledby="funding-label">
                 {props.fundingTotal === "" ? <LoadingFieldStatus title="Loading..." /> : props.fundingTotal}
               </dd>
             </div>
