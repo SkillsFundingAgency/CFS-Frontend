@@ -44,12 +44,21 @@ export async function getCurrentPublishedProvider(
   );
 }
 
+export async function getReleasedProviderTransactionsService(
+  specificationId: string,
+  providerId: string
+): Promise<AxiosResponse<ProviderTransactionSummary>> {
+  return axios.get<ProviderTransactionSummary>(
+    `${baseURL}/getreleasedprovidertransactions/${specificationId}/${providerId}`
+  );
+}
+
 export async function getProviderTransactionsService(
   specificationId: string,
   providerId: string
 ): Promise<AxiosResponse<ProviderTransactionSummary>> {
   return axios.get<ProviderTransactionSummary>(
-    `${baseURL}/getProviderTransactions/${specificationId}/${providerId}`
+    `${baseURL}/getprovidertransactions/${specificationId}/${providerId}`
   );
 }
 

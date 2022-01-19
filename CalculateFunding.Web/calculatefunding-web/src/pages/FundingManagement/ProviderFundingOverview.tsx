@@ -27,8 +27,8 @@ import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import { IStoreState } from "../../reducers/rootReducer";
 import { getCurrentProfileConfigService } from "../../services/fundingLineDetailsService";
 import {
-  getProviderTransactionsService,
   getReleasedProfileTotalsService,
+  getReleasedProviderTransactionsService,
 } from "../../services/providerService";
 import { FeatureFlagsState } from "../../states/FeatureFlagsState";
 import { FundingLineProfile } from "../../types/FundingLineProfile";
@@ -78,9 +78,12 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
     ProviderTransactionSummary,
     AxiosError
   >(
-    `provider-transactions-for-spec-${specificationId}-provider-${providerId}`,
-    async () => (await getProviderTransactionsService(specificationId, providerId)).data,
-    { onError: (err) => addError({ error: err, description: "Error while loading provider transactions" }) }
+    `provider-released-transactions-for-spec-${specificationId}-provider-${providerId}`,
+    async () => (await getReleasedProviderTransactionsService(specificationId, providerId)).data,
+    {
+      onError: (err) =>
+        addError({ error: err, description: "Error while loading released provider transactions" }),
+    }
   );
 
   const { data: profilingPatterns, isLoading: isLoadingProfilingPatterns } = useQuery<

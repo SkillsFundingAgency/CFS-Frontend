@@ -137,15 +137,15 @@ namespace CalculateFunding.Frontend.Controllers
             return new NotFoundObjectResult(Content("Error. Not Found."));
         }
 
-        [Route("api/provider/getProviderTransactions/{specificationId}/{providerId}")]
+        [Route("api/provider/getreleasedprovidertransactions/{specificationId}/{providerId}")]
         [HttpGet]
-        public async Task<IActionResult> GetPublishedProviderTransactions(string specificationId, string providerId)
+        public async Task<IActionResult> GetReleasedPublishedProviderTransactions(string specificationId, string providerId)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
 
             ApiResponse<IEnumerable<ReleasePublishedProviderTransaction>> result =
-                await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
+                await _publishingApiClient.GetReleasedPublishedProviderTransactions(specificationId, providerId);
 
             if (result == null || !result.Content.Any())
             {
@@ -176,6 +176,45 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ReleasePublishedProviderTransaction latestPublishedProvider = result.Content.OrderByDescending(x => x.Date).First();
+
+            output.FundingTotal = latestPublishedProvider?.TotalFunding != null
+                ? $"£{latestPublishedProvider.TotalFunding.Value:N2}"
+                : "";
+
+            output.LatestStatus = result.Content.OrderByDescending(x => x.Date).FirstOrDefault()?.Status.ToString();
+
+            return new OkObjectResult(output);
+        }
+
+        [Route("api/provider/getprovidertransactions/{specificationId}/{providerId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPublishedProviderTransactions(string specificationId, string providerId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+            Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
+
+            ApiResponse<IEnumerable<PublishedProviderTransaction>> result =
+                await _publishingApiClient.GetPublishedProviderTransactions(specificationId, providerId);
+
+            if (result == null || !result.Content.Any())
+                return new NotFoundObjectResult(Content("Error. Not Found."));
+
+            ProviderTransactionResultsViewModel output = new ProviderTransactionResultsViewModel
+            { Status = result.StatusCode, Results = new List<ProviderTransactionResultsItemViewModel>() };
+
+            foreach (PublishedProviderTransaction item in result.Content)
+            {
+                output.Results.Add(new ProviderTransactionResultsItemViewModel
+                {
+                    Status = item.Status.ToString(),
+                    Author = item.Author.Name,
+                    DateChanged = $"{item.Date:M} {item.Date.Year} at {item.Date.DateTime:h:mm tt}",
+                    TotalFunding = item.TotalFunding.HasValue ? $"£{item.TotalFunding.Value:N2}" : "",
+                    VariationReasons = item.VariationReasons
+                });
+            }
+
+            PublishedProviderTransaction latestPublishedProvider = result.Content.OrderByDescending(x => x.Date).First();
 
             output.FundingTotal = latestPublishedProvider?.TotalFunding != null
                 ? $"£{latestPublishedProvider.TotalFunding.Value:N2}"
