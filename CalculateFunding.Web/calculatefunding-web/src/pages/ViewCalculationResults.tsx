@@ -230,7 +230,17 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   }
 
   function clearFilters() {
-    setCalculationProviderSearchRequest(initialSearch);
+    setIsLoading(true);
+    setCalculationProviderSearchRequest((prevState) => {
+      return { ...prevState,
+        localAuthority: [],
+        providerType: [],
+        providerSubType: [],
+        errorToggle: "",
+        searchTerm:"",
+        pageNumber: 1 };
+    });
+
     // @ts-ignore
     document.getElementById("searchProviders").reset();
   }
@@ -504,12 +514,12 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                   );
                 })}
               </div>
-              {providers.totalResults === 0 && singleFire ? (
+              {providers.totalResults === 0 && singleFire && !isLoading ? (
                 <h2 className="govuk-heading-m">There are no results available</h2>
               ) : (
                 ""
               )}
-              {providers.totalResults > 0 && (
+              {providers.totalResults > 0 && !isLoading && (
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-two-thirds">
                     <Pagination
