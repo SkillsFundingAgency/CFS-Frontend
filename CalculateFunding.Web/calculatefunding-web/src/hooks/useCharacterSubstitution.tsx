@@ -37,6 +37,7 @@ export const useCharacterSubstitution = (): CharacterSubstitutionResult => {
         className = className.replace("£", "Pound");
         className = className.replace("=", "Equals");
         className = className.replace("+", "Plus");
+        className = className.replace(/["]+/g, "");
 
         const chars: string[] = [];
 
