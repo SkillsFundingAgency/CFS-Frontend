@@ -3,6 +3,8 @@ import { DateTime } from "luxon";
 
 import * as jobSubscriptionHook from "../hooks/Jobs/useJobSubscription";
 import { AddJobSubscription } from "../hooks/Jobs/useJobSubscription";
+import * as featureFlagsHook from "../hooks/useFeatureFlags";
+import { FeatureFlagsState } from "../states/FeatureFlagsState";
 import { CompletionStatus } from "../types/CompletionStatus";
 import { JobDetails } from "../types/jobDetails";
 import { JobNotification, JobSubscription } from "../types/Jobs/JobSubscriptionModels";
@@ -178,6 +180,8 @@ export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string 
     return jobSubscriptionSpy;
   };
 
+
+
   return {
     setupJobSpy,
     notification,
@@ -190,3 +194,31 @@ export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string 
     waitForLoadingToFinish
   };
 };
+
+export const featureFlagsTestHelper = () => {
+  const setupFeatureFlags = (enableReactQueryDevTool: boolean,
+                                    profilingPatternVisible: boolean,
+                                    releaseTimetableVisible: boolean,
+                                    specToSpec: boolean,
+                                    templateBuilderVisible: boolean,
+                                    enableNewFundingManagement:boolean) =>{
+    const featureFlagsSpy = jest.spyOn(featureFlagsHook, "useFeatureFlags");
+    featureFlagsSpy.mockImplementation(() => {
+      const featureFlagsState : FeatureFlagsState = {
+        enableReactQueryDevTool: enableReactQueryDevTool,
+        profilingPatternVisible: profilingPatternVisible,
+        releaseTimetableVisible: releaseTimetableVisible,
+        specToSpec: specToSpec,
+        templateBuilderVisible: templateBuilderVisible,
+        enableNewFundingManagement:enableNewFundingManagement
+      }
+      return  { featureFlagsState };
+
+    });
+    return featureFlagsSpy;
+  }
+
+  return {
+    setupFeatureFlags
+  }
+}

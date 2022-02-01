@@ -7,7 +7,7 @@ import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 const {
   hasNoJobObserverState,
   mockSpecificationPermissions,
-  mockApprovedSpecificationService,
+    mockSpecificationService,
   mockFundingLineStructureService,
   mockDatasetBySpecificationIdService,
   mockCalculationService,
@@ -23,7 +23,7 @@ describe("<ViewSpecification /> ", () => {
       haveNoJobNotification();
       setupJobSpy();
       mockSpecificationPermissions();
-      mockApprovedSpecificationService();
+      mockSpecificationService();
       mockFundingLineStructureService();
       mockDatasetBySpecificationIdService();
       mockCalculationService();

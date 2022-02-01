@@ -1,13 +1,14 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
+import { featureFlagsTestHelper,jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
 const {
   hasNoJobObserverState,
   mockSpecificationPermissions,
   mockApprovedSpecificationService,
+    mockSpecificationService,
   mockFundingLineStructureService,
   mockDatasetBySpecificationIdService,
   mockCalculationWithDraftCalculationsService,
@@ -15,15 +16,16 @@ const {
   renderViewApprovedSpecificationPage,
 } = ViewSpecificationTestData();
 const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({});
-
+const { setupFeatureFlags } = featureFlagsTestHelper();
 describe("<ViewSpecification /> ", () => {
   describe("approving all calcs", () => {
     beforeEach(async () => {
       haveNoJobNotification();
       setupJobSpy();
+      setupFeatureFlags(false, false, false, false, false, true);
       hasNoJobObserverState();
       mockSpecificationPermissions();
-      mockApprovedSpecificationService();
+      mockSpecificationService();
       mockFundingLineStructureService();
       mockDatasetBySpecificationIdService();
       mockCalculationWithDraftCalculationsService();

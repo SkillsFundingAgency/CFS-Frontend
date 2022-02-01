@@ -98,11 +98,6 @@ describe("<SpecificationFundingLineResults/> tests", () => {
       setupJobSpy();
     });
 
-    it("shows approve status in funding line structure tab", async () => {
-      const { queryAllByText } = renderView();
-      await waitFor(() => expect(queryAllByText("Draft")[0]).toHaveClass("govuk-tag"));
-    });
-
     it("renders collapsible steps", async () => {
       const { container } = renderView();
       await waitFor(() => expect(container.querySelectorAll(".collapsible-steps")).toHaveLength(1));

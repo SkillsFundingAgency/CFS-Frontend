@@ -251,11 +251,6 @@ export function SpecificationFundingLineResults({
               <div className="govuk-grid-column-two-thirds">
                 <h2 className="govuk-heading-l">
                   Funding line structure
-                  <ApproveStatusButton
-                    id={specification.id}
-                    status={specification.approvalStatus}
-                    callback={handleApproveFundingLineStructure}
-                  />
                 </h2>
               </div>
               <div className="govuk-grid-column-one-third"></div>
