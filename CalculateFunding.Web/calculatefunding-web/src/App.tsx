@@ -53,16 +53,17 @@ import { ProviderFundingOverviewOld } from "./pages/FundingApprovals/ProviderFun
 import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
 import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
 import { ViewEditFundingLineProfileOld } from "./pages/FundingApprovals/ViewEditFundingLineProfileOld";
-import FundingManagement from "./pages/FundingManagement/FundingManagement";
-import { FundingManagementApprovalConfirm } from "./pages/FundingManagement/FundingManagementApprovalConfirm";
-import { FundingManagementApprovalResults } from "./pages/FundingManagement/FundingManagementApprovalResults";
-import { FundingManagementApprovalSelection } from "./pages/FundingManagement/FundingManagementApprovalSelection";
-import { FundingManagementApprovalUploadBatch } from "./pages/FundingManagement/FundingManagementApprovalUploadBatch";
+import { ConfirmApprovalOfFunding } from "./pages/FundingManagement/ConfirmApprovalOfFunding";
+import FundingManagementHome from "./pages/FundingManagement/FundingManagementHome";
 import { ProviderFundingOverview } from "./pages/FundingManagement/ProviderFundingOverview";
-import { FundingManagementReleaseProviderSearch } from "./pages/FundingManagement/Releases/FundingManagementReleaseProviderSearch";
-import { FundingManagementReleasePurpose } from "./pages/FundingManagement/Releases/FundingManagementReleasePurpose";
-import { FundingManagementReleaseSelection } from "./pages/FundingManagement/Releases/FundingManagementReleaseSelection";
-import { FundingManagementReleaseUploadBatch } from "./pages/FundingManagement/Releases/FundingManagementReleaseUploadBatch";
+import { ProvidersForFundingApproval } from "./pages/FundingManagement/ProvidersForFundingApproval";
+import { ConfirmFundingRelease } from "./pages/FundingManagement/Releases/ConfirmFundingRelease";
+import { ProvidersForFundingRelease } from "./pages/FundingManagement/Releases/ProvidersForFundingRelease";
+import { PurposeOfFundingRelease } from "./pages/FundingManagement/Releases/PurposeOfFundingRelease";
+import { SelectSpecificationForFundingRelease } from "./pages/FundingManagement/Releases/SelectSpecificationForFundingRelease";
+import { UploadProvidersForRelease } from "./pages/FundingManagement/Releases/UploadProvidersForRelease";
+import { SelectSpecificationForFundingApproval } from "./pages/FundingManagement/SelectSpecificationForFundingApproval";
+import { UploadProvidersForFundingApproval } from "./pages/FundingManagement/UploadProvidersForFundingApproval";
 import { ViewEditFundingLineProfile } from "./pages/FundingManagement/ViewEditFundingLineProfile";
 import { Home } from "./pages/Home";
 import { Admin } from "./pages/Permissions/Admin";
@@ -241,39 +242,43 @@ const permissionsRoutes = (
 
 const fundingManagementRoutes = (
   <Route path="/FundingManagement">
-    <Route path="/FundingManagement" exact={true} component={FundingManagement} />
+    <Route path="/FundingManagement" exact={true} component={FundingManagementHome} />
     <Route
       path="/FundingManagement/Approve/Selection"
       exact={true}
-      component={FundingManagementApprovalSelection}
+      component={SelectSpecificationForFundingApproval}
     />
     <Route
       path="/FundingManagement/Approve/Results/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={FundingManagementApprovalResults}
+      component={ProvidersForFundingApproval}
     />
     <Route
       path="/FundingManagement/Approve/Confirm/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={FundingManagementApprovalConfirm}
+      component={ConfirmApprovalOfFunding}
     />
     <Route
       path="/FundingManagement/Approve/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={FundingManagementApprovalUploadBatch}
+      component={UploadProvidersForFundingApproval}
     />
     <Route
       path="/FundingManagement/Release/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
       exact={true}
-      component={FundingManagementReleaseUploadBatch}
+      component={UploadProvidersForRelease}
     />
     <Route
       path="/FundingManagement/Release/Results/:fundingStreamId/:fundingPeriodId/:specificationId"
       exact={true}
-      component={FundingManagementReleaseProviderSearch}
+      component={ProvidersForFundingRelease}
     />
-    <Route path="/FundingManagement/Release/Select" component={FundingManagementReleaseSelection} />
+    <Route path="/FundingManagement/Release/Select" component={SelectSpecificationForFundingRelease} />
     <Route
       path="/FundingManagement/Release/Purpose/:fundingStreamId/:fundingPeriodId/:specificationId"
       exact={true}
-      component={FundingManagementReleasePurpose}
+      component={PurposeOfFundingRelease}
+    />
+    <Route
+      path="/FundingManagement/Release/Confirm/:fundingStreamId/:fundingPeriodId/:specificationId"
+      component={ConfirmFundingRelease}
     />
     <Route
       path="/FundingManagement/:actionType/Provider/:providerId/Specification/:specificationId/Version/:specCoreProviderVersionId"

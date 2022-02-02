@@ -1,7 +1,7 @@
 ﻿import { AxiosError } from "axios";
 import { useQuery } from "react-query";
 
-import { getPublishedProviderErrors } from "../../services/publishedProviderService";
+import { publishedProviderService } from "../../services/publishedProviderService";
 
 export type PublishedProviderErrorSearchQueryResult = {
   publishedProvidersWithErrors: string[] | undefined;
@@ -15,7 +15,7 @@ export const usePublishedProviderErrorSearch = (
 ): PublishedProviderErrorSearchQueryResult => {
   const { data, isLoading, isError, error } = useQuery<string[], AxiosError>(
     `published-provider-errors-for-spec-${specificationId}`,
-    async () => (await getPublishedProviderErrors(specificationId)).data,
+    async () => (await publishedProviderService.getPublishedProviderErrors(specificationId)).data,
     {
       onError,
       enabled: (specificationId && specificationId.length > 0) === true,

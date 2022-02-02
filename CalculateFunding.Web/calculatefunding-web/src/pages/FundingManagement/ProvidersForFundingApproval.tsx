@@ -9,6 +9,7 @@ import { initialiseFundingSearchSelection } from "../../actions/FundingSearchSel
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
+import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
 import { PublishedProviderResults } from "../../components/Funding/PublishedProviderResults";
 import { PublishedProviderSearchFilters } from "../../components/Funding/PublishedProviderSearchFilters";
 import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
@@ -42,12 +43,10 @@ export interface FundingManagementApprovalResultsProps {
   specificationId: string;
 }
 
-export const FundingManagementApprovalResults = ({
+export const ProvidersForFundingApproval = ({
   match,
 }: RouteComponentProps<FundingManagementApprovalResultsProps>): JSX.Element => {
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specificationId = match.params.specificationId;
+  const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
@@ -300,7 +299,7 @@ export const FundingManagementApprovalResults = ({
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
-        <Breadcrumb name={"Funding approvals"} url={"/FundingManagementApprovalSelection"} />
+        <FundingSelectionBreadcrumb actionType={FundingActionType.Approve} />
         <Breadcrumb name={specification?.fundingStreams[0].name ?? ""} />
       </Breadcrumbs>
 
@@ -457,9 +456,6 @@ export const FundingManagementApprovalResults = ({
                 specCoreProviderVersionId={specification.providerVersionId}
                 enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
                 providerSearchResults={publishedProviderSearchResults}
-                canRefreshFunding={hasPermissionToRefresh}
-                canApproveFunding={hasPermissionToApprove}
-                canReleaseFunding={false}
                 totalResults={
                   publishedProviderIds
                     ? publishedProviderIds.length

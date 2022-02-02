@@ -2,17 +2,20 @@ import { AxiosError } from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { RouteComponentProps } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { initialiseFundingSearchSelection } from "../../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { ConfirmationModal } from "../../../components/ConfirmationModal";
 import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
-import { ApprovalResultsTable } from "../../../components/Funding/Approvals/ApprovalResultsTable";
+import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
 import { PublishedProviderSearchFilters } from "../../../components/Funding/PublishedProviderSearchFilters";
-import { LoadingStatus } from "../../../components/LoadingStatus";
+import { ReleaseResultsTable } from "../../../components/Funding/Releases/ReleaseResultsTable";
+import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
+import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { PermissionStatus } from "../../../components/PermissionStatus";
 import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
@@ -30,15 +33,19 @@ import { JobDetails } from "../../../types/jobDetails";
 import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
-import { FundingManagementApprovalResultsProps } from "../FundingManagementApprovalResults";
 
-export const ApprovalResultsDUPLICATE = ({
+export interface ReleaseResultsProps {
+  fundingStreamId: string;
+  fundingPeriodId: string;
+  specificationId: string;
+}
+
+export const ProvidersForFundingRelease = ({
   match,
-}: RouteComponentProps<FundingManagementApprovalResultsProps>): JSX.Element => {
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specificationId = match.params.specificationId;
+}: RouteComponentProps<ReleaseResultsProps>): JSX.Element => {
+  const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
@@ -68,7 +75,11 @@ export const ApprovalResultsDUPLICATE = ({
     state.searchCriteria,
     fundingConfiguration && fundingConfiguration.approvalMode,
     {
-      onError: (err) => addError({ error: err, description: "Error while searching for providers" }),
+      onError: (err) =>
+        addError({
+          error: err,
+          description: "Error while searching for providers",
+        }),
       enabled:
         (isSearchCriteriaInitialised &&
           state.searchCriteria &&
@@ -92,13 +103,18 @@ export const ApprovalResultsDUPLICATE = ({
     [jobNotifications]
   );
 
-  const { publishedProvidersWithErrors } = usePublishedProviderErrorSearch(specificationId, (err) =>
-    addError({ error: err, description: "Error while loading provider funding errors" })
+  const { publishedProvidersWithErrors, isLoadingPublishedProviderErrors } = usePublishedProviderErrorSearch(
+    specificationId,
+    (err) =>
+      addError({
+        error: err,
+        description: "Error while loading provider funding errors",
+      })
   );
-  const { hasPermission } = useSpecificationPermissions(match.params.specificationId, [
-    Permission.CanRefreshFunding,
-    Permission.CanApproveFunding,
-  ]);
+  const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
+    match.params.specificationId,
+    [Permission.CanRefreshFunding, Permission.CanReleaseFunding]
+  );
   useQuery<JobDetails | undefined, AxiosError>(
     `last-spec-${specificationId}-refresh`,
     async () =>
@@ -110,23 +126,29 @@ export const ApprovalResultsDUPLICATE = ({
       refetchOnWindowFocus: false,
       enabled: specificationId !== undefined && specificationId.length > 0,
       onSettled: (data) => setLastRefresh(data?.lastUpdated),
-      onError: (err) => addError({ error: err, description: "Error while loading last refresh date" }),
+      onError: (err) =>
+        addError({
+          error: err,
+          description: "Error while loading last refresh date",
+        }),
     }
   );
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
-  const { addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
+  const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const hasPermissionToRefresh: boolean = useMemo(
     () => hasPermission && !!hasPermission(Permission.CanRefreshFunding),
-    [hasPermission]
+    [isPermissionsFetched]
   );
-  const hasPermissionToApprove: boolean = useMemo(
-    () => hasPermission && !!hasPermission(Permission.CanApproveFunding),
-    [hasPermission]
+
+  const hasPermissionToRelease = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFunding),
+    [isPermissionsFetched]
   );
 
   const dispatch = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     if (!isSearchCriteriaInitialised) {
@@ -146,7 +168,7 @@ export const ApprovalResultsDUPLICATE = ({
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
       JobType.GenerateGraphAndInstructAllocationJob,
     ]);
-  }, [match, isSearchCriteriaInitialised, dispatch, addJobTypeSubscription]);
+  }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
     const completedRefreshJob = jobNotifications.find(
@@ -164,7 +186,7 @@ export const ApprovalResultsDUPLICATE = ({
       setJobId("");
       refetchSearchResults();
     }
-  }, [jobNotifications, jobId, refetchSearchResults]);
+  }, [jobNotifications, jobId]);
 
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
@@ -176,7 +198,10 @@ export const ApprovalResultsDUPLICATE = ({
       monitorFallback: MonitorFallback.Polling,
       fetchPriorNotifications: true,
       onError: (err) =>
-        addError({ error: err, description: "An error occurred while monitoring a background job" }),
+        addError({
+          error: err,
+          description: "An error occurred while monitoring a background job",
+        }),
     });
   }
 
@@ -247,19 +272,54 @@ export const ApprovalResultsDUPLICATE = ({
     isLoadingSearchResults ||
     isLoadingRefresh;
 
+  const haveAnyProviderErrors =
+    isLoadingPublishedProviderErrors ||
+    (publishedProvidersWithErrors && publishedProvidersWithErrors.length > 0);
+
+  const blockActionBasedOnProviderErrors =
+    fundingConfiguration?.approvalMode === ApprovalMode.All && haveAnyProviderErrors;
+
   const activeActionJobs = activeJobs(actionJobs);
   const hasActiveActionJobs = !!activeActionJobs.length;
 
   const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh || hasActiveActionJobs;
+
+  async function handleRelease() {
+    if (
+      publishedProviderSearchResults &&
+      publishedProviderSearchResults.canPublish &&
+      hasPermissionToRelease
+    ) {
+      if (
+        fundingConfiguration?.approvalMode === ApprovalMode.All &&
+        publishedProvidersWithErrors &&
+        publishedProvidersWithErrors.length > 0
+      ) {
+        addErrorMessage(
+          "Funding cannot be released as there are providers in error",
+          undefined,
+          undefined,
+          "Please filter by error status to identify affected providers"
+        );
+      } else {
+        history.push(
+          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
+        );
+      }
+    }
+  }
 
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url={"/"} />
         <Breadcrumb name="Funding management" url={"/FundingManagement"} />
-        <Breadcrumb name="Funding approvals" url={"/FundingManagementApprovalSelection"} />
+        <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
         <Breadcrumb name={specification?.fundingStreams[0].name ?? ""} />
       </Breadcrumbs>
+
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+      <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
       <div className="govuk-grid-row govuk-!-margin-bottom-5">
         <div className="govuk-grid-column-two-thirds">
@@ -319,10 +379,18 @@ export const ApprovalResultsDUPLICATE = ({
           />
         </div>
         <div className="govuk-grid-column-two-thirds">
-          {isLoading ? (
-            <LoadingStatus title={"Loading provider results"} />
-          ) : (
-            <ApprovalResultsTable
+          <LoadingStatusNotifier
+            notifications={[
+              {
+                title: "Loading provider results",
+                isActive: isLoading,
+                id: "searchLoadingNotification",
+              },
+            ]}
+          />
+
+          {!isLoading && (
+            <ReleaseResultsTable
               specificationId={specificationId}
               fundingStreamId={fundingStreamId}
               fundingPeriodId={fundingPeriodId}
@@ -330,8 +398,7 @@ export const ApprovalResultsDUPLICATE = ({
               enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
               providerSearchResults={publishedProviderSearchResults}
               canRefreshFunding={hasPermissionToRefresh}
-              canApproveFunding={hasPermissionToApprove}
-              canReleaseFunding={false}
+              canReleaseFunding={hasPermissionToRelease}
               totalResults={
                 publishedProviderIds
                   ? publishedProviderIds.length
@@ -345,6 +412,33 @@ export const ApprovalResultsDUPLICATE = ({
               clearErrorMessages={clearErrorMessages}
             />
           )}
+        </div>
+      </div>
+
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-full right-align">
+          <div className="right-align">
+            <button
+              className="govuk-button govuk-!-margin-right-1"
+              disabled={disableRefresh}
+              onClick={handleRefresh}
+            >
+              Refresh funding
+            </button>
+            <button
+              className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+              disabled={
+                hasActiveActionJobs ||
+                !publishedProviderSearchResults?.canPublish ||
+                !hasPermissionToRelease ||
+                isLoadingRefresh ||
+                blockActionBasedOnProviderErrors
+              }
+              onClick={handleRelease}
+            >
+              Release funding
+            </button>
+          </div>
         </div>
       </div>
     </Main>

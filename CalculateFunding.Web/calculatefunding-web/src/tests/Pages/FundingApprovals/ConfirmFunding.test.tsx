@@ -310,24 +310,7 @@ describe("<ConfirmFunding />", () => {
         });
       });
 
-      it("displays back button instead of confirm button", async () => {
-        await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
-        const button = screen.queryByRole("button", { name: /Confirm approval/ }) as HTMLButtonElement;
-        expect(button).toBeInTheDocument();
-        expect(button).toBeEnabled();
-        const acknowledgementCheckbox = screen.getByTestId("acknowledgementCheckbox") as HTMLInputElement;
-
-        userEvent.click(acknowledgementCheckbox);
-        userEvent.click(button);
-
-        const { approveProvidersFundingService } = require("../../../services/publishService");
-        await waitFor(() => {
-          expect(approveProvidersFundingService).toBeCalledTimes(1);
-          expect(screen.queryByRole("link", { name: /Back/ })).toBeInTheDocument();
-        });
-      });
-
-      it("redirects user back to the funding page after the approval job is complete", async () => {
+      it("redirects user back to the funding page after user has confirmed and acknowledged", async () => {
         await waitFor(() => expect(config.mockFundingSummaryForApprovingService).toHaveBeenCalled());
         const button = screen.queryByRole("button", { name: /Confirm approval/ }) as HTMLButtonElement;
         expect(button).toBeInTheDocument();
@@ -436,7 +419,7 @@ function setupTestConfig() {
       fundingStreamId: fundingStream.id,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       enableConverterDataMerge: false,
-      releaseChannels:[]
+      releaseChannels: [],
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -451,7 +434,7 @@ function setupTestConfig() {
       fundingStreamId: fundingStream.id,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       enableConverterDataMerge: false,
-      releaseChannels:[]
+      releaseChannels: [],
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -509,7 +492,7 @@ function setupTestConfig() {
     urn: "851305",
     majorVersion: 1,
     minorVersion: 1,
-    releases:[]
+    releases: [],
   };
   const provider2: PublishedProviderResult = {
     isIndicative: false,
@@ -530,7 +513,7 @@ function setupTestConfig() {
     urn: "82096",
     majorVersion: 1,
     minorVersion: 1,
-    releases:[]
+    releases: [],
   };
 
   const mockConfirmApprovalRoute: match<ConfirmFundingRouteProps> = {
@@ -739,7 +722,9 @@ function setupTestConfig() {
 
       return {
         ...mockService,
-        searchForPublishedProviderResults: mockSearchService,
+        publishedProviderService: {
+          searchForPublishedProviderResults: mockSearchService,
+        },
       };
     });
   };

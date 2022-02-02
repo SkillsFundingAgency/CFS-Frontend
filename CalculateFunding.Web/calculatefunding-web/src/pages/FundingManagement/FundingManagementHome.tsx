@@ -1,5 +1,4 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { Main } from "../../components/Main";
@@ -7,7 +6,7 @@ import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
 import { Section } from "../../types/Sections";
 
-export default function FundingManagement(): JSX.Element {
+export default function FundingManagementHome(): JSX.Element {
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>

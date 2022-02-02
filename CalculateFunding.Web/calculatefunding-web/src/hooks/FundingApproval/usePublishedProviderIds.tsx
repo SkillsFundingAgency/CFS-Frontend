@@ -2,7 +2,7 @@
 import { useQuery, UseQueryOptions } from "react-query";
 import { QueryObserverResult, RefetchOptions } from "react-query/types/core/types";
 
-import * as publishedProviderService from "../../services/publishedProviderService";
+import { publishedProviderService } from "../../services/publishedProviderService";
 import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 
 export type PublishedProviderIdsQueryResult = {

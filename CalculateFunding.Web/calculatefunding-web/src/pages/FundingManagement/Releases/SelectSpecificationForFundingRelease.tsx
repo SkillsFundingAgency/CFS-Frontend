@@ -6,6 +6,7 @@ import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { LoadingFieldStatus } from "../../../components/LoadingFieldStatus";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { Title } from "../../../components/Title";
+// eslint-disable-next-line max-len
 import { useOptionsForSpecificationsSelectedForFunding } from "../../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
 import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
@@ -16,7 +17,7 @@ import {
   FundingStreamWithSpecificationSelectedForFunding,
 } from "../../../types/SpecificationSelectedForFunding";
 
-export function FundingManagementReleaseSelection(): JSX.Element {
+export function SelectSpecificationForFundingRelease(): JSX.Element {
   const [selectedFundingStream, setSelectedFundingStream] =
     useState<FundingStreamWithSpecificationSelectedForFunding>();
   const [selectedFundingPeriod, setSelectedFundingPeriod] =

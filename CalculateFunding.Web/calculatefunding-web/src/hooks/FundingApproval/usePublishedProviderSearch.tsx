@@ -1,7 +1,7 @@
 ﻿import { AxiosError } from "axios";
 import { useQuery, UseQueryOptions } from "react-query";
 
-import * as publishedProviderService from "../../services/publishedProviderService";
+import { publishedProviderService } from "../../services/publishedProviderService";
 import { ApprovalMode } from "../../types/ApprovalMode";
 import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";

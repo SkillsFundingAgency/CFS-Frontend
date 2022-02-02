@@ -20,9 +20,6 @@ export interface IPublishedProviderResultsProps {
   specCoreProviderVersionId?: string;
   enableBatchSelection: boolean;
   providerSearchResults: PublishedProviderSearchResults | undefined;
-  canRefreshFunding: boolean | undefined;
-  canApproveFunding: boolean | undefined;
-  canReleaseFunding: boolean | undefined;
   totalResults: number;
   allPublishedProviderIds: string[] | undefined;
   addError: (errorMessage: string, fieldName?: string) => void;

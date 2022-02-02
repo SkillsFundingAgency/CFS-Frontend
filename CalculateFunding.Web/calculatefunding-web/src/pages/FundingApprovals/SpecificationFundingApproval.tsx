@@ -488,9 +488,6 @@ export const SpecificationFundingApproval = ({
                 specCoreProviderVersionId={specification.providerVersionId}
                 enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
                 providerSearchResults={publishedProviderSearchResults}
-                canRefreshFunding={hasPermissionToRefresh}
-                canApproveFunding={hasPermissionToApprove}
-                canReleaseFunding={hasPermissionToRelease}
                 totalResults={
                   publishedProviderIds
                     ? publishedProviderIds.length

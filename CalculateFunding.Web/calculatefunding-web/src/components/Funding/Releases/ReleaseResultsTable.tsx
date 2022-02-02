@@ -12,7 +12,6 @@ import { NoData } from "../../NoData";
 import { Pagination } from "../../Pagination";
 import { PublishedProviderRow } from "../PublishedProviderRow";
 
-
 export interface ReleaseResultsTableProps {
   specificationId: string;
   fundingStreamId: string;
@@ -41,7 +40,8 @@ export function ReleaseResultsTable(props: ReleaseResultsTableProps) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (selectAll && props.allPublishedProviderIds && props.allPublishedProviderIds.length === 0) {
+    if (!props.allPublishedProviderIds) return;
+    if (selectAll && props.allPublishedProviderIds.length === 0) {
       setSelectAll(false);
     }
   }, [selectAll, props.allPublishedProviderIds]);
@@ -71,8 +71,6 @@ export function ReleaseResultsTable(props: ReleaseResultsTableProps) {
   async function handlePageChange(page: number) {
     dispatch(actions.setPage(page));
   }
-
-
 
   return (
     <>

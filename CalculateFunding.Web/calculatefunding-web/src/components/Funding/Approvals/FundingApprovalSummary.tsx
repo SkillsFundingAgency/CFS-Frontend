@@ -1,39 +1,27 @@
 ﻿import React from "react";
-import { Link } from "react-router-dom";
 
-import { ErrorProps } from "../../hooks/useErrors";
-import { ConfirmFundingRouteProps } from "../../pages/FundingApprovals/ConfirmFunding";
-import { ApprovalMode } from "../../types/ApprovalMode";
+import { useErrorContext } from "../../../context/ErrorContext";
+import { ApprovalMode } from "../../../types/ApprovalMode";
 import {
   FundingActionType,
   PublishedProviderFundingCount,
-} from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { SpecificationSummary } from "../../types/SpecificationSummary";
-import { FormattedNumber, NumberType } from "../FormattedNumber";
-import { LoadingFieldStatus } from "../LoadingFieldStatus";
-import { CsvDownloadPublishedProviders } from "./CsvDownloadPublishedProviders";
+} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import { SpecificationSummary } from "../../../types/SpecificationSummary";
+import { FormattedNumber, NumberType } from "../../FormattedNumber";
+import { LoadingFieldStatus } from "../../LoadingFieldStatus";
+import { ChangeUploadBatch } from "../ChangeUploadBatch";
+import { CsvDownloadPublishedProviders } from "../CsvDownloadPublishedProviders";
 
-export interface FundingConfirmationSummaryProps {
-  routingParams: ConfirmFundingRouteProps;
+export interface FundingApprovalSummaryProps {
   approvalMode: ApprovalMode;
   specification: SpecificationSummary;
   fundingSummary: PublishedProviderFundingCount | undefined;
-  canReleaseFunding: boolean | undefined;
-  canApproveFunding: boolean | undefined;
-  addError: (props: ErrorProps) => void;
   isWaitingForJob: boolean;
 }
 
-export function FundingConfirmationSummary(props: FundingConfirmationSummaryProps) {
-  const actionType = props.routingParams.mode;
-
-  if (
-    actionType === FundingActionType.Refresh ||
-    (actionType === FundingActionType.Release && !props.canReleaseFunding) ||
-    (actionType === FundingActionType.Approve && !props.canApproveFunding)
-  ) {
-    return <></>;
-  }
+export function FundingApprovalSummary(props: FundingApprovalSummaryProps) {
+  const actionType = FundingActionType.Approve;
+  const { addErrorToContext } = useErrorContext();
 
   if (!props.fundingSummary) {
     return (
@@ -53,8 +41,8 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
             <table className="govuk-table" aria-label="funding-summary-table">
               <thead className="govuk-table__head">
                 <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Description
+                  <th scope="col" className="govuk-table__header" aria-label={"Description"}>
+                    &nbsp;
                   </th>
                   <th scope="col" className="govuk-table__header">
                     Summary
@@ -70,11 +58,7 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                     {batchSize === 0 ? (
                       <div className="govuk-form-group--error">
                         Providers selected
-                        <span className={"govuk-error-message"}>
-                          {`No eligible providers to be ${
-                            props.routingParams.mode === FundingActionType.Release ? "released" : "approved"
-                          }`}
-                        </span>
+                        <span className={"govuk-error-message"}>No eligible providers to be approved</span>
                       </div>
                     ) : (
                       "Providers selected"
@@ -83,9 +67,9 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                   <td className="govuk-table__cell">
                     {props.approvalMode === ApprovalMode.Batches && batchSize > 0 && (
                       <CsvDownloadPublishedProviders
-                        actionType={actionType}
+                        actionType={FundingActionType.Approve}
                         specificationId={props.specification.id}
-                        addError={props.addError}
+                        addError={addErrorToContext}
                       />
                     )}
                   </td>
@@ -103,14 +87,14 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
                     Funding period
                   </th>
                   <td className="govuk-table__cell">{props.specification.fundingPeriod.name}</td>
-                  <td className="govuk-table__cell govuk-table__cell--numeric"></td>
+                  <td className="govuk-table__cell govuk-table__cell--numeric">&nbsp;</td>
                 </tr>
                 <tr className="govuk-table__row">
                   <th scope="row" className="govuk-table__header">
                     Specification selected
                   </th>
                   <td className="govuk-table__cell">{props.specification.name}</td>
-                  <td className="govuk-table__cell govuk-table__cell--numeric"></td>
+                  <td className="govuk-table__cell govuk-table__cell--numeric">&nbsp;</td>
                 </tr>
                 <tr className="govuk-table__row">
                   <th scope="row" className="govuk-table__header">
@@ -134,20 +118,11 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
         </div>
 
         {props.approvalMode === ApprovalMode.Batches && !props.isWaitingForJob && (
-          <div className="govuk-grid-row govuk-!-margin-bottom-7">
-            <div className="govuk-grid-column-three-quarters">
-              <Link
-                to={`/Approvals/SpecificationFundingApproval/${props.routingParams.fundingStreamId}/${props.routingParams.fundingPeriodId}/${props.specification.id}`}
-                className="govuk-link govuk-link--no-visited-state right-align"
-              >
-                Change selection
-              </Link>
-            </div>
-          </div>
+          <ChangeUploadBatch actionType={actionType} specification={props.specification} />
         )}
       </>
     );
   }
 }
 
-export default React.memo(FundingConfirmationSummary);
+export default React.memo(FundingApprovalSummary);

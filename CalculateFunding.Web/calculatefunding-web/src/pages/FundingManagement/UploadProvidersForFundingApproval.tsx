@@ -7,13 +7,14 @@ import { Link } from "react-router-dom";
 
 import * as actions from "../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import * as publishedProviderService from "../../services/publishedProviderService";
+import { publishedProviderService } from "../../services/publishedProviderService";
 import { HistoryPage } from "../../types/HistoryPage";
 import { JobCreatedResponse } from "../../types/JobCreatedResponse";
 import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
@@ -29,7 +30,7 @@ export interface UploadBatchRouteProps {
   specificationId: string;
 }
 
-export function FundingManagementApprovalUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
+export function UploadProvidersForFundingApproval({ match }: RouteComponentProps<UploadBatchRouteProps>) {
   const fundingStreamId = match.params.fundingStreamId;
   const fundingPeriodId = match.params.fundingPeriodId;
   const specificationId = match.params.specificationId;
@@ -194,7 +195,7 @@ export function FundingManagementApprovalUploadBatch({ match }: RouteComponentPr
           <Breadcrumbs>
             <Breadcrumb name="Calculate funding" url="/" />
             <Breadcrumb name="Funding management" url="/FundingManagement" />
-            <Breadcrumb name="Funding approvals" url="/FundingManagementApprovalSelection" />
+            <FundingSelectionBreadcrumb actionType={FundingActionType.Approve} />
             <Breadcrumb name={currentPage.title} />
           </Breadcrumbs>
         </div>

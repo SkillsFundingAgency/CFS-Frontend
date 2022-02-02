@@ -102,7 +102,7 @@ export const FundingApprovalTestSetup = () => {
       fundingStreamId: fundingStream2.id,
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
-      releaseChannels:[]
+      releaseChannels: [],
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -117,7 +117,7 @@ export const FundingApprovalTestSetup = () => {
       fundingStreamId: fundingStream1.id,
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
-      releaseChannels:[]
+      releaseChannels: [],
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -251,9 +251,11 @@ export const FundingApprovalTestSetup = () => {
 
       return {
         ...mockService,
-        uploadBatchOfPublishedProviders: mockUploadFileService,
-        validatePublishedProvidersByBatch: mockCreateValidationJobService,
-        getPublishedProvidersByBatch: mockGetPublishedProvidersByBatchService,
+        publishedProviderService: {
+          uploadBatchOfPublishedProviders: mockUploadFileService,
+          validatePublishedProvidersByBatch: mockCreateValidationJobService,
+          getPublishedProvidersByBatch: mockGetPublishedProvidersByBatchService,
+        },
       };
     });
   };

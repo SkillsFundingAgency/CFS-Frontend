@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 
 import * as actions from "../../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
 import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
@@ -14,13 +15,14 @@ import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
-import * as publishedProviderService from "../../../services/publishedProviderService";
+import { publishedProviderService } from "../../../services/publishedProviderService";
 import { HistoryPage } from "../../../types/HistoryPage";
 import { JobCreatedResponse } from "../../../types/JobCreatedResponse";
 import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { BatchUploadResponse } from "../../../types/PublishedProvider/BatchUploadResponse";
 import { BatchValidationRequest } from "../../../types/PublishedProvider/BatchValidationRequest";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
 
 export interface UploadBatchRouteProps {
@@ -29,10 +31,8 @@ export interface UploadBatchRouteProps {
   specificationId: string;
 }
 
-export function FundingManagementReleaseUploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specificationId = match.params.specificationId;
+export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadBatchRouteProps>) {
+  const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
   const [fileName, setFileName] = useState<string>("");
   const [theFile, setTheFile] = useState<File>();
   const [jobId, setJobId] = useState<string | undefined>();
@@ -210,7 +210,7 @@ export function FundingManagementReleaseUploadBatch({ match }: RouteComponentPro
           <Breadcrumbs>
             <Breadcrumb name="Calculate funding" url="/" />
             <Breadcrumb name="Funding management" url="/FundingManagement" />
-            <Breadcrumb name="Release management" url="/FundingManagementReleaseSelection" />
+            <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
             <Breadcrumb name={currentPage.title} />
           </Breadcrumbs>
         </div>

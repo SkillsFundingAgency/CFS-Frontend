@@ -14,7 +14,7 @@ import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import * as publishedProviderService from "../../services/publishedProviderService";
+import { publishedProviderService } from "../../services/publishedProviderService";
 import { HistoryPage } from "../../types/HistoryPage";
 import { JobCreatedResponse } from "../../types/JobCreatedResponse";
 import { JobType } from "../../types/jobType";
@@ -158,7 +158,7 @@ export function UploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps
     }
   }, [latestJob, publishedProviderIds]);
 
-  const { specification } = useSpecificationSummary(specificationId, (err) =>
+  const { specification } = useSpecificationSummary(specificationId, () =>
     addError({ error: "Error while loading specification" })
   );
 

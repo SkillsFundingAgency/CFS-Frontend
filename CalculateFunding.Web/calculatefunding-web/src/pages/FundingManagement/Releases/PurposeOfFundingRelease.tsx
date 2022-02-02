@@ -3,6 +3,7 @@ import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
 import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
@@ -10,6 +11,7 @@ import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import { ReleaseChannel } from "../../../types/FundingConfiguration";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
 
 export interface FundingManagementReleasePurposeProps {
@@ -18,13 +20,11 @@ export interface FundingManagementReleasePurposeProps {
   specificationId: string;
 }
 
-export const FundingManagementReleasePurpose = ({
+export const PurposeOfFundingRelease = ({
   match,
 }: RouteComponentProps<FundingManagementReleasePurposeProps>) => {
   const history = useHistory();
-  const fundingStreamId = match.params.fundingStreamId;
-  const fundingPeriodId = match.params.fundingPeriodId;
-  const specificationId = match.params.specificationId;
+  const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
   const [releaseActions, setReleaseActions] = useState<ReleaseChannel[]>([]);
 
@@ -46,9 +46,9 @@ export const FundingManagementReleasePurpose = ({
       addError({ error: "Please select a release type" });
     } else {
       history.push(
-        `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?purposes=[${releaseActions.map(
-          (r) => r.channelCode
-        )}]`
+        `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseActions
+          .map((r) => `purposes=${r.channelCode}`)
+          .join("&")}`
       );
     }
   }
@@ -67,7 +67,7 @@ export const FundingManagementReleasePurpose = ({
         <Breadcrumbs>
           <Breadcrumb name="Calculate funding" url="/" />
           <Breadcrumb name="Funding management" url="/FundingManagement" />
-          <Breadcrumb name="Release management" url="/FundingManagement/Release/Select" />
+          <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
           <Breadcrumb
             name={`${specification?.name}`}
             url={`/FundingManagement/Release/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
@@ -102,16 +102,18 @@ export const FundingManagementReleasePurpose = ({
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-full">
               <div className="govuk-checkboxes">
-                {fundingConfiguration?.releaseChannels?.map((rac, index) => (
-                  <div key={index} className="govuk-checkboxes__item">
-                    <input
-                      type="checkbox"
-                      className="govuk-checkboxes__input"
-                      onChange={(e) => setReleaseAction(e, rac)}
-                    />
-                    <label className="govuk-label govuk-checkboxes__label">{rac.channelCode} </label>
-                  </div>
-                ))}
+                {fundingConfiguration?.releaseChannels
+                  ?.filter((rc) => !!rc.isVisible)
+                  ?.map((rac, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        type="checkbox"
+                        className="govuk-checkboxes__input"
+                        onChange={(e) => setReleaseAction(e, rac)}
+                      />
+                      <label className="govuk-label govuk-checkboxes__label">{rac.channelCode} </label>
+                    </div>
+                  ))}
               </div>
             </div>
           </div>
