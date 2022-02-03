@@ -1,59 +1,59 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import * as actions from "../../actions/FundingSearchSelectionActions";
-import { IStoreState } from "../../reducers/rootReducer";
-import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import { BackToTop } from "../BackToTop";
-import { FormattedNumber, NumberType } from "../FormattedNumber";
-import { NoData } from "../NoData";
-import { Pagination } from "../Pagination";
-import { PublishedProviderRow } from "./PublishedProviderRow";
+import * as actions from "../../../actions/FundingSearchSelectionActions";
+import { IStoreState } from "../../../reducers/rootReducer";
+import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import { PublishedProviderSearchResults } from "../../../types/PublishedProvider/PublishedProviderSearchResults";
+import { BackToTop } from "../../BackToTop";
+import { FormattedNumber, NumberType } from "../../FormattedNumber";
+import { NoData } from "../../NoData";
+import { Pagination } from "../../Pagination";
+import { ProviderResultRow } from "./ProviderResultRow";
 
-export interface FundingManagementApprovalResultsProps {
-  specificationId: string;
-  fundingStreamId: string;
-  fundingPeriodId: string;
+export interface ProviderResultsForFundingProps {
+  actionType: FundingActionType;
   specCoreProviderVersionId?: string;
   enableBatchSelection: boolean;
   providerSearchResults: PublishedProviderSearchResults | undefined;
-  canRefreshFunding: boolean | undefined;
-  canApproveFunding: boolean | undefined;
-  canReleaseFunding: boolean | undefined;
   totalResults: number;
   allPublishedProviderIds: string[] | undefined;
-  addError: (errorMessage: string, fieldName?: string) => void;
-  clearErrorMessages: () => void;
-  setIsLoadingRefresh: (set: boolean) => void;
 }
 
-export function FundingManagementApprovalResults(props: FundingManagementApprovalResultsProps) {
+export function ProviderResultsTable({
+  actionType,
+  providerSearchResults,
+  allPublishedProviderIds,
+  enableBatchSelection,
+  totalResults,
+  specCoreProviderVersionId,
+}: ProviderResultsForFundingProps) {
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
   const havePageResults =
-    props.providerSearchResults !== undefined &&
-    props.providerSearchResults.providers !== undefined &&
-    props.providerSearchResults.providers.length > 0;
+    providerSearchResults !== undefined &&
+    providerSearchResults.providers !== undefined &&
+    providerSearchResults.providers.length > 0;
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (selectAll && props.allPublishedProviderIds && props.allPublishedProviderIds.length === 0) {
+    if (!allPublishedProviderIds) return;
+    if (selectAll && allPublishedProviderIds.length === 0) {
       setSelectAll(false);
     }
-  }, [selectAll, props.allPublishedProviderIds]);
+  }, [selectAll, allPublishedProviderIds]);
 
   const handleToggleAllProviders = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (props.allPublishedProviderIds) {
+    if (allPublishedProviderIds) {
       const checked = e.target.checked;
       setSelectAll(checked);
       dispatch(
         checked
-          ? actions.addProvidersToFundingSelection(props.allPublishedProviderIds)
-          : actions.removeProvidersFromFundingSelection(props.allPublishedProviderIds)
+          ? actions.addProvidersToFundingSelection(allPublishedProviderIds)
+          : actions.removeProvidersFromFundingSelection(allPublishedProviderIds)
       );
     }
   };
@@ -76,20 +76,20 @@ export function FundingManagementApprovalResults(props: FundingManagementApprova
     <>
       <NoData hidden={havePageResults} />
 
-      {havePageResults && props.providerSearchResults && (
+      {havePageResults && providerSearchResults && (
         <table className="govuk-table" data-testid={"published-provider-results"}>
           <thead>
             <tr>
               <th className="govuk-table__header govuk-body">
                 Provider name
-                {props.enableBatchSelection && (
+                {enableBatchSelection && (
                   <>
                     <br />
                     <span className="govuk-!-margin-right-2">
                       <span id="checkbox-checked">
                         {state.selectedProviderIds ? state.selectedProviderIds.length : 0}
                       </span>{" "}
-                      / <span id="checkbox-count">{props.totalResults}</span>
+                      / <span id="checkbox-count">{totalResults}</span>
                     </span>
                     <div className="govuk-checkboxes govuk-checkboxes--small">
                       <div className="govuk-checkboxes__item">
@@ -109,13 +109,13 @@ export function FundingManagementApprovalResults(props: FundingManagementApprova
                   </>
                 )}
               </th>
-              <th className="govuk-table__header govuk-body">UKPRN</th>
               <th className="govuk-table__header govuk-body">Status</th>
+              <th className="govuk-table__header govuk-body">Released version</th>
               <th className="govuk-table__header govuk-body">
                 Funding total
                 <br />
                 <FormattedNumber
-                  value={props.providerSearchResults.filteredFundingAmount}
+                  value={providerSearchResults.filteredFundingAmount}
                   type={NumberType.FormattedMoney}
                 />
                 <br />
@@ -124,13 +124,13 @@ export function FundingManagementApprovalResults(props: FundingManagementApprova
             </tr>
           </thead>
           <tbody>
-            {props.providerSearchResults.providers.map((provider, i) => (
-              <PublishedProviderRow
+            {providerSearchResults.providers.map((provider, i) => (
+              <ProviderResultRow
                 key={`provider-${i}`}
-                actionType={FundingActionType.Approve}
+                actionType={actionType}
                 publishedProvider={provider}
-                specCoreProviderVersionId={props.specCoreProviderVersionId}
-                enableSelection={props.enableBatchSelection}
+                specCoreProviderVersionId={specCoreProviderVersionId}
+                enableSelection={enableBatchSelection}
                 isSelected={state.selectedProviderIds.includes(provider.publishedProviderVersionId)}
                 handleItemSelectionToggle={handleItemSelectionToggle}
               />
@@ -141,20 +141,20 @@ export function FundingManagementApprovalResults(props: FundingManagementApprova
 
       <BackToTop id="top" />
 
-      {props.totalResults > 0 && props.providerSearchResults && (
+      {totalResults > 0 && providerSearchResults && (
         <nav
           className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
           role="navigation"
           aria-label="Pagination"
         >
           <div className="pagination__summary">
-            Showing {props.providerSearchResults.startItemNumber} -{" "}
-            {props.providerSearchResults.endItemNumber} of {props.totalResults} results
+            Showing {providerSearchResults.startItemNumber} - {providerSearchResults.endItemNumber} of{" "}
+            {totalResults} results
           </div>
           <Pagination
             callback={handlePageChange}
-            currentPage={props.providerSearchResults.pagerState.currentPage}
-            lastPage={props.providerSearchResults.pagerState.lastPage}
+            currentPage={providerSearchResults.pagerState.currentPage}
+            lastPage={providerSearchResults.pagerState.lastPage}
           />
         </nav>
       )}

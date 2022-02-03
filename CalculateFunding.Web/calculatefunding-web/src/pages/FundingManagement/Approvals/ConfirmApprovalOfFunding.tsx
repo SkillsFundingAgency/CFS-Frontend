@@ -1,22 +1,22 @@
 import React, { useMemo, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { FundingApprovalSummary } from "../../components/Funding/Approvals/FundingApprovalSummary";
-import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
-import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
-import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
-import { Main } from "../../components/Main";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { PermissionStatus } from "../../components/PermissionStatus";
-import { useErrorContext } from "../../context/ErrorContext";
-import { useFundingConfirmation } from "../../hooks/FundingApproval/useFundingConfirmation";
-import * as publishService from "../../services/publishService";
-import { ApprovalMode } from "../../types/ApprovalMode";
-import { Permission } from "../../types/Permission";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { Section } from "../../types/Sections";
+import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
+import { FundingApprovalSummary } from "../../../components/Funding/Confirmation/FundingApprovalSummary";
+import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
+import JobNotificationSection from "../../../components/Jobs/JobNotificationSection";
+import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
+import { Main } from "../../../components/Main";
+import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { PermissionStatus } from "../../../components/PermissionStatus";
+import { useErrorContext } from "../../../context/ErrorContext";
+import { useFundingConfirmation } from "../../../hooks/FundingApproval/useFundingConfirmation";
+import * as publishService from "../../../services/publishService";
+import { ApprovalMode } from "../../../types/ApprovalMode";
+import { Permission } from "../../../types/Permission";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import { Section } from "../../../types/Sections";
 
 export interface FundingManagementApprovalsConfirmFundingRouteProps {
   fundingStreamId: string;

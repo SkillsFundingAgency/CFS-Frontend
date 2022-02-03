@@ -2,19 +2,22 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import * as actions from "../../actions/FundingSearchSelectionActions";
-import { IStoreState } from "../../reducers/rootReducer";
-import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
-import { Facet, FacetValue } from "../../types/Facet";
+import * as actions from "../../../actions/FundingSearchSelectionActions";
+import { IStoreState } from "../../../reducers/rootReducer";
+import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
+import { Facet, FacetValue } from "../../../types/Facet";
 import {
   PublishedProviderSearchFacet,
   PublishedProviderSearchRequest,
-} from "../../types/publishedProviderSearchRequest";
-import { CollapsiblePanel } from "../CollapsiblePanel";
-import { ProviderSearchBox, SearchFieldOption } from "../ProviderSearchBox";
-import { FilterAllocationType } from "../Search/FilterAllocationType";
-import { FilterCheckboxFieldset } from "../Search/FilterCheckboxFieldset";
-import { FilterOptionProps } from "../Search/FilterCheckboxOption";
+} from "../../../types/publishedProviderSearchRequest";
+import { CollapsiblePanel } from "../../CollapsiblePanel";
+import {
+  FilterAllocationType,
+  FilterCheckboxFieldset,
+  FilterOptionProps,
+  ProviderSearchBox,
+  SearchFieldOption,
+} from "../../Search";
 
 export interface PublishedProviderSearchFiltersProps {
   facets: Facet[];

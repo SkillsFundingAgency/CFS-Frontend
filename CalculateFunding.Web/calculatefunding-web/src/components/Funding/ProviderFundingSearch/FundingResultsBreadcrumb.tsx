@@ -1,7 +1,7 @@
 ﻿import React from "react";
 
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { Breadcrumb } from "../Breadcrumbs";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import { Breadcrumb } from "../../Breadcrumbs";
 
 export const FundingResultsBreadcrumb = ({
   actionType,
@@ -27,4 +27,3 @@ export const FundingResultsBreadcrumb = ({
     }
   />
 );
-

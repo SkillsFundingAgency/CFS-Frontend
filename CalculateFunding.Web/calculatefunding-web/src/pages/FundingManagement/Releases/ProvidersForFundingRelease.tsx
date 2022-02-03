@@ -10,8 +10,8 @@ import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { ConfirmationModal } from "../../../components/ConfirmationModal";
 import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
 import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
-import { PublishedProviderSearchFilters } from "../../../components/Funding/PublishedProviderSearchFilters";
-import { ReleaseResultsTable } from "../../../components/Funding/Releases/ReleaseResultsTable";
+import { ProviderResultsTable } from "../../../components/Funding/ProviderFundingSearch/ProviderResultsTable";
+import { PublishedProviderSearchFilters } from "../../../components/Funding/ProviderFundingSearch/PublishedProviderSearchFilters";
 import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
@@ -390,15 +390,11 @@ export const ProvidersForFundingRelease = ({
           />
 
           {!isLoading && (
-            <ReleaseResultsTable
-              specificationId={specificationId}
-              fundingStreamId={fundingStreamId}
-              fundingPeriodId={fundingPeriodId}
+            <ProviderResultsTable
+              actionType={FundingActionType.Release}
               specCoreProviderVersionId={specification?.providerVersionId}
               enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
               providerSearchResults={publishedProviderSearchResults}
-              canRefreshFunding={hasPermissionToRefresh}
-              canReleaseFunding={hasPermissionToRelease}
               totalResults={
                 publishedProviderIds
                   ? publishedProviderIds.length
@@ -407,9 +403,6 @@ export const ProvidersForFundingRelease = ({
                   : 0
               }
               allPublishedProviderIds={publishedProviderIds}
-              setIsLoadingRefresh={setIsLoadingRefresh}
-              addError={addErrorMessage}
-              clearErrorMessages={clearErrorMessages}
             />
           )}
         </div>

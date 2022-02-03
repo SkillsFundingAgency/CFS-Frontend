@@ -1,19 +1,17 @@
 ﻿import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import * as actions from "../../actions/FundingSearchSelectionActions";
-import { IStoreState } from "../../reducers/rootReducer";
-import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import { BackToTop } from "../BackToTop";
-import { FormattedNumber, NumberType } from "../FormattedNumber";
-import { NoData } from "../NoData";
-import { Pagination } from "../Pagination";
-import { PublishedProviderRow } from "./PublishedProviderRow";
+import * as actions from "../../../actions/FundingSearchSelectionActions";
+import { IStoreState } from "../../../reducers/rootReducer";
+import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
+import { PublishedProviderSearchResults } from "../../../types/PublishedProvider/PublishedProviderSearchResults";
+import { BackToTop } from "../../BackToTop";
+import { FormattedNumber, NumberType } from "../../FormattedNumber";
+import { NoData } from "../../NoData";
+import { Pagination } from "../../Pagination";
+import { ProviderResultRow } from "./ProviderResultRow";
 
 export interface IPublishedProviderResultsProps {
-  actionType?: FundingActionType;
   specificationId: string;
   fundingStreamId: string;
   fundingPeriodId: string;
@@ -27,6 +25,7 @@ export interface IPublishedProviderResultsProps {
   setIsLoadingRefresh: (set: boolean) => void;
 }
 
+// Note: used by old funding provider search page
 export function PublishedProviderResults(props: IPublishedProviderResultsProps) {
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
@@ -107,11 +106,8 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
                   </>
                 )}
               </th>
-              {!props.actionType && <th className="govuk-table__header govuk-body">UKPRN</th>}
+              <th className="govuk-table__header govuk-body">UKPRN</th>
               <th className="govuk-table__header govuk-body">Status</th>
-              {props.actionType === FundingActionType.Release && (
-                <th className="govuk-table__header govuk-body">Released version</th>
-              )}
               <th className="govuk-table__header govuk-body">
                 Funding total
                 <br />
@@ -126,9 +122,8 @@ export function PublishedProviderResults(props: IPublishedProviderResultsProps) 
           </thead>
           <tbody>
             {props.providerSearchResults.providers.map((provider, i) => (
-              <PublishedProviderRow
+              <ProviderResultRow
                 key={`provider-${i}`}
-                actionType={props.actionType}
                 publishedProvider={provider}
                 specCoreProviderVersionId={props.specCoreProviderVersionId}
                 enableSelection={props.enableBatchSelection}

@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 
-import { ProviderSearchBox, SearchFieldOption } from "../../../components/ProviderSearchBox";
+import { ProviderSearchBox, SearchFieldOption } from "../../../components/Search";
 
 const renderComponent = (searchField: SearchFieldOption = { isSelected: false }) => {
   const callback: (value: SearchFieldOption) => void = jest.fn();
@@ -85,7 +85,6 @@ describe("<ProviderSearchBox />", () => {
           searchTerm: "1234",
           isSelected: true,
         });
-
         const textbox = screen.getByRole("textbox", { name: /Provider name/ }) as HTMLInputElement;
 
         await userEvent.clear(textbox);

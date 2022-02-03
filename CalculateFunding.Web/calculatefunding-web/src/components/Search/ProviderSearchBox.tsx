@@ -1,8 +1,7 @@
 import * as React from "react";
-import { useState } from "react";
 
-import { ConditionalTextSearchInput } from "./Search/ConditionalTextSearchInput";
-import { SearchOptionLabel } from "./Search/SearchOptionLabel";
+import { ConditionalTextSearchInput } from "./ConditionalTextSearchInput";
+import { SearchOptionLabel } from "./SearchOptionLabel";
 
 export interface SearchFieldOption {
   searchField?: string;

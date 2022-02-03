@@ -9,8 +9,8 @@ import { initialiseFundingSearchSelection } from "../../actions/FundingSearchSel
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { PublishedProviderResults } from "../../components/Funding/PublishedProviderResults";
-import { PublishedProviderSearchFilters } from "../../components/Funding/PublishedProviderSearchFilters";
+import { PublishedProviderResults } from "../../components/Funding/ProviderFundingSearch/PublishedProviderResults";
+import { PublishedProviderSearchFilters } from "../../components/Funding/ProviderFundingSearch/PublishedProviderSearchFilters";
 import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
 import { LoadingNotification, LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";

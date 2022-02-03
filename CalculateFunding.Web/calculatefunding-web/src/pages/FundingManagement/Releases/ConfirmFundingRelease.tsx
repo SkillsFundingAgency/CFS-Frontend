@@ -3,8 +3,8 @@ import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
+import { FundingReleaseSummary } from "../../../components/Funding/Confirmation/FundingReleaseSummary";
 import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
-import { FundingReleaseSummary } from "../../../components/Funding/Releases/FundingReleaseSummary";
 import JobNotificationSection from "../../../components/Jobs/JobNotificationSection";
 import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";

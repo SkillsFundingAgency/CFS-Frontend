@@ -2,19 +2,19 @@ import { Main } from "components/Main";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
 
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { Title } from "../../components/Title";
-import { useOptionsForSpecificationsSelectedForFunding } from "../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
-import { useErrors } from "../../hooks/useErrors";
-import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
-import { ApprovalMode } from "../../types/ApprovalMode";
-import { Section } from "../../types/Sections";
+import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { LoadingFieldStatus } from "../../../components/LoadingFieldStatus";
+import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { Title } from "../../../components/Title";
+import { useOptionsForSpecificationsSelectedForFunding } from "../../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
+import { useErrors } from "../../../hooks/useErrors";
+import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
+import { ApprovalMode } from "../../../types/ApprovalMode";
+import { Section } from "../../../types/Sections";
 import {
   FundingPeriodWithSpecificationSelectedForFunding,
   FundingStreamWithSpecificationSelectedForFunding,
-} from "../../types/SpecificationSelectedForFunding";
+} from "../../../types/SpecificationSelectedForFunding";
 
 export function SelectSpecificationForFundingApproval(): JSX.Element {
   const [selectedFundingStream, setSelectedFundingStream] =

@@ -5,39 +5,39 @@ import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
-import { initialiseFundingSearchSelection } from "../../actions/FundingSearchSelectionActions";
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { ConfirmationModal } from "../../components/ConfirmationModal";
-import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
-import { PublishedProviderResults } from "../../components/Funding/PublishedProviderResults";
-import { PublishedProviderSearchFilters } from "../../components/Funding/PublishedProviderSearchFilters";
-import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
-import { LoadingNotification, LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
-import { Main } from "../../components/Main";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { PermissionStatus } from "../../components/PermissionStatus";
-import { activeJobs, getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
-import { usePublishedProviderErrorSearch } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
-import { usePublishedProviderSearch } from "../../hooks/FundingApproval/usePublishedProviderSearch";
-import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
-import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
-import { useErrors } from "../../hooks/useErrors";
-import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
-import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import { IStoreState } from "../../reducers/rootReducer";
-import { getLatestSuccessfulJob } from "../../services/jobService";
-import * as publishService from "../../services/publishService";
-import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
-import { ApprovalMode } from "../../types/ApprovalMode";
-import { JobDetails } from "../../types/jobDetails";
-import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../types/jobType";
-import { Permission } from "../../types/Permission";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { Section } from "../../types/Sections";
+import { initialiseFundingSearchSelection } from "../../../actions/FundingSearchSelectionActions";
+import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
+import { ConfirmationModal } from "../../../components/ConfirmationModal";
+import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
+import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
+import { ProviderResultsTable } from "../../../components/Funding/ProviderFundingSearch/ProviderResultsTable";
+import { PublishedProviderSearchFilters } from "../../../components/Funding/ProviderFundingSearch/PublishedProviderSearchFilters";
+import JobNotificationSection from "../../../components/Jobs/JobNotificationSection";
+import { LoadingNotification, LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
+import { Main } from "../../../components/Main";
+import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { PermissionStatus } from "../../../components/PermissionStatus";
+import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
+import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
+import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
+import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
+import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
+import { useErrors } from "../../../hooks/useErrors";
+import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
+import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
+import { IStoreState } from "../../../reducers/rootReducer";
+import { getLatestSuccessfulJob } from "../../../services/jobService";
+import * as publishService from "../../../services/publishService";
+import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
+import { ApprovalMode } from "../../../types/ApprovalMode";
+import { JobDetails } from "../../../types/jobDetails";
+import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
+import { JobType } from "../../../types/jobType";
+import { Permission } from "../../../types/Permission";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import { Section } from "../../../types/Sections";
 
-export interface FundingManagementApprovalResultsProps {
+export interface ProvidersForFundingApprovalProps {
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
@@ -45,7 +45,7 @@ export interface FundingManagementApprovalResultsProps {
 
 export const ProvidersForFundingApproval = ({
   match,
-}: RouteComponentProps<FundingManagementApprovalResultsProps>): JSX.Element => {
+}: RouteComponentProps<ProvidersForFundingApprovalProps>): JSX.Element => {
   const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
@@ -448,11 +448,8 @@ export const ProvidersForFundingApproval = ({
             !isLoadingSearchResults &&
             !isLoadingSpecification &&
             specification && (
-              <PublishedProviderResults
+              <ProviderResultsTable
                 actionType={FundingActionType.Approve}
-                specificationId={specificationId}
-                fundingStreamId={fundingStreamId}
-                fundingPeriodId={fundingPeriodId}
                 specCoreProviderVersionId={specification.providerVersionId}
                 enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
                 providerSearchResults={publishedProviderSearchResults}
@@ -464,9 +461,6 @@ export const ProvidersForFundingApproval = ({
                     : 0
                 }
                 allPublishedProviderIds={publishedProviderIds}
-                setIsLoadingRefresh={setIsLoadingRefresh}
-                addError={addErrorMessage}
-                clearErrorMessages={clearErrorMessages}
               />
             )}
         </div>
