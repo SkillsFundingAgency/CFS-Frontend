@@ -1,8 +1,11 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
+import { IStoreState, rootReducer } from "reducers/rootReducer";
+import { createStore, Store } from "redux";
 
 import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { LatestSpecificationJobWithMonitoringResult } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
@@ -15,14 +18,20 @@ function renderViewSpecificationResults() {
   const { ViewSpecificationResults } = require("../../../pages/Specifications/ViewSpecificationResults");
   return render(
     <MemoryRouter initialEntries={["/Specifications/ViewSpecificationResults/ABC123"]}>
+      <Provider store={store}>
       <QueryClientProvider client={new QueryClient()}>
         <Switch>
           <Route path="" component={ViewSpecificationResults} />
         </Switch>
       </QueryClientProvider>
+      </Provider>
     </MemoryRouter>
   );
 }
+
+const store: Store<IStoreState> = createStore(rootReducer);
+store.dispatch = jest.fn();
+
 const testSpec: SpecificationSummary = {
   coreProviderVersionUpdates: ProviderDataTrackingMode.Manual,
   name: "Wizard Training",

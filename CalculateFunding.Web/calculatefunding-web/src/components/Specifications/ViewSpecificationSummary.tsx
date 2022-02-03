@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useErrorContext } from "../../context/ErrorContext";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useSpecificationResults } from "../../hooks/Specifications/useSpecificationResults";
-import { useSpecificationsSelectedResults } from "../../hooks/Specifications/useSpecificationsSelectedResults";
+import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
 import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
 import * as calculationService from "../../services/calculationService";
@@ -196,7 +196,7 @@ export const ViewSpecificationSummary = ({
     const {
         selectedSpecifications,
         isLoadingSelectedSpecifications
-    } = useSpecificationsSelectedResults(specification.fundingPeriod.id, specification.fundingStreams[0].id);
+    } = useSpecsSelectedForFunding(specification.fundingPeriod.id, specification.fundingStreams[0].id);
 
     const { featureFlagsState } = useFeatureFlags();
 

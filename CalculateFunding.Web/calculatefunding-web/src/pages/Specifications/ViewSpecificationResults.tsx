@@ -13,7 +13,9 @@ import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { DownloadableReports } from "../../components/Reports/DownloadableReports";
 import { Tabs } from "../../components/Tabs";
 import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
 import { useErrors } from "../../hooks/useErrors";
+import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import { JobType } from "../../types/jobType";
 import { Section } from "../../types/Sections";
@@ -49,6 +51,10 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
     }
   }, [query]);
 
+  const { selectedSpecifications, isLoadingSelectedSpecifications } = useSpecsSelectedForFunding(specification?.fundingPeriod.id, specification?.fundingStreams[0].id);
+
+  const { featureFlagsState } = useFeatureFlags();
+
   return (
     <div>
       <Header location={Section.Results} />
@@ -79,15 +85,25 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
             </div>
             <div className="govuk-grid-column-one-third">
               <ul className="govuk-list right-align">
-                {specification && specification.isSelectedForFunding && (
-                  <li>
+                <li>Navigate to:</li>
+                {!isLoadingSelectedSpecifications && featureFlagsState.enableNewFundingManagement && (selectedSpecifications !== undefined && selectedSpecifications?.length > 0) && (
+                  <><li>
                     <Link
                       className="govuk-link govuk-link--no-visited-state"
-                      to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}
+                      to={`/FundingManagement/Approve/Results/${specification?.fundingStreams[0].id}/${specification?.fundingPeriod.id}/${specification?.id}`}
                     >
-                      View funding
+                      Funding approvals
                     </Link>
                   </li>
+                    <li>
+                      <Link
+                          className="govuk-link govuk-link--no-visited-state"
+                          to={`/FundingManagement/Release/Results/${specification?.fundingStreams[0].id}/${specification?.fundingPeriod.id}/${specification?.id}`}
+                      >
+                        Release management
+                      </Link>
+                    </li>
+                    </>
                 )}
                 <li>
                   <Link className={"govuk-link"} to={`/ViewSpecification/${specification?.id}`}>

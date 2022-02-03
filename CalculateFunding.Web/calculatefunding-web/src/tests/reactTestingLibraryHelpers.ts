@@ -220,5 +220,5 @@ export const featureFlagsTestHelper = () => {
 
   return {
     setupFeatureFlags
-  }
-}
+  };
+};
