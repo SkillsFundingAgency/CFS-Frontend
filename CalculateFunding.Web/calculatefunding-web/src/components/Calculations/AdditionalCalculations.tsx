@@ -337,8 +337,8 @@ export function AdditionalCalculations({
       )}
       <TableNavBottom
         currentPage={additionalCalculations?.currentPage}
-        lastPage={additionalCalculations?.lastPage}
-        totalCount={additionalCalculations?.totalCount}
+        lastPage={additionalCalculations?.pagerState.lastPage}
+        totalCount={additionalCalculations?.totalResults}
         totalResults={additionalCalculations?.totalResults}
         startItemNumber={additionalCalculations?.startItemNumber}
         endItemNumber={additionalCalculations?.endItemNumber}
