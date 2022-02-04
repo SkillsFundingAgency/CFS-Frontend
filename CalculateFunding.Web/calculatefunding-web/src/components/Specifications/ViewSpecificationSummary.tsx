@@ -10,7 +10,6 @@ import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
 import * as calculationService from "../../services/calculationService";
 import * as publishService from "../../services/publishService";
-import { getSpecificationsSelectedForFundingByPeriodAndStreamService } from "../../services/specificationService";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { CalculationType } from "../../types/CalculationSearchResponse";
 import { Permission } from "../../types/Permission";
@@ -26,7 +25,6 @@ export const ViewSpecificationSummary = ({
                                              isLoadingSelectedForFunding,
                                              monitorRefreshFundingJob,
                                              monitorApproveAllCalculationsJob,
-                                             selectedForFundingSpecId,
                                          }: {
     specification: SpecificationSummary;
     isLoadingSelectedForFunding: boolean;
@@ -262,11 +260,18 @@ export const ViewSpecificationSummary = ({
 
                 <ul className="govuk-list">
                     <li>Navigate to:</li>
-                    {featureFlagsState.enableNewFundingManagement && !isLoadingSelectedSpecifications && (selectedSpecifications !== undefined && selectedSpecifications.length > 0) &&
-                        <>
-                            <li><Link className={"govuk-link"} to={`/FundingManagement/Approve/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Funding approvals</Link></li>
-                            <li><Link className={"govuk-link"} to={`/FundingManagement/Release/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Release management</Link></li>
+                    {!isLoadingSelectedSpecifications && (selectedSpecifications !== undefined && selectedSpecifications.length > 0) &&
+
+                        (featureFlagsState.enableNewFundingManagement ? <>
+                            <li><Link
+                                className={"govuk-link"}
+                                to={`/FundingManagement/Approve/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Funding approvals</Link></li>
+                            <li><Link
+                                className={"govuk-link"}
+                                to={`/FundingManagement/Release/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Release management</Link></li>
                         </>
+                            :
+                            <li><Link className={"govuk-link"} to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Funding approvals</Link></li>)
                     }
                     {!isLoadingSpecificationResults && specificationHasCalculationResults && (
                         <li>
