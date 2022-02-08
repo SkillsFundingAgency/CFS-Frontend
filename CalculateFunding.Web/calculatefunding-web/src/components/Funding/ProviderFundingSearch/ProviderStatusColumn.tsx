@@ -24,10 +24,10 @@ export const ProviderStatusColumn = ({
       </td>
       {!!actionType && ( // exclude old funding page
         <td className="govuk-table__cell govuk-body">
-          {!provider.releases ? (
+          {!provider.releaseChannels ? (
             <>&nbsp;</>
           ) : (
-            provider.releases.map((release, idx) => (
+            provider.releaseChannels.map((release, idx) => (
               <div key={idx}>{`${release.channelName} v${release.majorVersion}.${release.minorVersion}`}</div>
             ))
           )}

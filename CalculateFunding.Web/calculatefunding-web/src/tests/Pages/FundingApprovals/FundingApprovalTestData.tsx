@@ -43,7 +43,6 @@ import {
 } from "../../fakes/testFactories";
 
 export function FundingApprovalTestData() {
-
   const fundingStream: FundingStream = {
     name: "FS123",
     id: "Wizard Training Scheme",
@@ -83,7 +82,7 @@ export function FundingApprovalTestData() {
       fundingStreamId: fundingStream.id,
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
-      releaseChannels:[]
+      releaseChannels: [],
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -98,7 +97,7 @@ export function FundingApprovalTestData() {
       fundingStreamId: fundingStream.id,
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
-      releaseChannels:[]
+      releaseChannels: [],
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -123,7 +122,7 @@ export function FundingApprovalTestData() {
     urn: "851305",
     majorVersion: 1,
     minorVersion: 1,
-    releases: []
+    releaseChannels: [],
   };
   const providerWithError1: PublishedProviderResult = {
     isIndicative: false,
@@ -144,7 +143,7 @@ export function FundingApprovalTestData() {
     urn: "82096",
     majorVersion: 1,
     minorVersion: 1,
-    releases:[]
+    releaseChannels: [],
   };
   const profileTotal: ProfileTotal = {
     distributionPeriodId: "",

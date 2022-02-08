@@ -21,7 +21,7 @@ export interface PublishedProviderResult {
   isIndicative: boolean;
   majorVersion: number;
   minorVersion: number;
-  releases: PublishedProviderRelease[]
+  releaseChannels: PublishedProviderRelease[];
 }
 
 export interface PublishedProviderSearchResults {
@@ -40,7 +40,7 @@ export interface PublishedProviderSearchResults {
   facets: Facet[];
 }
 
-export interface PublishedProviderRelease{
+export interface PublishedProviderRelease {
   channelName: string;
   channelCode: string;
   majorVersion: number;
