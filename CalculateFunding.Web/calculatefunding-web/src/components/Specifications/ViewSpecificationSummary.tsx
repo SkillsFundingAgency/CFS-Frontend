@@ -249,17 +249,15 @@ export const ViewSpecificationSummary = ({
                             </button>
                         </li>
                     )}
-
                     <li>
                         <Link to={`/Specifications/EditSpecification/${specification.id}`} className="govuk-link">
                             Edit specification
                         </Link>
                     </li>
-
                 </ul>
-
+                
                 <ul className="govuk-list">
-                    <li>Navigate to:</li>
+                    {!isLoadingSpecificationResults && (specificationHasCalculationResults || (selectedSpecifications !== undefined && selectedSpecifications.length > 0)) && <li>Navigate to:</li>}
                     {!isLoadingSelectedSpecifications && (selectedSpecifications !== undefined && selectedSpecifications.length > 0) &&
 
                         (featureFlagsState.enableNewFundingManagement ? <>
