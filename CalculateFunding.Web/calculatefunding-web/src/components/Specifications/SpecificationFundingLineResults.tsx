@@ -5,12 +5,10 @@ import { useErrorContext } from "../../context/ErrorContext";
 import { useCalculationCircularDependencies } from "../../hooks/Calculations/useCalculationCircularDependencies";
 import { getCalculationSummaryBySpecificationId } from "../../services/calculationService";
 import { getFundingLineStructureService } from "../../services/fundingStructuresService";
-import { approveFundingLineStructureService } from "../../services/specificationService";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { FundingStructureItemViewModel, FundingStructureType } from "../../types/FundingStructureItem";
 import { JobDetails } from "../../types/jobDetails";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
-import { ApproveStatusButton } from "../ApproveStatusButton";
 import { BackToTop } from "../BackToTop";
 import { CollapsibleSteps, setCollapsibleStepsAllStepsStatus } from "../CollapsibleSteps";
 import { FundingLineStep } from "../fundingLineStructure/FundingLineStep";
@@ -29,14 +27,12 @@ export interface SpecificationFundingLineResultsProps {
   specification: SpecificationSummary;
   refreshFundingLines?: boolean | undefined;
   activeJob?: JobDetails;
-  clearSpecificationFromCache: () => Promise<void>;
   monitorAssignTemplateCalculationsJob: () => Promise<void>;
 }
 
 export function SpecificationFundingLineResults({
   specification,
   refreshFundingLines,
-  clearSpecificationFromCache,
   monitorAssignTemplateCalculationsJob,
   activeJob,
 }: SpecificationFundingLineResultsProps) {
@@ -60,19 +56,6 @@ export function SpecificationFundingLineResults({
     specification.id,
     (err) => addError({ error: err, description: "Error while checking for circular reference errors" })
   );
-
-  const handleApproveFundingLineStructure = async (specificationId: string) => {
-    const response = await approveFundingLineStructureService(specificationId);
-    if (response.status === 200) {
-      clearSpecificationFromCache();
-    } else {
-      addError({
-        error: `${response.statusText} ${response.data}`,
-        description: "Error whilst approving funding line structure",
-        fieldName: "funding-line-results",
-      });
-    }
-  };
 
   function searchFundingLines(calculationName: string) {
     const fundingLinesCopy: FundingStructureItemViewModel[] =
@@ -249,9 +232,7 @@ export function SpecificationFundingLineResults({
           <>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
-                <h2 className="govuk-heading-l">
-                  Funding line structure
-                </h2>
+                <h2 className="govuk-heading-l">Funding line structure</h2>
               </div>
               <div className="govuk-grid-column-one-third"></div>
               <div className="govuk-grid-column-two-thirds">

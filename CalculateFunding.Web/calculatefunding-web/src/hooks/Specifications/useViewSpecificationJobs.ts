@@ -185,13 +185,14 @@ export const useViewSpecificationJobs = ({
   }
 
   const monitorApproveAllCalculationsJob = async (jobId: string) => {
+    if (!jobId?.length) throw Error("Missing job id for monitoring approve calculations job");
+
     await addSub({
       monitorMode: MonitorMode.SignalR,
       monitorFallback: MonitorFallback.Polling,
       fetchPriorNotifications: true,
       filterBy: {
         specificationId: specificationId,
-        jobTypes: [JobType.ApproveAllCalculationsJob],
         jobId: jobId,
       },
       onError: (e) =>

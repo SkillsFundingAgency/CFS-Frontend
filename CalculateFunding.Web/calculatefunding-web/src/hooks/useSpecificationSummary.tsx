@@ -17,14 +17,13 @@ export type SpecificationSummaryQueryResult = {
 
 export const useSpecificationSummary = (
   specificationId: string,
-  onError: (err: AxiosError) => void,
+  onError?: (err: AxiosError) => void,
   staleTime = 0
 ): SpecificationSummaryQueryResult => {
   const config: UseQueryOptions<SpecificationSummary, AxiosError> = {
     cacheTime: milliseconds.OneHour,
     staleTime: staleTime,
-    refetchOnWindowFocus: false,
-    enabled: (specificationId && specificationId.length > 0) === true,
+    enabled: !!specificationId?.length,
     onError: onError,
   };
 

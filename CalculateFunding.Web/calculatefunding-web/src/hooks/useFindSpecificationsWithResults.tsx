@@ -8,16 +8,9 @@ import { SpecificationSummary } from "../types/SpecificationSummary";
 export const useFindSpecificationsWithResults = (
   fundingStreamId: string | undefined,
   fundingPeriodId: string | undefined,
-  options?: Omit<
-    UseQueryOptions<SpecificationSummary[], AxiosError, SpecificationSummary[]>,
-    "queryFn"
-  >
+  options?: Omit<UseQueryOptions<SpecificationSummary[], AxiosError, SpecificationSummary[]>, "queryFn">
 ) => {
-  const results = useQuery<
-    SpecificationSummary[],
-    AxiosError,
-    SpecificationSummary[]
-  >(
+  const results = useQuery<SpecificationSummary[], AxiosError, SpecificationSummary[]>(
     ["specs-with-calc-results", fundingStreamId, fundingPeriodId],
     async () =>
       (
@@ -29,12 +22,12 @@ export const useFindSpecificationsWithResults = (
     {
       enabled: !!fundingStreamId?.length && !!fundingPeriodId?.length,
       cacheTime: milliseconds.TenSeconds,
-      staleTime: milliseconds.OneDay,
+      staleTime: milliseconds.TenSeconds,
       ...options,
     }
   );
 
   const { data, isLoading } = results;
-  
+
   return { specificationsWithResults: data, isLoadingSpecificationsWithResults: isLoading, ...results };
 };

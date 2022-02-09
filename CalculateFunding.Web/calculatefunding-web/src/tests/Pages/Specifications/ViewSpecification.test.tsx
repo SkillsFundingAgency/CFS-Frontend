@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 
 import { SpecificationPermissionsResult } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { Permission } from "../../../types/Permission";
-import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
+import { jobSubscriptionTestHelper, showDebugMain } from "../../reactTestingLibraryHelpers";
 import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
 
 const {
@@ -51,6 +51,7 @@ describe("<ViewSpecification /> ", () => {
     describe("page render checks ", () => {
       it("shows correct status in funding line structure tab", async () => {
         await setup();
+        showDebugMain();
         expect(screen.getByText("Draft")).toBeInTheDocument();
       });
 

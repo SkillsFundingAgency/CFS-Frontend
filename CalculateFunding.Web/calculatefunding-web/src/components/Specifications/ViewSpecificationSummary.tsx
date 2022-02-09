@@ -1,285 +1,341 @@
-﻿import { useMemo } from "react";
-import * as React from "react";
+﻿import * as React from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { useErrorContext } from "../../context/ErrorContext";
+import { milliseconds } from "../../helpers/TimeInMs";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useSpecificationResults } from "../../hooks/Specifications/useSpecificationResults";
 import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
 import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
+import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import * as calculationService from "../../services/calculationService";
 import * as publishService from "../../services/publishService";
+import * as specificationService from "../../services/specificationService";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { CalculationType } from "../../types/CalculationSearchResponse";
 import { Permission } from "../../types/Permission";
 import { PublishStatus } from "../../types/PublishStatusModel";
-import { SpecificationSummary } from "../../types/SpecificationSummary";
-import { ApproveStatusButton } from "../ApproveStatusButton";
 import { ConfirmationModal } from "../ConfirmationModal";
 import { Details } from "../Details";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 
 export const ViewSpecificationSummary = ({
-                                             specification,
-                                             isLoadingSelectedForFunding,
-                                             monitorRefreshFundingJob,
-                                             monitorApproveAllCalculationsJob,
-                                         }: {
-    specification: SpecificationSummary;
-    isLoadingSelectedForFunding: boolean;
-    monitorRefreshFundingJob: (jobId: string) => void;
-    monitorApproveAllCalculationsJob: (jobId: string) => void;
-    selectedForFundingSpecId: string | undefined;
+  specificationId,
+  isLoadingSelectedForFunding,
+  monitorRefreshFundingJob,
+  monitorApproveAllCalculationsJob,
+}: {
+  specificationId: string;
+  isLoadingSelectedForFunding: boolean;
+  monitorRefreshFundingJob: (jobId: string) => void;
+  monitorApproveAllCalculationsJob: (jobId: string) => void;
+  selectedForFundingSpecId: string | undefined;
 }) => {
-    const {
-        addErrorToContext: addError,
-        addValidationErrorToContext: addValidationErrors,
-        clearErrorsFromContext: clearErrorMessages,
-    } = useErrorContext();
+  const {
+    addErrorToContext: addError,
+    addValidationErrorToContext: addValidationErrors,
+    clearErrorsFromContext: clearErrorMessages,
+  } = useErrorContext();
 
-    const { hasPermission, isPermissionsFetched } = useSpecificationPermissions(specification.id, [
-        Permission.CanApproveSpecification,
-        Permission.CanChooseFunding,
-        Permission.CanApproveAllCalculations,
-    ]);
+  const { specification, clearSpecificationFromCache } = useSpecificationSummary(
+    specificationId,
+    undefined,
+    milliseconds.OneSecond
+  );
 
-    const canApproveAllCalculations: boolean = useMemo(
-        () => !!(hasPermission && hasPermission(Permission.CanApproveAllCalculations)),
-        [hasPermission, isPermissionsFetched]
-    );
+  const { hasPermission, isPermissionsFetched } = useSpecificationPermissions(specificationId, [
+    Permission.CanApproveSpecification,
+    Permission.CanChooseFunding,
+    Permission.CanApproveAllCalculations,
+  ]);
 
-    const canChooseForFunding: boolean = useMemo(
-        () => hasPermission(Permission.CanChooseFunding) === true,
-        [hasPermission, isPermissionsFetched]
-    );
+  const canApproveAllCalculations: boolean = useMemo(
+    () => !!(hasPermission && hasPermission(Permission.CanApproveAllCalculations)),
+    [hasPermission, isPermissionsFetched]
+  );
 
-    const { fundingConfiguration } = useFundingConfiguration(
-        specification.fundingStreams[0]?.id,
-        specification.fundingPeriod?.id,
-        (err) => addError({ error: err, description: "Error while loading funding configuration" })
-    );
+  const canChooseForFunding: boolean = useMemo(
+    () => hasPermission(Permission.CanChooseFunding) === true,
+    [hasPermission, isPermissionsFetched]
+  );
 
-    const { specificationHasCalculationResults, isLoadingSpecificationResults } = useSpecificationResults(
-        specification.id,
-        specification.fundingStreams[0].id,
-        specification.fundingPeriod.id,
-        (err) => addError({ error: err, description: "Error while loading specification results" })
-    );
+  const { fundingConfiguration } = useFundingConfiguration(
+    specification?.fundingStreams[0]?.id,
+    specification?.fundingPeriod?.id,
+    (err) => addError({ error: err, description: "Error while loading funding configuration" })
+  );
 
-    async function chooseForFunding() {
-        try {
-            clearErrorMessages();
-            const isAllowed: boolean = await isUserAllowedToChooseSpecification(specification.id);
-            if (isAllowed) {
-                ConfirmationModal(
-                    <div className="govuk-row govuk-!-width-full">
-                        Are you sure you want to choose this specification?
-                    </div>,
-                    refreshFunding,
-                    "Confirm",
-                    "Cancel"
-                );
-            }
-        } catch (e) {
-            addError({ error: "A problem occurred while getting user permissions" });
-        }
+  const { specificationHasCalculationResults, isLoadingSpecificationResults } = useSpecificationResults(
+    specificationId,
+    specification?.fundingStreams[0]?.id,
+    specification?.fundingPeriod?.id,
+    (err) => addError({ error: err, description: "Error while loading specification results" })
+  );
+
+  async function chooseForFunding() {
+    try {
+      clearErrorMessages();
+      const isAllowed: boolean = await isUserAllowedToChooseSpecification(specificationId);
+      if (isAllowed) {
+        ConfirmationModal(
+          <div className="govuk-row govuk-!-width-full">
+            Are you sure you want to choose this specification?
+          </div>,
+          refreshFunding,
+          "Confirm",
+          "Cancel"
+        );
+      }
+    } catch (e) {
+      addError({ error: "A problem occurred while getting user permissions" });
     }
+  }
 
-    async function refreshFunding(confirm: boolean) {
-        if (confirm) {
-            try {
-                const response = await publishService.refreshSpecificationFundingService(specification.id);
-                const jobId = response.data as string;
-                if (jobId != null && jobId !== "") {
-                    await monitorRefreshFundingJob(jobId);
-                } else {
-                    addError({ error: "A problem occurred while refreshing funding" });
-                }
-            } catch (err: any) {
-                if (err.response.status === 400) {
-                    const errResponse = err.response.data;
-                    addValidationErrors({ validationErrors: errResponse, message: "Validation failed" });
-                } else {
-                    addError({ description: "A problem occurred while refreshing funding", error: err });
-                }
-            }
+  async function refreshFunding(confirm: boolean) {
+    if (confirm) {
+      try {
+        const response = await publishService.refreshSpecificationFundingService(specificationId);
+        const jobId = response.data as string;
+        if (jobId != null && jobId !== "") {
+          await monitorRefreshFundingJob(jobId);
+        } else {
+          addError({ error: "A problem occurred while refreshing funding" });
         }
+      } catch (err: any) {
+        if (err.response.status === 400) {
+          const errResponse = err.response.data;
+          addValidationErrors({ validationErrors: errResponse, message: "Validation failed" });
+        } else {
+          addError({ description: "A problem occurred while refreshing funding", error: err });
+        }
+      }
     }
+  }
 
-    async function isUserAllowedToChooseSpecification(specificationId: string) {
-        if (!canChooseForFunding) {
-            addError({ error: "You do not have permissions to choose this specification for funding" });
-            return false;
-        }
-        if (specification.approvalStatus !== PublishStatus.Approved) {
-            addError({
-                error: "Specification must be approved before the specification can be chosen for funding.",
-            });
-            return false;
-        }
-        try {
-            const calcs: CalculationSummary[] = (
-                await calculationService.getCalculationSummaryBySpecificationId(specificationId)
-            ).data;
-            if (
-                calcs
-                    .filter((calc) => calc.calculationType === CalculationType.Template)
-                    .some((calc) => calc.status !== PublishStatus.Approved)
-            ) {
-                addError({
-                    error: "Template calculations must be approved before the specification can be chosen for funding.",
-                });
-                return false;
-            }
-        } catch (err) {
-            addError({ error: "A problem occurred while choosing specification" });
-            return false;
-        }
-        return true;
+  async function isUserAllowedToChooseSpecification(specificationId: string) {
+    if (!specification) return false;
+
+    if (!canChooseForFunding) {
+      addError({ error: "You do not have permissions to choose this specification for funding" });
+      return false;
     }
-
-    async function submitApproveAllCalculations(confirm: boolean) {
-        if (confirm) {
-            try {
-                const response = await calculationService.approveAllCalculationsService(specification.id);
-                if (response.status !== 200 || !response.data?.id) {
-                    addError({ error: "A problem occurred while approving all calculations" });
-                } else {
-                    await monitorApproveAllCalculationsJob(response.data?.id);
-                }
-            } catch (err: any) {
-                addError({ description: "A problem occurred while approving all calculations", error: err });
-            }
-        }
+    if (specification.approvalStatus !== PublishStatus.Approved) {
+      addError({
+        error: "Specification must be approved before the specification can be chosen for funding.",
+      });
+      return false;
     }
-
-    async function isUserAllowedToApproveAllCalculations() {
-        if (!canApproveAllCalculations) {
-            addError({ error: "You don't have permission to approve calculations" });
-            return false;
-        }
-        try {
-            const calcs: CalculationSummary[] = (
-                await calculationService.getCalculationSummaryBySpecificationId(specification.id)
-            ).data;
-            if (!calcs.some((calc) => calc.status !== PublishStatus.Approved)) {
-                addError({ error: "All calculations have already been approved" });
-                return false;
-            }
-        } catch (err) {
-            addError({ error: "Approve all calculations failed - try again" });
-            return false;
-        }
-        return true;
+    try {
+      const calcs: CalculationSummary[] = (
+        await calculationService.getCalculationSummaryBySpecificationId(specificationId)
+      ).data;
+      if (
+        calcs
+          .filter((calc) => calc.calculationType === CalculationType.Template)
+          .some((calc) => calc.status !== PublishStatus.Approved)
+      ) {
+        addError({
+          error: "Template calculations must be approved before the specification can be chosen for funding.",
+        });
+        return false;
+      }
+    } catch (err) {
+      addError({ error: "A problem occurred while choosing specification" });
+      return false;
     }
+    return true;
+  }
 
-    async function approveAllCalculations() {
-        try {
-            clearErrorMessages();
-            const isAllowed: boolean = await isUserAllowedToApproveAllCalculations();
-            if (isAllowed) {
-                ConfirmationModal(
-                    "Are you sure you want to approve all calculations?",
-                    submitApproveAllCalculations,
-                    "Confirm",
-                    "Cancel"
-                );
-            }
-        } catch (e) {
-            addError({ error: "A problem occurred while getting user permissions" });
+  async function submitApproveAllCalculations(confirm: boolean) {
+    if (confirm) {
+      try {
+        const response = await calculationService.approveAllCalculationsService(specificationId);
+        if (response.status !== 200 || !response.data?.jobId?.length) {
+          addError({ error: "A problem occurred while approving all calculations" });
+        } else {
+          await monitorApproveAllCalculationsJob(response.data?.jobId);
         }
+      } catch (err: any) {
+        addError({ description: "A problem occurred while approving all calculations", error: err });
+      }
     }
+  }
 
-    const {
-        selectedSpecifications,
-        isLoadingSelectedSpecifications
-    } = useSpecsSelectedForFunding(specification.fundingPeriod.id, specification.fundingStreams[0].id);
+  async function isUserAllowedToApproveAllCalculations() {
+    if (!canApproveAllCalculations) {
+      addError({ error: "You don't have permission to approve calculations" });
+      return false;
+    }
+    try {
+      const calcs: CalculationSummary[] = (
+        await calculationService.getCalculationSummaryBySpecificationId(specificationId)
+      ).data;
+      if (!calcs.some((calc) => calc.status !== PublishStatus.Approved)) {
+        addError({ error: "All calculations have already been approved" });
+        return false;
+      }
+    } catch (err) {
+      addError({ error: "Approve all calculations failed - try again" });
+      return false;
+    }
+    return true;
+  }
 
-    const { featureFlagsState } = useFeatureFlags();
+  async function approveAllCalculations() {
+    try {
+      clearErrorMessages();
+      const isAllowed: boolean = await isUserAllowedToApproveAllCalculations();
+      if (isAllowed) {
+        ConfirmationModal(
+          "Are you sure you want to approve all calculations?",
+          submitApproveAllCalculations,
+          "Confirm",
+          "Cancel"
+        );
+      } else {
+        addError({ error: "You don't have permissions to approve all calculations" });
+      }
+    } catch (e) {
+      addError({ error: "A problem occurred while getting user permissions" });
+    }
+  }
 
-    return (
-        <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
-                <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
-                <span className="govuk-caption-l">
-          {specification.fundingStreams[0]?.name} for {specification?.fundingPeriod?.name}
+  const onApproveSpecification = async (event: any) => {
+    event.preventDefault();
+    try {
+      await specificationService.approveSpecification(specificationId);
+      await clearSpecificationFromCache();
+    } catch (e: any) {
+      addError({
+        error: e,
+        description: "Error whilst approving specification",
+      });
+    }
+  };
+
+  const { selectedSpecifications, isLoadingSelectedSpecifications } = useSpecsSelectedForFunding(
+    specification?.fundingPeriod.id,
+    specification?.fundingStreams[0].id
+  );
+
+  const { featureFlagsState } = useFeatureFlags();
+
+  if (!specification) return null;
+
+  return (
+    <div className="govuk-grid-row">
+      <div className="govuk-grid-column-two-thirds govuk-!-margin-bottom-5">
+        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification.name}</h1>
+        <span className="govuk-caption-l">
+          {specification.fundingStreams[0].name} for {specification.fundingPeriod.name}
         </span>
-                <ApproveStatusButton id={"view-specification-approval-status"} status={specification.approvalStatus} callback={false} />
-
-                {!isLoadingSelectedForFunding && specification.isSelectedForFunding && (
-                    <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
-                )}
-                {fundingConfiguration && fundingConfiguration.enableConverterDataMerge && (
-                    <p className="govuk-body govuk-!-margin-top-2">
-                        <strong className="govuk-tag govuk-tag--green">In year opener enabled</strong>
-                    </p>
-                )}
-                <div className="govuk-!-padding-top-9">
-                    <Details title={`What is ${specification.name}`} body={specification.description}/>
-                </div>
-            </div>
-
-            <div className="govuk-grid-column-one-third">
-                <ul className="govuk-list">
-                    <li>Actions:</li>
-                    {specification.approvalStatus !== "Approved" && <li>
-                        <button
-                            type="button"
-                            className="govuk-link"
-                            onClick={approveAllCalculations}
-                            data-testid="approve-calculations"
-                        >
-                            Approve all calculations
-                        </button>
-                    </li>}
-                    {specification.approvalStatus !== "Approved" &&
-                        <li><Link to="/FundingManagement">Approve specification</Link></li>
-                    }
-                    {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."}/>}
-                    {!featureFlagsState.enableNewFundingManagement && !isLoadingSelectedForFunding && (
-                        !specification.isSelectedForFunding && <li>
-                            <button
-                                type="button"
-                                className="govuk-link"
-                                onClick={chooseForFunding}
-                                data-testid="choose-for-funding"
-                            >
-                                Choose for funding
-                            </button>
-                        </li>
-                    )}
-                    <li>
-                        <Link to={`/Specifications/EditSpecification/${specification.id}`} className="govuk-link">
-                            Edit specification
-                        </Link>
-                    </li>
-                </ul>
-                
-                <ul className="govuk-list">
-                    {!isLoadingSpecificationResults && (specificationHasCalculationResults || (selectedSpecifications !== undefined && selectedSpecifications.length > 0)) && <li>Navigate to:</li>}
-                    {!isLoadingSelectedSpecifications && (selectedSpecifications !== undefined && selectedSpecifications.length > 0) &&
-
-                        (featureFlagsState.enableNewFundingManagement ? <>
-                            <li><Link
-                                className={"govuk-link"}
-                                to={`/FundingManagement/Approve/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Funding approvals</Link></li>
-                            <li><Link
-                                className={"govuk-link"}
-                                to={`/FundingManagement/Release/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Release management</Link></li>
-                        </>
-                            :
-                            <li><Link className={"govuk-link"} to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`}>Funding approvals</Link></li>)
-                    }
-                    {!isLoadingSpecificationResults && specificationHasCalculationResults && (
-                        <li>
-                            <Link className={"govuk-link"} to={`/ViewSpecificationResults/${specification.id}`}>
-                                View specification results
-                            </Link>
-                        </li>
-                    )}
-                </ul>
-            </div>
+        {!isLoadingSelectedForFunding && specification.isSelectedForFunding && (
+          <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
+        )}
+        <p className="govuk-body govuk-!-margin-top-2">
+          <strong className="govuk-tag">{specification.approvalStatus}</strong>{" "}
+          {fundingConfiguration && fundingConfiguration.enableConverterDataMerge && (
+            <strong className="govuk-tag govuk-tag--green">In year opener enabled</strong>
+          )}
+        </p>
+        <div className="govuk-!-padding-top-9">
+          <Details title={`What is ${specification.name}`} body={specification.description} />
         </div>
-    );
+      </div>
+
+      <div className="govuk-grid-column-one-third">
+        <ul className="govuk-list">
+          <li>Actions:</li>
+          {specification.approvalStatus !== "Approved" && (
+            <li>
+              <button
+                type="button"
+                className="govuk-link"
+                onClick={approveAllCalculations}
+                data-testid="approve-calculations"
+              >
+                Approve all calculations
+              </button>
+            </li>
+          )}
+          {specification.approvalStatus !== "Approved" && (
+            <li>
+              <Link to="#" onClick={onApproveSpecification}>
+                Approve specification
+              </Link>
+            </li>
+          )}
+          {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."} />}
+          {!featureFlagsState.enableNewFundingManagement &&
+            !isLoadingSelectedForFunding &&
+            !specification.isSelectedForFunding && (
+              <li>
+                <button
+                  type="button"
+                  className="govuk-link"
+                  onClick={chooseForFunding}
+                  data-testid="choose-for-funding"
+                >
+                  Choose for funding
+                </button>
+              </li>
+            )}
+          <li>
+            <Link to={`/Specifications/EditSpecification/${specificationId}`} className="govuk-link">
+              Edit specification
+            </Link>
+          </li>
+        </ul>
+
+        <ul className="govuk-list">
+          {!isLoadingSpecificationResults &&
+            (specificationHasCalculationResults ||
+              (selectedSpecifications !== undefined && selectedSpecifications.length > 0)) && (
+              <li>Navigate to:</li>
+            )}
+          {!isLoadingSelectedSpecifications &&
+            selectedSpecifications !== undefined &&
+            selectedSpecifications.length > 0 &&
+            (featureFlagsState.enableNewFundingManagement ? (
+              <>
+                <li>
+                  <Link
+                    className={"govuk-link"}
+                    to={`/FundingManagement/Approve/Results/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}
+                  >
+                    Funding approvals
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className={"govuk-link"}
+                    to={`/FundingManagement/Release/Results/${specification.fundingStreams[0]?.id}/${specification.fundingPeriod.id}/${specificationId}`}
+                  >
+                    Release management
+                  </Link>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link
+                  className={"govuk-link"}
+                  to={`/Approvals/SpecificationFundingApproval/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specificationId}`}
+                >
+                  Funding approvals
+                </Link>
+              </li>
+            ))}
+          {!isLoadingSpecificationResults && specificationHasCalculationResults && (
+            <li>
+              <Link className={"govuk-link"} to={`/ViewSpecificationResults/${specificationId}`}>
+                View specification results
+              </Link>
+            </li>
+          )}
+        </ul>
+      </div>
+    </div>
+  );
 };

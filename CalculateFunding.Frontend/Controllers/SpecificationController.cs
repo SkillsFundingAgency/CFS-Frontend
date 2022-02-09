@@ -356,22 +356,19 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(publishStatusEditModel, nameof(publishStatusEditModel));
+
             if (!await _authorizationHelper.DoesUserHavePermission(User, specificationId, SpecificationActionTypes.CanApproveSpecification))
             {
                 return new ForbidResult();
             }
 
-            ApiResponse<PublishStatusResponseModel> response = await _specificationsApiClient.UpdateSpecificationStatus(specificationId, new PublishStatusRequestModel
-            {
-                PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<Common.Models.Versioning.PublishStatus>()
-            });
+            ApiResponse<PublishStatusResponseModel> response = await _specificationsApiClient.UpdateSpecificationStatus(specificationId,
+                new PublishStatusRequestModel
+                {
+                    PublishStatus = publishStatusEditModel.PublishStatus.AsMatchingEnum<Common.Models.Versioning.PublishStatus>()
+                });
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return Ok(response.Content);
-            }
-
-            throw new InvalidOperationException($"An error occurred while retrieving code context. Status code={response.StatusCode}");
+            return response.Handle("Approve specification", x => Ok(x.Content));
         }
 
         [Route("api/specs/get-all-specifications")]

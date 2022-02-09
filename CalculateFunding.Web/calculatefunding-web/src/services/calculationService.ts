@@ -190,10 +190,11 @@ export async function getCalculationCircularDependencies(specificationId: string
   );
 }
 
-export async function approveAllCalculationsService(specificationId: string) {
-  return axios(`/api/specs/${specificationId}/calculations/approveall`, {
+export async function approveAllCalculationsService(
+  specificationId: string
+): Promise<AxiosResponse<JobCreatedResponse>> {
+  return axios(`/api/specs/${specificationId}/calculations/approveAll`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
   });
 }
 

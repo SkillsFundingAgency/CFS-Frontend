@@ -9,9 +9,9 @@ export type SpecificationSummaryQueryResult = {
 };
 
 export const useSpecificationResults = (
-  specificationId: string,
-  fundingStreamId: string,
-  fundingPeriodId: string,
+  specificationId: string | undefined,
+  fundingStreamId: string | undefined,
+  fundingPeriodId: string | undefined,
   onError: (err: AxiosError) => void,
   onSuccess?: (data: SpecificationSummary[]) => void
 ): SpecificationSummaryQueryResult => {
@@ -19,6 +19,7 @@ export const useSpecificationResults = (
     fundingStreamId,
     fundingPeriodId,
     {
+      enabled: !!specificationId?.length && !!fundingStreamId?.length && !!fundingPeriodId?.length,
       onError: onError,
       onSuccess: onSuccess,
     }

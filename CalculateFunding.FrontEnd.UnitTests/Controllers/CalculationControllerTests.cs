@@ -1,6 +1,9 @@
 ﻿// <copyright file="CalculationControllerTests.cs" company="Department for Education">
 // Copyright (c) Department for Education. All rights reserved.
 // </copyright>
+
+using CalculateFunding.Frontend.ViewModels.Jobs;
+
 namespace CalculateFunding.Frontend.Controllers
 {
     using System;
@@ -412,9 +415,9 @@ namespace CalculateFunding.Frontend.Controllers
         public void ApproveAllCalculations_GivenApproveAllCalculationsReturnsBadRequest_ThrowsInvalidOperationException()
         {
             //Arrange
-
             string specificationId = "abc123";
             ICalculationsApiClient calcsClient = Substitute.For<ICalculationsApiClient>();
+
             calcsClient
                 .QueueApproveAllSpecificationCalculations(Arg.Is(specificationId))
                 .Returns(new ApiResponse<Job>(HttpStatusCode.BadRequest));
@@ -422,19 +425,24 @@ namespace CalculateFunding.Frontend.Controllers
             IMapper mapper = MappingHelper.CreateFrontEndMapper();
 
             IAuthorizationHelper authorizationHelper = Substitute.For<IAuthorizationHelper>();
-            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId), Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
+
+            authorizationHelper.DoesUserHavePermission(Arg.Any<ClaimsPrincipal>(), Arg.Is(specificationId),
+                    Arg.Is(SpecificationActionTypes.CanApproveAllCalculations))
                 .Returns(true);
 
-            CalculationController controller = CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
+            CalculationController controller =
+                CreateCalculationController(calcsClient, mapper, authorizationHelper, resultsApiClient, specificationsApiClient, policiesApiClient);
 
             // Act
-            Action a = new Action(() =>
-            {
-                IActionResult result = controller.ApproveAllCalculations(specificationId).Result;
-            });
+            IActionResult result = controller.ApproveAllCalculations(specificationId)
+                .Result;
 
             // Assert
-            a.Should().Throw<InvalidOperationException>();
+            result.Should()
+                .NotBeNull();
+
+            result.Should()
+                .BeOfType<BadRequestResult>();
         }
 
         [TestMethod]
@@ -469,10 +477,8 @@ namespace CalculateFunding.Frontend.Controllers
             OkObjectResult okObjectResult = result as OkObjectResult;
             okObjectResult.Should().NotBeNull();
             okObjectResult.Value.Should().NotBeNull();
-            okObjectResult.Value.Should().BeOfType<Job>();
-
-            Job actualJob = okObjectResult.Value as Job;
-            actualJob.Id.Should().Be(jobId);
+            okObjectResult.Value.Should().BeOfType<JobCreatedResponse>();
+            (okObjectResult.Value as JobCreatedResponse)?.JobId.Should().Be(jobId);
         }
 
         [TestMethod]

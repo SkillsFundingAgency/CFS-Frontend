@@ -23,6 +23,7 @@ using CalculateFunding.Common.ApiClient.Specifications;
 using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.ApiClient.Policies;
 using CalculateFunding.Common.ApiClient.Policies.Models;
+using CalculateFunding.Frontend.ViewModels.Jobs;
 
 namespace CalculateFunding.Frontend.Controllers
 {
@@ -60,7 +61,10 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/specs/{specificationId}/calculations/{calculationId}")]
-        public async Task<IActionResult> SaveCalculation(string specificationId, string calculationId, [FromBody] CalculationUpdateViewModel vm)
+        public async Task<IActionResult> SaveCalculation(
+            string specificationId,
+            string calculationId,
+            [FromBody] CalculationUpdateViewModel vm)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
@@ -78,10 +82,12 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<Calculation> existingCalculationResponse = await _calcClient.GetCalculationById(calculationId);
             IActionResult errorResult = existingCalculationResponse.IsSuccessOrReturnFailureResult("Calculation");
+
             if (errorResult != null)
             {
                 return errorResult;
             }
+
             Calculation existingCalculation = existingCalculationResponse.Content;
 
             CalculationEditModel update = new CalculationEditModel()
@@ -113,8 +119,10 @@ namespace CalculateFunding.Frontend.Controllers
 
         [Route("api/specs/{specificationId}/calculations/{calculationId}/compilePreview")]
         [HttpPost]
-        public async Task<IActionResult> CompilePreview([FromRoute] string specificationId, [FromRoute] string calculationId
-            , [FromBody] PreviewCompileRequestViewModel vm)
+        public async Task<IActionResult> CompilePreview(
+            [FromRoute] string specificationId,
+            [FromRoute] string calculationId,
+            [FromBody] PreviewCompileRequestViewModel vm)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
@@ -130,7 +138,11 @@ namespace CalculateFunding.Frontend.Controllers
                     {
                         CompilerMessages = new List<CompilerMessage>
                         {
-                            new CompilerMessage {Message = modelStateValue.Errors[0].ErrorMessage}
+                            new CompilerMessage
+                            {
+                                Message = modelStateValue.Errors[0]
+                                    .ErrorMessage
+                            }
                         }
                     };
                 }
@@ -160,7 +172,7 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
             ApiResponse<IEnumerable<TypeInformation>> response = await _calcClient.GetCodeContextForSpecification(specificationId);
-            
+
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return Ok(response.Content);
@@ -178,7 +190,10 @@ namespace CalculateFunding.Frontend.Controllers
         /// <returns></returns>
         [Route("api/specs/{specificationId}/calculations/{calculationId}/status")]
         [HttpPut]
-        public async Task<IActionResult> ApproveCalculation([FromRoute] string specificationId, [FromRoute] string calculationId, [FromBody] PublishStatusEditModel publishStatusEditModel)
+        public async Task<IActionResult> ApproveCalculation(
+            [FromRoute] string specificationId,
+            [FromRoute] string calculationId,
+            [FromBody] PublishStatusEditModel publishStatusEditModel)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
@@ -199,6 +214,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             bool canApprove = await CanUserApproveCalculation(calculationResult.Content);
+
             if (!canApprove)
             {
                 return new ForbidResult();
@@ -213,7 +229,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ValidatedApiResponse<PublishStatusResult> response = await _calcClient.UpdatePublishStatus(calculationId, publishStatusEditModel);
-                
+
             if (response.IsBadRequest(out BadRequestObjectResult badRequest))
             {
                 return badRequest;
@@ -232,7 +248,7 @@ namespace CalculateFunding.Frontend.Controllers
         /// </summary>
         /// <param name="specificationId">Specification ID</param>
         /// <returns></returns>
-        [Route("api/specs/{specificationId}/calculations/approveall")]
+        [Route("api/specs/{specificationId}/calculations/approveAll")]
         [HttpPut]
         public async Task<IActionResult> ApproveAllCalculations([FromRoute] string specificationId)
         {
@@ -245,15 +261,11 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<CalcsJob> response = await _calcClient.QueueApproveAllSpecificationCalculations(specificationId);
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return Ok(response.Content);
-            }
-
-            throw new InvalidOperationException($"An error occurred while approving all calculations. Status code={response.StatusCode}");
+            return response.Handle("Approve all calculations",
+                onSuccess: x => x.Content.Id != null ? Ok(new JobCreatedResponse { JobId = x.Content.Id }) : BadRequest());
         }
 
-        [Route("api/calcs/{calculationId}/approvepermission")]
+        [Route("api/calcs/{calculationId}/approvePermission")]
         [HttpGet]
         public async Task<IActionResult> GetIsUserAllowedToApproveCalculation([FromRoute] string calculationId)
         {
@@ -302,9 +314,10 @@ namespace CalculateFunding.Frontend.Controllers
             createCalculation.ValueType = vm.CalculationType;
 
             ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);
-            
+
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("CreateCalculation");
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -323,6 +336,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("GetCalculationStatusCounts");
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -333,7 +347,10 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpPost]
         [Route("api/specs/{specificationId}/calculations/{calculationId}/editadditionalcalculation")]
-        public async Task<IActionResult> EditAdditionalCalculation(string specificationId, string calculationId, [FromBody] EditAdditionalCalculationViewModel vm)
+        public async Task<IActionResult> EditAdditionalCalculation(
+            string specificationId,
+            string calculationId,
+            [FromBody] EditAdditionalCalculationViewModel vm)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.ArgumentNotNull(vm, nameof(vm));
@@ -357,9 +374,10 @@ namespace CalculateFunding.Frontend.Controllers
             editCalculation.DataType = vm.DataType;
 
             ValidatedApiResponse<Calculation> response = await _calcClient.EditCalculation(specificationId, calculationId, editCalculation);
-                
+
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("EditCalculation");
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -378,6 +396,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult calcResponseError =
                 calcResponse.IsSuccessOrReturnFailureResult("GetCalculationById");
+
             if (calcResponseError != null)
             {
                 return calcResponseError;
@@ -396,10 +415,11 @@ namespace CalculateFunding.Frontend.Controllers
             string fundingStreamId = calculationByIdViewModel.FundingStreamId;
 
             ApiResponse<TemplateMapping> templateMappingResponse =
-                    await _calcClient.GetTemplateMapping(calculationByIdViewModel.SpecificationId, fundingStreamId);
+                await _calcClient.GetTemplateMapping(calculationByIdViewModel.SpecificationId, fundingStreamId);
 
             IActionResult templateMappingResponseError =
                 templateMappingResponse.IsSuccessOrReturnFailureResult("GetTemplateMapping");
+
             if (templateMappingResponseError != null)
             {
                 return templateMappingResponseError;
@@ -410,6 +430,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult specificationResponseError =
                 specificationResponse.IsSuccessOrReturnFailureResult("GetSpecificationSummaryById");
+
             if (specificationResponseError != null)
             {
                 return specificationResponseError;
@@ -425,24 +446,33 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult policiesResponseError =
                 policiesResponse.IsSuccessOrReturnFailureResult("GetDistinctTemplateMetadataCalculationsContents");
+
             if (policiesResponseError != null)
             {
                 return policiesResponseError;
             }
 
             TemplateMetadataDistinctCalculationsContents templateContents = policiesResponse.Content;
-            uint templateCalculationId = templateMapping.TemplateMappingItems.First(t => t.CalculationId == calculationId).TemplateId;
+
+            uint templateCalculationId = templateMapping.TemplateMappingItems.First(t => t.CalculationId == calculationId)
+                .TemplateId;
 
             calculationByIdViewModel.TemplateCalculationId = templateCalculationId;
-            calculationByIdViewModel.TemplateCalculationType = templateContents.Calculations.First(c => c.TemplateCalculationId == templateCalculationId).Type;
+
+            calculationByIdViewModel.TemplateCalculationType = templateContents.Calculations.First(c => c.TemplateCalculationId == templateCalculationId)
+                .Type;
 
             return Ok(calculationByIdViewModel);
         }
 
         [HttpGet]
         [Route("api/calcs/getcalculations/{specificationId}/{calculationType}/{pageNumber}")]
-        public async Task<IActionResult> GetCalculationsForSpecification(string specificationId,
-            CalculationType calculationType, int pageNumber, [FromQuery] string searchTerm, [FromQuery] string status)
+        public async Task<IActionResult> GetCalculationsForSpecification(
+            string specificationId,
+            CalculationType calculationType,
+            int pageNumber,
+            [FromQuery] string searchTerm,
+            [FromQuery] string status)
         {
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
 
@@ -459,6 +489,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("SearchCalculationsForSpecification");
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -476,7 +507,8 @@ namespace CalculateFunding.Frontend.Controllers
             ApiResponse<ResultsJob> result =
                 await _resultsApiClient.RunGenerateCalculationCsvResultsJob(specificationId);
 
-            return result.IsSuccessOrReturnFailureResult(nameof(specificationId)) ?? Ok(new {
+            return result.IsSuccessOrReturnFailureResult(nameof(specificationId)) ?? Ok(new
+            {
                 jobId = result.Content?.Id
             });
         }
@@ -495,14 +527,16 @@ namespace CalculateFunding.Frontend.Controllers
             Guard.ArgumentNotNull(calculationType, nameof(calculationType));
 
             PublishStatus? publishStatus = !string.IsNullOrEmpty(status) && status != "All"
-                ? publishStatus = (PublishStatus) Enum.Parse(typeof(PublishStatus), status)
+                ? publishStatus = (PublishStatus)Enum.Parse(typeof(PublishStatus), status)
                 : null;
 
             ApiResponse<SearchResults<CalculationSearchResult>> calculationSearchResultResponse =
                 await _calcClient.SearchCalculationsForSpecification(specificationId,
                     calculationType, publishStatus, searchTerm, pageNumber);
+
             IActionResult calculationSearchResultErrorResult =
                 calculationSearchResultResponse.IsSuccessOrReturnFailureResult("SearchCalculationsForSpecification");
+
             if (calculationSearchResultErrorResult != null)
             {
                 return calculationSearchResultErrorResult;
@@ -512,8 +546,10 @@ namespace CalculateFunding.Frontend.Controllers
 
             ApiResponse<ProviderResultResponse> providerResultResponse =
                 await _resultsApiClient.GetProviderResults(providerId, specificationId);
+
             IActionResult providerResultResponseErrorResult =
                 providerResultResponse.IsSuccessOrReturnFailureResult("GetProviderResults");
+
             if (providerResultResponseErrorResult != null)
             {
                 return providerResultResponseErrorResult;
@@ -528,16 +564,18 @@ namespace CalculateFunding.Frontend.Controllers
                         ValueType = c.ValueType,
                         Value = providerResultResponse.Content.CalculationResults
                             .FirstOrDefault(calcResult =>
-                                calcResult.Calculation != null && calcResult.Calculation.Id == c.Id)?.Value,
+                                calcResult.Calculation != null && calcResult.Calculation.Id == c.Id)
+                            ?.Value,
                         LastUpdatedDate = c.LastUpdatedDate,
                         ExceptionMessage = providerResultResponse.Content.CalculationResults
                             .FirstOrDefault(calcResult =>
-                                calcResult.Calculation != null && calcResult.Calculation.Id == c.Id)?.ExceptionMessage,
+                                calcResult.Calculation != null && calcResult.Calculation.Id == c.Id)
+                            ?.ExceptionMessage,
                     });
 
             AdditionalCalculationViewModel additionalCalculationViewModel =
                 new AdditionalCalculationViewModel(additionalCalcs, calcSearchResults.TotalCount,
-                    pageNumber, (int) Math.Ceiling(calcSearchResults.TotalCount / (double) 50),
+                    pageNumber, (int)Math.Ceiling(calcSearchResults.TotalCount / (double)50),
                     50, calcSearchResults.TotalErrorCount, calcSearchResults.Facets);
 
 
@@ -555,8 +593,8 @@ namespace CalculateFunding.Frontend.Controllers
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return new OkObjectResult(response.Content
-                    .OrderByDescending(v=>v.Version)
-                    .ThenByDescending(v=>v.LastUpdated));
+                    .OrderByDescending(v => v.Version)
+                    .ThenByDescending(v => v.LastUpdated));
             }
 
             return new BadRequestObjectResult(response.Content);
@@ -564,7 +602,8 @@ namespace CalculateFunding.Frontend.Controllers
 
         [HttpGet]
         [Route("api/calcs/getmultipleversions")]
-        public async Task<IActionResult> GetMulitpleCalculationVersions([FromQuery] string calculationId,
+        public async Task<IActionResult> GetMulitpleCalculationVersions(
+            [FromQuery] string calculationId,
             [FromQuery(Name = "versions[]")] int[] versions)
         {
             Guard.IsNullOrWhiteSpace(calculationId, nameof(calculationId));
@@ -574,6 +613,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("GetMultipleVersionsByCalculationId");
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -592,6 +632,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("GetCalculationSummariesForSpecification");
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -606,10 +647,12 @@ namespace CalculateFunding.Frontend.Controllers
         {
             Guard.IsNullOrWhiteSpace(calculationName, nameof(calculationName));
 
-            ApiResponse<CalculationIdentifier> response = await _calcClient.GenerateCalculationIdentifier(new GenerateIdentifierModel { CalculationName = calculationName });
+            ApiResponse<CalculationIdentifier> response =
+                await _calcClient.GenerateCalculationIdentifier(new GenerateIdentifierModel { CalculationName = calculationName });
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult(nameof(GenerateCalculationIdentifier));
+
             if (errorResult != null)
             {
                 return errorResult;
@@ -632,7 +675,8 @@ namespace CalculateFunding.Frontend.Controllers
                 return false;
             }
 
-            return User.GetUserProfile()?.Id != calculation.Author.Id;
+            return User.GetUserProfile()
+                ?.Id != calculation.Author.Id;
         }
     }
 }

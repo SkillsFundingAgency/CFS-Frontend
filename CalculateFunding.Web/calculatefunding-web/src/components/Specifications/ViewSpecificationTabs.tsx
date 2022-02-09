@@ -18,13 +18,11 @@ export const ViewSpecificationTabs = ({
   specification,
   approveAllCalculationsJob,
   lastConverterWizardReportDate,
-  clearSpecificationFromCache,
   monitorAssignTemplateCalculationsJob,
 }: {
   specification: SpecificationSummary;
   approveAllCalculationsJob: JobDetails | undefined;
   lastConverterWizardReportDate: Date | undefined;
-  clearSpecificationFromCache: () => Promise<void>;
   monitorAssignTemplateCalculationsJob: () => Promise<void>;
 }) => {
   const { addErrorToContext } = useErrorContext();
@@ -80,7 +78,6 @@ export const ViewSpecificationTabs = ({
             <SpecificationFundingLineResults
               specification={specification}
               refreshFundingLines={approveAllCalculationsJob?.isSuccessful}
-              clearSpecificationFromCache={clearSpecificationFromCache}
               monitorAssignTemplateCalculationsJob={monitorAssignTemplateCalculationsJob}
             />
           </Tabs.Panel>

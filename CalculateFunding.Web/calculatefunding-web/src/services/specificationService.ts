@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 
 import { CalculationSearchRequestViewModel } from "../types/CalculationSearchRequestViewModel";
 import { CalculationSearchResultResponse } from "../types/CalculationSearchResponse";
-import { PublishStatus, PublishStatusModel } from "../types/PublishStatusModel";
+import { PublishStatus } from "../types/PublishStatusModel";
 import { CreateSpecificationModel } from "../types/Specifications/CreateSpecificationModel";
 import {
   FundingLineProfileVariationPointer,
@@ -80,10 +80,7 @@ export async function getSpecificationsByFundingPeriodAndStreamIdService(
   );
 }
 
-export async function getSpecificationsWithResultsService(
-  fundingStreamId: string,
-  fundingPeriodId: string
-) {
+export async function getSpecificationsWithResultsService(fundingStreamId: string, fundingPeriodId: string) {
   return axios.request<SpecificationSummary[]>({
     url: `${baseURL}/specifications-by-fundingperiod-and-fundingstream/${fundingPeriodId}/${fundingStreamId}/with-results`,
     method: "GET",
@@ -103,17 +100,10 @@ export async function getAllSpecificationsService(
   });
 }
 
-export async function approveFundingLineStructureService(specificationId: string) {
-  const publishStatusEditModel: PublishStatusModel = {
-    publishStatus: PublishStatus.Approved,
-  };
-
+export async function approveSpecification(specificationId: string): Promise<AxiosResponse<PublishStatus>> {
   return axios(`${baseURL}/${specificationId}/status`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: publishStatusEditModel,
+    data: { publishStatus: PublishStatus.Approved },
   });
 }
 

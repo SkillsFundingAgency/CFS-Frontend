@@ -31,13 +31,11 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
     addErrorToContext: addError,
     clearErrorsFromContext: clearErrorMessages,
   } = useErrorContext();
-  const { specification, isLoadingSpecification, clearSpecificationFromCache } = useSpecificationSummary(
-    specificationId,
-    (err) =>
-      addError({
-        error: err,
-        description: "Error while loading specification",
-      })
+  const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
+    addError({
+      error: err,
+      description: "Error while loading specification",
+    })
   );
   const fundingStream = specification?.fundingStreams ? specification.fundingStreams[0] : undefined;
   const { missingPermissions, isPermissionsFetched } = useSpecificationPermissions(specificationId, [
@@ -157,7 +155,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
       {specification && fundingStream && !isApproveCalcsJobMonitoring && !isRefreshJobMonitoring && (
         <>
           <ViewSpecificationSummary
-            specification={specification}
+            specificationId={specificationId}
             isLoadingSelectedForFunding={isLoadingSelectedForFunding}
             monitorApproveAllCalculationsJob={monitorApproveAllCalculationsJob}
             monitorRefreshFundingJob={monitorRefreshFundingJob}
@@ -167,7 +165,6 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
             specification={specification}
             approveAllCalculationsJob={approveAllCalculationsJob}
             lastConverterWizardReportDate={lastConverterWizardReportDate}
-            clearSpecificationFromCache={clearSpecificationFromCache}
             monitorAssignTemplateCalculationsJob={monitorAssignTemplateCalculationsJob}
           />
         </>
