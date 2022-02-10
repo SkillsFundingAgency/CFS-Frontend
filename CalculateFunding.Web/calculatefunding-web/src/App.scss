@@ -467,7 +467,7 @@ ul.autocomplete {
   }
 
   .collapsible-step-header-description {
-    width: 590px;
+    width: 400px;
     display: inline-block;
   }
 
@@ -482,7 +482,7 @@ ul.autocomplete {
   }
 
   .collapsible-step-header-with-calculation-value .collapsible-step-header-description {
-    width: 485px;
+    width: 400px;
     display: inline-block;
   }
 
@@ -507,7 +507,7 @@ ul.autocomplete {
   }
 
   .collapsible-step-header-with-updated-date .collapsible-step-header-description {
-    width: 510px;
+    width: 400px;
   }
 
   .collapsible-step-header-with-updated-date .collapsible-step-header-updated-date {
@@ -517,6 +517,7 @@ ul.autocomplete {
 
   .collapsible-step-panel-button {
     width: 30px;
+    float:right;
   }
 
   .collapsible-step-panel-button:hover {
