@@ -18,7 +18,7 @@ export const ProviderResultNameColumn = (props: ProviderResultNameColumnProps) =
 
   if (props.publishedProvider.hasErrors) {
     return (
-      <td className="govuk-table__cell govuk-!-padding-bottom-0">
+      <td className="govuk-table__cell govuk-!-padding-bottom-0" colSpan={2}>
         <div className="govuk-checkboxes govuk-checkboxes--small">
           <label className="govuk-label govuk-form-group--error" htmlFor={props.id}>
             <Link
