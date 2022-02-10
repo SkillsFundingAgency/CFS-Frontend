@@ -15,6 +15,7 @@ import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useCharacterSubstitution } from "../../hooks/useCharacterSubstitution";
+import { useConfirmLeavePage } from "../../hooks/useConfirmLeavePage";
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import { createAdditionalCalculationService } from "../../services/calculationService";
@@ -56,13 +57,11 @@ export function CreateAdditionalCalculation({
   const onCalculationChange = async (state: CalculationSourceCodeState) => {
     setCalculationState(state);
     if (state.errorMessage.length > 0) {
-      addError(
-          {
-            error: state.errorMessage,
-            description: "An error occured related to the calculation source code",
-            fieldName: "source-code"
-          }
-      );
+      addError({
+        error: state.errorMessage,
+        description: "An error occured related to the calculation source code",
+        fieldName: "source-code",
+      });
     }
   };
 
@@ -70,20 +69,22 @@ export function CreateAdditionalCalculation({
     if (!calculationState) {
       return;
     } else if (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully) {
-      addError(
-          {
-            error: "Please build your calculation source code to check it is valid",
-            description: "Unvalidated source code",
-            fieldName: "source-code"
-          }
-      );
+      addError({
+        error: "Please build your calculation source code to check it is valid",
+        description: "Unvalidated source code",
+        fieldName: "source-code",
+      });
       return;
     } else if (
       additionalCalculationName === "" ||
       additionalCalculationName.length < 4 ||
       additionalCalculationName.length > 180
     ) {
-      addError({ error: "Please use a name between 4 and 180 characters", description: "Invalid name", fieldName: "calculation-name" });
+      addError({
+        error: "Please use a name between 4 and 180 characters",
+        description: "Invalid name",
+        fieldName: "calculation-name",
+      });
       return;
     } else {
       clearErrorMessages();
@@ -105,6 +106,8 @@ export function CreateAdditionalCalculation({
         });
     }
   }
+
+  useConfirmLeavePage(!isSaving && calculationState !== undefined && calculationState.isDirty);
 
   const { substitution, substituteCharacters } = useCharacterSubstitution();
 
@@ -165,7 +168,9 @@ export function CreateAdditionalCalculation({
                 substituteCharacters(e.target.value);
               }}
             />
-            {substitution.length > 0 && <span className="govuk-caption-m">Source code name: {substitution}</span>}
+            {substitution.length > 0 && (
+              <span className="govuk-caption-m">Source code name: {substitution}</span>
+            )}
             <InlineError fieldName={"calculation-name"} errors={errors} />
           </div>
 
