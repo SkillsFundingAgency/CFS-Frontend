@@ -215,6 +215,7 @@ export function ConfirmApprovalOfFunding({
                     className="govuk-checkboxes__input"
                     name="acknowledgementCheckbox"
                     type="checkbox"
+                    disabled={isConfirming}
                     checked={acknowledge}
                     onChange={handleAcknowledge}
                   />

@@ -364,6 +364,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
                     name="acknowledgementCheckbox"
                     type="checkbox"
                     data-testid="acknowledgementCheckbox"
+                    disabled={isConfirming}
                     checked={acknowledge}
                     onChange={handleAcknowledge}
                   />
