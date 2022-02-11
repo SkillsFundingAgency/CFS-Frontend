@@ -392,7 +392,7 @@ export function ViewEditFundingLineProfile({
                     />
                   </RowItem>
 
-                  <RowItem id="amount-already-paid" title="Instalments paid value">
+                  <RowItem id="amount-already-paid" title="Instalments processed value">
                     <FormattedNumber
                       value={fundingLineProfile.amountAlreadyPaid || 0}
                       type={NumberType.FormattedMoney}
@@ -425,7 +425,7 @@ export function ViewEditFundingLineProfile({
                   <thead className="govuk-table__head">
                     <tr className="govuk-table__row">
                       <th scope="col" className="govuk-table__header">
-                        Instalment month
+                        Instalment
                       </th>
                       <th scope="col" className="govuk-table__header">
                         Payment status
@@ -459,7 +459,7 @@ export function ViewEditFundingLineProfile({
                               )}
                             </th>
                             <td className="govuk-table__cell" data-testid={`paid-${i}`}>
-                              {p.isPaid ? <strong className="govuk-tag">Paid</strong> : null}
+                              {p.isPaid ? <strong className="govuk-tag">Processed</strong> : null}
                             </td>
                             <td className="govuk-table__cell" data-testid={`instalment-number-${i}`}>
                               {p.installmentNumber}
