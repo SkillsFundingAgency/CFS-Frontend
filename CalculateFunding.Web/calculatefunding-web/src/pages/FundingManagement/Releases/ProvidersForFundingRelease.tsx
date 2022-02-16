@@ -1,14 +1,9 @@
-import { AxiosError } from "axios";
 import React, { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
-import { Link } from "react-router-dom";
 
 import { initialiseFundingSearchSelection } from "../../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
-import { ConfirmationModal } from "../../../components/ConfirmationModal";
-import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
 import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
 import { ProviderResultsTable } from "../../../components/Funding/ProviderFundingSearch/ProviderResultsTable";
 import { PublishedProviderSearchFilters } from "../../../components/Funding/ProviderFundingSearch/PublishedProviderSearchFilters";
@@ -16,7 +11,9 @@ import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
-import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
+import { TextLink } from "../../../components/TextLink";
+import { Title } from "../../../components/Title";
+import { activeJobs } from "../../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
 import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
@@ -25,8 +22,6 @@ import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import { IStoreState } from "../../../reducers/rootReducer";
-import { getLatestSuccessfulJob } from "../../../services/jobService";
-import * as publishService from "../../../services/publishService";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { JobDetails } from "../../../types/jobDetails";
@@ -36,7 +31,7 @@ import { Permission } from "../../../types/Permission";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
 
-export interface ReleaseResultsProps {
+export interface ProvidersForFundingReleaseProps {
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
@@ -44,7 +39,7 @@ export interface ReleaseResultsProps {
 
 export const ProvidersForFundingRelease = ({
   match,
-}: RouteComponentProps<ReleaseResultsProps>): JSX.Element => {
+}: RouteComponentProps<ProvidersForFundingReleaseProps>): JSX.Element => {
   const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
@@ -113,35 +108,10 @@ export const ProvidersForFundingRelease = ({
   );
   const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
     match.params.specificationId,
-    [Permission.CanRefreshFunding, Permission.CanReleaseFunding]
+    [Permission.CanReleaseFunding]
   );
-  useQuery<JobDetails | undefined, AxiosError>(
-    `last-spec-${specificationId}-refresh`,
-    async () =>
-      getJobDetailsFromJobResponse(
-        (await getLatestSuccessfulJob(specificationId, JobType.RefreshFundingJob)).data
-      ),
-    {
-      cacheTime: 0,
-      refetchOnWindowFocus: false,
-      enabled: specificationId !== undefined && specificationId.length > 0,
-      onSettled: (data) => setLastRefresh(data?.lastUpdated),
-      onError: (err) =>
-        addError({
-          error: err,
-          description: "Error while loading last refresh date",
-        }),
-    }
-  );
-  const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
   const [jobId, setJobId] = useState<string>("");
-  const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
-  const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
-  const hasPermissionToRefresh: boolean = useMemo(
-    () => hasPermission && !!hasPermission(Permission.CanRefreshFunding),
-    [isPermissionsFetched]
-  );
-
+  const { errors, addErrorMessage, addError } = useErrors();
   const hasPermissionToRelease = useMemo(
     () => hasPermission && hasPermission(Permission.CanReleaseFunding),
     [isPermissionsFetched]
@@ -171,18 +141,10 @@ export const ProvidersForFundingRelease = ({
   }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
-    const completedRefreshJob = jobNotifications.find(
-      (n) => n.latestJob?.isComplete && n.latestJob?.jobType === JobType.RefreshFundingJob
-    )?.latestJob;
-    if (completedRefreshJob) {
-      setIsLoadingRefresh(false);
-      setLastRefresh(completedRefreshJob.lastUpdated);
-    }
     if (
       jobId !== "" &&
       jobNotifications.some((n) => n.latestJob?.isComplete && n.latestJob?.jobId === jobId)
     ) {
-      setIsLoadingRefresh(false);
       setJobId("");
       refetchSearchResults();
     }
@@ -205,58 +167,6 @@ export const ProvidersForFundingRelease = ({
     });
   }
 
-  async function handleRefresh() {
-    clearErrorMessages();
-
-    try {
-      setIsLoadingRefresh(true);
-      await publishService.preValidateForRefreshFundingService(specificationId);
-      setIsLoadingRefresh(false);
-
-      ConfirmationModal(<ConfirmRefreshModelBody />, refreshFunding, "Confirm", "Cancel");
-    } catch (error: any) {
-      window.scrollTo(0, 0);
-      const axiosError = error as AxiosError;
-      if (axiosError && axiosError.response && axiosError.response.status === 400) {
-        addValidationErrors({
-          validationErrors: axiosError.response.data,
-          message: "Error trying to refresh funding",
-        });
-      } else {
-        addError({ error: error, description: "Error trying to refresh funding" });
-      }
-    }
-    setIsLoadingRefresh(false);
-  }
-
-  async function refreshFunding() {
-    setIsLoadingRefresh(true);
-    try {
-      setJobId((await publishService.refreshSpecificationFundingService(specificationId)).data);
-    } catch (e) {
-      addErrorMessage(e, "Error trying to refresh funding");
-    } finally {
-      setIsLoadingRefresh(false);
-    }
-  }
-
-  const ConfirmRefreshModelBody = () => {
-    return (
-      <div className="govuk-grid-column-full left-align">
-        <h1 className="govuk-heading-l">Confirm funding refresh</h1>
-        <p className="govuk-body">A refresh of funding will update the following data:</p>
-        <ul className="govuk-list govuk-list--bullet">
-          <li>Allocation values</li>
-          <li>Profile values</li>
-        </ul>
-        <p className="govuk-body">
-          This update will affect providers in specification {specification?.name} for the funding stream{" "}
-          {specification?.fundingStreams[0].name} and period {specification?.fundingPeriod.name}.
-        </p>
-      </div>
-    );
-  };
-
   const clearFundingSearchSelection = () => {
     dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
   };
@@ -269,8 +179,7 @@ export const ProvidersForFundingRelease = ({
     !isSearchCriteriaInitialised ||
     isLoadingSpecification ||
     isLoadingFundingConfiguration ||
-    isLoadingSearchResults ||
-    isLoadingRefresh;
+    isLoadingSearchResults;
 
   const haveAnyProviderErrors =
     isLoadingPublishedProviderErrors ||
@@ -282,19 +191,13 @@ export const ProvidersForFundingRelease = ({
   const activeActionJobs = activeJobs(actionJobs);
   const hasActiveActionJobs = !!activeActionJobs.length;
 
-  const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh || hasActiveActionJobs;
-
   async function handleRelease() {
     if (
       publishedProviderSearchResults &&
       publishedProviderSearchResults.canPublish &&
       hasPermissionToRelease
     ) {
-      if (
-        fundingConfiguration?.approvalMode === ApprovalMode.All &&
-        publishedProvidersWithErrors &&
-        publishedProvidersWithErrors.length > 0
-      ) {
+      if (fundingConfiguration?.approvalMode === ApprovalMode.All && !!publishedProvidersWithErrors?.length) {
         addErrorMessage(
           "Funding cannot be released as there are providers in error",
           undefined,
@@ -309,6 +212,10 @@ export const ProvidersForFundingRelease = ({
     }
   }
 
+  const canRelease =
+    !hasActiveActionJobs && publishedProviderSearchResults?.canPublish && hasPermissionToRelease;
+  const showUploadBatchAction = canRelease && fundingConfiguration?.approvalMode === ApprovalMode.Batches;
+
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
@@ -321,53 +228,54 @@ export const ProvidersForFundingRelease = ({
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
-      <div className="govuk-grid-row govuk-!-margin-bottom-5">
+      <div className="govuk-grid-row govuk-!-margin-bottom-2">
         <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">{specification?.name}</h1>
-          {specification && specification?.fundingStreams?.length > 0 && specification?.fundingPeriod?.name && (
-            <h2 className="govuk-caption-l">
-              {specification.fundingStreams[0].name} for {specification && specification.fundingPeriod.name}
-            </h2>
-          )}
+          <Title
+            title={specification?.name ?? ""}
+            titleCaption={
+              !specification
+                ? ""
+                : `${specification?.fundingStreams[0].name} for ${specification.fundingPeriod.name}`
+            }
+          />
         </div>
-        <div className="govuk-grid-column-one-third">
-          <ul className="govuk-list right-align">
-            <li>
-              <Link className={"govuk-link"} to={`/ViewSpecification/${specification?.id}`}>
-                Manage specification
-              </Link>
-            </li>
-            <li>
-              <Link
-                className="govuk-link govuk-link--no-visited-state"
-                to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}
-              >
-                Specification reports
-              </Link>
-            </li>
-            <li>
-              <Link to="/">Approve batch of providers</Link>
-            </li>
-
-            <li>
-              <Link to="/">Release management</Link>
-            </li>
-            <li>
-              <button
-                className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
-                disabled={disableRefresh}
-                onClick={handleRefresh}
-              >
-                Refresh funding
-              </button>
-            </li>
-
-            {lastRefresh && (
-              <p className="govuk-body-s govuk-!-margin-bottom-0">
-                Last refresh <DateTimeFormatter date={lastRefresh as Date} />
-              </p>
-            )}
-          </ul>
+        <div className="govuk-grid-column-one-third govuk-right-align">
+          {showUploadBatchAction && (
+            <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management action links">
+              <ul className="govuk-list">
+                <li>Actions:</li>
+                {showUploadBatchAction && (
+                  <li>
+                    <TextLink
+                      to={`/FundingManagement/Release/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                    >
+                      Upload batch of providers
+                    </TextLink>
+                  </li>
+                )}
+              </ul>
+            </nav>
+          )}
+          <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management other links">
+            <ul className="govuk-list">
+              <li>Navigate to:</li>
+              <li>
+                <TextLink
+                  to={`/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                >
+                  Funding approvals
+                </TextLink>
+              </li>
+              <li>
+                <TextLink to={`/ViewSpecification/${specificationId}`}>Manage specification</TextLink>
+              </li>
+              <li>
+                <TextLink to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}>
+                  Specification reports
+                </TextLink>
+              </li>
+            </ul>
+          </nav>
         </div>
       </div>
       <div className="govuk-grid-row">
@@ -412,21 +320,8 @@ export const ProvidersForFundingRelease = ({
         <div className="govuk-grid-column-full right-align">
           <div className="right-align">
             <button
-              className="govuk-button govuk-!-margin-right-1"
-              disabled={disableRefresh}
-              onClick={handleRefresh}
-            >
-              Refresh funding
-            </button>
-            <button
               className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-              disabled={
-                hasActiveActionJobs ||
-                !publishedProviderSearchResults?.canPublish ||
-                !hasPermissionToRelease ||
-                isLoadingRefresh ||
-                blockActionBasedOnProviderErrors
-              }
+              disabled={!canRelease || !blockActionBasedOnProviderErrors}
               onClick={handleRelease}
             >
               Release funding

@@ -46,9 +46,9 @@ export const useSpecificationWithResultsSelection = (
   );
 
   const {
-    data: specifications,
-    isLoading: isLoadingSpecifications,
-    isFetched: hasFetchedSpecifications,
+    specificationsWithResults,
+    isLoadingSpecificationsWithResults,
+    hasFetchedSpecificationsWithResults,
   } = useFindSpecificationsWithResults(selectedFundingStreamId, selectedFundingPeriodId, {
     onSuccess: () => {
       setSelectedSpecificationId(undefined);
@@ -71,9 +71,9 @@ export const useSpecificationWithResultsSelection = (
     isLoadingFundingPeriods,
     selectedFundingPeriodId,
     setSelectedFundingPeriodId,
-    specifications,
-    isLoadingSpecifications,
-    hasFetchedSpecifications,
+    specificationsWithResults,
+    isLoadingSpecificationsWithResults,
+    hasFetchedSpecificationsWithResults,
     selectedSpecificationId,
     setSelectedSpecificationId,
   };

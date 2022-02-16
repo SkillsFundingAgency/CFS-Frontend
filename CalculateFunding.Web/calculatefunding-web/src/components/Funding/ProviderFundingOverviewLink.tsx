@@ -1,8 +1,6 @@
 ﻿import React from "react";
-import { useSelector } from "react-redux";
 
-import { IStoreState } from "../../reducers/rootReducer";
-import { FeatureFlagsState } from "../../states/FeatureFlagsState";
+import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { TextLink } from "../TextLink";
 
@@ -21,10 +19,8 @@ export const ProviderFundingOverviewUri = ({
   fundingStreamId: string;
   fundingPeriodId: string;
 }) => {
-  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
-    (state) => state.featureFlags
-  );
-  return featureFlagsState.enableNewFundingManagement
+  const { enableNewFundingManagement } = useFeatureFlags();
+  return enableNewFundingManagement
     ? `/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${specCoreProviderVersionId}`
     : `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${specCoreProviderVersionId}/${fundingStreamId}/${fundingPeriodId}`;
 };

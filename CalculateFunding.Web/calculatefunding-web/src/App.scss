@@ -1,9 +1,10 @@
 @import "styles/govuk-frontend";
+
 @font-face {
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  src: url(https://fonts.gstatic.com/s/materialicons/v99/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format("woff2");
+  src: url("https://fonts.gstatic.com/s/materialicons/v99/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2") format("woff2");
 }
 
 .govuk-width-container {
@@ -52,7 +53,7 @@ input:disabled {
   -moz-osx-font-smoothing: grayscale;
   font-weight: 700;
   font-size: 19px;
-  font-size: 1.1875rem;
+  font-size: "1.1875rem";
   line-height: 1.31579;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -114,12 +115,30 @@ input:disabled {
   font-size: 19px;
 }
 
+ul.autocomplete {
+  border-bottom: 2px solid $govuk-input-border-colour;
+  border-right: 2px solid $govuk-input-border-colour;
+  border-left: 2px solid $govuk-input-border-colour;
+  border-top: none;
+  position: absolute;
+  width: 274px;
+  background-color: $govuk-body-background-colour;
+  z-index: 5;
+
+  li {
+    padding-right: 5px;
+    padding-left: 5px;
+    list-style: none;
+    cursor: pointer;
+  }
+}
+
 /////////////////////////////////////
 /////      funding line         /////
 /////////////////////////////////////
 #fundingline-structure {
-  .funding-lines-table tr td:nth-child(1),
-  #funding-lines-table tr th:nth-child(1) {
+  #funding-lines-table tr th:nth-child(1),
+  .funding-lines-table tr td:nth-child(1) {
     width: 10%;
   }
 
@@ -341,24 +360,6 @@ input:disabled {
   text-align: center;
 }
 
-ul.autocomplete {
-  border-bottom: 2px solid $govuk-input-border-colour;
-  border-right: 2px solid $govuk-input-border-colour;
-  border-left: 2px solid $govuk-input-border-colour;
-  border-top: none;
-  position: absolute;
-  width: 274px;
-  background-color: $govuk-body-background-colour;
-  z-index: 5;
-
-  li {
-    padding-right: 5px;
-    padding-left: 5px;
-    list-style: none;
-    cursor: pointer;
-  }
-}
-
 .right-align {
   float: right;
 }
@@ -425,7 +426,7 @@ ul.autocomplete {
 
   .collapsible-step-circle-background {
     text-shadow: 0 -0.1em 0 govuk-colour("white"), 0.1em 0 0 govuk-colour("white"),
-      0 0.1em 0 govuk-colour("white"), -0.1em 0 0 govuk-colour("white");
+    0 0.1em 0 govuk-colour("white"), -0.1em 0 0 govuk-colour("white");
   }
 
   .collapsible-step-circle-step-label,
@@ -538,6 +539,7 @@ ul.autocomplete {
       line-height: 12px;
     }
   }
+
   .govuk-collapsiblepanel-heading-collapser {
     &:after {
       content: "\2212";
@@ -706,8 +708,13 @@ a.govuk-link-red {
   white-space: nowrap;
 }
 
-.govuk-scroll-window{
+.govuk-scroll-window {
   overflow-y: auto;
   min-height: 60px;
   max-height: 400px;
+}
+
+.govuk-right-align {
+  width: auto !important;
+  float: right !important;
 }

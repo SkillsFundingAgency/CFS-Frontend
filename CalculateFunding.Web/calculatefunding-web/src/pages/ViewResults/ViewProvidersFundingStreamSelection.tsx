@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 
 import { AutoComplete } from "../../components/AutoComplete";
-import { BackAnchor } from "../../components/BackAnchor";
+import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
@@ -42,10 +42,6 @@ export function ViewProvidersFundingStreamSelection() {
     } else {
       setIsFormValid(false);
     }
-  }
-
-  function goBack() {
-    history.goBack();
   }
 
   return (
@@ -113,7 +109,7 @@ export function ViewProvidersFundingStreamSelection() {
             </div>
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-third">
-                <BackAnchor name="Back" callback={goBack} />
+                <BackLink />
               </div>
             </div>
           </div>

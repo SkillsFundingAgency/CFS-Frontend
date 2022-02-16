@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
+
+import { TextLink } from "./TextLink";
 
 export interface BackLinkProps {
   to?: string | undefined;
@@ -9,7 +10,12 @@ export interface BackLinkProps {
   handleOnClick?: any;
 }
 
-export function BackLink({ to = "", children = "Back", handleOnClick, className }: BackLinkProps) {
+export const BackLink = ({
+  to = "",
+  children = "Back",
+  handleOnClick,
+  className,
+}: BackLinkProps) => {
   const history = useHistory();
 
   const onClickHandler = (event: any) => {
@@ -25,14 +31,10 @@ export function BackLink({ to = "", children = "Back", handleOnClick, className 
     }
     return;
   };
-
+  
   return (
-    <Link
-      className={`govuk-link govuk-back-link govuk-link--no-visited-state ${className || ""}`}
-      to={to}
-      onClick={onClickHandler}
-    >
+    <TextLink to={to} handleOnClick={handleOnClick ?? onClickHandler} additionalCss={`govuk-back-link ${className}`}>
       {children}
-    </Link>
+    </TextLink>
   );
-}
+};

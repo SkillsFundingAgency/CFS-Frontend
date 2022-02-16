@@ -32,7 +32,7 @@ const store: Store<IStoreState> = createStore(rootReducer);
 
 store.dispatch = jest.fn();
 
-export function SpecificationTestData() {
+export function CreateSpecificationTestData() {
   const useSelectorSpy = jest.spyOn(redux, "useSelector");
 
   const renderCreateSpecificationPage = async () => {

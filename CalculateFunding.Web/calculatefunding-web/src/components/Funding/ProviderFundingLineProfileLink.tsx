@@ -1,8 +1,6 @@
 ﻿import React from "react";
-import { useSelector } from "react-redux";
 
-import { IStoreState } from "../../reducers/rootReducer";
-import { FeatureFlagsState } from "../../states/FeatureFlagsState";
+import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import { FundingLineProfile } from "../../types/FundingLineProfile";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { TextLink } from "../TextLink";
@@ -16,7 +14,7 @@ export const ProviderFundingLineProfileLink = ({
   specCoreProviderVersionId,
   fundingStreamId,
   fundingPeriodId,
-  children
+  children,
 }: {
   actionType: FundingActionType;
   editMode: "view" | "edit";
@@ -28,10 +26,8 @@ export const ProviderFundingLineProfileLink = ({
   fundingPeriodId: string;
   children: any;
 }) => {
-  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
-    (state) => state.featureFlags
-  );
-  return featureFlagsState.enableNewFundingManagement ? (
+  const { enableNewFundingManagement } = useFeatureFlags();
+  return enableNewFundingManagement ? (
     <TextLink
       to={`/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${specCoreProviderVersionId}/FundingLine/${profile.fundingLineCode}/${editMode}`}
     >

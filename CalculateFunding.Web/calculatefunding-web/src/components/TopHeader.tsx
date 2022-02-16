@@ -65,8 +65,8 @@ export const TopHeader = React.memo(function (props: { location: Section }) {
           >
             Menu
           </button>
-          <nav>
-            <ul id="navigation" className="govuk-header__navigation " aria-label="Top Level Navigation">
+          <nav aria-label="Top Level Navigation">
+            <ul id="navigation" className="govuk-header__navigation ">
               <li
                 className={
                   "govuk-header__navigation-item" +

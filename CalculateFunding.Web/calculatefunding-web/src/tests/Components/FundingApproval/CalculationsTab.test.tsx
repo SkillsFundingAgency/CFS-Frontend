@@ -13,10 +13,10 @@ import { ProviderDataTrackingMode } from "../../../types/Specifications/Provider
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { ValueFormatType } from "../../../types/TemplateBuilderDefinitions";
 import { fakery } from "../../fakes/fakery";
-import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
+import { jobSubscriptionTestUtils } from "../../testing-utils";
 
 const { haveJobSuccessfulNotification, haveJobInProgressNotification, setupJobSpy } =
-  jobSubscriptionTestHelper({});
+  jobSubscriptionTestUtils({});
 
 describe("<CalculationsTab/> tests", () => {
   beforeAll(() => {

@@ -1,6 +1,4 @@
-import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
-import { useQuery } from "react-query";
 import { useDispatch } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
@@ -17,12 +15,12 @@ import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
+import { useGetCoreProviders } from "../../hooks/useGetCoreProviders";
+import { useGetProviderSnapshots } from "../../hooks/useGetProviderSnapshots";
+import { useGetPublishedTemplates } from "../../hooks/useGetPublishedTemplates";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import * as policyService from "../../services/policyService";
-import * as providerService from "../../services/providerService";
-import * as providerVersionService from "../../services/providerVersionService";
 import * as specificationService from "../../services/specificationService";
-import { CoreProviderSummary, ProviderSnapshot, ProviderSource } from "../../types/CoreProviderSummary";
+import { ProviderSource } from "../../types/CoreProviderSummary";
 import { JobMonitoringFilter } from "../../types/Jobs/JobMonitoringFilter";
 import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
@@ -31,7 +29,6 @@ import { UpdateCoreProviderVersion } from "../../types/Provider/UpdateCoreProvid
 import { Section } from "../../types/Sections";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { UpdateSpecificationModel } from "../../types/Specifications/UpdateSpecificationModel";
-import { PublishedFundingTemplate } from "../../types/TemplateBuilderDefinitions";
 
 export interface EditSpecificationRouteProps {
   specificationId: string;
@@ -66,9 +63,10 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
       })
   );
 
-  const fundingStreamId =
-    specification && specification?.fundingStreams?.length > 0 ? specification?.fundingStreams[0]?.id : null;
-  const fundingPeriodId = specification && specification?.fundingPeriod?.id;
+  const fundingStreamId = specification?.fundingStreams?.length
+    ? specification?.fundingStreams[0]?.id
+    : undefined;
+  const fundingPeriodId = specification?.fundingPeriod?.id ?? undefined;
 
   const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
     fundingStreamId,
@@ -88,33 +86,20 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
   });
 
-  const { data: coreProviders, isLoading: isLoadingCoreProviders } = useQuery<
-    CoreProviderSummary[],
-    AxiosError
-  >(
-    `coreProviderSummary-for-${fundingStreamId}`,
-    async () =>
-      (await providerVersionService.getCoreProvidersByFundingStream(fundingStreamId as string)).data,
-    {
-      enabled: providerSource === ProviderSource.CFS,
-      onError: (err) =>
-        err.response?.status !== 404 &&
-        addError({
-          error: err,
-          description: "Could not find a provider data source",
-          fieldName: "selectCoreProvider",
-        }),
-    }
-  );
+  const { coreProviders, isLoadingCoreProviders } = useGetCoreProviders(fundingStreamId, providerSource, {
+    onError: (err) =>
+      err.response?.status !== 404 &&
+      addError({
+        error: err,
+        description: "Could not find a provider data source",
+        fieldName: "selectCoreProvider",
+      }),
+  });
 
-  const { data: providerSnapshots, isLoading: isLoadingProviderSnapshots } = useQuery<
-    ProviderSnapshot[],
-    AxiosError
-  >(
-    `coreProviderSummary-for-${fundingStreamId}`,
-    async () => (await providerService.getProviderSnapshotsByFundingStream(fundingStreamId as string)).data,
+  const { providerSnapshots, isLoadingProviderSnapshots } = useGetProviderSnapshots(
+    fundingStreamId,
+    providerSource,
     {
-      enabled: providerSource === ProviderSource.FDZ,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -129,22 +114,10 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
   );
 
   const [templateVersionData, setTemplateVersionData] = useState<NameValuePair[]>([]);
-  const { data: publishedFundingTemplates, isLoading: isLoadingPublishedFundingTemplates } = useQuery<
-    PublishedFundingTemplate[],
-    AxiosError
-  >(
-    `published-funding-templates-for-${fundingStreamId}-${fundingPeriodId}`,
-    async () =>
-      (
-        await policyService.getPublishedTemplatesByStreamAndPeriod(
-          fundingStreamId as string,
-          fundingPeriodId as string
-        )
-      ).data,
+  const { publishedTemplates, isLoadingPublishedTemplates } = useGetPublishedTemplates(
+    fundingStreamId,
+    fundingPeriodId,
     {
-      enabled:
-        (fundingStreamId && fundingStreamId.length > 0 && fundingPeriodId && fundingPeriodId.length > 0) ===
-        true,
       onError: (err) =>
         err.response?.status !== 404 &&
         addError({
@@ -331,8 +304,14 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
   }, [specification]);
 
   useEffect(() => {
-    if (specification && fundingStreamId && publishedFundingTemplates) {
-      const templates = publishedFundingTemplates.map((publishedFundingTemplate) => ({
+    if (
+      !isLoadingSpecification &&
+      !isLoadingPublishedTemplates &&
+      !!specification?.templateIds &&
+      !!fundingStreamId &&
+      !!publishedTemplates
+    ) {
+      const templates = publishedTemplates.map((publishedFundingTemplate) => ({
         name: publishedFundingTemplate.templateVersion,
         value: publishedFundingTemplate.templateVersion,
       }));
@@ -342,7 +321,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
         setSelectedTemplateVersion(selectedVersion.value);
       }
     }
-  }, [specification, publishedFundingTemplates]);
+  }, [specification, publishedTemplates]);
 
   useEffect(() => {
     if (providerSource === ProviderSource.CFS && coreProviders) {
@@ -396,7 +375,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
   const blockingActiveJob = jobNotifications?.find((n) => !!n.latestJob?.isActive)?.latestJob;
 
   const isLoading: boolean =
-    isLoadingPublishedFundingTemplates ||
+    isLoadingPublishedTemplates ||
     isLoadingFundingConfiguration ||
     isLoadingCoreProviders ||
     isLoadingProviderSnapshots ||
@@ -441,7 +420,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
                 title: "Loading funding configuration",
               },
               {
-                isActive: isLoadingPublishedFundingTemplates,
+                isActive: isLoadingPublishedTemplates,
                 title: "Loading templates",
               },
               {

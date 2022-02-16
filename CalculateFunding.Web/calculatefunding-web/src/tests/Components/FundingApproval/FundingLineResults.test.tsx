@@ -12,10 +12,10 @@ import { PublishStatus } from "../../../types/PublishStatusModel";
 import { ProviderDataTrackingMode } from "../../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { ValueFormatType } from "../../../types/TemplateBuilderDefinitions";
-import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
+import { jobSubscriptionTestUtils } from "../../testing-utils";
 
 const { haveJobSuccessfulNotification, haveJobInProgressNotification, setupJobSpy } =
-  jobSubscriptionTestHelper({});
+  jobSubscriptionTestUtils({});
 
 describe("<FundingLineResults/> tests", () => {
   beforeAll(() => {

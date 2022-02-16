@@ -12,9 +12,9 @@ import {
   ReportGroupingLevel,
   ReportType,
 } from "../../../types/Specifications/ReportMetadataViewModel";
-import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
+import { jobSubscriptionTestUtils } from "../../testing-utils";
 
-const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestHelper({});
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestUtils({});
 const mockErrorHook = jest.spyOn(errorHook, "useErrors");
 const err: ErrorHookResult = {
   errors: [],

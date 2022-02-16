@@ -1,53 +1,62 @@
-import { act, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import React from "react";
+import { Provider } from "react-redux";
+import { MemoryRouter } from "react-router";
 
-import { JobNotification } from "../../../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../../../types/jobType";
-import { jobSubscriptionTestHelper } from "../../reactTestingLibraryHelpers";
-import { ViewSpecificationTestData } from "./ViewSpecificationTestData";
+import { ErrorContextWrapper } from "../../../context/ErrorContext";
+import { ViewSpecificationRoute } from "../../../pages/Specifications/ViewSpecification";
+import { ProviderSource } from "../../../types/CoreProviderSummary";
+import { PublishStatus } from "../../../types/PublishStatusModel";
+import { fakery } from "../../fakes/fakery";
+import { mockApiService } from "../../fakes/mockApiServices";
+import { hasFullSpecPermissions } from "../../fakes/testFactories";
+import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
+import {
+  jobSubscriptionTestUtils,
+  reduxMockingUtils,
+  useSpecificationSummaryUtils,
+} from "../../testing-utils";
+import { useCalculationCircularDependenciesUtils } from "../../testing-utils/useCalculationCircularDependenciesUtils";
+import { useGetCalculationErrorsUtils } from "../../testing-utils/useCalculationErrorsUtils";
+import { useCalculationSummariesBySpecificationUtils } from "../../testing-utils/useCalculationSummariesBySpecificationUtils";
+import { useFindSpecsWithResultsUtils } from "../../testing-utils/useFindSpecificationsWithResultsUtils";
+import { useFundingConfigurationUtils } from "../../testing-utils/useFundingConfigurationUtils";
+import { useGetFundingStructureUtils } from "../../testing-utils/useFundingStructureUtils";
+import { useSpecsSelectedForFundingUtils } from "../../testing-utils/useSpecsSelectedForFundingUtils";
 
-describe("<ViewSpecification /> ", () => {
-  const {
-    hasNoJobObserverState,
-    mockSpecificationPermissions,
-    mockApprovedSpecificationService,
-    mockFundingLineStructureService,
-    mockDatasetBySpecificationIdService,
-    mockCalculationService,
-    mockPublishService,
-    fundingConfigurationSpy,
-    hasNoCalcErrors,
-    renderViewApprovedSpecificationPage,
-  } = ViewSpecificationTestData();
-  const { haveFailedJobNotification, haveNoJobNotification, setupJobSpy, getNotificationCallback } =
-    jobSubscriptionTestHelper({});
+describe("<ViewSpecification />", () => {
+  const { setupJobSpy, haveNoJobNotification } = jobSubscriptionTestUtils();
+  const refreshSpy = mockApiService.makeRefreshSpecSpy();
 
   describe("choosing approved specification for funding ", () => {
-    let notification: JobNotification;
-
     beforeEach(async () => {
+      hasFullSpecPermissions();
       haveNoJobNotification();
-      hasNoJobObserverState();
       setupJobSpy();
+      useSpecificationSummaryUtils.hasSpecification(spec);
+      useFundingConfigurationUtils.hasFundingConfigurationResult(fundingConfig);
+      useFindSpecsWithResultsUtils.hasNoSpecsWithResults();
+      useSpecsSelectedForFundingUtils.hasNoSpecsSelectedForFunding();
+      useGetCalculationErrorsUtils.hasNoCalculationErrors();
+      useCalculationCircularDependenciesUtils.hasNoCalculationCircularDependencies();
+      useCalculationSummariesBySpecificationUtils.hasNoCalculations();
+      useGetFundingStructureUtils.hasNoFundingStructure();
 
-      mockSpecificationPermissions();
-      mockApprovedSpecificationService();
-      mockFundingLineStructureService();
-      mockDatasetBySpecificationIdService();
-      mockCalculationService();
-      mockPublishService();
-      fundingConfigurationSpy();
-      hasNoCalcErrors();
+      await renderPage();
+    });
+    afterEach(() => jest.clearAllMocks());
 
-      await renderViewApprovedSpecificationPage();
+    it("it makes all the expected calls to the API", async () => {
+      expect(useSpecificationSummaryUtils.spy).toBeCalled();
+      expect(useFundingConfigurationUtils.spy).toBeCalled();
+      expect(useSpecsSelectedForFundingUtils.spy).toBeCalled();
+      expect(useFindSpecsWithResultsUtils.spy).toBeCalled();
+      expect(useGetCalculationErrorsUtils.spy).toBeCalled();
+      expect(useCalculationCircularDependenciesUtils.spy).toBeCalled();
     });
 
-    afterEach(() => {
-      jest.clearAllMocks();
-    });
-
-    it("shows error when refresh job fails", async () => {
-      const { refreshSpecificationFundingService } = require("../../../services/publishService");
+    it("choosing for funding will trigger a refresh", async () => {
       const chooseForFundingButton = await screen.findByTestId("choose-for-funding");
       userEvent.click(chooseForFundingButton);
 
@@ -56,19 +65,43 @@ describe("<ViewSpecification /> ", () => {
       )) as HTMLButtonElement;
       userEvent.click(modalContinueButton);
 
-      await waitFor(() => expect(refreshSpecificationFundingService).toBeCalledTimes(1));
-
-      notification = haveFailedJobNotification({ jobType: JobType.RefreshFundingJob }, {});
-      setupJobSpy();
-      act(() => {
-        getNotificationCallback()(notification);
-      });
-
-      const errorNotification = await screen.findByTestId("error-summary");
-      expect(errorNotification).toBeInTheDocument();
-      expect(
-        within(errorNotification as HTMLElement).getByText(/Failed to choose specification for funding/)
-      ).toBeInTheDocument();
+      await waitFor(() => expect(refreshSpy).toBeCalledTimes(1));
     });
   });
 });
+
+const fundingStream = fakery.makeFundingStream();
+const fundingPeriod = fakery.makeFundingPeriod();
+const spec = fakery.makeSpecificationSummary({
+  fundingStreams: [fundingStream],
+  fundingPeriod,
+  approvalStatus: PublishStatus.Approved,
+  isSelectedForFunding: false,
+});
+const fundingConfig = fakery.makeFundingConfiguration({
+  fundingStreamId: fundingStream.id,
+  fundingPeriodId: fundingPeriod.id,
+  providerSource: ProviderSource.CFS,
+});
+
+const renderPage = async () => {
+  const { ViewSpecification } = require("../../../pages/Specifications/ViewSpecification");
+  reduxMockingUtils.store.dispatch = jest.fn();
+  render(
+    <QueryClientProviderTestWrapper>
+      <Provider store={reduxMockingUtils.store}>
+        <ErrorContextWrapper>
+          <MemoryRouter>
+            <ViewSpecification
+              location={location}
+              history={history}
+              match={fakery.makeMatch<ViewSpecificationRoute>({
+                specificationId: spec.id,
+              })}
+            />
+          </MemoryRouter>
+        </ErrorContextWrapper>
+      </Provider>
+    </QueryClientProviderTestWrapper>
+  );
+};

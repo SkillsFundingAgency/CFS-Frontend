@@ -1,5 +1,6 @@
 ﻿import { FundingStreamPeriodProfilePattern } from "types/ProviderProfileTotalsForStreamAndPeriod";
 
+import * as calculationService from "../../services/calculationService";
 import * as policyService from "../../services/policyService";
 import * as profilingService from "../../services/profilingService";
 import * as publishService from "../../services/publishService";
@@ -82,6 +83,36 @@ const makeProfilePatternsSpy = (
   return getAllProfilePatternsSpy;
 };
 
+const makeRefreshSpecSpy = (): JestSpy => {
+  const spy: jest.SpyInstance<Promise<unknown>> = jest.spyOn(
+    publishService,
+    "refreshSpecificationFundingService"
+  );
+  spy.mockResolvedValue(fakeAxiosResponse.successWithoutResult());
+
+  return spy;
+};
+
+const makeUpdateSpecSpy = (): JestSpy => {
+  const updateSpecSpy: jest.SpyInstance<Promise<unknown>> = jest.spyOn(
+    specificationService,
+    "updateSpecificationService"
+  );
+  updateSpecSpy.mockResolvedValue(fakeAxiosResponse.successWithoutResult());
+
+  return updateSpecSpy;
+};
+
+const makeApproveAllCalcsSpy = (): JestSpy => {
+  const updateSpecSpy: jest.SpyInstance<Promise<unknown>> = jest.spyOn(
+    calculationService,
+    "approveAllCalculationsService"
+  );
+  updateSpecSpy.mockResolvedValue(fakeAxiosResponse.successWithoutResult());
+
+  return updateSpecSpy;
+};
+
 export const mockApiService = {
   makeSpecificationSummarySpy,
   makeFundingStreamsSpy,
@@ -89,4 +120,7 @@ export const mockApiService = {
   makeFindSpecsWithResultsSpy,
   makeGetLatestPublishDateSpy,
   makeProfilePatternsSpy,
+  makeUpdateSpecSpy,
+  makeRefreshSpecSpy,
+  makeApproveAllCalcsSpy,
 };

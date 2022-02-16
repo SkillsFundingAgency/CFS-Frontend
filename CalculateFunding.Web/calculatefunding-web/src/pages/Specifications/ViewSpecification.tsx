@@ -13,9 +13,9 @@ import { ViewSpecificationSummary } from "../../components/Specifications/ViewSp
 import { ViewSpecificationTabs } from "../../components/Specifications/ViewSpecificationTabs";
 import { useErrorContext } from "../../context/ErrorContext";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
+import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
 import { useViewSpecificationJobs } from "../../hooks/Specifications/useViewSpecificationJobs";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import * as specificationService from "../../services/specificationService";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { Section } from "../../types/Sections";
@@ -26,6 +26,7 @@ export interface ViewSpecificationRoute {
 
 export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificationRoute>): JSX.Element {
   const specificationId = match.params.specificationId;
+
   const {
     state: errors,
     addErrorToContext: addError,
@@ -44,7 +45,17 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
     Permission.CanApproveAllCalculations,
   ]);
   const [selectedForFundingSpecId, setSelectedForFundingSpecId] = useState<string | undefined>();
-  const [isLoadingSelectedForFunding, setIsLoadingSelectedForFunding] = useState(false);
+  const { isLoadingSpecsSelectedForFunding } = useSpecsSelectedForFunding(
+    specification?.fundingPeriod?.id,
+    fundingStream?.id,
+    {
+      enabled:
+        !!fundingStream?.id?.length &&
+        !!specification?.fundingPeriod?.id &&
+        !specification.isSelectedForFunding,
+      onSuccess: (data) => setSelectedForFundingSpecId(data?.find((x) => !!x.id)?.id),
+    }
+  );
   const {
     monitorApproveAllCalculationsJob,
     monitorConverterWizardJob,
@@ -64,32 +75,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
   const history = useHistory();
 
   useEffect(() => {
-    const findSpecSelectedForFunding = async (fundingStreamId: string, fundingPeriodId: string) => {
-      const result = await specificationService.getSpecificationsSelectedForFundingByPeriodAndStreamService(
-        fundingPeriodId,
-        fundingStreamId
-      );
-      return result.data?.find((x) => !!x.id);
-    };
-
-    const fetch = async () => {
-      if (!specification) return;
-
-      setIsLoadingSelectedForFunding(true);
-      if (specification.isSelectedForFunding) {
-        setSelectedForFundingSpecId(specification.id);
-      } else {
-        const otherSelectedSpec = await findSpecSelectedForFunding(
-          specification.fundingStreams[0].id,
-          specification.fundingPeriod.id
-        );
-        setSelectedForFundingSpecId(otherSelectedSpec?.id);
-      }
-      setIsLoadingSelectedForFunding(false);
-    };
-
     document.title = "Specification Results - Calculate funding";
-    fetch();
     monitorConverterWizardJob();
     clearErrorMessages();
   }, [specification?.id]);
@@ -156,7 +142,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
         <>
           <ViewSpecificationSummary
             specificationId={specificationId}
-            isLoadingSelectedForFunding={isLoadingSelectedForFunding}
+            isLoadingSelectedForFunding={isLoadingSpecsSelectedForFunding}
             monitorApproveAllCalculationsJob={monitorApproveAllCalculationsJob}
             monitorRefreshFundingJob={monitorRefreshFundingJob}
             selectedForFundingSpecId={selectedForFundingSpecId}

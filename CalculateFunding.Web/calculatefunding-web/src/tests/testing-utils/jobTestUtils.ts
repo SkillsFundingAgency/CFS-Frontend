@@ -1,30 +1,15 @@
-﻿import { screen, waitForElementToBeRemoved } from "@testing-library/react";
-import { DateTime } from "luxon";
+﻿import { DateTime } from "luxon";
 
-import * as jobSubscriptionHook from "../hooks/Jobs/useJobSubscription";
-import { AddJobSubscription } from "../hooks/Jobs/useJobSubscription";
-import * as featureFlagsHook from "../hooks/useFeatureFlags";
-import { FeatureFlagsState } from "../states/FeatureFlagsState";
-import { CompletionStatus } from "../types/CompletionStatus";
-import { JobDetails } from "../types/jobDetails";
-import { JobNotification, JobSubscription } from "../types/Jobs/JobSubscriptionModels";
-import { JobType } from "../types/jobType";
-import { RunningStatus } from "../types/RunningStatus";
+import { AddJobSubscription } from "../../hooks/Jobs/useJobSubscription";
+import * as jobSubscriptionHook from "../../hooks/Jobs/useJobSubscription";
+import { CompletionStatus } from "../../types/CompletionStatus";
+import { JobDetails } from "../../types/jobDetails";
+import { JobNotification, JobSubscription } from "../../types/Jobs/JobSubscriptionModels";
+import { JobType } from "../../types/jobType";
+import { RunningStatus } from "../../types/RunningStatus";
+import { waitForLoadingToFinish } from "./reactTestingLibraryUtils";
 
-export const showDebugMain = (): void => screen.debug(screen.getByTestId("main-content"), 20000);
-
-export const waitForLoadingToFinish = async ({ timeout = 4000 } = {}) => {
-  if (screen.queryAllByTestId("loader")?.length || screen.queryAllByText(/loading/, { exact: false })?.length)
-    await waitForElementToBeRemoved(
-      () => [
-        ...screen.queryAllByTestId("loader", { exact: false }),
-        ...screen.queryAllByText(/loading/, { exact: false }),
-      ],
-      { timeout }
-    );
-};
-
-export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string | undefined }) => {
+export const jobSubscriptionTestUtils = ({ mockSpecId }: { mockSpecId?: string | undefined } = {}) => {
   let notification: JobNotification | undefined;
   let subscription: JobSubscription = {
     filterBy: {
@@ -180,8 +165,6 @@ export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string 
     return jobSubscriptionSpy;
   };
 
-
-
   return {
     setupJobSpy,
     notification,
@@ -191,34 +174,6 @@ export const jobSubscriptionTestHelper = ({ mockSpecId }: { mockSpecId?: string 
     haveJobSuccessfulNotification,
     haveFailedJobNotification,
     haveJobInProgressNotification,
-    waitForLoadingToFinish
-  };
-};
-
-export const featureFlagsTestHelper = () => {
-  const setupFeatureFlags = (enableReactQueryDevTool: boolean,
-                                    profilingPatternVisible: boolean,
-                                    releaseTimetableVisible: boolean,
-                                    specToSpec: boolean,
-                                    templateBuilderVisible: boolean,
-                                    enableNewFundingManagement:boolean) =>{
-    const featureFlagsSpy = jest.spyOn(featureFlagsHook, "useFeatureFlags");
-    featureFlagsSpy.mockImplementation(() => {
-      const featureFlagsState : FeatureFlagsState = {
-        enableReactQueryDevTool: enableReactQueryDevTool,
-        profilingPatternVisible: profilingPatternVisible,
-        releaseTimetableVisible: releaseTimetableVisible,
-        specToSpec: specToSpec,
-        templateBuilderVisible: templateBuilderVisible,
-        enableNewFundingManagement:enableNewFundingManagement
-      }
-      return  { featureFlagsState };
-
-    });
-    return featureFlagsSpy;
-  }
-
-  return {
-    setupFeatureFlags
+    waitForLoadingToFinish,
   };
 };

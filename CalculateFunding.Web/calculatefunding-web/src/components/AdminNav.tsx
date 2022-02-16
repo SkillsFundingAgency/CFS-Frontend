@@ -13,7 +13,7 @@ export const AdminNav = React.memo(function () {
 
   return (
     <div className="govuk-grid-column-one-third">
-      <nav className="right-align">
+      <nav className="right-align" aria-label="Admin">
         <span className="govuk-body-s govuk-!-margin-right-2">
           {canAdminister && (
             <Link className="govuk-link" to="/Permissions/Admin">

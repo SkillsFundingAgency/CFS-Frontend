@@ -28,7 +28,7 @@ export function Title({
           </div>
         </div>
       )}
-      <div className="govuk-grid-row govuk-!-margin-top-3 govuk-!-margin-bottom-2" data-testid="page-title">
+      <div className="govuk-grid-row govuk-!-margin-top-0 govuk-!-margin-bottom-2" data-testid="page-title">
         <hgroup className="govuk-grid-column-full">
           {preTitleCaption && (
             <span className="govuk-hint govuk-caption-s govuk-!-margin-top-2 govuk-!-margin-bottom-2">

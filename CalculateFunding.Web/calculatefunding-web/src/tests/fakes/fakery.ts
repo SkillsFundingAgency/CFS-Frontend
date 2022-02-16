@@ -1,11 +1,21 @@
+import { match } from "react-router";
+
+import { ApprovalMode } from "../../types/ApprovalMode";
+import { CalculationSummary, CalculationValueType } from "../../types/CalculationDetails";
+import { CalculationType } from "../../types/CalculationSearchResponse";
 import { CompletionStatus } from "../../types/CompletionStatus";
+import { CoreProviderSummary, ProviderSnapshot, ProviderSource } from "../../types/CoreProviderSummary";
+import { FundingConfiguration } from "../../types/FundingConfiguration";
 import { JobDetails } from "../../types/jobDetails";
 import { JobType } from "../../types/jobType";
+import { UpdateCoreProviderVersion } from "../../types/Provider/UpdateCoreProviderVersion";
 import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import { ProviderSummary, ProviderTransactionSummary } from "../../types/ProviderSummary";
+import { PublishStatus } from "../../types/PublishStatusModel";
 import { RunningStatus } from "../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
+import { PublishedFundingTemplate } from "../../types/TemplateBuilderDefinitions";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
 
 const makeSpecificationSummary = (overrides: Partial<SpecificationSummary> = {}): SpecificationSummary => {
@@ -32,19 +42,71 @@ const makeSpecificationSummary = (overrides: Partial<SpecificationSummary> = {})
     ...overrides,
   };
 };
-
-const makeFundingStream = (overrides: Partial<FundingStream>): FundingStream => {
+const makeCoreProviderSummary = (overrides: Partial<CoreProviderSummary> = {}): CoreProviderSummary => {
   return {
-    name: "Stream-111",
-    id: "Wizard Training Scheme",
+    providerVersionId: "provider-version-4162",
+    versionType: "",
+    name: "CORE Provider",
+    description: "",
+    version: 11,
+    targetDate: new Date(),
+    fundingStream: "WOOF-123",
+    created: new Date(),
+    ...overrides,
+  };
+};
+const makeProviderSnapshot = (overrides: Partial<ProviderSnapshot> = {}): ProviderSnapshot => {
+  return {
+    providerSnapshotId: 2354,
+    name: "Provider Snapshot Name 2354",
+    description: "Provider Snapshot Description 2354",
+    version: 14,
+    targetDate: new Date(),
+    created: new Date(),
+    fundingStreamCode: "WOOF-123",
+    fundingStreamName: "Pet Training Scheme",
     ...overrides,
   };
 };
 
-const makeFundingPeriod = (overrides: Partial<FundingPeriod>): FundingPeriod => {
+const makeFundingStream = (overrides: Partial<FundingStream> = {}): FundingStream => {
   return {
-    name: "Period-111",
+    id: "Stream-111",
+    name: "Wizard Training Scheme",
+    ...overrides,
+  };
+};
+
+const makeFundingPeriod = (overrides: Partial<FundingPeriod> = {}): FundingPeriod => {
+  return {
     id: "2020-2047",
+    name: "Period-111",
+    ...overrides,
+  };
+};
+
+const makeCalculationSummary = (overrides: Partial<CalculationSummary> = {}): CalculationSummary => {
+  return {
+    id: "calc-1",
+    calculationType: CalculationType.Template,
+    name: "Calc 1",
+    calculationValueType: CalculationValueType.Currency,
+    status: PublishStatus.Draft,
+    version: 0,
+    ...overrides,
+  };
+};
+
+const makeFundingConfiguration = (overrides: Partial<FundingConfiguration> = {}): FundingConfiguration => {
+  return {
+    approvalMode: ApprovalMode.All,
+    providerSource: ProviderSource.CFS,
+    defaultTemplateVersion: "1.1",
+    fundingPeriodId: makeFundingPeriod().id,
+    fundingStreamId: makeFundingStream().id,
+    enableConverterDataMerge: false,
+    updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
+    releaseChannels: [],
     ...overrides,
   };
 };
@@ -133,6 +195,19 @@ const makeProviderTransactionSummary = (
   };
 };
 
+const makePublishedFundingTemplate = (
+  overrides: Partial<PublishedFundingTemplate>
+): PublishedFundingTemplate => {
+  return {
+    authorId: "2000",
+    authorName: "Bill Gates",
+    publishDate: new Date(),
+    publishNote: "another publish note",
+    schemaVersion: "1.1",
+    templateVersion: "3.2",
+    ...overrides,
+  } as PublishedFundingTemplate;
+};
 const makeProviderSummary = (overrides: Partial<ProviderSummary>): ProviderSummary => {
   return {
     authority: "",
@@ -213,13 +288,29 @@ const makeProviderSummary = (overrides: Partial<ProviderSummary>): ProviderSumma
   };
 };
 
+function makeMatch<T>(params: T, overrides: Partial<match<T>> = {}): match<T> {
+  return {
+    params,
+    url: "",
+    path: "",
+    isExact: true,
+    ...overrides,
+  };
+}
+
 export const fakery = {
   makeSpecificationSummary,
+  makeCoreProviderSummary,
+  makeProviderSnapshot,
   makeFundingStream,
   makeFundingPeriod,
+  makeFundingConfiguration,
+  makeCalculationSummary,
   makeSuccessfulJob,
   makeFailedJob,
   makeFundingStreamPeriodProfilePattern,
   makeProviderTransactionSummary,
   makeProviderSummary,
+  makePublishedFundingTemplate,
+  makeMatch,
 };

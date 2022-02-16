@@ -3,7 +3,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
-import { Link } from "react-router-dom";
 
 import { initialiseFundingSearchSelection } from "../../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
@@ -17,6 +16,8 @@ import { LoadingNotification, LoadingStatusNotifier } from "../../../components/
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
+import { TextLink } from "../../../components/TextLink";
+import { Title } from "../../../components/Title";
 import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
@@ -292,7 +293,14 @@ export const ProvidersForFundingApproval = ({
   const activeActionJobs = activeJobs(actionJobs);
   const hasActiveActionJobs = !!activeActionJobs.length;
 
-  const disableRefresh: boolean = !hasPermissionToRefresh || isLoadingRefresh || hasActiveActionJobs;
+  const canRefresh: boolean = hasPermissionToRefresh && !isLoadingRefresh && !hasActiveActionJobs;
+  const canApprove: boolean =
+    !hasActiveActionJobs &&
+    !!publishedProviderSearchResults?.canApprove &&
+    hasPermissionToApprove &&
+    !isLoadingRefresh;
+
+  const showApproveBatchAction = canApprove && fundingConfiguration?.approvalMode === ApprovalMode.Batches;
 
   return (
     <Main location={Section.FundingManagement}>
@@ -341,58 +349,68 @@ export const ProvidersForFundingApproval = ({
       )}
 
       {!isLoadingSpecification && specification && (
-        <div className="govuk-grid-row govuk-!-margin-bottom-5">
+        <div className="govuk-grid-row govuk-!-margin-bottom-2">
           <div className="govuk-grid-column-two-thirds">
-            <h1 className="govuk-heading-xl govuk-!-margin-bottom-1" data-testid="specName">
-              {specification.name}
-            </h1>
-            {specification?.fundingStreams?.length > 0 && specification?.fundingPeriod?.name && (
-              <span className="govuk-caption-l" data-testid="fundingDetails">
-                {specification.fundingStreams[0].name} for {specification && specification.fundingPeriod.name}
-              </span>
-            )}
+            <Title
+              title={specification?.name ?? ""}
+              titleCaption={
+                !specification
+                  ? ""
+                  : `${specification?.fundingStreams[0].name} for ${specification.fundingPeriod.name}`
+              }
+            />
           </div>
-          <div className="govuk-grid-column-one-third">
-            <ul className="govuk-list right-align">
-              <li>
-                <Link className={"govuk-link"} to={`/ViewSpecification/${specification?.id}`}>
-                  Manage specification
-                </Link>
-              </li>
-              {fundingConfiguration && fundingConfiguration.approvalMode === ApprovalMode.Batches && (
+          <div className="govuk-grid-column-one-third govuk-right-align">
+            {showApproveBatchAction && (
+              <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management action links">
+                <ul className="govuk-list">
+                  <li>Actions:</li>
+                  {showApproveBatchAction && (
+                    <li>
+                      <TextLink
+                        to={`/FundingManagement/Approve/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                      >
+                        Upload batch of providers
+                      </TextLink>
+                    </li>
+                  )}
+                  {canRefresh && (
+                    <>
+                      <li>
+                        <TextLink handleOnClick={handleRefresh}>Refresh funding</TextLink>
+                      </li>
+                      {lastRefresh && (
+                        <p className="govuk-body-s govuk-!-margin-bottom-0">
+                          Last refresh <DateTimeFormatter date={lastRefresh as Date} />
+                        </p>
+                      )}
+                    </>
+                  )}
+                </ul>
+              </nav>
+            )}
+            <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management other links">
+              <ul className="govuk-list">
+                <li>Navigate to:</li>
                 <li>
-                  <Link
-                    className="govuk-link govuk-link--no-visited-state"
-                    to={`/Approvals/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                  <TextLink
+                    to={`/FundingManagement/Release/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
                   >
-                    Upload batch file of providers
-                  </Link>
+                    Release management
+                  </TextLink>
                 </li>
-              )}
-              <li>
-                <Link
-                  className="govuk-link govuk-link--no-visited-state"
-                  to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}
-                >
-                  Specification reports
-                </Link>
-              </li>
-              <li>
-                <button
-                  className="govuk-link govuk-!-margin-right-1 govuk-link--no-visited-state"
-                  disabled={disableRefresh}
-                  onClick={handleRefresh}
-                >
-                  Refresh funding
-                </button>
-              </li>
-
-              {lastRefresh && (
-                <p className="govuk-body-s govuk-!-margin-bottom-0">
-                  Last refresh <DateTimeFormatter date={lastRefresh as Date} />
-                </p>
-              )}
-            </ul>
+                <li>
+                  <TextLink to={`/ViewSpecification/${specificationId}`}>Manage specification</TextLink>
+                </li>
+                <li>
+                  <TextLink
+                    to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}
+                  >
+                    Specification reports
+                  </TextLink>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       )}
@@ -471,22 +489,12 @@ export const ProvidersForFundingApproval = ({
           <div className="right-align">
             <button
               className="govuk-button govuk-!-margin-right-1"
-              disabled={disableRefresh}
+              disabled={!canRefresh || !blockActionBasedOnProviderErrors}
               onClick={handleRefresh}
             >
               Refresh funding
             </button>
-            <button
-              className="govuk-button"
-              disabled={
-                hasActiveActionJobs ||
-                !publishedProviderSearchResults?.canApprove ||
-                !hasPermissionToApprove ||
-                isLoadingRefresh ||
-                blockActionBasedOnProviderErrors
-              }
-              onClick={handleApprove}
-            >
+            <button className="govuk-button" disabled={!canApprove} onClick={handleApprove}>
               Approve funding
             </button>
           </div>

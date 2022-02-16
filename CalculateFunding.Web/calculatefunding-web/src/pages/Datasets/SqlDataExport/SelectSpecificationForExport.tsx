@@ -21,9 +21,9 @@ export const SelectSpecificationForExport = (): JSX.Element => {
     isLoadingFundingPeriods,
     selectedFundingPeriodId,
     setSelectedFundingPeriodId,
-    specifications,
-    isLoadingSpecifications,
-    hasFetchedSpecifications,
+    specificationsWithResults,
+    isLoadingSpecificationsWithResults,
+    hasFetchedSpecificationsWithResults,
     selectedSpecificationId,
     setSelectedSpecificationId,
   } = useSpecificationWithResultsSelection(addError, clearErrorMessages);
@@ -106,13 +106,13 @@ export const SelectSpecificationForExport = (): JSX.Element => {
           </fieldset>
         )}
 
-        {isLoadingSpecifications && <LoadingFieldStatus title="Loading specifications" />}
+        {isLoadingSpecificationsWithResults && <LoadingFieldStatus title="Loading specifications" />}
 
-        {!specifications?.length &&
+        {!specificationsWithResults?.length &&
           selectedFundingPeriodId &&
           selectedFundingStreamId &&
-          !isLoadingSpecifications &&
-          hasFetchedSpecifications && (
+          !isLoadingSpecificationsWithResults &&
+          hasFetchedSpecificationsWithResults && (
             <div className="govuk-form-group">
               <label className="govuk-label">Specification</label>
               <div className="govuk-error-summary">
@@ -121,7 +121,7 @@ export const SelectSpecificationForExport = (): JSX.Element => {
             </div>
           )}
 
-        {!!specifications?.length && (
+        {!!specificationsWithResults?.length && (
           <fieldset className="govuk-fieldset">
             <div className="govuk-form-group">
               <label htmlFor="select-spec" className="govuk-label">
@@ -131,13 +131,13 @@ export const SelectSpecificationForExport = (): JSX.Element => {
                 id="select-spec"
                 className="govuk-select"
                 placeholder="Please select"
-                disabled={specifications.length === 0}
+                disabled={specificationsWithResults.length === 0}
                 onChange={onSpecificationSelection}
               >
                 <option key={""} value={""}>
                   Please select a specification
                 </option>
-                {specifications
+                {specificationsWithResults
                   .sort((a, b) => Number(a.isSelectedForFunding) - Number(b.isSelectedForFunding))
                   .map((s) => (
                     <option key={s.id} value={s.id}>
@@ -167,4 +167,3 @@ export const SelectSpecificationForExport = (): JSX.Element => {
     </Main>
   );
 };
-

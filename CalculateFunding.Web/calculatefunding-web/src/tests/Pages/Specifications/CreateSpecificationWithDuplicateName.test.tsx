@@ -4,9 +4,9 @@ import userEvent from "@testing-library/user-event";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { ProviderSource } from "../../../types/CoreProviderSummary";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
-import { SpecificationTestData } from "./SpecificationTestData";
+import { CreateSpecificationTestData } from "./CreateSpecificationTestData";
 
-const test = SpecificationTestData();
+const test = CreateSpecificationTestData();
 
 describe("<CreateSpecification /> with duplicated specification name", () => {
   beforeEach(async () => {

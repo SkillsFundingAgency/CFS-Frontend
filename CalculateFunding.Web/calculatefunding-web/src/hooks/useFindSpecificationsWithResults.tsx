@@ -5,12 +5,18 @@ import { milliseconds } from "../helpers/TimeInMs";
 import * as specificationService from "../services/specificationService";
 import { SpecificationSummary } from "../types/SpecificationSummary";
 
+export interface FindSpecsWithResultsQueryResult {
+  specificationsWithResults: SpecificationSummary[] | undefined;
+  isLoadingSpecificationsWithResults: boolean;
+  hasFetchedSpecificationsWithResults: boolean;
+}
+
 export const useFindSpecificationsWithResults = (
   fundingStreamId: string | undefined,
   fundingPeriodId: string | undefined,
   options?: Omit<UseQueryOptions<SpecificationSummary[], AxiosError, SpecificationSummary[]>, "queryFn">
-) => {
-  const results = useQuery<SpecificationSummary[], AxiosError, SpecificationSummary[]>(
+): FindSpecsWithResultsQueryResult => {
+  const { data, isLoading, isFetched } = useQuery<SpecificationSummary[], AxiosError, SpecificationSummary[]>(
     ["specs-with-calc-results", fundingStreamId, fundingPeriodId],
     async () =>
       (
@@ -27,7 +33,9 @@ export const useFindSpecificationsWithResults = (
     }
   );
 
-  const { data, isLoading } = results;
-
-  return { specificationsWithResults: data, isLoadingSpecificationsWithResults: isLoading, ...results };
+  return {
+    specificationsWithResults: data,
+    isLoadingSpecificationsWithResults: isLoading,
+    hasFetchedSpecificationsWithResults: isFetched,
+  };
 };

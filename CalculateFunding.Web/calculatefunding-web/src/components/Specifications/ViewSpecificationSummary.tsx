@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useErrorContext } from "../../context/ErrorContext";
 import { milliseconds } from "../../helpers/TimeInMs";
+import { useCalculationSummariesBySpecification } from "../../hooks/Calculations/useCalculationSummariesBySpecification";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useSpecificationResults } from "../../hooks/Specifications/useSpecificationResults";
 import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
@@ -13,7 +14,6 @@ import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
 import * as calculationService from "../../services/calculationService";
 import * as publishService from "../../services/publishService";
 import * as specificationService from "../../services/specificationService";
-import { CalculationSummary } from "../../types/CalculationDetails";
 import { CalculationType } from "../../types/CalculationSearchResponse";
 import { Permission } from "../../types/Permission";
 import { PublishStatus } from "../../types/PublishStatusModel";
@@ -74,10 +74,21 @@ export const ViewSpecificationSummary = ({
     (err) => addError({ error: err, description: "Error while loading specification results" })
   );
 
+  const { calculationSummaries, isLoadingCalculationSummaries } = useCalculationSummariesBySpecification({
+    specificationId,
+  });
+
+  const { specsSelectedForFunding, isLoadingSpecsSelectedForFunding } = useSpecsSelectedForFunding(
+    specification?.fundingPeriod?.id,
+    specification?.fundingStreams[0]?.id
+  );
+
+  const { enableNewFundingManagement } = useFeatureFlags();
+
   async function chooseForFunding() {
     try {
       clearErrorMessages();
-      const isAllowed: boolean = await isUserAllowedToChooseSpecification(specificationId);
+      const isAllowed: boolean = await isUserAllowedToChooseSpecification();
       if (isAllowed) {
         ConfirmationModal(
           <div className="govuk-row govuk-!-width-full">
@@ -104,7 +115,7 @@ export const ViewSpecificationSummary = ({
           addError({ error: "A problem occurred while refreshing funding" });
         }
       } catch (err: any) {
-        if (err.response.status === 400) {
+        if (err.response?.status === 400) {
           const errResponse = err.response.data;
           addValidationErrors({ validationErrors: errResponse, message: "Validation failed" });
         } else {
@@ -114,7 +125,7 @@ export const ViewSpecificationSummary = ({
     }
   }
 
-  async function isUserAllowedToChooseSpecification(specificationId: string) {
+  async function isUserAllowedToChooseSpecification() {
     if (!specification) return false;
 
     if (!canChooseForFunding) {
@@ -127,24 +138,18 @@ export const ViewSpecificationSummary = ({
       });
       return false;
     }
-    try {
-      const calcs: CalculationSummary[] = (
-        await calculationService.getCalculationSummaryBySpecificationId(specificationId)
-      ).data;
-      if (
-        calcs
-          .filter((calc) => calc.calculationType === CalculationType.Template)
-          .some((calc) => calc.status !== PublishStatus.Approved)
-      ) {
-        addError({
-          error: "Template calculations must be approved before the specification can be chosen for funding.",
-        });
-        return false;
-      }
-    } catch (err) {
-      addError({ error: "A problem occurred while choosing specification" });
+    if (!calculationSummaries) return false;
+    if (
+      calculationSummaries
+        .filter((calc) => calc.calculationType === CalculationType.Template)
+        .some((calc) => calc.status !== PublishStatus.Approved)
+    ) {
+      addError({
+        error: "Template calculations must be approved before the specification can be chosen for funding.",
+      });
       return false;
     }
+
     return true;
   }
 
@@ -168,18 +173,17 @@ export const ViewSpecificationSummary = ({
       addError({ error: "You don't have permission to approve calculations" });
       return false;
     }
-    try {
-      const calcs: CalculationSummary[] = (
-        await calculationService.getCalculationSummaryBySpecificationId(specificationId)
-      ).data;
-      if (!calcs.some((calc) => calc.status !== PublishStatus.Approved)) {
-        addError({ error: "All calculations have already been approved" });
-        return false;
-      }
-    } catch (err) {
-      addError({ error: "Approve all calculations failed - try again" });
+
+    if (!calculationSummaries) return false;
+    if (
+      !calculationSummaries
+        .filter((calc) => calc.calculationType === CalculationType.Template)
+        .some((calc) => calc.status !== PublishStatus.Approved)
+    ) {
+      addError({ error: "All calculations have already been approved" });
       return false;
     }
+
     return true;
   }
 
@@ -215,13 +219,6 @@ export const ViewSpecificationSummary = ({
     }
   };
 
-  const { selectedSpecifications, isLoadingSelectedSpecifications } = useSpecsSelectedForFunding(
-    specification?.fundingPeriod.id,
-    specification?.fundingStreams[0].id
-  );
-
-  const { featureFlagsState } = useFeatureFlags();
-
   if (!specification) return null;
 
   return (
@@ -231,7 +228,7 @@ export const ViewSpecificationSummary = ({
         <span className="govuk-caption-l">
           {specification.fundingStreams[0].name} for {specification.fundingPeriod.name}
         </span>
-        {!isLoadingSelectedForFunding && specification.isSelectedForFunding && (
+        {specification.isSelectedForFunding && (
           <strong className="govuk-tag govuk-!-margin-bottom-5">Chosen for funding</strong>
         )}
         <p className="govuk-body govuk-!-margin-top-2">
@@ -268,8 +265,9 @@ export const ViewSpecificationSummary = ({
             </li>
           )}
           {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."} />}
-          {!featureFlagsState.enableNewFundingManagement &&
+          {!enableNewFundingManagement &&
             !isLoadingSelectedForFunding &&
+            !isLoadingCalculationSummaries &&
             !specification.isSelectedForFunding && (
               <li>
                 <button
@@ -291,14 +289,12 @@ export const ViewSpecificationSummary = ({
 
         <ul className="govuk-list">
           {!isLoadingSpecificationResults &&
-            (specificationHasCalculationResults ||
-              (selectedSpecifications !== undefined && selectedSpecifications.length > 0)) && (
+            (specificationHasCalculationResults || !!specsSelectedForFunding?.length) && (
               <li>Navigate to:</li>
             )}
-          {!isLoadingSelectedSpecifications &&
-            selectedSpecifications !== undefined &&
-            selectedSpecifications.length > 0 &&
-            (featureFlagsState.enableNewFundingManagement ? (
+          {!isLoadingSpecsSelectedForFunding &&
+            !!specsSelectedForFunding?.length &&
+            (enableNewFundingManagement ? (
               <>
                 <li>
                   <Link

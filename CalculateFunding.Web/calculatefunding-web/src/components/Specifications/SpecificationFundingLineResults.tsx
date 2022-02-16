@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { useErrorContext } from "../../context/ErrorContext";
 import { useCalculationCircularDependencies } from "../../hooks/Calculations/useCalculationCircularDependencies";
-import { getCalculationSummaryBySpecificationId } from "../../services/calculationService";
-import { getFundingLineStructureService } from "../../services/fundingStructuresService";
+import { useCalculationSummariesBySpecification } from "../../hooks/Calculations/useCalculationSummariesBySpecification";
+import { useFundingStructure } from "../../hooks/useFundingStructure";
 import { CalculationSummary } from "../../types/CalculationDetails";
 import { FundingStructureItemViewModel, FundingStructureType } from "../../types/FundingStructureItem";
 import { JobDetails } from "../../types/jobDetails";
@@ -21,7 +21,7 @@ import {
   updateFundingLineExpandStatus,
 } from "../fundingLineStructure/FundingLineStructureHelper";
 import { InputSearch } from "../InputSearch";
-import { LoadingStatus } from "../LoadingStatus";
+import { LoadingStatusNotifier } from "../LoadingStatusNotifier";
 
 export interface SpecificationFundingLineResultsProps {
   specification: SpecificationSummary;
@@ -38,11 +38,9 @@ export function SpecificationFundingLineResults({
 }: SpecificationFundingLineResultsProps) {
   const { addErrorToContext: addError, clearErrorsFromContext: clearErrorMessages } = useErrorContext();
   const [fundingLinesExpandedStatus, setFundingLinesExpandedStatus] = useState(false);
-  const [isLoadingFundingLineStructure, setIsLoadingFundingLineStructure] = useState(true);
   const [fundingLineStructureError, setFundingLineStructureError] = useState<boolean>(false);
   const [fundingLineSearchSuggestions, setFundingLineSearchSuggestions] = useState<string[]>([]);
   const [fundingLines, setFundingLines] = useState<FundingStructureItemViewModel[]>([]);
-  const [calculationSummaries, setCalculationSummaries] = useState<CalculationSummary[]>();
   const [fundingStructureViewModelItems, setFundingStructureViewModelItems] = useState<
     FundingStructureItemViewModel[]
   >([]);
@@ -56,6 +54,29 @@ export function SpecificationFundingLineResults({
     specification.id,
     (err) => addError({ error: err, description: "Error while checking for circular reference errors" })
   );
+  const { fundingStructure, isLoadingFundingStructure, refetchFundingStructure } = useFundingStructure({
+    specificationId: specification.id,
+    fundingStreamId: specification.fundingStreams[0].id,
+    fundingPeriodId: specification.fundingPeriod.id,
+    options: {
+      onSuccess: (data) => {
+        setFundingLines(data);
+        setInitialExpandedStatus(data, false);
+      },
+      onError: (err) => {
+        setFundingLineStructureError(true);
+        addError({
+          error: err,
+          description: "A problem occurred while loading funding line structure",
+          fieldName: "funding-line-results",
+        });
+      },
+    },
+  });
+
+  const { calculationSummaries, isLoadingCalculationSummaries } = useCalculationSummariesBySpecification({
+    specificationId: specification?.id,
+  });
 
   function searchFundingLines(calculationName: string) {
     const fundingLinesCopy: FundingStructureItemViewModel[] =
@@ -113,7 +134,6 @@ export function SpecificationFundingLineResults({
             node && visitNode(node, hashMap, calculationSummaries);
           }
         }
-        setIsLoadingFundingLineStructure(false);
       }
     }
   }
@@ -129,35 +149,7 @@ export function SpecificationFundingLineResults({
     }
   }
 
-  const fetchData = async () => {
-    try {
-      const fundingLineStructureResponse = await getFundingLineStructureService(
-        specification.id,
-        specification.fundingPeriod.id,
-        specification.fundingStreams[0].id
-      );
-      const fundingStructureItems: FundingStructureItemViewModel[] = fundingLineStructureResponse.data;
-      setFundingLines(fundingStructureItems);
-      setInitialExpandedStatus(fundingStructureItems, false);
-
-      const calculationSummariesResponse = await getCalculationSummaryBySpecificationId(specification.id);
-      setCalculationSummaries(calculationSummariesResponse.data);
-
-      clearErrorMessages(["funding-line-results"]);
-    } catch (err: any) {
-      setIsLoadingFundingLineStructure(false);
-      setFundingLineStructureError(true);
-      addError({
-        error: err,
-        description: "A problem occurred while loading funding line structure",
-        fieldName: "funding-line-results",
-      });
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-
     monitorAssignTemplateCalculationsJob();
 
     return () => clearErrorMessages(["funding-line-results"]);
@@ -165,14 +157,14 @@ export function SpecificationFundingLineResults({
 
   useEffect(() => {
     if (!refreshFundingLinesRef.current && refreshFundingLines) {
-      fetchData();
+      refetchFundingStructure();
     }
   }, [refreshFundingLines]);
 
   useEffect(() => {
     setFundingLineRenderInternalState(true);
-    if (fundingLines.length !== 0) {
-      if (fundingStructureViewModelItems.length === 0) {
+    if (fundingLines?.length !== 0) {
+      if (fundingStructure?.length === 0) {
         setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
         setFundingStructureViewModelItems(fundingLines);
       }
@@ -210,22 +202,35 @@ export function SpecificationFundingLineResults({
 
   return (
     <section className="govuk-tabs__panel" id="fundingline-structure">
-      {(isLoadingFundingLineStructure || !!activeJob) && (
-        <LoadingStatus
-          title={"Loading funding line structure"}
-          description={`${
-            isLoadingFundingLineStructure
-              ? "Please wait whilst funding line structure is loading"
-              : "Please wait. A funding job is running."
-          }`}
-        />
-      )}
+      <LoadingStatusNotifier
+        notifications={[
+          {
+            isActive: isLoadingFundingStructure,
+            title: "Loading funding structure",
+            description: "Please wait whilst funding line structure is loading",
+          },
+          {
+            isActive: isLoadingCalculationSummaries,
+            title: "Loading calculations",
+          },
+          {
+            isActive: isLoadingCircularDependencies,
+            title: "Checking for circular dependency errors",
+          },
+          {
+            isActive: !!activeJob,
+            description: "Please wait. A funding job is running.",
+            title: `Job ${activeJob?.statusDescription}: ${activeJob?.jobDescription}`,
+          },
+        ]}
+      />
       <div className="govuk-grid-row" hidden={!fundingLineStructureError}>
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-error-message">An error has occurred. Please see above for details.</p>
         </div>
       </div>
-      {!isLoadingFundingLineStructure &&
+      {!isLoadingFundingStructure &&
+        !isLoadingCalculationSummaries &&
         !isLoadingCircularDependencies &&
         !fundingLineStructureError &&
         !activeJob && (
