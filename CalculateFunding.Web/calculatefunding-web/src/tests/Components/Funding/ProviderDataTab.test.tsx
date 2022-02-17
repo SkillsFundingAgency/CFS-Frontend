@@ -1,4 +1,4 @@
-﻿import { render, screen } from "@testing-library/react";
+﻿import { getByText,render, screen } from "@testing-library/react";
 import React from "react";
 
 import { ErrorContextWrapper } from "../../../context/ErrorContext";
@@ -29,6 +29,16 @@ describe("<ProviderDataTab />", () => {
       "predecessors1, predecessors2"
     );
   });
+
+  it("displays London region code", async () =>{
+    expect(screen.getByText("London region code")).toBeInTheDocument();
+    expect((await screen.getByText("CDN"))).toBeInTheDocument();
+  })
+
+  it("displays London region name", async () =>{
+    expect(screen.getByText("London region name")).toBeInTheDocument();
+    expect((await screen.getByText("Camden"))).toBeInTheDocument();
+  })
 });
 
 const renderComponent = async () => {

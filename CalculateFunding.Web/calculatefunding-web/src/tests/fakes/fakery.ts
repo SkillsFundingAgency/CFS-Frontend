@@ -283,6 +283,8 @@ const makeProviderSummary = (overrides: Partial<ProviderSummary>): ProviderSumma
     statutoryLowAge: "",
     wardCode: "",
     wardName: "",
+    londonRegionName: "Camden",
+    londonRegionCode: "CDN",
     predecessors: ["predecessors1", "predecessors2"],
     successors: ["successors1", "successors2"],
     ...overrides,
