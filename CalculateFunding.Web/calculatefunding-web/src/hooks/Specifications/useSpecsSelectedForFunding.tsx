@@ -29,5 +29,8 @@ export const useSpecsSelectedForFunding = (
     }
   );
 
-  return { specsSelectedForFunding: data, isLoadingSpecsSelectedForFunding: isLoading } as SpecsSelectedForFundingResult;
+  return {
+    specsSelectedForFunding: data,
+    isLoadingSpecsSelectedForFunding: isLoading,
+  } as SpecsSelectedForFundingResult;
 };

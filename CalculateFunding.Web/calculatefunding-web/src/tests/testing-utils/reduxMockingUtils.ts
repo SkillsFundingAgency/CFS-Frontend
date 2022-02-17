@@ -24,7 +24,7 @@ const createFundingSearchSelectionState = (
 
 const setupFundingSearchSelectionState = (state: FundingSearchSelectionState) => {
   useSelectorSpy.mockReturnValue(state);
-}
+};
 
 export const reduxMockingUtils = {
   store,

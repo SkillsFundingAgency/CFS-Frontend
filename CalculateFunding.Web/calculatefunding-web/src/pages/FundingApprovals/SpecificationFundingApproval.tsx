@@ -19,6 +19,7 @@ import { PermissionStatus } from "../../components/PermissionStatus";
 import { activeJobs, getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../hooks/FundingApproval/usePublishedProviderSearch";
+import { useJobObserver } from "../../hooks/Jobs/useJobObserver";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
@@ -30,7 +31,7 @@ import * as publishService from "../../services/publishService";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../types/ApprovalMode";
 import { JobDetails } from "../../types/jobDetails";
-import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
+import { JobNotification, MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
@@ -55,9 +56,20 @@ export const SpecificationFundingApproval = ({
   const isSearchCriteriaInitialised =
     state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
 
-  const { addSub, results: jobNotifications } = useJobSubscription({
+  const {
+    addSub,
+    removeSub,
+    results: jobNotifications,
+  } = useJobSubscription({
     onError: (err) =>
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
+
+  const { monitorObservedJob, isObserving } = useJobObserver({
+    addSub,
+    removeSub,
+    jobNotifications,
+    onError: (error: any) => addError({ error: error, description: "Error while monitoring funding jobs" }),
   });
 
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
@@ -152,6 +164,7 @@ export const SpecificationFundingApproval = ({
         )
       );
     }
+    monitorObservedJob(handleObservedJobCompleted);
 
     addJobTypeSubscription([JobType.RefreshFundingJob]);
     addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
@@ -184,6 +197,22 @@ export const SpecificationFundingApproval = ({
       refetchSearchResults();
     }
   }, [jobNotifications, jobId]);
+
+  const handleObservedJobCompleted = (notification: JobNotification) => {
+    const observedJob = notification?.latestJob;
+    if (!observedJob || observedJob.isActive) return;
+    if (observedJob.isComplete) {
+      if (observedJob.isFailed) {
+        addError({
+          error: observedJob.outcome ?? "An unknown error occurred",
+          description: "A background job failed",
+        });
+      }
+      if (observedJob.isSuccessful) {
+        refetchSearchResults();
+      }
+    }
+  };
 
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
@@ -314,7 +343,8 @@ export const SpecificationFundingApproval = ({
     isLoadingSpecification ||
     isLoadingFundingConfiguration ||
     isLoadingSearchResults ||
-    isLoadingRefresh;
+    isLoadingRefresh ||
+    isObserving;
 
   const haveAnyProviderErrors =
     isLoadingPublishedProviderErrors ||

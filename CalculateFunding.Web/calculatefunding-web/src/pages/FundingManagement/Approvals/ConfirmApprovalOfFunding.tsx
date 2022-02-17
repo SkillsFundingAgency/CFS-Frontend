@@ -12,6 +12,7 @@ import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
 import { useErrorContext } from "../../../context/ErrorContext";
 import { useFundingConfirmation } from "../../../hooks/FundingApproval/useFundingConfirmation";
+import { useAddJobObserver } from "../../../hooks/Jobs/useAddJobObserver";
 import * as publishService from "../../../services/publishService";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { Permission } from "../../../types/Permission";
@@ -51,6 +52,7 @@ export function ConfirmApprovalOfFunding({
     fundingPeriodId: fundingPeriodId,
     actionType: mode,
   });
+  const { addJobObserver } = useAddJobObserver();
   const [isConfirming, setIsConfirming] = useState<boolean>(false);
   const [acknowledge, setAcknowledge] = useState<boolean>(false);
   const isLoading = useMemo(
@@ -79,13 +81,17 @@ export function ConfirmApprovalOfFunding({
       return;
     }
     setIsConfirming(true);
+    let jobId: string;
     try {
       if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
-        await publishService.approveProvidersFundingService(specificationId, selectedProviderIds);
+        jobId = (await publishService.approveProvidersFundingService(specificationId, selectedProviderIds))
+          .data.jobId;
       } else {
-        await publishService.approveSpecificationFundingService(specificationId);
+        jobId = (await publishService.approveSpecificationFundingService(specificationId)).data.jobId;
       }
       clearFundingSearchSelection();
+      addJobObserver({ jobId: jobId, specificationId: specificationId });
+
       history.push(
         `/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
       );

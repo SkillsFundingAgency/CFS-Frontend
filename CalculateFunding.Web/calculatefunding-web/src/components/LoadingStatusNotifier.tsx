@@ -25,7 +25,13 @@ export const LoadingStatusNotifier = ({
   if (!firstActiveNotification) return null;
 
   return (
-    <div id={id} role="alert" aria-label="Loading..." className="govuk-grid-row" data-testid={firstActiveNotification.id ?? testId}>
+    <div
+      id={id}
+      role="alert"
+      aria-label="Loading..."
+      className="govuk-grid-row"
+      data-testid={firstActiveNotification.id ?? testId}
+    >
       <div className="govuk-grid-column-full govuk-!-margin-top-9">
         <h2 className="govuk-heading-l center-align">{firstActiveNotification.title}</h2>
         <h3 className="govuk-heading-m center-align">{firstActiveNotification.subTitle}</h3>

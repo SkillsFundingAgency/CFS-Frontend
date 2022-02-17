@@ -1,6 +1,6 @@
 ﻿import React from "react";
-import { Link } from "react-router-dom";
 import { renderToString } from "react-dom/server";
+import { Link } from "react-router-dom";
 
 export const TextLink = ({
   to,

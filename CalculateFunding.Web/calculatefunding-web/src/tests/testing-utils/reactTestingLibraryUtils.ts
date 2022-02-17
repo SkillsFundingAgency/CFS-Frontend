@@ -1,6 +1,5 @@
 ﻿import { screen, waitForElementToBeRemoved } from "@testing-library/react";
 
-
 export const showDebugMain = (): void => screen.debug(screen.getByTestId("main-content"), 20000);
 
 export const waitForLoadingToFinish = async ({ timeout = 4000 } = {}) => {
@@ -17,6 +16,4 @@ export const waitForLoadingToFinish = async ({ timeout = 4000 } = {}) => {
 export const reactTesting = {
   showDebugMain,
   waitForElementToBeRemoved,
-}
-
-
+};

@@ -250,6 +250,7 @@ const fundingManagementRoutes = (
     />
     <Route
       path="/FundingManagement/Approve/Results/:fundingStreamId/:fundingPeriodId/:specificationId"
+      exact={true}
       component={ProvidersForFundingApproval}
     />
     <Route

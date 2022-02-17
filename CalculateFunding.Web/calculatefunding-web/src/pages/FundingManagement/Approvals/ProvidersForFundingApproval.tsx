@@ -21,6 +21,7 @@ import { Title } from "../../../components/Title";
 import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
+import { useJobObserver } from "../../../hooks/Jobs/useJobObserver";
 import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../../hooks/useErrors";
@@ -32,7 +33,7 @@ import * as publishService from "../../../services/publishService";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { JobDetails } from "../../../types/jobDetails";
-import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
+import { JobNotification, MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
@@ -55,7 +56,11 @@ export const ProvidersForFundingApproval = ({
   const isSearchCriteriaInitialised =
     state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
 
-  const { addSub, results: jobNotifications } = useJobSubscription({
+  const {
+    addSub,
+    removeSub,
+    results: jobNotifications,
+  } = useJobSubscription({
     onError: (err) =>
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
   });
@@ -68,6 +73,12 @@ export const ProvidersForFundingApproval = ({
     fundingPeriodId,
     (err) => addErrorMessage(err.message, "", "Error while loading funding configuration")
   );
+  const { monitorObservedJob, isObserving } = useJobObserver({
+    addSub,
+    removeSub,
+    jobNotifications,
+    onError: (error: any) => addError({ error: error, description: "Error while monitoring funding jobs" }),
+  });
   const {
     publishedProviderSearchResults,
     publishedProviderIds,
@@ -124,7 +135,7 @@ export const ProvidersForFundingApproval = ({
     }
   );
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
-  const [jobId, setJobId] = useState<string>("");
+  const [refreshJobId, setRefreshJobId] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
   const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const hasPermissionToRefresh: boolean = useMemo(
@@ -139,6 +150,36 @@ export const ProvidersForFundingApproval = ({
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const handleRefreshJobNotification = async (notification: JobNotification | undefined) => {
+    if (
+      notification &&
+      notification?.latestJob?.isComplete &&
+      notification?.latestJob?.jobType === JobType.RefreshFundingJob
+    ) {
+      setIsLoadingRefresh(false);
+      setLastRefresh(notification.latestJob.lastUpdated);
+      if (refreshJobId?.length && notification.latestJob.jobId === refreshJobId) {
+        refetchSearchResults();
+      }
+    }
+  };
+
+  const handleObservedJobCompleted = (notification: JobNotification) => {
+    const observedJob = notification?.latestJob;
+    if (!observedJob || observedJob.isActive) return;
+    if (observedJob.isComplete) {
+      if (observedJob.isFailed) {
+        addError({
+          error: observedJob.outcome ?? "An unknown error occurred",
+          description: "A background job failed",
+        });
+      }
+      if (observedJob.isSuccessful) {
+        refetchSearchResults();
+      }
+    }
+  };
+
   useEffect(() => {
     if (!isSearchCriteriaInitialised) {
       dispatch(
@@ -149,9 +190,15 @@ export const ProvidersForFundingApproval = ({
         )
       );
     }
+    monitorObservedJob(handleObservedJobCompleted);
 
     addJobTypeSubscription([JobType.RefreshFundingJob]);
     addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
+    addJobTypeSubscription([
+      JobType.PublishBatchProviderFundingJob,
+      JobType.PublishAllProviderFundingJob,
+      JobType.ReIndexPublishedProvidersJob,
+    ]);
     addJobTypeSubscription([
       JobType.CreateInstructAllocationJob,
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
@@ -160,22 +207,12 @@ export const ProvidersForFundingApproval = ({
   }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
-    const completedRefreshJob = jobNotifications.find(
-      (n) => n.latestJob?.isComplete && n.latestJob?.jobType === JobType.RefreshFundingJob
-    )?.latestJob;
-    if (completedRefreshJob) {
-      setIsLoadingRefresh(false);
-      setLastRefresh(completedRefreshJob.lastUpdated);
-    }
-    if (
-      jobId !== "" &&
-      jobNotifications.some((n) => n.latestJob?.isComplete && n.latestJob?.jobId === jobId)
-    ) {
-      setIsLoadingRefresh(false);
-      setJobId("");
-      refetchSearchResults();
-    }
-  }, [jobNotifications, jobId]);
+    handleRefreshJobNotification(
+      jobNotifications.find(
+        (n) => n.latestJob?.isComplete && n.latestJob?.jobType === JobType.RefreshFundingJob
+      )
+    );
+  }, [jobNotifications, refreshJobId]);
 
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
@@ -243,7 +280,7 @@ export const ProvidersForFundingApproval = ({
   async function refreshFunding() {
     setIsLoadingRefresh(true);
     try {
-      setJobId((await publishService.refreshSpecificationFundingService(specificationId)).data);
+      setRefreshJobId((await publishService.refreshSpecificationFundingService(specificationId)).data);
     } catch (e) {
       addErrorMessage(e, "Error trying to refresh funding");
     } finally {
@@ -281,6 +318,7 @@ export const ProvidersForFundingApproval = ({
     isLoadingSpecification ||
     isLoadingFundingConfiguration ||
     isLoadingSearchResults ||
+    isObserving ||
     isLoadingRefresh;
 
   const haveAnyProviderErrors =
@@ -489,7 +527,7 @@ export const ProvidersForFundingApproval = ({
           <div className="right-align">
             <button
               className="govuk-button govuk-!-margin-right-1"
-              disabled={!canRefresh || !blockActionBasedOnProviderErrors}
+              disabled={!canRefresh || blockActionBasedOnProviderErrors}
               onClick={handleRefresh}
             >
               Refresh funding

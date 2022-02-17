@@ -1,3 +1,4 @@
+import JobNotificationSection from "components/Jobs/JobNotificationSection";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
@@ -7,7 +8,7 @@ import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
 import { ProviderResultsTable } from "../../../components/Funding/ProviderFundingSearch/ProviderResultsTable";
 import { PublishedProviderSearchFilters } from "../../../components/Funding/ProviderFundingSearch/PublishedProviderSearchFilters";
-import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
+import { LoadingNotification, LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
@@ -16,6 +17,7 @@ import { Title } from "../../../components/Title";
 import { activeJobs } from "../../../helpers/jobDetailsHelper";
 import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
+import { useJobObserver } from "../../../hooks/Jobs/useJobObserver";
 import { useJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../../hooks/useErrors";
@@ -25,7 +27,7 @@ import { IStoreState } from "../../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import { JobDetails } from "../../../types/jobDetails";
-import { MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
+import { JobNotification, MonitorFallback, MonitorMode } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
@@ -48,9 +50,19 @@ export const ProvidersForFundingRelease = ({
   const isSearchCriteriaInitialised =
     state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
 
-  const { addSub, results: jobNotifications } = useJobSubscription({
+  const {
+    addSub,
+    removeSub,
+    results: jobNotifications,
+  } = useJobSubscription({
     onError: (err) =>
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
+  const { monitorObservedJob, isObserving } = useJobObserver({
+    addSub,
+    removeSub,
+    jobNotifications,
+    onError: (error: any) => addError({ error: error, description: "Error while monitoring funding jobs" })
   });
 
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
@@ -130,6 +142,7 @@ export const ProvidersForFundingRelease = ({
         )
       );
     }
+    monitorObservedJob(handleObservedJobCompleted);
 
     addJobTypeSubscription([JobType.RefreshFundingJob]);
     addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
@@ -149,6 +162,22 @@ export const ProvidersForFundingRelease = ({
       refetchSearchResults();
     }
   }, [jobNotifications, jobId]);
+
+  const handleObservedJobCompleted = (notification: JobNotification) => {
+    const observedJob = notification?.latestJob;
+    if (!observedJob || observedJob.isActive) return;
+    if (observedJob.isComplete) {
+      if (observedJob.isFailed) {
+        addError({
+          error: observedJob.outcome ?? "An unknown error occurred",
+          description: "A background job failed",
+        });
+      }
+      if (observedJob.isSuccessful) {
+        refetchSearchResults();
+      }
+    }
+  };
 
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
@@ -179,6 +208,7 @@ export const ProvidersForFundingRelease = ({
     !isSearchCriteriaInitialised ||
     isLoadingSpecification ||
     isLoadingFundingConfiguration ||
+    isObserving ||
     isLoadingSearchResults;
 
   const haveAnyProviderErrors =
@@ -228,58 +258,99 @@ export const ProvidersForFundingRelease = ({
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
-      <div className="govuk-grid-row govuk-!-margin-bottom-2">
-        <div className="govuk-grid-column-two-thirds">
-          <Title
-            title={specification?.name ?? ""}
-            titleCaption={
-              !specification
-                ? ""
-                : `${specification?.fundingStreams[0].name} for ${specification.fundingPeriod.name}`
-            }
-          />
-        </div>
-        <div className="govuk-grid-column-one-third govuk-right-align">
-          {showUploadBatchAction && (
-            <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management action links">
+      {!isLoading && !activeActionJobs?.length && (
+        <JobNotificationSection
+          jobNotifications={jobNotifications}
+          notificationSettings={[
+            {
+              jobTypes: [
+                JobType.CreateInstructAllocationJob,
+                JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+                JobType.GenerateGraphAndInstructAllocationJob,
+              ],
+              showActive: true,
+              showFailed: true,
+              showSuccessful: false,
+              activeDescription: "Calculation run in progress",
+              failDescription: "Calculation run failed",
+            },
+            {
+              jobTypes: [
+                JobType.RefreshFundingJob,
+                JobType.ApproveAllProviderFundingJob,
+                JobType.ApproveBatchProviderFundingJob,
+                JobType.PublishBatchProviderFundingJob,
+                JobType.PublishAllProviderFundingJob,
+                JobType.ReIndexPublishedProvidersJob,
+              ],
+              showActive: false, // we show a spinner separately
+              showFailed: true,
+              showSuccessful: true,
+            },
+          ]}
+        />
+      )}
+
+      {!isLoadingSpecification && specification && (
+        <div className="govuk-grid-row govuk-!-margin-bottom-2">
+          <div className="govuk-grid-column-two-thirds">
+            <Title
+              title={specification?.name ?? ""}
+              titleCaption={
+                !specification
+                  ? ""
+                  : `${specification?.fundingStreams[0].name} for ${specification.fundingPeriod.name}`
+              }
+            />
+          </div>
+          <div className="govuk-grid-column-one-third govuk-right-align">
+            {showUploadBatchAction && (
+              <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management action links">
+                <ul className="govuk-list">
+                  <li>Actions:</li>
+                  {showUploadBatchAction && (
+                    <li>
+                      <TextLink
+                        to={`/FundingManagement/Release/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                      >
+                        Upload batch of providers
+                      </TextLink>
+                    </li>
+                  )}
+                </ul>
+              </nav>
+            )}
+            <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management other links">
               <ul className="govuk-list">
-                <li>Actions:</li>
-                {showUploadBatchAction && (
-                  <li>
-                    <TextLink
-                      to={`/FundingManagement/Release/UploadBatch/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-                    >
-                      Upload batch of providers
-                    </TextLink>
-                  </li>
-                )}
+                <li>Navigate to:</li>
+                <li>
+                  <TextLink
+                    to={`/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                  >
+                    Funding approvals
+                  </TextLink>
+                </li>
+                <li>
+                  <TextLink to={`/ViewSpecification/${specificationId}`}>Manage specification</TextLink>
+                </li>
+                <li>
+                  <TextLink
+                    to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}
+                  >
+                    Specification reports
+                  </TextLink>
+                </li>
               </ul>
             </nav>
-          )}
-          <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management other links">
-            <ul className="govuk-list">
-              <li>Navigate to:</li>
-              <li>
-                <TextLink
-                  to={`/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-                >
-                  Funding approvals
-                </TextLink>
-              </li>
-              <li>
-                <TextLink to={`/ViewSpecification/${specificationId}`}>Manage specification</TextLink>
-              </li>
-              <li>
-                <TextLink to={`/ViewSpecificationResults/${specificationId}?initialTab=downloadable-reports`}>
-                  Specification reports
-                </TextLink>
-              </li>
-            </ul>
-          </nav>
+          </div>
         </div>
-      </div>
+      )}
+
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
+        <div
+          className="govuk-grid-column-one-third"
+          hidden={hasActiveActionJobs || !publishedProviderSearchResults}
+        >
           <PublishedProviderSearchFilters
             facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
             numberOfProvidersWithErrors={0}
@@ -287,17 +358,35 @@ export const ProvidersForFundingRelease = ({
           />
         </div>
         <div className="govuk-grid-column-two-thirds">
-          <LoadingStatusNotifier
-            notifications={[
-              {
-                title: "Loading provider results",
-                isActive: isLoading,
-                id: "searchLoadingNotification",
-              },
-            ]}
-          />
+          {(isLoading || hasActiveActionJobs) && (
+            <LoadingStatusNotifier
+              notifications={[
+                {
+                  isActive: isLoadingSpecification,
+                  title: "Loading specification...",
+                  description: "Updating, please wait",
+                },
+                ...activeActionJobs.map<LoadingNotification>((job) => {
+                  return {
+                    title: `Job ${job.statusDescription}: ${job.jobDescription}`,
+                    description: job.isActive
+                      ? "Monitoring job progress. Please wait, this could take several minutes"
+                      : "",
+                  };
+                }),
+                {
+                  isActive: isLoadingSearchResults,
+                  title: "Loading provider funding data...",
+                },
+                {
+                  isActive: isLoadingFundingConfiguration,
+                  title: "Loading funding configuration...",
+                },
+              ]}
+            />
+          )}
 
-          {!isLoading && (
+          {!isLoading && !hasActiveActionJobs && specification && (
             <ProviderResultsTable
               actionType={FundingActionType.Release}
               specCoreProviderVersionId={specification?.providerVersionId}
@@ -321,7 +410,7 @@ export const ProvidersForFundingRelease = ({
           <div className="right-align">
             <button
               className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-              disabled={!canRelease || !blockActionBasedOnProviderErrors}
+              disabled={!canRelease || blockActionBasedOnProviderErrors}
               onClick={handleRelease}
             >
               Release funding

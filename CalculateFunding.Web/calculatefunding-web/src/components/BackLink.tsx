@@ -10,12 +10,7 @@ export interface BackLinkProps {
   handleOnClick?: any;
 }
 
-export const BackLink = ({
-  to = "",
-  children = "Back",
-  handleOnClick,
-  className,
-}: BackLinkProps) => {
+export const BackLink = ({ to = "", children = "Back", handleOnClick, className }: BackLinkProps) => {
   const history = useHistory();
 
   const onClickHandler = (event: any) => {
@@ -31,9 +26,13 @@ export const BackLink = ({
     }
     return;
   };
-  
+
   return (
-    <TextLink to={to} handleOnClick={handleOnClick ?? onClickHandler} additionalCss={`govuk-back-link ${className}`}>
+    <TextLink
+      to={to}
+      handleOnClick={handleOnClick ?? onClickHandler}
+      additionalCss={`govuk-back-link ${className}`}
+    >
       {children}
     </TextLink>
   );

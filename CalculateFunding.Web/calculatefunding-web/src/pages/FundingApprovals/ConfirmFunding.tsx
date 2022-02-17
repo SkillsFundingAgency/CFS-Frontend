@@ -12,6 +12,7 @@ import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { getLatestJob } from "../../helpers/jobDetailsHelper";
+import { useAddJobObserver } from "../../hooks/Jobs/useAddJobObserver";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../hooks/useErrors";
@@ -60,6 +61,8 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     match.params.fundingPeriodId,
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
+
+  const { addJobObserver } = useAddJobObserver();
 
   const {
     addSub,
@@ -212,20 +215,24 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     setIsConfirming(true);
     try {
       const specId = match.params.specificationId;
+      let jobId = "";
       if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
         if (match.params.mode === FundingActionType.Approve) {
-          await publishService.approveProvidersFundingService(specId, state.selectedProviderIds);
+          jobId = (await publishService.approveProvidersFundingService(specId, state.selectedProviderIds))
+            .data.jobId;
         } else if (match.params.mode === FundingActionType.Release) {
-          await publishService.releaseProvidersFundingService(specId, state.selectedProviderIds);
+          jobId = (await publishService.releaseProvidersFundingService(specId, state.selectedProviderIds))
+            .data.jobId;
         }
       } else {
         if (match.params.mode === FundingActionType.Approve) {
-          await publishService.approveSpecificationFundingService(specId);
+          jobId = (await publishService.approveSpecificationFundingService(specId)).data.jobId;
         } else if (match.params.mode === FundingActionType.Release) {
-          await publishService.releaseSpecificationFundingService(specId);
+          jobId = (await publishService.releaseSpecificationFundingService(specId)).data.jobId;
         }
       }
       clearFundingSearchSelection();
+      addJobObserver({ jobId: jobId, specificationId: specId });
       history.push(
         `/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`
       );
