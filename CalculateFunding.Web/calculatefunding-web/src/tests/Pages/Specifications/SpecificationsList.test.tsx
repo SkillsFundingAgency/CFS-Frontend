@@ -82,7 +82,7 @@ describe("<SpecificationsList />", () => {
 
   it("renders the correct link to Create Specifications", async () => {
     await renderPage();
-    const link = screen.getByRole("link", { name: /Create specification/ });
+    const link = screen.getByRole("link", { name: /Create a new specification/ });
     expect(link).toBeInTheDocument();
     expect(link.getAttribute("href")).toBe("/Specifications/CreateSpecification");
   });
