@@ -18,6 +18,7 @@ export interface FundingConfiguration {
   updateCoreProviderVersion: UpdateCoreProviderVersion;
   releaseActionGroups?: ReleaseActionGroup[];
   releaseChannels: ReleaseChannel[];
+  enableCarryForward: boolean;
 }
 
 export interface ReleaseChannel {

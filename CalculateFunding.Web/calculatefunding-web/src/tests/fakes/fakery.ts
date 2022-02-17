@@ -107,6 +107,7 @@ const makeFundingConfiguration = (overrides: Partial<FundingConfiguration> = {})
     enableConverterDataMerge: false,
     updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
     releaseChannels: [],
+    enableCarryForward:false,
     ...overrides,
   };
 };

@@ -83,6 +83,7 @@ export function FundingApprovalTestData() {
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       releaseChannels: [],
+      enableCarryForward: false
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -98,6 +99,7 @@ export function FundingApprovalTestData() {
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       releaseChannels: [],
+      enableCarryForward: false
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
