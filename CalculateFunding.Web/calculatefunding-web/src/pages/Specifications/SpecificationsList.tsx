@@ -174,7 +174,8 @@ export function SpecificationsList() {
                             <Breadcrumb name={"Calculate funding"} url={"/"}/>
                             <Breadcrumb name={"View specifications"}/>
                         </Breadcrumbs>
-                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Specifications</h1>
+                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-0">Specifications</h1>
+                        <h3 className="govuk-caption-l govuk-!-margin-top-2">Create and manage the specifications used to calculate funding.</h3>
                     </div>
                 </div>
                 <div className="govuk-grid-row">
