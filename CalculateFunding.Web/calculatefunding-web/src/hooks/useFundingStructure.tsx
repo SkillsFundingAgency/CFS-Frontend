@@ -27,8 +27,8 @@ export const useFundingStructure = ({
       (
         await getFundingLineStructureService(
           specificationId as string,
-          fundingStreamId as string,
-          fundingPeriodId as string
+          fundingPeriodId as string,
+          fundingStreamId as string
         )
       ).data,
     {
