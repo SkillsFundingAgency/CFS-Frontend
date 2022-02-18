@@ -1,5 +1,5 @@
 import JobNotificationSection from "components/Jobs/JobNotificationSection";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 
@@ -62,7 +62,7 @@ export const ProvidersForFundingRelease = ({
     addSub,
     removeSub,
     jobNotifications,
-    onError: (error: any) => addError({ error: error, description: "Error while monitoring funding jobs" })
+    onError: (error: any) => addError({ error: error, description: "Error while monitoring funding jobs" }),
   });
 
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
@@ -122,7 +122,6 @@ export const ProvidersForFundingRelease = ({
     match.params.specificationId,
     [Permission.CanReleaseFunding]
   );
-  const [jobId, setJobId] = useState<string>("");
   const { errors, addErrorMessage, addError } = useErrors();
   const hasPermissionToRelease = useMemo(
     () => hasPermission && hasPermission(Permission.CanReleaseFunding),
@@ -147,21 +146,16 @@ export const ProvidersForFundingRelease = ({
     addJobTypeSubscription([JobType.RefreshFundingJob]);
     addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
     addJobTypeSubscription([
+      JobType.PublishBatchProviderFundingJob,
+      JobType.PublishAllProviderFundingJob,
+      JobType.ReIndexPublishedProvidersJob,
+    ]);
+    addJobTypeSubscription([
       JobType.CreateInstructAllocationJob,
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
       JobType.GenerateGraphAndInstructAllocationJob,
     ]);
   }, [match, isSearchCriteriaInitialised]);
-
-  useEffect(() => {
-    if (
-      jobId !== "" &&
-      jobNotifications.some((n) => n.latestJob?.isComplete && n.latestJob?.jobId === jobId)
-    ) {
-      setJobId("");
-      refetchSearchResults();
-    }
-  }, [jobNotifications, jobId]);
 
   const handleObservedJobCompleted = (notification: JobNotification) => {
     const observedJob = notification?.latestJob;
