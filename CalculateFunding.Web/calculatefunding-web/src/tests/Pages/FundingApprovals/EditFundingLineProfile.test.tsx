@@ -157,6 +157,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
           fundingLineCode: "fundingLineId",
           fundingPeriodId: "fundingPeriodId",
           fundingStreamId: "fundingStreamId",
+          specificationId: "specId",
           profilePeriods: [
             {
               distributionPeriodId: "period",
@@ -203,6 +204,7 @@ describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
           fundingLineCode: "fundingLineId",
           fundingPeriodId: "fundingPeriodId",
           fundingStreamId: "fundingStreamId",
+          specificationId: "specId",
           profilePeriods: [
             {
               distributionPeriodId: "period",

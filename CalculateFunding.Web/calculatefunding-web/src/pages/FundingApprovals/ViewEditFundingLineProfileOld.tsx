@@ -173,7 +173,9 @@ export function ViewEditFundingLineProfileOld({
     if (editMode === ProfileEditMode.View) {
       clearErrorMessages();
       history.push(
-        `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit`
+        "/Approvals/ProviderFundingOverview/" +
+          `${specificationId}/${providerId}/` +
+          `${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit`
       );
     } else {
       if (editMode === ProfileEditMode.EditAll && !hasAcknowledgedHistoricEdit) {
@@ -195,6 +197,7 @@ export function ViewEditFundingLineProfileOld({
 
         const carryForwardValue = calculateNewCarryForwardAmount(totalProfilingAllocationAmount);
         const request: ApplyCustomProfileRequest = {
+          specificationId: specificationId,
           fundingStreamId: fundingStreamId,
           fundingPeriodId: fundingPeriodId,
           fundingLineCode: fundingLineId,
@@ -216,7 +219,9 @@ export function ViewEditFundingLineProfileOld({
         await applyCustomProfile(request);
         await getFundingLineProfile();
         history.push(
-          `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`
+          "/Approvals/ProviderFundingOverview/" +
+            `${specificationId}/${providerId}/${providerVersionId}/` +
+            `${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`
         );
       } catch (err: any) {
         window.scrollTo(0, 0);
@@ -235,13 +240,17 @@ export function ViewEditFundingLineProfileOld({
   const handleCancelClick = () => {
     clearErrorMessages();
     history.push(
-      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`
+      "/Approvals/ProviderFundingOverview/" +
+        `${specificationId}/${providerId}/${providerVersionId}/` +
+        `${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`
     );
   };
 
   const handleChangeToRuleBasedProfileClick = () => {
     history.push(
-      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit/change-profile-type`
+      "/Approvals/ProviderFundingOverview/" +
+        `${specificationId}/${providerId}/${providerVersionId}/` +
+        `${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit/change-profile-type`
     );
   };
 
@@ -352,7 +361,11 @@ export function ViewEditFundingLineProfileOld({
             />
             <Breadcrumb
               name={fundingLineProfile.providerName}
-              url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
+              url={
+                "/Approvals/ProviderFundingOverview/" +
+                `${specificationId}/${providerId}/${providerVersionId}/` +
+                `${fundingStreamId}/${fundingPeriodId}`
+              }
             />
             <Breadcrumb name={pageTitle ?? "Funding Line Profile"} />
           </Breadcrumbs>
@@ -649,7 +662,11 @@ export function ViewEditFundingLineProfileOld({
                 fundingLineCode={fundingLineId}
               />
               <BackLink
-                to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
+                to={
+                  "/Approvals/ProviderFundingOverview/" +
+                  `${specificationId}/${providerId}/${providerVersionId}/` +
+                  `${fundingStreamId}/${fundingPeriodId}`
+                }
               />
             </div>
           </div>

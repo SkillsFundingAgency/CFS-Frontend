@@ -1,7 +1,5 @@
-import { StringNullableChain } from "lodash";
-import { string } from "prop-types";
-
 export interface ApplyCustomProfileRequest {
+  specificationId: string;
   fundingStreamId: string;
   fundingPeriodId: string;
   fundingLineCode: string;
