@@ -21,7 +21,7 @@ export const reduceFundingSearchSelectionState: Reducer<
     if (filterChange.isSelected) {
       original.push(filterChange.value);
     } else {
-      const position = filters.providerType.indexOf(filterChange.value);
+      const position = original.findIndex(filterItem => filterItem == filterChange.value);
       original.splice(position, 1);
     }
     return original;
