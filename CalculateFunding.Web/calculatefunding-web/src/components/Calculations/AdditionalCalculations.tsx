@@ -150,7 +150,6 @@ export function AdditionalCalculations({
   }
 
   function searchByText(specificationId: string, status: string, pageNumber: number, searchTerm: string) {
-    setSortBy("");
     findAdditionalCalculations(specificationId, status, pageNumber, searchTerm);
   }
 
@@ -206,6 +205,7 @@ export function AdditionalCalculations({
                   title={"Additional calculation name"}
                   sortName={"name"}
                   callback={sortByValue}
+                  sortAsc={true}
                 />
               </th>
               {!providerId && (

@@ -5,6 +5,7 @@ interface SortableButtonProps {
   sortName: string;
   title: string;
   callback: any;
+  sortAsc?: boolean;
 }
 
 enum sortStatus {
@@ -13,8 +14,10 @@ enum sortStatus {
   descending = "descending",
 }
 
-export default function SortableButton({ sortName, title, callback }: SortableButtonProps) {
-  const [buttonSortStatus, setButtonSortStatus] = useState<sortStatus>(sortStatus.none);
+export default function SortableButton({ sortName, title, callback, sortAsc }: SortableButtonProps) {
+  const [buttonSortStatus, setButtonSortStatus] = useState<sortStatus>(
+    sortAsc === undefined ? sortStatus.none : sortAsc ? sortStatus.descending : sortStatus.ascending
+  );
 
   function sortByValue() {
     switch (buttonSortStatus) {
