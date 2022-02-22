@@ -12,7 +12,7 @@ import { ViewEditFundingLineProfilePropsOld } from "../../../pages/FundingApprov
 import { Permission } from "../../../types/Permission";
 import { hasSpecPermissions } from "../../fakes/testFactories";
 
-describe("<ViewEditFundingLineProfile in VIEW mode />", () => {
+describe("<ViewEditFundingLineProfileOld in VIEW mode />", () => {
   afterEach(async () => {
     mockHistoryPush.mockClear();
     mockApplyCustomProfile.mockClear();

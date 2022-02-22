@@ -20,21 +20,16 @@ import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecific
 import { useConfirmLeavePage } from "../../hooks/useConfirmLeavePage";
 import { useErrors } from "../../hooks/useErrors";
 import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
+import { useFindSpecificationsWithResults } from "../../hooks/useFundingLinePublishedProviderDetails";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import {
-  applyCustomProfile,
-  getFundingLinePublishedProviderDetails,
-} from "../../services/publishedProviderFundingLineService";
+import { applyCustomProfile } from "../../services/publishedProviderFundingLineService";
 import { ProfileTotal } from "../../types/FundingLineProfile";
 import { Permission } from "../../types/Permission";
 import {
   ApplyCustomProfileRequest,
   ProfilePeriodType,
 } from "../../types/PublishedProvider/ApplyCustomProfileRequest";
-import {
-  FundingLineProfile,
-  FundingLineProfileViewModel,
-} from "../../types/PublishedProvider/FundingLineProfile";
+import { FundingLineProfile } from "../../types/PublishedProvider/FundingLineProfile";
 import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../types/Sections";
 
@@ -47,9 +42,7 @@ export interface ViewEditFundingLineProfileProps {
   specCoreProviderVersionId: string;
 }
 
-export function ViewEditFundingLineProfile({
-  match,
-}: RouteComponentProps<ViewEditFundingLineProfileProps>): JSX.Element {
+export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEditFundingLineProfileProps>) {
   const {
     actionType,
     specificationId,
@@ -97,28 +90,53 @@ export function ViewEditFundingLineProfile({
     lastUpdatedUser: { id: "", name: "" },
     profileTotals: [],
   });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [pageTitle, setPageTitle] = useState<string>();
   const [canEditCustomProfile, setCanEditCustomProfile] = useState<boolean>(false);
   const [canChangeToRuleBasedProfile, setCanChangeToRuleBasedProfile] = useState<boolean>(false);
   const [isContractedProvider, setIsContractedProvider] = useState<boolean>(false);
-  const providerFundingOverviewUrl =
-    `/FundingManagement/${actionType}/Provider/` +
-    `${providerId}/Specification/${specificationId}/Version/${providerVersionId}`;
+  const providerFundingOverviewUrl = `/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${providerVersionId}`;
+
+  const { isLoadingFundingLineProfile, refetchFundingLineProfile } = useFindSpecificationsWithResults({
+    specificationId,
+    providerId,
+    fundingLineCode: fundingLineId,
+    fundingStreamId,
+    fundingPeriodId,
+    options: {
+      onSuccess: (profile) => {
+        profile.fundingLineProfile.profileTotals.forEach(
+          (p) =>
+            (p.profileRemainingPercentage =
+              editMode === ProfileEditMode.EditAll ? p.profilePercentage : p.profileRemainingPercentage)
+        );
+        setFundingLineProfile(profile.fundingLineProfile);
+        setEditedFundingLineProfile(profile.fundingLineProfile);
+        setCanEditCustomProfile(profile.enableUserEditableCustomProfiles);
+        setCanChangeToRuleBasedProfile(
+          actionType === FundingActionType.Approve && profile.enableUserEditableRuleBasedProfiles
+        );
+        setIsContractedProvider(profile.contractedProvider);
+      },
+    },
+  });
 
   useEffect(() => {
     if (actionType === FundingActionType.Approve && match.params.editMode === "edit") {
-      setEditMode(ProfileEditMode.EditUnpaid);
+      if (editMode !== ProfileEditMode.EditUnpaid) {
+        setEditMode(ProfileEditMode.EditUnpaid);
+        setEditMode(ProfileEditMode.EditUnpaid);
+        refetchFundingLineProfile();
+      }
     } else {
-      setEditMode(ProfileEditMode.View);
+      if (editMode !== ProfileEditMode.View) {
+        setEditMode(ProfileEditMode.View);
+        setEditMode(ProfileEditMode.View);
+        refetchFundingLineProfile();
+      }
     }
   }, [match.params.editMode]);
-
-  useEffect(() => {
-    getFundingLineProfile();
-  }, [editMode]);
 
   useEffect(() => {
     const title = `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile${
@@ -132,7 +150,6 @@ export function ViewEditFundingLineProfile({
     match.params.specificationId,
     [Permission.CanApplyCustomProfilePattern]
   );
-
   useConfirmLeavePage(
     editMode !== ProfileEditMode.View && !isSaving && isDirty,
     "Are you sure you want to leave without saving your changes?"
@@ -155,34 +172,6 @@ export function ViewEditFundingLineProfile({
       isErrors = true;
     }
     return !isErrors;
-  };
-
-  const getFundingLineProfile = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getFundingLinePublishedProviderDetails(
-        specificationId,
-        providerId,
-        fundingStreamId as string,
-        fundingLineId,
-        fundingPeriodId as string
-      );
-      const profile = response.data as FundingLineProfileViewModel;
-      profile.fundingLineProfile.profileTotals.forEach(
-        (p) =>
-          (p.profileRemainingPercentage =
-            editMode === ProfileEditMode.EditAll ? p.profilePercentage : p.profileRemainingPercentage)
-      );
-      setEditedFundingLineProfile(profile.fundingLineProfile);
-      setFundingLineProfile(profile.fundingLineProfile);
-      setCanEditCustomProfile(profile.enableUserEditableCustomProfiles);
-      setCanChangeToRuleBasedProfile(profile.enableUserEditableRuleBasedProfiles);
-      setIsContractedProvider(profile.contractedProvider);
-    } catch (err: any) {
-      addError({ error: err });
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleEditProfileClick = async () => {
@@ -229,7 +218,9 @@ export function ViewEditFundingLineProfile({
         };
 
         await applyCustomProfile(request);
-        await getFundingLineProfile();
+
+        await refetchFundingLineProfile();
+
         history.push(`${providerFundingOverviewUrl}/FundingLine/${fundingLineId}/view`);
       } catch (err: any) {
         window.scrollTo(0, 0);
@@ -319,6 +310,7 @@ export function ViewEditFundingLineProfile({
   const handleEditPaid = () => {
     if (isContractedProvider && !hasMissingPermissions) {
       setEditMode(ProfileEditMode.EditAll);
+      refetchFundingLineProfile();
     }
   };
 
@@ -347,9 +339,11 @@ export function ViewEditFundingLineProfile({
   return (
     <Main location={Section.FundingManagement}>
       <MultipleErrorSummary errors={errors} />
-      {isLoading || isLoadingSpecification || isLoading || isSaving ? (
+      {isLoadingFundingLineProfile || isLoadingSpecification || isSaving ? (
         <LoadingStatus
-          title={`${isLoading || isLoadingSpecification ? "Loading" : "Saving"} funding line profile`}
+          title={`${
+            isLoadingFundingLineProfile || isLoadingSpecification ? "Loading" : "Saving"
+          } funding line profile`}
         />
       ) : (
         <>

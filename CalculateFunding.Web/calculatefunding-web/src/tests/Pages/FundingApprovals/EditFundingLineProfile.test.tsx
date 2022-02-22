@@ -14,7 +14,7 @@ import { ViewEditFundingLineProfilePropsOld } from "../../../pages/FundingApprov
 import { Permission } from "../../../types/Permission";
 import { hasSpecPermissions } from "../../fakes/testFactories";
 
-describe("<ViewEditFundingLineProfile in EDIT mode />", () => {
+describe("<ViewEditFundingLineProfileOld in EDIT mode />", () => {
   afterEach(async () => {
     mockHistoryPush.mockClear();
     mockApplyCustomProfile.mockClear();
