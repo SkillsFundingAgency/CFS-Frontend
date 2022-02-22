@@ -143,12 +143,20 @@ export const ProviderDataTab = ({
           <dd className="govuk-summary-list__value">{providerDetails.postcode}</dd>
         </div>
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Region</dt>
+          <dt className="govuk-summary-list__key">Regional schools commissioner region name</dt>
           <dd className="govuk-summary-list__value">{providerDetails.rscRegionName}</dd>
         </div>
         <div className="govuk-summary-list__row">
-          <dt className="govuk-summary-list__key">Region code</dt>
+          <dt className="govuk-summary-list__key">Regional schools commissioner region code</dt>
           <dd className="govuk-summary-list__value">{providerDetails.rscRegionCode}</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Government office region name</dt>
+          <dd className="govuk-summary-list__value">{providerDetails.governmentOfficeRegionName}</dd>
+        </div>
+        <div className="govuk-summary-list__row">
+          <dt className="govuk-summary-list__key">Government office region code</dt>
+          <dd className="govuk-summary-list__value">{providerDetails.governmentOfficeRegionCode}</dd>
         </div>
         <div className="govuk-summary-list__row">
           <dt className="govuk-summary-list__key">London region code</dt>

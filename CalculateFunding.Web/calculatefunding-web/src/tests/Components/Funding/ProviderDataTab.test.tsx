@@ -1,4 +1,4 @@
-﻿import { getByText,render, screen } from "@testing-library/react";
+﻿import { render, screen } from "@testing-library/react";
 import React from "react";
 
 import { ErrorContextWrapper } from "../../../context/ErrorContext";
@@ -38,6 +38,26 @@ describe("<ProviderDataTab />", () => {
   it("displays London region name", async () =>{
     expect(screen.getByText("London region name")).toBeInTheDocument();
     expect((await screen.getByText("Camden"))).toBeInTheDocument();
+  })
+
+  it("displays Regional schools commissioner region name", async () =>{
+    expect(screen.getByText("Regional schools commissioner region name")).toBeInTheDocument();
+    expect((await screen.getByText("South Central"))).toBeInTheDocument();
+  })
+
+  it("displays Regional schools commissioner region code", async () =>{
+    expect(screen.getByText("Regional schools commissioner region code")).toBeInTheDocument();
+    expect((await screen.getByText("SC"))).toBeInTheDocument();
+  })
+
+  it("displays Government office region name", async () =>{
+    expect(screen.getByText("Government office region name")).toBeInTheDocument();
+    expect((await screen.getByText("London"))).toBeInTheDocument();
+  })
+
+  it("displays Government office region code", async () =>{
+    expect(screen.getByText("Government office region code")).toBeInTheDocument();
+    expect((await screen.getByText("LDN"))).toBeInTheDocument();
   })
 });
 
