@@ -372,36 +372,43 @@ export const SpecificationFundingApproval = ({
       <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
       {!activeActionJobs?.length && (
-        <JobNotificationSection
-          jobNotifications={jobNotifications}
-          notificationSettings={[
-            {
-              jobTypes: [
-                JobType.CreateInstructAllocationJob,
-                JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-                JobType.GenerateGraphAndInstructAllocationJob,
-              ],
-              showActive: true,
-              showFailed: true,
-              showSuccessful: false,
-              activeDescription: "Calculation run in progress",
-              failDescription: "Calculation run failed",
-            },
-            {
-              jobTypes: [
-                JobType.RefreshFundingJob,
-                JobType.ApproveAllProviderFundingJob,
-                JobType.ApproveBatchProviderFundingJob,
-                JobType.PublishBatchProviderFundingJob,
-                JobType.PublishAllProviderFundingJob,
-                JobType.ReIndexPublishedProvidersJob,
-              ],
-              showActive: false, // we show a spinner separately
-              showFailed: true,
-              showSuccessful: true,
-            },
-          ]}
-        />
+        <>
+          <JobNotificationSection
+            jobNotifications={jobNotifications}
+            notificationSettings={[
+              {
+                jobTypes: [
+                  JobType.RefreshFundingJob,
+                  JobType.ApproveAllProviderFundingJob,
+                  JobType.ApproveBatchProviderFundingJob,
+                  JobType.PublishBatchProviderFundingJob,
+                  JobType.PublishAllProviderFundingJob,
+                  JobType.ReIndexPublishedProvidersJob,
+                ],
+                showActive: false, // we show a spinner separately
+                showFailed: true,
+                showSuccessful: true,
+              },
+            ]}
+          />
+          <JobNotificationSection
+            jobNotifications={jobNotifications}
+            notificationSettings={[
+              {
+                jobTypes: [
+                  JobType.CreateInstructAllocationJob,
+                  JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+                  JobType.GenerateGraphAndInstructAllocationJob,
+                ],
+                showActive: true,
+                showFailed: true,
+                showSuccessful: false,
+                activeDescription: "Calculation run in progress",
+                failDescription: "Calculation run failed",
+              }
+            ]}
+          />
+        </>
       )}
 
       {!isLoadingSpecification && specification && (
