@@ -57,6 +57,7 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
             _fundingStreamId = "fundingStreamId";
             _fundingLineCode = "fundingLineCode";
             _fundingPeriodId = "fundingPeriodId";
+            _providerVersionId = "providerVersionId";
         }
 
         [TestMethod]
@@ -265,8 +266,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
         private void GivenProviderExists()
         {
             _providersApiClient
-                .Setup(_ => _.GetCurrentProviderForFundingStream(
-                    _fundingStreamId, _providerId))
+                .Setup(_ => _.GetProviderByIdFromProviderVersion(
+                    _providerVersionId, _providerId))
                 .ReturnsAsync(new ApiResponse<ProviderVersionSearchResult>(HttpStatusCode.OK, new ProviderVersionSearchResult
                 {
                     Id = _providerId,
@@ -339,7 +340,8 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                     _specificationId,
                     _providerId,
                     _fundingStreamId,
-                    _fundingLineCode);
+                    _fundingLineCode,
+                    _providerVersionId);
         }
 
         private async Task<IActionResult> WhenGetCurrentProfileConfig()

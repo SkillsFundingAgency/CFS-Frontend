@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { RouteComponentProps } from "react-router";
-import { Link } from "react-router-dom";
 
 import { AccordionPanel } from "../../components/AccordionPanel";
 import { BackLink } from "../../components/BackLink";
@@ -43,7 +42,8 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
           specificationId,
           providerId,
           fundingStreamId,
-          fundingLineCode
+          fundingLineCode,
+          providerVersionId
         )
       ).data
   );

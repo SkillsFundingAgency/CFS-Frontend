@@ -152,17 +152,19 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}/{fundingLineCode}/changes")]
+        [Route("api/publishedproviderfundinglinedetails/{specificationId}/{providerId}/{fundingStreamId}/{fundingLineCode}/{providerVersionId}/changes")]
         public async Task<IActionResult> GetPreviousProfilesForSpecificationForProviderForFundingLine(
             string specificationId,
             string providerId,
             string fundingStreamId,
-            string fundingLineCode)
+            string fundingLineCode,
+            string providerVersionId)
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
             Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
             Guard.IsNullOrWhiteSpace(providerId, nameof(providerId));
             Guard.IsNullOrWhiteSpace(fundingLineCode, nameof(fundingLineCode));
+            Guard.IsNullOrWhiteSpace(providerVersionId, nameof(providerVersionId));
 
             ApiResponse<IEnumerable<FundingLineChange>> fundingLineApiResponse = await _publishingApiClient
                 .GetPreviousProfilesForSpecificationForProviderForFundingLine(
@@ -179,7 +181,7 @@ namespace CalculateFunding.Frontend.Controllers
             }
 
             ApiResponse<ProviderVersionSearchResult> providerResponse =
-                await _providersApiClient.GetCurrentProviderForFundingStream(fundingStreamId, providerId);
+                await _providersApiClient.GetProviderByIdFromProviderVersion(providerVersionId, providerId);
             IActionResult providerErrorResult =
                 providerResponse.IsSuccessOrReturnFailureResult(nameof(ProviderVersionSearchResult));
             if (providerErrorResult != null)

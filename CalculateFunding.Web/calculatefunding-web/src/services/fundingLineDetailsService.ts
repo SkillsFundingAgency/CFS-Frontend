@@ -17,10 +17,11 @@ export async function getPreviousProfilesForSpecificationForProviderForFundingLi
   specificationId: string,
   providerId: string,
   fundingStreamId: string,
-  fundingLineCode: string
+  fundingLineCode: string,
+  providerVersionId: string
 ) {
   return axios.get<FundingLineChangeViewModel>(
-    `${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/changes`
+    `${baseURL}/${specificationId}/${providerId}/${fundingStreamId}/${fundingLineCode}/${providerVersionId}/changes`
   );
 }
 
