@@ -38,7 +38,7 @@ import { FundingActionType } from "../../types/PublishedProvider/PublishedProvid
 import { Section } from "../../types/Sections";
 
 export interface ProviderFundingOverviewRoute {
-  actionType: FundingActionType;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
   specificationId: string;
   providerId: string;
   specCoreProviderVersionId?: string;

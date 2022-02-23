@@ -23,13 +23,13 @@ export interface FundingManagementApprovalsConfirmFundingRouteProps {
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
-  mode: FundingActionType;
 }
 
 export function ConfirmApprovalOfFunding({
   match,
 }: RouteComponentProps<FundingManagementApprovalsConfirmFundingRouteProps>) {
-  const { fundingStreamId, fundingPeriodId, specificationId, mode } = match.params;
+  const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
+  const actionType = FundingActionType.Approve;
   const history = useHistory();
   const { state: errors, clearErrorsFromContext, addErrorToContext } = useErrorContext();
   const {
@@ -50,7 +50,7 @@ export function ConfirmApprovalOfFunding({
     specificationId: specificationId,
     fundingStreamId: fundingStreamId,
     fundingPeriodId: fundingPeriodId,
-    actionType: mode,
+    actionType: actionType,
   });
   const { addJobObserver } = useAddJobObserver();
   const [isConfirming, setIsConfirming] = useState<boolean>(false);

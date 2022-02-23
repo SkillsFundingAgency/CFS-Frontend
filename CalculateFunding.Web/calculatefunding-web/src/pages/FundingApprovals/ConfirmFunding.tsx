@@ -38,27 +38,27 @@ export interface ConfirmFundingRouteProps {
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
-  mode: FundingActionType;
+  mode: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
 export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRouteProps>) {
   const history = useHistory();
   const dispatch = useDispatch();
+  const { specificationId, fundingStreamId, fundingPeriodId, mode: actionType } = match.params;
 
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
-  const { specification, isLoadingSpecification } = useSpecificationSummary(
-    match.params.specificationId,
-    (err) => addError({ error: err, description: "Error while loading specification" })
+  const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
+    addError({ error: err, description: "Error while loading specification" })
   );
   const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
-    match.params.specificationId,
+    specificationId,
     [Permission.CanApproveFunding, Permission.CanReleaseFunding]
   );
   const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
-    match.params.fundingStreamId,
-    match.params.fundingPeriodId,
+    fundingStreamId,
+    fundingPeriodId,
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
 
@@ -95,14 +95,14 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
   );
   const [specificationLastUpdatedDate, setSpecificationLastUpdatedDate] = useState<Date>();
   useEffect(() => {
-    getSpecificationCalculationResultsMetadata(match.params.specificationId)
+    getSpecificationCalculationResultsMetadata(specificationId)
       .then((result) => {
         setSpecificationLastUpdatedDate(result.data.lastUpdated);
       })
       .catch((err) => {
         addError({
           error: err,
-          description: `Error while getting specification calculation results metadata for specification Id: ${match.params.specificationId}`,
+          description: `Error while getting specification calculation results metadata for specification Id: ${specificationId}`,
         });
       });
 
@@ -110,7 +110,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
       monitorMode: MonitorMode.SignalR,
       monitorFallback: MonitorFallback.Polling,
       filterBy: {
-        specificationId: match.params.specificationId,
+        specificationId: specificationId,
         jobTypes: [
           JobType.RefreshFundingJob,
           JobType.ApproveAllProviderFundingJob,
@@ -124,7 +124,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     return () => {
       removeAllSubs();
     };
-  }, [match.params.specificationId]);
+  }, [specificationId]);
 
   const latestJob = getLatestJob(notifications.flatMap((n) => n.latestJob));
   const isWaitingForJob = notifications.some((n) => !!n.latestJob?.isActive);
@@ -134,13 +134,13 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
 
     async function loadBatchFundingSummary() {
       const response =
-        match.params.mode === FundingActionType.Approve
+        actionType === FundingActionType.Approve
           ? await publishService.getFundingSummaryForApprovingService(
-              match.params.specificationId,
+              specificationId,
               state.selectedProviderIds
             )
           : await publishService.getFundingSummaryForReleasingService(
-              match.params.specificationId,
+              specificationId,
               state.selectedProviderIds
             );
       setFundingSummary(response.data);
@@ -148,16 +148,16 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
 
     async function loadFullFundingSummary() {
       const search = buildInitialPublishedProviderSearchRequest(
-        match.params.fundingStreamId,
-        match.params.fundingPeriodId,
-        match.params.specificationId
+        fundingStreamId,
+        fundingPeriodId,
+        specificationId
       );
       const publishedProviderSearchResults = (
         await publishedProviderService.searchForPublishedProviderResults(search)
       ).data;
       const funding: PublishedProviderFundingCount = {
         count:
-          match.params.mode === FundingActionType.Approve
+          actionType === FundingActionType.Approve
             ? publishedProviderSearchResults.totalProvidersToApprove
             : publishedProviderSearchResults.totalProvidersToPublish,
         indicativeProviderCount: 0,
@@ -182,24 +182,19 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
         loadBatchFundingSummary();
       }
       if (state.selectedProviderIds.length === 0) {
-        addError({ error: "There are no selected providers to " + match.params.mode.toLowerCase() });
+        addError({ error: "There are no selected providers to " + actionType.toLowerCase() });
       }
     }
   }, [fundingConfiguration, match.params]);
 
   const clearFundingSearchSelection = useCallback(() => {
-    dispatch(
-      initialiseFundingSearchSelection(
-        match.params.fundingStreamId,
-        match.params.fundingPeriodId,
-        match.params.specificationId
-      )
-    );
+    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
   }, [match.params]);
 
   const handleAcknowledge = async () => {
     setAcknowledge(!acknowledge);
   };
+
   const handleConfirm = async () => {
     clearErrorMessages();
     if (!acknowledge) {
@@ -214,32 +209,32 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     }
     setIsConfirming(true);
     try {
-      const specId = match.params.specificationId;
+      const specId = specificationId;
       let jobId = "";
       if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
-        if (match.params.mode === FundingActionType.Approve) {
+        if (actionType === FundingActionType.Approve) {
           jobId = (await publishService.approveProvidersFundingService(specId, state.selectedProviderIds))
             .data.jobId;
-        } else if (match.params.mode === FundingActionType.Release) {
+        } else if (actionType === FundingActionType.Release) {
           jobId = (await publishService.releaseProvidersFundingService(specId, state.selectedProviderIds))
             .data.jobId;
         }
       } else {
-        if (match.params.mode === FundingActionType.Approve) {
+        if (actionType === FundingActionType.Approve) {
           jobId = (await publishService.approveSpecificationFundingService(specId)).data.jobId;
-        } else if (match.params.mode === FundingActionType.Release) {
+        } else if (actionType === FundingActionType.Release) {
           jobId = (await publishService.releaseSpecificationFundingService(specId)).data.jobId;
         }
       }
       clearFundingSearchSelection();
       addJobObserver({ jobId: jobId, specificationId: specId });
       history.push(
-        `/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`
+        `/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
       );
     } catch (e: any) {
       addError({
         error: e,
-        description: `Error while trying to ${match.params.mode.toLowerCase()} specification`,
+        description: `Error while trying to ${actionType.toLowerCase()} specification`,
       });
       setIsConfirming(false);
     }
@@ -255,20 +250,20 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
         <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
         <Breadcrumb
           name="Funding approval results"
-          url={`/Approvals/SpecificationFundingApproval/${match.params.fundingStreamId}/${match.params.fundingPeriodId}/${match.params.specificationId}`}
+          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
         />
-        <Breadcrumb name={match.params.mode + " funding"} />
+        <Breadcrumb name={actionType + " funding"} />
       </Breadcrumbs>
 
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
 
       <div>
         <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">
-          Confirm funding {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
+          Confirm funding {actionType === FundingActionType.Approve ? "approval" : "release"}
         </h1>
         <span className="govuk-caption-xl govuk-!-margin-bottom-8">
           Check the information below carefully before{" "}
-          {match.params.mode === FundingActionType.Approve ? "approving" : "releasing"} the funding
+          {actionType === FundingActionType.Approve ? "approving" : "releasing"} the funding
         </span>
       </div>
 
@@ -390,7 +385,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
             disabled={isLoading || isWaitingForJob || !fundingSummary}
             onClick={handleConfirm}
           >
-            Confirm {match.params.mode === FundingActionType.Approve ? "approval" : "release"}
+            Confirm {actionType === FundingActionType.Approve ? "approval" : "release"}
           </button>
           <a
             className="govuk-button govuk-button--secondary"

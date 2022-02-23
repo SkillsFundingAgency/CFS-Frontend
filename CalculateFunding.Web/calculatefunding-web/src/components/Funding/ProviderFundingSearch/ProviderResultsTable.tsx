@@ -13,7 +13,7 @@ import { Pagination } from "../../Pagination";
 import { ProviderResultRow } from "./ProviderResultRow";
 
 export interface ProviderResultsForFundingProps {
-  actionType: FundingActionType;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
   specCoreProviderVersionId?: string;
   enableBatchSelection: boolean;
   providerSearchResults: PublishedProviderSearchResults | undefined;

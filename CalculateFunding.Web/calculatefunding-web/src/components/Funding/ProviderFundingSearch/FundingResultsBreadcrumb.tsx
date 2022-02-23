@@ -10,7 +10,7 @@ export const FundingResultsBreadcrumb = ({
   fundingStreamId,
   fundingPeriodId,
 }: {
-  actionType: FundingActionType | undefined;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh> | undefined;
   specificationId: string | undefined;
   specificationName: string | undefined;
   fundingStreamId: string | undefined;

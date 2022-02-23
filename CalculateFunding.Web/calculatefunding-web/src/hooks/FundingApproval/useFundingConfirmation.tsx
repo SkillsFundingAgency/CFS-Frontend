@@ -32,20 +32,25 @@ export const useFundingConfirmation = ({
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
-  actionType: FundingActionType;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
 }) => {
   const dispatch = useDispatch();
   const { addErrorToContext, clearErrorsFromContext } = useErrorContext();
   const { selectedProviderIds } = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
+  const [fundingSummary, setFundingSummary] = useState<PublishedProviderFundingCount>();
+  const [specificationLastUpdatedDate, setSpecificationLastUpdatedDate] = useState<Date>();
+
   const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
     addErrorToContext({ error: err, description: "Error while loading specification" })
   );
+
   const { hasPermission, isPermissionsFetched } = useSpecificationPermissions(specificationId, [
     Permission.CanApproveFunding,
     Permission.CanReleaseFunding,
   ]);
+
   const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
     fundingStreamId,
     fundingPeriodId,
@@ -61,8 +66,6 @@ export const useFundingConfirmation = ({
       addErrorToContext({ error: err, description: "An error occurred while monitoring the running jobs" }),
   });
 
-  const [fundingSummary, setFundingSummary] = useState<PublishedProviderFundingCount>();
-
   const hasPermissionToApprove = useMemo(
     () => hasPermission && hasPermission(Permission.CanApproveFunding),
     [isPermissionsFetched]
@@ -71,8 +74,6 @@ export const useFundingConfirmation = ({
     () => hasPermission && hasPermission(Permission.CanReleaseFunding),
     [isPermissionsFetched]
   );
-
-  const [specificationLastUpdatedDate, setSpecificationLastUpdatedDate] = useState<Date>();
 
   useEffect(() => {
     getSpecificationCalculationResultsMetadata(specificationId)
@@ -117,7 +118,7 @@ export const useFundingConfirmation = ({
         actionType === FundingActionType.Approve
           ? await publishService.getFundingSummaryForApprovingService(specificationId, selectedProviderIds)
           : await publishService.getFundingSummaryForReleasingService(specificationId, selectedProviderIds);
-      setFundingSummary(response.data);
+      setFundingSummary(response?.data);
     }
 
     async function loadFullFundingSummary() {
@@ -126,32 +127,36 @@ export const useFundingConfirmation = ({
         fundingPeriodId,
         specificationId
       );
-      const publishedProviderSearchResults = (
-        await publishedProviderService.searchForPublishedProviderResults(search)
-      ).data;
-      const funding: PublishedProviderFundingCount = {
-        count:
-          actionType === FundingActionType.Approve
-            ? publishedProviderSearchResults.totalProvidersToApprove
-            : publishedProviderSearchResults.totalProvidersToPublish,
-        indicativeProviderCount: 0,
-        paidProviderCount: 0,
-        fundingStreamsFundings: [],
-        localAuthorities: [],
-        localAuthoritiesCount: 0,
-        providerTypes: [],
-        providerTypesCount: 0,
-        totalFunding: publishedProviderSearchResults.totalFundingAmount,
-        indicativeProviderTotalFunding: null,
-        paidProvidersTotalFunding: null,
-      };
-      setFundingSummary(funding);
+      try {
+        const { data: providers } = await publishedProviderService.searchForPublishedProviderResults(search);
+
+        const funding: PublishedProviderFundingCount = {
+          count:
+            actionType === FundingActionType.Approve
+              ? providers.totalProvidersToApprove
+              : providers.totalProvidersToPublish,
+          indicativeProviderCount: 0,
+          paidProviderCount: 0,
+          fundingStreamsFundings: [],
+          localAuthorities: [],
+          localAuthoritiesCount: 0,
+          providerTypes: [],
+          providerTypesCount: 0,
+          totalFunding: providers.totalFundingAmount,
+          indicativeProviderTotalFunding: null,
+          paidProvidersTotalFunding: null,
+        };
+        setFundingSummary(funding);
+      } catch (err: any) {
+        addErrorToContext({ error: err, description: "Unexpected error while fetching provider results" });
+      }
     }
 
     if (fundingConfiguration.approvalMode === ApprovalMode.All) {
       loadFullFundingSummary();
     }
     if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
+      console.log("selectedProviderIds", selectedProviderIds);
       if (selectedProviderIds.length > 0) {
         loadBatchFundingSummary();
       }

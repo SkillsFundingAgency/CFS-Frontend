@@ -34,7 +34,7 @@ import { FundingActionType } from "../../types/PublishedProvider/PublishedProvid
 import { Section } from "../../types/Sections";
 
 export interface ViewEditFundingLineProfileProps {
-  actionType: FundingActionType;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
   editMode?: string;
   providerId: string;
   specificationId: string;

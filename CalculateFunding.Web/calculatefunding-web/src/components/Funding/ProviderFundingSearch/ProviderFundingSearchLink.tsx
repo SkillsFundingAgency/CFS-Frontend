@@ -11,7 +11,7 @@ export const ProviderFundingSearchLink = ({
   fundingPeriodId,
   children,
 }: {
-  actionType: FundingActionType;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
   specificationId: string;
   fundingStreamId: string;
   fundingPeriodId: string;

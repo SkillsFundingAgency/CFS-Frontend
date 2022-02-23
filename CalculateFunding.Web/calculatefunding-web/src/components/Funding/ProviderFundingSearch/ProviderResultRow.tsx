@@ -8,7 +8,7 @@ import { ProviderResultNameColumn } from "./ProviderResultNameColumn";
 import { ProviderStatusColumn } from "./ProviderStatusColumn";
 
 export interface ProviderResultRowProps {
-  actionType?: FundingActionType; // null indicates old funding page
+  actionType?: Exclude<FundingActionType, FundingActionType.Refresh>; // null indicates old funding page
   publishedProvider: PublishedProviderResult;
   specCoreProviderVersionId?: string;
   enableSelection: boolean;

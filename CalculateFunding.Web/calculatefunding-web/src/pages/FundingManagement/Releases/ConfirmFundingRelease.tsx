@@ -25,14 +25,13 @@ export interface FundingManagementApprovalsConfirmFundingRouteProps {
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
-  mode: FundingActionType;
 }
 
 export function ConfirmFundingRelease({
   match,
 }: RouteComponentProps<FundingManagementApprovalsConfirmFundingRouteProps>) {
-  const history = useHistory();
   const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
+  const history = useHistory();
   const params = new URLSearchParams(history.location.search);
   const channelCodes = params.getAll("purposes");
   const actionType = FundingActionType.Release;

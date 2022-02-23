@@ -8,7 +8,7 @@ export const ProviderStatusColumn = ({
   actionType,
 }: {
   provider: PublishedProviderResult;
-  actionType: FundingActionType | undefined;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh> | undefined;
 }) =>
   provider.hasErrors ? (
     <td className="govuk-table__cell govuk-body">

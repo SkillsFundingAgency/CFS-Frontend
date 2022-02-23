@@ -28,7 +28,6 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
   const actionType = props.routingParams.mode;
 
   if (
-    actionType === FundingActionType.Refresh ||
     (actionType === FundingActionType.Release && !props.canReleaseFunding) ||
     (actionType === FundingActionType.Approve && !props.canApproveFunding)
   ) {
