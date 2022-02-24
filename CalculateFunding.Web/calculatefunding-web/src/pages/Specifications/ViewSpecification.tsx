@@ -62,7 +62,6 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
     converterWizardJob,
     approveAllCalculationsJob,
     isRefreshJobMonitoring,
-    isApproveCalcsJobRunning,
     isApproveCalcsJobMonitoring,
     lastConverterWizardReportDate,
   } = useViewSpecificationJobs({
@@ -115,22 +114,21 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           },
         ]}
       />
-      {((converterWizardJob && !converterWizardJob.isSuccessful) || isApproveCalcsJobRunning) && (
+      {((converterWizardJob && !converterWizardJob.isSuccessful) ||
+        (approveAllCalculationsJob && !approveAllCalculationsJob.isActive)) && (
         <div className="govuk-form-group">
-          {isApproveCalcsJobRunning && (
-            <JobBanner
-              job={approveAllCalculationsJob}
-              notificationSettings={[
-                {
-                  jobTypes: [],
-                  showActive: false,
-                  showFailed: false,
-                  showSuccessful: true,
-                },
-              ]}
-            />
-          )}
-          {converterWizardJob && <JobBanner job={converterWizardJob} />}
+          <JobBanner
+            job={approveAllCalculationsJob}
+            notificationSettings={[
+              {
+                jobTypes: [],
+                showActive: false,
+                showFailed: true,
+                showSuccessful: true,
+              },
+            ]}
+          />
+          <JobBanner job={converterWizardJob} />
         </div>
       )}
       {specification && fundingStream && !isApproveCalcsJobMonitoring && !isRefreshJobMonitoring && (

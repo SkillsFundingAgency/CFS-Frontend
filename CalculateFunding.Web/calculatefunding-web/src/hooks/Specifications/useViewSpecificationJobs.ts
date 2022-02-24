@@ -35,7 +35,7 @@ export const useViewSpecificationJobs = ({
     undefined
   );
   const [approveAllCalculationsJob, setApproveAllCalcsJob] = useState<JobDetails>();
-  const { addSub, removeSub, removeAllSubs, subs, results } = useJobSubscription({
+  const { addSub, removeSub, removeAllSubs, subs } = useJobSubscription({
     onError: (err) =>
       addError({ error: err, description: "An error occurred while monitoring the running jobs" }),
     onNewNotification: handleJobNotification,
@@ -47,10 +47,6 @@ export const useViewSpecificationJobs = ({
   );
   const isApproveCalcsJobMonitoring = useMemo(
     () => !!subs.find((s) => s.filterBy.jobTypes?.includes(JobType.ApproveAllCalculationsJob)),
-    [subs]
-  );
-  const isApproveCalcsJobRunning = useMemo(
-    () => !!results.find((n) => n.latestJob?.jobType === JobType.ApproveAllCalculationsJob),
     [subs]
   );
   const dispatch = useDispatch();
@@ -261,7 +257,6 @@ export const useViewSpecificationJobs = ({
     lastConverterWizardReportDate,
     isRefreshJobMonitoring,
     isApproveCalcsJobMonitoring,
-    isApproveCalcsJobRunning,
     converterWizardJob,
     approveAllCalculationsJob,
     monitorApproveAllCalculationsJob,
