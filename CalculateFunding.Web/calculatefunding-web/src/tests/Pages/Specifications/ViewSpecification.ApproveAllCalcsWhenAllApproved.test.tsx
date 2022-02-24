@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import React from "react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router";
@@ -45,11 +44,8 @@ describe("<ViewSpecification />", () => {
     });
     afterEach(() => jest.clearAllMocks());
 
-    it("shows error given all calculations already approved", async () => {
-      const approveAllCalculationsButton = await screen.findByTestId("approve-calculations");
-      userEvent.click(approveAllCalculationsButton);
-
-      expect(screen.getByText("All calculations have already been approved")).toBeInTheDocument();
+    it("hides approve all calculations when already approved", async () => {
+      expect(screen.queryByTestId("approve-calculations")).not.toBeInTheDocument();
     });
   });
 });

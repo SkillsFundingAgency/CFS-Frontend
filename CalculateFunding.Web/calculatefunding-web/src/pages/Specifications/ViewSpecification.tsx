@@ -4,7 +4,6 @@ import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import JobBanner from "../../components/Jobs/JobBanner";
-import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
@@ -16,7 +15,6 @@ import { useSpecificationPermissions } from "../../hooks/Permissions/useSpecific
 import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
 import { useViewSpecificationJobs } from "../../hooks/Specifications/useViewSpecificationJobs";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
-import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import { Section } from "../../types/Sections";
 
@@ -117,20 +115,17 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           },
         ]}
       />
-      {(isRefreshJobMonitoring ||
-        (converterWizardJob && !converterWizardJob.isSuccessful) ||
-        isApproveCalcsJobMonitoring) && (
+      {((converterWizardJob && !converterWizardJob.isSuccessful) || isApproveCalcsJobRunning) && (
         <div className="govuk-form-group">
-          {(isRefreshJobMonitoring || isApproveCalcsJobMonitoring) && (
-            <LoadingFieldStatus title={"Checking for running jobs..."} />
-          )}
           {isApproveCalcsJobRunning && (
             <JobBanner
               job={approveAllCalculationsJob}
               notificationSettings={[
                 {
+                  jobTypes: [],
+                  showActive: false,
+                  showFailed: false,
                   showSuccessful: true,
-                  jobTypes: [JobType.ApproveAllCalculationsJob],
                 },
               ]}
             />

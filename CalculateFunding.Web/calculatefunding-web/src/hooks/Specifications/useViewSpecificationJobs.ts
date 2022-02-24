@@ -193,6 +193,7 @@ export const useViewSpecificationJobs = ({
       fetchPriorNotifications: true,
       filterBy: {
         specificationId: specificationId,
+        jobTypes: [JobType.ApproveAllCalculationsJob],
         jobId: jobId,
       },
       onError: (e) =>

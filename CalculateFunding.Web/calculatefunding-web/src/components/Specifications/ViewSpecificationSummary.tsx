@@ -174,16 +174,6 @@ export const ViewSpecificationSummary = ({
       return false;
     }
 
-    if (!calculationSummaries) return false;
-    if (
-      !calculationSummaries
-        .filter((calc) => calc.calculationType === CalculationType.Template)
-        .some((calc) => calc.status !== PublishStatus.Approved)
-    ) {
-      addError({ error: "All calculations have already been approved" });
-      return false;
-    }
-
     return true;
   }
 
@@ -245,18 +235,21 @@ export const ViewSpecificationSummary = ({
       <div className="govuk-grid-column-one-third">
         <ul className="govuk-list">
           <li>Actions:</li>
-          {specification.approvalStatus !== "Approved" && (
-            <li>
-              <button
-                type="button"
-                className="govuk-link"
-                onClick={approveAllCalculations}
-                data-testid="approve-calculations"
-              >
-                Approve all calculations
-              </button>
-            </li>
-          )}
+          {calculationSummaries &&
+            calculationSummaries
+              .filter((calc) => calc.calculationType === CalculationType.Template)
+              .some((calc) => calc.status !== PublishStatus.Approved) && (
+              <li>
+                <button
+                  type="button"
+                  className="govuk-link"
+                  onClick={approveAllCalculations}
+                  data-testid="approve-calculations"
+                >
+                  Approve all calculations
+                </button>
+              </li>
+            )}
           {specification.approvalStatus !== "Approved" && (
             <li>
               <Link to="#" onClick={onApproveSpecification}>
