@@ -473,7 +473,7 @@ export function IndividualPermissionsAdmin(): JSX.Element {
               </button>
               <button
                 onClick={onRemoveUserPermissions}
-                disabled={isSaving || isRemoving}
+                disabled={isSaving || isRemoving || originalPermissions?.length === 0}
                 className="govuk-button govuk-button--warning govuk-!-margin-right-1"
               >
                 {isRemoving ? (
