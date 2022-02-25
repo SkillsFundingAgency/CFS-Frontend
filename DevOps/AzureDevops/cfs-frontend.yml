@@ -27,10 +27,27 @@ jobs:
   - job:
     displayName: 'Build, test and publish'
     steps:
+    - powershell: |
+        $targetBranch = $env:SYSTEM_PULLREQUEST_TARGETBRANCH -replace "refs/heads/"
+
+        Write-Host "Checking for differences between $targetBranch and current branch"
+        $reactmergeCommitHash = git merge-base HEAD origin/$targetBranch
+        $reactchangedFiles = @(git diff --name-only $reactmergeCommitHash -- CalculateFunding.Web/)
+        $reactchangedFiles
+        if($reactchangedFiles.Count -gt 0){
+         Write-Host "Changes to to react files, React Build task will run"
+        } else {
+         Write-Host "No changes to react files, React Build task will NOT run"
+         echo "##vso[task.setvariable variable=SkipBuildReactApp]true"
+        }
+      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+      displayName: "Check if calculatefunding.web folder contents has changed"  
+
     - task: NodeTool@0
       displayName: 'Use Node 14.x'
       inputs:
         versionSpec: 14.x
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))     
 
     - powershell: |
         cd '${{ variables.projectFolder }}'
@@ -39,6 +56,7 @@ jobs:
         Write-host "========================= Audit packages  ========================="
         yarn install --audit
       displayName: "Run yarn install"
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
 
     - powershell: |
         cd '${{ variables.projectFolder }}'
@@ -68,7 +86,7 @@ jobs:
         node .\node_modules\typescript\bin\tsc --noEmit
         echo  "========================= Finished running PR checks ========================="
         
-      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'), eq(variables['Build.Reason'], 'PullRequest'))
       displayName: "Run PR checks"
 
     - powershell: |
@@ -78,6 +96,7 @@ jobs:
         yarn test
         Write-host "========================= Finished test ========================="
       displayName: 'Run Yarn Test site'
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
 
     - task: PublishTestResults@2
       displayName: 'Publish React Test Results as test-report.xml'
@@ -86,6 +105,7 @@ jobs:
         searchFolder: '$(System.DefaultWorkingDirectory)\${{ variables.projectFolder }}'
         testRunTitle: 'React Test _$(Build.BuildNumber)'
       continueOnError: true  
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
 
     - powershell: |
         cd '${{ variables.projectFolder }}'
@@ -95,12 +115,14 @@ jobs:
         yarn run build
         Write-host "========================= Finished build ========================="
       displayName: 'Run Yarn build site'
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
 
     - task: CopyFiles@2
       displayName: 'Copy Files to: CalculateFunding.Frontend/wwwroot/app'
       inputs:
         SourceFolder: '${{ variables.projectFolder }}/Build'
         TargetFolder: CalculateFunding.Frontend/wwwroot/app
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
 
     - task: UseDotNet@2
       displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersionNet6)'
