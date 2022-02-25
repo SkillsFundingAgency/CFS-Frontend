@@ -74,14 +74,14 @@ export function RadioSearch(props: {
 
   return (
     <div className={"govuk-radios__item"}>
+      <input
+        type="radio"
+        className={"govuk-radios__input"}
+        id={props.radioId}
+        name={props.radioName}
+        onChange={() => setSearch(props.searchType)}
+      />
       <label className={"govuk-radios__label"} htmlFor={props.radioId}>
-        <input
-          type="radio"
-          className={"govuk-radios__input"}
-          id={props.radioId}
-          name={props.radioName}
-          onChange={() => setSearch(props.searchType)}
-        />
         {props.text}
       </label>
       <div className="govuk-inset-text" hidden={props.selectedSearchType !== props.searchType}>
