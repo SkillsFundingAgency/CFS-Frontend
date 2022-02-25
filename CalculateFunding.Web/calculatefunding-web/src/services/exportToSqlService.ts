@@ -19,7 +19,16 @@ const runJobToExportCalcResultsToSql = (specificationId: string) => {
   });
 };
 
+const runJobToExportReleasedDataToSql = (specificationId:string, fundingStreamId:string) =>{
+  return axios.request<JobCreatedResponse>({
+    url: `/api/sqlqa/specifications/${specificationId}/funding-streams/${fundingStreamId}/released/export-to-sql`,
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 export const sqlExportService = {
   runJobToExportAllocationDataToSql,
   runJobToExportCalcResultsToSql,
+  runJobToExportReleasedDataToSql
 };

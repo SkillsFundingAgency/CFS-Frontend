@@ -55,4 +55,5 @@
   ReleaseManagementDataMigrationJob = "ReleaseManagementDataMigrationJob",
   ReleaseProvidersToChannelsJob = "ReleaseProvidersToChannelsJob",
   PopulateCalculationResultsQaDatabaseJob = "PopulateCalculationResultsQaDatabaseJob",
+  RunReleasedSqlImportJob = "RunReleasedSqlImportJob",
 }

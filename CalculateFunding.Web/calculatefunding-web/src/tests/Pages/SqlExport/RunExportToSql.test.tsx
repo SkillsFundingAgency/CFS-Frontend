@@ -36,8 +36,8 @@ describe("<RunExportToSql /> tests", () => {
       await waitFor(() => expect(getSpecSpy).toBeCalled());
       await waitForLoadingToFinish();
 
-      expect(screen.queryAllByText(/23 November 2020/i)).toHaveLength(2);
-      expect(screen.queryAllByText("N/A", { exact: false })).toHaveLength(2);
+      expect(screen.queryAllByText(/23 November 2020/i)).toHaveLength(3);
+      expect(screen.queryAllByText("N/A", { exact: false })).toHaveLength(3);
 
       const buttons = screen.getAllByRole("button", { name: /Create SQL data/ });
       expect(buttons[0]).toBeDisabled();
@@ -50,6 +50,7 @@ const latestPublishedDate = "2020-11-23T17:35:01.1080915+00:00";
 const spec = fakery.makeSpecificationSummary();
 const mockTriggerCalcResultsExport = jest.fn();
 const mockTriggerCurrentAllocationResultsExport = jest.fn();
+const mockTriggerReleasedResultsExport = jest.fn();
 
 const useRunExportToSqlSpy = jest.spyOn(useExportToSqlJobsHook, "useExportToSqlJobs");
 const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>) => {
@@ -60,10 +61,13 @@ const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>
       isExportingReleasedResults: false,
       lastCalcResultsExportJob: undefined,
       lastExportAllocationDataJob: undefined,
+      lastReleasedAllocationJob: undefined,
       triggerCalcResultsExport: mockTriggerCalcResultsExport,
       triggerCurrentAllocationResultsExport: mockTriggerCurrentAllocationResultsExport,
+      triggerReleasedResultsExport: mockTriggerReleasedResultsExport,
       latestPublishedDate: { value: null },
       isLoadingLatestPublishedDate: false,
+
       hasRunningFundingJobs: false,
       isExporting: false,
       isAnotherUserRunningSqlJob: false,
@@ -75,6 +79,9 @@ const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>
       isExportingCalcResults: false,
       isLatestAllocationDataAlreadyExported: false,
       isLatestCalcResultsAlreadyExported: false,
+      isLatestReleaseDataAlreadyExported: false,
+      isCurrentAllocationStateBlockedByJob: false,
+      isLatestAllocationStateBlockedByJob: false,
       ...overrides,
     };
   });

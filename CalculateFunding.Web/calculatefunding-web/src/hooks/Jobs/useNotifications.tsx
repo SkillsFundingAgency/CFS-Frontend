@@ -67,23 +67,6 @@ export const useNotifications = ({ notify }: NotificationsParams): Notifications
         }
       });
 
-      console.log(
-        "Merging new notifications: setNotifications",
-        "with new = ",
-        newOnes,
-        "from existing = ",
-        existingOnes,
-        "to result = ",
-        output,
-        " (matchingNewOnes",
-        matchingNewOnes,
-        "nonMatchingNewOnes",
-        nonMatchingNewOnes,
-        "nonMatchingExistingOnes",
-        nonMatchingExistingOnes,
-        ")"
-      );
-
       return output;
     });
   };
