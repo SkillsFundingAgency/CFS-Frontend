@@ -54,7 +54,7 @@ export function SpecificationFundingLineResults({
     specification.id,
     (err) => addError({ error: err, description: "Error while checking for circular reference errors" })
   );
-  const { fundingStructure, isLoadingFundingStructure, refetchFundingStructure } = useFundingStructure({
+  const { isLoadingFundingStructure, refetchFundingStructure } = useFundingStructure({
     specificationId: specification.id,
     fundingStreamId: specification.fundingStreams[0].id,
     fundingPeriodId: specification.fundingPeriod.id,
@@ -164,10 +164,8 @@ export function SpecificationFundingLineResults({
   useEffect(() => {
     setFundingLineRenderInternalState(true);
     if (fundingLines?.length !== 0) {
-      if (fundingStructure?.length === 0) {
-        setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
-        setFundingStructureViewModelItems(fundingLines);
-      }
+      setFundingLineSearchSuggestions([...getDistinctOrderedFundingLineCalculations(fundingLines)]);
+      setFundingStructureViewModelItems(fundingLines);
     }
   }, [fundingLines]);
 
