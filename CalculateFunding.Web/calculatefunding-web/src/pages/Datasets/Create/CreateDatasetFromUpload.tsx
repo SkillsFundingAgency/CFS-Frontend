@@ -7,10 +7,9 @@ import { Link } from "react-router-dom";
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { ConfirmationPanel } from "../../../components/ConfirmationPanel";
 import { PageHeaderFieldset } from "../../../components/Fieldset";
-import { Footer } from "../../../components/Footer";
 import Form from "../../../components/Form";
-import { Header } from "../../../components/Header";
 import { LoadingStatus } from "../../../components/LoadingStatus";
+import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import RadioOption from "../../../components/RadioOption";
 import { SelectionField, SelectionFieldOption } from "../../../components/SelectionField";
@@ -197,159 +196,154 @@ export function CreateDatasetFromUpload({
   }
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
-          <Breadcrumb
-            name={specification ? specification.name : "specification"}
-            url={`/ViewSpecification/${specificationId}`}
-          />
-          <Breadcrumb name={"Create dataset"} />
-        </Breadcrumbs>
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
+        <Breadcrumb
+          name={specification ? specification.name : "specification"}
+          url={`/ViewSpecification/${specificationId}`}
+        />
+        <Breadcrumb name={"Create dataset"} />
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
 
-        <ConfirmationPanel title={"Dataset created"} hidden={!isSuccess}>
-          Dataset {selectedDatasetName} has been created.
-        </ConfirmationPanel>
+      <ConfirmationPanel title={"Dataset created"} hidden={!isSuccess}>
+        Dataset {selectedDatasetName} has been created.
+      </ConfirmationPanel>
 
-        <MultipleErrorSummary errors={errors} />
+      {(isLoadingSpecification || isLoadingFundingConfiguration || isUpdating) && (
+        <LoadingStatus
+          title={
+            isLoadingSpecification
+              ? "Loading specification"
+              : isLoadingFundingConfiguration
+              ? "Loading funding configuration"
+              : isUpdating
+              ? "Creating Dataset"
+              : "Loading"
+          }
+          id={"create-dataset-loader"}
+          subTitle="Please wait"
+          description={isUpdating ? "This can take a few minutes" : ""}
+        />
+      )}
 
-        {(isLoadingSpecification || isLoadingFundingConfiguration || isUpdating) && (
-          <LoadingStatus
-            title={
-              isLoadingSpecification
-                ? "Loading specification"
-                : isLoadingFundingConfiguration
-                ? "Loading funding configuration"
-                : isUpdating
-                ? "Creating Dataset"
-                : "Loading"
-            }
-            id={"create-dataset-loader"}
-            subTitle="Please wait"
-            description={isUpdating ? "This can take a few minutes" : ""}
-          />
-        )}
+      {!isUpdating && specification && fundingConfiguration && (
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-full">
+            <Form token="create-dataset" heading="Create dataset" titleCaption={specification.name}>
+              <PageHeaderFieldset
+                token="create-dataset"
+                heading="Check funding lines/calculations before creating data set"
+              />
+              <SelectionField
+                token="data-schema"
+                label="Select data schema"
+                hint="Please select data schema"
+                options={dataSchemas?.map<SelectionFieldOption>((d) => ({
+                  id: d.id,
+                  displayValue: d.name,
+                }))}
+                changeSelection={changeDataSchema}
+                selectedValue={selectedDataSchema}
+                errors={errors.filter((e) => e.fieldName === "DatasetDefinitionId")}
+                isLoading={isLoadingDataSchemas}
+              />
+              <TextField
+                token="dataset-name"
+                label="Data set name"
+                hint="Use a descriptive unique name other users can understand"
+                onChange={changeDatasetName}
+                value={selectedDatasetName}
+                errors={errors.filter((e) => e.fieldName === "Name")}
+                isLoading={isLoadingDataSchemas}
+              />
+              <TextAreaField
+                token="dataset-name"
+                label="Description"
+                hint="Please provide a description for the dataset"
+                onChange={changeDatasetDescription}
+                value={datasetDescription}
+                errors={errors.filter((e) => e.fieldName === "Name")}
+                isLoading={isLoadingDataSchemas}
+              />
 
-        {!isUpdating && specification && fundingConfiguration && (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <Form token="create-dataset" heading="Create dataset" titleCaption={specification.name}>
-                <PageHeaderFieldset
-                  token="create-dataset"
-                  heading="Check funding lines/calculations before creating data set"
-                />
-                <SelectionField
-                  token="data-schema"
-                  label="Select data schema"
-                  hint="Please select data schema"
-                  options={dataSchemas?.map<SelectionFieldOption>((d) => ({
-                    id: d.id,
-                    displayValue: d.name,
-                  }))}
-                  changeSelection={changeDataSchema}
-                  selectedValue={selectedDataSchema}
-                  errors={errors.filter((e) => e.fieldName === "DatasetDefinitionId")}
-                  isLoading={isLoadingDataSchemas}
-                />
-                <TextField
-                  token="dataset-name"
-                  label="Data set name"
-                  hint="Use a descriptive unique name other users can understand"
-                  onChange={changeDatasetName}
-                  value={selectedDatasetName}
-                  errors={errors.filter((e) => e.fieldName === "Name")}
-                  isLoading={isLoadingDataSchemas}
-                />
-                <TextAreaField
-                  token="dataset-name"
-                  label="Description"
-                  hint="Please provide a description for the dataset"
-                  onChange={changeDatasetDescription}
-                  value={datasetDescription}
-                  errors={errors.filter((e) => e.fieldName === "Name")}
-                  isLoading={isLoadingDataSchemas}
-                />
-
-                {fundingConfiguration && fundingConfiguration.providerSource === ProviderSource.CFS && (
-                  <div className="govuk-form-group">
-                    <fieldset className="govuk-fieldset">
-                      <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                        <h3 className="govuk-heading-m">Set as provider data</h3>
-                      </legend>
-                      <div className="govuk-radios govuk-radios--inline">
-                        <RadioOption
-                          token="set-as-data-provider-yes"
-                          label="Yes"
-                          value="true"
-                          checked={isSetAsProviderData === true}
-                          callback={() => setIsSetAsProviderData(true)}
-                        />
-                        <RadioOption
-                          token="set-as-data-provider-no"
-                          label="No"
-                          value="false"
-                          checked={isSetAsProviderData === false}
-                          callback={() => setIsSetAsProviderData(false)}
-                        />
-                      </div>
-                    </fieldset>
-                  </div>
-                )}
-                {converterEligible && (
-                  <div className="govuk-form-group">
-                    <fieldset className="govuk-fieldset ">
-                      <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                        <h3 className="govuk-heading-m">Enable copy data for provider</h3>
-                      </legend>
-                      <div className="govuk-radios govuk-radios--inline">
-                        <RadioOption
-                          token="set-converter-enabled-yes"
-                          label="Yes"
-                          value="true"
-                          checked={converterEnabled === true}
-                          callback={() => setConverterEnabled(true)}
-                        />
-                        <RadioOption
-                          token="set-converter-enabled-no"
-                          label="No"
-                          value="false"
-                          checked={converterEnabled === false}
-                          callback={() => setConverterEnabled(false)}
-                        />
-                      </div>
-                    </fieldset>
-                  </div>
-                )}
-              </Form>
-              <button
-                className="govuk-button govuk-!-margin-right-1"
-                data-module="govuk-button"
-                onClick={() => saveDataset(false)}
-              >
-                Save and continue
-              </button>
-              <button
-                className="govuk-button govuk-button--secondary"
-                data-module="govuk-button"
-                onClick={() => saveDataset(true)}
-              >
-                Save and add another
-              </button>
-              <Link
-                to={`/ViewSpecification/${specificationId}`}
-                className="govuk-button govuk-button--warning govuk-!-margin-left-1"
-                data-module="govuk-button"
-              >
-                Cancel
-              </Link>
-            </div>
+              {fundingConfiguration && fundingConfiguration.providerSource === ProviderSource.CFS && (
+                <div className="govuk-form-group">
+                  <fieldset className="govuk-fieldset">
+                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                      <h3 className="govuk-heading-m">Set as provider data</h3>
+                    </legend>
+                    <div className="govuk-radios govuk-radios--inline">
+                      <RadioOption
+                        token="set-as-data-provider-yes"
+                        label="Yes"
+                        value="true"
+                        checked={isSetAsProviderData === true}
+                        callback={() => setIsSetAsProviderData(true)}
+                      />
+                      <RadioOption
+                        token="set-as-data-provider-no"
+                        label="No"
+                        value="false"
+                        checked={isSetAsProviderData === false}
+                        callback={() => setIsSetAsProviderData(false)}
+                      />
+                    </div>
+                  </fieldset>
+                </div>
+              )}
+              {converterEligible && (
+                <div className="govuk-form-group">
+                  <fieldset className="govuk-fieldset ">
+                    <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                      <h3 className="govuk-heading-m">Enable copy data for provider</h3>
+                    </legend>
+                    <div className="govuk-radios govuk-radios--inline">
+                      <RadioOption
+                        token="set-converter-enabled-yes"
+                        label="Yes"
+                        value="true"
+                        checked={converterEnabled === true}
+                        callback={() => setConverterEnabled(true)}
+                      />
+                      <RadioOption
+                        token="set-converter-enabled-no"
+                        label="No"
+                        value="false"
+                        checked={converterEnabled === false}
+                        callback={() => setConverterEnabled(false)}
+                      />
+                    </div>
+                  </fieldset>
+                </div>
+              )}
+            </Form>
+            <button
+              className="govuk-button govuk-!-margin-right-1"
+              data-module="govuk-button"
+              onClick={() => saveDataset(false)}
+            >
+              Save and continue
+            </button>
+            <button
+              className="govuk-button govuk-button--secondary"
+              data-module="govuk-button"
+              onClick={() => saveDataset(true)}
+            >
+              Save and add another
+            </button>
+            <Link
+              to={`/ViewSpecification/${specificationId}`}
+              className="govuk-button govuk-button--warning govuk-!-margin-left-1"
+              data-module="govuk-button"
+            >
+              Cancel
+            </Link>
           </div>
-        )}
-      </div>
-      <Footer />
-    </div>
+        </div>
+      )}
+    </Main>
   );
 }

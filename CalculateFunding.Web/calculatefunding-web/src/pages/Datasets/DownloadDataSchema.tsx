@@ -17,6 +17,8 @@ import { DatasetDefinitionResponseViewModel } from "../../types/Datasets/Dataset
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
 import { SearchFacetValue } from "../../types/TemplateBuilderDefinitions";
+import { Main } from "../../components/Main";
+import { Title } from "../../components/Title";
 
 export function DownloadDataSchema() {
   const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -162,168 +164,151 @@ export function DownloadDataSchema() {
   }
 
   return (
-    <div>
-      <Header location={Section.Datasets} />
-      <div className="govuk-width-container">
-        <div className="govuk-grid-row govuk-!-margin-bottom-9">
-          <div className="govuk-grid-column-full">
-            <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-              <Breadcrumb name={"Download data schema template"} />
-            </Breadcrumbs>
-            <h1 className="govuk-heading-xl">Download data schema template</h1>
-          </div>
-        </div>
-        <div className="govuk-grid-row govuk-!-margin-bottom-9">
-          <div className="govuk-grid-column-full">
-            <MultipleErrorSummary errors={errors} />
-          </div>
-        </div>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-third">
-            <form id="searchDatasources">
-              <CollapsiblePanel title={"Search"} isExpanded={true} isCollapsible={false}>
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                      Search data schema templates
-                    </label>
-                    <input
-                      className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
-                      id="mainContentSearch"
-                      autoComplete="off"
-                      name="search"
-                      type="text"
-                      onChange={(e) => searchText(e)}
-                    />
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by funding stream"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchRequest.filters["fundingStreamName"]?.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input
-                      className="govuk-input"
-                      type="text"
-                      onChange={(e) => searchFundingStreamFilters(e)}
-                    />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterFundingStreams.map((f, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          key={`fundingstream-${f.name}`}
-                          id={`fundingstream-${f.name}`}
-                          name={`fundingstream-${f.name}`}
-                          type="checkbox"
-                          value={f.name}
-                          onChange={(e) => filterByFundingStream(e)}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`fundingstream-${f.name}`}
-                        >
-                          {f.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-                Clear filters
-              </button>
-            </form>
-          </div>
-          <div className="govuk-grid-column-two-thirds">
-            <LoadingStatus title={"Loading data schema"} hidden={!isLoading} />
-            <NoData
-              hidden={(datasetDefinitions != null && datasetDefinitions.totalResults > 0) || isLoading}
-            />
-            <table className="govuk-table" hidden={isLoading || datasetDefinitions.totalResults === 0}>
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Data schema template
-                  </th>
-                  <th scope="col" className="govuk-table__header text-stretch">
-                    Last updated
-                  </th>
-                  <th scope="col" className="govuk-table__header">
-                    Download
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body">
-                {datasetDefinitions.datasetDefinitions.map((d, index) => (
-                  <tr className="govuk-table__row" key={index}>
-                    <th scope="row" className="govuk-table__header">
-                      <p>{d.name}</p>
-                      <div className="govuk-!-margin-top-2">
-                        <details
-                          className="govuk-details govuk-!-margin-bottom-0"
-                          data-module="govuk-details"
-                        >
-                          <summary className="govuk-details__summary">
-                            <span className="govuk-details__summary-text">Data schema description</span>
-                          </summary>
-                          <div className="govuk-details__text">
-                            <p>
-                              <strong>Provider identifier:</strong> {d.providerIdentifier}
-                            </p>
-                            <p>
-                              <strong>Description:</strong> {d.description}
-                            </p>
-                          </div>
-                        </details>
-                      </div>
-                    </th>
-                    <td className="govuk-table__cell">
-                      <DateTimeFormatter date={d.lastUpdatedDate} />
-                    </td>
-                    <td className="govuk-table__cell">
-                      <p className="govuk-body-s">
-                        <a
-                          className="govuk-link"
-                          target="_self"
-                          href={`/api/datasets/download-dataset-schema/${d.id}`}
-                        >
-                          {d.name}.xlsx
-                        </a>
-                      </p>
-                    </td>
-                    <td className="govuk-table__cell"></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <BackToTop id={"top"} />
-            {datasetDefinitions.totalResults > 0 && (
-              <nav role="navigation" aria-label="Pagination">
-                <div className="pagination__summary">
-                  Showing {datasetDefinitions.startItemNumber} - {datasetDefinitions.endItemNumber} of{" "}
-                  {datasetDefinitions.totalResults} results
+    <Main location={Section.Datasets}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+        <Breadcrumb name={"Download data schema template"} />
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
+      <Title title={"Download data schema template"} />
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          <form id="searchDatasources">
+            <CollapsiblePanel title={"Search"} isExpanded={true} isCollapsible={false}>
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label filterLabel" htmlFor="filter-by-type">
+                    Search data schema templates
+                  </label>
+                  <input
+                    className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
+                    id="mainContentSearch"
+                    autoComplete="off"
+                    name="search"
+                    type="text"
+                    onChange={(e) => searchText(e)}
+                  />
                 </div>
-                <Pagination
-                  currentPage={datasetDefinitions.currentPage}
-                  lastPage={datasetDefinitions.pagerState.lastPage}
-                  callback={setPagination}
-                />
-              </nav>
-            )}
-          </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title={"Filter by funding stream"}
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={searchRequest.filters["fundingStreamName"]?.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input
+                    className="govuk-input"
+                    type="text"
+                    onChange={(e) => searchFundingStreamFilters(e)}
+                  />
+                </div>
+                <div className="govuk-checkboxes">
+                  {filterFundingStreams.map((f, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        key={`fundingstream-${f.name}`}
+                        id={`fundingstream-${f.name}`}
+                        name={`fundingstream-${f.name}`}
+                        type="checkbox"
+                        value={f.name}
+                        onChange={(e) => filterByFundingStream(e)}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`fundingstream-${f.name}`}
+                      >
+                        {f.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
+              Clear filters
+            </button>
+          </form>
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          <LoadingStatus title={"Loading data schema"} hidden={!isLoading} />
+          <NoData hidden={(datasetDefinitions != null && datasetDefinitions.totalResults > 0) || isLoading} />
+          <table className="govuk-table" hidden={isLoading || datasetDefinitions.totalResults === 0}>
+            <thead className="govuk-table__head">
+              <tr className="govuk-table__row">
+                <th scope="col" className="govuk-table__header">
+                  Data schema template
+                </th>
+                <th scope="col" className="govuk-table__header text-stretch">
+                  Last updated
+                </th>
+                <th scope="col" className="govuk-table__header">
+                  Download
+                </th>
+              </tr>
+            </thead>
+            <tbody className="govuk-table__body">
+              {datasetDefinitions.datasetDefinitions.map((d, index) => (
+                <tr className="govuk-table__row" key={index}>
+                  <th scope="row" className="govuk-table__header">
+                    <p>{d.name}</p>
+                    <div className="govuk-!-margin-top-2">
+                      <details className="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                        <summary className="govuk-details__summary">
+                          <span className="govuk-details__summary-text">Data schema description</span>
+                        </summary>
+                        <div className="govuk-details__text">
+                          <p>
+                            <strong>Provider identifier:</strong> {d.providerIdentifier}
+                          </p>
+                          <p>
+                            <strong>Description:</strong> {d.description}
+                          </p>
+                        </div>
+                      </details>
+                    </div>
+                  </th>
+                  <td className="govuk-table__cell">
+                    <DateTimeFormatter date={d.lastUpdatedDate} />
+                  </td>
+                  <td className="govuk-table__cell">
+                    <p className="govuk-body-s">
+                      <a
+                        className="govuk-link"
+                        target="_self"
+                        href={`/api/datasets/download-dataset-schema/${d.id}`}
+                      >
+                        {d.name}.xlsx
+                      </a>
+                    </p>
+                  </td>
+                  <td className="govuk-table__cell"></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <BackToTop id={"top"} />
+          {datasetDefinitions.totalResults > 0 && (
+            <nav role="navigation" aria-label="Pagination">
+              <div className="pagination__summary">
+                Showing {datasetDefinitions.startItemNumber} - {datasetDefinitions.endItemNumber} of{" "}
+                {datasetDefinitions.totalResults} results
+              </div>
+              <Pagination
+                currentPage={datasetDefinitions.currentPage}
+                lastPage={datasetDefinitions.pagerState.lastPage}
+                callback={setPagination}
+              />
+            </nav>
+          )}
         </div>
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 }

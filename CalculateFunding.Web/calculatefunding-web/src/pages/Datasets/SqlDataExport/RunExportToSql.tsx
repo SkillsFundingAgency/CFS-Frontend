@@ -69,6 +69,9 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
                 <Breadcrumb name="Export to SQL"/>
             </Breadcrumbs>
 
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+      <MultipleErrorSummary errors={errors} />
+      
             <Title
                 title="Export data to SQL"
                 titleCaption={
@@ -77,10 +80,6 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
                         : ""
                 }
             />
-
-            <MultipleErrorSummary errors={errors}/>
-
-            <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched}/>
 
             {isLoadingSpecification || !specification ? (
                 <LoadingStatus title="Loading"/>

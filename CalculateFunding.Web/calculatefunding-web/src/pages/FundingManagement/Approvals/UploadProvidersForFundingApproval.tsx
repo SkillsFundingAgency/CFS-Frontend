@@ -190,17 +190,12 @@ export function UploadProvidersForFundingApproval({ match }: RouteComponentProps
 
   return (
     <Main location={Section.FundingManagement}>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-full">
-          <Breadcrumbs>
-            <Breadcrumb name="Calculate funding" url="/" />
-            <Breadcrumb name="Funding management" url="/FundingManagement" />
-            <FundingSelectionBreadcrumb actionType={FundingActionType.Approve} />
-            <Breadcrumb name={currentPage.title} />
-          </Breadcrumbs>
-        </div>
-      </div>
-
+      <Breadcrumbs>
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Funding management" url="/FundingManagement" />
+        <FundingSelectionBreadcrumb actionType={FundingActionType.Approve} />
+        <Breadcrumb name={currentPage.title} />
+      </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
 
       <div className="govuk-grid-row">

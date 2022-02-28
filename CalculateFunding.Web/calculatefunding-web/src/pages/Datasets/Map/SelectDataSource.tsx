@@ -253,7 +253,6 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
 
   return (
     <Main location={Section.Datasets}>
-      <MultipleErrorSummary errors={errors} />
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
@@ -266,6 +265,29 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
         )}
         <Breadcrumb name={`Change ${specificationName}`} />
       </Breadcrumbs>
+      <PermissionStatus
+        requiredPermissions={missingPermissions}
+        hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
+      />
+      <MultipleErrorSummary errors={errors} />
+      <JobNotifications jobNotifications={jobNotifications} />
+      <LoadingStatusNotifier
+        notifications={[
+          {
+            isActive: isLoadingRelationshipData || !relationshipData,
+            title: "Loading data sources...",
+          },
+          {
+            isActive: isLoadingSpecification || !specification,
+            title: "Loading specification...",
+          },
+          {
+            isActive: isCheckingForPermissions,
+            title: "Checking your permissions....",
+          },
+          { isActive: isUpdating, title: "Assigning version to dataset...." },
+        ]}
+      />
       <section>
         {specification && (
           <Title title={specification.name} titleCaption={specification.fundingPeriod?.name} />
@@ -279,28 +301,6 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
             </span>
           </h3>
         )}
-        <PermissionStatus
-          requiredPermissions={missingPermissions}
-          hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
-        />
-        <LoadingStatusNotifier
-          notifications={[
-            {
-              isActive: isLoadingRelationshipData || !relationshipData,
-              title: "Loading data sources...",
-            },
-            {
-              isActive: isLoadingSpecification || !specification,
-              title: "Loading specification...",
-            },
-            {
-              isActive: isCheckingForPermissions,
-              title: "Checking your permissions....",
-            },
-            { isActive: isUpdating, title: "Assigning version to dataset...." },
-          ]}
-        />
-        <JobNotifications jobNotifications={jobNotifications} />
       </section>
       <section>
         <DataSourceSelectionForm

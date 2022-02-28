@@ -346,310 +346,304 @@ export function ViewEditFundingLineProfileOld({
 
   return (
     <Main location={Section.FundingManagement}>
+      <Breadcrumbs>
+        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Approvals" />
+        <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
+        <Breadcrumb
+          name={"Funding approval results"}
+          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+        />
+        <Breadcrumb
+          name={fundingLineProfile.providerName}
+          url={
+            "/Approvals/ProviderFundingOverview/" +
+            `${specificationId}/${providerId}/${providerVersionId}/` +
+            `${fundingStreamId}/${fundingPeriodId}`
+          }
+        />
+        <Breadcrumb name={pageTitle ?? "Funding Line Profile"} />
+      </Breadcrumbs>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} />
       {isLoading || isSaving ? (
         <LoadingStatus title={`${isLoading ? "Loading" : "Saving"} funding line profile`} />
       ) : (
         <>
-          <Breadcrumbs>
-            <Breadcrumb name="Calculate funding" url={"/"} />
-            <Breadcrumb name="Approvals" />
-            <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
-            <Breadcrumb
-              name={"Funding approval results"}
-              url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-            />
-            <Breadcrumb
-              name={fundingLineProfile.providerName}
-              url={
-                "/Approvals/ProviderFundingOverview/" +
-                `${specificationId}/${providerId}/${providerVersionId}/` +
-                `${fundingStreamId}/${fundingPeriodId}`
-              }
-            />
-            <Breadcrumb name={pageTitle ?? "Funding Line Profile"} />
-          </Breadcrumbs>
+          <Title
+            title={pageTitle ?? "Funding line profile"}
+            preTitleCaption={`Funding line code: ${fundingLineProfile.fundingLineCode}`}
+            titleCaption={fundingLineProfile.providerName}
+          >
+            <p className="govuk-body-s govuk-!-margin-top-3" data-testid="last-updated-by">
+              {`Last updated by ${fundingLineProfile.lastUpdatedUser.name} on `}
+              {fundingLineProfile.lastUpdatedDate && (
+                <DateTimeFormatter date={fundingLineProfile.lastUpdatedDate} />
+              )}
+            </p>
+          </Title>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-full">
-              <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+              <dl className="govuk-summary-list govuk-summary-list--no-border">
+                <RowItem id={"ukprn"} title={"UKPRN"}>
+                  {fundingLineProfile.ukprn}
+                </RowItem>
+
+                <RowItem id="total-allocation" title="Total allocation">
+                  <FormattedNumber
+                    value={fundingLineProfile.fundingLineAmount || 0}
+                    type={NumberType.FormattedMoney}
+                  />
+                </RowItem>
+
+                <RowItem id="amount-already-paid" title="Instalments paid value">
+                  <FormattedNumber
+                    value={fundingLineProfile.amountAlreadyPaid || 0}
+                    type={NumberType.FormattedMoney}
+                  />
+                </RowItem>
+
+                <RowItem id="remaining-amount" title="Balance available for profiling">
+                  <FormattedNumber value={remainingAmount} type={NumberType.FormattedMoney} />
+                </RowItem>
+              </dl>
+            </div>
+            <div className="govuk-grid-column-one-third">
+              {editMode === ProfileEditMode.EditUnpaid &&
+                isContractedProvider &&
+                editedFundingLineProfile.profileTotals.some((p) => p.isPaid) && (
+                  <ul className="govuk-list right-align">
+                    <li>
+                      <button className="govuk-link govuk-link--no-visited-state" onClick={handleEditPaid}>
+                        Edit historic instalments
+                      </button>
+                    </li>
+                  </ul>
+                )}
             </div>
           </div>
-          <section>
-            <Title
-              title={pageTitle ?? "Funding line profile"}
-              preTitleCaption={`Funding line code: ${fundingLineProfile.fundingLineCode}`}
-              titleCaption={fundingLineProfile.providerName}
-            >
-              <p className="govuk-body-s govuk-!-margin-top-3" data-testid="last-updated-by">
-                {`Last updated by ${fundingLineProfile.lastUpdatedUser.name} on `}
-                {fundingLineProfile.lastUpdatedDate && (
-                  <DateTimeFormatter date={fundingLineProfile.lastUpdatedDate} />
-                )}
-              </p>
-            </Title>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-full">
-                <dl className="govuk-summary-list govuk-summary-list--no-border">
-                  <RowItem id={"ukprn"} title={"UKPRN"}>
-                    {fundingLineProfile.ukprn}
-                  </RowItem>
-
-                  <RowItem id="total-allocation" title="Total allocation">
-                    <FormattedNumber
-                      value={fundingLineProfile.fundingLineAmount || 0}
-                      type={NumberType.FormattedMoney}
-                    />
-                  </RowItem>
-
-                  <RowItem id="amount-already-paid" title="Instalments paid value">
-                    <FormattedNumber
-                      value={fundingLineProfile.amountAlreadyPaid || 0}
-                      type={NumberType.FormattedMoney}
-                    />
-                  </RowItem>
-
-                  <RowItem id="remaining-amount" title="Balance available for profiling">
-                    <FormattedNumber value={remainingAmount} type={NumberType.FormattedMoney} />
-                  </RowItem>
-                </dl>
-              </div>
-              <div className="govuk-grid-column-one-third">
-                {editMode === ProfileEditMode.EditUnpaid &&
-                  isContractedProvider &&
-                  editedFundingLineProfile.profileTotals.some((p) => p.isPaid) && (
-                    <ul className="govuk-list right-align">
-                      <li>
-                        <button className="govuk-link govuk-link--no-visited-state" onClick={handleEditPaid}>
-                          Edit historic instalments
-                        </button>
-                      </li>
-                    </ul>
-                  )}
-              </div>
-            </div>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-full">
-                <table className="govuk-table govuk-!-margin-top-5" data-testid="data-table">
-                  <caption className="govuk-table__caption">Profiling instalments</caption>
-                  <thead className="govuk-table__head">
-                    <tr className="govuk-table__row">
-                      <th scope="col" className="govuk-table__header">
-                        Instalment month
-                      </th>
-                      <th scope="col" className="govuk-table__header">
-                        Payment status
-                      </th>
-                      <th scope="col" className="govuk-table__header">
-                        Instalment number
-                      </th>
-                      <th scope="col" className="govuk-table__header">
-                        Per cent
-                      </th>
-                      <th scope="col" className="govuk-table__header">
-                        Value
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="govuk-table__body">
-                    {editedFundingLineProfile.profileTotals
-                      .sort((a, b) => a.installmentNumber - b.installmentNumber)
-                      .map((p, i) => {
-                        return (
-                          <tr
-                            className="govuk-table__row"
-                            key={p.installmentNumber}
-                            data-testid="profile-total"
-                          >
-                            <th scope="row" className="govuk-table__header">
-                              {p.actualDate ? (
-                                <DateTimeFormatter date={p.actualDate} />
-                              ) : (
-                                `${p.typeValue} ${p.year}`
-                              )}
-                            </th>
-                            <td className="govuk-table__cell" data-testid={`paid-${i}`}>
-                              {p.isPaid ? <strong className="govuk-tag">Paid</strong> : null}
-                            </td>
-                            <td className="govuk-table__cell" data-testid={`instalment-number-${i}`}>
-                              {p.installmentNumber}
-                            </td>
-                            <EditableProfileTotal
-                              index={i}
-                              profileTotal={p}
-                              remainingAmount={profilingAmount || 0}
-                              setProfileTotal={updateProfileTotal}
-                              mode={editMode}
-                              setIsDirty={setIsDirty}
-                              errors={errors}
-                              addError={addError}
-                              clearErrorMessages={clearErrorMessages}
-                            />
-                          </tr>
-                        );
-                      })}
-                    <tr className="govuk-table__row">
-                      <th scope="row" className="govuk-table__header">
-                        To be carried forward
-                      </th>
-                      <td className="govuk-table__cell"></td>
-                      <td className="govuk-table__cell"></td>
-                      <td className="govuk-table__cell"></td>
-                      <td className="govuk-table__cell">
-                        <strong data-testid="balance-carried-forward">
-                          <FormattedNumber value={newCarryForwardAmount} type={NumberType.FormattedMoney} />
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-full">
+              <table className="govuk-table govuk-!-margin-top-5" data-testid="data-table">
+                <caption className="govuk-table__caption">Profiling instalments</caption>
+                <thead className="govuk-table__head">
+                  <tr className="govuk-table__row">
+                    <th scope="col" className="govuk-table__header">
+                      Instalment month
+                    </th>
+                    <th scope="col" className="govuk-table__header">
+                      Payment status
+                    </th>
+                    <th scope="col" className="govuk-table__header">
+                      Instalment number
+                    </th>
+                    <th scope="col" className="govuk-table__header">
+                      Per cent
+                    </th>
+                    <th scope="col" className="govuk-table__header">
+                      Value
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="govuk-table__body">
+                  {editedFundingLineProfile.profileTotals
+                    .sort((a, b) => a.installmentNumber - b.installmentNumber)
+                    .map((p, i) => {
+                      return (
+                        <tr
+                          className="govuk-table__row"
+                          key={p.installmentNumber}
+                          data-testid="profile-total"
+                        >
+                          <th scope="row" className="govuk-table__header">
+                            {p.actualDate ? (
+                              <DateTimeFormatter date={p.actualDate} />
+                            ) : (
+                              `${p.typeValue} ${p.year}`
+                            )}
+                          </th>
+                          <td className="govuk-table__cell" data-testid={`paid-${i}`}>
+                            {p.isPaid ? <strong className="govuk-tag">Paid</strong> : null}
+                          </td>
+                          <td className="govuk-table__cell" data-testid={`instalment-number-${i}`}>
+                            {p.installmentNumber}
+                          </td>
+                          <EditableProfileTotal
+                            index={i}
+                            profileTotal={p}
+                            remainingAmount={profilingAmount || 0}
+                            setProfileTotal={updateProfileTotal}
+                            mode={editMode}
+                            setIsDirty={setIsDirty}
+                            errors={errors}
+                            addError={addError}
+                            clearErrorMessages={clearErrorMessages}
+                          />
+                        </tr>
+                      );
+                    })}
+                  <tr className="govuk-table__row">
+                    <th scope="row" className="govuk-table__header">
+                      To be carried forward
+                    </th>
+                    <td className="govuk-table__cell"></td>
+                    <td className="govuk-table__cell"></td>
+                    <td className="govuk-table__cell"></td>
+                    <td className="govuk-table__cell">
+                      <strong data-testid="balance-carried-forward">
+                        <FormattedNumber value={newCarryForwardAmount} type={NumberType.FormattedMoney} />
+                      </strong>
+                    </td>
+                  </tr>
+                  <tr className="govuk-table__row">
+                    <th scope="row" className="govuk-table__header">
+                      Total allocation
+                    </th>
+                    <td className="govuk-table__cell"></td>
+                    <td className="govuk-table__cell"></td>
+                    <td className="govuk-table__cell" id="totalPercent">
+                      <div
+                        className={`govuk-form-group ${
+                          errors.filter((e) => e.fieldName === "totalPercent").length > 0
+                            ? "govuk-form-group--error"
+                            : ""
+                        }`}
+                      >
+                        {errors.filter((e) => e.fieldName === "totalPercent").length > 0
+                          ? errors.map(
+                              (error) =>
+                                error.fieldName === "totalPercent" && (
+                                  <span
+                                    key={error.id}
+                                    className="govuk-error-message govuk-!-margin-bottom-1"
+                                  >
+                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                  </span>
+                                )
+                            )
+                          : null}
+                        <strong data-testid="total-allocation-percent">
+                          <FormattedNumber
+                            value={totalProfilingAllocationPercent}
+                            type={NumberType.FormattedPercentage}
+                            decimalPlaces={totalProfilingAllocationPercent === 100 ? 0 : 2}
+                          />
                         </strong>
-                      </td>
-                    </tr>
-                    <tr className="govuk-table__row">
-                      <th scope="row" className="govuk-table__header">
-                        Total allocation
-                      </th>
-                      <td className="govuk-table__cell"></td>
-                      <td className="govuk-table__cell"></td>
-                      <td className="govuk-table__cell" id="totalPercent">
-                        <div
-                          className={`govuk-form-group ${
-                            errors.filter((e) => e.fieldName === "totalPercent").length > 0
-                              ? "govuk-form-group--error"
-                              : ""
-                          }`}
-                        >
-                          {errors.filter((e) => e.fieldName === "totalPercent").length > 0
-                            ? errors.map(
-                                (error) =>
-                                  error.fieldName === "totalPercent" && (
-                                    <span
-                                      key={error.id}
-                                      className="govuk-error-message govuk-!-margin-bottom-1"
-                                    >
-                                      <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                    </span>
-                                  )
-                              )
-                            : null}
-                          <strong data-testid="total-allocation-percent">
-                            <FormattedNumber
-                              value={totalProfilingAllocationPercent}
-                              type={NumberType.FormattedPercentage}
-                              decimalPlaces={totalProfilingAllocationPercent === 100 ? 0 : 2}
-                            />
-                          </strong>
-                        </div>
-                      </td>
-                      <td className="govuk-table__cell" id="totalAllocation">
-                        <div
-                          className={`govuk-form-group ${
-                            errors.filter((e) => e.fieldName === "totalAllocation").length > 0
-                              ? "govuk-form-group--error"
-                              : ""
-                          }`}
-                        >
-                          {errors.filter((e) => e.fieldName === "totalAllocation").length > 0
-                            ? errors.map(
-                                (error) =>
-                                  error.fieldName === "totalAllocation" && (
-                                    <span
-                                      key={error.id}
-                                      className="govuk-error-message govuk-!-margin-bottom-1"
-                                    >
-                                      <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                    </span>
-                                  )
-                              )
-                            : null}
-                          <strong data-testid="total-allocation-amount">
-                            <FormattedNumber value={totalAllocationAmount} type={NumberType.FormattedMoney} />
-                          </strong>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+                      </div>
+                    </td>
+                    <td className="govuk-table__cell" id="totalAllocation">
+                      <div
+                        className={`govuk-form-group ${
+                          errors.filter((e) => e.fieldName === "totalAllocation").length > 0
+                            ? "govuk-form-group--error"
+                            : ""
+                        }`}
+                      >
+                        {errors.filter((e) => e.fieldName === "totalAllocation").length > 0
+                          ? errors.map(
+                              (error) =>
+                                error.fieldName === "totalAllocation" && (
+                                  <span
+                                    key={error.id}
+                                    className="govuk-error-message govuk-!-margin-bottom-1"
+                                  >
+                                    <span className="govuk-visually-hidden">Error:</span> {error.message}
+                                  </span>
+                                )
+                            )
+                          : null}
+                        <strong data-testid="total-allocation-amount">
+                          <FormattedNumber value={totalAllocationAmount} type={NumberType.FormattedMoney} />
+                        </strong>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+          </div>
 
-            {editMode === ProfileEditMode.EditAll &&
-              editedFundingLineProfile.profileTotals.some((p) => p.isPaid) && (
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-two-thirds">
-                    <div
-                      className={`govuk-form-group ${
-                        errors.filter((e) => e.fieldName === "acknowledge").length > 0
-                          ? "govuk-form-group--error"
-                          : ""
-                      }`}
-                    >
-                      {errors.filter((e) => e.fieldName === "acknowledge").length > 0
-                        ? errors.map(
-                            (error) =>
-                              error.fieldName === "acknowledge" && (
-                                <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
-                                  <span className="govuk-visually-hidden">Error:</span> {error.message}
-                                </span>
-                              )
-                          )
-                        : null}
-                      <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
-                        <legend className="govuk-fieldset__legend">
-                          <div className="govuk-warning-text">
-                            <span className="govuk-warning-text__icon" aria-hidden="true">
-                              !
-                            </span>
-                            <strong className="govuk-warning-text__text" role="alert">
-                              <span className="govuk-warning-text__assistive">Warning</span>
-                              You are editing historic instalments
-                            </strong>
-                          </div>
-                        </legend>
-                        <div className="govuk-checkboxes">
-                          <div className="govuk-checkboxes__item">
-                            <input
-                              className="govuk-checkboxes__input"
-                              id="acknowledgementCheckbox"
-                              name="acknowledgementCheckbox"
-                              type="checkbox"
-                              onChange={handleAcknowledgementOfHistoricEditing}
-                              checked={hasAcknowledgedHistoricEdit}
-                            />
-                            <label
-                              className="govuk-label govuk-checkboxes__label"
-                              htmlFor="acknowledgementCheckbox"
-                            >
-                              I acknowledge that I am editing historic instalments and wish to continue
-                            </label>
-                          </div>
+          {editMode === ProfileEditMode.EditAll &&
+            editedFundingLineProfile.profileTotals.some((p) => p.isPaid) && (
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-two-thirds">
+                  <div
+                    className={`govuk-form-group ${
+                      errors.filter((e) => e.fieldName === "acknowledge").length > 0
+                        ? "govuk-form-group--error"
+                        : ""
+                    }`}
+                  >
+                    {errors.filter((e) => e.fieldName === "acknowledge").length > 0
+                      ? errors.map(
+                          (error) =>
+                            error.fieldName === "acknowledge" && (
+                              <span key={error.id} className="govuk-error-message govuk-!-margin-bottom-1">
+                                <span className="govuk-visually-hidden">Error:</span> {error.message}
+                              </span>
+                            )
+                        )
+                      : null}
+                    <fieldset className="govuk-fieldset" aria-describedby="acknowledgementCheckbox">
+                      <legend className="govuk-fieldset__legend">
+                        <div className="govuk-warning-text">
+                          <span className="govuk-warning-text__icon" aria-hidden="true">
+                            !
+                          </span>
+                          <strong className="govuk-warning-text__text" role="alert">
+                            <span className="govuk-warning-text__assistive">Warning</span>
+                            You are editing historic instalments
+                          </strong>
                         </div>
-                      </fieldset>
-                    </div>
+                      </legend>
+                      <div className="govuk-checkboxes">
+                        <div className="govuk-checkboxes__item">
+                          <input
+                            className="govuk-checkboxes__input"
+                            id="acknowledgementCheckbox"
+                            name="acknowledgementCheckbox"
+                            type="checkbox"
+                            onChange={handleAcknowledgementOfHistoricEditing}
+                            checked={hasAcknowledgedHistoricEdit}
+                          />
+                          <label
+                            className="govuk-label govuk-checkboxes__label"
+                            htmlFor="acknowledgementCheckbox"
+                          >
+                            I acknowledge that I am editing historic instalments and wish to continue
+                          </label>
+                        </div>
+                      </div>
+                    </fieldset>
                   </div>
                 </div>
-              )}
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-two-thirds">
-                <button
-                  className="govuk-button govuk-!-margin-right-1"
-                  disabled={hasMissingPermissions || !canEditCustomProfile}
-                  onClick={handleEditProfileClick}
-                >
-                  {editMode !== ProfileEditMode.View ? "Apply profile" : "Edit profile"}
-                </button>
-                {editMode !== ProfileEditMode.View && (
-                  <button
-                    className="govuk-button govuk-button--secondary govuk-!-margin-right-1"
-                    onClick={handleCancelClick}
-                    data-testid="cancel-btn"
-                  >
-                    Cancel
-                  </button>
-                )}
-                {canChangeToRuleBasedProfile && (
-                  <button className="govuk-button" onClick={handleChangeToRuleBasedProfileClick}>
-                    Change to rule based profile
-                  </button>
-                )}
               </div>
+            )}
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <button
+                className="govuk-button govuk-!-margin-right-1"
+                disabled={hasMissingPermissions || !canEditCustomProfile}
+                onClick={handleEditProfileClick}
+              >
+                {editMode !== ProfileEditMode.View ? "Apply profile" : "Edit profile"}
+              </button>
+              {editMode !== ProfileEditMode.View && (
+                <button
+                  className="govuk-button govuk-button--secondary govuk-!-margin-right-1"
+                  onClick={handleCancelClick}
+                  data-testid="cancel-btn"
+                >
+                  Cancel
+                </button>
+              )}
+              {canChangeToRuleBasedProfile && (
+                <button className="govuk-button" onClick={handleChangeToRuleBasedProfileClick}>
+                  Change to rule based profile
+                </button>
+              )}
             </div>
-          </section>
+          </div>
           <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible" />
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">

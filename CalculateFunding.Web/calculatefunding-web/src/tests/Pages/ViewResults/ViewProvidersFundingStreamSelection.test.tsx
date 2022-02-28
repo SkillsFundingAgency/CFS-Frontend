@@ -1,16 +1,24 @@
-import "@testing-library/jest-dom/extend-expect";
-import "@testing-library/jest-dom";
-
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
 import { MemoryRouter } from "react-router";
 
-import * as policyService from "../../../services/policyService";
+import { fakery } from "../../fakes/fakery";
 import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
+import { useFundingStreamsUtils } from "../../testing-utils/useFundingStreamsUtils";
 
 describe("<ViewProvidersFundingStreamSelection />", () => {
+  const { spy, hasFundingStreamsResult } = useFundingStreamsUtils;
+
+  beforeEach(() => {
+    hasFundingStreamsResult([stream1, stream2, stream3, stream4]);
+    renderPage();
+    expect(spy).toBeCalled();
+    expect(screen.getByText(/Please wait whilst funding streams are loading/i)).not.toBeVisible();
+  });
+
+  afterEach(() => jest.resetAllMocks());
+
   it("renders funding streams in autocomplete drop-down", async () => {
-    await renderPage();
     fireEvent.click(screen.getByRole("textbox"));
     expect(screen.getByText(/14-16/)).toBeInTheDocument();
     expect(screen.getByText(/16-19/)).toBeInTheDocument();
@@ -19,14 +27,12 @@ describe("<ViewProvidersFundingStreamSelection />", () => {
   });
 
   it("shows validation message and does not redirect if Continue clicked without selecting a funding stream", async () => {
-    await renderPage();
     fireEvent.click(screen.getByText(/Continue/));
     expect(screen.getByTestId("validation-error")).toBeInTheDocument();
     expect(mockHistoryPush).not.toHaveBeenCalled();
   });
 
   it("does not show validation message and does redirect if Continue clicked and funding stream has been selected", async () => {
-    await renderPage();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "Dedicated Schools Grant" } });
     fireEvent.click(screen.getByTestId("Dedicated Schools Grant"), {
       target: { innerText: "Dedicated Schools Grant" },
@@ -37,36 +43,23 @@ describe("<ViewProvidersFundingStreamSelection />", () => {
   });
 });
 
-const renderPage = async () => {
+const stream1 = fakery.makeFundingStream({ id: "1416", name: "14-16" });
+const stream2 = fakery.makeFundingStream({ id: "1619", name: "16-19" });
+const stream3 = fakery.makeFundingStream({ id: "GAG", name: "Academies General Annual Grant" });
+const stream4 = fakery.makeFundingStream({ id: "DSG", name: "Dedicated Schools Grant" });
+
+const renderPage = () => {
   const {
     ViewProvidersFundingStreamSelection,
   } = require("../../../pages/ViewResults/ViewProvidersFundingStreamSelection");
-  const component = render(
+  render(
     <MemoryRouter>
       <QueryClientProviderTestWrapper>
         <ViewProvidersFundingStreamSelection />
       </QueryClientProviderTestWrapper>
     </MemoryRouter>
   );
-  await waitFor(() => {
-    expect(screen.queryByText(/Please wait whilst funding streams are loading/i)).not.toBeInTheDocument();
-  });
-  return component;
 };
-
-const getFundingStreamsServiceSpy = jest.spyOn(policyService, "getFundingStreamsService");
-getFundingStreamsServiceSpy.mockResolvedValue({
-  data: [
-    { id: "1416", name: "14-16" },
-    { id: "1619", name: "16-19" },
-    { id: "GAG", name: "Academies General Annual Grant" },
-    { id: "DSG", name: "Dedicated Schools Grant" },
-  ],
-  status: 200,
-  statusText: "",
-  headers: {},
-  config: {},
-});
 
 const mockHistoryPush = jest.fn();
 

@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
+import { Main } from "../../components/Main";
+import { Title } from "../../components/Title";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { getFundingStreamsService } from "../../services/policyService";
 import {
@@ -85,137 +85,130 @@ export function SelectSpecification() {
   }
 
   return (
-    <div>
-      <Header location={Section.Results} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"View results"} url={"/results"} />
-          <Breadcrumb name={"Select specification"} />
-        </Breadcrumbs>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <h2 className="govuk-heading-l">Select specification</h2>
-            <span className="govuk-caption-m">You can select the specification and funding period.</span>
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View results"} url={"/results"} />
+        <Breadcrumb name={"Select specification"} />
+      </Breadcrumbs>
+      <Title
+        title="Select specification"
+        titleCaption="You can select the specification and funding period."
+      />
+
+      <div className="govuk-main-wrapper govuk-main-wrapper--l">
+        <fieldset className="govuk-fieldset">
+          <div className="govuk-form-group">
+            <label htmlFor="select-funding-stream" className="govuk-label">
+              Select funding stream:
+            </label>
+            <select
+              id="select-funding-stream"
+              className="govuk-select"
+              disabled={fundingStreams.length === 0}
+              onChange={(e) => {
+                updateFundingPeriods(e);
+              }}
+            >
+              <option>Please select a funding stream</option>
+              {fundingStreams.map((fs) => (
+                <option key={fs.id} value={fs.id}>
+                  {fs.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </fieldset>
+        <fieldset className="govuk-fieldset">
+          <div className="govuk-form-group">
+            <label htmlFor="select-funding-period" className="govuk-label">
+              Select funding period:
+            </label>
+            <select
+              id="select-funding-period"
+              className="govuk-select"
+              placeholder="Please select"
+              disabled={fundingPeriods.length === 0}
+              onChange={(e) => {
+                updateSpecifications(e);
+              }}
+            >
+              <option>Please select a funding period</option>
+              {fundingPeriods.map((fp) => (
+                <option key={fp.id} value={fp.id}>
+                  {fp.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </fieldset>
+        <LoadingFieldStatus title="Loading specifications" hidden={!loadingState.specification.loading} />
+        <div
+          className="govuk-form-group"
+          hidden={
+            !(loadingState.specification.loaded && !loadingState.specification.data) ||
+            loadingState.specification.loading
+          }
+        >
+          <label className="govuk-label">Specification</label>
+          <div className="govuk-error-summary">
+            <span className="govuk-body-m">There are no specifications available for the selection</span>
           </div>
         </div>
-        <div className="govuk-main-wrapper govuk-main-wrapper--l">
-          <fieldset className="govuk-fieldset">
-            <div className="govuk-form-group">
-              <label htmlFor="select-funding-stream" className="govuk-label">
-                Select funding stream:
-              </label>
-              <select
-                id="select-funding-stream"
-                className="govuk-select"
-                disabled={fundingStreams.length === 0}
-                onChange={(e) => {
-                  updateFundingPeriods(e);
-                }}
-              >
-                <option>Please select a funding stream</option>
-                {fundingStreams.map((fs) => (
-                  <option key={fs.id} value={fs.id}>
-                    {fs.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </fieldset>
-          <fieldset className="govuk-fieldset">
-            <div className="govuk-form-group">
-              <label htmlFor="select-funding-period" className="govuk-label">
-                Select funding period:
-              </label>
-              <select
-                id="select-funding-period"
-                className="govuk-select"
-                placeholder="Please select"
-                disabled={fundingPeriods.length === 0}
-                onChange={(e) => {
-                  updateSpecifications(e);
-                }}
-              >
-                <option>Please select a funding period</option>
-                {fundingPeriods.map((fp) => (
-                  <option key={fp.id} value={fp.id}>
-                    {fp.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </fieldset>
-          <LoadingFieldStatus title="Loading specifications" hidden={!loadingState.specification.loading} />
-          <div
-            className="govuk-form-group"
-            hidden={
-              !(loadingState.specification.loaded && !loadingState.specification.data) ||
-              loadingState.specification.loading
-            }
-          >
-            <label className="govuk-label">Specification</label>
-            <div className="govuk-error-summary">
-              <span className="govuk-body-m">There are no specifications available for the selection</span>
-            </div>
-          </div>
-          <fieldset
-            className="govuk-fieldset"
-            hidden={
-              !(loadingState.specification.loaded && loadingState.specification.data) ||
-              loadingState.specification.loading
-            }
-          >
-            <div className="govuk-form-group">
-              <label htmlFor="select-specification" className="govuk-label">
-                Select specification:
-              </label>
-              <select
-                id="select-specification"
-                className="govuk-select"
-                placeholder="Please select"
-                disabled={specifications.length === 0}
-                onChange={(e) => {
-                  setSpecification(e);
-                }}
-              >
-                <option key={""} value={""}>
-                  Please select a specification
+        <fieldset
+          className="govuk-fieldset"
+          hidden={
+            !(loadingState.specification.loaded && loadingState.specification.data) ||
+            loadingState.specification.loading
+          }
+        >
+          <div className="govuk-form-group">
+            <label htmlFor="select-specification" className="govuk-label">
+              Select specification:
+            </label>
+            <select
+              id="select-specification"
+              className="govuk-select"
+              placeholder="Please select"
+              disabled={specifications.length === 0}
+              onChange={(e) => {
+                setSpecification(e);
+              }}
+            >
+              <option key={""} value={""}>
+                Please select a specification
+              </option>
+              {specifications.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
                 </option>
-                {specifications.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </fieldset>
-          <div
-            className="govuk-grid-row"
-            hidden={
-              !(loadingState.specification.loaded && loadingState.specification.data) ||
-              loadingState.specification.loading
-            }
-          >
-            <div className="govuk-grid-column-full">
-              <Link
-                to={
-                  selectedSpecificationId === ""
-                    ? "#"
-                    : `/ViewSpecificationResults/${selectedSpecificationId}`
-                }
-                role="button"
-                className={`govuk-button govuk-button ${
-                  selectedSpecificationId === "" ? "govuk-button--disabled" : "govuk-button govuk-button"
-                }`}
-                data-module="govuk-button"
-              >
-                Continue
-              </Link>
-            </div>
+              ))}
+            </select>
+          </div>
+        </fieldset>
+        <div
+          className="govuk-grid-row"
+          hidden={
+            !(loadingState.specification.loaded && loadingState.specification.data) ||
+            loadingState.specification.loading
+          }
+        >
+          <div className="govuk-grid-column-full">
+            <Link
+              to={
+                selectedSpecificationId === "" ? "#" : `/ViewSpecificationResults/${selectedSpecificationId}`
+              }
+              role="button"
+              className={`govuk-button govuk-button ${
+                selectedSpecificationId === "" ? "govuk-button--disabled" : "govuk-button govuk-button"
+              }`}
+              data-module="govuk-button"
+            >
+              Continue
+            </Link>
           </div>
         </div>
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 }

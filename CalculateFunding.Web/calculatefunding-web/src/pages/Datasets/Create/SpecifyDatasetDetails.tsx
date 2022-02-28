@@ -117,7 +117,6 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
 
   return (
     <Main location={Section.Datasets}>
-      <MultipleErrorSummary errors={errors} />
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url={"/"} />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
@@ -133,6 +132,7 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
         requiredPermissions={missingPermissions}
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
+      <MultipleErrorSummary errors={errors} />
       <section>
         <Form token="create-dataset" heading="Create data set">
           <DatasetName

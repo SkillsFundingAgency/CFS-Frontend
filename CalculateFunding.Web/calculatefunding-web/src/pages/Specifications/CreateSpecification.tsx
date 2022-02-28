@@ -5,10 +5,9 @@ import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
@@ -363,323 +362,311 @@ export function CreateSpecification(): JSX.Element {
   const activeJob = jobNotifications.find((n) => n.latestJob?.isActive)?.latestJob;
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-          <Breadcrumb name={"Create specification"} />
-        </Breadcrumbs>
-        <div className="govuk-main-wrapper">
-          <PermissionStatus
-            requiredPermissions={[Permission.CanCreateSpecification]}
-            hidden={!permittedFundingStreams || permittedFundingStreams.length > 0}
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
+        <Breadcrumb name={"Create specification"} />
+      </Breadcrumbs>
+      <PermissionStatus
+        requiredPermissions={[Permission.CanCreateSpecification]}
+        hidden={!permittedFundingStreams || permittedFundingStreams.length > 0}
+      />
+
+      <MultipleErrorSummary errors={errors} />
+
+      <LoadingStatusNotifier
+        notifications={[
+          {
+            isActive: isSaving,
+            title: "Creating Specification",
+            subTitle: activeJob
+              ? `Job ${activeJob.statusDescription}: ${activeJob.jobDescription}`
+              : "Waiting for update...",
+            description: "This can take a few minutes",
+          },
+        ]}
+      />
+
+      <fieldset hidden={isSaving} className="govuk-fieldset" id="create-specification-fieldset">
+        <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+          <h1 className="govuk-fieldset__heading">Create specification</h1>
+        </legend>
+        <div
+          className={`govuk-form-group ${
+            errors.filter((e) => e.fieldName === "name").length > 0 ? "govuk-form-group--error" : ""
+          }`}
+        >
+          <label className="govuk-label" htmlFor="specification-name">
+            Specification name
+          </label>
+          <input
+            className="govuk-input"
+            id="specification-name"
+            name="specification-name"
+            type="text"
+            onChange={handleNameChange}
+            data-testid={"specification-name-input"}
           />
-
-          <MultipleErrorSummary errors={errors} />
-
-          <LoadingStatusNotifier
-            notifications={[
-              {
-                isActive: isSaving,
-                title: "Creating Specification",
-                subTitle: activeJob
-                  ? `Job ${activeJob.statusDescription}: ${activeJob.jobDescription}`
-                  : "Waiting for update...",
-                description: "This can take a few minutes",
-              },
-            ]}
-          />
-
-          <fieldset hidden={isSaving} className="govuk-fieldset" id="create-specification-fieldset">
-            <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-              <h1 className="govuk-fieldset__heading">Create specification</h1>
-            </legend>
-            <div
-              className={`govuk-form-group ${
-                errors.filter((e) => e.fieldName === "name").length > 0 ? "govuk-form-group--error" : ""
-              }`}
-            >
-              <label className="govuk-label" htmlFor="specification-name">
-                Specification name
-              </label>
-              <input
-                className="govuk-input"
-                id="specification-name"
-                name="specification-name"
-                type="text"
-                onChange={handleNameChange}
-                data-testid={"specification-name-input"}
-              />
-            </div>
-
-            <div
-              className={`govuk-form-group ${
-                errors.filter((e) => e.fieldName === "funding-stream").length > 0
-                  ? "govuk-form-group--error"
-                  : ""
-              }`}
-            >
-              <label className="govuk-label" htmlFor="funding-stream">
-                Funding streams
-              </label>
-              {fundingStreams && fundingStreams.length > 0 && (
-                <select
-                  className="govuk-select"
-                  id="funding-stream"
-                  name="funding-stream"
-                  onChange={handleFundingStreamChange}
-                  data-testid={"funding-stream-dropdown"}
-                >
-                  <option value="">Select funding Stream</option>
-                  {fundingStreams &&
-                    fundingStreams.map((fs, index) => (
-                      <option key={index} value={fs.id}>
-                        {fs.name}
-                      </option>
-                    ))}
-                </select>
-              )}
-              {isLoadingFundingStreams && <LoadingFieldStatus title="Loading..." />}
-            </div>
-
-            <div
-              className={`govuk-form-group ${
-                errors.filter((e) => e.fieldName === "funding-period").length > 0
-                  ? "govuk-form-group--error"
-                  : ""
-              }`}
-            >
-              <label className="govuk-label" htmlFor="funding-period">
-                Funding period
-              </label>
-              <select
-                className="govuk-select"
-                id="funding-period"
-                name="funding-period"
-                disabled={
-                  !selectedFundingStreamId ||
-                  !fundingPeriods ||
-                  fundingPeriods.length === 0 ||
-                  isLoadingFundingPeriods
-                }
-                onChange={handleFundingPeriodChange}
-                data-testid={"funding-period-dropdown"}
-              >
-                <option value="">Select funding period</option>
-                {selectedFundingStreamId &&
-                  !isLoadingFundingPeriods &&
-                  fundingPeriods &&
-                  fundingPeriods.map((fp, index) => (
-                    <option key={index} value={fp.id}>
-                      {fp.name}
-                    </option>
-                  ))}
-              </select>
-              {isLoadingFundingPeriods && <LoadingFieldStatus title="Loading..." />}
-            </div>
-
-            {providerSource === ProviderSource.FDZ &&
-              fundingConfiguration?.updateCoreProviderVersion ===
-                (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused) && (
-                <div
-                  className={`govuk-form-group ${
-                    errors.filter((e) => e.fieldName === "trackProviderData").length > 0
-                      ? "govuk-form-group--error"
-                      : ""
-                  }`}
-                >
-                  <fieldset
-                    className="govuk-fieldset"
-                    id="trackProviderData"
-                    aria-describedby="trackProviderData-hint"
-                    role="radiogroup"
-                  >
-                    <legend className="govuk-label" id="trackProviderData-label">
-                      Track latest core provider data?
-                    </legend>
-                    <div id="trackProviderData-hint" className="govuk-hint">
-                      Select yes if you wish to use the latest available provider data.
-                    </div>
-                    <span className="govuk-error-message govuk-visually-hidden" id="trackProviderData-error">
-                      <span className="govuk-visually-hidden">Error:</span> Please select an option
-                    </span>
-                    <div className="govuk-radios">
-                      <div className="govuk-radios__item">
-                        <input
-                          className="govuk-radios__input"
-                          id="trackProviderData-yes"
-                          name="trackProviderData-yes"
-                          type="radio"
-                          value="yes"
-                          checked={enableTrackProviderData === ProviderDataTrackingMode.UseLatest}
-                          onChange={handleTrackProviderDataChange}
-                          aria-describedby="provider-data-item-hint"
-                        />
-                        <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-yes">
-                          Yes
-                        </label>
-                        <div id="trackProviderData-yes-hint" className="govuk-hint govuk-radios__hint">
-                          This specification will use the latest available provider data
-                        </div>
-                      </div>
-                      <div className="govuk-radios__item">
-                        <input
-                          className="govuk-radios__input"
-                          id="trackProviderData-no"
-                          name="trackProviderData-no"
-                          type="radio"
-                          value="no"
-                          checked={enableTrackProviderData === ProviderDataTrackingMode.Manual}
-                          onChange={handleTrackProviderDataChange}
-                          aria-describedby="trackProviderData-no-hint"
-                        />
-                        <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-no">
-                          No
-                        </label>
-                        <div id="trackProviderData-no-hint" className="govuk-hint govuk-radios__hint">
-                          I will select which provider data to use
-                        </div>
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-              )}
-
-            {(providerSource === ProviderSource.CFS ||
-              fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual ||
-              enableTrackProviderData === ProviderDataTrackingMode.Manual) && (
-              <div
-                className={`govuk-form-group ${
-                  errors.filter((e) => e.fieldName === "selectCoreProvider").length > 0
-                    ? "govuk-form-group--error"
-                    : ""
-                }`}
-              >
-                <label className="govuk-label" htmlFor="selectCoreProvider">
-                  Core provider data
-                </label>
-                <select
-                  className="govuk-select"
-                  id="selectCoreProvider"
-                  name="selectCoreProvider"
-                  disabled={
-                    !selectedFundingStreamId ||
-                    !selectedFundingPeriodId ||
-                    !fundingPeriods ||
-                    !coreProviders ||
-                    !providerSnapshots ||
-                    isLoadingCoreProviders
-                  }
-                  onChange={handleProviderDataChange}
-                  data-testid={"core-provider-dropdown"}
-                >
-                  <option value="">Select core provider</option>
-                  {providerSource === ProviderSource.CFS && coreProviders && coreProviders.length > 0
-                    ? coreProviders.map((cp, index) => (
-                        <option key={index} value={cp.providerVersionId}>
-                          {cp.name}
-                        </option>
-                      ))
-                    : null}
-                  {providerSource === ProviderSource.FDZ && providerSnapshots && providerSnapshots.length > 0
-                    ? providerSnapshots.map((cp, index) => (
-                        <option key={index} value={cp.providerSnapshotId}>
-                          {cp.name}
-                        </option>
-                      ))
-                    : null}
-                </select>
-                {(isLoadingFundingConfiguration || isLoadingProviderSnapshots || isLoadingCoreProviders) && (
-                  <LoadingFieldStatus title="Loading..." />
-                )}
-              </div>
-            )}
-
-            <div
-              className={`govuk-form-group ${
-                errors.filter((e) => e.fieldName === "selectTemplateVersion").length > 0
-                  ? "govuk-form-group--error"
-                  : ""
-              }`}
-            >
-              <label className="govuk-label" htmlFor="selectedTemplateVersion">
-                Template version
-              </label>
-              <select
-                className="govuk-select"
-                id="selectTemplateVersion"
-                name="selectTemplateVersion"
-                disabled={
-                  !selectedFundingStreamId ||
-                  !selectedFundingPeriodId ||
-                  !fundingPeriods ||
-                  !publishedFundingTemplates ||
-                  isLoadingPublishedFundingTemplates
-                }
-                onChange={handleTemplateVersionChange}
-                value={selectedTemplateVersion || ""}
-                data-testid={"template-version-dropdown"}
-              >
-                <option value="">Select template version</option>
-                {publishedFundingTemplates &&
-                  publishedFundingTemplates
-                    .sort((a, b) => parseFloat(a.templateVersion) - parseFloat(b.templateVersion))
-                    .map((publishedFundingTemplate, index) => (
-                      <option
-                        key={index}
-                        value={publishedFundingTemplate.templateVersion}
-                        data-testid="templateVersion-option"
-                      >
-                        {publishedFundingTemplate.templateVersion}
-                      </option>
-                    ))}
-              </select>
-              {isLoadingPublishedFundingTemplates && <LoadingFieldStatus title="Loading..." />}
-            </div>
-
-            <div
-              className={`govuk-form-group ${
-                errors.filter((e) => e.fieldName === "description").length > 0
-                  ? "govuk-form-group--error"
-                  : ""
-              }`}
-            >
-              <label className="govuk-label" htmlFor="description">
-                Can you provide more detail?
-              </label>
-              <textarea
-                className="govuk-textarea"
-                id="description"
-                name="description"
-                rows={8}
-                onChange={handleDescriptionChange}
-                data-testid={"description-textarea"}
-              ></textarea>
-            </div>
-            <div className="govuk-form-group">
-              <button
-                id="submit-specification-button"
-                className="govuk-button govuk-!-margin-right-1"
-                data-module="govuk-button"
-                onClick={handleSave}
-              >
-                Save and continue
-              </button>
-              <Link
-                id="cancel-create-specification"
-                to="/SpecificationsList"
-                className="govuk-button govuk-button--secondary"
-                data-module="govuk-button"
-              >
-                Cancel
-              </Link>
-            </div>
-          </fieldset>
         </div>
-      </div>
-      <Footer />
-    </div>
+
+        <div
+          className={`govuk-form-group ${
+            errors.filter((e) => e.fieldName === "funding-stream").length > 0 ? "govuk-form-group--error" : ""
+          }`}
+        >
+          <label className="govuk-label" htmlFor="funding-stream">
+            Funding streams
+          </label>
+          {fundingStreams && fundingStreams.length > 0 && (
+            <select
+              className="govuk-select"
+              id="funding-stream"
+              name="funding-stream"
+              onChange={handleFundingStreamChange}
+              data-testid={"funding-stream-dropdown"}
+            >
+              <option value="">Select funding Stream</option>
+              {fundingStreams &&
+                fundingStreams.map((fs, index) => (
+                  <option key={index} value={fs.id}>
+                    {fs.name}
+                  </option>
+                ))}
+            </select>
+          )}
+          {isLoadingFundingStreams && <LoadingFieldStatus title="Loading..." />}
+        </div>
+
+        <div
+          className={`govuk-form-group ${
+            errors.filter((e) => e.fieldName === "funding-period").length > 0 ? "govuk-form-group--error" : ""
+          }`}
+        >
+          <label className="govuk-label" htmlFor="funding-period">
+            Funding period
+          </label>
+          <select
+            className="govuk-select"
+            id="funding-period"
+            name="funding-period"
+            disabled={
+              !selectedFundingStreamId ||
+              !fundingPeriods ||
+              fundingPeriods.length === 0 ||
+              isLoadingFundingPeriods
+            }
+            onChange={handleFundingPeriodChange}
+            data-testid={"funding-period-dropdown"}
+          >
+            <option value="">Select funding period</option>
+            {selectedFundingStreamId &&
+              !isLoadingFundingPeriods &&
+              fundingPeriods &&
+              fundingPeriods.map((fp, index) => (
+                <option key={index} value={fp.id}>
+                  {fp.name}
+                </option>
+              ))}
+          </select>
+          {isLoadingFundingPeriods && <LoadingFieldStatus title="Loading..." />}
+        </div>
+
+        {providerSource === ProviderSource.FDZ &&
+          fundingConfiguration?.updateCoreProviderVersion ===
+            (UpdateCoreProviderVersion.ToLatest || UpdateCoreProviderVersion.Paused) && (
+            <div
+              className={`govuk-form-group ${
+                errors.filter((e) => e.fieldName === "trackProviderData").length > 0
+                  ? "govuk-form-group--error"
+                  : ""
+              }`}
+            >
+              <fieldset
+                className="govuk-fieldset"
+                id="trackProviderData"
+                aria-describedby="trackProviderData-hint"
+                role="radiogroup"
+              >
+                <legend className="govuk-label" id="trackProviderData-label">
+                  Track latest core provider data?
+                </legend>
+                <div id="trackProviderData-hint" className="govuk-hint">
+                  Select yes if you wish to use the latest available provider data.
+                </div>
+                <span className="govuk-error-message govuk-visually-hidden" id="trackProviderData-error">
+                  <span className="govuk-visually-hidden">Error:</span> Please select an option
+                </span>
+                <div className="govuk-radios">
+                  <div className="govuk-radios__item">
+                    <input
+                      className="govuk-radios__input"
+                      id="trackProviderData-yes"
+                      name="trackProviderData-yes"
+                      type="radio"
+                      value="yes"
+                      checked={enableTrackProviderData === ProviderDataTrackingMode.UseLatest}
+                      onChange={handleTrackProviderDataChange}
+                      aria-describedby="provider-data-item-hint"
+                    />
+                    <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-yes">
+                      Yes
+                    </label>
+                    <div id="trackProviderData-yes-hint" className="govuk-hint govuk-radios__hint">
+                      This specification will use the latest available provider data
+                    </div>
+                  </div>
+                  <div className="govuk-radios__item">
+                    <input
+                      className="govuk-radios__input"
+                      id="trackProviderData-no"
+                      name="trackProviderData-no"
+                      type="radio"
+                      value="no"
+                      checked={enableTrackProviderData === ProviderDataTrackingMode.Manual}
+                      onChange={handleTrackProviderDataChange}
+                      aria-describedby="trackProviderData-no-hint"
+                    />
+                    <label className="govuk-label govuk-radios__label" htmlFor="trackProviderData-no">
+                      No
+                    </label>
+                    <div id="trackProviderData-no-hint" className="govuk-hint govuk-radios__hint">
+                      I will select which provider data to use
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+            </div>
+          )}
+
+        {(providerSource === ProviderSource.CFS ||
+          fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual ||
+          enableTrackProviderData === ProviderDataTrackingMode.Manual) && (
+          <div
+            className={`govuk-form-group ${
+              errors.filter((e) => e.fieldName === "selectCoreProvider").length > 0
+                ? "govuk-form-group--error"
+                : ""
+            }`}
+          >
+            <label className="govuk-label" htmlFor="selectCoreProvider">
+              Core provider data
+            </label>
+            <select
+              className="govuk-select"
+              id="selectCoreProvider"
+              name="selectCoreProvider"
+              disabled={
+                !selectedFundingStreamId ||
+                !selectedFundingPeriodId ||
+                !fundingPeriods ||
+                !coreProviders ||
+                !providerSnapshots ||
+                isLoadingCoreProviders
+              }
+              onChange={handleProviderDataChange}
+              data-testid={"core-provider-dropdown"}
+            >
+              <option value="">Select core provider</option>
+              {providerSource === ProviderSource.CFS && coreProviders && coreProviders.length > 0
+                ? coreProviders.map((cp, index) => (
+                    <option key={index} value={cp.providerVersionId}>
+                      {cp.name}
+                    </option>
+                  ))
+                : null}
+              {providerSource === ProviderSource.FDZ && providerSnapshots && providerSnapshots.length > 0
+                ? providerSnapshots.map((cp, index) => (
+                    <option key={index} value={cp.providerSnapshotId}>
+                      {cp.name}
+                    </option>
+                  ))
+                : null}
+            </select>
+            {(isLoadingFundingConfiguration || isLoadingProviderSnapshots || isLoadingCoreProviders) && (
+              <LoadingFieldStatus title="Loading..." />
+            )}
+          </div>
+        )}
+
+        <div
+          className={`govuk-form-group ${
+            errors.filter((e) => e.fieldName === "selectTemplateVersion").length > 0
+              ? "govuk-form-group--error"
+              : ""
+          }`}
+        >
+          <label className="govuk-label" htmlFor="selectedTemplateVersion">
+            Template version
+          </label>
+          <select
+            className="govuk-select"
+            id="selectTemplateVersion"
+            name="selectTemplateVersion"
+            disabled={
+              !selectedFundingStreamId ||
+              !selectedFundingPeriodId ||
+              !fundingPeriods ||
+              !publishedFundingTemplates ||
+              isLoadingPublishedFundingTemplates
+            }
+            onChange={handleTemplateVersionChange}
+            value={selectedTemplateVersion || ""}
+            data-testid={"template-version-dropdown"}
+          >
+            <option value="">Select template version</option>
+            {publishedFundingTemplates &&
+              publishedFundingTemplates
+                .sort((a, b) => parseFloat(a.templateVersion) - parseFloat(b.templateVersion))
+                .map((publishedFundingTemplate, index) => (
+                  <option
+                    key={index}
+                    value={publishedFundingTemplate.templateVersion}
+                    data-testid="templateVersion-option"
+                  >
+                    {publishedFundingTemplate.templateVersion}
+                  </option>
+                ))}
+          </select>
+          {isLoadingPublishedFundingTemplates && <LoadingFieldStatus title="Loading..." />}
+        </div>
+
+        <div
+          className={`govuk-form-group ${
+            errors.filter((e) => e.fieldName === "description").length > 0 ? "govuk-form-group--error" : ""
+          }`}
+        >
+          <label className="govuk-label" htmlFor="description">
+            Can you provide more detail?
+          </label>
+          <textarea
+            className="govuk-textarea"
+            id="description"
+            name="description"
+            rows={8}
+            onChange={handleDescriptionChange}
+            data-testid={"description-textarea"}
+          ></textarea>
+        </div>
+        <div className="govuk-form-group">
+          <button
+            id="submit-specification-button"
+            className="govuk-button govuk-!-margin-right-1"
+            data-module="govuk-button"
+            onClick={handleSave}
+          >
+            Save and continue
+          </button>
+          <Link
+            id="cancel-create-specification"
+            to="/SpecificationsList"
+            className="govuk-button govuk-button--secondary"
+            data-module="govuk-button"
+          >
+            Cancel
+          </Link>
+        </div>
+      </fieldset>
+    </Main>
   );
 }

@@ -3,12 +3,12 @@ import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { FundingStreamAndPeriodSelection } from "../../components/TemplateBuilder/FundingStreamAndPeriodSelection";
+import { Title } from "../../components/Title";
 import { useTemplatePermissions } from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
@@ -168,89 +168,77 @@ export const CreateTemplate = () => {
   };
 
   return (
-    <div>
-      <Header location={Section.Templates} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate Funding"} url={"/"} />
-          <Breadcrumb name={"Templates"} url={"/Templates/List"} />
-          <Breadcrumb name={"Create a new template"} />
-        </Breadcrumbs>
-        <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <MultipleErrorSummary errors={errors} />
-          </div>
-        </div>
-        <div className="govuk-main-wrapper">
-          <h1 className="govuk-heading-xl">Create a new template</h1>
-          <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">Build a new funding policy template</h3>
-        </div>
-        {canCreateTemplate && (
-          <form id="createTemplate">
-            <div className="govuk-grid-row" hidden={!isLoading}>
-              <LoadingStatus
-                title={"Loading options..."}
-                description={"Please wait whilst the options are loading"}
+    <Main location={Section.Templates}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate Funding"} url={"/"} />
+        <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+        <Breadcrumb name={"Create a new template"} />
+      </Breadcrumbs>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
+      <MultipleErrorSummary errors={errors} />
+
+      <LoadingStatus
+        title={"Loading options..."}
+        description={"Please wait whilst the options are loading"}
+        hidden={!isLoading}
+      />
+      <Title title="Create a new template" titleCaption="Build a new funding policy template" />
+
+      {canCreateTemplate && (
+        <form id="createTemplate">
+          {!isLoading && (
+            <>
+              <FundingStreamAndPeriodSelection
+                hideFundingStreamSelection={false}
+                fundingStreams={fundingStreams}
+                fundingPeriods={fundingPeriods}
+                errors={errors}
+                onFundingStreamChange={handleFundingStreamChange}
+                onFundingPeriodChange={handleFundingPeriodChange}
               />
-            </div>
-            {!isLoading && (
-              <>
-                <FundingStreamAndPeriodSelection
-                  hideFundingStreamSelection={false}
-                  fundingStreams={fundingStreams}
-                  fundingPeriods={fundingPeriods}
-                  errors={errors}
-                  onFundingStreamChange={handleFundingStreamChange}
-                  onFundingPeriodChange={handleFundingPeriodChange}
-                />
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-full govuk-form-group">
-                    <label className="govuk-label" htmlFor="description">
-                      Description
-                    </label>
-                    <textarea
-                      className="govuk-textarea"
-                      id="description"
-                      rows={8}
-                      aria-describedby="description-hint"
-                      maxLength={1000}
-                      onChange={handleDescriptionChange}
-                    />
-                  </div>
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full govuk-form-group">
+                  <label className="govuk-label" htmlFor="description">
+                    Description
+                  </label>
+                  <textarea
+                    className="govuk-textarea"
+                    id="description"
+                    rows={8}
+                    aria-describedby="description-hint"
+                    maxLength={1000}
+                    onChange={handleDescriptionChange}
+                  />
                 </div>
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-full">
-                    {selectedFundingPeriodId && selectedFundingStreamId && (
-                      <button
-                        className="govuk-button"
-                        data-testid="save"
-                        onClick={handleSaveClick}
-                        disabled={!enableSaveButton}
-                      >
-                        Create Template
-                      </button>
-                    )}
-                    &nbsp;
-                    <Link
-                      id="cancel-create-template"
-                      to="/Templates/List"
-                      className="govuk-button govuk-button--secondary"
-                      data-module="govuk-button"
+              </div>
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                  {selectedFundingPeriodId && selectedFundingStreamId && (
+                    <button
+                      className="govuk-button"
+                      data-testid="save"
+                      onClick={handleSaveClick}
+                      disabled={!enableSaveButton}
                     >
-                      Back
-                    </Link>
-                    {saveMessage.length > 0 ? (
-                      <span className="govuk-error-message">{saveMessage}</span>
-                    ) : null}
-                  </div>
+                      Create Template
+                    </button>
+                  )}
+                  &nbsp;
+                  <Link
+                    id="cancel-create-template"
+                    to="/Templates/List"
+                    className="govuk-button govuk-button--secondary"
+                    data-module="govuk-button"
+                  >
+                    Back
+                  </Link>
+                  {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                 </div>
-              </>
-            )}
-          </form>
-        )}
-      </div>
-      <Footer />
-    </div>
+              </div>
+            </>
+          )}
+        </form>
+      )}
+    </Main>
   );
 };

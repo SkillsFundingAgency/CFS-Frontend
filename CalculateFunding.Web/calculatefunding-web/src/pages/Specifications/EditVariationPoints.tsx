@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
@@ -163,23 +162,21 @@ export function EditVariationPoints({ match }: RouteComponentProps<EditVariation
   const isLoading: boolean = isLoadingInstalments || isLoadingVariationManagement || isLoadingSpecification;
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
+        <Breadcrumb
+          name={specification ? specification.name : ""}
+          url={`/ViewSpecification/${specificationId}`}
+        />
+        <Breadcrumb name={"Edit specification"} />
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
       {isLoading || isSaving ? (
         <LoadingStatus title={`${isLoading ? "Loading" : "Saving"} installment variation`} />
-      ) : null}
-      {!isLoading && !isSaving && (
+      ) : (
         <div className="govuk-width-container">
-          <Breadcrumbs>
-            <Breadcrumb name={"Calculate funding"} url={"/"} />
-            <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-            <Breadcrumb
-              name={specification ? specification.name : ""}
-              url={`/ViewSpecification/${specificationId}`}
-            />
-            <Breadcrumb name={"Edit specification"} />
-          </Breadcrumbs>
-          <MultipleErrorSummary errors={errors} />
           <div className="govuk-main-wrapper">
             <fieldset className="govuk-fieldset">
               <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
@@ -267,7 +264,6 @@ export function EditVariationPoints({ match }: RouteComponentProps<EditVariation
           </div>
         </div>
       )}
-      <Footer />
-    </div>
+    </Main>
   );
 }

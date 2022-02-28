@@ -1,3 +1,4 @@
+import { Main } from "components/Main";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Link } from "react-router-dom";
@@ -5,12 +6,11 @@ import { Link } from "react-router-dom";
 import { AutoComplete } from "../../components/AutoComplete";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateFormatter } from "../../components/DateFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
+import { Title } from "../../components/Title";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { usePermittedFundingStreams } from "../../hooks/Permissions/usePermittedFundingStreams";
 import { useErrors } from "../../hooks/useErrors";
@@ -544,161 +544,143 @@ export function LoadNewDataSource() {
   }, [selectedFundingStream]);
 
   return (
-    <div>
-      <Header location={Section.Datasets} />
-      <div className="govuk-width-container">
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-              <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
-              <Breadcrumb name={"Load new data source file"} />
-            </Breadcrumbs>
+    <Main location={Section.Datasets}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+        <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
+        <Breadcrumb name={"Load new data source file"} />
+      </Breadcrumbs>
+      <PermissionStatus
+        requiredPermissions={[requiredPermission]}
+        hidden={!!permittedFundingStreams?.length || dataSchemaIsLoading || isLoadingFundingStreams}
+      />
+      <MultipleErrorSummary errors={errors} />
+      <LoadingStatus
+        title={"Create data source"}
+        hidden={!isLoading}
+        subTitle={"Please wait whilst the data source is created"}
+      />
+      <Title
+        title={"Upload new data source"}
+        titleCaption={"Load a new data source file to create a dataset to use in calculations."}
+      />
+      <div className="govuk-grid-row" hidden={isLoading}>
+        <div className="govuk-grid-column-two-thirds">
+          <div
+            className={
+              "govuk-form-group" + (validateForm.fundingStreamValid ? "" : " govuk-form-group--error")
+            }
+          >
+            <label className="govuk-label" htmlFor="sort">
+              Funding stream
+            </label>
+            <span className="govuk-hint">Select a funding stream you have permissions for</span>
+            {isLoadingFundingStreams ? (
+              <div className="loader-inline">
+                <LoadingFieldStatus title={"loading funding streams"} />
+              </div>
+            ) : (
+              <AutoComplete
+                suggestions={fundingStreamSuggestions.map((fs) => fs.name)}
+                callback={updateFundingStreamSelection}
+                disabled={isLoadingFundingStreams}
+                componentId={"autocomplete-funding-stream"}
+              />
+            )}
           </div>
-        </div>
-        <LoadingStatus
-          title={"Create data source"}
-          hidden={!isLoading}
-          subTitle={"Please wait whilst the data source is created"}
-        />
-        <div className="govuk-grid-row govuk-!-margin-bottom-9">
-          <div className="govuk-grid-column-full">
-            <MultipleErrorSummary errors={errors} />
+          {coreProviderTargetDate && (
+            <div className={"govuk-form-group"}>
+              <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
+                <div className="govuk-summary-list__row">
+                  <dt className="govuk-summary-list__key">Core provider data version to upload against</dt>
+                  <dd className="govuk-summary-list__value" data-testid="provider-target-date">
+                    <DateFormatter date={coreProviderTargetDate} />
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          )}
+
+          <div
+            className={
+              "govuk-form-group" + (validateForm.dataDefinitionIdValid ? "" : " govuk-form-group--error")
+            }
+          >
+            <label className="govuk-label" htmlFor="sort">
+              Data schema
+            </label>
+            {dataSchemaIsLoading ? (
+              <LoadingFieldStatus title={"loading data schemas"} />
+            ) : (
+              <AutoComplete
+                suggestions={dataSchemaSuggestions.map((dss) => dss.name)}
+                callback={updateDataSchemaSelection}
+                disabled={dataSchemaIsLoading}
+                componentId={"autocomplete-data-schema"}
+              />
+            )}
           </div>
-        </div>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <PermissionStatus
-              requiredPermissions={[requiredPermission]}
-              hidden={permittedFundingStreams.length > 0 || dataSchemaIsLoading || isLoadingFundingStreams}
+
+          <div
+            className={"govuk-form-group" + (validateForm.fileNameValid ? "" : " govuk-form-group--error")}
+          >
+            <label className="govuk-label" htmlFor="dataset-source-filename">
+              Dataset source file name
+            </label>
+            <span id="event-name-hint" className="govuk-hint">
+              Use a descriptive unique name other users can understand
+            </span>
+            <input
+              className="govuk-input"
+              id="dataset-source-filename"
+              name="dataset-source-filename"
+              type="text"
+              onChange={(e) => setDatasetSourceFileName(e.target.value)}
+              data-testid="new-datasource-filename"
             />
           </div>
-        </div>
-        <div className="govuk-grid-row" hidden={isLoading}>
-          <div className="govuk-grid-column-two-thirds">
-            <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">Upload new data source</h1>
-            <p className="govuk-body">
-              Load a new data source file to create a dataset to use in calculations.
-            </p>
-            <div
-              className={
-                "govuk-form-group" + (validateForm.fundingStreamValid ? "" : " govuk-form-group--error")
-              }
-            >
-              <label className="govuk-label" htmlFor="sort">
-                Funding stream
-              </label>
-              <span className="govuk-hint">Select a funding stream you have permissions for</span>
-              {isLoadingFundingStreams ? (
-                <div className="loader-inline">
-                  <LoadingFieldStatus title={"loading funding streams"} />
-                </div>
-              ) : (
-                <AutoComplete
-                  suggestions={fundingStreamSuggestions.map((fs) => fs.name)}
-                  callback={updateFundingStreamSelection}
-                  disabled={isLoadingFundingStreams}
-                  componentId={"autocomplete-funding-stream"}
-                />
-              )}
-            </div>
-            {coreProviderTargetDate && (
-              <div className={"govuk-form-group"}>
-                <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Core provider data version to upload against</dt>
-                    <dd className="govuk-summary-list__value" data-testid="provider-target-date">
-                      <DateFormatter date={coreProviderTargetDate} />
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            )}
 
-            <div
-              className={
-                "govuk-form-group" + (validateForm.dataDefinitionIdValid ? "" : " govuk-form-group--error")
-              }
-            >
-              <label className="govuk-label" htmlFor="sort">
-                Data schema
-              </label>
-              {dataSchemaIsLoading ? (
-                <LoadingFieldStatus title={"loading data schemas"} />
-              ) : (
-                <AutoComplete
-                  suggestions={dataSchemaSuggestions.map((dss) => dss.name)}
-                  callback={updateDataSchemaSelection}
-                  disabled={dataSchemaIsLoading}
-                  componentId={"autocomplete-data-schema"}
-                />
-              )}
-            </div>
-
-            <div
-              className={"govuk-form-group" + (validateForm.fileNameValid ? "" : " govuk-form-group--error")}
-            >
-              <label className="govuk-label" htmlFor="dataset-source-filename">
-                Dataset source file name
-              </label>
-              <span id="event-name-hint" className="govuk-hint">
-                Use a descriptive unique name other users can understand
-              </span>
-              <input
-                className="govuk-input"
-                id="dataset-source-filename"
-                name="dataset-source-filename"
-                type="text"
-                onChange={(e) => setDatasetSourceFileName(e.target.value)}
-                data-testid="new-datasource-filename"
-              />
-            </div>
-
-            <div
-              className={
-                "govuk-form-group" + (validateForm.descriptionValid ? "" : " govuk-form-group--error")
-              }
-            >
-              <label className="govuk-label" htmlFor="more-detail">
-                Description
-              </label>
-              <textarea
-                className="govuk-textarea"
-                id="more-detail"
-                name="more-detail"
-                rows={8}
-                aria-describedby="more-detail-hint"
-                onChange={(e) => setDescription(e.target.value)}
-                data-testid="new-datasource-description"
-              />
-            </div>
-            <div className={"govuk-form-group" + (validateForm.fileValid ? "" : " govuk-form-group--error")}>
-              <div className="govuk-form-group">
-                <label className="govuk-label" htmlFor="file-upload-1">
-                  Upload data source file
-                </label>
-                <input
-                  className="govuk-file-upload"
-                  id="file-upload-1"
-                  name="file-upload-1"
-                  type="file"
-                  onChange={storeFileUpload}
-                />
-              </div>
-            </div>
-            <CreateDataSourceButton />
-            <Link
-              to="/Datasets/ManageDataSourceFiles"
-              className="govuk-button govuk-button--secondary"
-              data-module="govuk-button"
-            >
-              Cancel
-            </Link>
+          <div
+            className={"govuk-form-group" + (validateForm.descriptionValid ? "" : " govuk-form-group--error")}
+          >
+            <label className="govuk-label" htmlFor="more-detail">
+              Description
+            </label>
+            <textarea
+              className="govuk-textarea"
+              id="more-detail"
+              name="more-detail"
+              rows={8}
+              aria-describedby="more-detail-hint"
+              onChange={(e) => setDescription(e.target.value)}
+              data-testid="new-datasource-description"
+            />
           </div>
+          <div className={"govuk-form-group" + (validateForm.fileValid ? "" : " govuk-form-group--error")}>
+            <div className="govuk-form-group">
+              <label className="govuk-label" htmlFor="file-upload-1">
+                Upload data source file
+              </label>
+              <input
+                className="govuk-file-upload"
+                id="file-upload-1"
+                name="file-upload-1"
+                type="file"
+                onChange={storeFileUpload}
+              />
+            </div>
+          </div>
+          <CreateDataSourceButton />
+          <Link
+            to="/Datasets/ManageDataSourceFiles"
+            className="govuk-button govuk-button--secondary"
+            data-module="govuk-button"
+          >
+            Cancel
+          </Link>
         </div>
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 }

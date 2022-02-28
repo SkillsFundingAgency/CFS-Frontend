@@ -5,11 +5,15 @@ import { milliseconds } from "../helpers/TimeInMs";
 import * as policyService from "../services/policyService";
 import { FundingStream } from "../types/viewFundingTypes";
 
+export interface FundingStreamsQueryResult {
+  fundingStreams: FundingStream[] | undefined;
+  isLoadingFundingStreams: boolean;
+}
 export const useFundingStreams = (
   securityTrimmed: boolean,
   options?: Omit<UseQueryOptions<FundingStream[], AxiosError, FundingStream[]>, "queryFn">
-) => {
-  const results = useQuery<FundingStream[], AxiosError, FundingStream[]>(
+): FundingStreamsQueryResult => {
+  const { data, isLoading } = useQuery<FundingStream[], AxiosError, FundingStream[]>(
     ["funding-streams", securityTrimmed],
     async () => (await policyService.getFundingStreamsService(securityTrimmed))?.data,
     {
@@ -19,6 +23,5 @@ export const useFundingStreams = (
     }
   );
 
-  const { data, isLoading } = results;
-  return { fundingStreams: data, isLoadingFundingStreams: isLoading, ...results };
+  return { fundingStreams: data, isLoadingFundingStreams: isLoading };
 };

@@ -63,7 +63,6 @@ export function SelectDatasetTypeToCreate({
 
   return (
     <Main location={Section.Datasets}>
-      <MultipleErrorSummary errors={errors} />
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url={"/"} />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
@@ -77,6 +76,7 @@ export function SelectDatasetTypeToCreate({
         requiredPermissions={missingPermissions}
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
+      <MultipleErrorSummary errors={errors} />
       <section>
         <Form token="select-dataset-type" heading="Which data set type?">
           <div className="govuk-grid-row govuk-!-margin-bottom-4">

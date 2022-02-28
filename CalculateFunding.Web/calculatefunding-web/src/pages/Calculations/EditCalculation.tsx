@@ -14,11 +14,10 @@ import {
 import { CircularReferenceErrorSummary } from "../../components/CircularReferenceErrorSummary";
 import { ConfirmationPanel } from "../../components/ConfirmationPanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { InlineError } from "../../components/InlineError";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { useCalculation } from "../../hooks/Calculations/useCalculation";
@@ -198,236 +197,225 @@ export function EditCalculation({
   const [additionalCalculationName, setAdditionalCalculationName] = useState<string>("");
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
-          {specification && (
-            <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
-          )}
-          <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`} />
-        </Breadcrumbs>
-
-        <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
-
-        {(isApproving || updateCalculation.isLoading) && calculation && (
-          <LoadingStatus
-            title={
-              isLoadingSpecification || isLoadingCalculation
-                ? "Loading"
-                : updateCalculation.isLoading
-                ? `Saving ${calculation.calculationType} calculation`
-                : `Approving ${calculation.calculationType} calculation`
-            }
-            subTitle={
-              isLoadingSpecification ? "Please wait" : "Please wait whilst the calculation is updated"
-            }
-          />
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
+        {specification && (
+          <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
         )}
+        <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`} />
+      </Breadcrumbs>
 
-        <MultipleErrorSummary errors={errors} />
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+      <MultipleErrorSummary errors={errors} />
 
-        <ConfirmationPanel title={"Save successful"} hidden={!updateCalculation.isSuccess || isApproving}>
-          Your changes have been saved
-        </ConfirmationPanel>
+      {(isApproving || updateCalculation.isLoading) && calculation && (
+        <LoadingStatus
+          title={
+            isLoadingSpecification || isLoadingCalculation
+              ? "Loading"
+              : updateCalculation.isLoading
+              ? `Saving ${calculation.calculationType} calculation`
+              : `Approving ${calculation.calculationType} calculation`
+          }
+          subTitle={isLoadingSpecification ? "Please wait" : "Please wait whilst the calculation is updated"}
+        />
+      )}
 
-        <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>
-          <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-            <span className="govuk-caption-l">{subtitle}</span>
-            {calculation?.calculationType == CalculationType.Template && (
-              <h2 id="calculation-name-title" className={"govuk-heading-l"}>
-                {calculation ? calculation.name : <LoadingFieldStatus title="Loading..." />}
-              </h2>
-            )}
-          </legend>
-          {calculation?.calculationType == CalculationType.Additional && (
-            <div className="govuk-form-group">
-              <input
-                className="govuk-input"
-                id="calculation-name"
-                name="calculation-name"
-                type="text"
-                pattern="[A-Za-z0-9]+"
-                onChange={(e) => {
-                  setAdditionalCalculationName(e.target.value);
-                  substituteCharacters(e.target.value);
-                }}
-                value={additionalCalculationName}
-              />
-            </div>
+      <ConfirmationPanel title={"Save successful"} hidden={!updateCalculation.isSuccess || isApproving}>
+        Your changes have been saved
+      </ConfirmationPanel>
+
+      <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>
+        <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+          <span className="govuk-caption-l">{subtitle}</span>
+          {calculation?.calculationType == CalculationType.Template && (
+            <h2 id="calculation-name-title" className={"govuk-heading-l"}>
+              {calculation ? calculation.name : <LoadingFieldStatus title="Loading..." />}
+            </h2>
           )}
-          {substitution.length > 0 && (
-            <span className="govuk-caption-m">Source code name: {substitution}</span>
-          )}
-          <InlineError fieldName={"calculation-name"} errors={errors} />
+        </legend>
+        {calculation?.calculationType == CalculationType.Additional && (
+          <div className="govuk-form-group">
+            <input
+              className="govuk-input"
+              id="calculation-name"
+              name="calculation-name"
+              type="text"
+              pattern="[A-Za-z0-9]+"
+              onChange={(e) => {
+                setAdditionalCalculationName(e.target.value);
+                substituteCharacters(e.target.value);
+              }}
+              value={additionalCalculationName}
+            />
+          </div>
+        )}
+        {substitution.length > 0 && <span className="govuk-caption-m">Source code name: {substitution}</span>}
+        <InlineError fieldName={"calculation-name"} errors={errors} />
 
-          <div
-            id="calculation-status"
-            className={
-              "govuk-grid-row govuk-!-margin-bottom-2 govuk-form-group" +
-              (errors.some((err) => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")
-            }
-          >
-            <span className="govuk-error-message">
-              <span className="govuk-visually-hidden">Error:</span>{" "}
-              {errors.find((err) => err.fieldName === "calculation-status")}
-            </span>
-            <div className="govuk-grid-column-full">
-              <dl className="govuk-summary-list govuk-summary-list--no-border">
-                <div className="govuk-summary-list__row">
-                  <dt className="govuk-summary-list__key">Calculation status</dt>
-                  <dd className="govuk-summary-list__value">
-                    <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2 calc-status">
-                      {calculationPublishStatus ? (
-                        calculationPublishStatus
-                      ) : (
-                        <LoadingFieldStatus title="Loading..." />
-                      )}
-                    </strong>
-                  </dd>
-                </div>
-
-                {calculation?.calculationType === CalculationType.Template && (
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Calculation type</dt>
-                    <dd className="govuk-summary-list__value">
-                      <span>
-                        {convertCamelCaseToSpaceDelimited(calculation.templateCalculationType || "")}
-                      </span>
-                    </dd>
-                  </div>
-                )}
-
-                <div className="govuk-summary-list__row">
-                  <dt className="govuk-summary-list__key">Value type</dt>
-                  <dd className="govuk-summary-list__value">
-                    {calculation ? (
-                      <>
-                        <select
-                          className="govuk-select"
-                          onChange={(e) => setCalculationValueType(e.target.value as ValueType)}
-                          hidden={calculation.calculationType === CalculationType.Template}
-                          value={calculationValueType}
-                        >
-                          <option value={ValueType.Percentage}>Percentage</option>
-                          <option value={ValueType.Currency}>Currency</option>
-                          <option value={ValueType.Number}>Number</option>
-                        </select>
-                        <span hidden={calculation.calculationType === CalculationType.Additional}>
-                          {calculation.valueType}
-                        </span>
-                      </>
+        <div
+          id="calculation-status"
+          className={
+            "govuk-grid-row govuk-!-margin-bottom-2 govuk-form-group" +
+            (errors.some((err) => err.fieldName === "calculation-status") ? " govuk-form-group--error" : "")
+          }
+        >
+          <span className="govuk-error-message">
+            <span className="govuk-visually-hidden">Error:</span>{" "}
+            {errors.find((err) => err.fieldName === "calculation-status")}
+          </span>
+          <div className="govuk-grid-column-full">
+            <dl className="govuk-summary-list govuk-summary-list--no-border">
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Calculation status</dt>
+                <dd className="govuk-summary-list__value">
+                  <strong className="govuk-tag govuk-tag--green govuk-!-margin-top-2 calc-status">
+                    {calculationPublishStatus ? (
+                      calculationPublishStatus
                     ) : (
                       <LoadingFieldStatus title="Loading..." />
                     )}
+                  </strong>
+                </dd>
+              </div>
+
+              {calculation?.calculationType === CalculationType.Template && (
+                <div className="govuk-summary-list__row">
+                  <dt className="govuk-summary-list__key">Calculation type</dt>
+                  <dd className="govuk-summary-list__value">
+                    <span>{convertCamelCaseToSpaceDelimited(calculation.templateCalculationType || "")}</span>
                   </dd>
                 </div>
-              </dl>
-            </div>
-          </div>
+              )}
 
-          {isLoadingCircularDependencies && (
-            <LoadingFieldStatus title="Checking for circular reference errors" />
-          )}
-          {!isLoadingCircularDependencies && circularReferenceErrors && (
-            <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3} />
-          )}
-
-          {calculation && specification && (
-            <CalculationSourceCode
-              excludeMonacoEditor={excludeMonacoEditor === true}
-              specificationId={specificationId}
-              calculationName={calculation.name}
-              calculationType={calculation.calculationType}
-              dataType={calculation.dataType}
-              fundingStreams={specification.fundingStreams}
-              onChange={onCalculationChange}
-              originalSourceCode={calculation.sourceCode}
-              calculationId={calculationId}
-            />
-          )}
-
-          <CalculationResultsLink calculationId={calculationId} />
-
-          {calculationState &&
-            calculationState.isDirty &&
-            !calculationState?.calculationBuild.hasCodeBuiltSuccessfully && (
-              <div
-                className={
-                  "govuk-form-group" +
-                  (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully
-                    ? " govuk-form-group--error"
-                    : "")
-                }
-              >
-                <div className="govuk-body">
-                  Your calculation’s build output must be successful before you can save it
-                </div>
+              <div className="govuk-summary-list__row">
+                <dt className="govuk-summary-list__key">Value type</dt>
+                <dd className="govuk-summary-list__value">
+                  {calculation ? (
+                    <>
+                      <select
+                        className="govuk-select"
+                        onChange={(e) => setCalculationValueType(e.target.value as ValueType)}
+                        hidden={calculation.calculationType === CalculationType.Template}
+                        value={calculationValueType}
+                      >
+                        <option value={ValueType.Percentage}>Percentage</option>
+                        <option value={ValueType.Currency}>Currency</option>
+                        <option value={ValueType.Number}>Number</option>
+                      </select>
+                      <span hidden={calculation.calculationType === CalculationType.Additional}>
+                        {calculation.valueType}
+                      </span>
+                    </>
+                  ) : (
+                    <LoadingFieldStatus title="Loading..." />
+                  )}
+                </dd>
               </div>
-            )}
-
-          {calculationState && calculationState.isDirty && (
-            <div className="govuk-form-group">
-              <div className="govuk-body">Your calculation must be saved before you can approve it</div>
-            </div>
-          )}
-
-          <div className="govuk-grid-row govuk-!-margin-top-9">
-            <div className="govuk-grid-column-two-thirds">
-              <button
-                className="govuk-button govuk-!-margin-right-1"
-                data-module="govuk-button"
-                onClick={onSaveCalculation}
-                disabled={
-                  !calculationState ||
-                  !calculationState.calculationBuild.hasCodeBuiltSuccessfully ||
-                  updateCalculation.isLoading ||
-                  !canCreateAdditionalCalculation
-                }
-              >
-                Save and continue
-              </button>
-
-              <button
-                className="govuk-button govuk-!-margin-right-1"
-                data-module="govuk-button"
-                onClick={onApproveCalculation}
-                disabled={
-                  (calculationState && calculationState.isDirty) ||
-                  !calculation ||
-                  calculationPublishStatus === PublishStatus.Approved ||
-                  !canApproveCalculation
-                }
-              >
-                Approve
-              </button>
-
-              <Link
-                to={`/ViewSpecification/${specificationId}`}
-                className="govuk-button govuk-button--secondary"
-                data-module="govuk-button"
-              >
-                Cancel
-              </Link>
-            </div>
+            </dl>
           </div>
+        </div>
 
-          {calculation && (
-            <p id="last-saved-date" className={"govuk-body"}>
-              Last saved <DateTimeFormatter date={calculation.lastUpdated} />
-            </p>
+        {isLoadingCircularDependencies && (
+          <LoadingFieldStatus title="Checking for circular reference errors" />
+        )}
+        {!isLoadingCircularDependencies && circularReferenceErrors && (
+          <CircularReferenceErrorSummary errors={circularReferenceErrors} defaultSize={3} />
+        )}
+
+        {calculation && specification && (
+          <CalculationSourceCode
+            excludeMonacoEditor={excludeMonacoEditor === true}
+            specificationId={specificationId}
+            calculationName={calculation.name}
+            calculationType={calculation.calculationType}
+            dataType={calculation.dataType}
+            fundingStreams={specification.fundingStreams}
+            onChange={onCalculationChange}
+            originalSourceCode={calculation.sourceCode}
+            calculationId={calculationId}
+          />
+        )}
+
+        <CalculationResultsLink calculationId={calculationId} />
+
+        {calculationState &&
+          calculationState.isDirty &&
+          !calculationState?.calculationBuild.hasCodeBuiltSuccessfully && (
+            <div
+              className={
+                "govuk-form-group" +
+                (calculationState.isDirty && !calculationState.calculationBuild.hasCodeBuiltSuccessfully
+                  ? " govuk-form-group--error"
+                  : "")
+              }
+            >
+              <div className="govuk-body">
+                Your calculation’s build output must be successful before you can save it
+              </div>
+            </div>
           )}
 
-          <div className={"govuk-form-group"}>
-            <Link className="govuk-body" to={`/Calculations/CalculationVersionHistory/${calculationId}`}>
-              View calculation history
+        {calculationState && calculationState.isDirty && (
+          <div className="govuk-form-group">
+            <div className="govuk-body">Your calculation must be saved before you can approve it</div>
+          </div>
+        )}
+
+        <div className="govuk-grid-row govuk-!-margin-top-9">
+          <div className="govuk-grid-column-two-thirds">
+            <button
+              className="govuk-button govuk-!-margin-right-1"
+              data-module="govuk-button"
+              onClick={onSaveCalculation}
+              disabled={
+                !calculationState ||
+                !calculationState.calculationBuild.hasCodeBuiltSuccessfully ||
+                updateCalculation.isLoading ||
+                !canCreateAdditionalCalculation
+              }
+            >
+              Save and continue
+            </button>
+
+            <button
+              className="govuk-button govuk-!-margin-right-1"
+              data-module="govuk-button"
+              onClick={onApproveCalculation}
+              disabled={
+                (calculationState && calculationState.isDirty) ||
+                !calculation ||
+                calculationPublishStatus === PublishStatus.Approved ||
+                !canApproveCalculation
+              }
+            >
+              Approve
+            </button>
+
+            <Link
+              to={`/ViewSpecification/${specificationId}`}
+              className="govuk-button govuk-button--secondary"
+              data-module="govuk-button"
+            >
+              Cancel
             </Link>
           </div>
-        </fieldset>
-      </div>
-      <Footer />
-    </div>
+        </div>
+
+        {calculation && (
+          <p id="last-saved-date" className={"govuk-body"}>
+            Last saved <DateTimeFormatter date={calculation.lastUpdated} />
+          </p>
+        )}
+
+        <div className={"govuk-form-group"}>
+          <Link className="govuk-body" to={`/Calculations/CalculationVersionHistory/${calculationId}`}>
+            View calculation history
+          </Link>
+        </div>
+      </fieldset>
+    </Main>
   );
 }

@@ -92,8 +92,6 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
 
   return (
     <Main location={Section.Datasets}>
-      <MultipleErrorSummary errors={errors} />
-
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
@@ -103,6 +101,7 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
         />
         <Breadcrumb name={specificationName} />
       </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
 
       <Title title={specificationName}>
         <span className="govuk-caption-xl">{fundingPeriodName}</span>

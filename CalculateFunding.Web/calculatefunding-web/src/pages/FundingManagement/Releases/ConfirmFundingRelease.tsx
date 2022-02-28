@@ -105,8 +105,6 @@ export function ConfirmFundingRelease({
 
   return (
     <Main location={Section.FundingManagement}>
-      <MultipleErrorSummary errors={errors} />
-
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
@@ -122,6 +120,7 @@ export function ConfirmFundingRelease({
         requiredPermissions={hasPermissionToRelease ? [] : [Permission.CanReleaseFunding]}
         hidden={!isPermissionsFetched}
       />
+      <MultipleErrorSummary errors={errors} />
 
       <Title
         title="Confirm funding release"

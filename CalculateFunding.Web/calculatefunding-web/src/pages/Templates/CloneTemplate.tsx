@@ -1,17 +1,16 @@
 ﻿import { toNumber } from "lodash";
 import React, { useState } from "react";
 import { useHistory } from "react-router";
-// @ts-ignore
 import { useParams } from "react-router-dom";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { FundingStreamAndPeriodSelection } from "../../components/TemplateBuilder/FundingStreamAndPeriodSelection";
+import { Title } from "../../components/Title";
 import { useTemplatePermissions } from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
@@ -182,103 +181,90 @@ export const CloneTemplate = () => {
   };
 
   return (
-    <div>
-      <Header location={Section.Templates} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate Funding"} url={"/"} />
-          <Breadcrumb name={"Templates"} url={"/Templates/List"} />
-          <Breadcrumb
-            name={isLoading ? "Loading..." : templateToClone ? templateToClone.name : "Template"}
-            url={`/Templates/${templateId}/Edit`}
-          />
-          <Breadcrumb
-            name={
-              isLoading
-                ? "Loading..."
-                : templateToClone
-                ? `Version ${templateToClone.majorVersion}.${templateToClone.minorVersion}`
-                : ""
-            }
-            url={
-              templateToClone &&
-              `/Templates/${templateToClone.templateId}/Versions/${templateToClone.version}`
-            }
-          />
-          <Breadcrumb name={"Clone template"} />
-        </Breadcrumbs>
-        <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
-        {canCreateTemplate && (
+    <Main location={Section.Templates}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate Funding"} url={"/"} />
+        <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+        <Breadcrumb
+          name={isLoading ? "Loading..." : templateToClone ? templateToClone.name : "Template"}
+          url={`/Templates/${templateId}/Edit`}
+        />
+        <Breadcrumb
+          name={
+            isLoading
+              ? "Loading..."
+              : templateToClone
+              ? `Version ${templateToClone.majorVersion}.${templateToClone.minorVersion}`
+              : ""
+          }
+          url={
+            templateToClone && `/Templates/${templateToClone.templateId}/Versions/${templateToClone.version}`
+          }
+        />
+        <Breadcrumb name={"Clone template"} />
+      </Breadcrumbs>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
+      <MultipleErrorSummary errors={canCreateTemplate ? errors : []} />
+      <LoadingStatus
+        title={"Loading options..."}
+        description={"Please wait whilst the options are loading"}
+        hidden={!isLoading}
+      />
+      <Title
+        title="Clone a template"
+        titleCaption={
+          templateToClone &&
+          `Clone a template of ${templateToClone.name} version ${templateToClone.majorVersion}.${templateToClone.minorVersion}`
+        }
+      />
+
+      {canCreateTemplate && (
+        <form id="cloneTemplate">
+          {fundingStream && !isLoading && (
+            <FundingStreamAndPeriodSelection
+              hideFundingStreamSelection={true}
+              selectedFundingStreamId={fundingStream.id}
+              selectedFundingPeriodId={selectedFundingPeriodId}
+              fundingStreams={[fundingStream]}
+              fundingPeriods={fundingPeriods}
+              errors={errors}
+              onFundingPeriodChange={handleFundingPeriodChange}
+            />
+          )}
           <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              <MultipleErrorSummary errors={errors} />
+            <div className="govuk-grid-column-full">
+              <label className="govuk-label" htmlFor="description">
+                Template description
+              </label>
+              <textarea
+                className="govuk-textarea"
+                id="description"
+                rows={8}
+                aria-describedby="description-hint"
+                maxLength={1000}
+                onChange={handleDescriptionChange}
+              />
             </div>
           </div>
-        )}
-        <div className="govuk-main-wrapper">
-          <h1 className="govuk-heading-xl">Clone a template</h1>
-          {templateToClone && (
-            <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">
-              Clone a template of {templateToClone.name} version {templateToClone.majorVersion}.
-              {templateToClone.minorVersion}
-            </h3>
-          )}
-          {canCreateTemplate && (
-            <form id="cloneTemplate">
-              <div className="govuk-grid-row" hidden={!isLoading}>
-                <LoadingStatus
-                  title={"Loading options..."}
-                  description={"Please wait whilst the options are loading"}
-                />
-              </div>
-              {fundingStream && !isLoading && (
-                <FundingStreamAndPeriodSelection
-                  hideFundingStreamSelection={true}
-                  selectedFundingStreamId={fundingStream.id}
-                  selectedFundingPeriodId={selectedFundingPeriodId}
-                  fundingStreams={[fundingStream]}
-                  fundingPeriods={fundingPeriods}
-                  errors={errors}
-                  onFundingPeriodChange={handleFundingPeriodChange}
-                />
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-full">
+              {selectedFundingPeriodId && (
+                <button
+                  className="govuk-button"
+                  data-testid="save"
+                  onClick={handleSaveClick}
+                  disabled={!enableSaveButton}
+                >
+                  Clone Template
+                </button>
               )}
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full">
-                  <label className="govuk-label" htmlFor="description">
-                    Template description
-                  </label>
-                  <textarea
-                    className="govuk-textarea"
-                    id="description"
-                    rows={8}
-                    aria-describedby="description-hint"
-                    maxLength={1000}
-                    onChange={handleDescriptionChange}
-                  />
-                </div>
-              </div>
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full">
-                  {selectedFundingPeriodId && (
-                    <button
-                      className="govuk-button"
-                      data-testid="save"
-                      onClick={handleSaveClick}
-                      disabled={!enableSaveButton}
-                    >
-                      Clone Template
-                    </button>
-                  )}
-                  {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
-                </div>
-              </div>
+              {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+            </div>
+          </div>
 
-              <BackLink to={`/Templates/${templateId}/Edit?version=${version}`} />
-            </form>
-          )}
-        </div>
-      </div>
-      <Footer />
-    </div>
+          <BackLink to={`/Templates/${templateId}/Edit?version=${version}`} />
+        </form>
+      )}
+    </Main>
   );
 };

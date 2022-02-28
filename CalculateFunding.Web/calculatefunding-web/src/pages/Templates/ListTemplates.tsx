@@ -6,13 +6,13 @@ import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { SearchBox } from "../../components/SearchBox";
 import { TableNavBottom } from "../../components/TableNavBottom";
+import { Title } from "../../components/Title";
 import { useTemplatePermissions } from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import { useErrors } from "../../hooks/useErrors";
 import { searchForTemplates } from "../../services/templateBuilderDatasourceService";
@@ -93,154 +93,147 @@ export const ListTemplates = () => {
   };
 
   return (
-    <div id={"listTemplates"}>
-      <Header location={Section.Templates} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"Templates"} />
-        </Breadcrumbs>
-        <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
-        <MultipleErrorSummary errors={errors} />
-        <div className="govuk-main-wrapper">
-          <h1 className="govuk-heading-xl">Templates</h1>
-          <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">View and edit existing templates</h3>
-          {canCreateTemplate && (
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-one-third">
-                <Link
-                  to="/Templates/Create"
-                  id="create-template-link"
-                  data-testid={"create-template-link"}
-                  className="govuk-button govuk-button--primary"
-                  data-module="govuk-button"
-                >
-                  Create a new template
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
+    <Main location={Section.Templates}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Templates"} />
+      </Breadcrumbs>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
+      <MultipleErrorSummary errors={errors} />
+      <LoadingStatus
+        title={"Loading templates list"}
+        description={"Please wait whilst the templates list is loading"}
+        hidden={!isLoading}
+      />
 
-        <div className="govuk-grid-row" hidden={!isLoading}>
-          <LoadingStatus
-            title={"Loading templates list"}
-            description={"Please wait whilst the templates list is loading"}
+      <Title title={"Templates"} titleCaption={"View and edit existing templates"} />
+
+      {canCreateTemplate && (
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-one-third">
+            <Link
+              to="/Templates/Create"
+              id="create-template-link"
+              data-testid={"create-template-link"}
+              className="govuk-button govuk-button--primary"
+              data-module="govuk-button"
+            >
+              Create a new template
+            </Link>
+          </div>
+        </div>
+      )}
+      <div className="govuk-grid-row" hidden={isLoading}>
+        <div className="govuk-grid-column-one-third">
+          <CollapsiblePanel title={"Search"} isExpanded={true}>
+            <label className="govuk-label filterLabel" htmlFor="filter-by-type">
+              Search
+            </label>
+            <SearchBox callback={filterBySearchTerm} timeout={900} />
+          </CollapsiblePanel>
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          {haveResults && (
+            <table className="govuk-table" id="templates-table" data-testid={"template-results"}>
+              <thead className="govuk-table__head">
+                <tr className="govuk-table__row">
+                  <th scope="col" className="govuk-table__header">
+                    Template
+                  </th>
+                  <th scope="col" className="govuk-table__header">
+                    Last Updated
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="govuk-table__body" id="mainContentResults">
+                {templateListResults.results.map((template) => (
+                  <tr
+                    className="govuk-table__row"
+                    key={template.id}
+                    data-testid={`template-result-${template.id}`}
+                  >
+                    <th scope="row" className="govuk-table__header">
+                      <Link
+                        to={""}
+                        onClick={(e) => handleTemplateLinkClick(e as MouseEvent, `${template.id}`)}
+                      >
+                        {template.name}
+                      </Link>
+                      <div className="govuk-!-margin-top-3">
+                        <details
+                          className="govuk-details govuk-!-margin-bottom-0"
+                          data-module="govuk-details"
+                        >
+                          <summary className="govuk-details__summary">
+                            <span className="govuk-details__summary-text">Template details</span>
+                          </summary>
+                          <div className="govuk-details__text">
+                            <p className="govuk-body">
+                              <strong>Funding stream:</strong> &nbsp; {template.fundingStreamName}
+                            </p>
+                            <p className="govuk-body">
+                              <strong>Funding period:</strong> &nbsp; {template.fundingPeriodName}
+                            </p>
+                            <p className="govuk-body">
+                              <strong>Current version:</strong> &nbsp;
+                              <Link
+                                to={`/Templates/${template.id}/Edit`}
+                                className="govuk-link"
+                                data-testid={`template-link-${template.id}`}
+                              >
+                                {template.currentMajorVersion}.{template.currentMinorVersion}
+                              </Link>{" "}
+                              &nbsp;
+                              {template.status === TemplateStatus.Draft && (
+                                <span>
+                                  <strong className="govuk-tag govuk-tag--blue govuk-!-margin-left-2">
+                                    In Progress
+                                  </strong>
+                                </span>
+                              )}
+                              {template.status === TemplateStatus.Published && (
+                                <span>
+                                  <strong className="govuk-tag govuk-tag--green govuk-!-margin-left-2">
+                                    Published
+                                  </strong>
+                                </span>
+                              )}
+                            </p>
+                            <p className="govuk-body">
+                              <Link
+                                to={`/Templates/${template.id}/Versions`}
+                                className="govuk-link"
+                                data-testid={`versions-link-${template.id}`}
+                              >
+                                View all versions
+                              </Link>
+                            </p>
+                          </div>
+                        </details>
+                      </div>
+                    </th>
+                    <td className="govuk-table__cell">
+                      <DateTimeFormatter date={template.lastUpdatedDate} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {!haveResults && <p className="govuk-body">There are no records to match your search</p>}
+          <BackToTop id={"listTemplates"} />
+
+          <TableNavBottom
+            currentPage={templateListResults?.pagerState?.currentPage}
+            lastPage={templateListResults?.pagerState?.lastPage}
+            totalCount={templateListResults?.totalCount}
+            totalResults={templateListResults?.totalCount}
+            startItemNumber={templateListResults?.startItemNumber}
+            endItemNumber={templateListResults?.endItemNumber}
+            onPageChange={setPagination}
           />
         </div>
-        <div className="govuk-grid-row" hidden={isLoading}>
-          <div className="govuk-grid-column-one-third">
-            <CollapsiblePanel title={"Search"} isExpanded={true}>
-              <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                Search
-              </label>
-              <SearchBox callback={filterBySearchTerm} timeout={900} />
-            </CollapsiblePanel>
-          </div>
-          <div className="govuk-grid-column-two-thirds">
-            {haveResults && (
-              <table className="govuk-table" id="templates-table" data-testid={"template-results"}>
-                <thead className="govuk-table__head">
-                  <tr className="govuk-table__row">
-                    <th scope="col" className="govuk-table__header">
-                      Template
-                    </th>
-                    <th scope="col" className="govuk-table__header">
-                      Last Updated
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="govuk-table__body" id="mainContentResults">
-                  {templateListResults.results.map((template) => (
-                    <tr
-                      className="govuk-table__row"
-                      key={template.id}
-                      data-testid={`template-result-${template.id}`}
-                    >
-                      <th scope="row" className="govuk-table__header">
-                        <Link
-                          to={""}
-                          onClick={(e) => handleTemplateLinkClick(e as MouseEvent, `${template.id}`)}
-                        >
-                          {template.name}
-                        </Link>
-                        <div className="govuk-!-margin-top-3">
-                          <details
-                            className="govuk-details govuk-!-margin-bottom-0"
-                            data-module="govuk-details"
-                          >
-                            <summary className="govuk-details__summary">
-                              <span className="govuk-details__summary-text">Template details</span>
-                            </summary>
-                            <div className="govuk-details__text">
-                              <p className="govuk-body">
-                                <strong>Funding stream:</strong> &nbsp; {template.fundingStreamName}
-                              </p>
-                              <p className="govuk-body">
-                                <strong>Funding period:</strong> &nbsp; {template.fundingPeriodName}
-                              </p>
-                              <p className="govuk-body">
-                                <strong>Current version:</strong> &nbsp;
-                                <Link
-                                  to={`/Templates/${template.id}/Edit`}
-                                  className="govuk-link"
-                                  data-testid={`template-link-${template.id}`}
-                                >
-                                  {template.currentMajorVersion}.{template.currentMinorVersion}
-                                </Link>{" "}
-                                &nbsp;
-                                {template.status === TemplateStatus.Draft && (
-                                  <span>
-                                    <strong className="govuk-tag govuk-tag--blue govuk-!-margin-left-2">
-                                      In Progress
-                                    </strong>
-                                  </span>
-                                )}
-                                {template.status === TemplateStatus.Published && (
-                                  <span>
-                                    <strong className="govuk-tag govuk-tag--green govuk-!-margin-left-2">
-                                      Published
-                                    </strong>
-                                  </span>
-                                )}
-                              </p>
-                              <p className="govuk-body">
-                                <Link
-                                  to={`/Templates/${template.id}/Versions`}
-                                  className="govuk-link"
-                                  data-testid={`versions-link-${template.id}`}
-                                >
-                                  View all versions
-                                </Link>
-                              </p>
-                            </div>
-                          </details>
-                        </div>
-                      </th>
-                      <td className="govuk-table__cell">
-                        <DateTimeFormatter date={template.lastUpdatedDate} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            {!haveResults && <p className="govuk-body">There are no records to match your search</p>}
-            <BackToTop id={"listTemplates"} />
-
-            <TableNavBottom
-              currentPage={templateListResults?.pagerState?.currentPage}
-              lastPage={templateListResults?.pagerState?.lastPage}
-              totalCount={templateListResults?.totalCount}
-              totalResults={templateListResults?.totalCount}
-              startItemNumber={templateListResults?.startItemNumber}
-              endItemNumber={templateListResults?.endItemNumber}
-              onPageChange={setPagination}
-            />
-          </div>
-        </div>
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 };

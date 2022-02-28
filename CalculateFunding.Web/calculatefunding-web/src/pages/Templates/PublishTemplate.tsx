@@ -4,14 +4,14 @@ import { Link, useParams } from "react-router-dom";
 import Sidebar from "react-sidebar";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import OrganisationChart from "../../components/TemplateBuilder/OrganisationChart";
 import { SidebarContent } from "../../components/TemplateBuilder/SidebarContent";
 import TemplateBuilderNode from "../../components/TemplateBuilder/TemplateBuilderNode";
+import { Title } from "../../components/Title";
 import { useTemplatePermissions } from "../../hooks/TemplateBuilder/useTemplatePermissions";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import {
@@ -178,224 +178,198 @@ export const PublishTemplate = () => {
   };
 
   return (
-    <div>
-      <Header location={Section.Templates} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate Funding"} url={"/"} />
-          <Breadcrumb name={"Templates"} url={"/Templates/List"} />
-          <Breadcrumb name={"Publish a template"} />
-        </Breadcrumbs>
+    <Main location={Section.Templates}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate Funding"} url={"/"} />
+        <Breadcrumb name={"Templates"} url={"/Templates/List"} />
+        <Breadcrumb name={"Publish a template"} />
+      </Breadcrumbs>
+      <PermissionStatus
+        requiredPermissions={missingPermissions ? missingPermissions : []}
+        hidden={isLoading}
+      />
+      <MultipleErrorSummary errors={errors} />
+      <LoadingStatus
+        title={"Loading..."}
+        description={"Please wait whilst the template is loading"}
+        hidden={!isLoading}
+      />
+      <Title title={"Publish Template"} titleCaption={"Check the information below before publishing"} />
 
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <MultipleErrorSummary errors={errors} />
-          </div>
-        </div>
-
-        <div className="govuk-main-wrapper">
-          <h1 className="govuk-heading-xl">Publish Template</h1>
-          {canApproveTemplate && (
-            <h3 className="govuk-caption-xl govuk-!-padding-bottom-5">
-              Check the information below before publishing
-            </h3>
-          )}
-          <PermissionStatus
-            requiredPermissions={missingPermissions ? missingPermissions : []}
-            hidden={isLoading}
-          />
-        </div>
-
-        {canApproveTemplate && (
-          <div>
-            <div className="govuk-grid-row" hidden={!isLoading}>
-              <LoadingStatus
-                title={"Loading..."}
-                description={"Please wait whilst the template is loading"}
-              />
-            </div>
-            <div className="govuk-grid-row" hidden={isLoading}>
-              <div className="govuk-grid-column-full">
-                <form id="publishTemplate">
-                  <span className="govuk-caption-m">Template Name</span>
-                  <h3 className="govuk-heading-m" data-testid="template-name">
-                    {template && template.name}
-                  </h3>
-                  <span className="govuk-caption-m">Funding stream</span>
-                  <h3 className="govuk-heading-m">{template && template.fundingStreamName}</h3>
-                  <span className="govuk-caption-m">Funding period</span>
-                  <h3 className="govuk-heading-m">{template && template.fundingPeriodName}</h3>
-                  <span className="govuk-caption-m">Description</span>
-                  <h3 className="govuk-heading-m">{template && template.description}</h3>
-                  <span className="govuk-caption-m">Version</span>
-                  <h3 className="govuk-heading-m">
-                    {template && template.majorVersion + "." + template.minorVersion}
-                  </h3>
-                  <div
-                    className={
-                      "govuk-form-group " +
-                      (errors.some((error) => error.fieldName === "status") ? "govuk-form-group--error" : "")
-                    }
-                  >
-                    <span className="govuk-caption-m">Status</span>
-                    <h3 className="govuk-heading-m" id="status">
-                      {template && template.status}
-                    </h3>
-                    {errors.map(
-                      (error) =>
-                        error.fieldName === "status" && (
-                          <span
-                            key={error.id}
-                            id={"status-error-" + error.id}
-                            className="govuk-error-message"
-                          >
-                            <span className="govuk-visually-hidden">Error:</span> {error.message}
-                          </span>
-                        )
-                    )}
-                  </div>
-                  <div
-                    className={
-                      "govuk-form-group " +
-                      (errors.some((error) => error.fieldName === "publishNote")
-                        ? "govuk-form-group--error"
-                        : "")
-                    }
-                  >
-                    <label className="govuk-label" htmlFor="description">
-                      Add publish note
-                    </label>
-                    <textarea
-                      className="govuk-textarea"
-                      id="publishNote"
-                      rows={4}
-                      maxLength={1000}
-                      onClick={() => clearErrorMessages}
-                      onChange={handlePublishNoteChange}
-                    />
-                    {errors.map(
-                      (error) =>
-                        error.fieldName === "publishNote" && (
-                          <span
-                            key={error.id}
-                            id={"publishNote-error-" + error.id}
-                            className="govuk-error-message"
-                          >
-                            <span className="govuk-visually-hidden">Error:</span> {error.message}
-                          </span>
-                        )
-                    )}
-                  </div>
-                  <div
-                    id="content"
-                    className={
-                      "gov-org-chart-container " +
-                      (errors.some((error) => error.fieldName === "content") ? "govuk-form-group--error" : "")
-                    }
-                  >
-                    <OrganisationChart
-                      ref={orgchart}
-                      NodeTemplate={TemplateBuilderNode}
-                      onClickNode={readSelectedNode}
-                      onClickChart={clearSelectedNode}
-                      openSideBar={openSideBar}
-                      isEditMode={false}
-                      datasource={ds}
-                      chartClass="myChart"
-                      collapsible={true}
-                      draggable={true}
-                      pan={true}
-                      zoom={true}
-                      multipleSelect={false}
-                    />
-                    {errors.map(
-                      (error) =>
-                        error.fieldName === "content" && (
-                          <span id={"status-error-" + error.id} className="govuk-error-message">
-                            <span className="govuk-visually-hidden">Error:</span> {error.message}
-                          </span>
-                        )
-                    )}
-                  </div>
-                  {publishMessage.length > 0 && errors.length === 0 ? (
-                    <div className="govuk-form-group">
-                      <strong className="govuk-tag govuk-tag--green">{publishMessage}</strong>
-                    </div>
-                  ) : null}
-                  {publishErrorMessage.length > 0 ? (
-                    <div className="govuk-form-group">
-                      <strong className="govuk-tag govuk-tag--red">{publishErrorMessage}</strong>
-                    </div>
-                  ) : null}
-                  {template && template.status !== "Published" && (
-                    <button
-                      className="govuk-button"
-                      data-testid="publish"
-                      disabled={isPublishing || isLoading || !canApproveTemplate || !template}
-                      onClick={(e) => handlePublishClick(e as React.MouseEvent<HTMLButtonElement>)}
-                    >
-                      Publish
-                    </button>
-                  )}
-                  &nbsp;
-                  {template && template.status !== "Published" && (
-                    <Link
-                      id="cancel"
-                      to="/Templates/List"
-                      className="govuk-button govuk-button--secondary"
-                      data-module="govuk-button"
-                    >
-                      Back
-                    </Link>
-                  )}
-                  {template && template.status === "Published" && (
-                    <Link
-                      id="continue"
-                      to="/Templates/List"
-                      className="govuk-button govuk-button--primary"
-                      data-module="govuk-button"
-                    >
-                      Continue
-                    </Link>
-                  )}
-                  <Sidebar
-                    sidebar={
-                      <SidebarContent
-                        data={selectedNodes}
-                        calcs={getCalculations()}
-                        isEditMode={false}
-                        openSideBar={openSideBar}
-                      />
-                    }
-                    open={isSidebarOpen}
-                    onSetOpen={openSideBar}
-                    pullRight={true}
-                    styles={{
-                      sidebar: {
-                        background: "white",
-                        position: "fixed",
-                        padding: "20px 20px",
-                        width: "500px",
-                      },
-                      root: { position: "undefined" },
-                      content: {
-                        position: "undefined",
-                        top: "undefined",
-                        left: "undefined",
-                        right: "undefined",
-                        bottom: "undefined",
-                      },
-                    }}
-                  >
-                    <span></span>
-                  </Sidebar>
-                </form>
+      {canApproveTemplate && (
+        <div className="govuk-grid-row" hidden={isLoading}>
+          <div className="govuk-grid-column-full">
+            <form id="publishTemplate">
+              <span className="govuk-caption-m">Template Name</span>
+              <h3 className="govuk-heading-m" data-testid="template-name">
+                {template && template.name}
+              </h3>
+              <span className="govuk-caption-m">Funding stream</span>
+              <h3 className="govuk-heading-m">{template && template.fundingStreamName}</h3>
+              <span className="govuk-caption-m">Funding period</span>
+              <h3 className="govuk-heading-m">{template && template.fundingPeriodName}</h3>
+              <span className="govuk-caption-m">Description</span>
+              <h3 className="govuk-heading-m">{template && template.description}</h3>
+              <span className="govuk-caption-m">Version</span>
+              <h3 className="govuk-heading-m">
+                {template && template.majorVersion + "." + template.minorVersion}
+              </h3>
+              <div
+                className={
+                  "govuk-form-group " +
+                  (errors.some((error) => error.fieldName === "status") ? "govuk-form-group--error" : "")
+                }
+              >
+                <span className="govuk-caption-m">Status</span>
+                <h3 className="govuk-heading-m" id="status">
+                  {template && template.status}
+                </h3>
+                {errors.map(
+                  (error) =>
+                    error.fieldName === "status" && (
+                      <span key={error.id} id={"status-error-" + error.id} className="govuk-error-message">
+                        <span className="govuk-visually-hidden">Error:</span> {error.message}
+                      </span>
+                    )
+                )}
               </div>
-            </div>
+              <div
+                className={
+                  "govuk-form-group " +
+                  (errors.some((error) => error.fieldName === "publishNote") ? "govuk-form-group--error" : "")
+                }
+              >
+                <label className="govuk-label" htmlFor="description">
+                  Add publish note
+                </label>
+                <textarea
+                  className="govuk-textarea"
+                  id="publishNote"
+                  rows={4}
+                  maxLength={1000}
+                  onClick={() => clearErrorMessages}
+                  onChange={handlePublishNoteChange}
+                />
+                {errors.map(
+                  (error) =>
+                    error.fieldName === "publishNote" && (
+                      <span
+                        key={error.id}
+                        id={"publishNote-error-" + error.id}
+                        className="govuk-error-message"
+                      >
+                        <span className="govuk-visually-hidden">Error:</span> {error.message}
+                      </span>
+                    )
+                )}
+              </div>
+              <div
+                id="content"
+                className={
+                  "gov-org-chart-container " +
+                  (errors.some((error) => error.fieldName === "content") ? "govuk-form-group--error" : "")
+                }
+              >
+                <OrganisationChart
+                  ref={orgchart}
+                  NodeTemplate={TemplateBuilderNode}
+                  onClickNode={readSelectedNode}
+                  onClickChart={clearSelectedNode}
+                  openSideBar={openSideBar}
+                  isEditMode={false}
+                  datasource={ds}
+                  chartClass="myChart"
+                  collapsible={true}
+                  draggable={true}
+                  pan={true}
+                  zoom={true}
+                  multipleSelect={false}
+                />
+                {errors.map(
+                  (error) =>
+                    error.fieldName === "content" && (
+                      <span id={"status-error-" + error.id} className="govuk-error-message">
+                        <span className="govuk-visually-hidden">Error:</span> {error.message}
+                      </span>
+                    )
+                )}
+              </div>
+              {publishMessage.length > 0 && errors.length === 0 ? (
+                <div className="govuk-form-group">
+                  <strong className="govuk-tag govuk-tag--green">{publishMessage}</strong>
+                </div>
+              ) : null}
+              {publishErrorMessage.length > 0 ? (
+                <div className="govuk-form-group">
+                  <strong className="govuk-tag govuk-tag--red">{publishErrorMessage}</strong>
+                </div>
+              ) : null}
+              {template && template.status !== "Published" && (
+                <button
+                  className="govuk-button"
+                  data-testid="publish"
+                  disabled={isPublishing || isLoading || !canApproveTemplate || !template}
+                  onClick={(e) => handlePublishClick(e as React.MouseEvent<HTMLButtonElement>)}
+                >
+                  Publish
+                </button>
+              )}
+              &nbsp;
+              {template && template.status !== "Published" && (
+                <Link
+                  id="cancel"
+                  to="/Templates/List"
+                  className="govuk-button govuk-button--secondary"
+                  data-module="govuk-button"
+                >
+                  Back
+                </Link>
+              )}
+              {template && template.status === "Published" && (
+                <Link
+                  id="continue"
+                  to="/Templates/List"
+                  className="govuk-button govuk-button--primary"
+                  data-module="govuk-button"
+                >
+                  Continue
+                </Link>
+              )}
+              <Sidebar
+                sidebar={
+                  <SidebarContent
+                    data={selectedNodes}
+                    calcs={getCalculations()}
+                    isEditMode={false}
+                    openSideBar={openSideBar}
+                  />
+                }
+                open={isSidebarOpen}
+                onSetOpen={openSideBar}
+                pullRight={true}
+                styles={{
+                  sidebar: {
+                    background: "white",
+                    position: "fixed",
+                    padding: "20px 20px",
+                    width: "500px",
+                  },
+                  root: { position: "undefined" },
+                  content: {
+                    position: "undefined",
+                    top: "undefined",
+                    left: "undefined",
+                    right: "undefined",
+                    bottom: "undefined",
+                  },
+                }}
+              >
+                <span></span>
+              </Sidebar>
+            </form>
           </div>
-        )}
-      </div>
-      <Footer />
-    </div>
+        </div>
+      )}
+    </Main>
   );
 };

@@ -17,6 +17,8 @@ import { DatasetDefinitionRequestViewModel } from "../../types/Datasets/DatasetD
 import { SpecificationDatasourceRelationshipViewModel } from "../../types/Datasets/SpecificationDatasourceRelationshipViewModel";
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
+import { Main } from "../../components/Main";
+import { Title } from "../../components/Title";
 
 export function MapDataSourceFiles() {
   const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -205,203 +207,193 @@ export function MapDataSourceFiles() {
   }
 
   return (
-    <div id="map-datasource-files">
-      <Header location={Section.Datasets} />
-      <div className="govuk-width-container">
-        <div className="govuk-grid-row govuk-!-margin-bottom-9">
-          <div className="govuk-grid-column-full">
-            <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-              <Breadcrumb name={"Map data sources to data sets for a specification"} />
-            </Breadcrumbs>
-            <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Map data source files</h1>
-            <span className="govuk-caption-xl">Map data source files to data sets for a specification</span>
-          </div>
-        </div>
-        <div className="govuk-grid-row govuk-!-margin-bottom-9">
-          <div className="govuk-grid-column-full">
-            <MultipleErrorSummary errors={errors} />
-          </div>
-        </div>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-third">
-            <form id="searchDatasources">
-              <CollapsiblePanel title={"Search"} isExpanded={true}>
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                      Search
-                    </label>
-                    <input
-                      className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
-                      id="mainContentSearch"
-                      autoComplete="off"
-                      name="search"
-                      type="text"
-                      onChange={(e) => searchText(e)}
-                    />
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by funding stream"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchRequest.filters["fundingStreamNames"]?.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input
-                      className="govuk-input"
-                      type="text"
-                      onChange={(e) => searchFundingStreamFilters(e)}
-                    />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterFundingStreams.map((f, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          key={`fundingstream-${f}`}
-                          id={`fundingstream-${f}`}
-                          name={`fundingstream-${f}`}
-                          type="checkbox"
-                          value={f}
-                          checked={
-                            searchRequest.filters["fundingStreamNames"] !== undefined &&
-                            searchRequest.filters["fundingStreamNames"].includes(f)
-                          }
-                          onChange={(e) => filterByFundingStream(e)}
-                        />
-                        <label className="govuk-label govuk-checkboxes__label" htmlFor={`fundingstream-${f}`}>
-                          {f}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by funding period"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchRequest.filters["fundingPeriodName"]?.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input
-                      className="govuk-input"
-                      type="text"
-                      onChange={(e) => searchFundingPeriodFilters(e)}
-                    />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterFundingPeriods.map((f, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          key={`fundingperiod-${f}`}
-                          id={`fundingperiod-${f}`}
-                          name={`fundingperiod-${f}`}
-                          type="checkbox"
-                          value={f}
-                          checked={
-                            searchRequest.filters["fundingPeriodName"] !== undefined &&
-                            searchRequest.filters["fundingPeriodName"].includes(f)
-                          }
-                          onChange={(e) => filterByFundingPeriod(e)}
-                        />
-                        <label className="govuk-label govuk-checkboxes__label" htmlFor={`fundingperiod-${f}`}>
-                          {f}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-                Clear filters
-              </button>
-            </form>
-          </div>
-
-          <div className="govuk-grid-column-two-thirds">
-            <LoadingStatus title={"Loading specifications"} hidden={!isLoading} />
-            <NoData
-              hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading}
-            />
-            <table className="govuk-table" hidden={isLoading || datasetRelationships.items.length === 0}>
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header govuk-!-width-one-half">
-                    Specification
-                  </th>
-                  <th scope="col" className="govuk-table__header"></th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body" id="mainContentResults">
-                {datasetRelationships.items.map((dr, index) => (
-                  <tr className="govuk-table__row" key={index}>
-                    <th scope="row" className="govuk-table__header">
-                      <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
-                        {dr.specificationName}
-                      </Link>
-                      {dr.definitionRelationshipCount > 0 ? (
-                        <p className="govuk-body govuk-!-margin-top-2">
-                          {dr.totalMappedDataSets} of {dr.definitionRelationshipCount} data sets mapped for
-                          specification
-                        </p>
-                      ) : (
-                        <span>
-                          <p className="govuk-body govuk-!-margin-top-2">
-                            No data sets exist for specification
-                          </p>
-                          <p className="govuk-body-s">
-                            <Link to={`/Datasets/CreateDataset/${dr.specificationId}`}>
-                              Create new data set
-                            </Link>
-                          </p>
-                        </span>
-                      )}
-                      {dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ? (
-                        <p className="govuk-body">
-                          {" "}
-                          Last mapped <DateTimeFormatter date={dr.mapDatasetLastUpdated} />
-                        </p>
-                      ) : null}
-                    </th>
-                    <td className="govuk-table__cell"></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <BackToTop id={"top"} />
-            {!isLoading && datasetRelationships.totalCount > 0 && (
-              <nav
-                className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
-                role="navigation"
-                aria-label="Pagination"
-              >
-                <div className="pagination__summary">
-                  Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of{" "}
-                  {datasetRelationships.totalCount} results
+    <Main location={Section.Datasets}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+        <Breadcrumb name={"Map data sources to data sets for a specification"} />
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
+      <Title
+        title={"Map data source files"}
+        titleCaption={"Map data source files to data sets for a specification"}
+      />
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          <form id="searchDatasources">
+            <CollapsiblePanel title={"Search"} isExpanded={true}>
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label filterLabel" htmlFor="filter-by-type">
+                    Search
+                  </label>
+                  <input
+                    className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
+                    id="mainContentSearch"
+                    autoComplete="off"
+                    name="search"
+                    type="text"
+                    onChange={(e) => searchText(e)}
+                  />
                 </div>
-                <Pagination
-                  currentPage={datasetRelationships.pagerState.currentPage}
-                  lastPage={datasetRelationships.pagerState.lastPage}
-                  callback={pageChange}
-                />
-              </nav>
-            )}
-          </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title={"Filter by funding stream"}
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={searchRequest.filters["fundingStreamNames"]?.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input
+                    className="govuk-input"
+                    type="text"
+                    onChange={(e) => searchFundingStreamFilters(e)}
+                  />
+                </div>
+                <div className="govuk-checkboxes">
+                  {filterFundingStreams.map((f, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        key={`fundingstream-${f}`}
+                        id={`fundingstream-${f}`}
+                        name={`fundingstream-${f}`}
+                        type="checkbox"
+                        value={f}
+                        checked={
+                          searchRequest.filters["fundingStreamNames"] !== undefined &&
+                          searchRequest.filters["fundingStreamNames"].includes(f)
+                        }
+                        onChange={(e) => filterByFundingStream(e)}
+                      />
+                      <label className="govuk-label govuk-checkboxes__label" htmlFor={`fundingstream-${f}`}>
+                        {f}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title={"Filter by funding period"}
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={searchRequest.filters["fundingPeriodName"]?.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input
+                    className="govuk-input"
+                    type="text"
+                    onChange={(e) => searchFundingPeriodFilters(e)}
+                  />
+                </div>
+                <div className="govuk-checkboxes">
+                  {filterFundingPeriods.map((f, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        key={`fundingperiod-${f}`}
+                        id={`fundingperiod-${f}`}
+                        name={`fundingperiod-${f}`}
+                        type="checkbox"
+                        value={f}
+                        checked={
+                          searchRequest.filters["fundingPeriodName"] !== undefined &&
+                          searchRequest.filters["fundingPeriodName"].includes(f)
+                        }
+                        onChange={(e) => filterByFundingPeriod(e)}
+                      />
+                      <label className="govuk-label govuk-checkboxes__label" htmlFor={`fundingperiod-${f}`}>
+                        {f}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
+              Clear filters
+            </button>
+          </form>
+        </div>
+
+        <div className="govuk-grid-column-two-thirds">
+          <LoadingStatus title={"Loading specifications"} hidden={!isLoading} />
+          <NoData
+            hidden={(datasetRelationships != null && datasetRelationships.items.length > 0) || isLoading}
+          />
+          <table className="govuk-table" hidden={isLoading || datasetRelationships.items.length === 0}>
+            <thead className="govuk-table__head">
+              <tr className="govuk-table__row">
+                <th scope="col" className="govuk-table__header govuk-!-width-one-half">
+                  Specification
+                </th>
+                <th scope="col" className="govuk-table__header"></th>
+              </tr>
+            </thead>
+            <tbody className="govuk-table__body" id="mainContentResults">
+              {datasetRelationships.items.map((dr, index) => (
+                <tr className="govuk-table__row" key={index}>
+                  <th scope="row" className="govuk-table__header">
+                    <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
+                      {dr.specificationName}
+                    </Link>
+                    {dr.definitionRelationshipCount > 0 ? (
+                      <p className="govuk-body govuk-!-margin-top-2">
+                        {dr.totalMappedDataSets} of {dr.definitionRelationshipCount} data sets mapped for
+                        specification
+                      </p>
+                    ) : (
+                      <span>
+                        <p className="govuk-body govuk-!-margin-top-2">
+                          No data sets exist for specification
+                        </p>
+                        <p className="govuk-body-s">
+                          <Link to={`/Datasets/CreateDataset/${dr.specificationId}`}>
+                            Create new data set
+                          </Link>
+                        </p>
+                      </span>
+                    )}
+                    {dr.definitionRelationshipCount > 0 && dr.mapDatasetLastUpdated != null ? (
+                      <p className="govuk-body">
+                        {" "}
+                        Last mapped <DateTimeFormatter date={dr.mapDatasetLastUpdated} />
+                      </p>
+                    ) : null}
+                  </th>
+                  <td className="govuk-table__cell"></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <BackToTop id={"top"} />
+          {!isLoading && datasetRelationships.totalCount > 0 && (
+            <nav
+              className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
+              role="navigation"
+              aria-label="Pagination"
+            >
+              <div className="pagination__summary">
+                Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of{" "}
+                {datasetRelationships.totalCount} results
+              </div>
+              <Pagination
+                currentPage={datasetRelationships.pagerState.currentPage}
+                lastPage={datasetRelationships.pagerState.lastPage}
+                callback={pageChange}
+              />
+            </nav>
+          )}
         </div>
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 }

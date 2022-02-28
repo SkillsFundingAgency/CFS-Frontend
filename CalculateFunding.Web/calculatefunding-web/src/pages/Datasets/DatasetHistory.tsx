@@ -41,21 +41,13 @@ export function DatasetHistory({ match }: RouteComponentProps<DatasetHistoryRout
 
   return (
     <Main location={Section.Datasets}>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-full">
-          <Breadcrumbs>
-            <Breadcrumb name={"Calculate funding"} url={"/"} />
-            <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-            <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
-            {dataset && <Breadcrumb name={dataset.name} />}
-          </Breadcrumbs>
-        </div>
-      </div>
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-full">
-          <MultipleErrorSummary errors={errors} />
-        </div>
-      </div>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
+        <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
+        {dataset && <Breadcrumb name={dataset.name} />}
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
       <Title title={dataset?.name ?? ""} includeBackLink={false} />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

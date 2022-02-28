@@ -7,9 +7,8 @@ import { Link } from "react-router-dom";
 
 import * as actions from "../../actions/FundingSearchSelectionActions";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { useErrors } from "../../hooks/useErrors";
@@ -180,138 +179,117 @@ export function UploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps
     hasUsersValidationJobActive;
 
   return (
-    <div>
-      <Header location={Section.FundingManagement} />
-      <div className="govuk-width-container">
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <main
-              className="govuk-main-wrapper govuk-main-wrapper--auto-spacing"
-              id="main-content"
-              role="main"
-            >
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-full">
-                  <Breadcrumbs>
-                    <Breadcrumb name="Calculate funding" url="/" />
-                    <Breadcrumb name="Approvals" />
-                    <Breadcrumb name="Select specification" url="/Approvals/Select" />
-                    <Breadcrumb name={currentPage.title} />
-                  </Breadcrumbs>
-                </div>
-              </div>
+    <Main location={Section.FundingManagement}>
+      <Breadcrumbs>
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Approvals" />
+        <Breadcrumb name="Select specification" url="/Approvals/Select" />
+        <Breadcrumb name={currentPage.title} />
+      </Breadcrumbs>
 
-              <MultipleErrorSummary errors={errors} />
+      <MultipleErrorSummary errors={errors} />
 
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                  <div className="govuk-form-group">
-                    <fieldset className="govuk-fieldset">
-                      <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                        <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">
-                          {currentPage.title}
-                        </h1>
-                      </legend>
-                      {specification && (
-                        <dl className="govuk-summary-list govuk-summary-list--no-border">
-                          <div className="govuk-summary-list__row">
-                            <dt className="govuk-summary-list__key">
-                              <h2 className="govuk-heading-s govuk-!-margin-bottom-1">
-                                {specification.name} selected
-                              </h2>
-                            </dt>
-                          </div>
-                        </dl>
-                      )}
-                      {!isBlocked && (
-                        <ul className="govuk-list govuk-list--bullet">
-                          <li>The file is in xlsx format</li>
-                          <li>The file contains one UKPRN column</li>
-                          <li>The upload data must be in the first sheet of the xlsx file</li>
-                          <li>
-                            Providers already approved or released will not be shown in the provider count
-                            summaries
-                          </li>
-                        </ul>
-                      )}
-                    </fieldset>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <div className="govuk-form-group">
+            <fieldset className="govuk-fieldset">
+              <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">{currentPage.title}</h1>
+              </legend>
+              {specification && (
+                <dl className="govuk-summary-list govuk-summary-list--no-border">
+                  <div className="govuk-summary-list__row">
+                    <dt className="govuk-summary-list__key">
+                      <h2 className="govuk-heading-s govuk-!-margin-bottom-1">
+                        {specification.name} selected
+                      </h2>
+                    </dt>
                   </div>
-                </div>
-              </div>
-
-              {isBlocked && (
-                <LoadingStatus
-                  title={
-                    isValidatingOrUploading
-                      ? "Validating your upload"
-                      : hasActiveJob
-                      ? "Background job is running"
-                      : isExtractingProviderIds
-                      ? "Extracting providers from file"
-                      : "Loading"
-                  }
-                  subTitle={
-                    isUploadingBatchFile
-                      ? "Uploading your file..."
-                      : isCreatingValidationJob
-                      ? "Creating job to validate file..."
-                      : isWaitingForJob
-                      ? "Waiting for validation job to start..."
-                      : latestJob && latestJob.isActive
-                      ? `Job ${latestJob.statusDescription}: ${latestJob.jobDescription}`
-                      : ""
-                  }
-                />
+                </dl>
               )}
               {!isBlocked && (
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-two-thirds">
-                    <div className="govuk-form-group">
-                      <label className="govuk-label" htmlFor="file-upload">
-                        <strong>Upload an XLSX file</strong>
-                      </label>
-                      <input
-                        className="govuk-file-upload"
-                        id="file-upload"
-                        name="file-upload"
-                        type="file"
-                        disabled={isBlocked}
-                        onChange={getFileToUpload}
-                      />
-                    </div>
-                    <button
-                      className="govuk-button govuk-!-margin-right-1"
-                      type="button"
-                      onClick={uploadForApprove}
-                      disabled={fileName.length === 0 || isBlocked}
-                      data-module="govuk-button"
-                    >
-                      Approve funding
-                    </button>
-                    <button
-                      className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-                      type="button"
-                      onClick={uploadForRelease}
-                      disabled={fileName.length === 0 || isBlocked}
-                      data-module="govuk-button"
-                    >
-                      Release funding
-                    </button>
-                    <Link
-                      className="govuk-button govuk-button--secondary"
-                      data-module="govuk-button"
-                      to={"/Approvals/Select"}
-                    >
-                      Cancel
-                    </Link>
-                  </div>
-                </div>
+                <ul className="govuk-list govuk-list--bullet">
+                  <li>The file is in xlsx format</li>
+                  <li>The file contains one UKPRN column</li>
+                  <li>The upload data must be in the first sheet of the xlsx file</li>
+                  <li>
+                    Providers already approved or released will not be shown in the provider count summaries
+                  </li>
+                </ul>
               )}
-            </main>
+            </fieldset>
           </div>
         </div>
       </div>
-      <Footer />
-    </div>
+
+      {isBlocked && (
+        <LoadingStatus
+          title={
+            isValidatingOrUploading
+              ? "Validating your upload"
+              : hasActiveJob
+              ? "Background job is running"
+              : isExtractingProviderIds
+              ? "Extracting providers from file"
+              : "Loading"
+          }
+          subTitle={
+            isUploadingBatchFile
+              ? "Uploading your file..."
+              : isCreatingValidationJob
+              ? "Creating job to validate file..."
+              : isWaitingForJob
+              ? "Waiting for validation job to start..."
+              : latestJob && latestJob.isActive
+              ? `Job ${latestJob.statusDescription}: ${latestJob.jobDescription}`
+              : ""
+          }
+        />
+      )}
+      {!isBlocked && (
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <div className="govuk-form-group">
+              <label className="govuk-label" htmlFor="file-upload">
+                <strong>Upload an XLSX file</strong>
+              </label>
+              <input
+                className="govuk-file-upload"
+                id="file-upload"
+                name="file-upload"
+                type="file"
+                disabled={isBlocked}
+                onChange={getFileToUpload}
+              />
+            </div>
+            <button
+              className="govuk-button govuk-!-margin-right-1"
+              type="button"
+              onClick={uploadForApprove}
+              disabled={fileName.length === 0 || isBlocked}
+              data-module="govuk-button"
+            >
+              Approve funding
+            </button>
+            <button
+              className="govuk-button govuk-button--warning govuk-!-margin-right-1"
+              type="button"
+              onClick={uploadForRelease}
+              disabled={fileName.length === 0 || isBlocked}
+              data-module="govuk-button"
+            >
+              Release funding
+            </button>
+            <Link
+              className="govuk-button govuk-button--secondary"
+              data-module="govuk-button"
+              to={"/Approvals/Select"}
+            >
+              Cancel
+            </Link>
+          </div>
+        </div>
+      )}
+    </Main>
   );
 }

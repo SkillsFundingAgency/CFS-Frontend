@@ -149,7 +149,6 @@ export function SelectDatasetTemplateItems({
 
   return (
     <Main location={Section.Datasets}>
-      <MultipleErrorSummary errors={errors} />
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url={"/"} />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
@@ -166,6 +165,7 @@ export function SelectDatasetTemplateItems({
         requiredPermissions={missingPermissions}
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
+      <MultipleErrorSummary errors={errors} />
       <section>
         <Form token="select-template-items" heading="Select funding lines and calculations">
           <ReferenceSpecificationDetails referenceSpecification={refSpec} />

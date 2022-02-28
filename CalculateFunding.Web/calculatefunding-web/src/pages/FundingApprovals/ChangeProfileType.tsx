@@ -5,10 +5,9 @@ import { useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { Footer } from "../../components/Footer";
 import { PreviewProfileModal } from "../../components/Funding/PreviewProfileModal";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { useProviderVersion } from "../../hooks/Providers/useProviderVersion";
@@ -288,190 +287,175 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   }, [fundingStreamId, providerId, providerVersionId, fundingLineId, fundingPeriodId]);
 
   return (
-    <div>
-      <Header location={Section.FundingManagement} />
-      <div className="govuk-width-container">
-        {isPageLoading || isSaving ? (
-          <LoadingStatus title={`${isPageLoading ? "Loading profile patterns" : "Saving profile pattern"}`} />
-        ) : (
-          <>
-            <Breadcrumbs>
-              <Breadcrumb name="Calculate funding" url={"/"} />
-              <Breadcrumb name="Approvals" />
-              <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
-              <Breadcrumb
-                name={"Funding approval results"}
-                url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-              />
-              <Breadcrumb
-                name={providerName}
-                url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
-              />
-              <Breadcrumb
-                name={fundingLineName}
-                url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`}
-              />
-              <Breadcrumb name="Change profile type" />
-            </Breadcrumbs>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-full">
-                <PermissionStatus requiredPermissions={missingPermissions} hidden={isPageLoading} />
-              </div>
+    <Main location={Section.FundingManagement}>
+      <Breadcrumbs>
+        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Approvals" />
+        <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
+        <Breadcrumb
+          name={"Funding approval results"}
+          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+        />
+        <Breadcrumb
+          name={providerName}
+          url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
+        />
+        <Breadcrumb
+          name={fundingLineName}
+          url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`}
+        />
+        <Breadcrumb name="Change profile type" />
+      </Breadcrumbs>
+      <PermissionStatus requiredPermissions={missingPermissions} hidden={isPageLoading} />
+      <MultipleErrorSummary errors={errors} />
+      {isPageLoading || isSaving ? (
+        <LoadingStatus title={`${isPageLoading ? "Loading profile patterns" : "Saving profile pattern"}`} />
+      ) : (
+        <>
+          <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-margin-top-5">
+            <div className="govuk-grid-column-two-thirds">
+              <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Change profile type</h1>
             </div>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-full">
-                <MultipleErrorSummary errors={errors} />
+            {noRuleBasedPatterns && (
+              <div className="govuk-inset-text">
+                {`No rule based patterns are available. ${fundingLineName} is using the national pattern.`}
               </div>
-            </div>
-            <div className="govuk-grid-row govuk-!-margin-bottom-5 govuk-!-margin-top-5">
-              <div className="govuk-grid-column-two-thirds">
-                <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Change profile type</h1>
-              </div>
-              {noRuleBasedPatterns && (
-                <div className="govuk-inset-text">
-                  {`No rule based patterns are available. ${fundingLineName} is using the national pattern.`}
+            )}
+          </div>
+          <div className="govuk-form-group">
+            <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+              <h4 className="govuk-heading-s">Select pattern type</h4>
+            </legend>
+            <span id="rule-based-hint" className="govuk-hint">
+              Select one option.
+            </span>
+            <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+              {getNationalPattern && (
+                <div className="govuk-radios__item">
+                  <input
+                    className="govuk-radios__input"
+                    name="national"
+                    type="radio"
+                    data-aria-controls="national-pattern"
+                    value={PatternType.National}
+                    checked={patternType === PatternType.National}
+                    onChange={handleProfilePatternSelected}
+                    aria-labelledby="national-type"
+                  />
+                  <label className="govuk-label govuk-radios__label" htmlFor="national" id="national-type">
+                    {getNationalPatternName()}
+                    <span className="govuk-hint">{getNationalPatternDescription()}</span>
+                    <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>
+                      Preview profile
+                    </button>
+                  </label>
                 </div>
               )}
-            </div>
-            <div className="govuk-form-group">
-              <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h4 className="govuk-heading-s">Select pattern type</h4>
-              </legend>
-              <span id="rule-based-hint" className="govuk-hint">
-                Select one option.
-              </span>
-              <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                {getNationalPattern && (
-                  <div className="govuk-radios__item">
-                    <input
-                      className="govuk-radios__input"
-                      name="national"
-                      type="radio"
-                      data-aria-controls="national-pattern"
-                      value={PatternType.National}
-                      checked={patternType === PatternType.National}
-                      onChange={handleProfilePatternSelected}
-                      aria-labelledby="national-type"
-                    />
-                    <label className="govuk-label govuk-radios__label" htmlFor="national" id="national-type">
-                      {getNationalPatternName()}
-                      <span className="govuk-hint">{getNationalPatternDescription()}</span>
-                      <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>
-                        Preview profile
-                      </button>
-                    </label>
-                  </div>
-                )}
-                <div className="govuk-form-group">
-                  <fieldset className="govuk-fieldset" aria-describedby="rule-based-hint">
-                    <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-                      <div className="govuk-radios__item">
-                        <input
-                          className="govuk-radios__input"
-                          name="rule-based"
-                          type="radio"
-                          aria-controls="rule-based-pattern"
-                          aria-expanded={patternType === PatternType.RuleBased}
-                          value={PatternType.RuleBased}
-                          checked={patternType === PatternType.RuleBased}
-                          onChange={handleProfilePatternSelected}
-                          aria-labelledby="rule-based-type"
-                          disabled={noRuleBasedPatterns}
-                        />
-                        <label
-                          className="govuk-label govuk-radios__label"
-                          htmlFor="rule-based"
-                          id="rule-based-type"
-                        >
-                          Rule based
-                        </label>
-                      </div>
-                      <div
-                        className="govuk-radios__conditional"
-                        hidden={patternType !== PatternType.RuleBased}
+              <div className="govuk-form-group">
+                <fieldset className="govuk-fieldset" aria-describedby="rule-based-hint">
+                  <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                    <div className="govuk-radios__item">
+                      <input
+                        className="govuk-radios__input"
+                        name="rule-based"
+                        type="radio"
+                        aria-controls="rule-based-pattern"
+                        aria-expanded={patternType === PatternType.RuleBased}
+                        value={PatternType.RuleBased}
+                        checked={patternType === PatternType.RuleBased}
+                        onChange={handleProfilePatternSelected}
+                        aria-labelledby="rule-based-type"
+                        disabled={noRuleBasedPatterns}
+                      />
+                      <label
+                        className="govuk-label govuk-radios__label"
+                        htmlFor="rule-based"
+                        id="rule-based-type"
                       >
-                        <div
-                          className={`govuk-form-group ${
-                            validated && !ruleBasedPatternKey ? "govuk-form-group--error" : ""
-                          }`}
-                        >
-                          <fieldset className="govuk-fieldset">
-                            <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
-                              <h4 className="govuk-heading-s">Select rule based pattern</h4>
-                            </legend>
-                            {validated && !ruleBasedPatternKey && (
-                              <span className="govuk-error-message">
-                                <span className="govuk-visually-hidden">Error:</span>A rule based pattern must
-                                be selected
-                              </span>
-                            )}
-                            <div className="govuk-radios govuk-radios--small">
-                              {getRuleBasedPatterns.map((rbp) => {
-                                const patternKey = rbp.profilePatternKey;
-                                if (patternKey === undefined || patternKey === null) return <></>;
-                                return (
-                                  <div className="govuk-radios__item" key={rbp.id}>
-                                    <input
-                                      className="govuk-radios__input"
-                                      name={rbp.id}
-                                      type="radio"
-                                      value={patternKey}
-                                      checked={ruleBasedPatternKey === patternKey}
-                                      onChange={handleRuleBasedPatternChange}
-                                      aria-labelledby={`${rbp.id}-rule-based-label`}
-                                    />
-                                    <label
-                                      className="govuk-label govuk-radios__label"
-                                      htmlFor={rbp.id}
-                                      id={`${rbp.id}-rule-based-label`}
+                        Rule based
+                      </label>
+                    </div>
+                    <div className="govuk-radios__conditional" hidden={patternType !== PatternType.RuleBased}>
+                      <div
+                        className={`govuk-form-group ${
+                          validated && !ruleBasedPatternKey ? "govuk-form-group--error" : ""
+                        }`}
+                      >
+                        <fieldset className="govuk-fieldset">
+                          <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+                            <h4 className="govuk-heading-s">Select rule based pattern</h4>
+                          </legend>
+                          {validated && !ruleBasedPatternKey && (
+                            <span className="govuk-error-message">
+                              <span className="govuk-visually-hidden">Error:</span>A rule based pattern must
+                              be selected
+                            </span>
+                          )}
+                          <div className="govuk-radios govuk-radios--small">
+                            {getRuleBasedPatterns.map((rbp) => {
+                              const patternKey = rbp.profilePatternKey;
+                              if (patternKey === undefined || patternKey === null) return <></>;
+                              return (
+                                <div className="govuk-radios__item" key={rbp.id}>
+                                  <input
+                                    className="govuk-radios__input"
+                                    name={rbp.id}
+                                    type="radio"
+                                    value={patternKey}
+                                    checked={ruleBasedPatternKey === patternKey}
+                                    onChange={handleRuleBasedPatternChange}
+                                    aria-labelledby={`${rbp.id}-rule-based-label`}
+                                  />
+                                  <label
+                                    className="govuk-label govuk-radios__label"
+                                    htmlFor={rbp.id}
+                                    id={`${rbp.id}-rule-based-label`}
+                                  >
+                                    {rbp.profilePatternDisplayName && rbp.profilePatternDisplayName !== null
+                                      ? rbp.profilePatternDisplayName
+                                      : "Unknown name"}
+                                    <span className="govuk-hint">
+                                      {rbp.profilePatternDescription && rbp.profilePatternDescription !== null
+                                        ? rbp.profilePatternDescription
+                                        : "Unknown description"}
+                                    </span>
+                                    <button
+                                      className="govuk-link"
+                                      onClick={() => handlePreviewProfile(patternKey)}
                                     >
-                                      {rbp.profilePatternDisplayName && rbp.profilePatternDisplayName !== null
-                                        ? rbp.profilePatternDisplayName
-                                        : "Unknown name"}
-                                      <span className="govuk-hint">
-                                        {rbp.profilePatternDescription &&
-                                        rbp.profilePatternDescription !== null
-                                          ? rbp.profilePatternDescription
-                                          : "Unknown description"}
-                                      </span>
-                                      <button
-                                        className="govuk-link"
-                                        onClick={() => handlePreviewProfile(patternKey)}
-                                      >
-                                        Preview profile
-                                      </button>
-                                    </label>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </fieldset>
-                        </div>
+                                      Preview profile
+                                    </button>
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </fieldset>
                       </div>
                     </div>
-                  </fieldset>
-                </div>
+                  </div>
+                </fieldset>
               </div>
             </div>
-            <div>
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                  <button
-                    className="govuk-button govuk-!-margin-right-1"
-                    onClick={handleApplyClick}
-                    disabled={!canChangeProfileType || isSaving || missingData}
-                  >
-                    Apply
-                  </button>
-                  <button className="govuk-button govuk-button--secondary" onClick={handleCancelClick}>
-                    Cancel
-                  </button>
-                </div>
+          </div>
+          <div>
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <button
+                  className="govuk-button govuk-!-margin-right-1"
+                  onClick={handleApplyClick}
+                  disabled={!canChangeProfileType || isSaving || missingData}
+                >
+                  Apply
+                </button>
+                <button className="govuk-button govuk-button--secondary" onClick={handleCancelClick}>
+                  Cancel
+                </button>
               </div>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
       {previewProfilePatternKey !== undefined && (
         <PreviewProfileModal
           specificationId={specificationId}
@@ -486,7 +470,6 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
           setPreviewProfilePatternKey={setPreviewProfilePatternKey}
         />
       )}
-      <Footer />
-    </div>
+    </Main>
   );
 }

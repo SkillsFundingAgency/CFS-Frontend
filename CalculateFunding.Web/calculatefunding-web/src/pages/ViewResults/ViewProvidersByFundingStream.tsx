@@ -210,10 +210,9 @@ export function ViewProvidersByFundingStream({
         <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
         <Breadcrumb name={"View provider results"} />
       </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
 
       <Title title="View provider results" titleCaption={fundingStreamName} />
-
-      <MultipleErrorSummary errors={errors} />
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">

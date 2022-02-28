@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { RouteComponentProps } from "react-router";
-import { Link } from "react-router-dom";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { GdsMonacoDiffEditor } from "../../components/GdsMonacoDiffEditor";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { useErrors } from "../../hooks/useErrors";
@@ -22,7 +21,6 @@ import { CalculationVersionHistorySummary } from "../../types/Calculations/Calcu
 import { CalculationType } from "../../types/CalculationSearchResponse";
 import { PublishStatus } from "../../types/PublishStatusModel";
 import { Section } from "../../types/Sections";
-import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { ValueType } from "../../types/ValueType";
 
@@ -182,8 +180,14 @@ export function CompareCalculationVersions({
   }
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
+        <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
+        <Breadcrumb name={"Calculation version history"} />
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
       <LoadingStatus
         title={"Loading calculation version history"}
         description={"Please wait whilst calculation versions are loaded"}
@@ -193,21 +197,6 @@ export function CompareCalculationVersions({
         className="govuk-width-container"
         hidden={isLoading.calculations || isLoading.specifications || isLoading.calculationVersions}
       >
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
-              <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
-              <Breadcrumb name={"Calculation version history"} />
-            </Breadcrumbs>
-          </div>
-        </div>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <MultipleErrorSummary errors={errors} />
-          </div>
-        </div>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
             <p className="govuk-body">
@@ -271,6 +260,6 @@ export function CompareCalculationVersions({
           </div>
         </div>
       </div>
-    </div>
+    </Main>
   );
 }

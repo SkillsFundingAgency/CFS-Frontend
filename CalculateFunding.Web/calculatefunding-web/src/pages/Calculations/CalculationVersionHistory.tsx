@@ -2,16 +2,14 @@ import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { RouteComponentProps, useHistory } from "react-router";
-import { Link } from "react-router-dom";
 
 import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
-import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
+import { Title } from "../../components/Title";
 import { useCalculation } from "../../hooks/Calculations/useCalculation";
 import { useErrors } from "../../hooks/useErrors";
 import { useSpecificationSummary } from "../../hooks/useSpecificationSummary";
@@ -25,7 +23,7 @@ export interface CalculationVersionHistoryRoute {
 
 export function CalculationVersionHistory({ match }: RouteComponentProps<CalculationVersionHistoryRoute>) {
   const calculationId = match.params.calculationId;
-  const { errors, addErrorMessage, clearErrorMessages } = useErrors();
+  const { errors, addErrorMessage } = useErrors();
   const { calculation, isLoadingCalculation } = useCalculation(calculationId, (err) =>
     addErrorMessage(err.message, "Error while loading calculation")
   );
@@ -77,8 +75,17 @@ export function CalculationVersionHistory({ match }: RouteComponentProps<Calcula
   }
 
   return (
-    <div>
-      <Header location={Section.Specifications} />
+    <Main location={Section.Specifications}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
+        {specification && (
+          <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
+        )}
+        {calculation && <Breadcrumb name={calculation.name} />}
+        <Breadcrumb name={"Calculation version history"} />
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
       {(isLoadingCalculation || isLoadingSpecification || isLoadingVersions) && (
         <LoadingStatus
           title={
@@ -91,32 +98,8 @@ export function CalculationVersionHistory({ match }: RouteComponentProps<Calcula
           description={"Please wait"}
         />
       )}
-      <MultipleErrorSummary errors={errors} />
+      <Title title={calculation?.name ?? "Loading..."} />
       <div className="govuk-width-container">
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <Breadcrumbs>
-              <Breadcrumb name={"Calculate funding"} url={"/"} />
-              <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
-              {specification && (
-                <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
-              )}
-              {calculation && <Breadcrumb name={calculation.name} />}
-              <Breadcrumb name={"Calculation version history"} />
-            </Breadcrumbs>
-          </div>
-        </div>
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-full">
-            <h1 className="govuk-heading-xl">
-              {!isLoadingCalculation && calculation ? (
-                calculation.name
-              ) : (
-                <LoadingFieldStatus title="Loading..." />
-              )}
-            </h1>
-          </div>
-        </div>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
             <div className="govuk-inset-text">Select two versions for comparison</div>
@@ -189,7 +172,6 @@ export function CalculationVersionHistory({ match }: RouteComponentProps<Calcula
         </div>
         <BackLink to={`/Specifications/EditCalculation/${calculationId}`} />
       </div>
-      <Footer />
-    </div>
+    </Main>
   );
 }

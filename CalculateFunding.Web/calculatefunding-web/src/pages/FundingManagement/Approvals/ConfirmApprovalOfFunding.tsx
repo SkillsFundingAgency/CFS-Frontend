@@ -10,6 +10,7 @@ import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
+import { Title } from "../../../components/Title";
 import { useErrorContext } from "../../../context/ErrorContext";
 import { useFundingConfirmation } from "../../../hooks/FundingApproval/useFundingConfirmation";
 import { useAddJobObserver } from "../../../hooks/Jobs/useAddJobObserver";
@@ -106,8 +107,6 @@ export function ConfirmApprovalOfFunding({
 
   return (
     <Main location={Section.FundingManagement}>
-      <MultipleErrorSummary errors={errors} />
-
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
@@ -123,13 +122,7 @@ export function ConfirmApprovalOfFunding({
         requiredPermissions={hasPermissionToApprove ? [] : [Permission.CanApproveFunding]}
         hidden={!isPermissionsFetched}
       />
-
-      <div>
-        <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Confirm funding approval</h1>
-        <h2 className="govuk-caption-xl govuk-!-margin-bottom-8">
-          Check the information below carefully before approving the funding
-        </h2>
-      </div>
+      <MultipleErrorSummary errors={errors} />
 
       {notifications.length > 0 && (
         <JobNotificationSection
@@ -160,6 +153,11 @@ export function ConfirmApprovalOfFunding({
             title: "Loading permissions",
           },
         ]}
+      />
+
+      <Title
+        title="Confirm funding release"
+        titleCaption="Check the information below carefully before approving the funding"
       />
 
       {fundingConfiguration && specification && (

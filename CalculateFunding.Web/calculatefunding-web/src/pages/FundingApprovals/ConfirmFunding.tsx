@@ -11,6 +11,7 @@ import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
+import { Title } from "../../components/Title";
 import { getLatestJob } from "../../helpers/jobDetailsHelper";
 import { useAddJobObserver } from "../../hooks/Jobs/useAddJobObserver";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
@@ -242,8 +243,6 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
 
   return (
     <Main location={Section.FundingManagement}>
-      <MultipleErrorSummary errors={errors} />
-
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Approvals"} />
@@ -256,16 +255,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
       </Breadcrumbs>
 
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
-
-      <div>
-        <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">
-          Confirm funding {actionType === FundingActionType.Approve ? "approval" : "release"}
-        </h1>
-        <span className="govuk-caption-xl govuk-!-margin-bottom-8">
-          Check the information below carefully before{" "}
-          {actionType === FundingActionType.Approve ? "approving" : "releasing"} the funding
-        </span>
-      </div>
+      <MultipleErrorSummary errors={errors} />
 
       {notifications.length > 0 && (
         <JobNotificationSection
@@ -296,6 +286,12 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
             title: "Loading permissions",
           },
         ]}
+      />
+
+      <Title
+        title={`Confirm funding ${actionType === FundingActionType.Approve ? "approval" : "release"}`}
+        titleCaption={`Check the information below carefully before{" "}
+          ${actionType === FundingActionType.Approve ? "approving" : "releasing"} the funding`}
       />
 
       {fundingConfiguration && specification && (

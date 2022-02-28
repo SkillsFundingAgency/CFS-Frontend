@@ -13,6 +13,7 @@ import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary"
 import { ReleaseChannel } from "../../../types/FundingConfiguration";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
+import {Title} from "../../../components/Title";
 
 export interface FundingManagementReleasePurposeProps {
   fundingStreamId: string;
@@ -75,6 +76,7 @@ export const PurposeOfFundingRelease = ({
           <Breadcrumb name="Release purpose" />
         </Breadcrumbs>
       )}
+      <MultipleErrorSummary errors={errors} />
 
       {isLoadingFundingConfiguration && isLoadingSpecification ? (
         <LoadingStatusNotifier
@@ -91,13 +93,7 @@ export const PurposeOfFundingRelease = ({
         />
       ) : (
         <>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <MultipleErrorSummary errors={errors} />
-              <h1 className="govuk-heading-l">For which purposes would you like to release?</h1>
-              <h2 className="govuk-caption-m">Select all that apply.</h2>
-            </div>
-          </div>
+          <Title title={"For which purposes would you like to release?"} titleCaption={"Select all that apply."} />
 
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-full">

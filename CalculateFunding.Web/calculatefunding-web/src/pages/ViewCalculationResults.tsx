@@ -7,11 +7,10 @@ import { AccordionPanel } from "../components/AccordionPanel";
 import { Breadcrumb, Breadcrumbs } from "../components/Breadcrumbs";
 import { CollapsiblePanel } from "../components/CollapsiblePanel";
 import { CollapsibleSearchBox } from "../components/CollapsibleSearchBox";
-import { Footer } from "../components/Footer";
-import { Header } from "../components/Header";
 import { JobNotificationBanner } from "../components/Jobs/JobNotificationBanner";
 import { LoadingFieldStatus } from "../components/LoadingFieldStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
+import { Main } from "../components/Main";
 import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
 import { Pagination } from "../components/Pagination";
 import { TagTypes } from "../components/Tag";
@@ -232,13 +231,15 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   function clearFilters() {
     setIsLoading(true);
     setCalculationProviderSearchRequest((prevState) => {
-      return { ...prevState,
+      return {
+        ...prevState,
         localAuthority: [],
         providerType: [],
         providerSubType: [],
         errorToggle: "",
-        searchTerm:"",
-        pageNumber: 1 };
+        searchTerm: "",
+        pageNumber: 1,
+      };
     });
 
     // @ts-ignore
@@ -267,280 +268,273 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   }
 
   return (
-    <div>
-      <Header location={Section.Results} />
-      <div className="govuk-width-container">
-        <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
-          <Breadcrumb name={"View results"} url={"/results"} />
-          <Breadcrumb name={"Select specification"} url={"/SelectSpecification"} />
-          {specification && (
-            <Breadcrumb name={specification.name} url={`/ViewSpecificationResults/${specification.id}`} />
-          )}
-          {calculation && <Breadcrumb name={calculation.name} />}
-        </Breadcrumbs>
-        <MultipleErrorSummary errors={errors} />
-        {specificationId.length > 0 && (
-          <JobNotificationBanner
-            job={latestJob}
-            isCheckingForJob={isCheckingForJob}
-            notificationSettings={[
-              {
-                jobTypes: jobsToWatch,
-                failDescription: "Calculation run failed due to a problem with the service",
-                failureOutcomeDescription:
-                  "Calculation run completed with one or more exceptions detected in the calculation code",
-              },
-            ]}
-          />
+    <Main location={Section.Results}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View results"} url={"/results"} />
+        <Breadcrumb name={"Select specification"} url={"/SelectSpecification"} />
+        {specification && (
+          <Breadcrumb name={specification.name} url={`/ViewSpecificationResults/${specification.id}`} />
         )}
-        <div className="govuk-main-wrapper">
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <h2 className="govuk-caption-xl">
-                {specification ? specification.fundingPeriod.name : <LoadingFieldStatus title="Loading..." />}
-              </h2>
-              <h1 className="govuk-heading-xl">
-                {calculation ? calculation.name : <LoadingFieldStatus title="Loading..." />}
-              </h1>
-              <h3 className="govuk-heading-m">{fundingStream.name}</h3>
-              {calculation && (
-                <Link
-                  id={"view-calculation-button"}
-                  to={`/Specifications/EditCalculation/${calculation.id}`}
-                  className="govuk-button"
-                  role="button"
-                >
-                  View calculation
-                </Link>
-              )}
-            </div>
-          </div>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-third">
-              <form id="searchProviders">
-                <CollapsiblePanel title={"Search"} isExpanded={true}>
-                  <fieldset className="govuk-fieldset">
-                    <span className="govuk-hint sidebar-search-span">Select one option.</span>
-                    <CollapsibleSearchBox searchTerm={""} callback={filterBySearchTerm} />
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel
-                  title="Filter by provider type"
-                  isExpanded={true}
-                  isCollapsible={true}
-                  showFacetCount={true}
-                  facetCount={calculationProviderSearchRequest.providerType.length}
-                >
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-checkboxes">
-                      {filterProviderTypes.map((pt, index) => (
-                        <div className="govuk-checkboxes__item" key={index}>
-                          <input
-                            className="govuk-checkboxes__input"
-                            id={`providerTypes-${pt.name}`}
-                            name={`providerTypes-${pt.name}`}
-                            type="checkbox"
-                            value={pt.name}
-                            onChange={filterByProviderTypes}
-                          />
-                          <label
-                            className="govuk-label govuk-checkboxes__label"
-                            htmlFor={`providerTypes-${pt.name}`}
-                          >
-                            {pt.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel
-                  title="Filter by provider sub type"
-                  isExpanded={true}
-                  isCollapsible={true}
-                  showFacetCount={true}
-                  facetCount={calculationProviderSearchRequest.providerSubType.length}
-                >
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-checkboxes">
-                      {filterProviderSubTypes.map((pt, index) => (
-                        <div className="govuk-checkboxes__item" key={index}>
-                          <input
-                            className="govuk-checkboxes__input"
-                            id={`providerSubTypes-${pt.name}`}
-                            name={`providerSubTypes-${pt.name}`}
-                            type="checkbox"
-                            value={pt.name}
-                            onChange={filterByProviderSubTypes}
-                          />
-                          <label
-                            className="govuk-label govuk-checkboxes__label"
-                            htmlFor={`providerSubTypes-${pt.name}`}
-                          >
-                            {pt.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel title="Filter by results status" isExpanded={true} isCollapsible={true}>
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-radios">
-                      {filterResultsStatus.map((pt, index) => (
-                        <div key={index} className="govuk-radios__item">
-                          <input
-                            className="govuk-radios__input"
-                            id={`resultsStatus-${pt.name}`}
-                            name="resultsStatus"
-                            type="radio"
-                            value={pt.name}
-                            defaultChecked={pt.name === "Without exceptions"}
-                            onChange={filterByResultStatus}
-                          />
-                          <label className="govuk-label govuk-radios__label" htmlFor="resultsStatus">
-                            {pt.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel
-                  title="Filter by local authority(LA)"
-                  isExpanded={true}
-                  isCollapsible={true}
-                  showFacetCount={true}
-                  facetCount={calculationProviderSearchRequest.localAuthority.length}
-                >
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-checkboxes">
-                      {filterLocalAuthority.map((pt, index) => (
-                        <div className="govuk-checkboxes__item" key={index}>
-                          <input
-                            className="govuk-checkboxes__input"
-                            id={`localAuthorities-${pt.name}`}
-                            name="localAuthorities"
-                            type="checkbox"
-                            value={pt.name}
-                            onChange={filterByLocalAuthority}
-                          />
-                          <label
-                            className="govuk-label govuk-checkboxes__label"
-                            htmlFor={`localAuthorities-${pt.name}`}
-                          >
-                            {pt.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-                  Clear filters
-                </button>
-              </form>
-            </div>
-            <div className="govuk-grid-column-two-thirds">
-              <LoadingStatus
-                title={"Updating search results"}
-                description={"Please wait whilst search results are updated"}
-                hidden={!isLoading}
-              />
-              <div
-                className="govuk-accordion"
-                data-module="govuk-accordion"
-                id="accordion-default "
-                hidden={providers.totalResults === 0 || isLoading}
-              >
-                <div className="govuk-accordion__controls">
-                  <button
-                    type="button"
-                    className="govuk-accordion__open-all"
-                    onClick={() => setAutoExpand(!autoExpand)}
-                  >
-                    {autoExpand ? "Close" : "Open"} all
-                    <span className="govuk-visually-hidden"> sections</span>
-                  </button>
-                </div>
-                {providers.calculationProviderResults.map((cpr) => {
-                  const value = cpr.calculationResultDisplay;
-                  return (
-                    <AccordionPanel
-                      id={cpr.id}
-                      expanded={false}
-                      title={cpr.providerName}
-                      subtitle={"Value:"}
-                      boldSubtitle={` ${value}`}
-                      tagVisible={cpr.isIndicativeProvider}
-                      tagText={"Indicative"}
-                      tagType={TagTypes.grey}
-                      key={cpr.id}
-                      autoExpand={autoExpand}
-                    >
-                      <div
-                        id={"accordion-default-content-" + cpr.id}
-                        className="govuk-accordion__section-content"
-                      >
-                        {calculation && (
-                          <Link
-                            to={`/ViewResults/ViewProviderResults/${cpr.providerId}/${calculation.fundingStreamId}/?specificationId=${cpr.specificationId}`}
-                            className="govuk-link"
-                          >
-                            View provider calculations
-                          </Link>
-                        )}
-                        <dl className="govuk-summary-list govuk-!-margin-top-5">
-                          <div className="govuk-summary-list__row">
-                            <dt className="govuk-summary-list__key">Updated</dt>
-                            <dd className="govuk-summary-list__value">{cpr.lastUpdatedDateDisplay}</dd>
-                          </div>
-                          <div className="govuk-summary-list__row">
-                            <dt className="govuk-summary-list__key">UKPRN</dt>
-                            <dd className="govuk-summary-list__value">{cpr.ukprn}</dd>
-                          </div>
-                          <div className="govuk-summary-list__row">
-                            <dt className="govuk-summary-list__key">Provider type</dt>
-                            <dd className="govuk-summary-list__value">{cpr.providerType}</dd>
-                          </div>
-                          <div className="govuk-summary-list__row">
-                            <dt className="govuk-summary-list__key">Local authority</dt>
-                            <dd className="govuk-summary-list__value">{cpr.localAuthority}</dd>
-                          </div>
-                        </dl>
-                      </div>
-                    </AccordionPanel>
-                  );
-                })}
-              </div>
-              {providers.totalResults === 0 && singleFire && !isLoading ? (
-                <h2 className="govuk-heading-m">There are no results available</h2>
-              ) : (
-                ""
-              )}
-              {providers.totalResults > 0 && !isLoading && (
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-two-thirds">
-                    <Pagination
-                      currentPage={providers.pagerState.currentPage}
-                      lastPage={providers.pagerState.lastPage}
-                      callback={setPagination}
-                    />
-                  </div>
-                  <div className="govuk-grid-column-one-third">
-                    <p className="govuk-body-s">
-                      Showing {providers.startItemNumber} - {providers.endItemNumber} of{" "}
-                      {providers.totalResults}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+        {calculation && <Breadcrumb name={calculation.name} />}
+      </Breadcrumbs>
+      <MultipleErrorSummary errors={errors} />
+      {specificationId.length > 0 && (
+        <JobNotificationBanner
+          job={latestJob}
+          isCheckingForJob={isCheckingForJob}
+          notificationSettings={[
+            {
+              jobTypes: jobsToWatch,
+              failDescription: "Calculation run failed due to a problem with the service",
+              failureOutcomeDescription:
+                "Calculation run completed with one or more exceptions detected in the calculation code",
+            },
+          ]}
+        />
+      )}
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-full">
+          <h2 className="govuk-caption-xl">
+            {specification ? specification.fundingPeriod.name : <LoadingFieldStatus title="Loading..." />}
+          </h2>
+          <h1 className="govuk-heading-xl">
+            {calculation ? calculation.name : <LoadingFieldStatus title="Loading..." />}
+          </h1>
+          <h3 className="govuk-heading-m">{fundingStream.name}</h3>
+          {calculation && (
+            <Link
+              id={"view-calculation-button"}
+              to={`/Specifications/EditCalculation/${calculation.id}`}
+              className="govuk-button"
+              role="button"
+            >
+              View calculation
+            </Link>
+          )}
         </div>
       </div>
-      <Footer />
-    </div>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          <form id="searchProviders">
+            <CollapsiblePanel title={"Search"} isExpanded={true}>
+              <fieldset className="govuk-fieldset">
+                <span className="govuk-hint sidebar-search-span">Select one option.</span>
+                <CollapsibleSearchBox searchTerm={""} callback={filterBySearchTerm} />
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title="Filter by provider type"
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={calculationProviderSearchRequest.providerType.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-checkboxes">
+                  {filterProviderTypes.map((pt, index) => (
+                    <div className="govuk-checkboxes__item" key={index}>
+                      <input
+                        className="govuk-checkboxes__input"
+                        id={`providerTypes-${pt.name}`}
+                        name={`providerTypes-${pt.name}`}
+                        type="checkbox"
+                        value={pt.name}
+                        onChange={filterByProviderTypes}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`providerTypes-${pt.name}`}
+                      >
+                        {pt.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title="Filter by provider sub type"
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={calculationProviderSearchRequest.providerSubType.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-checkboxes">
+                  {filterProviderSubTypes.map((pt, index) => (
+                    <div className="govuk-checkboxes__item" key={index}>
+                      <input
+                        className="govuk-checkboxes__input"
+                        id={`providerSubTypes-${pt.name}`}
+                        name={`providerSubTypes-${pt.name}`}
+                        type="checkbox"
+                        value={pt.name}
+                        onChange={filterByProviderSubTypes}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`providerSubTypes-${pt.name}`}
+                      >
+                        {pt.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel title="Filter by results status" isExpanded={true} isCollapsible={true}>
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-radios">
+                  {filterResultsStatus.map((pt, index) => (
+                    <div key={index} className="govuk-radios__item">
+                      <input
+                        className="govuk-radios__input"
+                        id={`resultsStatus-${pt.name}`}
+                        name="resultsStatus"
+                        type="radio"
+                        value={pt.name}
+                        defaultChecked={pt.name === "Without exceptions"}
+                        onChange={filterByResultStatus}
+                      />
+                      <label className="govuk-label govuk-radios__label" htmlFor="resultsStatus">
+                        {pt.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <CollapsiblePanel
+              title="Filter by local authority(LA)"
+              isExpanded={true}
+              isCollapsible={true}
+              showFacetCount={true}
+              facetCount={calculationProviderSearchRequest.localAuthority.length}
+            >
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-checkboxes">
+                  {filterLocalAuthority.map((pt, index) => (
+                    <div className="govuk-checkboxes__item" key={index}>
+                      <input
+                        className="govuk-checkboxes__input"
+                        id={`localAuthorities-${pt.name}`}
+                        name="localAuthorities"
+                        type="checkbox"
+                        value={pt.name}
+                        onChange={filterByLocalAuthority}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`localAuthorities-${pt.name}`}
+                      >
+                        {pt.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
+            </CollapsiblePanel>
+            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
+              Clear filters
+            </button>
+          </form>
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          <LoadingStatus
+            title={"Updating search results"}
+            description={"Please wait whilst search results are updated"}
+            hidden={!isLoading}
+          />
+          <div
+            className="govuk-accordion"
+            data-module="govuk-accordion"
+            id="accordion-default "
+            hidden={providers.totalResults === 0 || isLoading}
+          >
+            <div className="govuk-accordion__controls">
+              <button
+                type="button"
+                className="govuk-accordion__open-all"
+                onClick={() => setAutoExpand(!autoExpand)}
+              >
+                {autoExpand ? "Close" : "Open"} all
+                <span className="govuk-visually-hidden"> sections</span>
+              </button>
+            </div>
+            {providers.calculationProviderResults.map((cpr) => {
+              const value = cpr.calculationResultDisplay;
+              return (
+                <AccordionPanel
+                  id={cpr.id}
+                  expanded={false}
+                  title={cpr.providerName}
+                  subtitle={"Value:"}
+                  boldSubtitle={` ${value}`}
+                  tagVisible={cpr.isIndicativeProvider}
+                  tagText={"Indicative"}
+                  tagType={TagTypes.grey}
+                  key={cpr.id}
+                  autoExpand={autoExpand}
+                >
+                  <div
+                    id={"accordion-default-content-" + cpr.id}
+                    className="govuk-accordion__section-content"
+                  >
+                    {calculation && (
+                      <Link
+                        to={`/ViewResults/ViewProviderResults/${cpr.providerId}/${calculation.fundingStreamId}/?specificationId=${cpr.specificationId}`}
+                        className="govuk-link"
+                      >
+                        View provider calculations
+                      </Link>
+                    )}
+                    <dl className="govuk-summary-list govuk-!-margin-top-5">
+                      <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">Updated</dt>
+                        <dd className="govuk-summary-list__value">{cpr.lastUpdatedDateDisplay}</dd>
+                      </div>
+                      <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">UKPRN</dt>
+                        <dd className="govuk-summary-list__value">{cpr.ukprn}</dd>
+                      </div>
+                      <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">Provider type</dt>
+                        <dd className="govuk-summary-list__value">{cpr.providerType}</dd>
+                      </div>
+                      <div className="govuk-summary-list__row">
+                        <dt className="govuk-summary-list__key">Local authority</dt>
+                        <dd className="govuk-summary-list__value">{cpr.localAuthority}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </AccordionPanel>
+              );
+            })}
+          </div>
+          {providers.totalResults === 0 && singleFire && !isLoading ? (
+            <h2 className="govuk-heading-m">There are no results available</h2>
+          ) : (
+            ""
+          )}
+          {providers.totalResults > 0 && !isLoading && (
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <Pagination
+                  currentPage={providers.pagerState.currentPage}
+                  lastPage={providers.pagerState.lastPage}
+                  callback={setPagination}
+                />
+              </div>
+              <div className="govuk-grid-column-one-third">
+                <p className="govuk-body-s">
+                  Showing {providers.startItemNumber} - {providers.endItemNumber} of {providers.totalResults}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </Main>
   );
 }

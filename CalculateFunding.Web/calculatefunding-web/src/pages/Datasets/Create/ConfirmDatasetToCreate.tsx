@@ -119,7 +119,6 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
 
   return (
     <Main location={Section.Datasets}>
-      <MultipleErrorSummary errors={errors} />
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url={"/"} />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
@@ -140,6 +139,7 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
         requiredPermissions={missingPermissions}
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
+      <MultipleErrorSummary errors={errors} />
       <section>
         {isSaving ? (
           <LoadingStatusNotifier
