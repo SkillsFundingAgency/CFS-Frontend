@@ -7,7 +7,7 @@ import { AccordionPanel } from "../components/AccordionPanel";
 import { Breadcrumb, Breadcrumbs } from "../components/Breadcrumbs";
 import { CollapsiblePanel } from "../components/CollapsiblePanel";
 import { CollapsibleSearchBox } from "../components/CollapsibleSearchBox";
-import { JobNotificationBanner } from "../components/Jobs/JobNotificationBanner";
+import JobNotificationSection from "../components/Jobs/JobNotificationSection";
 import { LoadingFieldStatus } from "../components/LoadingFieldStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { Main } from "../components/Main";
@@ -15,7 +15,7 @@ import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
 import { Pagination } from "../components/Pagination";
 import { TagTypes } from "../components/Tag";
 import { useCalculation } from "../hooks/Calculations/useCalculation";
-import { useLatestSpecificationJobWithMonitoring } from "../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { useJobSubscription } from "../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../hooks/useErrors";
 import { useSpecificationSummary } from "../hooks/useSpecificationSummary";
 import { getCalculationProvidersService } from "../services/calculationService";
@@ -65,12 +65,14 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     JobType.CreateInstructGenerateAggregationsAllocationJob,
     JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
   ];
-  const { latestJob, isCheckingForJob } = useLatestSpecificationJobWithMonitoring(
-    specificationId,
-    jobsToWatch,
-    (err) => addError({ error: err, description: "Error checking for job" })
-  );
-
+  const {
+    addSub,
+    removeAllSubs,
+    results: jobNotifications,
+  } = useJobSubscription({
+    onError: (err) =>
+      addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
   const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
     calculationValueType: "",
     errorToggle: "",
@@ -110,47 +112,6 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     totalErrorResults: 0,
     totalResults: 0,
   });
-
-  useEffect(() => {
-    if (calculation) {
-      setSpecificationId(calculation.specificationId);
-      const searchParams = {
-        calculationValueType: calculation.valueType,
-        errorToggle: "",
-        facetCount: 0,
-        includeFacets: true,
-        localAuthority: [],
-        pageNumber: 1,
-        pageSize: 50,
-        providerSubType: [],
-        providerType: [],
-        resultsStatus: [],
-        searchMode: SearchMode.All,
-        searchTerm: "",
-        calculationId: match.params.calculationId,
-        searchFields: [],
-      };
-      setInitialSearch(searchParams);
-      setCalculationProviderSearchRequest(searchParams);
-    }
-  }, [calculation]);
-
-  useEffect(() => {
-    if (providers.facets.length > 0) {
-      setProviderTypes(providers.facets[5].facetValues);
-      setProviderSubTypes(providers.facets[6].facetValues);
-      setLocalAuthority(providers.facets[8].facetValues);
-    }
-  }, [singleFire]);
-
-  useEffect(() => {
-    if (
-      calculationProviderSearchRequest.calculationId != null &&
-      calculationProviderSearchRequest.calculationId !== ""
-    ) {
-      getCalculationResults(calculationProviderSearchRequest);
-    }
-  }, [calculationProviderSearchRequest]);
 
   function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
     setIsLoading(true);
@@ -267,6 +228,47 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
       });
   }
 
+  useEffect(() => {
+    return () => removeAllSubs();
+  }, [removeAllSubs]);
+
+  useEffect(() => {
+    if (calculation) {
+      setSpecificationId(calculation.specificationId);
+      const searchParams = {
+        ...initialSearch,
+        calculationValueType: calculation.valueType,
+        calculationId: calculation.id,
+      };
+      setInitialSearch(searchParams);
+      setCalculationProviderSearchRequest(searchParams);
+      addSub({
+        filterBy: {
+          specificationId: calculation.specificationId,
+          jobTypes: jobsToWatch,
+        },
+        onError: (err) => addError({ error: err, description: "Error while subscribing to job updates" }),
+      });
+    }
+  }, [calculation]);
+
+  useEffect(() => {
+    if (providers.facets.length > 0) {
+      setProviderTypes(providers.facets[5].facetValues);
+      setProviderSubTypes(providers.facets[6].facetValues);
+      setLocalAuthority(providers.facets[8].facetValues);
+    }
+  }, [singleFire]);
+
+  useEffect(() => {
+    if (
+      calculationProviderSearchRequest.calculationId != null &&
+      calculationProviderSearchRequest.calculationId !== ""
+    ) {
+      getCalculationResults(calculationProviderSearchRequest);
+    }
+  }, [calculationProviderSearchRequest]);
+
   return (
     <Main location={Section.Results}>
       <Breadcrumbs>
@@ -280,15 +282,17 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       {specificationId.length > 0 && (
-        <JobNotificationBanner
-          job={latestJob}
-          isCheckingForJob={isCheckingForJob}
+        <JobNotificationSection
+          jobNotifications={jobNotifications}
           notificationSettings={[
             {
-              jobTypes: jobsToWatch,
+              showActive: true,
+              showFailed: true,
               failDescription: "Calculation run failed due to a problem with the service",
               failureOutcomeDescription:
                 "Calculation run completed with one or more exceptions detected in the calculation code",
+              showSuccessful: true,
+              jobTypes: jobsToWatch,
             },
           ]}
         />

@@ -4,8 +4,6 @@ import React from "react";
 import { MemoryRouter, Route, Switch } from "react-router";
 
 import * as calcHook from "../../hooks/Calculations/useCalculation";
-import * as useLatestSpecificationJobWithMonitoringHook from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import { LatestSpecificationJobWithMonitoringResult } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import * as specHook from "../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../hooks/useSpecificationSummary";
 import { CalculationDetails } from "../../types/CalculationDetails";
@@ -16,18 +14,11 @@ import { PublishStatus } from "../../types/PublishStatusModel";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { ValueType } from "../../types/ValueType";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
+import { jobSubscriptionTestUtils } from "../testing-utils";
 
-const latestSpecJobMonitorResult: LatestSpecificationJobWithMonitoringResult = {
-  hasJob: false,
-  isCheckingForJob: true,
-  isFetched: false,
-  isFetching: false,
-  latestJob: undefined,
-};
-jest
-  .spyOn(useLatestSpecificationJobWithMonitoringHook, "useLatestSpecificationJobWithMonitoring")
-  .mockImplementation(() => latestSpecJobMonitorResult);
 jest.mock("../../components/Header");
+
+const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestUtils({});
 
 const renderViewCalculationResultsPage = () => {
   const { ViewCalculationResults } = require("../../pages/ViewCalculationResults");
@@ -42,6 +33,8 @@ const renderViewCalculationResultsPage = () => {
 
 describe("<ViewCalculationResults />", () => {
   beforeEach(() => {
+    haveNoJobNotification();
+    setupJobSpy();
     mockCalculation();
     mockSpecification();
     jest.mock("../../services/calculationService", () => mockCalculationService());

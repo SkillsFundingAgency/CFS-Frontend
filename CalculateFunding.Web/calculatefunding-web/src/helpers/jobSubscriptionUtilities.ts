@@ -32,7 +32,7 @@ export const convert = (request: AddJobSubscription): JobSubscription => {
     filterBy: request.filterBy,
     id: uuidv4(),
     isEnabled: request.isEnabled ?? true,
-    monitorFallback: request.monitorFallback ?? MonitorFallback.None,
+    monitorFallback: request.monitorFallback ?? MonitorFallback.Polling,
     monitorMode: request.monitorMode ?? MonitorMode.SignalR,
     onDisconnect: request.onDisconnect,
     onError: request.onError,
