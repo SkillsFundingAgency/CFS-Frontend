@@ -35,19 +35,51 @@ jobs:
         $reactchangedFiles = @(git diff --name-only $reactmergeCommitHash -- CalculateFunding.Web/)
         $reactchangedFiles
         if($reactchangedFiles.Count -gt 0){
-         Write-Host "Changes to to react files, React Build task will run"
+         Write-Host "Changes to to react files, React Build tasks will run"
         } else {
-         Write-Host "No changes to react files, React Build task will NOT run"
+         Write-Host "No changes to react files, React Build tasks will NOT run"
          echo "##vso[task.setvariable variable=SkipBuildReactApp]true"
         }
       condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
-      displayName: "Check if calculatefunding.web folder contents has changed"  
+      displayName: "Check if calculatefunding.web folder contents has changed" 
+
+    - powershell: |
+        $targetBranch = $env:SYSTEM_PULLREQUEST_TARGETBRANCH -replace "refs/heads/"
+        
+        Write-Host "Checking for differences between $targetBranch and current branch"
+        $netmergeCommitHash = git merge-base HEAD origin/$targetBranch
+        $FrontEndchangedFiles = @(git diff --name-only $netmergeCommitHash -- CalculateFunding.Frontend/)
+        $FrontEndchangedFiles
+        if($FrontEndchangedFiles.Count -gt 0){
+         Write-Host "Changes to to FrontEnd files, .net tasks will run"
+        } else {
+         Write-Host "No changes to FrontEnd files"
+         echo "##vso[task.setvariable variable=Skipdotnettasks]true"
+        }
+      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+      displayName: "Check if Frontend contents has changed" 
+
+    - powershell: |
+        $targetBranch = $env:SYSTEM_PULLREQUEST_TARGETBRANCH -replace "refs/heads/"
+
+        Write-Host "Checking for differences between $targetBranch and current branch"
+        $netunittestsmergeCommitHash = git merge-base HEAD origin/$targetBranch
+        $FrontEndUnitTestschangedFiles = @(git diff --name-only $netunittestsmergeCommitHash -- CalculateFunding.FrontEnd.UnitTests/)
+        $FrontEndUnitTestschangedFiles
+        if($FrontEndUnitTestschangedFiles.Count -gt 0){
+         Write-Host "Changes to to FrontEnd Unit Tests files, .net tasks will run"
+        } else {
+         Write-Host "No changes to FrontEnd Unit Tests files"
+         echo "##vso[task.setvariable variable=SkipdotnetUTtasks]true"
+        }
+      condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+      displayName: "Check if Frontend Unit Tests contents has changed" 
 
     - task: NodeTool@0
       displayName: 'Use Node 14.x'
       inputs:
         versionSpec: 14.x
-      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))     
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))   
 
     - powershell: |
         cd '${{ variables.projectFolder }}'
@@ -128,6 +160,7 @@ jobs:
       displayName: 'Use .NET Core sdk $(DotnetCoreSdkVersionNet6)'
       inputs:
         version: '$(DotnetCoreSdkVersionNet6)'
+      condition: and(succeeded(), or(ne(variables['Skipdotnettasks'], 'true'), ne(variables['SkipdotnetUTtasks'], 'true'))) 
 
     - task: DotNetCoreCLI@2
       displayName: Restore
@@ -135,6 +168,7 @@ jobs:
         command: restore
         projects: '**/*.csproj'
         vstsFeed: '$(vstsFeed)'
+      condition: and(succeeded(), or(ne(variables['Skipdotnettasks'], 'true'), ne(variables['SkipdotnetUTtasks'], 'true'))) 
 
     - task: DotNetCoreCLI@2
       displayName: Test
@@ -142,12 +176,14 @@ jobs:
         command: test
         projects: '**/*Tests/*.csproj'
         arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+      condition: and(succeeded(), or(ne(variables['Skipdotnettasks'], 'true'), ne(variables['SkipdotnetUTtasks'], 'true'))) 
 
     - task: DotNetCoreCLI@2
       displayName: Publish
       inputs:
         command: publish
         arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) /p:AssemblyVersion=$(Build.BuildNumber)'
+      condition: and(succeeded(), or(ne(variables['Skipdotnettasks'], 'true'), ne(variables['SkipdotnetUTtasks'], 'true'))) 
 
     - task: CopyFiles@2
       displayName: 'Copy DevOps Files to: $(build.artifactstagingdirectory)/DevOps/'
