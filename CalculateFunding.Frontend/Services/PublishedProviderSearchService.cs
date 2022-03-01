@@ -40,7 +40,7 @@ namespace CalculateFunding.Frontend.Services
             _mapper = mapper;
         }
 
-        public async Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request, double? filteredAmount = null)
+        public async Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request.PageSize, "PageSize");
 
@@ -54,21 +54,18 @@ namespace CalculateFunding.Frontend.Services
                 Top = int.MaxValue,
                 SearchTerm = request.SearchTerm,
                 Filters = request.Filters,
-                SearchMode = Common.Models.Search.SearchMode.All,
-                SearchFields = request.SearchFields
+                SearchMode = Common.Models.Search.SearchMode.All
             };
 
-            Task<SearchResults<PublishedProviderSearchItem>> fundingTotalSearchTask = null;
+            Task<double?> fundingTotalSearchTask = null;
 
-            if (!filteredAmount.HasValue)
-            {
-                fundingTotalSearchTask = PerformSearch(requestOptions);
+            fundingTotalSearchTask = GetFundingValue(requestOptions);
 
-                tasks.Add(fundingTotalSearchTask);
-            }
+            tasks.Add(fundingTotalSearchTask);
             
             requestOptions.Top = request.PageSize.Value;
             requestOptions.IncludeFacets = request.IncludeFacets;
+            requestOptions.SearchFields = request.SearchFields;
 
             if (request.PageNumber.HasValue && request.PageNumber.Value > 0)
             {
@@ -84,8 +81,6 @@ namespace CalculateFunding.Frontend.Services
 
             await TaskHelper.WhenAllAndThrow(tasks.ToArray());
 
-            filteredAmount ??= fundingTotalSearchTask.Result.Results?.Sum(x => x.FundingValue) ?? 0;
-            
             PublishProviderSearchResultViewModel result = new PublishProviderSearchResultViewModel
             {
                 TotalResults = searchTask.Result?.TotalCount ?? 0,
@@ -93,7 +88,7 @@ namespace CalculateFunding.Frontend.Services
                 CurrentPage = requestOptions.PageNumber,
                 Facets = searchTask.Result?.Facets?.Select(facet => _mapper.Map<SearchFacetViewModel>(facet)),
                 Providers = searchTask.Result?.Results?.Select(provider => _mapper.Map<PublishedProviderSearchResultItemViewModel>(provider)),
-                FilteredFundingAmount = filteredAmount.Value
+                FilteredFundingAmount = fundingTotalSearchTask.Result ?? 0
             };
             
             int totalPages = (int) Math.Ceiling((double) result.TotalResults / (double) request.PageSize.Value);
@@ -167,6 +162,18 @@ namespace CalculateFunding.Frontend.Services
         private async Task<SearchResults<PublishedProviderSearchItem>> PerformSearch(SearchModel requestOptions)
         {
             ApiResponse<SearchResults<PublishedProviderSearchItem>> searchResponse = await _publishingApiClient.SearchPublishedProvider(requestOptions);
+            if (searchResponse == null)
+            {
+                _logger.Error("Find providers HTTP request failed");
+                return null;
+            }
+
+            return searchResponse.Content;
+        }
+
+        private async Task<double?> GetFundingValue(SearchModel requestOptions)
+        {
+            ApiResponse<double?> searchResponse = await _publishingApiClient.GetFundingValue(requestOptions);
             if (searchResponse == null)
             {
                 _logger.Error("Find providers HTTP request failed");

@@ -6,7 +6,6 @@ namespace CalculateFunding.Frontend.Interfaces.Services
 {
     public interface IPublishedProviderSearchService
     {
-        Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request,
-            double? filteredAmount = null);
+        Task<PublishProviderSearchResultViewModel> PerformSearch(SearchRequestViewModel request);
     }
 }
