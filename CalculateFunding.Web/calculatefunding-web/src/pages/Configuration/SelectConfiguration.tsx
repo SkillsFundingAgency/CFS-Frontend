@@ -50,10 +50,11 @@ export function SelectConfiguration() {
   }
 
   return (
-    <Main location={Section.Home}>
+    <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"Select configuration"} />
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Manage data" url="/Datasets/ManageData" />
+        <Breadcrumb name="Select configuration" />
       </Breadcrumbs>
 
       <MultipleErrorSummary errors={errors} />

@@ -31,13 +31,13 @@ export function Title({
       <div className="govuk-grid-row govuk-!-margin-top-0 govuk-!-margin-bottom-2" data-testid="page-title">
         <hgroup className="govuk-grid-column-full">
           {preTitleCaption && (
-            <span className="govuk-hint govuk-caption-s govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+            <span id="pre-title-caption" className="govuk-hint govuk-caption-s govuk-!-margin-top-2 govuk-!-margin-bottom-2">
               {preTitleCaption}
             </span>
           )}
-          <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">{title}</h1>
-          {titleCaption && <h3 className="govuk-caption-xl govuk-!-margin-top-2">{titleCaption}</h3>}
-          {description && <p className="govuk-body">{description}</p>}
+          <h1 id="title-header" className="govuk-heading-xl govuk-!-margin-bottom-2">{title}</h1>
+          {titleCaption && <h3 id="title-caption" className="govuk-caption-xl govuk-!-margin-top-2">{titleCaption}</h3>}
+          {description && <p id="title-desc" className="govuk-body">{description}</p>}
           {children}
         </hgroup>
       </div>

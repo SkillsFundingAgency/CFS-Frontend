@@ -107,6 +107,7 @@ export const useJobSubscription = ({
       console.log("Fetching previous job results");
       await loadLatestJobUpdate(newSub);
     }
+    
     return newSub;
   };
 
