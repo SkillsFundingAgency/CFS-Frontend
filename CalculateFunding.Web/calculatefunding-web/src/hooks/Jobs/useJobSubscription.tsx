@@ -107,7 +107,7 @@ export const useJobSubscription = ({
       console.log("Fetching previous job results");
       await loadLatestJobUpdate(newSub);
     }
-    
+
     return newSub;
   };
 
@@ -164,12 +164,13 @@ export const useJobSubscription = ({
     }
   };
 
+  const isSignalRJobMonitorEnabled = isEnabled && isSignalREnabled;
   const { results: signalRResults } = useSignalRJobMonitor({
     onError,
     mode: findUniqueSpecificationIdInSubscriptions(subs)
       ? JobMonitorMode.WatchSingleSpecification
       : JobMonitorMode.WatchAllJobs,
-    isEnabled: isEnabled && isSignalREnabled && subs.length > 0,
+    isEnabled: isSignalRJobMonitorEnabled,
     subscriptions: subs,
     onReconnecting: onSignalRReconnecting,
     onReconnection: onSignalRReconnected,
@@ -368,12 +369,15 @@ export const useJobSubscription = ({
 
   useEffect(() => {
     console.log("Subscription state change", subs);
-    if (!subs || subs.length === 0) {
+    if (isSignalRJobMonitorEnabled && (!subs || subs.length === 0)) {
       // no subs, deactivate signalR and polling
       console.log("No subscriptions - therefore deactivate signalR and polling");
-      setIsSignalREnabled(false);
+      // setIsSignalREnabled(false);
       setJobPollingInterval(0);
-    } else if (!isSignalREnabled && subs.some((s) => s.monitorFallback === MonitorFallback.Polling)) {
+    } else if (
+      !isSignalRJobMonitorEnabled &&
+      subs.some((s) => s.monitorFallback === MonitorFallback.Polling)
+    ) {
       // signalR is currently disabled & subs with fallback polling: make sure polling is enabled if applicable
       console.log("SignalR disabled - initiating polling");
       setJobPollingInterval(milliseconds.TenSeconds);

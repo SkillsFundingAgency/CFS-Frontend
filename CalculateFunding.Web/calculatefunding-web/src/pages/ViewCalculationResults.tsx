@@ -230,7 +230,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
 
   useEffect(() => {
     return () => removeAllSubs();
-  }, [removeAllSubs]);
+  }, []);
 
   useEffect(() => {
     if (calculation) {

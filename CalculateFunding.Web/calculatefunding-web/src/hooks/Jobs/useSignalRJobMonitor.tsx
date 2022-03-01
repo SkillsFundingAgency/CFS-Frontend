@@ -1,6 +1,6 @@
 ﻿import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { AxiosError } from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
 import { milliseconds } from "../../helpers/TimeInMs";
@@ -71,14 +71,16 @@ export const useSignalRJobMonitor = ({
 
   const stopSignalR = async () => {
     console.log("SignalR: shutting down");
-    hubConnection?.stop();
 
     if (hubRef?.current) {
       await hubRef?.current?.stop();
       hubRef.current = undefined;
     }
 
-    setHubConnection(undefined);
+    if (hubConnection) {
+      hubConnection?.stop();
+      setHubConnection(undefined);
+    }
   };
 
   const hasEnabledSubscriptions = () => {
@@ -267,13 +269,18 @@ export const useSignalRJobMonitor = ({
     }
   }, [isEnabled, subscriptions, hubConnection]);
 
-  return {
-    results: notifications,
-    state: hubRef.current?.state,
-    isMonitoring:
+  const isMonitoring = useMemo(() => {
+    return (
       !!hubRef.current &&
       (hubRef.current?.state == HubConnectionState.Connecting ||
         hubRef.current?.state === HubConnectionState.Connected ||
-        hubRef.current?.state === HubConnectionState.Reconnecting),
+        hubRef.current?.state === HubConnectionState.Reconnecting)
+    );
+  }, [hubRef.current]);
+
+  return {
+    results: notifications,
+    state: hubRef.current?.state,
+    isMonitoring: isMonitoring,
   };
 };
