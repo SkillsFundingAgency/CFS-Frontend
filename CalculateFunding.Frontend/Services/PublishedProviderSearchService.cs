@@ -151,7 +151,7 @@ namespace CalculateFunding.Frontend.Services
 
                     if (providerStats.TotalFunding.HasValue)
                     {
-                        result.TotalFundingAmount = +providerStats.TotalFunding.Value;
+                        result.TotalFundingAmount += providerStats.TotalFunding.Value;
                     }
                 }
             }

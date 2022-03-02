@@ -123,14 +123,6 @@ namespace CalculateFunding.Frontend.UnitTests.Controllers
                 SearchFields = new string[] { }
             };
 
-        private SearchRequestViewModel GetSearchModel(string searchTerm = "") =>
-            new SearchRequestViewModel
-            {
-                SearchTerm = searchTerm,
-                Filters = GetFilters(),
-                ErrorToggle = ""
-            };
-
         private Dictionary<string, string[]> GetFilters()
         {
             Dictionary<string, string[]> destination = new Dictionary<string, string[]>();
