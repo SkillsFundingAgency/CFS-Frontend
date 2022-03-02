@@ -286,7 +286,7 @@ export const ProvidersForFundingRelease = ({
                 showSuccessful: false,
                 activeDescription: "Calculation run in progress",
                 failDescription: "Calculation run failed",
-              }
+              },
             ]}
           />
         </>
@@ -348,16 +348,15 @@ export const ProvidersForFundingRelease = ({
       )}
 
       <div className="govuk-grid-row">
-        <div
-          className="govuk-grid-column-one-third"
-          hidden={hasActiveActionJobs || !publishedProviderSearchResults}
-        >
-          <PublishedProviderSearchFilters
-            facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
-            numberOfProvidersWithErrors={0}
-            clearFundingSearchSelection={clearFundingSearchSelection}
-          />
-        </div>
+        {!hasActiveActionJobs && (
+          <div className="govuk-grid-column-one-third">
+            <PublishedProviderSearchFilters
+              facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
+              numberOfProvidersWithErrors={0}
+              clearFundingSearchSelection={clearFundingSearchSelection}
+            />
+          </div>
+        )}
         <div className="govuk-grid-column-two-thirds">
           {(isLoading || hasActiveActionJobs) && (
             <LoadingStatusNotifier
