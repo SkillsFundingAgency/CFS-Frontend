@@ -183,7 +183,7 @@ describe("<FundingLineResults/> tests", () => {
     });
 
     it("shows calculation errors when providerId provided", async () => {
-      expect(await screen.findByText(/Error:/)).toBeInTheDocument();
+      expect(await screen.findAllByText(/Error:/)).toHaveLength(2);
     });
 
     it("shows circular reference errors when providerId provided", async () => {

@@ -224,11 +224,6 @@ export function FundingLineResults({
         specification.fundingStreams[0].id
       );
       const fundingStructureItems: FundingStructureItemViewModel[] = fundingLineStructureResponse.data;
-      setFundingLines(fundingStructureItems);
-      setInitialExpandedStatus(fundingStructureItems, false);
-
-      const calculationSummariesResponse = await getCalculationSummaryBySpecificationId(specification.id);
-      setCalculationSummaries(calculationSummariesResponse.data);
 
       if (providerId) {
         const providerResultsResponse = await getFundingStructureResultsForProviderAndSpecification(
@@ -238,6 +233,12 @@ export function FundingLineResults({
         );
         setProviderResults(providerResultsResponse.data);
       }
+
+      setFundingLines(fundingStructureItems);
+      setInitialExpandedStatus(fundingStructureItems, false);
+
+      const calculationSummariesResponse = await getCalculationSummaryBySpecificationId(specification.id);
+      setCalculationSummaries(calculationSummariesResponse.data);
 
       clearErrorMessages(["funding-line-results"]);
     } catch (err: any) {
