@@ -1,5 +1,6 @@
 import { waitFor } from "@testing-library/dom";
 import { render, screen } from "@testing-library/react";
+import { DateTime } from "luxon";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Provider } from "react-redux";
@@ -7,8 +8,8 @@ import { MemoryRouter } from "react-router";
 import { Route, Switch } from "react-router-dom";
 import { createStore, Store } from "redux";
 
-import * as useLatestSpecificationJobWithMonitoringHook from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
-import { LatestSpecificationJobWithMonitoringResult } from "../../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
+import { JobSubscriptionResult } from "../../../hooks/Jobs/useJobSubscription";
+import * as useJobSubscription from "../../../hooks/Jobs/useJobSubscription";
 import * as selectedSpecsHook from "../../../hooks/Specifications/useSpecsSelectedForFunding";
 import { SpecsSelectedForFundingResult } from "../../../hooks/Specifications/useSpecsSelectedForFunding";
 import * as specHook from "../../../hooks/useSpecificationSummary";
@@ -156,27 +157,38 @@ const testSpecNotChosenForFunding: SpecificationSummary = {
   dataDefinitionRelationshipIds: [],
 };
 
-const completedLatestJob: LatestSpecificationJobWithMonitoringResult = {
-  hasJob: true,
-  isCheckingForJob: false,
-  isFetched: true,
-  isFetching: false,
-  latestJob: {
-    isComplete: true,
-    jobId: "123",
-    statusDescription: "string",
-    jobDescription: "string",
-    runningStatus: RunningStatus.Completed,
-    failures: [],
-    isSuccessful: true,
-    isFailed: false,
-    isActive: false,
-  },
-};
+const completedLatestJob: JobSubscriptionResult = {
+  addSub: jest.fn(),
+  removeAllSubs: jest.fn(),
+  removeSub: jest.fn(),
+  replaceSubs:jest.fn(),
+  subs: [],
+  results: [{
+    latestJob: {
+      isComplete: true,
+      jobId: "123",
+      statusDescription: "string",
+      jobDescription: "string",
+      runningStatus: RunningStatus.Completed,
+      failures: [],
+      isSuccessful: true,
+      isFailed: false,
+      isActive: false,
+    },
+    subscription: {
+      id: "123",
+      filterBy : {},
+      onError: (err) => {return err},
+      isEnabled: false,
+      startDate: DateTime.fromSeconds(1)
+    }
+  }]
+
+}
 
 const hasCompletedJob = () =>
   jest
-    .spyOn(useLatestSpecificationJobWithMonitoringHook, "useLatestSpecificationJobWithMonitoring")
+    .spyOn(useJobSubscription, "useJobSubscription")
     .mockImplementation(() => completedLatestJob);
 
 const specResult = (spec: SpecificationSummary): SpecificationSummaryQueryResult => {
