@@ -258,8 +258,7 @@ export const ViewSpecificationSummary = ({
             </li>
           )}
           {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."} />}
-          {!enableNewFundingManagement &&
-            !isLoadingSelectedForFunding &&
+          {!isLoadingSelectedForFunding &&
             !isLoadingCalculationSummaries &&
             !specification.isSelectedForFunding && (
               <li>
