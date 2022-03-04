@@ -1,5 +1,4 @@
 ﻿import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
 
 import { convertToSlug } from "../../helpers/stringHelper";
 import { DatasetRelationshipType } from "../../types/Datasets/DatasetRelationshipType";
@@ -9,6 +8,7 @@ import { DateTimeFormatter } from "../DateTimeFormatter";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { LoadingStatus } from "../LoadingStatus";
 import { NoData } from "../NoData";
+import { TextLink } from "../TextLink";
 
 export interface SpecificationDataRelationshipsGridProps {
   isLoadingDatasetRelationships: boolean;
@@ -145,9 +145,9 @@ const DataRelationshipItemRow = React.memo(({ item, converterWizardJobs }: DataR
       </td>
       <td className="govuk-table__cell">
         {item.hasDataSourceFileToMap && !hasConverterWizardRunning && (
-          <Link to={`/Datasets/SelectDataSource/${item.relationshipId}`} className="govuk-link">
+          <TextLink to={`/Datasets/SelectDataSource/${item.relationshipId}`}>
             {item.datasetName && item.datasetName.length > 0 ? "Change" : "Map"}
-          </Link>
+          </TextLink>
         )}
       </td>
     </tr>

@@ -14,6 +14,7 @@ import { Main } from "../components/Main";
 import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
 import { Pagination } from "../components/Pagination";
 import { TagTypes } from "../components/Tag";
+import { TextLink } from "../components/TextLink";
 import { useCalculation } from "../hooks/Calculations/useCalculation";
 import { useJobSubscription } from "../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../hooks/useErrors";
@@ -486,12 +487,11 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                     className="govuk-accordion__section-content"
                   >
                     {calculation && (
-                      <Link
+                      <TextLink
                         to={`/ViewResults/ViewProviderResults/${cpr.providerId}/${calculation.fundingStreamId}/?specificationId=${cpr.specificationId}`}
-                        className="govuk-link"
                       >
                         View provider calculations
-                      </Link>
+                      </TextLink>
                     )}
                     <dl className="govuk-summary-list govuk-!-margin-top-5">
                       <div className="govuk-summary-list__row">

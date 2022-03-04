@@ -12,6 +12,7 @@ import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { CsvDownloadPublishedProviders } from "./CsvDownloadPublishedProviders";
+import {TextLink} from "../TextLink";
 
 export interface FundingConfirmationSummaryProps {
   routingParams: ConfirmFundingRouteProps;
@@ -135,12 +136,11 @@ export function FundingConfirmationSummary(props: FundingConfirmationSummaryProp
         {props.approvalMode === ApprovalMode.Batches && !props.isWaitingForJob && (
           <div className="govuk-grid-row govuk-!-margin-bottom-7">
             <div className="govuk-grid-column-three-quarters">
-              <Link
+              <TextLink
                 to={`/Approvals/SpecificationFundingApproval/${props.routingParams.fundingStreamId}/${props.routingParams.fundingPeriodId}/${props.specification.id}`}
-                className="govuk-link govuk-link--no-visited-state right-align"
               >
                 Change selection
-              </Link>
+              </TextLink>
             </div>
           </div>
         )}

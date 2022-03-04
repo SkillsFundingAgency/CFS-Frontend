@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { RouteComponentProps, useLocation } from "react-router";
-import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { AdditionalCalculations } from "../../components/Calculations/AdditionalCalculations";
@@ -11,6 +10,7 @@ import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { DownloadableReports } from "../../components/Reports/DownloadableReports";
 import { Tabs } from "../../components/Tabs";
+import { TextLink } from "../../components/TextLink";
 import { useLatestSpecificationJobWithMonitoring } from "../../hooks/Jobs/useLatestSpecificationJobWithMonitoring";
 import { useSpecsSelectedForFunding } from "../../hooks/Specifications/useSpecsSelectedForFunding";
 import { useErrors } from "../../hooks/useErrors";
@@ -92,27 +92,23 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
                 !!specsSelectedForFunding?.length && (
                   <>
                     <li>
-                      <Link
-                        className="govuk-link govuk-link--no-visited-state"
+                      <TextLink
                         to={`/FundingManagement/Approve/Results/${specification?.fundingStreams[0].id}/${specification?.fundingPeriod.id}/${specification?.id}`}
                       >
                         Funding approvals
-                      </Link>
+                      </TextLink>
                     </li>
                     <li>
-                      <Link
-                        className="govuk-link govuk-link--no-visited-state"
+                      <TextLink
                         to={`/FundingManagement/Release/Results/${specification?.fundingStreams[0].id}/${specification?.fundingPeriod.id}/${specification?.id}`}
                       >
                         Release management
-                      </Link>
+                      </TextLink>
                     </li>
                   </>
                 )}
               <li>
-                <Link className={"govuk-link"} to={`/ViewSpecification/${specification?.id}`}>
-                  Manage specification
-                </Link>
+                <TextLink to={`/ViewSpecification/${specification?.id}`}>Manage specification</TextLink>
               </li>
             </ul>
           </div>

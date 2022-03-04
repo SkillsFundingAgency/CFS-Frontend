@@ -73,7 +73,7 @@ import { MyPermissions } from "./pages/Permissions/MyPermissions";
 import { CreateSpecification } from "./pages/Specifications/CreateSpecification";
 import { EditSpecification } from "./pages/Specifications/EditSpecification";
 import { EditVariationPoints } from "./pages/Specifications/EditVariationPoints";
-import { SelectSpecification } from "./pages/Specifications/SelectSpecification";
+import { SelectSpecificationForResults } from "./pages/Specifications/SelectSpecificationForResults";
 import { SpecificationsList } from "./pages/Specifications/SpecificationsList";
 import { ViewSpecification } from "./pages/Specifications/ViewSpecification";
 import { ViewSpecificationResults } from "./pages/Specifications/ViewSpecificationResults";
@@ -182,7 +182,7 @@ const App: React.FunctionComponent = () => {
 
               {resultsRoutes}
 
-              <Route path="/SelectSpecification" component={SelectSpecification} />
+              <Route path="/SelectSpecification" component={SelectSpecificationForResults} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
               <Route path="/ViewSpecificationResults/:specificationId" component={ViewSpecificationResults} />
               <Route path="/ViewSpecification/:specificationId" component={ViewSpecification} />

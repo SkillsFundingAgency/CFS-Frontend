@@ -12,6 +12,7 @@ import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
+import { TextLink } from "../../../components/TextLink";
 import { CreateDatasetWorkflowState } from "../../../context/states";
 import { useAppContext } from "../../../context/useAppContext";
 import { convertCamelCaseToSpaceDelimited } from "../../../helpers/stringHelper";
@@ -180,9 +181,9 @@ const DatasetDetails = (props: {
           <dt className="govuk-summary-list__key govuk-!-width-one-third">Name</dt>
           <dd className="govuk-summary-list__value govuk-!-padding-left-2">{props.name}</dd>
           <dd className="govuk-summary-list__actions">
-            <Link className="govuk-link" to={`/Datasets/Create/SpecifyDatasetDetails/${props.forSpecId}`}>
+            <TextLink to={`/Datasets/Create/SpecifyDatasetDetails/${props.forSpecId}`}>
               Change <span className="govuk-visually-hidden">dataset name</span>
-            </Link>
+            </TextLink>
           </dd>
         </div>
         <div className="govuk-summary-list__row govuk-!-width-one-third">

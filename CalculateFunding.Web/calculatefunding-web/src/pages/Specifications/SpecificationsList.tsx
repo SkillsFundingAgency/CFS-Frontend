@@ -180,195 +180,197 @@ export function SpecificationsList() {
           },
         ]}
       />
-      
-      <Title
-        title="Specifications"
-        titleCaption="Create and manage the specifications used to calculate funding."
-      />
 
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
-          <Link
-            to="/Specifications/CreateSpecification"
-            id={"create-specification-link"}
-            className="govuk-button govuk-button--primary"
-            data-module="govuk-button"
-          >
-            Create a new specification
-          </Link>
-        </div>
-      </div>
       {!isLoading && (
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-third">
-            <form id="searchSpecifications">
-              <CollapsiblePanel title="Search" isExpanded={true}>
-                <fieldset className="govuk-fieldset">
-                  <label className="govuk-label">Search</label>
-                  <input className="govuk-input" onChange={filterBySearchTerm} />
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by funding period"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchCriteria.fundingPeriods.length}
+        <>
+          <Title
+            title="Specifications"
+            titleCaption="Create and manage the specifications used to calculate funding."
+          />
+
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-third">
+              <Link
+                to="/Specifications/CreateSpecification"
+                id={"create-specification-link"}
+                className="govuk-button govuk-button--primary"
+                data-module="govuk-button"
               >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input className="govuk-input" type="text" onChange={searchFundingPeriods} />
-                  </div>
-                  <div className="govuk-checkboxes govuk-scroll-window">
-                    {filterFundingPeriods.map((fp, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          id={`fundingPeriods-${fp.name}`}
-                          name={`fundingPeriods-${fp.name}`}
-                          type="checkbox"
-                          value={fp.name}
-                          onChange={filterByFundingPeriod}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`fundingPeriods-${fp.name}`}
-                        >
-                          {fp.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by funding streams"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchCriteria.fundingStreams.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input className="govuk-input" type="text" onChange={searchFundingStreams} />
-                  </div>
-                  <div className="govuk-checkboxes govuk-scroll-window">
-                    {filterFundingStreams.map((fs, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          id={`fundingPeriods-${fs.name}`}
-                          name={`fundingPeriods-${fs.name}`}
-                          type="checkbox"
-                          value={fs.name}
-                          onChange={filterByFundingStream}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`fundingPeriods-${fs.name}`}
-                        >
-                          {fs.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <CollapsiblePanel
-                title={"Filter by status"}
-                isExpanded={true}
-                isCollapsible={true}
-                showFacetCount={true}
-                facetCount={searchCriteria.status.length}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-form-group">
-                    <label className="govuk-label">Search</label>
-                    <input className="govuk-input" type="text" onChange={searchStatus} />
-                  </div>
-                  <div className="govuk-checkboxes">
-                    {filterStatus.map((s, index) => (
-                      <div key={index} className="govuk-checkboxes__item">
-                        <input
-                          className="govuk-checkboxes__input"
-                          id={`fundingPeriods-${s.name}`}
-                          name={`fundingPeriods-${s.name}`}
-                          type="checkbox"
-                          value={s.name}
-                          onChange={filterByStatus}
-                        />
-                        <label
-                          className="govuk-label govuk-checkboxes__label"
-                          htmlFor={`fundingPeriods-${s.name}`}
-                        >
-                          {s.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-              <button type="button" className="govuk-button" onClick={clearFilters}>
-                Clear filters
-              </button>
-            </form>
+                Create a new specification
+              </Link>
+            </div>
           </div>
-          <div className="govuk-grid-column-two-thirds">
-            <table
-              className="govuk-table"
-              id="specification-table"
-              hidden={specificationListResults.items.length < 1}
-            >
-              <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header">
-                    Specification
-                  </th>
-                  <th scope="col" className="govuk-table__header govuk-!-width-one-half">
-                    Last edited data
-                  </th>
-                  <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
-                    Specification status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="govuk-table__body" id="mainContentResults">
-                {specificationListResults.items.map((s) => (
-                  <tr key={s.id} className="govuk-table__row">
-                    <th scope="row" className="govuk-table__header">
-                      <Link to={`/ViewSpecification/${s.id}`}>{s.name}</Link>
-                      {s.isSelectedForFunding && (
-                        <strong className="govuk-tag govuk-!-margin-top-2">Chosen for funding</strong>
-                      )}
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-one-third">
+              <form id="searchSpecifications">
+                <CollapsiblePanel title="Search" isExpanded={true}>
+                  <fieldset className="govuk-fieldset">
+                    <label className="govuk-label">Search</label>
+                    <input className="govuk-input" onChange={filterBySearchTerm} />
+                  </fieldset>
+                </CollapsiblePanel>
+                <CollapsiblePanel
+                  title={"Filter by funding period"}
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={searchCriteria.fundingPeriods.length}
+                >
+                  <fieldset className="govuk-fieldset">
+                    <div className="govuk-form-group">
+                      <label className="govuk-label">Search</label>
+                      <input className="govuk-input" type="text" onChange={searchFundingPeriods} />
+                    </div>
+                    <div className="govuk-checkboxes govuk-scroll-window">
+                      {filterFundingPeriods.map((fp, index) => (
+                        <div key={index} className="govuk-checkboxes__item">
+                          <input
+                            className="govuk-checkboxes__input"
+                            id={`fundingPeriods-${fp.name}`}
+                            name={`fundingPeriods-${fp.name}`}
+                            type="checkbox"
+                            value={fp.name}
+                            onChange={filterByFundingPeriod}
+                          />
+                          <label
+                            className="govuk-label govuk-checkboxes__label"
+                            htmlFor={`fundingPeriods-${fp.name}`}
+                          >
+                            {fp.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </fieldset>
+                </CollapsiblePanel>
+                <CollapsiblePanel
+                  title={"Filter by funding streams"}
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={searchCriteria.fundingStreams.length}
+                >
+                  <fieldset className="govuk-fieldset">
+                    <div className="govuk-form-group">
+                      <label className="govuk-label">Search</label>
+                      <input className="govuk-input" type="text" onChange={searchFundingStreams} />
+                    </div>
+                    <div className="govuk-checkboxes govuk-scroll-window">
+                      {filterFundingStreams.map((fs, index) => (
+                        <div key={index} className="govuk-checkboxes__item">
+                          <input
+                            className="govuk-checkboxes__input"
+                            id={`fundingPeriods-${fs.name}`}
+                            name={`fundingPeriods-${fs.name}`}
+                            type="checkbox"
+                            value={fs.name}
+                            onChange={filterByFundingStream}
+                          />
+                          <label
+                            className="govuk-label govuk-checkboxes__label"
+                            htmlFor={`fundingPeriods-${fs.name}`}
+                          >
+                            {fs.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </fieldset>
+                </CollapsiblePanel>
+                <CollapsiblePanel
+                  title={"Filter by status"}
+                  isExpanded={true}
+                  isCollapsible={true}
+                  showFacetCount={true}
+                  facetCount={searchCriteria.status.length}
+                >
+                  <fieldset className="govuk-fieldset">
+                    <div className="govuk-form-group">
+                      <label className="govuk-label">Search</label>
+                      <input className="govuk-input" type="text" onChange={searchStatus} />
+                    </div>
+                    <div className="govuk-checkboxes">
+                      {filterStatus.map((s, index) => (
+                        <div key={index} className="govuk-checkboxes__item">
+                          <input
+                            className="govuk-checkboxes__input"
+                            id={`fundingPeriods-${s.name}`}
+                            name={`fundingPeriods-${s.name}`}
+                            type="checkbox"
+                            value={s.name}
+                            onChange={filterByStatus}
+                          />
+                          <label
+                            className="govuk-label govuk-checkboxes__label"
+                            htmlFor={`fundingPeriods-${s.name}`}
+                          >
+                            {s.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+                  </fieldset>
+                </CollapsiblePanel>
+                <button type="button" className="govuk-button" onClick={clearFilters}>
+                  Clear filters
+                </button>
+              </form>
+            </div>
+            <div className="govuk-grid-column-two-thirds">
+              <table
+                className="govuk-table"
+                id="specification-table"
+                hidden={specificationListResults.items.length < 1}
+              >
+                <thead className="govuk-table__head">
+                  <tr className="govuk-table__row">
+                    <th scope="col" className="govuk-table__header">
+                      Specification
                     </th>
-                    <td className="govuk-table__cell">
-                      {s.lastUpdatedDate && <DateTimeFormatter date={s.lastUpdatedDate} />}
-                    </td>
-                    <td className="govuk-table__cell">{s.status}</td>
+                    <th scope="col" className="govuk-table__header govuk-!-width-one-half">
+                      Last edited data
+                    </th>
+                    <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
+                      Specification status
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <NoData hidden={specificationListResults.items.length > 0} />
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-two-thirds">
-                <Pagination
-                  callback={movePage}
-                  currentPage={specificationListResults.pagerState.currentPage}
-                  lastPage={specificationListResults.pagerState.lastPage}
-                />
-              </div>
-              <div className="govuk-grid-column-one-third">
-                <p className="govuk-body-s">
-                  Showing {specificationListResults.startItemNumber} -{" "}
-                  {specificationListResults.endItemNumber} of {specificationListResults.totalCount} results
-                </p>
+                </thead>
+                <tbody className="govuk-table__body" id="mainContentResults">
+                  {specificationListResults.items.map((s) => (
+                    <tr key={s.id} className="govuk-table__row">
+                      <th scope="row" className="govuk-table__header">
+                        <Link to={`/ViewSpecification/${s.id}`}>{s.name}</Link>
+                        {s.isSelectedForFunding && (
+                          <strong className="govuk-tag govuk-!-margin-top-2">Chosen for funding</strong>
+                        )}
+                      </th>
+                      <td className="govuk-table__cell">
+                        {s.lastUpdatedDate && <DateTimeFormatter date={s.lastUpdatedDate} />}
+                      </td>
+                      <td className="govuk-table__cell">{s.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <NoData hidden={specificationListResults.items.length > 0} />
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-two-thirds">
+                  <Pagination
+                    callback={movePage}
+                    currentPage={specificationListResults.pagerState.currentPage}
+                    lastPage={specificationListResults.pagerState.lastPage}
+                  />
+                </div>
+                <div className="govuk-grid-column-one-third">
+                  <p className="govuk-body-s">
+                    Showing {specificationListResults.startItemNumber} -{" "}
+                    {specificationListResults.endItemNumber} of {specificationListResults.totalCount} results
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </Main>
   );

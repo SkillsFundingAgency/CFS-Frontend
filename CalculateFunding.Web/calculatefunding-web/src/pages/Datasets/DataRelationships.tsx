@@ -10,6 +10,7 @@ import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import SpecificationDataRelationshipsGrid from "../../components/Datasets/SpecificationDataRelationshipsGrid";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
+import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../../hooks/useErrors";
@@ -25,7 +26,6 @@ export interface DataRelationshipsRouteProps {
 }
 
 export function DataRelationships({ match }: RouteComponentProps<DataRelationshipsRouteProps>) {
-
   const specificationId = match.params.specificationId;
   const { data: datasetRelationships, isLoading } = useQuery<
     SpecificationDatasetRelationshipsViewModel,
@@ -57,7 +57,7 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
   );
   const { errors, addError } = useErrors();
   const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
-      (state) => state.featureFlags
+    (state) => state.featureFlags
   );
 
   const watchConverterWizardJobForRelationship = (specificationId: string, triggerByEntityId: string) => {
@@ -110,14 +110,15 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
       <section>
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
-            <AddDataRelationshipButton specificationId={specificationId} specToSpec={featureFlagsState.specToSpec} />
+            <AddDataRelationshipButton
+              specificationId={specificationId}
+              specToSpec={featureFlagsState.specToSpec}
+            />
           </div>
           <div className="govuk-grid-column-one-third">
             <ul className="govuk-list right-align">
               <li>
-                <Link className={"govuk-link"} to={`/ViewSpecification/${specificationId}`}>
-                  Manage specification
-                </Link>
+                <TextLink to={`/ViewSpecification/${specificationId}`}>Manage specification</TextLink>
               </li>
             </ul>
           </div>
@@ -139,11 +140,15 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
   );
 }
 
-const AddDataRelationshipButton = React.memo((props: { specificationId: string, specToSpec:boolean }) => {
+const AddDataRelationshipButton = React.memo((props: { specificationId: string; specToSpec: boolean }) => {
   return (
     <Link
       id={"create-dataset-link"}
-      to={props.specToSpec ? `/Datasets/Create/SelectDatasetTypeToCreate/${props.specificationId}` : `/Datasets/CreateDataset/${props.specificationId}`}
+      to={
+        props.specToSpec
+          ? `/Datasets/Create/SelectDatasetTypeToCreate/${props.specificationId}`
+          : `/Datasets/CreateDataset/${props.specificationId}`
+      }
       className="govuk-button govuk-button--primary button-createSpecification govuk-!-margin-top-4"
       data-module="govuk-button"
     >

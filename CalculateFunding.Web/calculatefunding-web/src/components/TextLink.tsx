@@ -3,6 +3,7 @@ import { renderToString } from "react-dom/server";
 import { Link } from "react-router-dom";
 
 export const TextLink = ({
+  id,
   to,
   children,
   additionalCss,
@@ -10,6 +11,7 @@ export const TextLink = ({
   describedBy,
   handleOnClick,
 }: {
+  id?: string;
   to?: string;
   children: any;
   additionalCss?: string;
@@ -30,6 +32,7 @@ export const TextLink = ({
   return (
     <Link
       className={`govuk-link govuk-link--no-visited-state ${additionalCss ?? ""}`}
+      id={id ?? ""}
       to={to ?? ""}
       aria-label={label ?? renderToString(children)}
       aria-describedby={describedBy}

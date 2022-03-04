@@ -18,7 +18,7 @@ export function Main({ location, className, children }: MainProps): JSX.Element 
       <div className="govuk-width-container">
         <SubHeader />
         <main
-          className={`govuk-main-wrapper govuk-main-wrapper--auto-spacing ${className ? className : ""}`}
+          className={className ? className : ""}
           id="main-content"
           data-testid="main-content"
           role="main"

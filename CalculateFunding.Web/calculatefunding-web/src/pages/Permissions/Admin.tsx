@@ -67,7 +67,7 @@ export function Admin() {
       {permissions && fundingStreams && fundingStreams.length === 0 && (
         <WarningText text="You don't have any admin permissions" className="govuk-!-margin-top-4" />
       )}
-      <section>
+      <section className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
         <form
           id="view-permissions-type"
           onSubmit={handleSubmit}

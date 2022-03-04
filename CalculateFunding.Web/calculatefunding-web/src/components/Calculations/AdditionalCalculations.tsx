@@ -19,6 +19,7 @@ import { formatNumber, NumberType } from "../FormattedNumber";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { LoadingStatus } from "../LoadingStatus";
 import { TableNavBottom } from "../TableNavBottom";
+import { TextLink } from "../TextLink";
 
 export interface AdditionalCalculationsProps {
   specificationId: string;
@@ -308,12 +309,9 @@ export function AdditionalCalculations({
                 <span className="govuk-warning-text__assistive">Warning</span>
                 No additional calculations available. &nbsp;
                 {isPermissionsFetched && !hasMissingPermissions && showCreateButton && (
-                  <Link
-                    className="govuk-link govuk-link--no-visited-state"
-                    to={`/specifications/CreateAdditionalCalculation/${specificationId}`}
-                  >
+                  <TextLink to={`/specifications/CreateAdditionalCalculation/${specificationId}`}>
                     Create a calculation
-                  </Link>
+                  </TextLink>
                 )}
               </strong>
             </div>

@@ -1,9 +1,9 @@
 ﻿import React from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
 
 import { IStoreState } from "../reducers/rootReducer";
 import { FundingStreamPermissions } from "../types/FundingStreamPermissions";
+import { TextLink } from "./TextLink";
 
 export const AdminNav = React.memo(function () {
   const permissions: FundingStreamPermissions[] = useSelector(
@@ -15,14 +15,8 @@ export const AdminNav = React.memo(function () {
     <div className="govuk-grid-column-one-third">
       <nav className="right-align" aria-label="Admin">
         <span className="govuk-body-s govuk-!-margin-right-2">
-          {canAdminister && (
-            <Link className="govuk-link" to="/Permissions/Admin">
-              Admin
-            </Link>
-          )}{" "}
-          <Link className="govuk-link" to="/Permissions/MyPermissions">
-            My user permissions
-          </Link>
+          {canAdminister && <TextLink to="/Permissions/Admin">Admin</TextLink>}{" "}
+          <TextLink to="/Permissions/MyPermissions">My user permissions</TextLink>
         </span>
       </nav>
     </div>

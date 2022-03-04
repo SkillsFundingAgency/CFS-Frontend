@@ -16,7 +16,7 @@ import { Section } from "../../types/Sections";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
 
-export function SelectSpecification() {
+export function SelectSpecificationForResults() {
   const [selectedFundingStreamId, setSelectedFundingStreamId] = useState("");
   const [selectedSpecificationId, setSpecificationId] = useState("");
 
@@ -85,12 +85,13 @@ export function SelectSpecification() {
   }
 
   return (
-    <Main location={Section.Specifications}>
+    <Main location={Section.Results}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"View results"} url={"/results"} />
-        <Breadcrumb name={"Select specification"} />
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="View results" url="/results" />
+        <Breadcrumb name="Select specification" />
       </Breadcrumbs>
+      
       <Title
         title="Select specification"
         titleCaption="You can select the specification and funding period."

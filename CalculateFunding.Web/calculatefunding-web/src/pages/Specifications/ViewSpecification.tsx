@@ -83,6 +83,8 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
       `/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification?.fundingPeriod.id}/${specificationId}`
     );
   }
+  
+  const isLoadingSomething = isLoadingSpecification || isApproveCalcsJobMonitoring || isRefreshJobMonitoring;
 
   return (
     <Main location={Section.Specifications}>
@@ -114,8 +116,8 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           },
         ]}
       />
-      {((converterWizardJob && !converterWizardJob.isSuccessful) ||
-        (approveAllCalculationsJob && !approveAllCalculationsJob.isActive)) && (
+      {!isLoadingSomething && ((!!converterWizardJob && !converterWizardJob.isSuccessful) ||
+        (!!approveAllCalculationsJob && !approveAllCalculationsJob.isActive)) && (
         <div className="govuk-form-group">
           <JobBanner
             job={approveAllCalculationsJob}
@@ -131,7 +133,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           <JobBanner job={converterWizardJob} />
         </div>
       )}
-      {specification && fundingStream && !isApproveCalcsJobMonitoring && !isRefreshJobMonitoring && (
+      {!isLoadingSomething && !!specification && !!fundingStream && !isApproveCalcsJobMonitoring && !isRefreshJobMonitoring && (
         <>
           <ViewSpecificationSummary
             specificationId={specificationId}

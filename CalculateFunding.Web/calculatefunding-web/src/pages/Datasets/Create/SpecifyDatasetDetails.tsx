@@ -133,7 +133,7 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <MultipleErrorSummary errors={errors} />
-      <section>
+      <section className="govuk-grid-row govuk-!-margin-top-9 govuk-!-margin-bottom-9">
         <Form token="create-dataset" heading="Create data set">
           <DatasetName
             datasetName={datasetName || ""}

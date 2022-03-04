@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 
 import { Main } from "../components/Main";
 import { TextLink } from "../components/TextLink";
+import { Title } from "../components/Title";
 import { FeatureFlagsState } from "../states/FeatureFlagsState";
 import { Section } from "../types/Sections";
 
@@ -13,13 +14,15 @@ export function Home(props: { featureFlags: FeatureFlagsState }) {
 
   return (
     <Main location={Section.Home}>
-      <div className="govuk-grid-row">
+      <Title
+        title="Calculate funding"
+        titleCaption="Calculate funding, quality assure the results or approve funding."
+        css="govuk-!-margin-top-6"
+      />
+
+      <div className="homepage-section-container govuk-grid-row govuk-!-margin-top-9 govuk-!-margin-bottom-9">
         <div className="govuk-grid-column-full">
-          <h1 className="govuk-heading-xl">Calculate funding</h1>
-          <h3 className="govuk-heading-m">
-            Calculate funding, quality assure the results or approve funding.
-          </h3>
-          <div className="homepage-section-container">
+          <section className="homepage-section-container">
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-one-third">
                 <div className="govuk-heading-m">
@@ -69,7 +72,7 @@ export function Home(props: { featureFlags: FeatureFlagsState }) {
                 </div>
               )}
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </Main>

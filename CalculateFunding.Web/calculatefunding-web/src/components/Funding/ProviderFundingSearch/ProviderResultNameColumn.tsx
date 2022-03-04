@@ -1,8 +1,8 @@
 ﻿import React from "react";
-import { Link } from "react-router-dom";
 
 import { PublishedProviderResult } from "../../../types/PublishedProvider/PublishedProviderSearchResults";
 import { Tag, TagTypes } from "../../Tag";
+import { TextLink } from "../../TextLink";
 
 export interface ProviderResultNameColumnProps {
   id: string;
@@ -21,13 +21,9 @@ export const ProviderResultNameColumn = (props: ProviderResultNameColumnProps) =
       <td className="govuk-table__cell govuk-!-padding-bottom-0" colSpan={2}>
         <div className="govuk-checkboxes govuk-checkboxes--small">
           <label className="govuk-label govuk-form-group--error" htmlFor={props.id}>
-            <Link
-              id={props.id}
-              to={props.fundingOverviewUrl}
-              className="govuk-link govuk-link--no-visited-state"
-            >
+            <TextLink id={props.id} to={props.fundingOverviewUrl}>
               {provider.providerName}
-            </Link>
+            </TextLink>
             <div className={"govuk-!-margin-top-2 govuk-!-margin-bottom-2"}>
               <span className={"govuk-body-s"}>
                 <span className={"govuk-!-font-weight-bold"}>UKPRN:</span>
@@ -65,9 +61,7 @@ export const ProviderResultNameColumn = (props: ProviderResultNameColumnProps) =
             onChange={props.handleItemSelectionToggle}
           />
           <label className="govuk-label govuk-checkboxes__label" htmlFor={props.id}>
-            <Link to={props.fundingOverviewUrl} className="govuk-link govuk-link--no-visited-state">
-              {provider.providerName}
-            </Link>
+            <TextLink to={props.fundingOverviewUrl}>{provider.providerName}</TextLink>
             <div className={"govuk-!-margin-top-2 govuk-!-margin-bottom-2"}>
               <span className={"govuk-body-s"}>
                 <span className={"govuk-!-font-weight-bold"}>UKPRN:</span>
@@ -88,9 +82,9 @@ export const ProviderResultNameColumn = (props: ProviderResultNameColumnProps) =
   } else {
     return (
       <td className="govuk-table__cell govuk-!-padding-bottom-0">
-        <Link id={props.id} to={props.fundingOverviewUrl} className="govuk-link govuk-link--no-visited-state">
+        <TextLink id={props.id} to={props.fundingOverviewUrl}>
           {provider.providerName}
-        </Link>
+        </TextLink>
         <div className={"govuk-!-margin-top-2 govuk-!-margin-bottom-2"}>
           <span className={"govuk-body-s"}>
             <span className={"govuk-!-font-weight-bold"}>UKPRN:</span>

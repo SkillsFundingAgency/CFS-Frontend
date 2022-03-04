@@ -5,20 +5,19 @@ import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
 import { Pagination } from "../../components/Pagination";
+import { TextLink } from "../../components/TextLink";
+import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { searchDatasetRelationshipsService } from "../../services/datasetService";
 import { DatasetDefinitionRequestViewModel } from "../../types/Datasets/DatasetDefinitionRequestViewModel";
 import { SpecificationDatasourceRelationshipViewModel } from "../../types/Datasets/SpecificationDatasourceRelationshipViewModel";
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
-import { Main } from "../../components/Main";
-import { Title } from "../../components/Title";
 
 export function MapDataSourceFiles() {
   const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -342,9 +341,9 @@ export function MapDataSourceFiles() {
               {datasetRelationships.items.map((dr, index) => (
                 <tr className="govuk-table__row" key={index}>
                   <th scope="row" className="govuk-table__header">
-                    <Link to={`/Datasets/DataRelationships/${dr.specificationId}`}>
+                    <TextLink to={`/Datasets/DataRelationships/${dr.specificationId}`}>
                       {dr.specificationName}
-                    </Link>
+                    </TextLink>
                     {dr.definitionRelationshipCount > 0 ? (
                       <p className="govuk-body govuk-!-margin-top-2">
                         {dr.totalMappedDataSets} of {dr.definitionRelationshipCount} data sets mapped for
