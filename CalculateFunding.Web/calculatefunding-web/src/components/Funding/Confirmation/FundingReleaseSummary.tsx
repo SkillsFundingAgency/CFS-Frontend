@@ -128,7 +128,12 @@ export function FundingReleaseSummary({
                       </th>
                     )}
                     <td className="govuk-table__cell">{channel.channelName}</td>
-                    <td className="govuk-table__cell govuk-table__cell--numeric">{channel.totalFunding}</td>
+                    <td className="govuk-table__cell govuk-table__cell--numeric">
+                      <FormattedNumber
+                        value={channel.totalFunding ? channel.totalFunding : 0}
+                        type={NumberType.FormattedMoney}
+                      />
+                    </td>
                   </tr>
                 ))}
                 <tr className="govuk-table__row">

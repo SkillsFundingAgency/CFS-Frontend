@@ -183,7 +183,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
         loadBatchFundingSummary();
       }
       if (state.selectedProviderIds.length === 0) {
-        addError({ error: "There are no selected providers to " + actionType.toLowerCase() });
+        addError({ error: `There are no selected providers to ${actionType.toLowerCase()}` });
       }
     }
   }, [fundingConfiguration, match.params]);

@@ -161,7 +161,7 @@ export const useFundingConfirmation = ({
         loadBatchFundingSummary();
       }
       if (selectedProviderIds.length === 0) {
-        addErrorToContext({ error: "There are no selected providers to approve" });
+        addErrorToContext({ error: `There are no selected providers to ${actionType.toLowerCase()}` });
       }
     }
   }, [fundingConfiguration]);

@@ -21,7 +21,7 @@ export const useReleaseFundingSummaryData = (
         )
       ).data,
     {
-      enabled: specificationId?.length > 0 && channelCodes?.length > 0 && publishedProviderIds?.length > 0,
+      enabled: specificationId?.length > 0 && channelCodes?.length > 0,
       ...options,
     }
   );
