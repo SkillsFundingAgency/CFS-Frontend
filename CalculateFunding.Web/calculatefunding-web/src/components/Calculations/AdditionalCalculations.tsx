@@ -285,7 +285,11 @@ export function AdditionalCalculations({
                       <span className="govuk-error-message">Error</span>
                     )}
                   </td>
-                  {providerId && <td className="govuk-table__cell">{renderValue(ac.value, ac.valueType)}</td>}
+                  {providerId && (
+                    <td className="govuk-table__cell">
+                      {ac.value && ac.value !== null ? renderValue(ac.value, ac.valueType) : "Excluded"}
+                    </td>
+                  )}
                   {!providerId && (
                     <td className="govuk-table__cell">
                       <DateTimeFormatter date={ac.lastUpdatedDate} />

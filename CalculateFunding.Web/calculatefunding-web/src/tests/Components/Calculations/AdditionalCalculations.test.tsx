@@ -86,11 +86,13 @@ describe("<AdditionalCalculations /> tests", () => {
     it("additional calculations are displayed", async () => {
       expect(await screen.findByText(testCalc1.name)).toBeInTheDocument();
       expect(await screen.findByText(testCalc2.name)).toBeInTheDocument();
+      expect(await screen.findByText(testCalc3.name)).toBeInTheDocument();
     });
 
     it("renders non-error statuses for calculations", async () => {
       expect(await screen.findByText(testCalc1.status)).toBeInTheDocument();
       expect(await screen.findByText(testCalc2.status)).toBeInTheDocument();
+      expect(await screen.findByText(testCalc3.status)).toBeInTheDocument();
       expect(screen.queryByText("Error")).not.toBeInTheDocument();
     });
 
@@ -133,17 +135,20 @@ describe("<AdditionalCalculations /> tests", () => {
     it("additional calculations are displayed", async () => {
       expect(await screen.findByText(testCalc1.name)).toBeInTheDocument();
       expect(await screen.findByText(testCalc2.name)).toBeInTheDocument();
+      expect(await screen.findByText(testCalc3.name)).toBeInTheDocument();
     });
 
     it("does not render status columns", async () => {
       expect(await screen.queryByText(testCalc1.status)).not.toBeInTheDocument();
       expect(await screen.queryByText(testCalc2.status)).not.toBeInTheDocument();
+      expect(await screen.queryByText(testCalc3.status)).not.toBeInTheDocument();
       expect(screen.queryByText("Error")).not.toBeInTheDocument();
     });
 
     it("renders value columns with correct formatting", async () => {
       expect(await screen.findByText(/£100/)).toBeInTheDocument();
       expect(await screen.findByText(/200/)).toBeInTheDocument();
+      expect(await screen.findByText(/Excluded/)).toBeInTheDocument();
     });
 
     it("does not render error message", async () => {
@@ -161,6 +166,7 @@ describe("<AdditionalCalculations /> tests", () => {
     it("additional calculations are displayed", async () => {
       expect(await screen.findByText(testCalc1.name)).toBeInTheDocument();
       expect(await screen.findByText(testCalc2.name)).toBeInTheDocument();
+      expect(await screen.findByText(testCalc3.name)).toBeInTheDocument();
     });
 
     it("error message is displayed once for calculation with circular reference error", async () => {
@@ -169,6 +175,7 @@ describe("<AdditionalCalculations /> tests", () => {
 
     it("error status is displayed for calculation without circular reference error", async () => {
       expect(screen.queryByText(testCalc2.status)).not.toBeInTheDocument();
+      expect(await screen.findByText(testCalc3.status)).toBeInTheDocument();
       expect(await screen.findByText(testCalc1.status)).toBeInTheDocument();
     });
   });
@@ -253,6 +260,22 @@ const testCalc2: CalculationSearchResult = {
   value: 200,
   exceptionMessage: undefined,
 };
+const testCalc3: CalculationSearchResult = {
+  calculationType: CalculationType.Additional,
+  description: undefined,
+  fundingStreamId: fundingStream.id,
+  id: "65472",
+  lastUpdatedDate: new Date(),
+  name: "Test Calc 3",
+  namespace: "blah-blah",
+  status: PublishStatus.Approved,
+  specificationId: testSpec.id,
+  valueType: ValueType.Currency,
+  specificationName: testSpec.name,
+  wasTemplateCalculation: false,
+  value: undefined,
+  exceptionMessage: undefined,
+};
 const withCircularRefErrorsResult: CalculationCircularDependenciesQueryResult = {
   circularReferenceErrors: [
     {
@@ -323,7 +346,7 @@ const mockCalculationService = () => {
             currentPage: 0,
           },
           facets: [],
-          calculations: [testCalc1, testCalc2],
+          calculations: [testCalc1, testCalc2, testCalc3],
         },
       })
     ),
@@ -337,7 +360,7 @@ const mockSpecificationService = () => {
       Promise.resolve({
         status: 200,
         data: {
-          calculations: [testCalc1, testCalc2],
+          calculations: [testCalc1, testCalc2, testCalc3],
           totalResults: 2,
           totalErrorResults: 0,
           currentPage: 1,
