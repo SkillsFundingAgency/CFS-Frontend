@@ -172,7 +172,6 @@ export const CreateTemplate = () => {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate Funding"} url={"/"} />
         <Breadcrumb name={"Templates"} url={"/Templates/List"} />
-        <Breadcrumb name={"Create a new template"} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
       <MultipleErrorSummary errors={errors} />

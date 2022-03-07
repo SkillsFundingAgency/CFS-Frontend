@@ -204,7 +204,6 @@ export function CreateDatasetFromUpload({
           name={specification ? specification.name : "specification"}
           url={`/ViewSpecification/${specificationId}`}
         />
-        <Breadcrumb name={"Create dataset"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
 

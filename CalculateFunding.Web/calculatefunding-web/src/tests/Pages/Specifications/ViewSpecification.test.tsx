@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { Provider } from "react-redux";
@@ -48,7 +48,10 @@ describe("<ViewSpecification />", () => {
 
       await renderPage();
     });
-    afterEach(() => jest.clearAllMocks());
+    afterEach(() => {
+      jest.clearAllMocks();
+      cleanup();
+    });
 
     it("it makes all the expected calls to the API", async () => {
       expect(useSpecificationSummaryUtils.spy).toBeCalled();
@@ -58,6 +61,27 @@ describe("<ViewSpecification />", () => {
       expect(useGetCalculationErrorsUtils.spy).toBeCalled();
       expect(useCalculationCircularDependenciesUtils.spy).toBeCalled();
     });
+
+    it("renders the breadcrumbs", async () => {
+      await renderPage();
+      const list = screen.getAllByRole("list", { name: /breadcrumb-list/i })[0];
+
+      const { getAllByRole } = within(list);
+      const items = getAllByRole("listitem");
+      expect(items).toHaveLength(2);
+    });
+
+    it("renders the correct items in the breadcrumb list", async () => {
+      await renderPage();
+      const list = screen.getAllByRole("list", { name: /breadcrumb-list/i })[0];
+
+      const { getAllByRole } = within(list);
+      const items = getAllByRole("listitem");
+
+      expect(items.length).toBe(2);
+      expect(items[0]).toHaveTextContent(/Calculate funding/i);
+      expect(items[1]).toHaveTextContent(/View specifications/i);
+    })
 
     it("shows correct status in funding line structure tab", async () => {
       expect(screen.getByText("Draft")).toBeInTheDocument();

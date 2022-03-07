@@ -210,7 +210,6 @@ export function MapDataSourceFiles() {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-        <Breadcrumb name={"Map data sources to data sets for a specification"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <Title

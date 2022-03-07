@@ -11,7 +11,6 @@ export function ViewResults() {
     <Main location={Section.Results}>
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
-        <Breadcrumb name="View results" />
       </Breadcrumbs>
 
       <Title title="View results" titleCaption="View results for providers and calculations." />

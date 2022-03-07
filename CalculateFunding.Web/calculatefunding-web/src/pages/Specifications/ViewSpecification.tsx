@@ -83,7 +83,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
       `/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification?.fundingPeriod.id}/${specificationId}`
     );
   }
-  
+
   const isLoadingSomething = isLoadingSpecification || isApproveCalcsJobMonitoring || isRefreshJobMonitoring;
 
   return (
@@ -91,7 +91,6 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-        <Breadcrumb name={specification?.name ?? ""} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} />

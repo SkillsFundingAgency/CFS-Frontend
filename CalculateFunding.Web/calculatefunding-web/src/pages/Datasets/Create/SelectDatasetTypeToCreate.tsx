@@ -70,7 +70,6 @@ export function SelectDatasetTypeToCreate({
           name={specification ? specification.name : "Specification"}
           url={specification ? `/ViewSpecification/${specification.id}` : "#"}
         />
-        <Breadcrumb name="Dataset type" />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

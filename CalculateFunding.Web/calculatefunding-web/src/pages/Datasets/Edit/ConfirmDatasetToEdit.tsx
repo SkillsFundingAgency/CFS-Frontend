@@ -145,7 +145,6 @@ export function ConfirmDatasetToEdit({
           name="Edit selected funding lines and calculations"
           url={`/Datasets/${relationshipId}/Edit/${updatingSpecId}`}
         />
-        <Breadcrumb name="Check data set" />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <section>

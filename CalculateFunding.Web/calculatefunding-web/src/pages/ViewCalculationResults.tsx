@@ -279,7 +279,6 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
         {specification && (
           <Breadcrumb name={specification.name} url={`/ViewSpecificationResults/${specification.id}`} />
         )}
-        {calculation && <Breadcrumb name={calculation.name} />}
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       {specificationId.length > 0 && (

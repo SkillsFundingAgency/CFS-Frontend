@@ -18,7 +18,7 @@ describe("<DownloadDataSchema />", () => {
         <DownloadDataSchema />
       </MemoryRouter>
     );
-    expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(3);
+    expect(wrapper.find(".govuk-breadcrumbs__list").children().length).toBe(2);
   });
 
   it("will have the correct <H1 /> title", () => {
@@ -46,15 +46,6 @@ describe("<DownloadDataSchema />", () => {
       </MemoryRouter>
     );
     expect(wrapper.find("Breadcrumb").at(1).text()).toBe("Manage data");
-  });
-
-  it("will have the correct <Breadcrumb /> for Download data schema template", () => {
-    const wrapper = mount(
-      <MemoryRouter>
-        <DownloadDataSchema />
-      </MemoryRouter>
-    );
-    expect(wrapper.find("Breadcrumb").at(2).text()).toBe("Download data schema template");
   });
 
   it("will have the correct number of collapsible panels", () => {

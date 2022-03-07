@@ -364,7 +364,6 @@ export const SpecificationFundingApproval = ({
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Approvals"} />
         <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
-        <Breadcrumb name={"Funding approval results"} />
       </Breadcrumbs>
 
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />

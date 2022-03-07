@@ -385,7 +385,6 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
-        <Breadcrumb name={"Edit specification"} />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

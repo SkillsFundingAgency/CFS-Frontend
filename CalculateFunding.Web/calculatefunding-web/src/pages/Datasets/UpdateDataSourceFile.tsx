@@ -394,7 +394,6 @@ export function UpdateDataSourceFile({
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
         <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
-        <Breadcrumb name="Update data source file" />
       </Breadcrumbs>
 
       <MultipleErrorSummary errors={errors} />

@@ -45,7 +45,6 @@ export function DatasetHistory({ match }: RouteComponentProps<DatasetHistoryRout
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
         <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
-        {dataset && <Breadcrumb name={dataset.name} />}
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <Title title={dataset?.name ?? ""} includeBackLink={false} />

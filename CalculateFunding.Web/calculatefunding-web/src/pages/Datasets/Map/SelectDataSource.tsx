@@ -263,7 +263,6 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
         {specification && (
           <Breadcrumb name={specificationName} url={`/Datasets/DataRelationships/${specification.id}`} />
         )}
-        <Breadcrumb name={`Change ${specificationName}`} />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

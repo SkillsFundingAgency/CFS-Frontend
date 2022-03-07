@@ -185,7 +185,6 @@ export function CompareCalculationVersions({
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
         <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
-        <Breadcrumb name={"Calculation version history"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <LoadingStatus

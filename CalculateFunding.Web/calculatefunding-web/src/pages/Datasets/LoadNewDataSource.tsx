@@ -549,7 +549,6 @@ export function LoadNewDataSource() {
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
         <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
-        <Breadcrumb name={"Load new data source file"} />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={[requiredPermission]}

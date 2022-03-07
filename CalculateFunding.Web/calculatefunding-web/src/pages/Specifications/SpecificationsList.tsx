@@ -168,7 +168,6 @@ export function SpecificationsList() {
     <Main location={Section.Specifications}>
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"View specifications"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <LoadingStatusNotifier

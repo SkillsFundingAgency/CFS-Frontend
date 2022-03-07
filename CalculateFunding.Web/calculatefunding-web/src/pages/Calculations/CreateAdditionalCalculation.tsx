@@ -129,7 +129,6 @@ export function CreateAdditionalCalculation({
         {specification && (
           <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
         )}
-        <Breadcrumb name={"Create additional calculation"} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} />

@@ -204,7 +204,6 @@ export function EditCalculation({
         {specification && (
           <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
         )}
-        <Breadcrumb name={`Edit ${calculation?.calculationType?.toLowerCase()} calculation`} />
       </Breadcrumbs>
 
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />

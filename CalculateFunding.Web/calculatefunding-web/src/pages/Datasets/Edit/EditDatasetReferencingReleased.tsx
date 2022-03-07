@@ -176,7 +176,6 @@ export function EditDatasetReferencingReleased({
           name={relationshipMetadata ? relationshipMetadata.currentSpecificationName : "Specification"}
           url={`/ViewSpecification/${updatingSpecId}`}
         />
-        <Breadcrumb name="Edit selected funding lines and calculations" />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

@@ -56,18 +56,8 @@ describe("<EditSpecification /> FDZ with manual tracking", () => {
       expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
     });
 
-    it("the breadcrumbs are correct", async () => {
-      expect((await screen.findAllByText(/Edit specification/))[0]).toHaveClass(
-        "govuk-breadcrumbs__list-item"
-      );
-    });
-
     it("will have the correct breadcrumbs", async () => {
-      expect(await screen.findAllByTestId("breadcrumb")).toHaveLength(3);
-    });
-
-    it("will have the correct <H1 /> title", async () => {
-      expect((await screen.findAllByText(/Edit specification/))[1]).toHaveClass("govuk-fieldset__heading");
+      expect(await screen.findAllByTestId("breadcrumb")).toHaveLength(2);
     });
 
     it("renders the specification name", async () => {

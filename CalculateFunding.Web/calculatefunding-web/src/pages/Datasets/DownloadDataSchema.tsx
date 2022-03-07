@@ -7,9 +7,11 @@ import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { Footer } from "../../components/Footer";
 import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
+import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
 import { Pagination } from "../../components/Pagination";
+import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { searchDatasetDefinitionsService } from "../../services/datasetService";
 import { DatasetDefinitionRequestViewModel } from "../../types/Datasets/DatasetDefinitionRequestViewModel";
@@ -17,8 +19,6 @@ import { DatasetDefinitionResponseViewModel } from "../../types/Datasets/Dataset
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
 import { SearchFacetValue } from "../../types/TemplateBuilderDefinitions";
-import { Main } from "../../components/Main";
-import { Title } from "../../components/Title";
 
 export function DownloadDataSchema() {
   const initialSearchRequest: DatasetDefinitionRequestViewModel = {
@@ -168,7 +168,6 @@ export function DownloadDataSchema() {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-        <Breadcrumb name={"Download data schema template"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <Title title={"Download data schema template"} />

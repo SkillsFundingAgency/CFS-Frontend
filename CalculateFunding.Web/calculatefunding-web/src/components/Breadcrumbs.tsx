@@ -12,7 +12,7 @@ export interface BreadcrumbProps {
 export function Breadcrumbs(props: { children: any }) {
   return (
     <nav id="breadcrumbs" aria-label="Breadcrumbs" className="govuk-breadcrumbs govuk-!-margin-bottom-5">
-      <ol className="govuk-breadcrumbs__list">{props.children}</ol>
+      <ol className="govuk-breadcrumbs__list" aria-label="breadcrumb-list">{props.children}</ol>
     </nav>
   );
 }

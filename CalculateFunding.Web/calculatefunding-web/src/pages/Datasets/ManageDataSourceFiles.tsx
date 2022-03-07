@@ -158,7 +158,6 @@ export function ManageDataSourceFiles() {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
-        <Breadcrumb name={"Manage data source files"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <Title title={"Manage data source files"} titleCaption={"Upload new or updated data source files"} />

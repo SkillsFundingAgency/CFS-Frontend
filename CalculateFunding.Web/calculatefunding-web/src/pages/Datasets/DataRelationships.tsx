@@ -99,7 +99,6 @@ export function DataRelationships({ match }: RouteComponentProps<DataRelationshi
           name={"Map data sources to datasets for a specification"}
           url={"/Datasets/MapDataSourceFiles"}
         />
-        <Breadcrumb name={specificationName} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
 

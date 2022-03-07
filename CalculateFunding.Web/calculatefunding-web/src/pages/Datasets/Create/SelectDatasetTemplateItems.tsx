@@ -159,7 +159,6 @@ export function SelectDatasetTemplateItems({
           url={`/Datasets/Create/SelectReferenceSpecification/${forSpecId}`}
         />
         <Breadcrumb name="Data set details" url={`/Datasets/Create/SpecifyDatasetDetails/${forSpecId}`} />
-        <Breadcrumb name="Select funding lines and calculations" />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

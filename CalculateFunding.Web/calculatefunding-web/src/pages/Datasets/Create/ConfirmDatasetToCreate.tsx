@@ -134,7 +134,6 @@ export function ConfirmDatasetToCreate({ match }: RouteComponentProps<CreateData
           name="Select funding lines and calculations"
           url={`/Datasets/Create/SelectDatasetTemplateItems/${forSpecId}`}
         />
-        <Breadcrumb name="Check data set" />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

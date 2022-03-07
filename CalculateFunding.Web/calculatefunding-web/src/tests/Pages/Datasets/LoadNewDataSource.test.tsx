@@ -45,7 +45,7 @@ describe("<LoadNewDataSource />", () => {
 
   describe("renders elements on initial page load ", () => {
     it("will have the correct breadcrumbs", async () => {
-      expect(screen.getAllByTestId("breadcrumb").length).toBe(4);
+      expect(screen.getAllByTestId("breadcrumb").length).toBe(3);
     });
 
     it("will find the title Upload new data source", async () => {

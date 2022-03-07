@@ -126,7 +126,6 @@ export function SpecifyDatasetDetails({ match }: RouteComponentProps<CreateDatas
           name="Funding stream and period"
           url={`/Datasets/Create/SelectReferenceSpecification/${forSpecId}`}
         />
-        <Breadcrumb name="Create data set" />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}
