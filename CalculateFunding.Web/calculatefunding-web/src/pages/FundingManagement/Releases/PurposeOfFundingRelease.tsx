@@ -1,29 +1,27 @@
 import React, { useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
-import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
 import { LoadingStatusNotifier } from "../../../components/LoadingStatusNotifier";
 import { Main } from "../../../components/Main";
 import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
+import { Title } from "../../../components/Title";
+import { WarningText } from "../../../components/WarningText";
 import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import { ReleaseChannel } from "../../../types/FundingConfiguration";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
-import {Title} from "../../../components/Title";
 
-export interface FundingManagementReleasePurposeProps {
+export interface PurposeOfFundingReleaseProps {
   fundingStreamId: string;
   fundingPeriodId: string;
   specificationId: string;
 }
 
-export const PurposeOfFundingRelease = ({
-  match,
-}: RouteComponentProps<FundingManagementReleasePurposeProps>) => {
+export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOfFundingReleaseProps>) => {
   const history = useHistory();
   const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
@@ -62,6 +60,8 @@ export const PurposeOfFundingRelease = ({
     }
   }
 
+  const releaseChannels = fundingConfiguration?.releaseChannels?.filter((rc) => !!rc.isVisible) ?? [];
+
   return (
     <Main location={Section.FundingManagement}>
       {!isLoadingFundingConfiguration && !isLoadingSpecification && (
@@ -93,34 +93,47 @@ export const PurposeOfFundingRelease = ({
         />
       ) : (
         <>
-          <Title title={"For which purposes would you like to release?"} titleCaption={"Select all that apply."} />
+          <Title
+            title={"For which purposes would you like to release?"}
+            titleCaption={"Select all that apply."}
+          />
 
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <div className="govuk-checkboxes">
-                {fundingConfiguration?.releaseChannels
-                  ?.filter((rc) => !!rc.isVisible)
-                  ?.map((rac, index) => (
-                    <div key={index} className="govuk-checkboxes__item">
-                      <input
-                        type="checkbox"
-                        className="govuk-checkboxes__input"
-                        onChange={(e) => setReleaseAction(e, rac)}
-                      />
-                      <label className="govuk-label govuk-checkboxes__label">{rac.channelCode} </label>
-                    </div>
-                  ))}
+          {!releaseChannels.length ? (
+            <WarningText text="There are no release purposes configured for the selected funding stream and funding period." />
+          ) : (
+            <>
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-full">
+                  <div className="govuk-checkboxes">
+                    {releaseChannels.map((rac, index) => (
+                      <div key={index} className="govuk-checkboxes__item">
+                        <input
+                          type="checkbox"
+                          className="govuk-checkboxes__input"
+                          aria-labelledby={`channel-${rac.channelCode}`}
+                          onChange={(e) => setReleaseAction(e, rac)}
+                        />
+                        <label
+                          id={`channel-${rac.channelCode}`}
+                          className="govuk-label govuk-checkboxes__label"
+                        >
+                          {rac.channelCode}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
           <div className="govuk-grid-row govuk-!-padding-top-9">
             <div className="govuk-grid-column-full">
-              <button className="govuk-button" onClick={setPurpose}>
+              <button className="govuk-button" onClick={setPurpose} hidden={!releaseChannels.length}>
                 Continue
               </button>{" "}
-              <Link className="govuk-button govuk-button--secondary" to={"/"}>
+              <button className="govuk-button govuk-button--secondary" onClick={history.goBack}>
                 Cancel
-              </Link>
+              </button>
             </div>
           </div>
         </>

@@ -14,13 +14,18 @@ export const WarningText: React.FunctionComponent<WarningTextProps> = ({
   hidden = false,
 }: WarningTextProps) => {
   return (
-    <div className={`govuk-warning-text ${className || ""}`} hidden={hidden}>
+    <div
+      role="alert"
+      aria-labelledby="warning-text"
+      className={`govuk-warning-text ${className || ""}`}
+      hidden={hidden}
+    >
       <span className="govuk-warning-text__icon" aria-hidden="true">
         !
       </span>
       <strong className="govuk-warning-text__text">
         <span className="govuk-warning-text__assistive">Warning</span>
-        <span>{text}</span>
+        <span id="warning-text">{text}</span>
       </strong>
     </div>
   );

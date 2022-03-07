@@ -1,4 +1,4 @@
-﻿import React from "react";
+﻿import React, { useEffect } from "react";
 
 import { errorHelper } from "../helpers/errorHelper";
 import { ErrorProps, ValidationErrorProps } from "../hooks/useErrors";
@@ -65,6 +65,12 @@ export const useErrorContext = () => {
   if (context === undefined) {
     throw new Error("useErrorContext must be used within an ErrorContext Provider");
   }
+
+  // clear up on unmount
+  useEffect(() => {
+    console.log("useErrorContext: unmounting: context.clearErrorsFromContext()");
+    return () => context.clearErrorsFromContext();
+  }, []);
 
   return { ...context };
 };
