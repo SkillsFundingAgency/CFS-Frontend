@@ -43,7 +43,7 @@ describe("<ProvidersForFundingRelease />", () => {
     const expectedSubtitle = `${fundingStream.name} for ${fundingPeriod.name}`;
     expect(
       screen.getByRole("heading", {
-        level: 3,
+        level: 2,
         name: expectedSubtitle,
       })
     ).toBeVisible();

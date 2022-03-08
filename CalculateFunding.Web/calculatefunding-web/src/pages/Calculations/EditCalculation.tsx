@@ -228,7 +228,7 @@ export function EditCalculation({
 
       <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-          <span className="govuk-caption-l">{subtitle}</span>
+          <span className="govuk-caption-xl">{subtitle}</span>
           {calculation?.calculationType == CalculationType.Template && (
             <h2 id="calculation-name-title" className={"govuk-heading-l"}>
               {calculation ? calculation.name : <LoadingFieldStatus title="Loading..." />}

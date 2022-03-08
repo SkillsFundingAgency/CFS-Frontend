@@ -106,7 +106,7 @@ export const ListTemplates = () => {
         hidden={!isLoading}
       />
 
-      <Title title={"Templates"} titleCaption={"View and edit existing templates"} />
+      <Title title={"Templates"} titleCaption={"Create and manage funding templates for funding line calculation hierarchies for any given funding stream and period."} />
 
       {canCreateTemplate && (
         <div className="govuk-grid-row">

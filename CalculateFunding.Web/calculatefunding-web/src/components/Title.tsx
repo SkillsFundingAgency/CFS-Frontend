@@ -6,6 +6,7 @@ export interface TitleProps {
   title: string;
   preTitleCaption?: string;
   titleCaption?: string;
+  largeTitleCaption?: boolean;
   description?: string;
   css?: string;
   children?: any;
@@ -17,6 +18,7 @@ export function Title({
   description,
   preTitleCaption,
   titleCaption,
+  largeTitleCaption = false,
   children,
   css = "govuk-!-margin-top-0",
   includeBackLink = false,
@@ -43,10 +45,15 @@ export function Title({
           <h1 id="title-header" className="govuk-heading-xl govuk-!-margin-bottom-2">
             {title}
           </h1>
-          {titleCaption && (
-            <h3 id="title-caption" className="govuk-caption-xl govuk-!-margin-top-2">
+          {titleCaption && largeTitleCaption && (
+            <h2 id="title-caption" className="govuk-caption-xl govuk-!-margin-top-2">
               {titleCaption}
-            </h3>
+            </h2>
+          )}
+          {titleCaption && !largeTitleCaption && (
+            <h2 id="title-caption" className="govuk-caption-l govuk-!-margin-top-2">
+              {titleCaption}
+            </h2>
           )}
           {description && (
             <p id="title-desc" className="govuk-body">
