@@ -70,7 +70,6 @@ export function SelectSpecificationForFundingApproval(): JSX.Element {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
-        <Breadcrumb name={"Funding approvals"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
 

@@ -299,7 +299,6 @@ export function SelectReferenceSpecification({
         <Breadcrumb name="Calculate funding" url={"/"} />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
         <Breadcrumb name={forSpec ? forSpec.name : "Specification"} url={`/ViewSpecification/${forSpecId}`} />
-        <Breadcrumb name="Create data set" />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions}

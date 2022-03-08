@@ -598,11 +598,6 @@ export function EditTemplate() {
           <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid="template-listing-link" />
           <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`} />
           <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`} />
-          <Breadcrumb
-            name={
-              isLoading ? "Loading..." : template ? `${template.majorVersion}.${template.minorVersion}` : ""
-            }
-          />
         </Breadcrumbs>
       )}
       <PermissionStatus

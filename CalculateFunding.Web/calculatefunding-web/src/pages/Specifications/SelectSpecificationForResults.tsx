@@ -89,9 +89,8 @@ export function SelectSpecificationForResults() {
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
         <Breadcrumb name="View results" url="/results" />
-        <Breadcrumb name="Select specification" />
       </Breadcrumbs>
-      
+
       <Title
         title="Select specification"
         titleCaption="You can select the specification and funding period."

@@ -82,7 +82,6 @@ export function CalculationVersionHistory({ match }: RouteComponentProps<Calcula
         {specification && (
           <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />
         )}
-        {calculation && <Breadcrumb name={calculation.name} />}
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       {(isLoadingCalculation || isLoadingSpecification || isLoadingVersions) && (

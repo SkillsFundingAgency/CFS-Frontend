@@ -208,7 +208,6 @@ export function ViewProvidersByFundingStream({
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"View results"} url={"/results"} />
         <Breadcrumb name={"Funding stream"} url={"/viewresults/viewprovidersfundingstreamselection"} />
-        <Breadcrumb name={"View provider results"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
 

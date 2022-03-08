@@ -48,7 +48,6 @@ export function ViewProvidersFundingStreamSelection() {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"View results"} url={"/results"} />
-        <Breadcrumb name={"Select funding stream"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <LoadingStatus

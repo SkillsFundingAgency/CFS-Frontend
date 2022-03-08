@@ -201,7 +201,6 @@ export const CloneTemplate = () => {
             templateToClone && `/Templates/${templateToClone.templateId}/Versions/${templateToClone.version}`
           }
         />
-        <Breadcrumb name={"Clone template"} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
       <MultipleErrorSummary errors={canCreateTemplate ? errors : []} />

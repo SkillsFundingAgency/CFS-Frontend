@@ -11,7 +11,6 @@ export default function FundingManagementHome(): JSX.Element {
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
-        <Breadcrumb name="Funding management" />
       </Breadcrumbs>
 
       <Title

@@ -47,7 +47,6 @@ export const SelectSpecificationForExport = (): JSX.Element => {
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
         <Breadcrumb name="Manage data" url="/Datasets/ManageData" />
-        <Breadcrumb name="Funding stream, period and specification" />
       </Breadcrumbs>
 
       <MultipleErrorSummary errors={errors} />

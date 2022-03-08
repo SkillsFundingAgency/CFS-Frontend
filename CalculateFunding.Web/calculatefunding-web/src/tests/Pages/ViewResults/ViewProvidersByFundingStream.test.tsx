@@ -234,7 +234,7 @@ describe("<ViewProvidersByFundingStream /> ", () => {
 
   it("has the relevant breadcrumbs", async () => {
     const { container } = renderComponent();
-    await waitFor(() => expect(container.querySelectorAll(".govuk-breadcrumbs__list-item").length).toBe(4));
+    await waitFor(() => expect(container.querySelectorAll(".govuk-breadcrumbs__list-item").length).toBe(3));
   });
 
   it("has the Calculate funding breadcrumb", async () => {
@@ -258,15 +258,6 @@ describe("<ViewProvidersByFundingStream /> ", () => {
     await waitFor(() =>
       expect(container.querySelectorAll(".govuk-breadcrumbs__list-item")[2].textContent).toBe(
         "Funding stream"
-      )
-    );
-  });
-
-  it("has the View provider results breadcrumb", async () => {
-    const { container } = renderComponent();
-    await waitFor(() =>
-      expect(container.querySelectorAll(".govuk-breadcrumbs__list-item")[3].textContent).toBe(
-        "View provider results"
       )
     );
   });

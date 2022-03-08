@@ -96,7 +96,6 @@ export const ListTemplates = () => {
     <Main location={Section.Templates}>
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
-        <Breadcrumb name={"Templates"} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />
       <MultipleErrorSummary errors={errors} />

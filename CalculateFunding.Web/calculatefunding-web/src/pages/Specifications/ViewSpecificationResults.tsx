@@ -76,7 +76,6 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
                 <Breadcrumb name={"Calculate funding"} url={"/"}/>
                 <Breadcrumb name={"View results"} url={"/results"}/>
                 <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
-                <Breadcrumb name={specification ? specification.name : ""}/>
             </Breadcrumbs>
 
             <MultipleErrorSummary errors={errors}/>

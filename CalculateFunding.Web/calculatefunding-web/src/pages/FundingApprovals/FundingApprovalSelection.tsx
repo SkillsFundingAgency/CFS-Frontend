@@ -70,7 +70,6 @@ export function FundingApprovalSelection() {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"Approvals"} />
-        <Breadcrumb name={"Select specification"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <Title

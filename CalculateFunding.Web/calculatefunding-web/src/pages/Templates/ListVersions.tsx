@@ -131,7 +131,6 @@ export const ListVersions = () => {
         <Breadcrumb name={"Calculate Funding"} url={"/"} />
         <Breadcrumb name={"Templates"} url={"/Templates/List"} />
         <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`} />
-        <Breadcrumb name={"Template Versions"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <LoadingStatus

@@ -182,7 +182,6 @@ export const PublishTemplate = () => {
       <Breadcrumbs>
         <Breadcrumb name={"Calculate Funding"} url={"/"} />
         <Breadcrumb name={"Templates"} url={"/Templates/List"} />
-        <Breadcrumb name={"Publish a template"} />
       </Breadcrumbs>
       <PermissionStatus
         requiredPermissions={missingPermissions ? missingPermissions : []}

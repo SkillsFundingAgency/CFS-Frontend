@@ -37,7 +37,7 @@ describe("Renders <FundingApprovalSelection /> correctly when selecting a fundin
   });
 
   it("renders Specification label", async () => {
-    expect(screen.getAllByText("Select specification")).toHaveLength(2);
+    expect(screen.getAllByText("Select specification")).toHaveLength(1);
   });
 
   it("renders Funding streams", async () => {
@@ -91,7 +91,7 @@ describe("Renders <FundingApprovalSelection /> correctly when selecting a fundin
   });
 
   it("renders Specification label", async () => {
-    expect(screen.getAllByText("Select specification")).toHaveLength(2);
+    expect(screen.getAllByText("Select specification")).toHaveLength(1);
   });
 
   it("renders Funding streams", async () => {

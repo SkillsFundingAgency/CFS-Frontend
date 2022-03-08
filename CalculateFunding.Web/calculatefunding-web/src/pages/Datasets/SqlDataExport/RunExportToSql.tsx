@@ -66,12 +66,11 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
             <Breadcrumbs>
                 <Breadcrumb name="Calculate funding" url="/"/>
                 <Breadcrumb name="Manage data" url="/Datasets/ManageData"/>
-                <Breadcrumb name="Export to SQL"/>
             </Breadcrumbs>
 
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} />
-      
+
             <Title
                 title="Export data to SQL"
                 titleCaption={

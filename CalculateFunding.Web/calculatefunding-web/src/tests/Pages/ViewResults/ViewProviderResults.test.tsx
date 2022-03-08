@@ -7,7 +7,7 @@ import { ErrorContextWrapper } from "../../../context/ErrorContext";
 import { ProviderVersionQueryResult } from "../../../hooks/Providers/useProviderVersion";
 import * as providerVersionHook from "../../../hooks/Providers/useProviderVersion";
 import { fakery } from "../../fakes/fakery";
-import {showDebugMain} from "../../testing-utils";
+import { showDebugMain } from "../../testing-utils";
 
 describe("<ViewProviderResults />", () => {
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe("<ViewProviderResults />", () => {
   });
 
   it("displays provider details", async () => {
-    expect(screen.getAllByText("Hogwarts School of Witchcraft and Wizardry").length).toBe(2);
+    expect(screen.getAllByText("Hogwarts School of Witchcraft and Wizardry").length).toBe(1);
     expect(screen.getByRole("heading", { name: /UKPRN: ukprn test/i })).toBeInTheDocument();
   });
 

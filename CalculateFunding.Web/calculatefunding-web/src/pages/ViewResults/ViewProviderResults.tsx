@@ -136,8 +136,6 @@ export function ViewProviderResults({
         <Breadcrumb name={"Calculate funding"} url={"/"} />
         <Breadcrumb name={"View results"} url={"/Results"} />
         <Breadcrumb name={"Select funding stream"} url={"/ViewResults/ViewProvidersFundingStreamSelection"} />
-        <Breadcrumb name={"View provider results"} goBack={true} />
-        <Breadcrumb name={providerDetails ? providerDetails.name : "Loading..."} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
       <LoadingStatus

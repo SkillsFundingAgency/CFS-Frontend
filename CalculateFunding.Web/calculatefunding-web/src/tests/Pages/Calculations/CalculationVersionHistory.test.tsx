@@ -54,11 +54,6 @@ describe("<CalculationVersionHistory> tests", () => {
     expect(link.getAttribute("href")).toBe("/ViewSpecification/" + testSpec.id);
   });
 
-  it("renders breadcrumb with calculation name", async () => {
-    const listItems = screen.getAllByRole("listitem").map((el) => el.textContent);
-    expect(listItems).toContain(testCalc.name);
-  });
-
   it("renders the calculation name as heading", async () => {
     expect(screen.getByRole("heading", { name: testCalc.name })).toBeInTheDocument();
   });
