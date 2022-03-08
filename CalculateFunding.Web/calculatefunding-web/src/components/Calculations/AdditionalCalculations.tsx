@@ -53,7 +53,7 @@ export function AdditionalCalculations({
   }, [specificationId, sortBy]);
 
   function renderValue(value: number | null | undefined, calculationType: ValueType): string {
-    if (!value) return "";
+    if (!value) return "Excluded";
     switch (calculationType) {
       case ValueType.Currency:
         return formatNumber(value, NumberType.FormattedMoney, 0, false);
@@ -287,7 +287,7 @@ export function AdditionalCalculations({
                   </td>
                   {providerId && (
                     <td className="govuk-table__cell">
-                      {ac.value && ac.value !== null ? renderValue(ac.value, ac.valueType) : "Excluded"}
+                      {renderValue(ac.value, ac.valueType)}
                     </td>
                   )}
                   {!providerId && (

@@ -387,35 +387,32 @@ export const ProvidersForFundingRelease = ({
           )}
 
           {!isLoading && !hasActiveActionJobs && specification && (
-            <ProviderResultsTable
-              actionType={FundingActionType.Release}
-              specCoreProviderVersionId={specification?.providerVersionId}
-              enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
-              providerSearchResults={publishedProviderSearchResults}
-              totalResults={
-                publishedProviderIds
-                  ? publishedProviderIds.length
-                  : publishedProviderSearchResults
-                  ? publishedProviderSearchResults.totalResults
-                  : 0
-              }
-              allPublishedProviderIds={publishedProviderIds}
-            />
+            <>
+              <ProviderResultsTable
+                actionType={FundingActionType.Release}
+                specCoreProviderVersionId={specification?.providerVersionId}
+                enableBatchSelection={fundingConfiguration?.approvalMode === ApprovalMode.Batches}
+                providerSearchResults={publishedProviderSearchResults}
+                totalResults={
+                  publishedProviderIds
+                    ? publishedProviderIds.length
+                    : publishedProviderSearchResults
+                    ? publishedProviderSearchResults.totalResults
+                    : 0
+                }
+                allPublishedProviderIds={publishedProviderIds}
+              />
+              <div className="right-align">
+                <button
+                  className="govuk-button govuk-button--warning govuk-!-margin-right-1 govuk-!-margin-top-4"
+                  disabled={!canRelease || blockActionBasedOnProviderErrors}
+                  onClick={handleRelease}
+                >
+                  Release funding
+                </button>
+              </div>
+            </>
           )}
-        </div>
-      </div>
-
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-full right-align">
-          <div className="right-align">
-            <button
-              className="govuk-button govuk-button--warning govuk-!-margin-right-1"
-              disabled={!canRelease || blockActionBasedOnProviderErrors}
-              onClick={handleRelease}
-            >
-              Release funding
-            </button>
-          </div>
         </div>
       </div>
     </Main>
