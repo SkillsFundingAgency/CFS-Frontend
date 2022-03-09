@@ -313,7 +313,11 @@ namespace CalculateFunding.Frontend.Controllers
             createCalculation.Name = vm.CalculationName;
             createCalculation.ValueType = vm.CalculationType;
 
-            ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation);
+            ValidatedApiResponse<Calculation> response = await _calcClient.CreateCalculation(specificationId, createCalculation, 
+                        skipCalcRun: false,
+                        skipQueueCodeContextCacheUpdate: false,
+                        overrideCreateModelAuthor: false,
+                        updateBuildProject: true);
 
             IActionResult errorResult =
                 response.IsSuccessOrReturnFailureResult("CreateCalculation");
