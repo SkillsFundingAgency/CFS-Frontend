@@ -389,7 +389,7 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
-        [HttpPost("api/specs/{specificationId}/release-providers")]
+        [HttpPost("api/specs/{specificationId}/release-funding-providers")]
         public async Task<IActionResult> ReleaseProviders([FromBody] ReleaseProvidersToChannelRequest providers, [FromRoute] string specificationId)
         {
             if (specificationId.IsNullOrEmpty())
@@ -413,7 +413,7 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
-        [HttpPost("api/specs/{specificationId}/release")]
+        [HttpPost("api/specs/{specificationId}/release-funding")]
         public async Task<IActionResult> Release([FromBody] ReleaseProvidersToChannelRequest providers, [FromRoute] string specificationId)
         {
             if (specificationId.IsNullOrEmpty())

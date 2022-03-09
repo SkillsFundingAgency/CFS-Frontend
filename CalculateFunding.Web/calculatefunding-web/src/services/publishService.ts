@@ -91,7 +91,7 @@ export async function releaseProvidersService(
   providers: string[],
   channelCodes: string[]
 ): Promise<AxiosResponse<JobCreatedResponse>> {
-  return axios(`/api/specs/${specificationId}/release-providers`, {
+  return axios(`/api/specs/${specificationId}/release-funding-providers`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: {
@@ -105,7 +105,7 @@ export async function releaseService(
   specificationId: string,
   channelCodes: string[]
 ): Promise<AxiosResponse<JobCreatedResponse>> {
-  return axios(`/api/specs/${specificationId}/release`, {
+  return axios(`/api/specs/${specificationId}/release-funding`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: {
