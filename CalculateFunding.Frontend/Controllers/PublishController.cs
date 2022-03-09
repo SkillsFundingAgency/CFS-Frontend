@@ -389,6 +389,49 @@ namespace CalculateFunding.Frontend.Controllers
                 onSuccess: x => Ok(x.Content));
         }
 
+        [HttpPost("api/specs/{specificationId}/release-providers")]
+        public async Task<IActionResult> ReleaseProviders([FromBody] ReleaseProvidersToChannelRequest providers, [FromRoute] string specificationId)
+        {
+            if (specificationId.IsNullOrEmpty())
+            {
+                ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
+            }
+
+            if (providers.ProviderIds.IsNullOrEmpty())
+            {
+                ModelState.AddModelError(nameof(providers.ProviderIds), "Missing " + nameof(providers.ProviderIds));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueReleaseProviderVersions(specificationId, providers);
+
+            return response.Handle(nameof(Specification),
+                onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpPost("api/specs/{specificationId}/release")]
+        public async Task<IActionResult> Release([FromBody] ReleaseProvidersToChannelRequest providers, [FromRoute] string specificationId)
+        {
+            if (specificationId.IsNullOrEmpty())
+            {
+                ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueRelease(specificationId, providers);
+
+            return response.Handle(nameof(Specification),
+                onSuccess: x => Ok(x.Content));
+        }
+
         [HttpGet]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("api/specs/{specificationId}/provider-errors")]

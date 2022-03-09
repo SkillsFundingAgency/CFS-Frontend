@@ -83,10 +83,11 @@ export function ConfirmFundingRelease({
     let jobId: string;
     try {
       if (fundingConfiguration.approvalMode === ApprovalMode.Batches && selectedProviderIds.length > 0) {
-        jobId = (await publishService.releaseProvidersFundingService(specificationId, selectedProviderIds))
-          .data.jobId;
+        jobId = (
+          await publishService.releaseProvidersService(specificationId, selectedProviderIds, channelCodes)
+        ).data.jobId;
       } else {
-        jobId = (await publishService.releaseSpecificationFundingService(specificationId)).data.jobId;
+        jobId = (await publishService.releaseService(specificationId, channelCodes)).data.jobId;
       }
       clearFundingSearchSelection();
       addJobObserver({ jobId: jobId, specificationId: specificationId });

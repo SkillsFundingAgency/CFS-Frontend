@@ -86,6 +86,34 @@ export async function releaseProvidersFundingService(
   });
 }
 
+export async function releaseProvidersService(
+  specificationId: string,
+  providers: string[],
+  channelCodes: string[]
+): Promise<AxiosResponse<JobCreatedResponse>> {
+  return axios(`/api/specs/${specificationId}/release-providers`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: {
+      providerIds: providers,
+      channels: channelCodes,
+    },
+  });
+}
+
+export async function releaseService(
+  specificationId: string,
+  channelCodes: string[]
+): Promise<AxiosResponse<JobCreatedResponse>> {
+  return axios(`/api/specs/${specificationId}/release`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: {
+      channels: channelCodes,
+    },
+  });
+}
+
 /// last time funding data was modified (e.g. refresh, approved, released)
 export async function getLatestPublishedDate(fundingStreamId: string, fundingPeriodId: string) {
   return axios.request<LatestPublishedDate>({
