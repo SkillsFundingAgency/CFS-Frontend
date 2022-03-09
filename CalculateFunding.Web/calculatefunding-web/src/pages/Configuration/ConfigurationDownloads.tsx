@@ -48,7 +48,7 @@ export function ConfigurationDownloads({ match }: RouteComponentProps<Configurat
 
       <MultipleErrorSummary errors={errors} />
 
-      <Title title="JSON data" titleCaption={`${fundingStreamId} ${fundingPeriodId}`} />
+      <Title title="Download configuration files" titleCaption={`${fundingStreamId} ${fundingPeriodId}`} />
 
       <h2 className="govuk-heading-m">Funding configuration</h2>
       <p className="govuk-body">

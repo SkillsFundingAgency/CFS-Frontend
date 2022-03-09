@@ -4,8 +4,6 @@ import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { Footer } from "../../components/Footer";
-import { Header } from "../../components/Header";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
@@ -170,7 +168,10 @@ export function DownloadDataSchema() {
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
-      <Title title={"Download data schema template"} />
+      <Title
+        title="Download data schemas"
+        titleCaption="Download the data schemas for data source files and datasets"
+      />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
           <form id="searchDatasources">

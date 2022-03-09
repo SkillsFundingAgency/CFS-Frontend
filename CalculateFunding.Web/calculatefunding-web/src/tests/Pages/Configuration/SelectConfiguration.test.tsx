@@ -44,7 +44,7 @@ describe("<SelectConfiguration /> tests", () => {
       await waitFor(() => expect(getFundingStreamsSpy).toBeCalledTimes(1));
       await waitFor(() => expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument());
 
-      const fundingStreamSelector = await screen.findByRole("combobox", { name: /Select funding stream/ });
+      const fundingStreamSelector = await screen.findByRole("combobox", { name: /Funding stream/ });
       expect(within(fundingStreamSelector).getAllByRole("option")).toHaveLength(3); // includes default non-option
       expect(
         within(fundingStreamSelector).getByRole("option", { name: mockFundingStream1.name })
@@ -65,14 +65,14 @@ describe("<SelectConfiguration /> tests", () => {
       await setup();
       await waitFor(() => expect(getFundingStreamsSpy).toBeCalledTimes(1));
 
-      const fundingStreamSelector = await screen.findByRole("combobox", { name: /Select funding stream/ });
+      const fundingStreamSelector = await screen.findByRole("combobox", { name: /Funding stream/ });
 
       userEvent.selectOptions(fundingStreamSelector, mockFundingStream2.name);
 
       await waitFor(() => expect(getFundingPeriodsSpy).toBeCalledTimes(1));
       await waitFor(() => expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument());
 
-      const fundingPeriodSelector = await screen.findByRole("combobox", { name: /Select funding period/ });
+      const fundingPeriodSelector = await screen.findByRole("combobox", { name: /Funding period/ });
       expect(within(fundingPeriodSelector).getAllByRole("option")).toHaveLength(3); // includes default non-option
       expect(
         within(fundingPeriodSelector).getByRole("option", { name: mockFundingPeriod1.name })
@@ -95,13 +95,13 @@ describe("<SelectConfiguration /> tests", () => {
       await setup();
       await waitFor(() => expect(getFundingStreamsSpy).toBeCalledTimes(1));
 
-      const fundingStreamSelector = await screen.findByRole("combobox", { name: /Select funding stream/ });
+      const fundingStreamSelector = await screen.findByRole("combobox", { name: /Funding stream/ });
 
       userEvent.selectOptions(fundingStreamSelector, mockFundingStream2.name);
 
       await waitFor(() => expect(getFundingPeriodsSpy).toBeCalledTimes(1));
 
-      const fundingPeriodSelector = await screen.findByRole("combobox", { name: /Select funding period/ });
+      const fundingPeriodSelector = await screen.findByRole("combobox", { name: /Funding period/ });
 
       userEvent.selectOptions(fundingPeriodSelector, mockFundingPeriod2.name);
       await waitFor(() => expect(screen.queryByTestId("loader-inline")).not.toBeInTheDocument());

@@ -27,7 +27,7 @@ describe("<DownloadDataSchema />", () => {
         <DownloadDataSchema />
       </MemoryRouter>
     );
-    expect(wrapper.find("h1.govuk-heading-xl").text()).toBe("Download data schema template");
+    expect(wrapper.find("h1.govuk-heading-xl").text()).toBe("Download data schemas");
   });
 
   it("will have the correct <Breadcrumb /> for Calculate funding", () => {

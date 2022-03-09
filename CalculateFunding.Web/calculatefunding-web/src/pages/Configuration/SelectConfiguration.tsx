@@ -54,17 +54,19 @@ export function SelectConfiguration() {
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
         <Breadcrumb name="Manage data" url="/Datasets/ManageData" />
-        <Breadcrumb name="Select configuration" />
       </Breadcrumbs>
 
       <MultipleErrorSummary errors={errors} />
 
-      <Title title="JSON data" titleCaption="Select funding stream and period to see available JSON data." />
+      <Title
+        title="Funding configuration"
+        titleCaption="Select a funding stream and period to download JSON configuration files"
+      />
 
       <fieldset className="govuk-fieldset">
         <div className="govuk-form-group">
           <label htmlFor="select-funding-stream" className="govuk-label">
-            Select funding stream:
+            Funding stream
           </label>
           <select
             id="select-funding-stream"
@@ -92,7 +94,7 @@ export function SelectConfiguration() {
           }`}
         >
           <label htmlFor="select-funding-period" className="govuk-label">
-            Select funding period:
+            Funding period
           </label>
           <select
             id="select-funding-period"

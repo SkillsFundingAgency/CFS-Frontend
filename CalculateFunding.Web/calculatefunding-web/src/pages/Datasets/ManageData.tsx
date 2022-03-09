@@ -13,10 +13,7 @@ export function ManageData() {
         <Breadcrumb name="Calculate funding" url="/" />
       </Breadcrumbs>
       <nav aria-label="Data management" aria-describedby="title-caption">
-        <Title
-          title="Manage data"
-          titleCaption="Manage data source files or map them to datasets for a specification"
-        />
+        <Title title="Manage data" titleCaption="Upload new or updated data source files" />
         <section className="homepage-section-container govuk-!-margin-top-9 govuk-!-margin-bottom-9">
           <div className="govuk-grid-row">
             <div className=" govuk-grid-column-one-third">
@@ -46,7 +43,7 @@ export function ManageData() {
                 </TextLink>
               </h3>
               <p id=" download-schemas-desc" className=" govuk-body">
-                Download the data schema for data source
+                Download the data schemas for data source files and datasets
               </p>
             </div>
           </div>
@@ -54,11 +51,11 @@ export function ManageData() {
             <div className=" govuk-grid-column-one-third">
               <h3 className=" govuk-heading-m">
                 <TextLink to="/Datasets/Export/SelectSpecificationForExport" describedBy=" sql-export-desc">
-                  Refresh SQL
+                  SQL data
                 </TextLink>
               </h3>
               <p id=" sql-export-desc" className=" govuk-body">
-                Refresh SQL funding
+                Refresh or create SQL data
               </p>
             </div>
             <div className=" govuk-grid-column-one-third">
@@ -68,7 +65,7 @@ export function ManageData() {
                 </TextLink>
               </h3>
               <p id=" download-config-desc" className=" govuk-body">
-                Download the funding and profiling configuration files.
+                Download the funding and profiling configuration files
               </p>
             </div>
           </div>
