@@ -172,7 +172,8 @@ export const useExportToSqlJobs = ({
     if (!notification.latestJob?.jobType) return;
     if (
       notification.latestJob.jobType === JobType.RunSqlImportJob ||
-      notification.latestJob.jobType === JobType.PopulateCalculationResultsQaDatabaseJob
+      notification.latestJob.jobType === JobType.PopulateCalculationResultsQaDatabaseJob ||
+      notification.latestJob.jobType === JobType.RunReleasedSqlImportJob
     ) {
       handleExportToSqlJob(notification);
     } else {
