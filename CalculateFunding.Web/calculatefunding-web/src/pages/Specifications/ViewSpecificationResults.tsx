@@ -20,74 +20,74 @@ import { JobType } from "../../types/jobType";
 import { Section } from "../../types/Sections";
 
 export interface ViewSpecificationResultsRoute {
-    specificationId: string;
+  specificationId: string;
 }
 
 function useParamQuery() {
-    return new URLSearchParams(useLocation().search);
+  return new URLSearchParams(useLocation().search);
 }
 
 export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpecificationResultsRoute>) {
-    const [initialTab, setInitialTab] = useState<string>("");
-    const query = useParamQuery();
-    const { errors, addErrorMessage, addError, clearErrorMessages } = useErrors();
-    const specificationId = match.params.specificationId;
-    const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
-        addErrorMessage(err.message, "Error while loading specification")
-    );
+  const [initialTab, setInitialTab] = useState<string>("");
+  const query = useParamQuery();
+  const { errors, addErrorMessage, addError, clearErrorMessages } = useErrors();
+  const specificationId = match.params.specificationId;
+  const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
+    addErrorMessage(err.message, "Error while loading specification")
+  );
+  const fundingStreamId = specification?.fundingStreams[0]?.id;
+  const fundingPeriodId = specification?.fundingPeriod.id;
 
-    const {
-        addSub,
-        results: jobNotifications,
-    } = useJobSubscription({
-        onError: (err) =>
-            addError({ error: err, description: "An error occurred while monitoring background jobs" }),
-    });
+  const { addSub, results: jobNotifications } = useJobSubscription({
+    onError: (err) =>
+      addError({ error: err, description: "An error occurred while monitoring background jobs" }),
+  });
 
-    useEffect(() => {
-        if (specificationId)
-            addSub({
-                filterBy: {
-                    specificationId: specificationId,
-                    jobTypes: [JobType.GenerateCalcCsvResultsJob]
-                }, onError: err => addError({ error: err })
-            });
-    }, [specificationId]);
+  useEffect(() => {
+    if (specificationId)
+      addSub({
+        filterBy: {
+          specificationId: specificationId,
+          jobTypes: [JobType.GenerateCalcCsvResultsJob],
+        },
+        onError: (err) => addError({ error: err }),
+      });
+  }, [specificationId]);
 
-    useEffect(() => {
-        if (query.get("initialTab")) {
-            const tabParam = query.get("initialTab") ?? "";
-            setInitialTab(tabParam);
-        } else {
-            setInitialTab("fundingline-structure");
-        }
-    }, [query]);
+  useEffect(() => {
+    if (query.get("initialTab")) {
+      const tabParam = query.get("initialTab") ?? "";
+      setInitialTab(tabParam);
+    } else {
+      setInitialTab("fundingline-structure");
+    }
+  }, [query]);
 
-    const { specsSelectedForFunding, isLoadingSpecsSelectedForFunding } = useSpecsSelectedForFunding(
-        specification?.fundingPeriod.id,
-        specification?.fundingStreams[0].id
-    );
+  const { specsSelectedForFunding, isLoadingSpecsSelectedForFunding } = useSpecsSelectedForFunding(
+    fundingPeriodId,
+    fundingStreamId
+  );
 
-    const { enableNewFundingManagement } = useFeatureFlags();
+  const { enableNewFundingManagement } = useFeatureFlags();
 
-    return (
-        <Main location={Section.Results}>
-            <Breadcrumbs>
-                <Breadcrumb name={"Calculate funding"} url={"/"}/>
-                <Breadcrumb name={"View results"} url={"/results"}/>
-                <Breadcrumb name={"Select specification"} url={"/SelectSpecification"}/>
-            </Breadcrumbs>
+  return (
+    <Main location={Section.Results}>
+      <Breadcrumbs>
+        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name={"View results"} url={"/results"} />
+        <Breadcrumb name={"Select specification"} url={"/SelectSpecification"} />
+      </Breadcrumbs>
 
-            <MultipleErrorSummary errors={errors}/>
+      <MultipleErrorSummary errors={errors} />
 
-            <LoadingStatus title={"Loading specification"} hidden={!isLoadingSpecification}/>
-            <div className="govuk-main-wrapper" hidden={isLoadingSpecification}>
-                <div className="govuk-grid-row">
-                    <div className="govuk-grid-column-two-thirds">
-                        <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">
-                            {specification !== undefined ? specification?.name : ""}
-                        </h1>
-                        <span className="govuk-caption-l">
+      <LoadingStatus title={"Loading specification"} hidden={!isLoadingSpecification} />
+      <div className="govuk-main-wrapper" hidden={isLoadingSpecification}>
+        <div className="govuk-grid-row">
+          <div className="govuk-grid-column-two-thirds">
+            <h1 className="govuk-heading-xl govuk-!-margin-bottom-1">
+              {specification !== undefined ? specification?.name : ""}
+            </h1>
+            <span className="govuk-caption-l">
               {specification !== undefined ? specification.fundingPeriod?.name : ""}
             </span>
             {specification && specification.isSelectedForFunding && (
@@ -99,29 +99,28 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
           <div className="govuk-grid-column-one-third">
             <ul className="govuk-list right-align">
               <li>Navigate to:</li>
-              {!isLoadingSpecsSelectedForFunding &&
-                enableNewFundingManagement &&
-                !!specsSelectedForFunding?.length && (
-                  <>
-                    <li>
-                      <TextLink
-                        to={`/FundingManagement/Approve/Results/${specification?.fundingStreams[0].id}/${specification?.fundingPeriod.id}/${specification?.id}`}
-                      >
-                        Funding approvals
-                      </TextLink>
-                    </li>
-                    <li>
-                      <TextLink
-                        to={`/FundingManagement/Release/Results/${specification?.fundingStreams[0].id}/${specification?.fundingPeriod.id}/${specification?.id}`}
-                      >
-                        Release management
-                      </TextLink>
-                    </li>
-                  </>
-                )}
-              <li>
-                <TextLink to={`/ViewSpecification/${specification?.id}`}>Manage specification</TextLink>
-              </li>
+              {!isLoadingSpecsSelectedForFunding && !!specsSelectedForFunding?.length && (
+                <>
+                  {enableNewFundingManagement ? (
+                    <>
+                      <NavActionLink
+                        label="Funding approvals"
+                        link={`/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                      />
+                      <NavActionLink
+                        label="Release management"
+                        link={`/FundingManagement/Release/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                      />
+                    </>
+                  ) : (
+                    <NavActionLink
+                      label="Funding approvals"
+                      link={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+                    />
+                  )}
+                </>
+              )}
+              <NavActionLink label="Manage specification" link={`/ViewSpecification/${specification?.id}`} />
             </ul>
           </div>
         </div>
@@ -134,45 +133,53 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
                   <Tabs.Tab label="additional-calculations">Additional Calculations</Tabs.Tab>
                   <Tabs.Tab label="downloadable-reports">
                     Downloadable Reports&nbsp;
-                                        {jobNotifications.find(x => x.latestJob)?.latestJob?.isFailed && (
-                                            <span
-                                                className="notification-badge"
-                                                data-testid="notification-badge"
-                                                aria-label="contains 1 error"
-                                            >
+                    {jobNotifications.find((x) => x.latestJob)?.latestJob?.isFailed && (
+                      <span
+                        className="notification-badge"
+                        data-testid="notification-badge"
+                        aria-label="contains 1 error"
+                      >
                         1
                       </span>
-                                        )}
-                                    </Tabs.Tab>
-                                </ul>
-                                <Tabs.Panel label="fundingline-structure">
-                                    {specification && (
-                                        <FundingLineResults
-                                            specification={specification}
-                                            addError={addError}
-                                            clearErrorMessages={clearErrorMessages}
-                                            jobTypes={[JobType.AssignTemplateCalculationsJob]}
-                                        />
-                                    )}
-                                </Tabs.Panel>
-                                <Tabs.Panel label="additional-calculations">
-                                    <AdditionalCalculations
-                                        specificationId={specificationId}
-                                        showCreateButton={false}
-                                        addError={addError}
-                                    />
-                                </Tabs.Panel>
-                                <Tabs.Panel label="downloadable-reports">
-                                    <DownloadableReports
-                                        fundingPeriodId={specification !== undefined ? specification.fundingPeriod?.id : ""}
-                                        specificationId={specificationId}
-                                    />
-                                </Tabs.Panel>
-                            </Tabs>
-                        </div>
-                    </div>
-                )}
+                    )}
+                  </Tabs.Tab>
+                </ul>
+                <Tabs.Panel label="fundingline-structure">
+                  {specification && (
+                    <FundingLineResults
+                      specification={specification}
+                      addError={addError}
+                      clearErrorMessages={clearErrorMessages}
+                      jobTypes={[JobType.AssignTemplateCalculationsJob]}
+                    />
+                  )}
+                </Tabs.Panel>
+                <Tabs.Panel label="additional-calculations">
+                  <AdditionalCalculations
+                    specificationId={specificationId}
+                    showCreateButton={false}
+                    addError={addError}
+                  />
+                </Tabs.Panel>
+                <Tabs.Panel label="downloadable-reports">
+                  <DownloadableReports
+                    fundingPeriodId={specification !== undefined ? specification.fundingPeriod?.id : ""}
+                    specificationId={specificationId}
+                  />
+                </Tabs.Panel>
+              </Tabs>
             </div>
-        </Main>
-    );
+          </div>
+        )}
+      </div>
+    </Main>
+  );
 }
+
+const NavActionLink = ({ link, label }: { link: string; label: string }) => {
+  return (
+    <li>
+      <TextLink to={link}>{label}</TextLink>
+    </li>
+  );
+};

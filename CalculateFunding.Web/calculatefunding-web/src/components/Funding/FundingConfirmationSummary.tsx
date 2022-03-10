@@ -1,5 +1,4 @@
 ﻿import React from "react";
-import { Link } from "react-router-dom";
 
 import { ErrorProps } from "../../hooks/useErrors";
 import { ConfirmFundingRouteProps } from "../../pages/FundingApprovals/ConfirmFunding";
@@ -11,8 +10,8 @@ import {
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { FormattedNumber, NumberType } from "../FormattedNumber";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
+import { TextLink } from "../TextLink";
 import { CsvDownloadPublishedProviders } from "./CsvDownloadPublishedProviders";
-import {TextLink} from "../TextLink";
 
 export interface FundingConfirmationSummaryProps {
   routingParams: ConfirmFundingRouteProps;
