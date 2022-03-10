@@ -42,7 +42,7 @@ describe("<PurposeOfFundingRelease />", () => {
       ).toBeVisible();
     });
 
-    it("shows continue button", async () => {
+    it("hides continue button", async () => {
       expect(screen.queryByRole("button", { name: /continue/i })).not.toBeInTheDocument();
     });
 

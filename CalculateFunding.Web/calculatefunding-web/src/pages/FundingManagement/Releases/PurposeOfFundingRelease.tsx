@@ -39,7 +39,12 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
 
+  const releaseChannels = fundingConfiguration?.releaseChannels?.filter((rc) => !!rc.isVisible) ?? [];
+  const haveAnyReleaseChannels = releaseChannels.length > 0;
+  
   function setPurpose() {
+    if (!haveAnyReleaseChannels) return;
+    
     clearErrorMessages();
     if (releaseActions && releaseActions?.length < 1) {
       addError({ error: "Please select a release type" });
@@ -59,8 +64,6 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
       setReleaseActions(releaseActions.filter((x) => x.channelCode !== rac.channelCode));
     }
   }
-
-  const releaseChannels = fundingConfiguration?.releaseChannels?.filter((rc) => !!rc.isVisible) ?? [];
 
   return (
     <Main location={Section.FundingManagement}>
@@ -98,7 +101,7 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
             titleCaption={"Select all that apply."}
           />
 
-          {!releaseChannels.length ? (
+          {!haveAnyReleaseChannels ? (
             <WarningText text="There are no release purposes configured for the selected funding stream and funding period." />
           ) : (
             <>
@@ -128,9 +131,11 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
           )}
           <div className="govuk-grid-row govuk-!-padding-top-9">
             <div className="govuk-grid-column-full">
-              <button className="govuk-button" onClick={setPurpose} hidden={!releaseChannels.length}>
-                Continue
-              </button>{" "}
+              {haveAnyReleaseChannels && (
+                <button className="govuk-button" onClick={setPurpose}>
+                  Continue
+                </button>
+              )}{" "}
               <button className="govuk-button govuk-button--secondary" onClick={history.goBack}>
                 Cancel
               </button>
