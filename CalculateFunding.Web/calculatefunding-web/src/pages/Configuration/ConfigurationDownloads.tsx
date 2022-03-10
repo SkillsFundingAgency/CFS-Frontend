@@ -43,7 +43,7 @@ export function ConfigurationDownloads({ match }: RouteComponentProps<Configurat
       <Breadcrumbs>
         <Breadcrumb name="Calculate funding" url="/" />
         <Breadcrumb name="Manage data" url="/Datasets/ManageData" />
-        <Breadcrumb name="Select configuration" url="/Configuration/SelectConfiguration" />
+        <Breadcrumb name="Funding configuration" url="/Configuration/SelectConfiguration" />
       </Breadcrumbs>
 
       <MultipleErrorSummary errors={errors} />
