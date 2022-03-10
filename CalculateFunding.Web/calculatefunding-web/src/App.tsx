@@ -1,6 +1,5 @@
 import "./App.scss";
 
-import { SignalrProvider } from "hooks/SignalR/SignalrProvider";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -159,30 +158,29 @@ const App: React.FunctionComponent = () => {
   }
 
   return (
-      <SignalrProvider>
-        <BrowserRouter
-          basename="/app"
-          getUserConfirmation={(message, callback) =>
-            ConfirmationModal(message, callback, "Leave this page", "Stay on this page")
-          }
-        >
-          <QueryClientProvider client={queryClient}>
-            <AppContextWrapper>
-              <ErrorContextWrapper>
-                <Switch>
-                  <Route exact path="/">
-                    <Home featureFlags={featureFlagsState} />
-                  </Route>
+    <BrowserRouter
+      basename="/app"
+      getUserConfirmation={(message, callback) =>
+        ConfirmationModal(message, callback, "Leave this page", "Stay on this page")
+      }
+    >
+      <QueryClientProvider client={queryClient}>
+        <AppContextWrapper>
+          <ErrorContextWrapper>
+            <Switch>
+              <Route exact path="/">
+                <Home featureFlags={featureFlagsState} />
+              </Route>
 
-                  {datasetRoutes(featureFlagsState)}
+              {datasetRoutes(featureFlagsState)}
 
-                  {featureFlagsState.enableNewFundingManagement
-                    ? fundingManagementRoutes
-                    : oldFundingApprovalRoutes}
+              {featureFlagsState.enableNewFundingManagement
+                ? fundingManagementRoutes
+                : oldFundingApprovalRoutes}
 
-                  <Route path="/Results" component={ViewResults} />
+              <Route path="/Results" component={ViewResults} />
 
-                  {resultsRoutes}
+              {resultsRoutes}
 
               <Route path="/SelectSpecification" component={SelectSpecificationForResults} />
               <Route path="/SpecificationsList" component={SpecificationsList} />
@@ -219,18 +217,17 @@ const App: React.FunctionComponent = () => {
               />
               {permissionsRoutes}
 
-                  <Route path="*">
-                    <NoMatch />
-                  </Route>
-                </Switch>
-                {process.env.NODE_ENV === "development" && featureFlagsState.enableReactQueryDevTool && (
-                  <ReactQueryDevtools initialIsOpen={false} />
-                )}
-              </ErrorContextWrapper>
-            </AppContextWrapper>
-          </QueryClientProvider>
-        </BrowserRouter>
-      </SignalrProvider>
+              <Route path="*">
+                <NoMatch />
+              </Route>
+            </Switch>
+            {process.env.NODE_ENV === "development" && featureFlagsState.enableReactQueryDevTool && (
+              <ReactQueryDevtools initialIsOpen={false} />
+            )}
+          </ErrorContextWrapper>
+        </AppContextWrapper>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 };
 
