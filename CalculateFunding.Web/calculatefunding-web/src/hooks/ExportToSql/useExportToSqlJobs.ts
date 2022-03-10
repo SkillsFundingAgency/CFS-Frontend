@@ -334,6 +334,7 @@ export const useExportToSqlJobs = ({
     // find other export jobs, whether active or historic
     [
       JobType.RunSqlImportJob,
+      JobType.RunReleasedSqlImportJob,
       JobType.PopulateCalculationResultsQaDatabaseJob,
       JobType.CreateInstructAllocationJob,
     ].map((jobType) => {
