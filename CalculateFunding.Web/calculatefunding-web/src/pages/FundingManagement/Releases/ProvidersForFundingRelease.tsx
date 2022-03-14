@@ -48,7 +48,9 @@ export const ProvidersForFundingRelease = ({
     (state) => state.fundingSearchSelection
   );
   const isSearchCriteriaInitialised =
-    state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
+    state.searchCriteria !== undefined &&
+    state.searchCriteria.specificationId === specificationId &&
+    state.searchCriteria.fundingAction === FundingActionType.Release;
 
   const {
     addSub,
@@ -137,7 +139,8 @@ export const ProvidersForFundingRelease = ({
         initialiseFundingSearchSelection(
           match.params.fundingStreamId,
           match.params.fundingPeriodId,
-          match.params.specificationId
+          match.params.specificationId,
+          FundingActionType.Release
         )
       );
     }
@@ -191,7 +194,7 @@ export const ProvidersForFundingRelease = ({
   }
 
   const clearFundingSearchSelection = () => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Release));
   };
 
   if (publishedProvidersWithErrors) {

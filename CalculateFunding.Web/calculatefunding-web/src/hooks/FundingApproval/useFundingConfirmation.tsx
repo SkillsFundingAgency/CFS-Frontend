@@ -125,7 +125,8 @@ export const useFundingConfirmation = ({
       const search = buildInitialPublishedProviderSearchRequest(
         fundingStreamId,
         fundingPeriodId,
-        specificationId
+        specificationId,
+        actionType
       );
       try {
         const { data: providers } = await publishedProviderService.searchForPublishedProviderResults(search);
@@ -167,7 +168,7 @@ export const useFundingConfirmation = ({
   }, [fundingConfiguration]);
 
   const clearFundingSearchSelection = useCallback(() => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, actionType));
   }, [specificationId, fundingPeriodId, fundingStreamId]);
 
   return {

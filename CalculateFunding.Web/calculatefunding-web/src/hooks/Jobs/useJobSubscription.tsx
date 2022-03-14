@@ -379,8 +379,10 @@ export const useJobSubscription = ({
       subs.some((s) => s.monitorFallback === MonitorFallback.Polling)
     ) {
       // signalR is currently disabled & subs with fallback polling: make sure polling is enabled if applicable
-      console.log("SignalR disabled - initiating polling");
-      setJobPollingInterval(milliseconds.TenSeconds);
+      if (jobPollingInterval === 0) {
+        console.log("SignalR disabled - initiating polling");
+        setJobPollingInterval(milliseconds.TenSeconds);
+      }
     } else {
       // do one off fetches and then clear flag
       const oneOffs = subs.filter((s) => s.fetchPriorNotifications);

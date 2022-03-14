@@ -17,6 +17,7 @@ import {
   useSpecificationSummaryUtils,
 } from "../../testing-utils";
 import { useFundingConfigurationUtils } from "../../testing-utils/useFundingConfigurationUtils";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 
 describe("<ProvidersForFundingApproval />", () => {
   const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestUtils({});
@@ -26,7 +27,7 @@ describe("<ProvidersForFundingApproval />", () => {
     haveNoJobNotification();
     setupJobSpy();
     const state = reduxMockingUtils.createFundingSearchSelectionState({
-      searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, spec.id),
+      searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, spec.id, FundingActionType.Approve),
     });
     reduxMockingUtils.setupFundingSearchSelectionState(state);
     useSpecificationSummaryUtils.hasSpecification(spec);

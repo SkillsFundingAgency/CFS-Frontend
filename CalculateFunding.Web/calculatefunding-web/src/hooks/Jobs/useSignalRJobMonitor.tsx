@@ -26,8 +26,6 @@ export interface SignalRJobMonitorProps {
 
 export interface SignalRJobMonitorResult {
   results: JobNotification[];
-  state: HubConnectionState | undefined;
-  isMonitoring: boolean;
 }
 
 // N.B.: this is either watching all jobs or just the specification specific jobs
@@ -269,18 +267,7 @@ export const useSignalRJobMonitor = ({
     }
   }, [isEnabled, subscriptions, hubConnection]);
 
-  const isMonitoring = useMemo(() => {
-    return (
-      !!hubRef.current &&
-      (hubRef.current?.state == HubConnectionState.Connecting ||
-        hubRef.current?.state === HubConnectionState.Connected ||
-        hubRef.current?.state === HubConnectionState.Reconnecting)
-    );
-  }, [hubRef.current]);
-
   return {
     results: notifications,
-    state: hubRef.current?.state,
-    isMonitoring: isMonitoring,
   };
 };

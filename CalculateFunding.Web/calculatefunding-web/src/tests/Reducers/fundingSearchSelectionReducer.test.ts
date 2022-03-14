@@ -3,6 +3,7 @@ import { reduceFundingSearchSelectionState } from "../../reducers/fundingSearchS
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
 import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 import { SearchMode } from "../../types/SearchMode";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 
 const searchCriters: PublishedProviderSearchRequest = {
   indicative: [],
@@ -23,6 +24,7 @@ const searchCriters: PublishedProviderSearchRequest = {
   fundingPeriodId: "34572345",
   errorToggle: "",
   searchFields: [],
+  fundingAction: FundingActionType.Approve
 };
 const initialState: FundingSearchSelectionState = {
   searchCriteria: searchCriters,
@@ -77,6 +79,7 @@ describe("fundingSearchSelectionReducer tests", () => {
         fundingPeriodId: "34572345",
         errorToggle: "",
         searchFields: ["Spells"],
+        fundingAction: FundingActionType.Approve
       };
       const previousState: FundingSearchSelectionState = {
         searchCriteria: previousSearch,
@@ -108,6 +111,7 @@ describe("fundingSearchSelectionReducer tests", () => {
           facetCount: 0,
           fundingPeriodId: "34572345",
           errorToggle: "",
+          fundingAction: FundingActionType.Approve
         },
         selectedProviderIds: ["356tytw345t", "retyw4358"],
       });

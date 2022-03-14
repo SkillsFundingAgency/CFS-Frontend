@@ -158,7 +158,7 @@ export function UploadProvidersForFundingApproval({ match }: RouteComponentProps
       setIsUpdating(false);
       setFileName("");
     } else if (latestJob.isSuccessful && publishedProviderIds) {
-      dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+      dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, actionType));
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
       history.push(

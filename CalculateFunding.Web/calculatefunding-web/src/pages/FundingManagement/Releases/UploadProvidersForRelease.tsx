@@ -161,7 +161,7 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
       setIsUpdating(false);
       setFileName("");
     } else if (latestJob.isSuccessful && publishedProviderIds) {
-      dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+      dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Release));
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
       if (

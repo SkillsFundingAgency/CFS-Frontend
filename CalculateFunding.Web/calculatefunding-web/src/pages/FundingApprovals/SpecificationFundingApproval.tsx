@@ -54,7 +54,7 @@ export const SpecificationFundingApproval = ({
     (state) => state.fundingSearchSelection
   );
   const isSearchCriteriaInitialised =
-    state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
+    state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId && state.searchCriteria.fundingAction === FundingActionType.Approve;
 
   const {
     addSub,
@@ -160,7 +160,8 @@ export const SpecificationFundingApproval = ({
         initialiseFundingSearchSelection(
           match.params.fundingStreamId,
           match.params.fundingPeriodId,
-          match.params.specificationId
+          match.params.specificationId,
+          FundingActionType.Approve
         )
       );
     }
@@ -331,7 +332,7 @@ export const SpecificationFundingApproval = ({
   };
 
   const clearFundingSearchSelection = () => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Approve));
   };
 
   if (publishedProvidersWithErrors) {

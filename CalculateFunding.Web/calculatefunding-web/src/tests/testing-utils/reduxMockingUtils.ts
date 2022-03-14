@@ -3,6 +3,7 @@ import { createStore, Store } from "redux";
 
 import { IStoreState, rootReducer } from "../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { buildInitialPublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 
 const store: Store<IStoreState> = createStore(rootReducer);
@@ -16,7 +17,8 @@ const createFundingSearchSelectionState = (
     searchCriteria: buildInitialPublishedProviderSearchRequest(
       "fundingStream.id",
       "fundingPeriod.id",
-      "testSpec.id"
+      "testSpec.id",
+      FundingActionType.Approve
     ),
     ...overrides,
   };

@@ -54,7 +54,9 @@ export const ProvidersForFundingApproval = ({
     (state) => state.fundingSearchSelection
   );
   const isSearchCriteriaInitialised =
-    state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId;
+    state.searchCriteria !== undefined &&
+    state.searchCriteria.specificationId === specificationId &&
+    state.searchCriteria.fundingAction === FundingActionType.Approve;
 
   const {
     addSub,
@@ -117,7 +119,7 @@ export const ProvidersForFundingApproval = ({
     (err) => addError({ error: err, description: "Error while loading provider funding errors" })
   );
   const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
-    match.params.specificationId,
+    specificationId,
     [Permission.CanRefreshFunding, Permission.CanApproveFunding]
   );
   useQuery<JobDetails | undefined, AxiosError>(
@@ -184,9 +186,10 @@ export const ProvidersForFundingApproval = ({
     if (!isSearchCriteriaInitialised) {
       dispatch(
         initialiseFundingSearchSelection(
-          match.params.fundingStreamId,
-          match.params.fundingPeriodId,
-          match.params.specificationId
+          fundingStreamId,
+          fundingPeriodId,
+          specificationId,
+          FundingActionType.Approve
         )
       );
     }
@@ -306,7 +309,7 @@ export const ProvidersForFundingApproval = ({
   };
 
   const clearFundingSearchSelection = () => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Approve));
   };
 
   if (publishedProvidersWithErrors) {

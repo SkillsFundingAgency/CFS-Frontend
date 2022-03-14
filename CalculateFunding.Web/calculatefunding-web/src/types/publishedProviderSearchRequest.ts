@@ -1,3 +1,4 @@
+import { FundingActionType } from "./PublishedProvider/PublishedProviderFundingCount";
 import { SearchMode } from "./SearchMode";
 
 export enum PublishedProviderSearchFacet {
@@ -28,12 +29,14 @@ export interface PublishedProviderSearchRequest {
   searchMode: SearchMode;
   searchFields: string[];
   indicative: string[];
+  fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
 export const buildInitialPublishedProviderSearchRequest = (
   fundingStreamId: string,
   fundingPeriodId: string,
-  specificationId: string
+  specificationId: string,
+  fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>
 ): PublishedProviderSearchRequest => {
   return {
     searchTerm: "",
@@ -54,5 +57,6 @@ export const buildInitialPublishedProviderSearchRequest = (
     searchFields: [],
     indicative: [],
     monthYearOpened: [],
+    fundingAction: fundingAction,
   };
 };

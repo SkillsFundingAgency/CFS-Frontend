@@ -151,7 +151,8 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
       const search = buildInitialPublishedProviderSearchRequest(
         fundingStreamId,
         fundingPeriodId,
-        specificationId
+        specificationId,
+        actionType
       );
       const publishedProviderSearchResults = (
         await publishedProviderService.searchForPublishedProviderResults(search)
@@ -189,7 +190,7 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
   }, [fundingConfiguration, match.params]);
 
   const clearFundingSearchSelection = useCallback(() => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId));
+    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, actionType));
   }, [match.params]);
 
   const handleAcknowledge = async () => {

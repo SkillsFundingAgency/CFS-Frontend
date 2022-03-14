@@ -9,8 +9,8 @@ import { createStore, Store } from "redux";
 import * as providerErrorsHook from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import * as providerIdsSearchHook from "../../../hooks/FundingApproval/usePublishedProviderIds";
 import * as providerSearchHook from "../../../hooks/FundingApproval/usePublishedProviderSearch";
-import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as jobSubscriptionHook from "../../../hooks/Jobs/useJobSubscription";
+import { AddJobSubscription } from "../../../hooks/Jobs/useJobSubscription";
 import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguration";
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
@@ -41,6 +41,7 @@ import {
   hasFullSpecPermissions,
   hasSpecPermissions,
 } from "../../fakes/testFactories";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 
 export function FundingApprovalTestData() {
   const fundingStream: FundingStream = {
@@ -222,7 +223,8 @@ export function FundingApprovalTestData() {
     searchCriteria: buildInitialPublishedProviderSearchRequest(
       fundingStream.id,
       fundingPeriod.id,
-      testSpec.id
+      testSpec.id,
+      FundingActionType.Approve
     ),
   };
 
