@@ -32,16 +32,23 @@ export interface ErrorHookResult {
 export const useErrors = (): ErrorHookResult => {
   const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
-  const addErrorToState = (newError: ErrorMessage | undefined) => {
-    if (!newError) return;
+  const filterDuplicates = (state: ErrorMessage[], newError: ErrorMessage) => {
+    if (errorHelper.findDuplicateError(state, newError)) {
+      return;
+    }
 
-    setErrors((errors) => [...errors, newError]);
+    return newError;
+  };
+
+  const addErrorToState = (newError: ErrorMessage | undefined) => {
+    if (newError)
+      setErrors((prev) => (errorHelper.findDuplicateError(prev, newError) ? prev : [...prev, newError]));
   };
 
   const addErrorsToState = (newErrors: ErrorMessage[] | undefined) => {
-    if (!newErrors?.length) return;
-
-    setErrors((errors) => [...errors, ...newErrors]);
+    if (newErrors && newErrors.length) {
+      setErrors((prev) => [...prev, ...newErrors.filter((err) => filterDuplicates(prev, err))]);
+    }
   };
 
   /** @deprecated - pls use {@link addError} instead */

@@ -309,12 +309,21 @@ export const ProvidersForFundingApproval = ({
   };
 
   const clearFundingSearchSelection = () => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Approve));
+    dispatch(
+      initialiseFundingSearchSelection(
+        fundingStreamId,
+        fundingPeriodId,
+        specificationId,
+        FundingActionType.Approve
+      )
+    );
   };
 
-  if (publishedProvidersWithErrors) {
-    publishedProvidersWithErrors.forEach((err) => addErrorMessage(err, "Provider error"));
-  }
+  useEffect(() => {
+    if (publishedProvidersWithErrors) {
+      publishedProvidersWithErrors.forEach((err) => addError({ error: err, description: "Provider error" }));
+    }
+  }, [publishedProvidersWithErrors]);
 
   const isLoading =
     !isSearchCriteriaInitialised ||
@@ -536,12 +545,16 @@ export const ProvidersForFundingApproval = ({
           <div className="right-align">
             <button
               className="govuk-button govuk-!-margin-right-1"
-              disabled={!canRefresh || blockActionBasedOnProviderErrors}
+              disabled={!canRefresh}
               onClick={handleRefresh}
             >
               Refresh funding
             </button>
-            <button className="govuk-button" disabled={!canApprove} onClick={handleApprove}>
+            <button
+              className="govuk-button"
+              disabled={!canApprove || blockActionBasedOnProviderErrors}
+              onClick={handleApprove}
+            >
               Approve funding
             </button>
           </div>

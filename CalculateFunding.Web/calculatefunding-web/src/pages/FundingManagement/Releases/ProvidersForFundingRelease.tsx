@@ -194,12 +194,21 @@ export const ProvidersForFundingRelease = ({
   }
 
   const clearFundingSearchSelection = () => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Release));
+    dispatch(
+      initialiseFundingSearchSelection(
+        fundingStreamId,
+        fundingPeriodId,
+        specificationId,
+        FundingActionType.Release
+      )
+    );
   };
 
-  if (publishedProvidersWithErrors) {
-    publishedProvidersWithErrors.forEach((err) => addErrorMessage(err, "Provider error"));
-  }
+  useEffect(() => {
+    if (publishedProvidersWithErrors) {
+      publishedProvidersWithErrors.forEach((err) => addError({ error: err, description: "Provider error" }));
+    }
+  }, [publishedProvidersWithErrors]);
 
   const isLoading =
     !isSearchCriteriaInitialised ||

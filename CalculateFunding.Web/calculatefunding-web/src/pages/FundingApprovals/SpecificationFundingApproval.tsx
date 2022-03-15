@@ -54,7 +54,9 @@ export const SpecificationFundingApproval = ({
     (state) => state.fundingSearchSelection
   );
   const isSearchCriteriaInitialised =
-    state.searchCriteria !== undefined && state.searchCriteria.specificationId === specificationId && state.searchCriteria.fundingAction === FundingActionType.Approve;
+    state.searchCriteria !== undefined &&
+    state.searchCriteria.specificationId === specificationId &&
+    state.searchCriteria.fundingAction === FundingActionType.Approve;
 
   const {
     addSub,
@@ -332,12 +334,21 @@ export const SpecificationFundingApproval = ({
   };
 
   const clearFundingSearchSelection = () => {
-    dispatch(initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Approve));
+    dispatch(
+      initialiseFundingSearchSelection(
+        fundingStreamId,
+        fundingPeriodId,
+        specificationId,
+        FundingActionType.Approve
+      )
+    );
   };
 
-  if (publishedProvidersWithErrors) {
-    publishedProvidersWithErrors.forEach((err) => addErrorMessage(err, "Provider error"));
-  }
+  useEffect(() => {
+    if (publishedProvidersWithErrors) {
+      publishedProvidersWithErrors.forEach((err) => addError({ error: err, description: "Provider error" }));
+    }
+  }, [publishedProvidersWithErrors]);
 
   const isLoading =
     !isSearchCriteriaInitialised ||
@@ -405,7 +416,7 @@ export const SpecificationFundingApproval = ({
                 showSuccessful: false,
                 activeDescription: "Calculation run in progress",
                 failDescription: "Calculation run failed",
-              }
+              },
             ]}
           />
         </>

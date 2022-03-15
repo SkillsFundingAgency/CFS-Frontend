@@ -3,21 +3,15 @@
 import { ErrorProps, ValidationErrorProps } from "../hooks/useErrors";
 import { ErrorMessage, ValidationErrors } from "../types/ErrorMessage";
 
-const findDuplicateError = (
-  state: readonly ErrorMessage[],
-  errorMessage: string | undefined,
-  fieldName?: string | undefined,
-  description?: string | undefined,
-  suggestion?: string | undefined
-) =>
+const findDuplicateError = (state: readonly ErrorMessage[], error: ErrorMessage) =>
   state &&
   state.find(
     (err) =>
       !err.validationErrors &&
-      (err.description === description || (!description && !err.description)) &&
-      (err.fieldName === fieldName || (!fieldName && !err.fieldName)) &&
-      (err.message === errorMessage || (!errorMessage && !err.message)) &&
-      (err.suggestion === suggestion || (!suggestion && !err.suggestion))
+      (err.description === error.description || (!error.description && !err.description)) &&
+      (err.fieldName === error.fieldName || (!error.fieldName && !err.fieldName)) &&
+      (err.message === error.message || (!error.message && !err.message)) &&
+      (err.suggestion === error.suggestion || (!error.suggestion && !err.suggestion))
   );
 
 const createErrorMessage = (
@@ -27,10 +21,6 @@ const createErrorMessage = (
   fieldName?: string,
   suggestion?: any
 ): ErrorMessage | undefined => {
-  if (findDuplicateError(state, errorMessage, fieldName, description, suggestion)) {
-    return;
-  }
-
   const errorCount: number = state.length;
 
   return {
