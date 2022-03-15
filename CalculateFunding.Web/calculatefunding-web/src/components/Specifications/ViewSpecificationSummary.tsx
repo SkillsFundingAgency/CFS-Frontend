@@ -260,7 +260,8 @@ export const ViewSpecificationSummary = ({
           {isLoadingSelectedForFunding && <LoadingFieldStatus title={"checking funding status..."} />}
           {!isLoadingSelectedForFunding &&
             !isLoadingCalculationSummaries &&
-            !specification.isSelectedForFunding && (
+            !specification.isSelectedForFunding &&
+              !specsSelectedForFunding?.length && (
               <li>
                 <button
                   type="button"
