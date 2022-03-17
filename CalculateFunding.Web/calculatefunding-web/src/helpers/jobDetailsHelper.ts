@@ -131,6 +131,10 @@ function setStatusFields(job: JobDetails) {
       job.statusDescription = "in progress";
       job.isActive = true;
       break;
+    case RunningStatus.Completing:
+      job.statusDescription = "completing";
+      job.isActive = true;
+      break;
     default:
       job.isComplete = true;
       switch (job.completionStatus) {
@@ -138,6 +142,9 @@ function setStatusFields(job: JobDetails) {
           job.statusDescription =
             job.failures.length > 0 ? "completed with error(s)" : "completed successfully";
           job.isSuccessful = job.failures.length === 0;
+          break;
+        case CompletionStatus.Superseded:
+          job.statusDescription = "superseded";
           break;
         case CompletionStatus.Cancelled:
           job.statusDescription = "cancelled";
@@ -152,7 +159,7 @@ function setStatusFields(job: JobDetails) {
           job.isFailed = true;
           break;
         default:
-          job.statusDescription = job.completionStatus ? job.completionStatus.toString() : "";
+          job.statusDescription = "unknown";
           job.isFailed = true;
           break;
       }
