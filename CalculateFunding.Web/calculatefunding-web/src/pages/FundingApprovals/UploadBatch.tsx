@@ -56,6 +56,7 @@ export function UploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps
       JobType.ApproveBatchProviderFundingJob,
       JobType.PublishBatchProviderFundingJob,
       JobType.PublishAllProviderFundingJob,
+      JobType.ReleaseProvidersToChannelsJob,
     ],
     (err) => addError({ error: err, description: "Error checking for background jobs running" })
   );
@@ -147,7 +148,14 @@ export function UploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps
       setIsUpdating(false);
       setFileName("");
     } else if (latestJob.isSuccessful && publishedProviderIds) {
-      dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, actionType));
+      dispatch(
+        actions.initialiseFundingSearchSelection(
+          fundingStreamId,
+          fundingPeriodId,
+          specificationId,
+          actionType
+        )
+      );
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
       history.push(

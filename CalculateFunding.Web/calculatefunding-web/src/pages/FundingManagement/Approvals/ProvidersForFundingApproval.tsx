@@ -108,7 +108,8 @@ export const ProvidersForFundingApproval = ({
             n.latestJob?.jobType === JobType.ApproveAllProviderFundingJob ||
             n.latestJob?.jobType === JobType.ApproveBatchProviderFundingJob ||
             n.latestJob?.jobType === JobType.PublishBatchProviderFundingJob ||
-            n.latestJob?.jobType === JobType.PublishAllProviderFundingJob
+            n.latestJob?.jobType === JobType.PublishAllProviderFundingJob ||
+            n.latestJob?.jobType === JobType.ReleaseProvidersToChannelsJob
         )
         .map((n) => n.latestJob as JobDetails) || ([] as JobDetails[]),
     [jobNotifications]
@@ -200,6 +201,7 @@ export const ProvidersForFundingApproval = ({
     addJobTypeSubscription([
       JobType.PublishBatchProviderFundingJob,
       JobType.PublishAllProviderFundingJob,
+      JobType.ReleaseProvidersToChannelsJob,
       JobType.ReIndexPublishedProvidersJob,
     ]);
     addJobTypeSubscription([
@@ -377,6 +379,7 @@ export const ProvidersForFundingApproval = ({
                   JobType.ApproveBatchProviderFundingJob,
                   JobType.PublishBatchProviderFundingJob,
                   JobType.PublishAllProviderFundingJob,
+                  JobType.ReleaseProvidersToChannelsJob,
                   JobType.ReIndexPublishedProvidersJob,
                 ],
                 showActive: false, // we show a spinner separately

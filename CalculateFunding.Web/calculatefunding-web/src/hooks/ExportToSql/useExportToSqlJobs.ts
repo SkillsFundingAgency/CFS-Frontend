@@ -106,7 +106,8 @@ export const useExportToSqlJobs = ({
       (n) =>
         (n.latestJob?.jobType === JobType.ReleaseProvidersToChannelsJob ||
           n.latestJob?.jobType === JobType.PublishAllProviderFundingJob ||
-          n.latestJob?.jobType === JobType.PublishBatchProviderFundingJob) &&
+          n.latestJob?.jobType === JobType.PublishBatchProviderFundingJob ||
+          n.latestJob?.jobType === JobType.ReleaseProvidersToChannelsJob) &&
         n.latestJob?.isSuccessful
     );
 
@@ -317,6 +318,7 @@ export const useExportToSqlJobs = ({
       JobType.RefreshFundingJob,
       JobType.PublishAllProviderFundingJob,
       JobType.PublishBatchProviderFundingJob,
+      JobType.ReleaseProvidersToChannelsJob,
       JobType.ReIndexPublishedProvidersJob,
     ].map((jobType) => {
       addSub({

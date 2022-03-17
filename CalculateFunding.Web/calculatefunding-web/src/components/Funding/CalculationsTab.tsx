@@ -255,6 +255,7 @@ export function CalculationsTab({ specification, providerId, transactions }: Cal
           JobType.ApproveBatchProviderFundingJob,
           JobType.PublishAllProviderFundingJob,
           JobType.PublishBatchProviderFundingJob,
+          JobType.ReleaseProvidersToChannelsJob,
           JobType.PublishedFundingUndoJob,
         ],
       },

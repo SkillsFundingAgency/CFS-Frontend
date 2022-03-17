@@ -362,6 +362,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
           JobType.ApproveBatchProviderFundingJob,
           JobType.PublishAllProviderFundingJob,
           JobType.PublishBatchProviderFundingJob,
+          JobType.ReleaseProvidersToChannelsJob,
         ],
       },
       monitorMode: MonitorMode.SignalR,

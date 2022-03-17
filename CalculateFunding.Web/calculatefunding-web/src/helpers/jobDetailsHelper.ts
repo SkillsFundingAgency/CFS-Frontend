@@ -271,6 +271,8 @@ function getJobProgressMessage(jobTypeString: string) {
       return "Generating Funding Stream permissions CSV";
     case JobType.ConverterWizardActivityCsvGenerationJob:
       return "Generating Converter Wizard Activity CSV";
+    case JobType.ReleaseProvidersToChannelsJob:
+      return "Releasing providers to channels";
     case undefined:
       return "";
     default:
