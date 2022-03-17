@@ -115,6 +115,7 @@ export function ViewProviderResults({
   }
 
   function populateSpecification(specificationId: string) {
+    clearErrorMessages();
     getSpecificationSummaryService(specificationId)
       .then((response) => {
         const result = response.data as SpecificationSummary;

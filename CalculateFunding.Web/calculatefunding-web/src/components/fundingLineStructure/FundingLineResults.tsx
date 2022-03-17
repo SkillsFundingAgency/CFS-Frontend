@@ -241,6 +241,7 @@ export function FundingLineResults({
       setCalculationSummaries(calculationSummariesResponse.data);
 
       clearErrorMessages(["funding-line-results"]);
+      setFundingLineStructureError(false);
     } catch (err: any) {
       setIsLoadingFundingLineStructure(false);
       setFundingLineStructureError(true);
