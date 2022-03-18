@@ -30,4 +30,5 @@ export interface ReleaseActionGroup {
   sortOrder: number;
   description: string;
   channelCodes: string[];
+  name: string;
 }

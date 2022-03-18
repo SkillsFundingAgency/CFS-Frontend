@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
+import { ReleaseActionGroup } from "types/FundingConfiguration";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { FundingSelectionBreadcrumb } from "../../../components/Funding/FundingSelectionBreadcrumb";
@@ -11,7 +12,6 @@ import { WarningText } from "../../../components/WarningText";
 import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
-import { ReleaseChannel } from "../../../types/FundingConfiguration";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
 
@@ -25,7 +25,7 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
   const history = useHistory();
   const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
 
-  const [releaseActions, setReleaseActions] = useState<ReleaseChannel[]>([]);
+  const [releaseActions, setReleaseActions] = useState<ReleaseActionGroup[]>([]);
 
   const { errors, addError, clearErrorMessages } = useErrors();
 
@@ -39,29 +39,34 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
 
-  const releaseChannels = fundingConfiguration?.releaseChannels?.filter((rc) => !!rc.isVisible) ?? [];
-  const haveAnyReleaseChannels = releaseChannels.length > 0;
-  
+  const releaseGroups = fundingConfiguration?.releaseActionGroups;
+
+  const haveAnyReleaseChannels = releaseGroups && releaseGroups.length > 0;
+
   function setPurpose() {
     if (!haveAnyReleaseChannels) return;
-    
+
     clearErrorMessages();
     if (releaseActions && releaseActions?.length < 1) {
       addError({ error: "Please select a release type" });
     } else {
+      const releaseChannels = releaseActions.map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+
       history.push(
-        `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseActions
-          .map((r) => `purposes=${r.channelCode}`)
+        `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${[
+          ...new Set(releaseChannels),
+        ]
+          .map((r) => `purposes=${r}`)
           .join("&")}`
       );
     }
   }
 
-  function setReleaseAction(e: React.ChangeEvent<HTMLInputElement>, rac: ReleaseChannel) {
+  function setReleaseAction(e: React.ChangeEvent<HTMLInputElement>, rac: ReleaseActionGroup) {
     if (e.target.checked) {
       setReleaseActions((prevState) => [...prevState, rac]);
     } else {
-      setReleaseActions(releaseActions.filter((x) => x.channelCode !== rac.channelCode));
+      setReleaseActions(releaseActions.filter((x) => x.name != rac.name));
     }
   }
 
@@ -108,19 +113,16 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                   <div className="govuk-checkboxes">
-                    {releaseChannels.map((rac, index) => (
+                    {releaseGroups.map((rac, index) => (
                       <div key={index} className="govuk-checkboxes__item">
                         <input
                           type="checkbox"
                           className="govuk-checkboxes__input"
-                          aria-labelledby={`channel-${rac.channelCode}`}
+                          aria-labelledby={`channel-${rac.name}`}
                           onChange={(e) => setReleaseAction(e, rac)}
                         />
-                        <label
-                          id={`channel-${rac.channelCode}`}
-                          className="govuk-label govuk-checkboxes__label"
-                        >
-                          {rac.channelCode}
+                        <label id={`channel-${rac.name}`} className="govuk-label govuk-checkboxes__label">
+                          {rac.name}
                         </label>
                       </div>
                     ))}

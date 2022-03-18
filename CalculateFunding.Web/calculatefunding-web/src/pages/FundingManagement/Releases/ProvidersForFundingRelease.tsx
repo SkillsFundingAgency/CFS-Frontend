@@ -230,6 +230,20 @@ export const ProvidersForFundingRelease = ({
   const hasActiveActionJobs = !!activeActionJobs.length;
 
   async function handleRelease() {
+    const releaseGroups = fundingConfiguration?.releaseActionGroups;
+
+    if (releaseGroups && releaseGroups.length === 1) {
+      const releaseChannels = releaseGroups.map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+
+      history.push(
+        `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseChannels
+          .map((r) => `purposes=${r}`)
+          .join("&")}`
+      );
+
+      return;
+    }
+
     if (
       publishedProviderSearchResults &&
       publishedProviderSearchResults.canPublish &&

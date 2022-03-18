@@ -87,11 +87,7 @@ describe("<PurposeOfFundingRelease />", () => {
     });
 
     it("shows correct channel option", async () => {
-      expect(screen.getByRole("checkbox", { name: /channel-A/i })).toBeVisible();
-    });
-
-    it("does not show channel option set to invisible", async () => {
-      expect(screen.queryByRole("checkbox", { name: /channel-invisible/i })).not.toBeInTheDocument();
+      expect(screen.getByRole("checkbox", { name: /action-group/i })).toBeVisible();
     });
 
     it("shows continue button", async () => {
@@ -116,14 +112,20 @@ const fundingConfigWithoutChannels = fakery.makeFundingConfiguration({
   fundingPeriodId: fundingPeriod.id,
   approvalMode: ApprovalMode.Batches,
   releaseChannels: undefined,
+  releaseActionGroups: undefined,
 });
 const fundingConfigWithChannels = fakery.makeFundingConfiguration({
   fundingStreamId: fundingStream.id,
   fundingPeriodId: fundingPeriod.id,
   approvalMode: ApprovalMode.Batches,
-  releaseChannels: [
-    { channelCode: "channel-A", isVisible: true },
-    { channelCode: "channel-invisible", isVisible: false },
+  releaseChannels: [{ channelCode: "channel-A", isVisible: true }],
+  releaseActionGroups: [
+    {
+      sortOrder: 1,
+      description: "action group",
+      channelCodes: ["channel-A"],
+      name: "action-group",
+    },
   ],
 });
 
