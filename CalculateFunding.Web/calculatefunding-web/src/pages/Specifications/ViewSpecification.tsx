@@ -1,3 +1,4 @@
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 import React from "react";
 import { useEffect, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
@@ -24,6 +25,7 @@ export interface ViewSpecificationRoute {
 
 export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificationRoute>): JSX.Element {
   const specificationId = match.params.specificationId;
+  const { enableNewFundingManagement } = useFeatureFlags();
 
   const {
     state: errors,
@@ -77,10 +79,20 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
     clearErrorMessages();
   }, [specification?.id]);
 
+  function ApproveFundingOverviewUri(
+    specificationId: string,
+    fundingStreamId: string | undefined,
+    fundingPeriodId: string | undefined
+  ): string {
+    return enableNewFundingManagement
+      ? `/FundingManagement/Approve/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
+      : `/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`;
+  }
+
   async function onSuccessfulRefreshFunding() {
     clearErrorMessages();
     history.push(
-      `/Approvals/SpecificationFundingApproval/${fundingStream?.id}/${specification?.fundingPeriod.id}/${specificationId}`
+      ApproveFundingOverviewUri(specificationId, fundingStream?.id, specification?.fundingPeriod.id)
     );
   }
 
@@ -115,40 +127,45 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
           },
         ]}
       />
-      {!isLoadingSomething && ((!!converterWizardJob && !converterWizardJob.isSuccessful) ||
-        (!!approveAllCalculationsJob && !approveAllCalculationsJob.isActive)) && (
-        <div className="govuk-form-group">
-          <JobBanner
-            job={approveAllCalculationsJob}
-            notificationSettings={[
-              {
-                jobTypes: [],
-                showActive: false,
-                showFailed: true,
-                showSuccessful: true,
-              },
-            ]}
-          />
-          <JobBanner job={converterWizardJob} />
-        </div>
-      )}
-      {!isLoadingSomething && !!specification && !!fundingStream && !isApproveCalcsJobMonitoring && !isRefreshJobMonitoring && (
-        <>
-          <ViewSpecificationSummary
-            specificationId={specificationId}
-            isLoadingSelectedForFunding={isLoadingSpecsSelectedForFunding}
-            monitorApproveAllCalculationsJob={monitorApproveAllCalculationsJob}
-            monitorRefreshFundingJob={monitorRefreshFundingJob}
-            selectedForFundingSpecId={selectedForFundingSpecId}
-          />
-          <ViewSpecificationTabs
-            specification={specification}
-            approveAllCalculationsJob={approveAllCalculationsJob}
-            lastConverterWizardReportDate={lastConverterWizardReportDate}
-            monitorAssignTemplateCalculationsJob={monitorAssignTemplateCalculationsJob}
-          />
-        </>
-      )}
+      {!isLoadingSomething &&
+        ((!!converterWizardJob && !converterWizardJob.isSuccessful) ||
+          (!!approveAllCalculationsJob && !approveAllCalculationsJob.isActive)) && (
+          <div className="govuk-form-group">
+            <JobBanner
+              job={approveAllCalculationsJob}
+              notificationSettings={[
+                {
+                  jobTypes: [],
+                  showActive: false,
+                  showFailed: true,
+                  showSuccessful: true,
+                },
+              ]}
+            />
+            <JobBanner job={converterWizardJob} />
+          </div>
+        )}
+      {!isLoadingSomething &&
+        !!specification &&
+        !!fundingStream &&
+        !isApproveCalcsJobMonitoring &&
+        !isRefreshJobMonitoring && (
+          <>
+            <ViewSpecificationSummary
+              specificationId={specificationId}
+              isLoadingSelectedForFunding={isLoadingSpecsSelectedForFunding}
+              monitorApproveAllCalculationsJob={monitorApproveAllCalculationsJob}
+              monitorRefreshFundingJob={monitorRefreshFundingJob}
+              selectedForFundingSpecId={selectedForFundingSpecId}
+            />
+            <ViewSpecificationTabs
+              specification={specification}
+              approveAllCalculationsJob={approveAllCalculationsJob}
+              lastConverterWizardReportDate={lastConverterWizardReportDate}
+              monitorAssignTemplateCalculationsJob={monitorAssignTemplateCalculationsJob}
+            />
+          </>
+        )}
     </Main>
   );
 }
