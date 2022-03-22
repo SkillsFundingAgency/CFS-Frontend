@@ -1,8 +1,13 @@
 import { AxiosError } from "axios";
+import { FundingSelectionBreadcrumb } from "components/Funding/FundingSelectionBreadcrumb";
+import { ProviderFundingOverviewUri } from "components/Funding/ProviderFundingOverviewLink";
+import { FundingResultsBreadcrumb } from "components/Funding/ProviderFundingSearch/FundingResultsBreadcrumb";
+import { useAllProfilePatterns } from "hooks/FundingApproval/useAllProfilePatterns";
+import { useSpecificationSummary } from "hooks/useSpecificationSummary";
 import React, { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
+import { FundingActionType } from "types/PublishedProvider/PublishedProviderFundingCount";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { PreviewProfileModal } from "../../components/Funding/PreviewProfileModal";
@@ -12,15 +17,11 @@ import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../components/PermissionStatus";
 import { useProviderVersion } from "../../hooks/Providers/useProviderVersion";
 import { useErrors } from "../../hooks/useErrors";
+import { useFindSpecificationsWithResults } from "../../hooks/useFundingLinePublishedProviderDetails";
 import { IStoreState } from "../../reducers/rootReducer";
-import {
-  assignProfilePatternKeyToPublishedProvider,
-  getAllProfilePatterns,
-} from "../../services/profilingService";
-import { getFundingLinePublishedProviderDetails } from "../../services/publishedProviderFundingLineService";
+import { assignProfilePatternKeyToPublishedProvider } from "../../services/profilingService";
 import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
-import { FundingLineProfileViewModel } from "../../types/PublishedProvider/FundingLineProfile";
 import { Section } from "../../types/Sections";
 
 export interface ChangeProfileTypeProps {
@@ -29,7 +30,8 @@ export interface ChangeProfileTypeProps {
   fundingPeriodId: string;
   specificationId: string;
   fundingLineId: string;
-  specCoreProviderVersionId: string;
+  providerVersionId: string;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
 enum PatternType {
@@ -39,14 +41,7 @@ enum PatternType {
 }
 
 export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTypeProps>) {
-  const {
-    fundingStreamId,
-    fundingPeriodId,
-    specificationId,
-    fundingLineId,
-    providerId,
-    specCoreProviderVersionId: providerVersionId,
-  } = match.params;
+  const { specificationId, fundingLineId, providerId, providerVersionId, actionType } = match.params;
   const permissions: FundingStreamPermissions[] = useSelector(
     (state: IStoreState) => state.userState.fundingStreamPermissions
   );
@@ -54,16 +49,17 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
 
   const history = useHistory();
 
-  const { data: profilePatterns, isFetching: isFetchingProfilePatterns } = useQuery<
-    FundingStreamPeriodProfilePattern[],
-    AxiosError
-  >(
-    `profile-patterns-${fundingStreamId}-${fundingPeriodId}`,
-    async () => (await getAllProfilePatterns(fundingStreamId, fundingPeriodId)).data,
-    {
-      onError: (err) => addError({ error: err, description: "Error while loading profile patterns" }),
-      refetchOnWindowFocus: false,
-    }
+  const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
+    addError({ error: err, description: "Error while loading specification" })
+  );
+
+  const fundingStreamId = specification && specification.fundingStreams[0]?.id;
+  const fundingPeriodId = specification && specification.fundingPeriod?.id;
+
+  const { profilePatterns, isLoadingProfilePatterns } = useAllProfilePatterns(
+    fundingStreamId as string,
+    fundingPeriodId as string,
+    (err) => addError({ error: err, description: "Error while loading profile patterns" })
   );
 
   const { providerVersion, isFetchingProviderVersion } = useProviderVersion(
@@ -82,30 +78,16 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
     }
   );
 
-  const { data: fundingLineProfileViewModel, isFetching: isFetchingFundingLineProfile } = useQuery<
-    FundingLineProfileViewModel,
-    AxiosError
-  >(
-    `provider-profiling-pattern-for-spec-${specificationId}-provider-${providerId}-stream-${fundingStreamId}-period-${fundingPeriodId}`,
-    async () =>
-      (
-        await getFundingLinePublishedProviderDetails(
-          specificationId,
-          providerId,
-          fundingStreamId,
-          fundingLineId,
-          fundingPeriodId
-        )
-      ).data,
-    {
+  const { fundingLineProfile, isLoadingFundingLineProfile } = useFindSpecificationsWithResults({
+    specificationId,
+    providerId,
+    fundingLineCode: fundingLineId,
+    fundingStreamId,
+    fundingPeriodId,
+    options: {
       onError: (err) => addError({ error: err, description: "Error while loading funding line profile" }),
-      refetchOnWindowFocus: false,
-    }
-  );
-
-  const fundingLineProfile = fundingLineProfileViewModel
-    ? fundingLineProfileViewModel.fundingLineProfile
-    : undefined;
+    },
+  });
 
   const [canChangeProfileType, setCanChangeProfileType] = useState<boolean>(false);
   const [missingPermissions, setMissingPermissions] = useState<string[]>([]);
@@ -118,18 +100,29 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   const [showModal, setShowModal] = useState<boolean>(false);
   const [noRuleBasedPatterns, setNoRuleBasedPatterns] = useState<boolean>(false);
   const [previewProfilePatternKey, setPreviewProfilePatternKey] = useState<string | null | undefined>();
+  const providerFundingOverviewUrl = ProviderFundingOverviewUri({
+    actionType: actionType,
+    specificationId: specificationId,
+    providerId: providerId,
+    specCoreProviderVersionId: providerVersionId,
+    fundingStreamId: fundingStreamId as string,
+    fundingPeriodId: fundingPeriodId as string,
+  });
 
   const isPageLoading =
-    isFetchingProfilePatterns || isFetchingProviderVersion || isFetchingFundingLineProfile;
+    isLoadingProfilePatterns ||
+    isFetchingProviderVersion ||
+    isLoadingFundingLineProfile ||
+    isLoadingSpecification;
   const providerName = providerVersion && providerVersion.name ? providerVersion.name : "Unknown provider";
   const fundingLineName =
-    fundingLineProfile && fundingLineProfile.fundingLineName
-      ? fundingLineProfile.fundingLineName
+    fundingLineProfile && fundingLineProfile.fundingLineProfile.fundingLineName
+      ? fundingLineProfile.fundingLineProfile.fundingLineName
       : "Unknown funding line name";
 
   const redirectToFundingLineProfile = () => {
     history.push(
-      `/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/edit`
+      `/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${providerVersionId}/FundingLine/${fundingLineId}/edit`
     );
   };
 
@@ -152,8 +145,8 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
       if (!isValidForm() || profilePatternKey === undefined) return;
       setIsSaving(true);
       await assignProfilePatternKeyToPublishedProvider(
-        fundingStreamId,
-        fundingPeriodId,
+        fundingStreamId as string,
+        fundingPeriodId as string,
         providerId,
         fundingLineId,
         profilePatternKey
@@ -195,40 +188,40 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
     setPreviewProfilePatternKey(key);
   };
 
-  const getNationalPattern: FundingStreamPeriodProfilePattern | undefined = useMemo(() => {
+  const nationalPattern: FundingStreamPeriodProfilePattern | undefined = useMemo(() => {
     if (!profilePatterns) return undefined;
-    const nationalPattern = profilePatterns.filter(
+    const nationalPatterns = profilePatterns.filter(
       (pp) => pp.fundingLineId === fundingLineId && pp.profilePatternKey === null
     );
-    if (nationalPattern.length === 1) {
-      return nationalPattern[0];
+    if (nationalPatterns.length === 1) {
+      return nationalPatterns[0];
     }
-    if (nationalPattern.length > 1) {
+    if (nationalPatterns.length > 1) {
       addError({ error: "More than one national profile found for this funding line." });
       setMissingData(true);
     }
     return undefined;
   }, [profilePatterns]);
 
-  const getNationalPatternName = () => {
-    return getNationalPattern && getNationalPattern.profilePatternDisplayName !== null
-      ? getNationalPattern.profilePatternDisplayName
+  const nationalPatternName = () => {
+    return nationalPattern && nationalPattern.profilePatternDisplayName !== null
+      ? nationalPattern.profilePatternDisplayName
       : "National";
   };
 
-  const getNationalPatternDescription = () => {
-    return getNationalPattern && getNationalPattern.profilePatternDescription !== null
-      ? getNationalPattern.profilePatternDescription
+  const nationalPatternDescription = () => {
+    return nationalPattern && nationalPattern.profilePatternDescription !== null
+      ? nationalPattern.profilePatternDescription
       : "";
   };
 
-  const getRuleBasedPatterns: FundingStreamPeriodProfilePattern[] = useMemo(() => {
+  const ruleBasedPatterns: FundingStreamPeriodProfilePattern[] = useMemo(() => {
     if (!profilePatterns) return [];
-    const ruleBasedPatterns = profilePatterns.filter(
+    const ruleBasedPatternsForFundingLine = profilePatterns.filter(
       (pp) => pp.fundingLineId === fundingLineId && pp.profilePatternKey !== null
     );
-    if (ruleBasedPatterns.length > 0) {
-      return ruleBasedPatterns;
+    if (ruleBasedPatternsForFundingLine.length > 0) {
+      return ruleBasedPatternsForFundingLine;
     }
     setNoRuleBasedPatterns(true);
     setMissingData(true);
@@ -246,18 +239,18 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   }, [permissions]);
 
   useEffect(() => {
-    if (!fundingLineProfile || fundingLineProfile.profilePatternKey === undefined) return;
-    if (fundingLineProfile.isCustomProfile) {
+    if (!fundingLineProfile || fundingLineProfile.fundingLineProfile.profilePatternKey === undefined) return;
+    if (fundingLineProfile.fundingLineProfile.isCustomProfile) {
       setPatternType(PatternType.Custom);
     } else {
-      if (fundingLineProfile.profilePatternKey === null) {
+      if (fundingLineProfile.fundingLineProfile.profilePatternKey === null) {
         setPatternType(PatternType.National);
       } else {
         setPatternType(PatternType.RuleBased);
-        setRuleBasedPatternKey(fundingLineProfile.profilePatternKey);
+        setRuleBasedPatternKey(fundingLineProfile.fundingLineProfile.profilePatternKey);
       }
     }
-    setProfilePatternKey(fundingLineProfile.profilePatternKey);
+    setProfilePatternKey(fundingLineProfile.fundingLineProfile.profilePatternKey);
   }, [fundingLineProfile]);
 
   useEffect(() => {
@@ -289,21 +282,17 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url={"/"} />
-        <Breadcrumb name="Approvals" />
-        <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
-        <Breadcrumb
-          name={"Funding approval results"}
-          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Funding Management" url="/FundingManagement" />
+        <FundingSelectionBreadcrumb actionType={actionType} />
+        <FundingResultsBreadcrumb
+          actionType={actionType}
+          specificationId={specificationId}
+          specificationName={specification?.name}
+          fundingPeriodId={fundingPeriodId}
+          fundingStreamId={fundingStreamId}
         />
-        <Breadcrumb
-          name={providerName}
-          url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
-        />
-        <Breadcrumb
-          name={fundingLineName}
-          url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/view`}
-        />
+        <Breadcrumb name={providerName ?? "Provider"} url={providerFundingOverviewUrl} />
         <Breadcrumb name="Change profile type" />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={isPageLoading} />
@@ -330,7 +319,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
               Select one option.
             </span>
             <div className="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
-              {getNationalPattern && (
+              {nationalPattern && (
                 <div className="govuk-radios__item">
                   <input
                     className="govuk-radios__input"
@@ -343,8 +332,8 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
                     aria-labelledby="national-type"
                   />
                   <label className="govuk-label govuk-radios__label" htmlFor="national" id="national-type">
-                    {getNationalPatternName()}
-                    <span className="govuk-hint">{getNationalPatternDescription()}</span>
+                    {nationalPatternName()}
+                    <span className="govuk-hint">{nationalPatternDescription()}</span>
                     <button className="govuk-link" onClick={() => handlePreviewProfile(null)}>
                       Preview profile
                     </button>
@@ -392,7 +381,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
                             </span>
                           )}
                           <div className="govuk-radios govuk-radios--small">
-                            {getRuleBasedPatterns.map((rbp) => {
+                            {ruleBasedPatterns.map((rbp) => {
                               const patternKey = rbp.profilePatternKey;
                               if (patternKey === undefined || patternKey === null) return <></>;
                               return (
@@ -459,8 +448,8 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
       {previewProfilePatternKey !== undefined && (
         <PreviewProfileModal
           specificationId={specificationId}
-          fundingStreamId={fundingStreamId}
-          fundingPeriodId={fundingPeriodId}
+          fundingStreamId={fundingStreamId as string}
+          fundingPeriodId={fundingPeriodId as string}
           providerId={providerId}
           fundingLineId={fundingLineId}
           previewProfilePatternKey={previewProfilePatternKey}

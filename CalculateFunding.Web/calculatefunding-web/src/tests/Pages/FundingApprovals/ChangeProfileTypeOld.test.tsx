@@ -9,7 +9,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import * as redux from "react-redux";
 import { match, MemoryRouter } from "react-router";
 
-import { ChangeProfileTypeProps } from "../../../pages/FundingApprovals/ChangeProfileType";
+import { ChangeProfileTypePropsOld } from "../../../pages/FundingApprovals/ChangeProfileTypeOld";
 
 describe("<ChangeProfileType /> ", () => {
   beforeEach(() => {
@@ -544,7 +544,7 @@ const useSelectorSpy = jest.spyOn(redux, "useSelector");
 const mockHistoryPush = jest.fn();
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
-const matchMock: match<ChangeProfileTypeProps> = {
+const matchMock: match<ChangeProfileTypePropsOld> = {
   params: {
     specificationId: "specId",
     providerId: "10005143",
@@ -559,11 +559,11 @@ const matchMock: match<ChangeProfileTypeProps> = {
 };
 
 const renderPage = () => {
-  const { ChangeProfileType } = require("../../../pages/FundingApprovals/ChangeProfileType");
+  const { ChangeProfileTypeOld } = require("../../../pages/FundingApprovals/ChangeProfileTypeOld");
   return render(
     <MemoryRouter>
       <QueryClientProvider client={new QueryClient()}>
-        <ChangeProfileType match={matchMock} location={location} history={history} />
+        <ChangeProfileTypeOld match={matchMock} location={location} history={history} />
       </QueryClientProvider>
     </MemoryRouter>
   );

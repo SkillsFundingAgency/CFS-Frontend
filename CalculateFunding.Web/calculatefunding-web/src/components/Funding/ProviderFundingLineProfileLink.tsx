@@ -7,7 +7,7 @@ import { TextLink } from "../TextLink";
 export const ProviderFundingLineProfileLink = ({
   editMode = "view",
   actionType,
-  fundingLineCode,
+  fundingLineId,
   specificationId,
   providerId,
   specCoreProviderVersionId,
@@ -17,25 +17,25 @@ export const ProviderFundingLineProfileLink = ({
 }: {
   actionType: FundingActionType;
   editMode: "view" | "edit";
-  fundingLineCode: string;
+  fundingLineId: string;
   specificationId: string;
   providerId: string;
   specCoreProviderVersionId?: string;
-  fundingStreamId: string;
-  fundingPeriodId: string;
+  fundingStreamId?: string;
+  fundingPeriodId?: string;
   children: any;
 }) => {
   const { enableNewFundingManagement } = useFeatureFlags();
   return enableNewFundingManagement ? (
     <TextLink
-      to={`/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${specCoreProviderVersionId}/FundingLine/${fundingLineCode}/${editMode}`}
+      to={`/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${specCoreProviderVersionId}/FundingLine/${fundingLineId}/${editMode}`}
     >
       {children}
     </TextLink>
   ) : (
     // OLD - deprecated
     <TextLink
-      to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${specCoreProviderVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}/${editMode}`}
+      to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${specCoreProviderVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineId}/${editMode}`}
     >
       {children}
     </TextLink>

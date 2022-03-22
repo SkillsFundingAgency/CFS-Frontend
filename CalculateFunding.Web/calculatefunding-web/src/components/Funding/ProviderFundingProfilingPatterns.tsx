@@ -105,7 +105,7 @@ const FundingLineProfileNameContainer = (props: {
       <ProviderFundingLineProfileLink
         editMode="view"
         {...props}
-        fundingLineCode={props.profile.fundingLineCode}
+        fundingLineId={props.profile.fundingLineCode}
       >
         {fundingLineTitle}
       </ProviderFundingLineProfileLink>

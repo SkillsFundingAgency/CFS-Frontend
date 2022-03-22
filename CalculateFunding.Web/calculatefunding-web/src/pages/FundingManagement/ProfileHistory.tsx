@@ -2,13 +2,15 @@ import { FundingSelectionBreadcrumb } from "components/Funding/FundingSelectionB
 import { ProviderFundingLineProfileLink } from "components/Funding/ProviderFundingLineProfileLink";
 import { ProviderFundingOverviewUri } from "components/Funding/ProviderFundingOverviewLink";
 import { FundingResultsBreadcrumb } from "components/Funding/ProviderFundingSearch/FundingResultsBreadcrumb";
+import { useErrors } from "hooks/useErrors";
+import { useSpecificationSummary } from "hooks/useSpecificationSummary";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { RouteComponentProps } from "react-router";
 import { FundingActionType } from "types/PublishedProvider/PublishedProviderFundingCount";
 
 import { AccordionPanel } from "../../components/AccordionPanel";
-import { Breadcrumb } from "../../components/Breadcrumbs";
+import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { ErrorSummary } from "../../components/ErrorSummary";
 import { FormattedNumber, NumberType } from "../../components/FormattedNumber";
@@ -21,20 +23,16 @@ import { Section } from "../../types/Sections";
 
 export interface ProfileHistoryProps {
   providerId: string;
-  fundingStreamId: string;
   specificationId: string;
-  fundingLineCode: string;
-  fundingPeriodId: string;
+  fundingLineId: string;
   providerVersionId: string;
   actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
 export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProps>) {
-  const fundingStreamId = match.params.fundingStreamId;
   const specificationId = match.params.specificationId;
-  const fundingLineCode = match.params.fundingLineCode;
+  const fundingLineId = match.params.fundingLineId;
   const providerId = match.params.providerId;
-  const fundingPeriodId = match.params.fundingPeriodId;
   const providerVersionId = match.params.providerVersionId;
   const actionType = match.params.actionType;
   const [allExpanded, setAllExpanded] = useState<boolean>(false);
@@ -43,19 +41,24 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
     specificationId: specificationId,
     providerId: providerId,
     specCoreProviderVersionId: providerVersionId,
-    fundingStreamId: fundingStreamId as string,
-    fundingPeriodId: fundingPeriodId as string,
   });
+  const { addError } = useErrors();
+  const { specification, isLoadingSpecification } = useSpecificationSummary(specificationId, (err) =>
+    addError({ error: err, description: "Error while loading specification" })
+  );
+
+  const fundingStreamId = specification && specification.fundingStreams[0]?.id;
+  const fundingPeriodId = specification && specification.fundingPeriod?.id;
 
   const { data, isLoading, isError, error } = useQuery<FundingLineChangeViewModel>(
-    `profile-history-${specificationId}-${providerId}-${fundingStreamId}-${fundingLineCode}`,
+    `profile-history-${specificationId}-${providerId}-${fundingStreamId}-${fundingLineId}`,
     async () =>
       (
         await getPreviousProfilesForSpecificationForProviderForFundingLine(
           specificationId,
           providerId,
-          fundingStreamId,
-          fundingLineCode,
+          fundingStreamId as string,
+          fundingLineId,
           providerVersionId
         )
       ).data
@@ -85,26 +88,28 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
 
   return (
     <Main location={Section.FundingManagement}>
-      <Breadcrumb name="Calculate funding" url="/" />
-      <Breadcrumb name="Funding Management" url="/FundingManagement" />
-      <FundingSelectionBreadcrumb actionType={actionType} />
-      <FundingResultsBreadcrumb
-        actionType={actionType}
-        specificationId={specificationId}
-        specificationName={data?.specificationName}
-        fundingPeriodId={fundingPeriodId}
-        fundingStreamId={fundingStreamId}
-      />
-      <Breadcrumb name={data?.providerName ?? "Provider"} url={providerFundingOverviewUrl} />
-      <Breadcrumb name="Profile history" />
-      {(isError || (!isLoading && !data)) && (
+      <Breadcrumbs>
+        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Funding Management" url="/FundingManagement" />
+        <FundingSelectionBreadcrumb actionType={actionType} />
+        <FundingResultsBreadcrumb
+          actionType={actionType}
+          specificationId={specificationId}
+          specificationName={specification?.name}
+          fundingPeriodId={fundingPeriodId}
+          fundingStreamId={fundingStreamId}
+        />
+        <Breadcrumb name={data?.providerName ?? "Provider"} url={providerFundingOverviewUrl} />
+        <Breadcrumb name="Profile history" />
+      </Breadcrumbs>
+      {(isError || (!isLoading && !data) || (!isLoadingSpecification && !specification)) && (
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
             <ErrorSummary error="There is a problem" title={getErrorMessage()} suggestion="" />
           </div>
         </div>
       )}
-      {isLoading ? (
+      {isLoading || isLoadingSpecification ? (
         <LoadingStatus title="Loading profiling history" />
       ) : (
         !!data && (

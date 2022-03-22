@@ -161,13 +161,20 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
       setIsUpdating(false);
       setFileName("");
     } else if (latestJob.isSuccessful && publishedProviderIds) {
-      dispatch(actions.initialiseFundingSearchSelection(fundingStreamId, fundingPeriodId, specificationId, FundingActionType.Release));
+      dispatch(
+        actions.initialiseFundingSearchSelection(
+          fundingStreamId,
+          fundingPeriodId,
+          specificationId,
+          FundingActionType.Release
+        )
+      );
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
       if (
         fundingConfiguration !== undefined &&
-        fundingConfiguration.releaseChannels !== undefined &&
-        fundingConfiguration.releaseChannels.length > 1
+        fundingConfiguration.releaseActionGroups !== undefined &&
+        fundingConfiguration.releaseActionGroups.length > 1
       ) {
         history.push(
           `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
@@ -248,7 +255,7 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
           ]}
         />
       )}
-      
+
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <div className="govuk-form-group">

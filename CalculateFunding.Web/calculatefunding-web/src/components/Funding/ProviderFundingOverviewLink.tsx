@@ -16,8 +16,8 @@ export const ProviderFundingOverviewUri = ({
   specificationId: string;
   providerId: string;
   specCoreProviderVersionId?: string;
-  fundingStreamId: string;
-  fundingPeriodId: string;
+  fundingStreamId?: string;
+  fundingPeriodId?: string;
 }) => {
   const { enableNewFundingManagement } = useFeatureFlags();
   return enableNewFundingManagement

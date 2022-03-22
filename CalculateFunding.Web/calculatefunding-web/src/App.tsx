@@ -46,7 +46,7 @@ import { MapDataSourceFiles } from "./pages/Datasets/MapDataSourceFiles";
 import { RunExportToSql } from "./pages/Datasets/SqlDataExport/RunExportToSql";
 import { SelectSpecificationForExport } from "./pages/Datasets/SqlDataExport/SelectSpecificationForExport";
 import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
-import { ChangeProfileType } from "./pages/FundingApprovals/ChangeProfileType";
+import { ChangeProfileTypeOld } from "./pages/FundingApprovals/ChangeProfileTypeOld";
 import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
 import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprovalSelection";
 import { ProfileHistoryOld } from "./pages/FundingApprovals/ProfileHistoryOld";
@@ -58,6 +58,7 @@ import { ConfirmApprovalOfFunding } from "./pages/FundingManagement/Approvals/Co
 import { ProvidersForFundingApproval } from "./pages/FundingManagement/Approvals/ProvidersForFundingApproval";
 import { SelectSpecificationForFundingApproval } from "./pages/FundingManagement/Approvals/SelectSpecificationForFundingApproval";
 import { UploadProvidersForFundingApproval } from "./pages/FundingManagement/Approvals/UploadProvidersForFundingApproval";
+import { ChangeProfileType } from "./pages/FundingManagement/ChangeProfileType";
 import FundingManagementHome from "./pages/FundingManagement/FundingManagementHome";
 import { ProviderFundingOverview } from "./pages/FundingManagement/ProviderFundingOverview";
 import { ConfirmFundingRelease } from "./pages/FundingManagement/Releases/ConfirmFundingRelease";
@@ -295,7 +296,13 @@ const fundingManagementRoutes = (
       component={ViewEditFundingLineProfile}
     />
     <Route
-      path="/FundingManagement/:actionType/:specificationId/:fundingStreamId/:fundingPeriodId/:fundingLineCode/:providerId/:providerVersionId/ProfilingHistory"
+      exact={true}
+      path="/FundingManagement/:actionType/Provider/:providerId/Specification/:specificationId/Version/:providerVersionId/FundingLine/:fundingLineId/edit/change-profile-type"
+      component={ChangeProfileType}
+    />
+    <Route
+      exact={true}
+      path="/FundingManagement/:actionType/Provider/:providerId/Specification/:specificationId/Version/:providerVersionId/FundingLine/:fundingLineId/view/ProfilingHistory"
       component={ProfileHistory}
     />
   </Route>
@@ -320,7 +327,7 @@ const oldFundingApprovalRoutes = (
     <Route
       exact
       path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/edit/change-profile-type"
-      component={ChangeProfileType}
+      component={ChangeProfileTypeOld}
     />
     <Route
       exact

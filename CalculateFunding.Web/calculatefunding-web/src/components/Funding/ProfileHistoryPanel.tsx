@@ -59,7 +59,7 @@ export function ProfileHistoryPanel({
         <div className="govuk-body">
           {enableNewFundingManagement ? (
             <TextLink
-              to={`/FundingManagement/${actionType}/${specificationId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}/${providerId}/${providerVersionId}/ProfilingHistory`}
+              to={`/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${providerVersionId}/FundingLine/${fundingLineCode}/view/ProfilingHistory`}
             >
               History of previous profiles
             </TextLink>
