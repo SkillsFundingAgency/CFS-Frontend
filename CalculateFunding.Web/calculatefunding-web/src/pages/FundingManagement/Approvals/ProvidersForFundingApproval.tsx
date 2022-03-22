@@ -423,7 +423,7 @@ export const ProvidersForFundingApproval = ({
             />
           </div>
           <div className="govuk-grid-column-one-third govuk-right-align">
-            {showApproveBatchAction && (
+            {(showApproveBatchAction || canRefresh) && (
               <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management action links">
                 <ul className="govuk-list">
                   <li>Actions:</li>
