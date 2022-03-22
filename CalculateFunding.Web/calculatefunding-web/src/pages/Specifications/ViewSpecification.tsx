@@ -75,7 +75,9 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
 
   useEffect(() => {
     document.title = "Specification Results - Calculate funding";
-    monitorConverterWizardJob();
+    if (specification?.id) {
+      monitorConverterWizardJob();
+    }
     clearErrorMessages();
   }, [specification?.id]);
 

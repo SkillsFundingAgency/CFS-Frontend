@@ -3,7 +3,7 @@
 import { ErrorProps, ValidationErrorProps } from "../hooks/useErrors";
 import { ErrorMessage, ValidationErrors } from "../types/ErrorMessage";
 
-const findDuplicateError = (state: readonly ErrorMessage[], error: ErrorMessage) =>
+const findDuplicateError = (state: readonly ErrorMessage[], error: ErrorMessage): ErrorMessage | undefined =>
   state &&
   state.find(
     (err) =>
@@ -20,7 +20,7 @@ const createErrorMessage = (
   description?: string,
   fieldName?: string,
   suggestion?: any
-): ErrorMessage | undefined => {
+): ErrorMessage => {
   const errorCount: number = state.length;
 
   return {
@@ -36,7 +36,7 @@ const createErrorMessage = (
 const createError = (
   state: readonly ErrorMessage[],
   { error, description, fieldName, suggestion }: ErrorProps
-) => {
+): ErrorMessage => {
   let errorMessage = "";
   const axiosError = error as AxiosError;
   if (axiosError && axiosError.isAxiosError) {
@@ -93,7 +93,7 @@ const createValidationErrorsAsIndividualErrors = (
 };
 
 const combineError = (state: readonly ErrorMessage[], newError: ErrorMessage | undefined): ErrorMessage[] => {
-  if (!newError) return state as ErrorMessage[];
+  if (!newError || findDuplicateError(state, newError)) return state as ErrorMessage[];
 
   return [...state, newError];
 };
@@ -104,7 +104,7 @@ const combineErrors = (
 ): ErrorMessage[] => {
   if (!newErrors?.length) return state as ErrorMessage[];
 
-  return [...state, ...newErrors];
+  return [...state, ...newErrors.filter((e) => !findDuplicateError(state, e))];
 };
 
 const clearErrorMessages = (state: readonly ErrorMessage[], fieldNames?: string[]): ErrorMessage[] => {

@@ -183,6 +183,7 @@ export const useViewSpecificationJobs = ({
   const monitorApproveAllCalculationsJob = async (jobId: string) => {
     if (!jobId?.length) throw Error("Missing job id for monitoring approve calculations job");
 
+    console.log("Adding sub for approve all calcs");
     await addSub({
       monitorMode: MonitorMode.SignalR,
       monitorFallback: MonitorFallback.Polling,
@@ -198,6 +199,7 @@ export const useViewSpecificationJobs = ({
   };
 
   const monitorAssignTemplateCalculationsJob = async () => {
+    console.log("Adding sub for assigning calcs");
     await addSub({
       filterBy: {
         specificationId: specificationId,
@@ -210,6 +212,7 @@ export const useViewSpecificationJobs = ({
   };
 
   const monitorRefreshFundingJob = async (jobId: string) => {
+    console.log("Adding sub for refresh");
     await addSub({
       monitorMode: MonitorMode.SignalR,
       filterBy: {
@@ -222,6 +225,7 @@ export const useViewSpecificationJobs = ({
   };
 
   const monitorConverterWizardJob = async () => {
+    console.log("Adding sub for converter wizard");
     await addSub({
       monitorMode: MonitorMode.SignalR,
       monitorFallback: MonitorFallback.Polling,
@@ -239,6 +243,7 @@ export const useViewSpecificationJobs = ({
 
   useEffect(() => {
     if (jobObserverState?.jobFilter) {
+      console.log("Adding sub for observed job", jobObserverState.jobFilter);
       addSub({
         filterBy: jobObserverState.jobFilter,
         monitorMode: MonitorMode.SignalR,

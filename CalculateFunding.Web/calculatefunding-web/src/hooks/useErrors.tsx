@@ -29,27 +29,16 @@ export interface ErrorHookResult {
   clearErrorMessages: (fieldNames?: string[]) => void;
 }
 
+// N.B. - all logic should be in the errorHelper as it will be shared between this hook and the ErrorContext
+// The ErrorContext / useErrorContext may eventually replace this hook as works better with child components
 export const useErrors = (): ErrorHookResult => {
   const [errors, setErrors] = React.useState<ErrorMessage[]>([]);
 
-  const filterDuplicates = (state: ErrorMessage[], newError: ErrorMessage) => {
-    if (errorHelper.findDuplicateError(state, newError)) {
-      return;
-    }
+  const addErrorToState = (newError: ErrorMessage | undefined) =>
+    setErrors((curr) => errorHelper.combineError(curr, newError));
 
-    return newError;
-  };
-
-  const addErrorToState = (newError: ErrorMessage | undefined) => {
-    if (newError)
-      setErrors((prev) => (errorHelper.findDuplicateError(prev, newError) ? prev : [...prev, newError]));
-  };
-
-  const addErrorsToState = (newErrors: ErrorMessage[] | undefined) => {
-    if (newErrors && newErrors.length) {
-      setErrors((prev) => [...prev, ...newErrors.filter((err) => filterDuplicates(prev, err))]);
-    }
-  };
+  const addErrorsToState = (newErrors: ErrorMessage[] | undefined) =>
+    setErrors((curr) => errorHelper.combineErrors(curr, newErrors));
 
   /** @deprecated - pls use {@link addError} instead */
   const addErrorMessage = (errorMessage: any, description?: string, fieldName?: string, suggestion?: any) =>

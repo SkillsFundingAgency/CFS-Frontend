@@ -41,12 +41,22 @@ export const useSignalRJobMonitor = ({
 }: SignalRJobMonitorProps): SignalRJobMonitorResult => {
   const [notifications, setNotifications] = useState<JobNotification[]>([]);
   const [newJob, setNewJob] = useState<JobDetails>();
-  const [hubConnection, setHubConnection] = useState<HubConnection>();
-  const hubRef = useRef<HubConnection>();
+  const previousHubState = useRef<HubConnectionState>(HubConnectionState.Disconnected);
+  const previousEnabledState = useRef<boolean>(!!isEnabled);
+  const initialisationCount = useRef<number>(0);
 
-  const hasInitialised = () => !!hubConnection;
-
-  const hasDisconnected = () => hubConnection?.state == HubConnectionState.Disconnected;
+  const hubConnection: HubConnection = useMemo(() => {
+    initialisationCount.current++;
+    console.log("useSignalRJobMonitor: initialising hub #" + initialisationCount.current);
+    const hub = new HubConnectionBuilder()
+      .withUrl("/api/notifications")
+      .withAutomaticReconnect([5, 8, 13])
+      .configureLogging(LogLevel.Debug)
+      .build();
+    hub.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
+    hub.serverTimeoutInMilliseconds = milliseconds.SixMinutes;
+    return hub;
+  }, []);
 
   const isInSubscriptions = (notification: JobNotification, subs: JobSubscription[]) => {
     return subs.some((s) => s.id === notification.subscription.id);
@@ -65,20 +75,6 @@ export const useSignalRJobMonitor = ({
       latestJob: job,
       subscription: sub,
     };
-  };
-
-  const stopSignalR = async () => {
-    console.log("SignalR: shutting down");
-
-    if (hubRef?.current) {
-      await hubRef?.current?.stop();
-      hubRef.current = undefined;
-    }
-
-    if (hubConnection) {
-      hubConnection?.stop();
-      setHubConnection(undefined);
-    }
   };
 
   const hasEnabledSubscriptions = () => {
@@ -100,6 +96,24 @@ export const useSignalRJobMonitor = ({
 
   const isThisJobValid = (job: JobResponse) => {
     return job && job.jobId && job.jobId.length > 1; // to catch edge case of 0 turned to string
+  };
+
+  const stopSignalR = async () => {
+    if (hubConnection) {
+      console.log("SignalR: shutting down", hubConnection);
+      await hubConnection.stop();
+      console.log("SignalR: shut down", hubConnection);
+    }
+  };
+
+  const startSignalR = async () => {
+    if (hubConnection) {
+      console.log("SignalR.startSignalR: hub starting", hubConnection);
+      await hubConnection.start();
+      console.log("SignalR.startSignalR: hub started", hubConnection);
+      console.log("SignalR.startSignalR: initiating job monitoring");
+      await initJobMonitoring();
+    }
   };
 
   const findMatchingSubs = (job: JobResponse | JobDetails): JobSubscription[] => {
@@ -145,7 +159,7 @@ export const useSignalRJobMonitor = ({
   };
 
   const processMessage = (message: any) => {
-    console.log("SignalR: received job", message);
+    console.log("useSignalRJobMonitor.processMessage: received job", message);
     const job = message as JobResponse;
     if (isThisJobValid(job)) {
       const jobDetails = getJobDetailsFromJobResponse(job);
@@ -156,7 +170,7 @@ export const useSignalRJobMonitor = ({
   };
 
   const notifyDisconnection = (error: Error | string | undefined) => {
-    console.log("SignalR: disconnected", error);
+    console.log("useSignalRJobMonitor: disconnected", error);
     const realError = error as Error;
     const errorMessage = realError
       ? `Error while monitoring jobs: ${realError.message}`
@@ -174,51 +188,97 @@ export const useSignalRJobMonitor = ({
   };
 
   const notifyReconnection = () => {
-    console.log("SignalR: reconnected");
+    console.log("useSignalRJobMonitor: reconnected");
     onReconnection && onReconnection();
   };
 
   const notifyReconnecting = (error: Error | string | undefined) => {
-    console.log("SignalR: reconnecting", error);
+    console.log("useSignalRJobMonitor: reconnecting", error);
     if (error) console.error(error);
     onReconnecting && onReconnecting();
   };
 
-  const monitorJobNotifications = async () => {
+  const initSignalR = async () => {
+    if (!hubConnection) {
+      console.log("useSignalRJobMonitor.initSignalR: Cannot start signalR because hub is undefined");
+      return;
+    }
+
     try {
-      if (!hubRef.current) {
-        console.log("SignalR: setting up configuration");
-        const hubConnect: HubConnection = new HubConnectionBuilder()
-          .withUrl("/api/notifications")
-          .withAutomaticReconnect([5, 8, 13])
-          .configureLogging(LogLevel.Information)
-          .build();
-        hubConnect.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
-        hubConnect.serverTimeoutInMilliseconds = milliseconds.SixMinutes;
-        hubConnect.on("NotificationEvent", processMessage);
-        hubConnect.onclose((error) => notifyDisconnection(error));
-        hubConnect.onreconnecting((error) => notifyReconnecting(error));
-        hubConnect.onreconnected(() => notifyReconnection());
+      console.log("useSignalRJobMonitor.initSignalR: setting up configuration");
 
-        console.log("SignalR: connecting");
-        await hubConnect.start();
+      hubConnection.on("NotificationEvent", processMessage);
+      hubConnection.onclose((error) => notifyDisconnection(error));
+      hubConnection.onreconnecting((error) => notifyReconnecting(error));
+      hubConnection.onreconnected(notifyReconnection);
 
-        // if all subs are linked to the SAME spec, then just follow that spec
-        const specId = findSingleSpecificationId(subscriptions);
-        if (mode === JobMonitorMode.WatchSingleSpecification && specId) {
-          await hubConnect.invoke("StartWatchingForSpecificationNotifications", specId);
-        } else {
-          // otherwise follow everything
-          await hubConnect.invoke("StartWatchingForAllNotifications");
-        }
-
-        setHubConnection(hubConnect);
-      }
+      console.log("useSignalRJobMonitor.initSignalR: connecting");
+      await startSignalR();
     } catch (err: any) {
-      console.error("SignalR: error", err);
+      console.error("useSignalRJobMonitor.initSignalR: error", err);
       await stopSignalR();
       notifyDisconnection(err);
     }
+  };
+
+  const initJobMonitoring = async () => {
+    if (!subscriptions?.length) {
+      console.log(
+        "useSignalRJobMonitor.initJobMonitoring: Cannot start monitoring because there are no subs"
+      );
+      return;
+    }
+    if (!hubConnection || hubConnection.state !== HubConnectionState.Connected) {
+      console.log(
+        "useSignalRJobMonitor.initJobMonitoring: Cannot start monitoring because hub is not yet connected. Scheduling retry in 10 secs..."
+      );
+      setTimeout(() => initJobMonitoring(), milliseconds.TenSeconds);
+      return;
+    }
+    try {
+      // if all subs are linked to the SAME spec, then just follow that spec
+      const specId = findSingleSpecificationId(subscriptions);
+      if (mode === JobMonitorMode.WatchSingleSpecification && specId) {
+        console.log(
+          "useSignalRJobMonitor.initJobMonitoring: invoking StartWatchingForSpecificationNotifications",
+          specId
+        );
+        await hubConnection.invoke("StartWatchingForSpecificationNotifications", specId);
+      } else {
+        // otherwise follow everything
+        console.log("useSignalRJobMonitor.initJobMonitoring: invoking StartWatchingForAllNotifications");
+        await hubConnection?.invoke("StartWatchingForAllNotifications");
+      }
+    } catch (err: any) {
+      console.error("useSignalRJobMonitor.initJobMonitoring: error", err);
+      await stopSignalR();
+      notifyDisconnection(err);
+    }
+  };
+
+  const stopSignalrIfInactive = () => {
+    if (
+      !hubConnection ||
+      hubConnection.state === HubConnectionState.Disconnected ||
+      hubConnection.state === HubConnectionState.Disconnecting
+    ) {
+      console.log("useSignalRJobMonitor.stopSignalrIfInactive: hub already stopped or stopping");
+    }
+
+    if (isEnabled === undefined) {
+      // reschedule to when initialised
+      console.log("useSignalRJobMonitor.stopSignalrIfInactive: rescheduling for 10 secs");
+      setTimeout(() => stopSignalrIfInactive(), milliseconds.TenSeconds);
+    }
+
+    // for some reason isEnabled can be false and subscriptions can be empty here even when there are new subscriptions
+    if (hasEnabledSubscriptions()) {
+      console.log("useSignalRJobMonitor.stopSignalrIfInactive: now active so not stopping");
+      return;
+    }
+
+    console.log("useSignalRJobMonitor.stopSignalrIfInactive: now stopping", subscriptions);
+    stopSignalR();
   };
 
   useEffect(() => {
@@ -226,7 +286,9 @@ export const useSignalRJobMonitor = ({
       const matchingSubscriptions = findMatchingSubs(newJob);
       if (matchingSubscriptions.length > 0) {
         console.log(
-          `SignalR: creating ${newJob.completionStatus || ""} ${newJob.runningStatus} job notification`,
+          `useSignalRJobMonitor[newJob]: new job: creating ${newJob.completionStatus || ""} ${
+            newJob.runningStatus
+          } job notification`,
           newJob
         );
         const updated = matchingSubscriptions.map((sub) => createJobNotification(newJob, sub));
@@ -235,37 +297,116 @@ export const useSignalRJobMonitor = ({
           return [...unchanged, ...updated];
         });
       } else {
-        console.log("SignalR: no matching subscription found for this job", newJob, subscriptions);
+        // no matching subscription found for this job
       }
     }
   }, [newJob]);
 
   useEffect(() => {
+    if (!hubConnection) {
+      console.log("useSignalRJobMonitor[hubConnection?.state]: SignalR hub is undefined", subscriptions);
+      return;
+    }
+
+    const prevState = previousHubState.current;
+    const currState = hubConnection?.state;
+    const haveEnabledSubs = hasEnabledSubscriptions();
     console.log(
-      `SignalR: state change [isEnabled: "${isEnabled?.toString()}", subscriptions: ${
+      `useSignalRJobMonitor[hubConnection?.state]: [isEnabled: "${previousEnabledState.current?.toString()}" -> "${isEnabled?.toString()}", subscriptions: ${
         subscriptions.length
-      }, hubConnection.state: "${hubConnection?.state}"]`,
+      }, hubConnection.state: "${prevState}" -> "${currState}"]`,
       subscriptions
     );
 
-    const shouldReconnect = isEnabled && hasDisconnected();
-    if (shouldReconnect) {
-      notifyDisconnection("SignalR has disconnected");
-      subscriptions.forEach((s) => s.isEnabled && !!s.onDisconnect && s.onDisconnect());
-    } else {
-      if (isEnabled && hasEnabledSubscriptions() && !hasInitialised()) {
-        console.log("SignalR: criteria for initialisation detected");
-        monitorJobNotifications();
-      } else {
-        if (!isEnabled || (!hasEnabledSubscriptions && hubRef.current)) {
-          console.log("SignalR: criteria for shutting down detected");
-          stopSignalR();
-        } else {
-          hubRef.current = hubConnection;
+    // handle hub state change
+    if (previousHubState.current !== hubConnection.state) {
+      // notify if connection has been lost
+      if (
+        prevState === HubConnectionState.Connected &&
+        (currState === HubConnectionState.Disconnected || currState === HubConnectionState.Disconnecting)
+      ) {
+        if (haveEnabledSubs) {
+          notifyDisconnection("SignalR has disconnected");
+          subscriptions.forEach((s) => s.isEnabled && !!s.onDisconnect && s.onDisconnect());
         }
       }
+
+      // restart monitoring?
+      if (currState === HubConnectionState.Disconnected && haveEnabledSubs) {
+        console.log("useSignalRJobMonitor: criteria for initialisation detected");
+        initSignalR();
+      }
+
+      if (currState !== HubConnectionState.Disconnected && !haveEnabledSubs) {
+        console.log("useSignalRJobMonitor: criteria for shutting down detected");
+        setTimeout(() => stopSignalrIfInactive(), milliseconds.TenSeconds);
+      }
+
+      if (currState == HubConnectionState.Connected && haveEnabledSubs) {
+        console.log("useSignalRJobMonitor: now connected: trigger job monitoring");
+        initJobMonitoring();
+      }
+
+      previousHubState.current = hubConnection.state;
     }
-  }, [isEnabled, subscriptions, hubConnection]);
+  }, [hubConnection?.state]);
+
+  useEffect(() => {
+    if (!hubConnection) {
+      console.log("useSignalRJobMonitor[isEnabled]: SignalR hub is undefined", subscriptions);
+      return;
+    }
+
+    const prevState = previousHubState.current;
+    const currState = hubConnection?.state;
+    const haveEnabledSubs = hasEnabledSubscriptions();
+    console.log(
+      `useSignalRJobMonitor[isEnabled]: [isEnabled: "${previousEnabledState.current?.toString()}" -> "${isEnabled?.toString()}", subscriptions: ${
+        subscriptions.length
+      }, hubConnection.state: "${prevState}" -> "${currState}"]`,
+      subscriptions
+    );
+
+    // change in isEnabled
+    if (!previousEnabledState.current && isEnabled) {
+      // kickstart
+      if (currState == HubConnectionState.Connected && haveEnabledSubs) {
+        console.log("useSignalRJobMonitor[isEnabled]: now connected: trigger job monitoring");
+        initJobMonitoring();
+      }
+    }
+
+    if (previousEnabledState.current !== !!isEnabled) {
+      previousEnabledState.current = !!isEnabled;
+    }
+  }, [isEnabled]);
+
+  useEffect(() => {
+    if (!hubConnection) {
+      console.log("useSignalRJobMonitor[subscriptions]: SignalR hub is undefined", subscriptions);
+      return;
+    }
+
+    const prevState = previousHubState.current;
+    const currState = hubConnection?.state;
+    const haveEnabledSubs = hasEnabledSubscriptions();
+    console.log(
+      `useSignalRJobMonitor[subscriptions]: [isEnabled: "${previousEnabledState.current?.toString()}" -> "${isEnabled?.toString()}", subscriptions: ${
+        subscriptions.length
+      }, hubConnection.state: "${prevState}" -> "${currState}"]`,
+      subscriptions
+    );
+
+    if (currState === HubConnectionState.Disconnected && haveEnabledSubs) {
+      console.log("useSignalRJobMonitor[subscriptions]: criteria for initialisation detected");
+      initSignalR();
+    }
+
+    if (currState !== HubConnectionState.Disconnected && !haveEnabledSubs) {
+      console.log("useSignalRJobMonitor[subscriptions]: criteria for shutting down detected");
+      setTimeout(() => stopSignalrIfInactive(), milliseconds.TenSeconds);
+    }
+  }, [subscriptions]);
 
   return {
     results: notifications,

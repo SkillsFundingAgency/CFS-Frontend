@@ -40,13 +40,16 @@ export const ErrorContextWrapper = ({ children }: { children: React.ReactNode })
   const [state, dispatch] = React.useReducer(errorContextEventReducer, [] as ErrorMessage[]);
 
   const contextValue = React.useMemo(() => {
-    const addErrorToContext = (err: ErrorProps) => dispatch({ type: "addError", payload: err });
+    const addErrorToContext = (err: ErrorProps) => {
+      dispatch({ type: "addError", payload: err });
+    };
 
-    const addValidationErrorToContext = (err: ValidationErrorProps) =>
+    const addValidationErrorToContext = (err: ValidationErrorProps) => {
       dispatch({
         type: "addValidationError",
         payload: err,
       });
+    };
 
     const clearErrorsFromContext = (fieldNames?: string[] | undefined) =>
       dispatch({
@@ -68,8 +71,10 @@ export const useErrorContext = () => {
 
   // clear up on unmount
   useEffect(() => {
-    console.log("useErrorContext: unmounting: context.clearErrorsFromContext()");
-    return () => context.clearErrorsFromContext();
+    return () => {
+      console.log("useErrorContext: unmounting: context.clearErrorsFromContext()");
+      context.clearErrorsFromContext();
+    }
   }, []);
 
   return { ...context };
