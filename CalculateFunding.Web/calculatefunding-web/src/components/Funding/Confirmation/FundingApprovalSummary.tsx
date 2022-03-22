@@ -2,10 +2,7 @@
 
 import { useErrorContext } from "../../../context/ErrorContext";
 import { ApprovalMode } from "../../../types/ApprovalMode";
-import {
-  FundingActionType,
-  PublishedProviderFundingCount,
-} from "../../../types/PublishedProvider/PublishedProviderFundingCount";
+import { FundingActionType, PublishedProviderFundingCount, } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FormattedNumber, NumberType } from "../../FormattedNumber";
 import { LoadingFieldStatus } from "../../LoadingFieldStatus";
@@ -65,7 +62,7 @@ export function FundingApprovalSummary(props: FundingApprovalSummaryProps) {
                     )}
                   </th>
                   <td className="govuk-table__cell">
-                    {props.approvalMode === ApprovalMode.Batches && batchSize > 0 && (
+                    {((props.approvalMode === ApprovalMode.Batches && batchSize > 0) || props.approvalMode === ApprovalMode.All) && (
                       <CsvDownloadPublishedProviders
                         actionType={FundingActionType.Approve}
                         specificationId={props.specification.id}
