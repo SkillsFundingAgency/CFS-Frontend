@@ -1,4 +1,4 @@
-﻿import { compose, filter } from "ramda";
+﻿import { compose, filter, take } from "ramda";
 import React from "react";
 
 import {
@@ -37,11 +37,13 @@ export interface JobNotificationSectionProps {
   jobNotifications: JobNotification[] | undefined;
   notificationSettings: JobTypeNotificationSetting[] | undefined; // if empty then show any job type with default messages
   isCheckingForJob?: boolean;
+  showOnlyMostRecent?: boolean;
   spinner?: SpinnerSettings;
 }
 
 const JobNotificationSection = ({
   jobNotifications,
+  showOnlyMostRecent,
   isCheckingForJob = false,
   notificationSettings,
   spinner = {
@@ -63,8 +65,8 @@ const JobNotificationSection = ({
     extractJobsFromNotifications
   )(jobNotifications);
 
-  const activeJobsToShow: JobDetails[] = activeJobs(jobs);
-  const failedJobsToShow: JobDetails[] = failedJobs(jobs);
+  const activeJobsToShow: JobDetails[] = showOnlyMostRecent ? take(1, activeJobs(jobs)) : activeJobs(jobs);
+  const failedJobsToShow: JobDetails[] = showOnlyMostRecent ? take(1, failedJobs(jobs)) : failedJobs(jobs);
   const successfulJobToShow: JobDetails | undefined = getLatestJob(successfulJobs(jobs));
 
   // show all active jobs if any, otherwise show all failed jobs and/or the latest successful job

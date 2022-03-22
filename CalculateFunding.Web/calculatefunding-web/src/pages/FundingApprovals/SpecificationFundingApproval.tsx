@@ -404,6 +404,7 @@ export const SpecificationFundingApproval = ({
           />
           <JobNotificationSection
             jobNotifications={jobNotifications}
+            showOnlyMostRecent={true}
             notificationSettings={[
               {
                 jobTypes: [

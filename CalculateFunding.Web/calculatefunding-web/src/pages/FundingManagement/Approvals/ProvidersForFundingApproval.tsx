@@ -201,7 +201,7 @@ export const ProvidersForFundingApproval = ({
       addJobTypeSubscription([
         JobType.PublishBatchProviderFundingJob,
         JobType.PublishAllProviderFundingJob,
-      JobType.ReleaseProvidersToChannelsJob,
+        JobType.ReleaseProvidersToChannelsJob,
         JobType.ReIndexPublishedProvidersJob,
       ]);
       addJobTypeSubscription([
@@ -391,6 +391,7 @@ export const ProvidersForFundingApproval = ({
           />
           <JobNotificationSection
             jobNotifications={jobNotifications}
+            showOnlyMostRecent={true}
             notificationSettings={[
               {
                 jobTypes: [

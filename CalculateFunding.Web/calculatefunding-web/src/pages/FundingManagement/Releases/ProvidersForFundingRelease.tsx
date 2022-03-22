@@ -303,6 +303,7 @@ export const ProvidersForFundingRelease = ({
           />
           <JobNotificationSection
             jobNotifications={jobNotifications}
+            showOnlyMostRecent={true}
             notificationSettings={[
               {
                 jobTypes: [
