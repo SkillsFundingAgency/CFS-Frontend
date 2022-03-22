@@ -293,7 +293,7 @@ export function UploadProvidersForFundingApproval({ match }: RouteComponentProps
             <Link
               className="govuk-button govuk-button--secondary"
               data-module="govuk-button"
-              to={"/Approvals/Select"}
+              to={"/FundingManagement/Approve/Selection"}
             >
               Cancel
             </Link>
