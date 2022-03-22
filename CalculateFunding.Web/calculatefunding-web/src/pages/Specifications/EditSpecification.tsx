@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
@@ -133,7 +134,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
   const [isUpdating, setIsUpdating] = useState(false);
   const history = useHistory();
   const dispatch = useDispatch();
-  const { errors, addError, clearErrorMessages } = useErrors();
+  const { errors, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const errorSuggestion = (
     <p>
       If the problem persists please contact the{" "}
@@ -264,14 +265,18 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
         dispatch(action.upsertJobObserverState(jobMonitoringFilter));
         history.push(`/ViewSpecification/${specificationId}`);
       } catch (error: any) {
-        if (error.response && error.response.data["Name"] !== undefined) {
-          addError({
-            error: error.response.data["Name"],
-            description: "Failed to save",
-            suggestion: errorSuggestion,
-          });
+        if (error.response && error.response.data["Name"]) {
+          addError({ error: error.response.data["Name"], suggestion: errorSuggestion });
         } else {
-          addError({ error: error, description: "Specification failed to update, please try again" });
+          const axiosError = error as AxiosError;
+          if (axiosError && axiosError.response && axiosError.response.status === 400) {
+            addValidationErrors({
+              validationErrors: axiosError.response.data,
+              message: "Error trying to update specification",
+            });
+          } else {
+            addError({ error: error, description: "Specification failed to update. Please try again" });
+          }
         }
         setIsUpdating(false);
       }
