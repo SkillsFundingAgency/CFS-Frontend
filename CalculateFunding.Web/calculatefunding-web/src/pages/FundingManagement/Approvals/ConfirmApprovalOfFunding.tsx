@@ -233,7 +233,13 @@ export function ConfirmApprovalOfFunding({
           </div>
 
           <ButtonControlsSection
-            isDisabled={isLoading || isWaitingForJob || !fundingSummary || !hasPermissionToApprove}
+            isDisabled={
+              isLoading ||
+              isWaitingForJob ||
+              !fundingSummary ||
+              !hasPermissionToApprove ||
+              fundingSummary.count == 0
+            }
             onConfirm={handleConfirm}
             onCancel={() => history.goBack()}
           />

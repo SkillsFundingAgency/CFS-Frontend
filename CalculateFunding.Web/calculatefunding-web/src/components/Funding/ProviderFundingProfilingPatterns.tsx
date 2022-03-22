@@ -102,7 +102,11 @@ const FundingLineProfileNameContainer = (props: {
 
   const FundingLineProfileLinkOrNot = () =>
     isNumber(props.profile.fundingLineAmount) ? (
-      <ProviderFundingLineProfileLink editMode="view" {...props}>
+      <ProviderFundingLineProfileLink
+        editMode="view"
+        {...props}
+        fundingLineCode={props.profile.fundingLineCode}
+      >
         {fundingLineTitle}
       </ProviderFundingLineProfileLink>
     ) : (

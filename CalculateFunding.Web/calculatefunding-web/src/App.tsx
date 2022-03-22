@@ -1,5 +1,6 @@
 import "./App.scss";
 
+import { ProfileHistory } from "pages/FundingManagement/ProfileHistory";
 import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -48,7 +49,7 @@ import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
 import { ChangeProfileType } from "./pages/FundingApprovals/ChangeProfileType";
 import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
 import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprovalSelection";
-import { ProfileHistory } from "./pages/FundingApprovals/ProfileHistory";
+import { ProfileHistoryOld } from "./pages/FundingApprovals/ProfileHistoryOld";
 import { ProviderFundingOverviewOld } from "./pages/FundingApprovals/ProviderFundingOverviewOld";
 import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
 import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
@@ -293,6 +294,10 @@ const fundingManagementRoutes = (
       sensitive={false}
       component={ViewEditFundingLineProfile}
     />
+    <Route
+      path="/FundingManagement/:actionType/:specificationId/:fundingStreamId/:fundingPeriodId/:fundingLineCode/:providerId/:providerVersionId/ProfilingHistory"
+      component={ProfileHistory}
+    />
   </Route>
 );
 
@@ -329,7 +334,7 @@ const oldFundingApprovalRoutes = (
     />
     <Route
       path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode"
-      component={ProfileHistory}
+      component={ProfileHistoryOld}
     />
   </Route>
 );

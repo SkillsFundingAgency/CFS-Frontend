@@ -7,7 +7,7 @@ import React from "react";
 import * as ReactQuery from "react-query";
 import { match, MemoryRouter } from "react-router";
 
-import { ProfileHistoryProps } from "../../../pages/FundingApprovals/ProfileHistory";
+import { ProfileHistoryPropsOld } from "../../../pages/FundingApprovals/ProfileHistoryOld";
 import { FundingLineChangeViewModel } from "../../../types/PublishedProvider/FundingLineProfile";
 
 const useQuerySpy = jest.spyOn(ReactQuery, "useQuery");
@@ -55,10 +55,10 @@ describe("<ProfileHistory />", () => {
 });
 
 const renderPage = () => {
-  const { ProfileHistory } = require("../../../pages/FundingApprovals/ProfileHistory");
+  const { ProfileHistoryOld } = require("../../../pages/FundingApprovals/ProfileHistoryOld");
   return render(
     <MemoryRouter>
-      <ProfileHistory match={matchMock} location={location} history={history} />
+      <ProfileHistoryOld match={matchMock} location={location} history={history} />
     </MemoryRouter>
   );
 };
@@ -146,7 +146,7 @@ const fundingLineChangeViewModel: FundingLineChangeViewModel = {
 
 const history = createMemoryHistory();
 const location = createLocation("", "", "");
-const matchMock: match<ProfileHistoryProps> = {
+const matchMock: match<ProfileHistoryPropsOld> = {
   params: {
     specificationId: "specId",
     providerId: "providerId",

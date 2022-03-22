@@ -1,7 +1,9 @@
+import { useFeatureFlags } from "hooks/useFeatureFlags";
 import React from "react";
 import { useQuery } from "react-query";
 
 import { getPreviousProfileExistsForSpecificationForProviderForFundingLine } from "../../services/fundingLineDetailsService";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { TextLink } from "../TextLink";
 
 export interface ProfileHistoryPanelProps {
@@ -11,6 +13,7 @@ export interface ProfileHistoryPanelProps {
   fundingLineCode: string;
   providerVersionId: string;
   fundingPeriodId: string;
+  actionType?: FundingActionType;
 }
 
 export function ProfileHistoryPanel({
@@ -20,7 +23,9 @@ export function ProfileHistoryPanel({
   fundingStreamId,
   fundingPeriodId,
   fundingLineCode,
+  actionType,
 }: ProfileHistoryPanelProps) {
+  const { enableNewFundingManagement } = useFeatureFlags();
   const { isLoading, isError, data } = useQuery<boolean>(
     `profile-history-exists-${specificationId}--${providerId}-${fundingStreamId}-${fundingLineCode}`,
     async () =>
@@ -52,11 +57,19 @@ export function ProfileHistoryPanel({
       ) : null}
       {data !== undefined && data ? (
         <div className="govuk-body">
-          <TextLink
-            to={`/Approvals/ProfilingHistory/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}
-          >
-            History of previous profiles
-          </TextLink>
+          {enableNewFundingManagement ? (
+            <TextLink
+              to={`/FundingManagement/${actionType}/${specificationId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}/${providerId}/${providerVersionId}/ProfilingHistory`}
+            >
+              History of previous profiles
+            </TextLink>
+          ) : (
+            <TextLink
+              to={`/Approvals/ProfilingHistory/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}`}
+            >
+              History of previous profiles
+            </TextLink>
+          )}
         </div>
       ) : null}
     </>

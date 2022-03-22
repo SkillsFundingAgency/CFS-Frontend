@@ -1,10 +1,14 @@
+import { FundingSelectionBreadcrumb } from "components/Funding/FundingSelectionBreadcrumb";
+import { ProviderFundingLineProfileLink } from "components/Funding/ProviderFundingLineProfileLink";
+import { ProviderFundingOverviewUri } from "components/Funding/ProviderFundingOverviewLink";
+import { FundingResultsBreadcrumb } from "components/Funding/ProviderFundingSearch/FundingResultsBreadcrumb";
 import React, { useState } from "react";
 import { useQuery } from "react-query";
 import { RouteComponentProps } from "react-router";
+import { FundingActionType } from "types/PublishedProvider/PublishedProviderFundingCount";
 
 import { AccordionPanel } from "../../components/AccordionPanel";
-import { BackLink } from "../../components/BackLink";
-import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { Breadcrumb } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { ErrorSummary } from "../../components/ErrorSummary";
 import { FormattedNumber, NumberType } from "../../components/FormattedNumber";
@@ -22,6 +26,7 @@ export interface ProfileHistoryProps {
   fundingLineCode: string;
   fundingPeriodId: string;
   providerVersionId: string;
+  actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
 export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProps>) {
@@ -31,7 +36,16 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
   const providerId = match.params.providerId;
   const fundingPeriodId = match.params.fundingPeriodId;
   const providerVersionId = match.params.providerVersionId;
+  const actionType = match.params.actionType;
   const [allExpanded, setAllExpanded] = useState<boolean>(false);
+  const providerFundingOverviewUrl = ProviderFundingOverviewUri({
+    actionType: actionType,
+    specificationId: specificationId,
+    providerId: providerId,
+    specCoreProviderVersionId: providerVersionId,
+    fundingStreamId: fundingStreamId as string,
+    fundingPeriodId: fundingPeriodId as string,
+  });
 
   const { data, isLoading, isError, error } = useQuery<FundingLineChangeViewModel>(
     `profile-history-${specificationId}-${providerId}-${fundingStreamId}-${fundingLineCode}`,
@@ -71,20 +85,18 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
 
   return (
     <Main location={Section.FundingManagement}>
-      <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url={"/"} />
-        <Breadcrumb name="Approvals" />
-        <Breadcrumb name="Select specification" url={"/Approvals/Select"} />
-        <Breadcrumb
-          name={"Funding approval results"}
-          url={`/Approvals/SpecificationFundingApproval/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
-        />
-        <Breadcrumb
-          name={data?.providerName ?? ""}
-          url={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}`}
-        />
-        <Breadcrumb name="Profile history" />
-      </Breadcrumbs>
+      <Breadcrumb name="Calculate funding" url="/" />
+      <Breadcrumb name="Funding Management" url="/FundingManagement" />
+      <FundingSelectionBreadcrumb actionType={actionType} />
+      <FundingResultsBreadcrumb
+        actionType={actionType}
+        specificationId={specificationId}
+        specificationName={data?.specificationName}
+        fundingPeriodId={fundingPeriodId}
+        fundingStreamId={fundingStreamId}
+      />
+      <Breadcrumb name={data?.providerName ?? "Provider"} url={providerFundingOverviewUrl} />
+      <Breadcrumb name="Profile history" />
       {(isError || (!isLoading && !data)) && (
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-full">
@@ -237,9 +249,13 @@ export function ProfileHistory({ match }: RouteComponentProps<ProfileHistoryProp
           </>
         )
       )}
-      <BackLink
-        to={`/Approvals/ProviderFundingOverview/${specificationId}/${providerId}/${providerVersionId}/${fundingStreamId}/${fundingPeriodId}/${fundingLineCode}/view`}
-      />
+      <ProviderFundingLineProfileLink
+        editMode="view"
+        {...match.params}
+        specCoreProviderVersionId={match.params.providerVersionId}
+      >
+        Back
+      </ProviderFundingLineProfileLink>
     </Main>
   );
 }

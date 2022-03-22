@@ -659,6 +659,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
             <div className="govuk-grid-column-two-thirds">
               {!!fundingStreamId && !!fundingPeriodId ? (
                 <ProfileHistoryPanel
+                  actionType={actionType}
                   specificationId={specificationId}
                   providerId={providerId}
                   providerVersionId={providerVersionId}
