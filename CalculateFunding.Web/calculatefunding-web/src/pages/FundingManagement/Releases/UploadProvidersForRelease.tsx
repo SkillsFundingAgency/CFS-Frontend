@@ -316,7 +316,7 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
             <Link
               className="govuk-button govuk-button--secondary"
               data-module="govuk-button"
-              to={"/FundingManagementReleaseSelection"}
+              to={"/FundingManagement/Release/Select"}
             >
               Cancel
             </Link>
