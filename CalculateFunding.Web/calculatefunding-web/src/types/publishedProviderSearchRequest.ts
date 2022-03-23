@@ -32,6 +32,20 @@ export interface PublishedProviderSearchRequest {
   fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
+const getFundingStatus = (action: FundingActionType) => {
+  switch (action) {
+    case FundingActionType.Approve: {
+      return ["Updated"];
+    }
+    case FundingActionType.Release: {
+      return ["Approved"];
+    }
+    default: {
+      return [];
+    }
+  }
+};
+
 export const buildInitialPublishedProviderSearchRequest = (
   fundingStreamId: string,
   fundingPeriodId: string,
@@ -40,7 +54,7 @@ export const buildInitialPublishedProviderSearchRequest = (
 ): PublishedProviderSearchRequest => {
   return {
     searchTerm: "",
-    status: [],
+    status: getFundingStatus(fundingAction),
     providerType: [],
     providerSubType: [],
     localAuthority: [],

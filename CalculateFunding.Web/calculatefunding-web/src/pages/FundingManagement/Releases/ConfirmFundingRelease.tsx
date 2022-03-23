@@ -1,4 +1,5 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import { useReleaseFundingSummaryData } from "hooks/FundingApproval/useReleaseFundingSummaryData";
+import React, { useMemo, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
@@ -42,7 +43,6 @@ export function ConfirmFundingRelease({
     isLoadingSpecification,
     fundingConfiguration,
     isLoadingFundingConfiguration,
-    fundingSummary,
     clearFundingSearchSelection,
     latestJob,
     isWaitingForJob,
@@ -66,6 +66,11 @@ export function ConfirmFundingRelease({
       fundingConfiguration === undefined ||
       !isPermissionsFetched,
     [specification, fundingConfiguration, isConfirming, isPermissionsFetched]
+  );
+  const { releaseSummaryData, isLoadingReleaseSummaryData } = useReleaseFundingSummaryData(
+    specificationId,
+    channelCodes,
+    selectedProviderIds
   );
 
   const handleCancel = () => {
@@ -171,15 +176,15 @@ export function ConfirmFundingRelease({
           <FundingReleaseSummary
             approvalMode={fundingConfiguration.approvalMode}
             specification={specification}
-            channelCodes={channelCodes}
-            fundingSummary={fundingSummary}
+            releaseSummary={releaseSummaryData}
             isWaitingForJob={isWaitingForJob}
+            isLoadingSummaryData={isLoadingReleaseSummaryData}
           />
         </section>
       )}
 
       <ButtonControlsSection
-        isDisabled={isLoading || isWaitingForJob || !fundingSummary || !hasPermissionToRelease}
+        isDisabled={isLoading || isWaitingForJob || !releaseSummaryData || !hasPermissionToRelease}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />

@@ -111,13 +111,13 @@ export const useFundingConfirmation = ({
   }, []);
 
   useEffect(() => {
-    if (!fundingConfiguration || fundingSummary) return;
+    if (!fundingConfiguration || fundingSummary || actionType == FundingActionType.Release) return;
 
     async function loadBatchFundingSummary() {
-      const response =
-        actionType === FundingActionType.Approve
-          ? await publishService.getFundingSummaryForApprovingService(specificationId, selectedProviderIds)
-          : await publishService.getFundingSummaryForReleasingService(specificationId, selectedProviderIds);
+      const response = await publishService.getFundingSummaryForApprovingService(
+        specificationId,
+        selectedProviderIds
+      );
       setFundingSummary(response?.data);
     }
 
