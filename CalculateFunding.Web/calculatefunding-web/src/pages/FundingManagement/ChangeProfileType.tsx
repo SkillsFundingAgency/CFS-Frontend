@@ -4,7 +4,7 @@ import { ProviderFundingOverviewUri } from "components/Funding/ProviderFundingOv
 import { FundingResultsBreadcrumb } from "components/Funding/ProviderFundingSearch/FundingResultsBreadcrumb";
 import { useAllProfilePatterns } from "hooks/FundingApproval/useAllProfilePatterns";
 import { useSpecificationSummary } from "hooks/useSpecificationSummary";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 import { FundingActionType } from "types/PublishedProvider/PublishedProviderFundingCount";
@@ -97,6 +97,9 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   const [ruleBasedPatternKey, setRuleBasedPatternKey] = useState<string | undefined>(undefined);
   const [validated, setValidated] = useState<boolean>(false);
   const [missingData, setMissingData] = useState<boolean>(false);
+  const [nationalPattern, setNationalPattern] = useState<FundingStreamPeriodProfilePattern | undefined>(
+    undefined
+  );
   const [showModal, setShowModal] = useState<boolean>(false);
   const [noRuleBasedPatterns, setNoRuleBasedPatterns] = useState<boolean>(false);
   const [previewProfilePatternKey, setPreviewProfilePatternKey] = useState<string | null | undefined>();
@@ -188,20 +191,20 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
     setPreviewProfilePatternKey(key);
   };
 
-  const nationalPattern: FundingStreamPeriodProfilePattern | undefined = useMemo(() => {
-    if (!profilePatterns) return undefined;
-    const nationalPatterns = profilePatterns.filter(
-      (pp) => pp.fundingLineId === fundingLineId && pp.profilePatternKey === null
-    );
+  const nationalPatterns: FundingStreamPeriodProfilePattern[] =
+    profilePatterns?.filter((pp) => pp.fundingLineId === fundingLineId && pp.profilePatternKey === null) ??
+    [];
+
+  useEffect(() => {
     if (nationalPatterns.length === 1) {
-      return nationalPatterns[0];
+      setNationalPattern(nationalPatterns[0]);
+      return;
     }
     if (nationalPatterns.length > 1) {
       addError({ error: "More than one national profile found for this funding line." });
       setMissingData(true);
     }
-    return undefined;
-  }, [profilePatterns]);
+  }, [nationalPatterns]);
 
   const nationalPatternName = () => {
     return nationalPattern && nationalPattern.profilePatternDisplayName !== null
@@ -215,18 +218,17 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
       : "";
   };
 
-  const ruleBasedPatterns: FundingStreamPeriodProfilePattern[] = useMemo(() => {
-    if (!profilePatterns) return [];
-    const ruleBasedPatternsForFundingLine = profilePatterns.filter(
-      (pp) => pp.fundingLineId === fundingLineId && pp.profilePatternKey !== null
-    );
-    if (ruleBasedPatternsForFundingLine.length > 0) {
-      return ruleBasedPatternsForFundingLine;
+  const ruleBasedPatterns: FundingStreamPeriodProfilePattern[] =
+    profilePatterns?.filter((pp) => pp.fundingLineId === fundingLineId && pp.profilePatternKey !== null) ??
+    [];
+
+  useEffect(() => {
+    if (ruleBasedPatterns.length > 0) {
+      return;
     }
     setNoRuleBasedPatterns(true);
     setMissingData(true);
-    return [];
-  }, [profilePatterns]);
+  }, [ruleBasedPatterns]);
 
   useEffect(() => {
     setMissingPermissions([]);
