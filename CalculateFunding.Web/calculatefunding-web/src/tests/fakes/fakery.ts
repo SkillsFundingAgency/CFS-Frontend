@@ -42,6 +42,32 @@ const makeSpecificationSummary = (overrides: Partial<SpecificationSummary> = {})
     ...overrides,
   };
 };
+const makeSpecificationSummaryNotChosen = (
+  overrides: Partial<SpecificationSummary> = {}
+): SpecificationSummary => {
+  return {
+    id: "WIZ111",
+    coreProviderVersionUpdates: ProviderDataTrackingMode.Manual,
+    name: "Wizard Training",
+    approvalStatus: "Draft",
+    description: "Training in potions, spells, dark arts, card tricks and Quidditch",
+    fundingPeriod: {
+      id: "FP-111",
+      name: "2019-20",
+    },
+    fundingStreams: [
+      {
+        name: "FS-111",
+        id: "Wizard Training Scheme",
+      },
+    ],
+    isSelectedForFunding: false,
+    providerVersionId: "",
+    templateIds: {},
+    dataDefinitionRelationshipIds: [],
+    ...overrides,
+  };
+};
 const makeCoreProviderSummary = (overrides: Partial<CoreProviderSummary> = {}): CoreProviderSummary => {
   return {
     providerVersionId: "provider-version-4162",
@@ -107,7 +133,7 @@ const makeFundingConfiguration = (overrides: Partial<FundingConfiguration> = {})
     enableConverterDataMerge: false,
     updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
     releaseChannels: [],
-    enableCarryForward:false,
+    enableCarryForward: false,
     ...overrides,
   };
 };
@@ -303,6 +329,7 @@ function makeMatch<T>(params: T, overrides: Partial<match<T>> = {}): match<T> {
 
 export const fakery = {
   makeSpecificationSummary,
+  makeSpecificationSummaryNotChosen,
   makeCoreProviderSummary,
   makeProviderSnapshot,
   makeFundingStream,

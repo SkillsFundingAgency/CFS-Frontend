@@ -1,10 +1,12 @@
 ﻿import { render, screen, waitFor } from "@testing-library/react";
 import { createBrowserHistory, createLocation } from "history";
+import * as useSpecificationSummaryHook from "hooks/useSpecificationSummary";
 import { DateTime } from "luxon";
 import React from "react";
 import { QueryClient } from "react-query";
 import { match, MemoryRouter } from "react-router";
 import { QueryClientProviderTestWrapper } from "tests/Hooks/QueryClientProviderTestWrapper";
+import { SpecificationSummary } from "types/SpecificationSummary";
 
 import * as useExportToSqlJobsHook from "../../../hooks/ExportToSql/useExportToSqlJobs";
 import { UseExportToSqlJobsHookResults } from "../../../hooks/ExportToSql/useExportToSqlJobs";
@@ -13,7 +15,12 @@ import { RunExportToSql } from "../../../pages/Datasets/SqlDataExport/RunExportT
 import { Permission } from "../../../types/Permission";
 import { fakery } from "../../fakes/fakery";
 import { mockApiService } from "../../fakes/mockApiServices";
-import { withMissingSpecPermissions } from "../../fakes/testFactories";
+import {
+  hasFullSpecPermissions,
+  withExportSqlJobs,
+  withMissingSpecPermissions,
+  withSpecification,
+} from "../../fakes/testFactories";
 import { waitForLoadingToFinish } from "../../testing-utils";
 
 describe("<RunExportToSql /> tests", () => {
@@ -43,11 +50,26 @@ describe("<RunExportToSql /> tests", () => {
       expect(buttons[0]).toBeDisabled();
       expect(buttons[1]).toBeDisabled();
     });
+
+    it("if specification is not chosen then user should not be able to run export on release/current allocations", async () => {
+      hasSpecificationChosenForFunding(specNotChosen);
+      hasExportSqlJobs();
+      hasFullSpecPermissions();
+
+      await renderPage();
+
+      await waitForLoadingToFinish();
+
+      const buttons = screen.getAllByRole("button");
+      expect(buttons[0]).toBeEnabled();
+      expect(buttons.length).toBe(1);
+    });
   });
 });
 
 const latestPublishedDate = "2020-11-23T17:35:01.1080915+00:00";
 const spec = fakery.makeSpecificationSummary();
+const specNotChosen = fakery.makeSpecificationSummaryNotChosen();
 const mockTriggerCalcResultsExport = jest.fn();
 const mockTriggerCurrentAllocationResultsExport = jest.fn();
 const mockTriggerReleasedResultsExport = jest.fn();
@@ -93,6 +115,16 @@ const hasMissingPermissions = () => {
   jest
     .spyOn(useSpecificationPermissionsHook, "useSpecificationPermissions")
     .mockImplementation(() => withMissingSpecPermissions([Permission.CanRefreshPublishedQa]));
+};
+
+const hasSpecificationChosenForFunding = (specification: SpecificationSummary) => {
+  jest
+    .spyOn(useSpecificationSummaryHook, "useSpecificationSummary")
+    .mockImplementation(() => withSpecification(specification));
+};
+
+const hasExportSqlJobs = () => {
+  jest.spyOn(useExportToSqlJobsHook, "useExportToSqlJobs").mockImplementation(() => withExportSqlJobs());
 };
 
 const mockHistoryPush = jest.fn();

@@ -1,4 +1,8 @@
-﻿import { PublishedProviderErrorSearchQueryResult } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
+﻿import { UseExportToSqlJobsHookResults } from "hooks/ExportToSql/useExportToSqlJobs";
+import { SpecificationSummaryQueryResult } from "hooks/useSpecificationSummary";
+import { SpecificationSummary } from "types/SpecificationSummary";
+
+import { PublishedProviderErrorSearchQueryResult } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { PublishedProviderIdsQueryResult } from "../../hooks/FundingApproval/usePublishedProviderIds";
 import { PublishedProviderSearchQueryResult } from "../../hooks/FundingApproval/usePublishedProviderSearch";
 import { SpecificationPermissionsResult } from "../../hooks/Permissions/useSpecificationPermissions";
@@ -72,6 +76,48 @@ export const withMissingSpecPermissions = (
     permissionsEnabled: allPermissions().filter((p) => !missingPermissions.includes(p)),
     permissionsDisabled: missingPermissions,
     missingPermissions: missingPermissions,
+  };
+};
+
+export const withSpecification = (specification: SpecificationSummary): SpecificationSummaryQueryResult => {
+  return {
+    specification: specification,
+    isLoadingSpecification: false,
+    haveErrorCheckingForSpecification: false,
+    isFetchingSpecification: false,
+    isSpecificationFetched: false,
+    errorCheckingForSpecification: null,
+    clearSpecificationFromCache: jest.fn(),
+  };
+};
+
+export const withExportSqlJobs = (): UseExportToSqlJobsHookResults => {
+  return {
+    lastExportAllocationDataJob: undefined,
+    lastCalcResultsExportJob: undefined,
+    lastReleasedAllocationJob: undefined,
+    hasRunningSqlJob: false,
+    hasRunningFundingJobs: false,
+    isAnotherUserRunningSqlJob: false,
+    isExportBlockedByJob: false,
+    isCurrentAllocationStateBlockedByJob: false,
+    isLatestAllocationStateBlockedByJob: false,
+    isLatestCalcResultsAlreadyExported: false,
+    isLatestAllocationDataAlreadyExported: false,
+    isLatestReleaseDataAlreadyExported: false,
+    latestPublishedDate: undefined,
+    isLoadingLatestPublishedDate: false,
+    exportJobId: "",
+    exportJob: undefined,
+    isExporting: false,
+    isExportingCalcResults: false,
+    isExportingCurrentResults: false,
+    isExportingReleasedResults: false,
+    fundingJobStatusMessage: "",
+    exportJobStatusMessage: "",
+    triggerCalcResultsExport: jest.fn(),
+    triggerCurrentAllocationResultsExport: jest.fn(),
+    triggerReleasedResultsExport: jest.fn(),
   };
 };
 
