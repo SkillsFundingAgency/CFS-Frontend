@@ -193,23 +193,22 @@ export const ProvidersForFundingApproval = ({
           FundingActionType.Approve
         )
       );
-
-      monitorObservedJob(handleObservedJobCompleted);
-
-      addJobTypeSubscription([JobType.RefreshFundingJob]);
-      addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
-      addJobTypeSubscription([
-        JobType.PublishBatchProviderFundingJob,
-        JobType.PublishAllProviderFundingJob,
-        JobType.ReleaseProvidersToChannelsJob,
-        JobType.ReIndexPublishedProvidersJob,
-      ]);
-      addJobTypeSubscription([
-        JobType.CreateInstructAllocationJob,
-        JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-        JobType.GenerateGraphAndInstructAllocationJob,
-      ]);
     }
+    monitorObservedJob(handleObservedJobCompleted);
+
+    addJobTypeSubscription([JobType.RefreshFundingJob]);
+    addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
+    addJobTypeSubscription([
+      JobType.PublishBatchProviderFundingJob,
+      JobType.PublishAllProviderFundingJob,
+      JobType.ReleaseProvidersToChannelsJob,
+      JobType.ReIndexPublishedProvidersJob,
+    ]);
+    addJobTypeSubscription([
+      JobType.CreateInstructAllocationJob,
+      JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+      JobType.GenerateGraphAndInstructAllocationJob,
+    ]);
   }, [match, isSearchCriteriaInitialised]);
 
   useEffect(() => {
