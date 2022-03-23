@@ -47,7 +47,10 @@ export const ProviderFundingStreamHistory = (props: ProviderFundingStreamHistory
             {transactions.results &&
               transactions.results.map((transaction, i) => (
                 <tr className="govuk-table__row" key={`transaction-${i}`}>
-                  <td className="govuk-table__cell">{transaction.status}</td>
+                  <td className="govuk-table__cell">
+                    {transaction.status}{" "}
+                    {transaction.status === "Released" && <span>for {transaction.channelName}</span>}
+                  </td>
                   <td className="govuk-table__cell">
                     v{transaction.majorVersion}.{transaction.minorVersion}
                   </td>
