@@ -134,34 +134,6 @@ export const ProvidersForFundingRelease = ({
   const dispatch = useDispatch();
   const history = useHistory();
 
-  useEffect(() => {
-    if (!isSearchCriteriaInitialised) {
-      dispatch(
-        initialiseFundingSearchSelection(
-          match.params.fundingStreamId,
-          match.params.fundingPeriodId,
-          match.params.specificationId,
-          FundingActionType.Release
-        )
-      );
-    }
-    monitorObservedJob(handleObservedJobCompleted);
-
-    addJobTypeSubscription([JobType.RefreshFundingJob]);
-    addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
-    addJobTypeSubscription([
-      JobType.PublishBatchProviderFundingJob,
-      JobType.PublishAllProviderFundingJob,
-      JobType.ReleaseProvidersToChannelsJob,
-      JobType.ReIndexPublishedProvidersJob,
-    ]);
-    addJobTypeSubscription([
-      JobType.CreateInstructAllocationJob,
-      JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
-      JobType.GenerateGraphAndInstructAllocationJob,
-    ]);
-  }, [match, isSearchCriteriaInitialised]);
-
   const handleObservedJobCompleted = (notification: JobNotification) => {
     const observedJob = notification?.latestJob;
     if (!observedJob || observedJob.isActive) return;
@@ -205,6 +177,56 @@ export const ProvidersForFundingRelease = ({
       )
     );
   };
+
+  useEffect(() => {
+    addJobTypeSubscription([JobType.RefreshFundingJob]);
+    addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
+    addJobTypeSubscription([
+      JobType.PublishBatchProviderFundingJob,
+      JobType.PublishAllProviderFundingJob,
+      JobType.ReleaseProvidersToChannelsJob,
+      JobType.ReIndexPublishedProvidersJob,
+    ]);
+    addJobTypeSubscription([
+      JobType.CreateInstructAllocationJob,
+      JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+      JobType.GenerateGraphAndInstructAllocationJob,
+    ]);
+    monitorObservedJob(handleObservedJobCompleted);
+  }, []);
+
+  useEffect(() => {
+    if (!jobNotifications?.length) return;
+    if (
+      jobNotifications.find(
+        (n) =>
+          n.latestJob?.isSuccessful &&
+          [
+            JobType.RefreshFundingJob,
+            JobType.ApproveAllProviderFundingJob,
+            JobType.ApproveBatchProviderFundingJob,
+            JobType.PublishBatchProviderFundingJob,
+            JobType.PublishAllProviderFundingJob,
+            JobType.ReleaseProvidersToChannelsJob,
+          ].includes(n.latestJob.jobType as JobType)
+      )
+    ) {
+      refetchSearchResults();
+    }
+  }, [jobNotifications]);
+
+  useEffect(() => {
+    if (!isSearchCriteriaInitialised) {
+      dispatch(
+        initialiseFundingSearchSelection(
+          match.params.fundingStreamId,
+          match.params.fundingPeriodId,
+          match.params.specificationId,
+          FundingActionType.Release
+        )
+      );
+    }
+  }, [isSearchCriteriaInitialised]);
 
   useEffect(() => {
     if (publishedProvidersWithErrors) {

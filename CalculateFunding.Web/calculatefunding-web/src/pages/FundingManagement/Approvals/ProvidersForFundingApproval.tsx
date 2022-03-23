@@ -138,7 +138,6 @@ export const ProvidersForFundingApproval = ({
     }
   );
   const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
-  const [refreshJobId, setRefreshJobId] = useState<string>("");
   const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
   const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const hasPermissionToRefresh: boolean = useMemo(
@@ -152,20 +151,6 @@ export const ProvidersForFundingApproval = ({
 
   const dispatch = useDispatch();
   const history = useHistory();
-
-  const handleRefreshJobNotification = async (notification: JobNotification | undefined) => {
-    if (
-      notification &&
-      notification?.latestJob?.isComplete &&
-      notification?.latestJob?.jobType === JobType.RefreshFundingJob
-    ) {
-      setIsLoadingRefresh(false);
-      setLastRefresh(notification.latestJob.lastUpdated);
-      if (refreshJobId?.length && notification.latestJob.jobId === refreshJobId) {
-        refetchSearchResults();
-      }
-    }
-  };
 
   const handleObservedJobCompleted = (notification: JobNotification) => {
     const observedJob = notification?.latestJob;
@@ -184,18 +169,6 @@ export const ProvidersForFundingApproval = ({
   };
 
   useEffect(() => {
-    if (!isSearchCriteriaInitialised) {
-      dispatch(
-        initialiseFundingSearchSelection(
-          fundingStreamId,
-          fundingPeriodId,
-          specificationId,
-          FundingActionType.Approve
-        )
-      );
-    }
-    monitorObservedJob(handleObservedJobCompleted);
-
     addJobTypeSubscription([JobType.RefreshFundingJob]);
     addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
     addJobTypeSubscription([
@@ -209,15 +182,51 @@ export const ProvidersForFundingApproval = ({
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
       JobType.GenerateGraphAndInstructAllocationJob,
     ]);
-  }, [match, isSearchCriteriaInitialised]);
+    monitorObservedJob(handleObservedJobCompleted);
+  }, []);
 
   useEffect(() => {
-    handleRefreshJobNotification(
+    if (!isSearchCriteriaInitialised) {
+      dispatch(
+        initialiseFundingSearchSelection(
+          fundingStreamId,
+          fundingPeriodId,
+          specificationId,
+          FundingActionType.Approve
+        )
+      );
+    }
+  }, [isSearchCriteriaInitialised]);
+
+  useEffect(() => {
+    if (!jobNotifications?.length) return;
+    if (
       jobNotifications.find(
-        (n) => n.latestJob?.isComplete && n.latestJob?.jobType === JobType.RefreshFundingJob
+        (n) =>
+          n.latestJob?.isSuccessful &&
+          [
+            JobType.ApproveAllProviderFundingJob,
+            JobType.ApproveBatchProviderFundingJob,
+            JobType.PublishBatchProviderFundingJob,
+            JobType.PublishAllProviderFundingJob,
+            JobType.ReleaseProvidersToChannelsJob,
+          ].includes(n.latestJob.jobType as JobType)
       )
-    );
-  }, [jobNotifications, refreshJobId]);
+    ) {
+      refetchSearchResults();
+    }
+
+    const refreshJobComplete = jobNotifications.find(
+      (n) => n.latestJob?.isComplete && n.latestJob.jobType === JobType.RefreshFundingJob
+    )?.latestJob;
+    if (refreshJobComplete) {
+      setLastRefresh(refreshJobComplete.lastUpdated);
+      setIsLoadingRefresh(false);
+      if (refreshJobComplete.isSuccessful) {
+        refetchSearchResults();
+      }
+    }
+  }, [jobNotifications]);
 
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
@@ -285,7 +294,7 @@ export const ProvidersForFundingApproval = ({
   async function refreshFunding() {
     setIsLoadingRefresh(true);
     try {
-      setRefreshJobId((await publishService.refreshSpecificationFundingService(specificationId)).data);
+      await publishService.refreshSpecificationFundingService(specificationId);
     } catch (e) {
       addErrorMessage(e, "Error trying to refresh funding");
     } finally {
