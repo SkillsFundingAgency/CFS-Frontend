@@ -171,18 +171,24 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
       );
       dispatch(actions.addProvidersToFundingSelection(publishedProviderIds));
 
-      if (
-        fundingConfiguration !== undefined &&
-        fundingConfiguration.releaseActionGroups !== undefined &&
-        fundingConfiguration.releaseActionGroups.length > 1
-      ) {
+      if (!fundingConfiguration || !fundingConfiguration.releaseActionGroups) {
+        addError({
+          error: "No release action groups setup in funding configuration",
+          description: "Validation failed",
+        });
+        return;
+      }
+
+      if (fundingConfiguration.releaseActionGroups.length == 1) {
         history.push(
-          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
+          `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}?${fundingConfiguration.releaseActionGroups[0].channelCodes
+            .map((r) => `purposes=${r}`)
+            .join("&")}`,
           { previousPage: currentPage }
         );
       } else {
         history.push(
-          `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
+          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
           { previousPage: currentPage }
         );
       }
@@ -221,6 +227,39 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
 
       <MultipleErrorSummary errors={errors} />
 
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <div className="govuk-form-group">
+            <fieldset className="govuk-fieldset">
+              <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">{currentPage.title}</h1>
+              </legend>
+              {specification && (
+                <dl className="govuk-summary-list govuk-summary-list--no-border">
+                  <div className="govuk-summary-list__row">
+                    <dt className="govuk-summary-list__key">
+                      <h2 className="govuk-heading-s govuk-!-margin-bottom-1">
+                        {specification.name} selected
+                      </h2>
+                    </dt>
+                  </div>
+                </dl>
+              )}
+              {!isBlocked && (
+                <ul className="govuk-list govuk-list--bullet">
+                  <li>The file is in xlsx format</li>
+                  <li>The file contains one UKPRN column</li>
+                  <li>The upload data must be in the first sheet of the xlsx file</li>
+                  <li>
+                    Providers already approved or released will not be shown in the provider count summaries
+                  </li>
+                </ul>
+              )}
+            </fieldset>
+          </div>
+        </div>
+      </div>
+
       {isBlocked && (
         <LoadingStatusNotifier
           notifications={[
@@ -256,38 +295,6 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
         />
       )}
 
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <div className="govuk-form-group">
-            <fieldset className="govuk-fieldset">
-              <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
-                <h1 className="govuk-fieldset__heading govuk-!-margin-bottom-5">{currentPage.title}</h1>
-              </legend>
-              {specification && (
-                <dl className="govuk-summary-list govuk-summary-list--no-border">
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">
-                      <h2 className="govuk-heading-s govuk-!-margin-bottom-1">
-                        {specification.name} selected
-                      </h2>
-                    </dt>
-                  </div>
-                </dl>
-              )}
-              {!isBlocked && (
-                <ul className="govuk-list govuk-list--bullet">
-                  <li>The file is in xlsx format</li>
-                  <li>The file contains one UKPRN column</li>
-                  <li>The upload data must be in the first sheet of the xlsx file</li>
-                  <li>
-                    Providers already approved or released will not be shown in the provider count summaries
-                  </li>
-                </ul>
-              )}
-            </fieldset>
-          </div>
-        </div>
-      </div>
       {!isBlocked && (
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-two-thirds">
