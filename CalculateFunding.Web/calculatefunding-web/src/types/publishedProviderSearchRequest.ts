@@ -1,3 +1,4 @@
+import { OptionalExceptFor } from "../helpers/genericTypes";
 import { FundingActionType } from "./PublishedProvider/PublishedProviderFundingCount";
 import { SearchMode } from "./SearchMode";
 
@@ -32,45 +33,28 @@ export interface PublishedProviderSearchRequest {
   fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
-const getFundingStatus = (action: FundingActionType) => {
-  switch (action) {
-    case FundingActionType.Approve: {
-      return ["Updated"];
-    }
-    case FundingActionType.Release: {
-      return ["Approved"];
-    }
-    default: {
-      return [];
-    }
-  }
-};
-
 export const buildInitialPublishedProviderSearchRequest = (
-  fundingStreamId: string,
-  fundingPeriodId: string,
-  specificationId: string,
-  fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>
+  options: OptionalExceptFor<
+    Omit<PublishedProviderSearchRequest, "hasErrors" | "pageNumber">,
+    "fundingStreamId" | "fundingPeriodId" | "specificationId" | "fundingAction"
+  >
 ): PublishedProviderSearchRequest => {
   return {
     searchTerm: "",
-    status: getFundingStatus(fundingAction),
+    status: [],
     providerType: [],
     providerSubType: [],
     localAuthority: [],
-    fundingStreamId: fundingStreamId,
-    specificationId: specificationId,
     hasErrors: undefined,
     searchMode: SearchMode.All,
     pageSize: 50,
     pageNumber: 1,
     includeFacets: true,
     facetCount: 0,
-    fundingPeriodId: fundingPeriodId,
     errorToggle: "",
     searchFields: [],
     indicative: [],
     monthYearOpened: [],
-    fundingAction: fundingAction,
+    ...options,
   };
 };

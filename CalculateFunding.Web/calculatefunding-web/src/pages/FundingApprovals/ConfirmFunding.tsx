@@ -148,12 +148,12 @@ export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRout
     }
 
     async function loadFullFundingSummary() {
-      const search = buildInitialPublishedProviderSearchRequest(
+      const search = buildInitialPublishedProviderSearchRequest({
         fundingStreamId,
         fundingPeriodId,
         specificationId,
-        actionType
-      );
+        fundingAction: actionType,
+      });
       const publishedProviderSearchResults = (
         await publishedProviderService.searchForPublishedProviderResults(search)
       ).data;

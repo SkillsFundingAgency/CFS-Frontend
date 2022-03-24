@@ -14,12 +14,12 @@ const createFundingSearchSelectionState = (
 ): FundingSearchSelectionState => {
   return {
     selectedProviderIds: [],
-    searchCriteria: buildInitialPublishedProviderSearchRequest(
-      "fundingStream.id",
-      "fundingPeriod.id",
-      "testSpec.id",
-      FundingActionType.Approve
-    ),
+    searchCriteria: buildInitialPublishedProviderSearchRequest({
+      fundingStreamId: "fundingStream.id",
+      fundingPeriodId: "fundingPeriod.id",
+      specificationId: "testSpec.id",
+      fundingAction: FundingActionType.Approve,
+    }),
     ...overrides,
   };
 };

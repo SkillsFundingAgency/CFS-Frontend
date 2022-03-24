@@ -25,6 +25,7 @@ import { FundingLineProfile, ProfileTotal } from "../../../types/FundingLineProf
 import { JobNotification, JobSubscription } from "../../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../../types/jobType";
 import { UpdateCoreProviderVersion } from "../../../types/Provider/UpdateCoreProviderVersion";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { PublishedProviderResult } from "../../../types/PublishedProvider/PublishedProviderSearchResults";
 import { buildInitialPublishedProviderSearchRequest } from "../../../types/publishedProviderSearchRequest";
 import { PublishStatus } from "../../../types/PublishStatusModel";
@@ -41,7 +42,6 @@ import {
   hasFullSpecPermissions,
   hasSpecPermissions,
 } from "../../fakes/testFactories";
-import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 
 export function FundingApprovalTestData() {
   const fundingStream: FundingStream = {
@@ -84,7 +84,7 @@ export function FundingApprovalTestData() {
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       releaseChannels: [],
-      enableCarryForward: false
+      enableCarryForward: false,
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -100,7 +100,7 @@ export function FundingApprovalTestData() {
       enableConverterDataMerge: false,
       updateCoreProviderVersion: UpdateCoreProviderVersion.Manual,
       releaseChannels: [],
-      enableCarryForward: false
+      enableCarryForward: false,
     },
     isLoadingFundingConfiguration: false,
     isErrorLoadingFundingConfiguration: false,
@@ -220,12 +220,12 @@ export function FundingApprovalTestData() {
 
   const fundingSearchSelectionState: FundingSearchSelectionState = {
     selectedProviderIds: [provider1.publishedProviderVersionId],
-    searchCriteria: buildInitialPublishedProviderSearchRequest(
-      fundingStream.id,
-      fundingPeriod.id,
-      testSpec.id,
-      FundingActionType.Approve
-    ),
+    searchCriteria: buildInitialPublishedProviderSearchRequest({
+      fundingStreamId: fundingStream.id,
+      fundingPeriodId: fundingPeriod.id,
+      specificationId: testSpec.id,
+      fundingAction: FundingActionType.Approve,
+    }),
   };
 
   const matchMock: match<SpecificationFundingApprovalRouteProps> = {

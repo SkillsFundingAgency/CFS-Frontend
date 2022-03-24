@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router";
 
 import { ProvidersForFundingApprovalProps } from "../../../pages/FundingManagement/Approvals/ProvidersForFundingApproval";
 import { ApprovalMode } from "../../../types/ApprovalMode";
+import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { buildInitialPublishedProviderSearchRequest } from "../../../types/publishedProviderSearchRequest";
 import { fakery } from "../../fakes/fakery";
 import { hasFullSpecPermissions } from "../../fakes/testFactories";
@@ -17,7 +18,6 @@ import {
   useSpecificationSummaryUtils,
 } from "../../testing-utils";
 import { useFundingConfigurationUtils } from "../../testing-utils/useFundingConfigurationUtils";
-import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 
 describe("<ProvidersForFundingApproval />", () => {
   const { haveNoJobNotification, setupJobSpy } = jobSubscriptionTestUtils({});
@@ -27,7 +27,12 @@ describe("<ProvidersForFundingApproval />", () => {
     haveNoJobNotification();
     setupJobSpy();
     const state = reduxMockingUtils.createFundingSearchSelectionState({
-      searchCriteria: buildInitialPublishedProviderSearchRequest(fundingStream.id, fundingPeriod.id, spec.id, FundingActionType.Approve),
+      searchCriteria: buildInitialPublishedProviderSearchRequest({
+        fundingStreamId: fundingStream.id,
+        fundingPeriodId: fundingPeriod.id,
+        specificationId: spec.id,
+        fundingAction: FundingActionType.Approve,
+      }),
     });
     reduxMockingUtils.setupFundingSearchSelectionState(state);
     useSpecificationSummaryUtils.hasSpecification(spec);

@@ -121,13 +121,28 @@ export const useFundingConfirmation = ({
       setFundingSummary(response?.data);
     }
 
+    const getDefaultFundingStatusFilters = (action: FundingActionType) => {
+      switch (action) {
+        case FundingActionType.Approve: {
+          return ["Updated", "Draft"];
+        }
+        case FundingActionType.Release: {
+          return ["Approved"];
+        }
+        default: {
+          return [];
+        }
+      }
+    };
+
     async function loadFullFundingSummary() {
-      const search = buildInitialPublishedProviderSearchRequest(
+      const search = buildInitialPublishedProviderSearchRequest({
         fundingStreamId,
         fundingPeriodId,
         specificationId,
-        actionType
-      );
+        fundingAction: actionType,
+        status: getDefaultFundingStatusFilters(actionType),
+      });
       try {
         const { data: providers } = await publishedProviderService.searchForPublishedProviderResults(search);
 

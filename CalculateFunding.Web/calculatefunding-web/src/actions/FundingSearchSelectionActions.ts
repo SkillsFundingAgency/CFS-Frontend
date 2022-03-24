@@ -2,11 +2,11 @@
 import { ThunkAction } from "redux-thunk";
 
 import { FundingSearchSelectionState } from "../states/FundingSearchSelectionState";
+import { FundingActionType } from "../types/PublishedProvider/PublishedProviderFundingCount";
 import {
   buildInitialPublishedProviderSearchRequest,
   PublishedProviderSearchRequest,
 } from "../types/publishedProviderSearchRequest";
-import {FundingActionType} from "../types/PublishedProvider/PublishedProviderFundingCount";
 
 export enum FundingSearchSelectionActionEvent {
   INITIALISE = "initialise",
@@ -109,13 +109,18 @@ export interface SearchFilter {
 
 export const initialiseFundingSearchSelection: ActionCreator<
   ThunkAction<Promise<any>, FundingSearchSelectionState, unknown, IInitialiseFundingSearchSelectionAction>
-> = (fundingStreamId: string, fundingPeriodId: string, specificationId: string, fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>) => {
-  const initialSearchCriteria = buildInitialPublishedProviderSearchRequest(
+> = (
+  fundingStreamId: string,
+  fundingPeriodId: string,
+  specificationId: string,
+  fundingAction: Exclude<FundingActionType, FundingActionType.Refresh>
+) => {
+  const initialSearchCriteria = buildInitialPublishedProviderSearchRequest({
     fundingStreamId,
     fundingPeriodId,
     specificationId,
-    fundingAction
-);
+    fundingAction,
+  });
   return async (dispatch) => {
     dispatch({
       type: FundingSearchSelectionActionEvent.INITIALISE,
