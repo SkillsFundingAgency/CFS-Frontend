@@ -179,6 +179,7 @@ export const ProvidersForFundingRelease = ({
   };
 
   useEffect(() => {
+    monitorObservedJob(handleObservedJobCompleted);
     addJobTypeSubscription([JobType.RefreshFundingJob]);
     addJobTypeSubscription([JobType.ApproveAllProviderFundingJob, JobType.ApproveBatchProviderFundingJob]);
     addJobTypeSubscription([
@@ -192,7 +193,6 @@ export const ProvidersForFundingRelease = ({
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
       JobType.GenerateGraphAndInstructAllocationJob,
     ]);
-    monitorObservedJob(handleObservedJobCompleted);
   }, []);
 
   useEffect(() => {
