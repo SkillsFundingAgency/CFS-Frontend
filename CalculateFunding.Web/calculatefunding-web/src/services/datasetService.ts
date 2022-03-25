@@ -213,9 +213,11 @@ export async function searchDatasetService(
       pageNumber: request.pageNumber,
       includeFacets: request.includeFacets,
       pageSize: request.pageSize,
+      facetCount: request.facetCount,
       fundingStreams: request.fundingStreams,
       dataSchemas: request.dataSchemas,
     },
+    // data: { ...request },
   });
 }
 

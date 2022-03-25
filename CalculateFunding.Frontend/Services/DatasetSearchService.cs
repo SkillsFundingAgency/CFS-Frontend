@@ -47,6 +47,7 @@ namespace CalculateFunding.Frontend.Services
 				Top = pageSize,
 				SearchTerm = request.SearchTerm,
 				IncludeFacets = request.IncludeFacets,
+                FacetCount = request.FacetCount,
 				Filters = request.Filters,
                 SearchMode = SearchMode.All
             };
@@ -120,6 +121,7 @@ namespace CalculateFunding.Frontend.Services
 				Top = pageSize,
 				SearchTerm = searchRequest.SearchTerm,
 				IncludeFacets = searchRequest.IncludeFacets,
+                FacetCount = searchRequest.FacetCount,
 				Filters = searchRequest.Filters,
 				SearchMode = searchRequest.SearchMode.AsMatchingEnum<SearchMode>()
 			};

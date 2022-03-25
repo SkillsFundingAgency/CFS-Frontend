@@ -1,3 +1,4 @@
+import { FacetValue } from "../Facet";
 import { PagerState } from "./DatasetDefinitionResponseViewModel";
 
 export interface Dataset {
@@ -23,5 +24,10 @@ export interface DatasetSearchResponseViewModel {
   startItemNumber: number;
   endItemNumber: number;
   pagerState: PagerState;
-  facets: any[];
+  facets: Facet[];
+}
+
+export interface Facet {
+  name: string;
+  facetValues: FacetValue[];
 }

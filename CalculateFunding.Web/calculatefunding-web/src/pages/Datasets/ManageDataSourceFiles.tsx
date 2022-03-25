@@ -23,7 +23,7 @@ import { Section } from "../../types/Sections";
 export function ManageDataSourceFiles() {
   const initialSearch: DatasetSearchRequestViewModel = {
     errorToggle: "",
-    facetCount: 0,
+    facetCount: 100,
     filters: [],
     includeFacets: true,
     pageNumber: 1,
@@ -34,7 +34,7 @@ export function ManageDataSourceFiles() {
     dataSchemas: [],
   };
 
-  const [datasetSearchData, setDatasetSearchData] = useState<DatasetSearchResponseViewModel>({
+  const [searchResults, setSearchResults] = useState<DatasetSearchResponseViewModel>({
     currentPage: 0,
     datasets: [],
     endItemNumber: 0,
@@ -53,50 +53,47 @@ export function ManageDataSourceFiles() {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchRequest, setSearchRequest] = useState<DatasetSearchRequestViewModel>(initialSearch);
-  const [filterFundingStreams, setFundingStreams] = useState<FacetValue[]>([]);
-  const [filterDataSchemas, setDataSchema] = useState<FacetValue[]>([]);
+  const [filterFundingStreams, setFilterFundingStreams] = useState<FacetValue[]>([]);
+  const [filterDataSchemas, setFilterDataSchemas] = useState<FacetValue[]>([]);
   const { errors, addError } = useErrors();
 
-  useEffectOnce(() => {
-    searchDataSourceFiles(searchRequest);
-  });
+  const getDataSchemaFacets = (results: DatasetSearchResponseViewModel): FacetValue[] =>
+    results.facets.find((f) => f.name === "definitionName")?.facetValues ?? [];
+  const getFundingStreamFacets = (results: DatasetSearchResponseViewModel): FacetValue[] =>
+    results.facets.find((f) => f.name === "fundingStreamName")?.facetValues ?? [];
 
-  function setPagination(e: number) {
-    const request = searchRequest;
-    request.pageNumber = e;
-    setSearchRequest((prevState) => {
-      return { ...prevState, pageNumber: e };
-    });
-    searchDataSourceFiles(request);
-  }
-
-  function searchDataSourceFiles(searchRequestViewModel: DatasetSearchRequestViewModel) {
+  const searchDataSourceFiles = async (searchRequestViewModel: DatasetSearchRequestViewModel) => {
     setIsLoading(true);
-    searchDatasetService(searchRequestViewModel)
-      .then((result) => {
-        setDatasetSearchData(result.data);
 
-        if (filterFundingStreams.length === 0) {
-          if (result.data.facets !== undefined && result.data.facets.length > 5) {
-            setFundingStreams(result.data.facets[5].facetValues);
-          }
-        }
+    try {
+      const response = await searchDatasetService(searchRequestViewModel);
+      setSearchResults(response.data);
 
-        if (filterDataSchemas.length === 0) {
-          if (result.data.facets !== undefined && result.data.facets.length > 2) {
-            setDataSchema(result.data.facets[2].facetValues);
-          }
-        }
-      })
-      .catch((err) => {
-        addError({ error: err, description: "Error while searching datasets" });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
+      if (filterFundingStreams.length === 0) {
+        setFilterFundingStreams(getFundingStreamFacets(response.data));
+      }
 
-  function searchText(e: React.ChangeEvent<HTMLInputElement>) {
+      if (filterDataSchemas.length === 0) {
+        setFilterDataSchemas(getDataSchemaFacets(response.data));
+      }
+    } catch (err: any) {
+      addError({ error: err, description: "Error while searching datasets" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const setPagination = async (page: number) => {
+    const request = searchRequest;
+    request.pageNumber = page;
+    setSearchRequest((prevState) => {
+      return { ...prevState, pageNumber: page };
+    });
+
+    await searchDataSourceFiles(request);
+  };
+
+  const searchText = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
 
     if ((term.length === 0 && searchRequest.searchTerm.length !== 0) || term.length > 2) {
@@ -106,11 +103,12 @@ export function ManageDataSourceFiles() {
       setSearchRequest((prevState) => {
         return { ...prevState, searchTerm: term, pageNumber: 1 };
       });
-      searchDataSourceFiles(request);
-    }
-  }
 
-  function filterByDataSchema(e: React.ChangeEvent<HTMLInputElement>) {
+      await searchDataSourceFiles(request);
+    }
+  };
+
+  const filterByDataSchema = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const filterUpdate = searchRequest.dataSchemas;
     if (e.target.checked) {
       filterUpdate.push(e.target.value);
@@ -125,10 +123,11 @@ export function ManageDataSourceFiles() {
     const request = searchRequest;
     request.dataSchemas = filterUpdate;
     request.pageNumber = 1;
-    searchDataSourceFiles(request);
-  }
 
-  function filterByFundingStreams(e: React.ChangeEvent<HTMLInputElement>) {
+    await searchDataSourceFiles(request);
+  };
+
+  const filterByFundingStreams = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const filterUpdate = searchRequest.fundingStreams;
     if (e.target.checked) {
       filterUpdate.push(e.target.value);
@@ -143,7 +142,30 @@ export function ManageDataSourceFiles() {
     const request = searchRequest;
     request.fundingStreams = filterUpdate;
     request.pageNumber = 1;
-    searchDataSourceFiles(request);
+
+    await searchDataSourceFiles(request);
+  };
+
+  function searchFundingStreams(e: React.ChangeEvent<HTMLInputElement>) {
+    const searchText = e.target.value;
+    setFilterFundingStreams(
+      searchText.trim().length === 0
+        ? getFundingStreamFacets(searchResults)
+        : getFundingStreamFacets(searchResults).filter((x) =>
+            x.name.toLowerCase().includes(searchText.toLowerCase())
+          )
+    );
+  }
+
+  function searchDataSchemas(e: React.ChangeEvent<HTMLInputElement>) {
+    const searchText = e.target.value;
+    setFilterDataSchemas(
+      searchText.trim().length === 0
+        ? getDataSchemaFacets(searchResults)
+        : getDataSchemaFacets(searchResults).filter((x) =>
+            x.name.toLowerCase().includes(searchText.toLowerCase())
+          )
+    );
   }
 
   function clearFilters() {
@@ -152,6 +174,10 @@ export function ManageDataSourceFiles() {
     setSearchRequest(initialSearch);
     searchDataSourceFiles(initialSearch);
   }
+
+  useEffectOnce(() => {
+    searchDataSourceFiles(searchRequest);
+  });
 
   return (
     <Main location={Section.Datasets}>
@@ -189,37 +215,45 @@ export function ManageDataSourceFiles() {
                 autoComplete="off"
                 name="search"
                 type="text"
-                onChange={(e) => searchText(e)}
+                onChange={searchText}
               />
             </CollapsiblePanel>
+
             <CollapsiblePanel
               title={"Filter by funding stream"}
-              isExpanded={false}
+              isExpanded={true}
               isCollapsible={true}
               showFacetCount={true}
               facetCount={searchRequest.fundingStreams.length}
             >
-              <div className="govuk-checkboxes">
-                {filterFundingStreams.map((fp, index) => (
-                  <div key={index} className="govuk-checkboxes__item">
-                    <input
-                      className="govuk-checkboxes__input"
-                      id={`fundingPeriods-${fp.name}`}
-                      name={`fundingPeriods-${fp.name}`}
-                      type="checkbox"
-                      value={fp.name}
-                      onChange={(e) => filterByFundingStreams(e)}
-                    />
-                    <label
-                      className="govuk-label govuk-checkboxes__label"
-                      htmlFor={`fundingPeriods-${fp.name}`}
-                    >
-                      {fp.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input className="govuk-input" type="text" onChange={searchFundingStreams} />
+                </div>
+                <div className="govuk-checkboxes govuk-scroll-window">
+                  {filterFundingStreams.map((stream, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        id={`funding-streams-${stream.name}`}
+                        name={`funding-streams-${stream.name}`}
+                        type="checkbox"
+                        value={stream.name}
+                        onChange={filterByFundingStreams}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`funding-streams-${stream.name}`}
+                      >
+                        {stream.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
             </CollapsiblePanel>
+
             <CollapsiblePanel
               title={"Filter by data schema"}
               isExpanded={false}
@@ -227,27 +261,34 @@ export function ManageDataSourceFiles() {
               showFacetCount={true}
               facetCount={searchRequest.dataSchemas.length}
             >
-              <div className="govuk-checkboxes">
-                {filterDataSchemas.map((fp, index) => (
-                  <div key={index} className="govuk-checkboxes__item">
-                    <input
-                      className="govuk-checkboxes__input"
-                      id={`fundingPeriods-${fp.name}`}
-                      name={`fundingPeriods-${fp.name}`}
-                      type="checkbox"
-                      value={fp.name}
-                      onChange={(e) => filterByDataSchema(e)}
-                    />
-                    <label
-                      className="govuk-label govuk-checkboxes__label"
-                      htmlFor={`fundingPeriods-${fp.name}`}
-                    >
-                      {fp.name}
-                    </label>
-                  </div>
-                ))}
-              </div>
+              <fieldset className="govuk-fieldset">
+                <div className="govuk-form-group">
+                  <label className="govuk-label">Search</label>
+                  <input className="govuk-input" type="text" onChange={searchDataSchemas} />
+                </div>
+                <div className="govuk-checkboxes govuk-scroll-window">
+                  {filterDataSchemas.map((schema, index) => (
+                    <div key={index} className="govuk-checkboxes__item">
+                      <input
+                        className="govuk-checkboxes__input"
+                        id={`data-schemas-${schema.name}`}
+                        name={`data-schemas-${schema.name}`}
+                        type="checkbox"
+                        value={schema.name}
+                        onChange={filterByDataSchema}
+                      />
+                      <label
+                        className="govuk-label govuk-checkboxes__label"
+                        htmlFor={`data-schemas-${schema.name}`}
+                      >
+                        {schema.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </fieldset>
             </CollapsiblePanel>
+
             <button type="button" className="govuk-button" onClick={() => clearFilters()}>
               Clear filters
             </button>
@@ -256,7 +297,7 @@ export function ManageDataSourceFiles() {
 
         <div className="govuk-grid-column-two-thirds">
           <LoadingStatus title={"Loading data source file results"} hidden={!isLoading} />
-          <table className="govuk-table" hidden={isLoading || datasetSearchData.datasets.length < 1}>
+          <table className="govuk-table" hidden={isLoading || searchResults.datasets.length < 1}>
             <thead className="govuk-table__head">
               <tr className="govuk-table__row">
                 <th scope="col" className="govuk-table__header govuk-!-width-one-half">
@@ -272,7 +313,7 @@ export function ManageDataSourceFiles() {
             </thead>
 
             <tbody className="govuk-table__body" id="mainContentResults">
-              {datasetSearchData.datasets.map((ds) => (
+              {searchResults.datasets.map((ds) => (
                 <tr className="govuk-table__row" key={ds.id}>
                   <th scope="row" className="govuk-table__header">
                     <Link className="govuk-link" to={`UpdateDataSourceFile/${ds.fundingStreamId}/${ds.id}`}>
@@ -331,7 +372,7 @@ export function ManageDataSourceFiles() {
               ))}
             </tbody>
           </table>
-          <NoData hidden={datasetSearchData.datasets.length > 0 || isLoading} />
+          <NoData hidden={searchResults.datasets.length > 0 || isLoading} />
           <div
             className="app-back-to-top app-back-to-top--fixed govuk-!-margin-top-9"
             data-module="app-back-to-top"
@@ -351,15 +392,15 @@ export function ManageDataSourceFiles() {
               Back to top
             </a>
           </div>
-          {datasetSearchData.totalResults > 0 && (
+          {searchResults.totalResults > 0 && (
             <nav role="navigation" aria-label="Pagination">
               <div className="pagination__summary">
-                Showing {datasetSearchData.startItemNumber} - {datasetSearchData.endItemNumber} of{" "}
-                {datasetSearchData.totalResults} results
+                Showing {searchResults.startItemNumber} - {searchResults.endItemNumber} of{" "}
+                {searchResults.totalResults} results
               </div>
               <Pagination
-                currentPage={datasetSearchData.pagerState.currentPage}
-                lastPage={datasetSearchData.pagerState.lastPage}
+                currentPage={searchResults.pagerState.currentPage}
+                lastPage={searchResults.pagerState.lastPage}
                 callback={setPagination}
               />
             </nav>
