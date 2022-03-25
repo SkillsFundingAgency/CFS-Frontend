@@ -106,6 +106,11 @@ namespace CalculateFunding.Common.ApiClient.Models
                 return new BadRequestResult();
             }
 
+            if (apiResponse.StatusCode == HttpStatusCode.PreconditionFailed)
+            {
+                return new BadRequestObjectResult(apiResponse.Content as string ?? apiResponse.Message);
+            }
+
             if (apiResponse.StatusCode != HttpStatusCode.OK)
             {
                 return new InternalServerErrorResult(apiResponse.Message ?? $"{entityName} API call did not return success, but instead '{apiResponse.StatusCode}'");
