@@ -444,11 +444,11 @@ export function GdsMonacoEditor(props: {
                       insertText: variable.name,
                       range: editorRange,
                       options: {
-                        inlineClassName: "obsolete-item",
+                        inlineClassName: variable.isObsolete? "obsolete-item" : "",
                       },
                     };
 
-                    if (
+                    if(
                       pathItems.find(
                         (pathItem) =>
                           pathItem.name.toLowerCase() === pathVariable.label.toString().toLowerCase() &&
@@ -482,6 +482,7 @@ export function GdsMonacoEditor(props: {
                       }
 
                       // @ts-ignore
+                      if(!results.suggestions.some(p => pathVariable))
                       results.suggestions.push(pathVariable);
                     }
                   }
