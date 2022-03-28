@@ -125,7 +125,7 @@ export const ProvidersForFundingRelease = ({
     match.params.specificationId,
     [Permission.CanReleaseFunding]
   );
-  const { errors, addErrorMessage, addError } = useErrors();
+  const { errors, addErrorMessage, addError, clearErrorMessages } = useErrors();
   const hasPermissionToRelease = useMemo(
     () => hasPermission && hasPermission(Permission.CanReleaseFunding),
     [isPermissionsFetched]
@@ -234,6 +234,12 @@ export const ProvidersForFundingRelease = ({
     }
   }, [publishedProvidersWithErrors]);
 
+  useEffect(() => {
+    if (state.selectedProviderIds.length > 0) {
+      clearErrorMessages(["selected-providers"]);
+    }
+  }, [state.selectedProviderIds]);
+
   const isLoading =
     !isSearchCriteriaInitialised ||
     isLoadingSpecification ||
@@ -252,25 +258,34 @@ export const ProvidersForFundingRelease = ({
   const hasActiveActionJobs = !!activeActionJobs.length;
 
   async function handleRelease() {
-    const releaseGroups = fundingConfiguration?.releaseActionGroups;
-
-    if (releaseGroups && releaseGroups.length === 1) {
-      const releaseChannels = releaseGroups.map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
-
-      history.push(
-        `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseChannels
-          .map((r) => `purposes=${r}`)
-          .join("&")}`
-      );
-
-      return;
-    }
-
     if (
       publishedProviderSearchResults &&
       publishedProviderSearchResults.canPublish &&
       hasPermissionToRelease
     ) {
+      if (
+        fundingConfiguration?.approvalMode === ApprovalMode.Batches &&
+        state.selectedProviderIds.length == 0
+      ) {
+        window.scrollTo(0, 0);
+        addError({ error: "There are no selected providers to release", fieldName: "selected-providers" });
+        return;
+      }
+
+      const releaseGroups = fundingConfiguration?.releaseActionGroups;
+
+      if (releaseGroups && releaseGroups.length === 1) {
+        const releaseChannels = releaseGroups.map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+
+        history.push(
+          `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseChannels
+            .map((r) => `purposes=${r}`)
+            .join("&")}`
+        );
+
+        return;
+      }
+
       if (fundingConfiguration?.approvalMode === ApprovalMode.All && !!publishedProvidersWithErrors?.length) {
         addErrorMessage(
           "Funding cannot be released as there are providers in error",

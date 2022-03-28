@@ -228,6 +228,12 @@ export const ProvidersForFundingApproval = ({
     }
   }, [jobNotifications]);
 
+  useEffect(() => {
+    if (state.selectedProviderIds.length > 0) {
+      clearErrorMessages(["selected-providers"]);
+    }
+  }, [state.selectedProviderIds]);
+
   function addJobTypeSubscription(jobTypes: JobType[]) {
     addSub({
       filterBy: {
@@ -248,6 +254,15 @@ export const ProvidersForFundingApproval = ({
       hasPermissionToApprove &&
       publishedProviderSearchResults.canApprove
     ) {
+      if (
+        fundingConfiguration?.approvalMode === ApprovalMode.Batches &&
+        state.selectedProviderIds.length == 0
+      ) {
+        window.scrollTo(0, 0);
+        addError({ error: "There are no selected providers to approve", fieldName: "selected-providers" });
+        return;
+      }
+
       if (
         fundingConfiguration?.approvalMode === ApprovalMode.All &&
         publishedProvidersWithErrors &&
