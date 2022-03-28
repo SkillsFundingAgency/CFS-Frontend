@@ -134,13 +134,13 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
               lastExportJob={lastExportAllocationDataJob}
               lastPublishDate={latestPublishedDate?.value ?? undefined}
             >
-              {isLatestAllocationDataAlreadyExported ? (
-                <div className="govuk-inset-text">SQL data up to date</div>
-              ) : specification?.isSelectedForFunding === false ? (
+              {specification?.isSelectedForFunding === false ? (
                 <div className="govuk-inset-text">
                   This specification has not been chosen for funding therefore you are unable to create the
                   SQL data.
                 </div>
+              ) : isLatestAllocationDataAlreadyExported ? (
+                <div className="govuk-inset-text">SQL data up to date</div>
               ) : (
                 <button
                   className="govuk-button"
@@ -163,13 +163,13 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
               lastExportJob={lastReleasedAllocationJob}
               lastPublishDate={latestPublishedDate?.value ?? undefined}
             >
-              {isLatestReleaseDataAlreadyExported ? (
-                <div className="govuk-inset-text">SQL data up to date</div>
-              ) : specification?.isSelectedForFunding === false ? (
+              {specification?.isSelectedForFunding === false ? (
                 <div className="govuk-inset-text">
                   This specification has not been chosen for funding therefore you are unable to create the
                   SQL data.
                 </div>
+              ) : isLatestReleaseDataAlreadyExported ? (
+                <div className="govuk-inset-text">SQL data up to date</div>
               ) : (
                 <button
                   className="govuk-button"
