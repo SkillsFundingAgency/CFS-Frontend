@@ -1,6 +1,6 @@
 ﻿import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { AxiosError } from "axios";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getJobDetailsFromJobResponse } from "../../helpers/jobDetailsHelper";
 import { milliseconds } from "../../helpers/TimeInMs";
@@ -26,6 +26,7 @@ export interface SignalRJobMonitorProps {
 
 export interface SignalRJobMonitorResult {
   results: JobNotification[];
+  forceReset: () => void;
 }
 
 // N.B.: this is either watching all jobs or just the specification specific jobs
@@ -41,11 +42,13 @@ export const useSignalRJobMonitor = ({
 }: SignalRJobMonitorProps): SignalRJobMonitorResult => {
   const [notifications, setNotifications] = useState<JobNotification[]>([]);
   const [newJob, setNewJob] = useState<JobDetails>();
+  const [hubConnection, setHubConnection] = useState<HubConnection>();
+  const [resetCount, setResetCount] = useState<number>(0);
   const previousHubState = useRef<HubConnectionState>(HubConnectionState.Disconnected);
   const previousEnabledState = useRef<boolean>(!!isEnabled);
   const initialisationCount = useRef<number>(0);
 
-  const hubConnection: HubConnection = useMemo(() => {
+  const initialiseHub = () => {
     initialisationCount.current++;
     console.log("useSignalRJobMonitor: initialising hub #" + initialisationCount.current);
     const hub = new HubConnectionBuilder()
@@ -55,8 +58,10 @@ export const useSignalRJobMonitor = ({
       .build();
     hub.keepAliveIntervalInMilliseconds = milliseconds.ThreeMinutes;
     hub.serverTimeoutInMilliseconds = milliseconds.SixMinutes;
-    return hub;
-  }, []);
+    setHubConnection(hub);
+  };
+
+  const forceReset = useCallback(() => setResetCount((curr) => curr + 1), []);
 
   const isInSubscriptions = (notification: JobNotification, subs: JobSubscription[]) => {
     return subs.some((s) => s.id === notification.subscription.id);
@@ -97,6 +102,13 @@ export const useSignalRJobMonitor = ({
   const isThisJobValid = (job: JobResponse) => {
     return job && job.jobId && job.jobId.length > 1; // to catch edge case of 0 turned to string
   };
+
+  useEffect(() => {
+    console.log("useSignalRJobMonitor: hubConnection: resetCount #" + resetCount);
+    if (!hubConnection || hubConnection.state !== HubConnectionState.Connected) {
+      initialiseHub();
+    }
+  }, [resetCount]);
 
   const stopSignalR = async () => {
     if (hubConnection) {
@@ -410,5 +422,6 @@ export const useSignalRJobMonitor = ({
 
   return {
     results: notifications,
+    forceReset,
   };
 };

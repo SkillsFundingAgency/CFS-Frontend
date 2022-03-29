@@ -1,4 +1,5 @@
-﻿import { AxiosError } from "axios";
+﻿import { HubConnectionState } from "@microsoft/signalr";
+import { AxiosError } from "axios";
 import { assoc } from "ramda";
 import { useEffect, useState } from "react";
 
@@ -68,12 +69,13 @@ export const useJobSubscription = ({
   const { notifications, addNotification } = useNotifications({ subs, notify });
   const [jobPollingInterval, setJobPollingInterval] = useState<number>(0);
   const [isSignalREnabled, setIsSignalREnabled] = useState<boolean>(false);
+  const [signalRState, setSignalRState] = useState<HubConnectionState>(HubConnectionState.Disconnected);
 
   // overwrite all subscriptions
   const replaceSubs = (request: AddJobSubscription[]): JobSubscription[] => {
     console.log("useJobSubscription.replaceSubs: Replacing existing job subscriptions with new ones");
 
-    reset();
+    clearPolling();
 
     const newSubs = request.map((x) => convert(x));
     setSubs(newSubs);
@@ -108,13 +110,15 @@ export const useJobSubscription = ({
       console.log("useJobSubscription.addSub: Subscription already exists", newSub, existing);
       console.log("useJobSubscription.addSub: triggering fetch of previous job results");
       await loadLatestJobUpdate(newSub);
+
+      return existing;
     }
 
     return newSub;
   };
 
-  const reset = () => {
-    console.log("Resetting job notifications");
+  const clearPolling = () => {
+    console.log("Resetting job polling and signalR settings to defaults");
     setIsSignalREnabled(true);
     setJobPollingInterval(0);
   };
@@ -133,12 +137,14 @@ export const useJobSubscription = ({
     console.log("useJobSubscription.kickstartSignalR");
     if (subs.some((s) => s.isEnabled && s.monitorMode === MonitorMode.SignalR)) {
       setIsSignalREnabled(true);
+      forceReset();
     }
   };
 
   const onSignalRCloseOrFail = () => {
     // trigger signalR shutdown
     setIsSignalREnabled(false);
+    setSignalRState(HubConnectionState.Disconnected);
 
     if (subs.length === 0) return;
 
@@ -156,6 +162,7 @@ export const useJobSubscription = ({
 
   const onSignalRReconnected = async () => {
     console.log("useJobSubscription.onSignalRReconnected: SignalR has reconnected");
+    setSignalRState(HubConnectionState.Connected);
 
     // cancel polling because we now have signalR working again
     if (jobPollingInterval > 0) {
@@ -168,6 +175,8 @@ export const useJobSubscription = ({
   };
 
   const onSignalRReconnecting = () => {
+    setSignalRState(HubConnectionState.Reconnecting);
+
     // try to find any job updates that would otherwise be missed in the interim
     if (jobPollingInterval <= 0 && anySubsWithSignalROrFallbackPolling(subs)) {
       console.log("Initiating polling");
@@ -176,7 +185,7 @@ export const useJobSubscription = ({
   };
 
   const isSignalRJobMonitorEnabled = isEnabled && isSignalREnabled;
-  const { results: signalRResults } = useSignalRJobMonitor({
+  const { results: signalRResults, forceReset } = useSignalRJobMonitor({
     onError,
     mode: findUniqueSpecificationIdInSubscriptions(subs)
       ? JobMonitorMode.WatchSingleSpecification
@@ -361,8 +370,11 @@ export const useJobSubscription = ({
   const clearOneOffFetch = assoc("fetchPriorNotifications", false);
 
   useInterval(async () => {
-    if (jobPollingInterval <= 0) {
-      reset();
+    if (signalRState === HubConnectionState.Connected && jobPollingInterval > 0) {
+      console.log(
+        `Polling scheduled (${jobPollingInterval}ms) but now disabling it because SignalR is connected`
+      );
+      clearPolling();
       return;
     }
 
