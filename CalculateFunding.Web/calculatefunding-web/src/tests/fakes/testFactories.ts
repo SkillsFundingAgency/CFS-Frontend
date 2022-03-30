@@ -96,6 +96,8 @@ export const withExportSqlJobs = (): UseExportToSqlJobsHookResults => {
     lastExportAllocationDataJob: undefined,
     lastCalcResultsExportJob: undefined,
     lastReleasedAllocationJob: undefined,
+    lastCalcEngineRunJob: undefined,
+    lastFundingChangeJob: undefined,
     hasRunningSqlJob: false,
     hasRunningFundingJobs: false,
     isAnotherUserRunningSqlJob: false,

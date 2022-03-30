@@ -1,5 +1,6 @@
 ﻿import { DateTime } from "luxon";
-import { equals, uniq } from "ramda";
+import { descend, equals, head, sort, uniq } from "ramda";
+import { compose } from "redux";
 import { v4 as uuidv4 } from "uuid";
 
 import { AddJobSubscription } from "../hooks/Jobs/useJobSubscription";
@@ -112,3 +113,9 @@ export const shouldUpdateNotification = (a: JobNotification | undefined, b: JobN
 
   return a.latestJob.lastUpdated < b.latestJob.lastUpdated;
 };
+
+export const sortNotificationsByLatestUpdate = sort<JobNotification>(
+  descend((notification) => notification?.latestJob?.lastUpdated ?? new Date(0))
+);
+
+export const getNotificationWithLastUpdate = compose<JobNotification | undefined>(head, sortNotificationsByLatestUpdate);

@@ -36,6 +36,8 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
     lastExportAllocationDataJob,
     lastCalcResultsExportJob,
     lastReleasedAllocationJob,
+    lastCalcEngineRunJob,
+    lastFundingChangeJob,
     hasRunningFundingJobs,
     isExportBlockedByJob,
     isCurrentAllocationStateBlockedByJob,
@@ -108,7 +110,7 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
               showAdditionalDetails={true}
               isAnotherUserRunningExportJob={isAnotherUserRunningSqlJob}
               lastExportJob={lastCalcResultsExportJob}
-              lastPublishDate={latestPublishedDate?.value ?? undefined}
+              lastChangeDate={lastCalcEngineRunJob?.lastUpdated}
             >
               {isLatestCalcResultsAlreadyExported ? (
                 <div className="govuk-inset-text">SQL data up to date</div>
@@ -132,7 +134,7 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
               isAnotherUserRunningExportJob={isAnotherUserRunningSqlJob}
               showAdditionalDetails={specification?.isSelectedForFunding}
               lastExportJob={lastExportAllocationDataJob}
-              lastPublishDate={latestPublishedDate?.value ?? undefined}
+              lastChangeDate={lastFundingChangeJob?.lastUpdated}
             >
               {specification?.isSelectedForFunding === false ? (
                 <div className="govuk-inset-text">
@@ -161,7 +163,7 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
               isAnotherUserRunningExportJob={isAnotherUserRunningSqlJob}
               showAdditionalDetails={specification?.isSelectedForFunding}
               lastExportJob={lastReleasedAllocationJob}
-              lastPublishDate={latestPublishedDate?.value ?? undefined}
+              lastChangeDate={latestPublishedDate?.value ?? undefined}
             >
               {specification?.isSelectedForFunding === false ? (
                 <div className="govuk-inset-text">
@@ -190,7 +192,7 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
 const ExportSection = ({
   title,
   description,
-  lastPublishDate,
+  lastChangeDate,
   lastExportJob,
   isAnotherUserRunningExportJob,
   showAdditionalDetails,
@@ -201,7 +203,7 @@ const ExportSection = ({
 }: {
   title: string;
   description: string;
-  lastPublishDate: Date | undefined;
+  lastChangeDate: Date | undefined;
   lastExportJob: JobDetails | undefined;
   exportStatusMessage: string;
   fundingStatusMessage: string;
@@ -256,10 +258,10 @@ const ExportSection = ({
                 <dd className="govuk-summary-list__value">
                   {hasRunningFundingJobs ? (
                     <LoadingFieldStatus title={fundingStatusMessage} />
-                  ) : !lastPublishDate ? (
+                  ) : !lastChangeDate ? (
                     <span className="govuk-body">N/A</span>
                   ) : (
-                    <DateTimeFormatter date={lastPublishDate} />
+                    <DateTimeFormatter date={lastChangeDate} />
                   )}
                 </dd>
               </div>

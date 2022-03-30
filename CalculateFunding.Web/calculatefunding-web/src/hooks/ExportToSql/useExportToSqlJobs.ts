@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 
+import { getNotificationWithLastUpdate } from "../../helpers/jobSubscriptionUtilities";
 import { sqlExportService } from "../../services/exportToSqlService";
 import { getLatestPublishedDate } from "../../services/publishService";
 import { JobDetails } from "../../types/jobDetails";
@@ -25,6 +26,8 @@ export interface UseExportToSqlJobsHookResults {
   lastExportAllocationDataJob: JobDetails | undefined;
   lastCalcResultsExportJob: JobDetails | undefined;
   lastReleasedAllocationJob: JobDetails | undefined;
+  lastCalcEngineRunJob: JobDetails | undefined;
+  lastFundingChangeJob: JobDetails | undefined;
   hasRunningSqlJob: boolean;
   hasRunningFundingJobs: boolean;
   isAnotherUserRunningSqlJob: boolean;
@@ -91,6 +94,27 @@ export const useExportToSqlJobs = ({
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
   });
 
+  const lastFundingChangeJob: JobDetails | undefined = useMemo(
+    () =>
+      getNotificationWithLastUpdate(
+        jobNotifications.filter(
+          (n) =>
+            [
+              JobType.ReleaseProvidersToChannelsJob,
+              JobType.PublishAllProviderFundingJob,
+              JobType.PublishBatchProviderFundingJob,
+              JobType.ReleaseProvidersToChannelsJob,
+              JobType.ApproveAllProviderFundingJob,
+              JobType.ApproveBatchProviderFundingJob,
+              JobType.RefreshFundingJob,
+              JobType.ApproveAllCalculationsJob,
+              JobType.AssignTemplateCalculationsJob,
+            ].includes(n.latestJob?.jobType as JobType) && n.latestJob?.isSuccessful
+        )
+      )?.latestJob,
+    [jobNotifications]
+  );
+
   const lastExportAllocationDataJob: JobDetails | undefined = useMemo(
     () => jobNotifications.find((n) => n.latestJob?.jobType === JobType.RunSqlImportJob)?.latestJob,
     [jobNotifications]
@@ -104,11 +128,12 @@ export const useExportToSqlJobs = ({
   const lastReleasedAllocationExportJob: JobDetails | undefined = useMemo(() => {
     const jobs = jobNotifications.filter(
       (n) =>
-        (n.latestJob?.jobType === JobType.ReleaseProvidersToChannelsJob ||
-          n.latestJob?.jobType === JobType.PublishAllProviderFundingJob ||
-          n.latestJob?.jobType === JobType.PublishBatchProviderFundingJob ||
-          n.latestJob?.jobType === JobType.ReleaseProvidersToChannelsJob) &&
-        n.latestJob?.isSuccessful
+        [
+          JobType.ReleaseProvidersToChannelsJob,
+          JobType.PublishAllProviderFundingJob,
+          JobType.PublishBatchProviderFundingJob,
+          JobType.ReleaseProvidersToChannelsJob,
+        ].includes(n.latestJob?.jobType as JobType) && n.latestJob?.isSuccessful
     );
 
     const job = jobs
@@ -311,7 +336,8 @@ export const useExportToSqlJobs = ({
   };
 
   useEffect(() => {
-    // monitor other ACTIVE background jobs
+    // monitor funding jobs
+    // (as individual subscriptions so they appear as separate banner notifications)
     [
       JobType.ApproveBatchProviderFundingJob,
       JobType.ApproveAllProviderFundingJob,
@@ -320,12 +346,15 @@ export const useExportToSqlJobs = ({
       JobType.PublishBatchProviderFundingJob,
       JobType.ReleaseProvidersToChannelsJob,
       JobType.ReIndexPublishedProvidersJob,
+      JobType.ApproveAllCalculationsJob,
+      JobType.AssignTemplateCalculationsJob,
     ].map((jobType) => {
       addSub({
         filterBy: {
           specificationId: specificationId,
           jobTypes: [jobType],
         },
+        fetchPriorNotifications: true,
         onError: (err) =>
           addError({
             error: err,
@@ -393,6 +422,8 @@ export const useExportToSqlJobs = ({
     lastExportAllocationDataJob,
     lastCalcResultsExportJob,
     lastReleasedAllocationJob,
+    lastCalcEngineRunJob,
+    lastFundingChangeJob,
     hasRunningSqlJob,
     hasRunningFundingJobs,
     isAnotherUserRunningSqlJob: hasRunningSqlJob && !isExporting,

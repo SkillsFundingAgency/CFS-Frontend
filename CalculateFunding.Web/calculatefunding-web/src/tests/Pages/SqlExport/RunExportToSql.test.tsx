@@ -43,8 +43,8 @@ describe("<RunExportToSql /> tests", () => {
       await waitFor(() => expect(getSpecSpy).toBeCalled());
       await waitForLoadingToFinish();
 
-      expect(screen.queryAllByText(/23 November 2020/i)).toHaveLength(3);
-      expect(screen.queryAllByText("N/A", { exact: false })).toHaveLength(3);
+      expect(screen.getAllByText(/23 November 2020/i)).toHaveLength(1);
+      expect(screen.getAllByText("N/A", { exact: false })).toBeTruthy();
 
       const buttons = screen.getAllByRole("button", { name: /Create SQL data/ });
       expect(buttons[0]).toBeDisabled();
@@ -89,7 +89,6 @@ const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>
       triggerReleasedResultsExport: mockTriggerReleasedResultsExport,
       latestPublishedDate: { value: null },
       isLoadingLatestPublishedDate: false,
-
       hasRunningFundingJobs: false,
       isExporting: false,
       isAnotherUserRunningSqlJob: false,
@@ -105,7 +104,7 @@ const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>
       isCurrentAllocationStateBlockedByJob: false,
       isLatestAllocationStateBlockedByJob: false,
       ...overrides,
-    };
+    } as UseExportToSqlJobsHookResults;
   });
 };
 const history = createBrowserHistory();
