@@ -248,6 +248,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
           specificationId: calculation.specificationId,
           jobTypes: jobsToWatch,
         },
+        fetchPriorNotifications: true,
         onError: (err) => addError({ error: err, description: "Error while subscribing to job updates" }),
       });
     }
