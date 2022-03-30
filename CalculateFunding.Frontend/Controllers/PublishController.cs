@@ -392,6 +392,14 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost("api/specs/{specificationId}/release-funding-providers")]
         public async Task<IActionResult> ReleaseProviders([FromBody] ReleaseProvidersToChannelRequest providers, [FromRoute] string specificationId)
         {
+            if (!await _authorizationHelper.DoesUserHavePermission(
+                User,
+                specificationId,
+                SpecificationActionTypes.CanReleaseFunding))
+            {
+                return new ForbidResult();
+            }
+
             if (specificationId.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
@@ -416,6 +424,14 @@ namespace CalculateFunding.Frontend.Controllers
         [HttpPost("api/specs/{specificationId}/release-funding")]
         public async Task<IActionResult> Release([FromBody] ReleaseProvidersToChannelRequest providers, [FromRoute] string specificationId)
         {
+            if (!await _authorizationHelper.DoesUserHavePermission(
+                User,
+                specificationId,
+                SpecificationActionTypes.CanReleaseFunding))
+            {
+                return new ForbidResult();
+            }
+
             if (specificationId.IsNullOrEmpty())
             {
                 ModelState.AddModelError(nameof(specificationId), "Missing " + nameof(specificationId));
