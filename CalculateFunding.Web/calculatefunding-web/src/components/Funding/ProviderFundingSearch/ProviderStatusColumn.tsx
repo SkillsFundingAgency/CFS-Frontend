@@ -19,8 +19,7 @@ export const ProviderStatusColumn = ({
   ) : (
     <>
       <td className="govuk-table__cell govuk-body">
-        {provider.fundingStatus}{" "}
-        {provider.majorVersion > 0 && <span>{`v${provider.majorVersion}.${provider.minorVersion}`}</span>}
+        {provider.fundingStatus} <span>{`v${provider.majorVersion}.${provider.minorVersion}`}</span>
       </td>
       {!!actionType && ( // exclude old funding page
         <td className="govuk-table__cell govuk-body">
