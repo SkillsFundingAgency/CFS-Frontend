@@ -101,11 +101,11 @@ export const useJobSubscription = ({
           }]`,
         newSub
       );
-      setSubs((existing) => [...existing, newSub]);
       if (!isSignalREnabled && newSub.isEnabled && newSub.monitorMode === MonitorMode.SignalR) {
         console.log("useJobSubscription.addSub: triggering startup of signalR because of new sub");
         setIsSignalREnabled(true);
       }
+      setSubs((existing) => [...existing, newSub]);
     } else {
       console.log("useJobSubscription.addSub: Subscription already exists", newSub, existing);
       console.log("useJobSubscription.addSub: triggering fetch of previous job results");
