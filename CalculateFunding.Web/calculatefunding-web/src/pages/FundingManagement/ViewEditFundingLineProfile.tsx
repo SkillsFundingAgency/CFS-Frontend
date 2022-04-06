@@ -1,8 +1,7 @@
 ﻿import { cloneDeep } from "lodash";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
-import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { FormattedNumber, NumberType, toDecimal } from "../../components/FormattedNumber";
@@ -93,7 +92,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
   });
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isDirty, setIsDirty] = useState<boolean>(false);
-  const [pageTitle, setPageTitle] = useState<string>();
+  // const [pageTitle, setPageTitle] = useState<string>();
   const [canEditCustomProfile, setCanEditCustomProfile] = useState<boolean>(false);
   const [canChangeToRuleBasedProfile, setCanChangeToRuleBasedProfile] = useState<boolean>(false);
   const [isContractedProvider, setIsContractedProvider] = useState<boolean>(false);
@@ -130,30 +129,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
     },
   });
 
-  useEffect(() => {
-    if (actionType === FundingActionType.Approve && match.params.editMode === "edit") {
-      if (editMode !== ProfileEditMode.EditUnpaid) {
-        setEditMode(ProfileEditMode.EditUnpaid);
-        setEditMode(ProfileEditMode.EditUnpaid);
-        refetchFundingLineProfile();
-      }
-    } else {
-      if (editMode !== ProfileEditMode.View) {
-        setEditMode(ProfileEditMode.View);
-        setEditMode(ProfileEditMode.View);
-        refetchFundingLineProfile();
-      }
-    }
-  }, [match.params.editMode]);
-
-  useEffect(() => {
-    const title = `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile${
-      fundingLineProfile ? " for " + fundingLineProfile.fundingLineName : ""
-    }`;
-    document.title = `${title} - Calculate funding`;
-    setPageTitle(title);
-  }, [editMode, fundingLineProfile]);
-
   const { missingPermissions, hasMissingPermissions, isPermissionsFetched } = useSpecificationPermissions(
     match.params.specificationId,
     [Permission.CanApplyCustomProfilePattern]
@@ -182,6 +157,58 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
     return !isErrors;
   };
 
+  const {
+    newCarryForwardAmount,
+    totalAllocationAmount,
+    totalProfilingAllocationAmount,
+    totalProfilingAllocationPercent,
+  } = useMemo(() => {
+    const calculateTotalPaidAndUnpaidAllocationAmount = (): number => {
+      if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
+      const totalAllocation = editedFundingLineProfile.profileTotals
+        .map((p) => p.value)
+        .reduce((a, c) => a + c, 0);
+
+      return toDecimal(totalAllocation || 0, 2);
+    };
+
+    const calculateTotalProfilingAllocationAmount = (): number => {
+      if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
+      const totalAllocation = editedFundingLineProfile.profileTotals
+        .filter((p) => (editMode == ProfileEditMode.EditAll ? true : !p.isPaid))
+        .map((p) => p.value)
+        .reduce((a, c) => a + c, 0);
+
+      return toDecimal(totalAllocation || 0, 2);
+    };
+
+    const calculateProfilingTotalAllocationPercent = (): number => {
+      if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
+      const totalPercentage = editedFundingLineProfile.profileTotals
+        .filter(
+          (p) =>
+            p.profileRemainingPercentage !== undefined &&
+            (editMode == ProfileEditMode.EditAll ? true : !p.isPaid)
+        )
+        .map((p) => p.profileRemainingPercentage)
+        .reduce((a, c) => (a !== undefined && c !== undefined ? a + c : 0), 0);
+
+      return toDecimal(totalPercentage || 0, 2);
+    };
+
+    const calculateNewCarryForwardAmount = (totalUnpaidAllocationAmount: number): number => {
+      return toDecimal(profilingAmount - totalUnpaidAllocationAmount || 0, 2);
+    };
+
+    const totalProfilingAllocationAmount = calculateTotalProfilingAllocationAmount();
+    return {
+      totalProfilingAllocationAmount,
+      totalProfilingAllocationPercent: calculateProfilingTotalAllocationPercent(),
+      totalAllocationAmount: calculateTotalPaidAndUnpaidAllocationAmount(),
+      newCarryForwardAmount: calculateNewCarryForwardAmount(totalProfilingAllocationAmount),
+    };
+  }, [editedFundingLineProfile]);
+
   const handleEditProfileClick = async () => {
     if (editMode === ProfileEditMode.View) {
       clearErrorMessages();
@@ -194,8 +221,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
       }
       try {
         clearErrorMessages(["totalPercent", "totalAllocation"]);
-        const totalProfilingAllocationAmount = calculateTotalProfilingAllocationAmount();
-        const totalProfilingAllocationPercent = calculateProfilingTotalAllocationPercent();
 
         if (!isFormValid(totalProfilingAllocationAmount, totalProfilingAllocationPercent)) {
           window.scrollTo(0, 0);
@@ -204,7 +229,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
 
         setIsSaving(true);
 
-        const carryForwardValue = calculateNewCarryForwardAmount(totalProfilingAllocationAmount);
         const request: ApplyCustomProfileRequest = {
           specificationId: specificationId as string,
           fundingStreamId: fundingStreamId as string,
@@ -212,7 +236,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
           fundingLineCode: fundingLineId,
           providerId: providerId,
           customProfileName: `${providerId}-${fundingStreamId}-${fundingPeriodId}-${fundingLineId}`,
-          carryOver: carryForwardValue > 0 ? carryForwardValue : null,
+          carryOver: newCarryForwardAmount > 0 ? newCarryForwardAmount : null,
           profilePeriods: editedFundingLineProfile
             ? editedFundingLineProfile.profileTotals.map((pt) => ({
                 type: pt.periodType as ProfilePeriodType,
@@ -244,7 +268,12 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
     }
   };
 
-  const handleCancelClick = () => {
+  const handleCancelAndBack = () => {
+    clearErrorMessages();
+    history.push(providerFundingOverviewUrl);
+  };
+
+  const handleCancelEdit = () => {
     clearErrorMessages();
     history.push(`${providerFundingOverviewUrl}/FundingLine/${fundingLineId}/view`);
   };
@@ -253,7 +282,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
     history.push(`${providerFundingOverviewUrl}/FundingLine/${fundingLineId}/edit/change-profile-type`);
   };
 
-  const updateProfileTotal = (instalmentNumber: number, newProfileTotal: ProfileTotal) => {
+  const handleUpdateProfileTotal = (instalmentNumber: number, newProfileTotal: ProfileTotal) => {
     if (!editedFundingLineProfile) return;
     const cloneOfFundingLineProfile: FundingLineProfile = cloneDeep(editedFundingLineProfile);
     cloneOfFundingLineProfile.profileTotals = cloneOfFundingLineProfile.profileTotals.map(
@@ -261,43 +290,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
         (profile.installmentNumber === instalmentNumber ? newProfileTotal : profile) as ProfileTotal
     );
     setEditedFundingLineProfile(cloneOfFundingLineProfile);
-  };
-
-  const calculateProfilingTotalAllocationPercent = (): number => {
-    if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
-    const totalPercentage = editedFundingLineProfile.profileTotals
-      .filter(
-        (p) =>
-          p.profileRemainingPercentage !== undefined &&
-          (editMode == ProfileEditMode.EditAll ? true : !p.isPaid)
-      )
-      .map((p) => p.profileRemainingPercentage)
-      .reduce((a, c) => (a !== undefined && c !== undefined ? a + c : 0), 0);
-
-    return toDecimal(totalPercentage || 0, 2);
-  };
-
-  const calculateTotalProfilingAllocationAmount = (): number => {
-    if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
-    const totalAllocation = editedFundingLineProfile.profileTotals
-      .filter((p) => (editMode == ProfileEditMode.EditAll ? true : !p.isPaid))
-      .map((p) => p.value)
-      .reduce((a, c) => a + c, 0);
-
-    return toDecimal(totalAllocation || 0, 2);
-  };
-
-  const calculateTotalPaidAndUnpaidAllocationAmount = (): number => {
-    if (!editedFundingLineProfile || editedFundingLineProfile.profileTotals.length === 0) return 0;
-    const totalAllocation = editedFundingLineProfile.profileTotals
-      .map((p) => p.value)
-      .reduce((a, c) => a + c, 0);
-
-    return toDecimal(totalAllocation || 0, 2);
-  };
-
-  const calculateNewCarryForwardAmount = (totalUnpaidAllocationAmount: number): number => {
-    return toDecimal(profilingAmount - totalUnpaidAllocationAmount || 0, 2);
   };
 
   const RowItem = (props: { id: string; title: string; children: any }) => {
@@ -326,23 +318,45 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
     setHasAcknowledgedHistoricEdit(e.target.checked);
   };
 
-  const remainingAmount =
-    fundingLineProfile &&
-    fundingLineProfile.remainingAmount !== undefined &&
-    fundingLineProfile.remainingAmount !== null
-      ? fundingLineProfile.remainingAmount
-      : 0;
-  const profilingAmount =
-    editMode === ProfileEditMode.EditAll &&
-    fundingLineProfile &&
-    fundingLineProfile.fundingLineAmount !== undefined &&
-    fundingLineProfile.fundingLineAmount !== null
-      ? fundingLineProfile.fundingLineAmount
-      : remainingAmount;
-  const totalProfilingAllocationAmount = calculateTotalProfilingAllocationAmount();
-  const totalProfilingAllocationPercent = calculateProfilingTotalAllocationPercent();
-  const totalAllocationAmount = calculateTotalPaidAndUnpaidAllocationAmount();
-  const newCarryForwardAmount = calculateNewCarryForwardAmount(totalProfilingAllocationAmount);
+  useEffect(() => {
+    if (actionType === FundingActionType.Approve && match.params.editMode === "edit") {
+      if (editMode !== ProfileEditMode.EditUnpaid) {
+        setEditMode(ProfileEditMode.EditUnpaid);
+        setEditMode(ProfileEditMode.EditUnpaid);
+        refetchFundingLineProfile();
+      }
+    } else {
+      if (editMode !== ProfileEditMode.View) {
+        setEditMode(ProfileEditMode.View);
+        setEditMode(ProfileEditMode.View);
+        refetchFundingLineProfile();
+      }
+    }
+  }, [match.params.editMode]);
+
+  const { pageTitle, remainingAmount, profilingAmount } = useMemo(() => {
+    if (!fundingLineProfile) {
+      return {
+        pageTitle: `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile`,
+        remainingAmount: 0,
+        profilingAmount: 0,
+      };
+    }
+    const remainingAmount = !fundingLineProfile?.remainingAmount ? 0 : fundingLineProfile.remainingAmount;
+    const profilingAmount =
+      !fundingLineProfile?.fundingLineAmount || editMode !== ProfileEditMode.EditAll
+        ? remainingAmount
+        : fundingLineProfile.fundingLineAmount;
+    return {
+      remainingAmount,
+      profilingAmount,
+      pageTitle: `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile${
+        fundingLineProfile ? " for " + fundingLineProfile.fundingLineName : ""
+      }`,
+    };
+  }, [fundingLineProfile, editMode]);
+
+  document.title = `${pageTitle} - Calculate funding`;
 
   return (
     <Main location={Section.FundingManagement}>
@@ -480,7 +494,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
                             index={i}
                             profileTotal={p}
                             remainingAmount={profilingAmount || 0}
-                            setProfileTotal={updateProfileTotal}
+                            setProfileTotal={handleUpdateProfileTotal}
                             mode={editMode}
                             setIsDirty={setIsDirty}
                             errors={errors}
@@ -638,15 +652,13 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
               >
                 {editMode !== ProfileEditMode.View ? "Apply profile" : "Edit profile"}
               </button>
-              {editMode !== ProfileEditMode.View && (
-                <button
-                  className="govuk-button govuk-button--secondary govuk-!-margin-right-1"
-                  onClick={handleCancelClick}
-                  data-testid="cancel-btn"
-                >
-                  Cancel
-                </button>
-              )}
+              <button
+                className="govuk-button govuk-button--secondary govuk-!-margin-right-1"
+                onClick={editMode === ProfileEditMode.View ? handleCancelEdit : handleCancelAndBack}
+                data-testid="cancel-btn"
+              >
+                Cancel
+              </button>
               {canChangeToRuleBasedProfile && (
                 <button className="govuk-button" onClick={handleChangeToRuleBasedProfileClick}>
                   Change to rule based profile
@@ -670,7 +682,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
               ) : (
                 <LoadingFieldStatus title="Loading..." />
               )}
-              <BackLink to={providerFundingOverviewUrl} />
             </div>
           </div>
         </>

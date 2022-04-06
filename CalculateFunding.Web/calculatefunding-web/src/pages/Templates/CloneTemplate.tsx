@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 import { useParams } from "react-router-dom";
 
-import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { CancelLink } from "../../components/CancelLink";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
@@ -246,7 +246,7 @@ export const CloneTemplate = () => {
             </div>
           </div>
           <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
+            <div className="govuk-grid-column-full govuk-body-m">
               {selectedFundingPeriodId && (
                 <button
                   className="govuk-button"
@@ -258,10 +258,9 @@ export const CloneTemplate = () => {
                 </button>
               )}
               {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
+              <CancelLink to={`/Templates/${templateId}/Edit?version=${version}`} />
             </div>
           </div>
-
-          <BackLink to={`/Templates/${templateId}/Edit?version=${version}`} />
         </form>
       )}
     </Main>

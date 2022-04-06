@@ -6,7 +6,7 @@ import { useQuery } from "react-query";
 import { useSelector } from "react-redux";
 import { RouteComponentProps, useLocation } from "react-router";
 
-import { BackLink } from "../../components/BackLink";
+import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { CalculationsTab } from "../../components/Funding/CalculationsTab";
 import { FundingSelectionBreadcrumb } from "../../components/Funding/FundingSelectionBreadcrumb";
@@ -249,7 +249,7 @@ export function ProviderFundingOverview({ match }: RouteComponentProps<ProviderF
         </div>
       )}
       <div className="govuk-clearfix"></div>
-      <BackLink />
+      <BackToTop id={"top"} />
     </Main>
   );
 }

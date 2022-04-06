@@ -229,7 +229,7 @@ export const CreateTemplate = () => {
                     className="govuk-button govuk-button--secondary"
                     data-module="govuk-button"
                   >
-                    Back
+                    Cancel
                   </Link>
                   {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
                 </div>

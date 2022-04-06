@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useHistory } from "react-router";
 
 import { AutoComplete } from "../../components/AutoComplete";
-import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { LoadingStatus } from "../../components/LoadingStatus";
@@ -91,16 +90,11 @@ export function ViewProvidersFundingStreamSelection() {
               </div>
             </fieldset>
           </div>
-          <div className="govuk-grid-row">
+          <div className="govuk-grid-row govuk-body-m">
             <div className="govuk-grid-column-one-third">
               <button className="govuk-button" type="button" aria-label="Continue" onClick={submit}>
                 Continue
               </button>
-            </div>
-          </div>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-third">
-              <BackLink />
             </div>
           </div>
         </div>

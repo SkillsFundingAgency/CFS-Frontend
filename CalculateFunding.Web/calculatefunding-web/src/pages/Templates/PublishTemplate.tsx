@@ -321,7 +321,7 @@ export const PublishTemplate = () => {
                   className="govuk-button govuk-button--secondary"
                   data-module="govuk-button"
                 >
-                  Back
+                  Cancel
                 </Link>
               )}
               {template && template.status === "Published" && (

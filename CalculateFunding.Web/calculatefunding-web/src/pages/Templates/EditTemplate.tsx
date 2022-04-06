@@ -10,8 +10,8 @@ import { Link, useParams } from "react-router-dom";
 import Sidebar from "react-sidebar";
 
 import { AutoComplete, AutoCompleteMode } from "../../components/AutoComplete";
-import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
+import { CancelLink } from "../../components/CancelLink";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
@@ -889,7 +889,9 @@ export function EditTemplate() {
             {saveMessage}
           </span>
         ) : null}
-        <BackLink to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"} />
+        <p className="govuk-body-m">
+          <CancelLink to={version !== undefined ? `/Templates/${templateId}/Versions` : "/Templates/List"} />
+        </p>
         <Sidebar
           sidebar={
             <SidebarContent

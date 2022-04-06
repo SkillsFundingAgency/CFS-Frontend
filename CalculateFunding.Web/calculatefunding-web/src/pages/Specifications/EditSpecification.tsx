@@ -663,11 +663,6 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
           </div>
         </fieldset>
       )}
-      {!isUpdating && (
-        <div className="govuk-form-group">
-          <BackLink to={`/ViewSpecification/${specificationId}`} />
-        </div>
-      )}
     </Main>
   );
 }
