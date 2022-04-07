@@ -1,7 +1,13 @@
 ﻿import { DateTime } from "luxon";
 
-import { getLatestJob, removeDuplicateJobsById, sortByLatest } from "../../helpers/jobDetailsHelper";
+import {
+  getJobProgressMessage,
+  getLatestJob,
+  removeDuplicateJobsById,
+  sortByLatest, unrecognisedJobTypeDescription,
+} from "../../helpers/jobDetailsHelper";
 import { JobDetails } from "../../types/jobDetails";
+import { JobType } from "../../types/jobType";
 
 describe("jobDetailsHelper tests", () => {
   describe("removeDuplicateJobsById tests", () => {
@@ -79,6 +85,16 @@ describe("jobDetailsHelper tests", () => {
       const result = getLatestJob(jobs);
 
       expect(result).toEqual(createDummyJob({ lastUpdated: baseDate.plus({ minute: 12 }).toJSDate() }));
+    });
+  });
+
+  describe("Job description tests", () => {
+    const allJobTypes = Object.keys(JobType).map((x) => (<any>JobType)[x] as JobType);
+    allJobTypes.forEach(jobType => {
+      it(`has description for job type ${jobType}`, () => {
+        const jobDescription = getJobProgressMessage(jobType);
+        expect(jobDescription?.length > 0 && jobDescription !== unrecognisedJobTypeDescription).toBe(true);
+      })
     });
   });
 

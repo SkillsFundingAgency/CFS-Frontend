@@ -1,9 +1,16 @@
 ﻿import { AxiosError } from "axios";
-import { DateTime } from "luxon";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 
-import { getNotificationWithLastUpdate } from "../../helpers/jobSubscriptionUtilities";
+import {
+  extractJobsSortedByLatest,
+  findJobWithId,
+  firstActiveJob,
+  firstJobWithType,
+  firstSuccessfulJob,
+  getJobType,
+  isJobTypeIn,
+} from "../../helpers/jobDetailsHelper";
 import { sqlExportService } from "../../services/exportToSqlService";
 import { getLatestPublishedDate } from "../../services/publishService";
 import { JobDetails } from "../../types/jobDetails";
@@ -22,34 +29,49 @@ export interface UseExportToSqlJobsHookProps {
   clearErrorMessages: (fieldNames?: string[]) => void;
 }
 
-export interface UseExportToSqlJobsHookResults {
-  lastExportAllocationDataJob: JobDetails | undefined;
-  lastCalcResultsExportJob: JobDetails | undefined;
-  lastReleasedAllocationJob: JobDetails | undefined;
-  lastCalcEngineRunJob: JobDetails | undefined;
-  lastFundingChangeJob: JobDetails | undefined;
-  hasRunningSqlJob: boolean;
-  hasRunningFundingJobs: boolean;
-  isAnotherUserRunningSqlJob: boolean;
+export interface SqlExportActions {
+  triggerCalcResultsExport: () => void;
+  triggerCurrentAllocationResultsExport: () => void;
+  triggerReleasedResultsExport: () => void;
+}
+
+export interface SqlExportState {
+  isAnotherUserExporting: boolean;
   isExportBlockedByJob: boolean;
   isCurrentAllocationStateBlockedByJob: boolean;
   isLatestAllocationStateBlockedByJob: boolean;
   isLatestCalcResultsAlreadyExported: boolean;
   isLatestAllocationDataAlreadyExported: boolean;
   isLatestReleaseDataAlreadyExported: boolean;
-  latestPublishedDate: LatestPublishedDate | undefined;
-  isLoadingLatestPublishedDate: boolean;
-  exportJobId: string;
-  exportJob: JobDetails | undefined;
   isExporting: boolean;
   isExportingCalcResults: boolean;
   isExportingCurrentResults: boolean;
   isExportingReleasedResults: boolean;
   fundingJobStatusMessage: string;
   exportJobStatusMessage: string;
-  triggerCalcResultsExport: () => void;
-  triggerCurrentAllocationResultsExport: () => void;
-  triggerReleasedResultsExport: () => void;
+}
+
+export interface JobsInfo {
+  exportJob: JobDetails | undefined;
+  latestExportAllocationDataJob: JobDetails | undefined;
+  latestCalcResultsExportJob: JobDetails | undefined;
+  latestReleasedAllocationJob: JobDetails | undefined;
+  lastSuccessfulFundingChangeJob: JobDetails | undefined;
+  latestCalcEngineRunJob: JobDetails | undefined;
+  latestReleasedAllocationExportJob: JobDetails | undefined;
+  hasRunningSqlJob: boolean;
+  hasRunningFundingJobs: boolean;
+  hasRunningCalcEngineJob: boolean;
+  hasRunningReleasedAllocationSqlImportJob: boolean;
+}
+
+export interface UseExportToSqlJobsHookResults {
+  jobsInfo: JobsInfo;
+  exportState: SqlExportState;
+  latestPublishedDate: LatestPublishedDate | undefined;
+  isLoadingLatestPublishedDate: boolean;
+  exportJobId: string;
+  actions: SqlExportActions;
 }
 
 export const useExportToSqlJobs = ({
@@ -61,7 +83,6 @@ export const useExportToSqlJobs = ({
 }: UseExportToSqlJobsHookProps): UseExportToSqlJobsHookResults => {
   const [isAnotherUserRunningSqlJob, setIsAnotherUserRunningSqlJob] = useState<boolean>(false);
   const [isAnotherUserRunningFundingJob, setIsAnotherUserRunningFundingJob] = useState<boolean>(false);
-
   const [isExportingCalcResults, setIsExportingCalcResults] = useState<boolean>(false);
   const [isExportingCurrentResults, setIsExportingCurrentResults] = useState<boolean>(false);
   const [isExportingReleasedResults, setIsExportingReleasedResults] = useState<boolean>(false);
@@ -69,6 +90,27 @@ export const useExportToSqlJobs = ({
   const [exportJobStatusMessage, setExportJobStatusMessage] = useState<string>("Data push queued");
   const [fundingJobStatusMessage, setFundingJobStatusMessage] = useState<string>("Funding job running");
   const [exportJobId, setExportJobId] = useState<string>("");
+  const sqlExportJobTypes = [
+    JobType.RunSqlImportJob,
+    JobType.PopulateCalculationResultsQaDatabaseJob,
+    JobType.RunReleasedSqlImportJob,
+  ];
+  const approveFundingJobTypes = [
+    JobType.ApproveAllProviderFundingJob,
+    JobType.ApproveBatchProviderFundingJob,
+  ];
+  const refreshFundingJobTypes = [JobType.RefreshFundingJob];
+  const releaseFundingJobTypes = [
+    JobType.ReleaseProvidersToChannelsJob,
+    JobType.PublishAllProviderFundingJob,
+    JobType.PublishBatchProviderFundingJob,
+  ];
+  const calcRunJobTypes = [
+    JobType.CreateInstructAllocationJob,
+    JobType.CreateInstructGenerateAggregationsAllocationJob,
+    JobType.GenerateGraphAndInstructAllocationJob,
+    JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
+  ];
 
   const {
     data: latestPublishedDate,
@@ -94,113 +136,39 @@ export const useExportToSqlJobs = ({
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
   });
 
-  const lastFundingChangeJob: JobDetails | undefined = useMemo(
-    () =>
-      getNotificationWithLastUpdate(
-        jobNotifications.filter(
-          (n) =>
-            [
-              JobType.ReleaseProvidersToChannelsJob,
-              JobType.PublishAllProviderFundingJob,
-              JobType.PublishBatchProviderFundingJob,
-              JobType.ReleaseProvidersToChannelsJob,
-              JobType.ApproveAllProviderFundingJob,
-              JobType.ApproveBatchProviderFundingJob,
-              JobType.RefreshFundingJob,
-              JobType.ApproveAllCalculationsJob,
-              JobType.AssignTemplateCalculationsJob,
-            ].includes(n.latestJob?.jobType as JobType) && n.latestJob?.isSuccessful
-        )
-      )?.latestJob,
-    [jobNotifications]
-  );
-
-  const lastExportAllocationDataJob: JobDetails | undefined = useMemo(
-    () => jobNotifications.find((n) => n.latestJob?.jobType === JobType.RunSqlImportJob)?.latestJob,
-    [jobNotifications]
-  );
-
-  const lastReleasedAllocationJob: JobDetails | undefined = useMemo(
-    () => jobNotifications.find((n) => n.latestJob?.jobType === JobType.RunReleasedSqlImportJob)?.latestJob,
-    [jobNotifications]
-  );
-
-  const lastReleasedAllocationExportJob: JobDetails | undefined = useMemo(() => {
-    const jobs = jobNotifications.filter(
-      (n) =>
-        [
-          JobType.ReleaseProvidersToChannelsJob,
-          JobType.PublishAllProviderFundingJob,
-          JobType.PublishBatchProviderFundingJob,
-          JobType.ReleaseProvidersToChannelsJob,
-        ].includes(n.latestJob?.jobType as JobType) && n.latestJob?.isSuccessful
-    );
-
-    const job = jobs
-      .sort((n) => DateTime.fromJSDate(n.latestJob?.lastUpdated ?? new Date(0)).toMillis())
-      .shift();
-
-    return job?.latestJob;
+  const jobsInfo: JobsInfo = useMemo(() => {
+    const jobsSortedByLatest = extractJobsSortedByLatest(jobNotifications);
+    const findLatestByJobType = firstJobWithType(jobsSortedByLatest);
+    const findLatestSuccessfulByJobType = firstSuccessfulJob(jobsSortedByLatest);
+    const findActiveByJobType = firstActiveJob(jobsSortedByLatest);
+    const findJobById = findJobWithId(jobsSortedByLatest);
+    return {
+      latestExportAllocationDataJob: findLatestByJobType([JobType.RunSqlImportJob]),
+      latestReleasedAllocationJob: findLatestByJobType([JobType.RunReleasedSqlImportJob]),
+      latestCalcResultsExportJob: findLatestByJobType([JobType.PopulateCalculationResultsQaDatabaseJob]),
+      latestCalcEngineRunJob: findLatestByJobType([JobType.CreateInstructAllocationJob]),
+      latestReleasedAllocationExportJob: findLatestByJobType(releaseFundingJobTypes),
+      lastSuccessfulFundingChangeJob: findLatestSuccessfulByJobType([
+        ...approveFundingJobTypes,
+        ...releaseFundingJobTypes,
+        ...calcRunJobTypes,
+      ]),
+      hasRunningCalcEngineJob: !!findActiveByJobType(calcRunJobTypes),
+      hasRunningFundingJobs: !!findActiveByJobType([
+        ...releaseFundingJobTypes,
+        ...approveFundingJobTypes,
+        ...refreshFundingJobTypes,
+      ]),
+      hasRunningSqlJob: !!findActiveByJobType(sqlExportJobTypes),
+      hasRunningReleasedAllocationSqlImportJob: !!findActiveByJobType([JobType.RunReleasedSqlImportJob]),
+      exportJob: findJobById(exportJobId),
+    };
   }, [jobNotifications]);
 
-  const lastCalcResultsExportJob: JobDetails | undefined = useMemo(
-    () =>
-      jobNotifications.find((n) => n.latestJob?.jobType === JobType.PopulateCalculationResultsQaDatabaseJob)
-        ?.latestJob,
-    [jobNotifications]
-  );
-
-  const lastCalcEngineRunJob: JobDetails | undefined = useMemo(
-    () =>
-      jobNotifications.find((n) => n.latestJob?.jobType === JobType.CreateInstructAllocationJob)?.latestJob,
-    [jobNotifications]
-  );
-  console.log("lastCalcEngineRunJob", lastCalcEngineRunJob);
-
-  const hasRunningFundingJobs: boolean = useMemo(
-    () =>
-      !!jobNotifications.find(
-        ({ latestJob: job }) =>
-          !!job?.jobType &&
-          job.jobType !== JobType.RunSqlImportJob &&
-          job.isActive &&
-          job.specificationId === specificationId
-      ),
-    [jobNotifications]
-  );
-
-  const hasRunningSqlJob: boolean = useMemo(
-    () =>
-      !!jobNotifications.find(
-        ({ latestJob: job }) =>
-          !!job?.jobType &&
-          (job.jobType === JobType.RunSqlImportJob ||
-            job.jobType === JobType.PopulateCalculationResultsQaDatabaseJob) &&
-          job.isActive &&
-          job.specificationId === specificationId
-      ),
-    [jobNotifications]
-  );
-
-  const hasRunningReleasedAllocationSqlImportJob: boolean = useMemo(
-    () =>
-      !!jobNotifications.find(
-        ({ latestJob: job }) =>
-          !!job?.jobType &&
-          job.jobType === JobType.RunReleasedSqlImportJob &&
-          job.isActive &&
-          job.specificationId === specificationId
-      ),
-    [jobNotifications]
-  );
-
   async function handleJobNotification(notification: JobNotification) {
-    if (!notification.latestJob?.jobType) return;
-    if (
-      notification.latestJob.jobType === JobType.RunSqlImportJob ||
-      notification.latestJob.jobType === JobType.PopulateCalculationResultsQaDatabaseJob ||
-      notification.latestJob.jobType === JobType.RunReleasedSqlImportJob
-    ) {
+    const jobType = getJobType(notification.latestJob?.jobType as string);
+    if (!jobType) return;
+    if (isJobTypeIn(sqlExportJobTypes)(jobType)) {
       handleExportToSqlJob(notification);
     } else {
       await handleOtherJobs(notification);
@@ -336,39 +304,12 @@ export const useExportToSqlJobs = ({
   };
 
   useEffect(() => {
-    // monitor funding jobs
-    // (as individual subscriptions so they appear as separate banner notifications)
     [
-      JobType.ApproveBatchProviderFundingJob,
-      JobType.ApproveAllProviderFundingJob,
-      JobType.RefreshFundingJob,
-      JobType.PublishAllProviderFundingJob,
-      JobType.PublishBatchProviderFundingJob,
-      JobType.ReleaseProvidersToChannelsJob,
-      JobType.ReIndexPublishedProvidersJob,
-      JobType.ApproveAllCalculationsJob,
-      JobType.AssignTemplateCalculationsJob,
-    ].map((jobType) => {
-      addSub({
-        filterBy: {
-          specificationId: specificationId,
-          jobTypes: [jobType],
-        },
-        fetchPriorNotifications: true,
-        onError: (err) =>
-          addError({
-            error: err,
-            description: "An error occurred while monitoring the running jobs",
-          }),
-      });
-    });
-
-    // find other export jobs, whether active or historic
-    [
-      JobType.RunSqlImportJob,
-      JobType.RunReleasedSqlImportJob,
-      JobType.PopulateCalculationResultsQaDatabaseJob,
-      JobType.CreateInstructAllocationJob,
+      ...sqlExportJobTypes,
+      ...calcRunJobTypes,
+      ...releaseFundingJobTypes,
+      ...approveFundingJobTypes,
+      ...refreshFundingJobTypes,
     ].map((jobType) => {
       addSub({
         filterBy: {
@@ -393,66 +334,75 @@ export const useExportToSqlJobs = ({
     };
   }, []);
 
-  const hasPreviousAllocationSqlExport = !!lastExportAllocationDataJob?.lastUpdated;
-  const hasPreviousAllocationSqlExportFailure = !!lastExportAllocationDataJob?.isFailed;
+  const isOutdated = (lastExportJob: JobDetails | undefined, lastUpdateJob: JobDetails | undefined) => {
+    return (
+      !!lastUpdateJob?.lastUpdated &&
+      !!lastExportJob?.lastUpdated &&
+      lastUpdateJob.lastUpdated > lastExportJob?.lastUpdated
+    );
+  };
 
-  const hasPreviousCalcResultsSqlExport = !!lastCalcResultsExportJob?.lastUpdated;
-  const hasPreviousCalcResultsSqlExportFailure = !!lastCalcResultsExportJob?.isFailed;
-
-  const hasPreviousReleasedAllocationSqlExport = !!lastReleasedAllocationJob?.lastUpdated;
-  const hasPreviousReleasedAllocationSqlExportFailure = !!lastReleasedAllocationJob?.isFailed;
-
-  const isCalcDataInSqlOutdated =
-    !!lastCalcEngineRunJob?.lastUpdated &&
-    !!lastCalcResultsExportJob?.lastUpdated &&
-    lastCalcEngineRunJob.lastUpdated > lastCalcResultsExportJob?.lastUpdated;
-
-  const isAllocationDataInSqlOutdated =
-    !lastExportAllocationDataJob?.lastUpdated ||
-    (!!latestPublishedDate?.value && latestPublishedDate.value > lastExportAllocationDataJob.lastUpdated);
-
-  const isReleasedAllocationDataInSqlOutdated =
-    !lastReleasedAllocationJob?.lastUpdated ||
-    (!!latestPublishedDate?.value &&
-      (lastReleasedAllocationExportJob?.lastUpdated !== undefined
-        ? latestPublishedDate.value > lastReleasedAllocationExportJob?.lastUpdated
-        : true));
+  const state = useMemo(() => {
+    const hasPreviousAllocationSqlExport = !!jobsInfo.latestExportAllocationDataJob?.lastUpdated;
+    const hasPreviousAllocationSqlExportFailure = !!jobsInfo.latestExportAllocationDataJob?.isFailed;
+    const hasPreviousCalcResultsSqlExport = !!jobsInfo.latestCalcResultsExportJob?.lastUpdated;
+    const hasPreviousCalcResultsSqlExportFailure = !!jobsInfo.latestCalcResultsExportJob?.isFailed;
+    const hasPreviousReleasedAllocationSqlExport = !!jobsInfo.latestReleasedAllocationJob?.lastUpdated;
+    const hasPreviousReleasedAllocationSqlExportFailure = !!jobsInfo.latestReleasedAllocationJob?.isFailed;
+    const isAllocationDataInSqlOutdated =
+      !jobsInfo.latestExportAllocationDataJob?.lastUpdated ||
+      (!!latestPublishedDate?.value &&
+        latestPublishedDate.value > jobsInfo.latestExportAllocationDataJob.lastUpdated);
+    const isCalcDataInSqlOutdated = isOutdated(
+      jobsInfo.latestCalcResultsExportJob,
+      jobsInfo.latestCalcEngineRunJob
+    );
+    const isReleasedAllocationDataInSqlOutdated =
+      !jobsInfo.latestReleasedAllocationJob?.lastUpdated ||
+      (!!latestPublishedDate?.value &&
+        (jobsInfo.latestReleasedAllocationExportJob?.lastUpdated !== undefined
+          ? latestPublishedDate.value > jobsInfo.latestReleasedAllocationExportJob?.lastUpdated
+          : true));
+    return {
+      isAnotherUserExporting: jobsInfo.hasRunningSqlJob && !isExporting,
+      isExportBlockedByJob: isExporting || jobsInfo.hasRunningFundingJobs || jobsInfo.hasRunningSqlJob,
+      isCurrentAllocationStateBlockedByJob:
+        isExporting || jobsInfo.hasRunningFundingJobs || jobsInfo.hasRunningSqlJob,
+      isLatestAllocationStateBlockedByJob:
+        isExportingReleasedResults || jobsInfo.hasRunningReleasedAllocationSqlImportJob,
+      isLatestCalcResultsAlreadyExported:
+        hasPreviousCalcResultsSqlExport &&
+        !hasPreviousCalcResultsSqlExportFailure &&
+        !isCalcDataInSqlOutdated,
+      isLatestAllocationDataAlreadyExported:
+        hasPreviousAllocationSqlExport &&
+        !hasPreviousAllocationSqlExportFailure &&
+        !isAllocationDataInSqlOutdated,
+      isLatestReleaseDataAlreadyExported:
+        hasPreviousReleasedAllocationSqlExport &&
+        !hasPreviousReleasedAllocationSqlExportFailure &&
+        !isReleasedAllocationDataInSqlOutdated,
+    };
+  }, [jobsInfo, isExporting, latestPublishedDate?.value]);
 
   return {
-    lastExportAllocationDataJob,
-    lastCalcResultsExportJob,
-    lastReleasedAllocationJob,
-    lastCalcEngineRunJob,
-    lastFundingChangeJob,
-    hasRunningSqlJob,
-    hasRunningFundingJobs,
-    isAnotherUserRunningSqlJob: hasRunningSqlJob && !isExporting,
-    isExportBlockedByJob: isExporting || hasRunningFundingJobs || hasRunningSqlJob,
-    isCurrentAllocationStateBlockedByJob: isExporting || hasRunningFundingJobs || hasRunningSqlJob,
-    isLatestAllocationStateBlockedByJob:
-      isExportingReleasedResults || hasRunningReleasedAllocationSqlImportJob,
-    isLatestCalcResultsAlreadyExported:
-      hasPreviousCalcResultsSqlExport && !hasPreviousCalcResultsSqlExportFailure && !isCalcDataInSqlOutdated,
-    isLatestAllocationDataAlreadyExported:
-      hasPreviousAllocationSqlExport &&
-      !hasPreviousAllocationSqlExportFailure &&
-      !isAllocationDataInSqlOutdated,
-    isLatestReleaseDataAlreadyExported:
-      hasPreviousReleasedAllocationSqlExport &&
-      !hasPreviousReleasedAllocationSqlExportFailure &&
-      !isReleasedAllocationDataInSqlOutdated,
+    jobsInfo,
+    exportState: {
+      ...state,
+      isExporting,
+      isExportingCalcResults,
+      isExportingCurrentResults,
+      isExportingReleasedResults,
+      fundingJobStatusMessage,
+      exportJobStatusMessage,
+    },
     latestPublishedDate,
     isLoadingLatestPublishedDate,
     exportJobId,
-    exportJob: jobNotifications.find((n) => n.latestJob?.jobId === exportJobId)?.latestJob,
-    isExporting,
-    isExportingCalcResults,
-    isExportingCurrentResults,
-    isExportingReleasedResults,
-    fundingJobStatusMessage,
-    exportJobStatusMessage,
-    triggerCalcResultsExport,
-    triggerCurrentAllocationResultsExport,
-    triggerReleasedResultsExport,
+    actions: {
+      triggerCalcResultsExport,
+      triggerCurrentAllocationResultsExport,
+      triggerReleasedResultsExport,
+    },
   };
 };

@@ -1,4 +1,4 @@
-﻿import React from "react";
+﻿import React, { useMemo } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
@@ -10,14 +10,27 @@ import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
 import { Title } from "../../../components/Title";
 import { convertToSlug } from "../../../helpers/stringHelper";
-import { useExportToSqlJobs } from "../../../hooks/ExportToSql/useExportToSqlJobs";
+import {
+  JobsInfo,
+  SqlExportActions,
+  SqlExportState,
+  useExportToSqlJobs,
+} from "../../../hooks/ExportToSql/useExportToSqlJobs";
 import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
 import { useErrors } from "../../../hooks/useErrors";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import { JobDetails } from "../../../types/jobDetails";
+import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
+import { LatestPublishedDate } from "../../../types/PublishedProvider/LatestPublishedDate";
 import { Section } from "../../../types/Sections";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
+
+enum ExportType {
+  CalculationsData,
+  LatestFundingData,
+  LastReleasedData,
+}
 
 export function RunExportToSql({ match }: RouteComponentProps<{ specificationId: string }>) {
   const { errors, addError, clearErrorMessages } = useErrors();
@@ -32,30 +45,8 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
   const fundingStreamId = specification?.fundingStreams[0]?.id;
   const fundingPeriodId = specification?.fundingPeriod?.id;
 
-  const {
-    lastExportAllocationDataJob,
-    lastCalcResultsExportJob,
-    lastReleasedAllocationJob,
-    lastCalcEngineRunJob,
-    lastFundingChangeJob,
-    hasRunningFundingJobs,
-    isExportBlockedByJob,
-    isCurrentAllocationStateBlockedByJob,
-    isLatestAllocationStateBlockedByJob,
-    isLatestCalcResultsAlreadyExported,
-    isLatestAllocationDataAlreadyExported,
-    isLatestReleaseDataAlreadyExported,
-    isAnotherUserRunningSqlJob,
-    latestPublishedDate,
-    isLoadingLatestPublishedDate,
-    isExporting,
-    exportJob,
-    fundingJobStatusMessage,
-    exportJobStatusMessage,
-    triggerCalcResultsExport,
-    triggerCurrentAllocationResultsExport,
-    triggerReleasedResultsExport,
-  } = useExportToSqlJobs({ specificationId, fundingStreamId, fundingPeriodId, addError, clearErrorMessages });
+  const { jobsInfo, exportState, actions, latestPublishedDate, isLoadingLatestPublishedDate } =
+    useExportToSqlJobs({ specificationId, fundingStreamId, fundingPeriodId, addError, clearErrorMessages });
 
   const { isCheckingForPermissions, isPermissionsFetched, hasMissingPermissions, missingPermissions } =
     useSpecificationPermissions(specificationId, [Permission.CanRefreshPublishedQa]);
@@ -84,104 +75,51 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
 
       {isLoadingSpecification || !specification ? (
         <LoadingStatus title="Loading" />
-      ) : isExporting ? (
+      ) : exportState.isExporting ? (
         <LoadingStatus
-          title={exportJobStatusMessage}
+          title={exportState.exportJobStatusMessage}
           subTitle="Please wait, this could take several minutes"
           description="Please do not refresh the page, you will be redirected automatically"
         />
-      ) : exportJob?.isSuccessful ? (
+      ) : jobsInfo.exportJob?.isSuccessful ? (
         <SuccessMessage
-          exportJob={exportJob}
+          exportJob={jobsInfo.exportJob}
           isLoadingLatestPublishedDate={isLoadingLatestPublishedDate}
           latestPublishedDate={latestPublishedDate?.value ?? undefined}
           specification={specification as SpecificationSummary}
         />
       ) : (
-        (!exportJob || exportJob?.isFailed) && (
+        (!jobsInfo.exportJob || jobsInfo.exportJob?.isFailed) && (
           <>
             <ExportSection
-              title="Latest calculation results"
-              description="Includes funding line, template calculation and additional calculation values for providers from
-              the latest specification calculation run."
-              exportStatusMessage={exportJobStatusMessage}
-              fundingStatusMessage={fundingJobStatusMessage}
-              hasRunningFundingJobs={hasRunningFundingJobs}
-              showAdditionalDetails={true}
-              isAnotherUserRunningExportJob={isAnotherUserRunningSqlJob}
-              lastExportJob={lastCalcResultsExportJob}
-              lastChangeDate={lastCalcEngineRunJob?.lastUpdated}
-            >
-              {isLatestCalcResultsAlreadyExported ? (
-                <div className="govuk-inset-text">SQL data up to date</div>
-              ) : (
-                <button
-                  className="govuk-button"
-                  onClick={triggerCalcResultsExport}
-                  disabled={isLoading || isExportBlockedByJob || !isExportPermitted}
-                >
-                  {lastCalcResultsExportJob ? "Refresh " : "Create "} SQL data
-                </button>
-              )}
-            </ExportSection>
+              type={ExportType.CalculationsData}
+              exportState={exportState}
+              jobsInfo={jobsInfo}
+              isLoading={isLoading}
+              actions={actions}
+              isExportPermitted={isExportPermitted}
+            />
 
             <ExportSection
-              title="Current state allocation results"
-              description="Includes funding line, template calculation and profile values for draft, approved, updated and released provider allocations."
-              exportStatusMessage={exportJobStatusMessage}
-              fundingStatusMessage={fundingJobStatusMessage}
-              hasRunningFundingJobs={hasRunningFundingJobs}
-              isAnotherUserRunningExportJob={isAnotherUserRunningSqlJob}
-              showAdditionalDetails={specification?.isSelectedForFunding}
-              lastExportJob={lastExportAllocationDataJob}
-              lastChangeDate={lastFundingChangeJob?.lastUpdated}
-            >
-              {specification?.isSelectedForFunding === false ? (
-                <div className="govuk-inset-text">
-                  This specification has not been chosen for funding therefore you are unable to create the
-                  SQL data.
-                </div>
-              ) : isLatestAllocationDataAlreadyExported ? (
-                <div className="govuk-inset-text">SQL data up to date</div>
-              ) : (
-                <button
-                  className="govuk-button"
-                  onClick={triggerCurrentAllocationResultsExport}
-                  disabled={isLoading || isCurrentAllocationStateBlockedByJob || !isExportPermitted}
-                >
-                  {lastExportAllocationDataJob ? "Refresh " : "Create "} SQL data
-                </button>
-              )}
-            </ExportSection>
+              type={ExportType.LatestFundingData}
+              exportState={exportState}
+              jobsInfo={jobsInfo}
+              isSelectedForFunding={specification?.isSelectedForFunding}
+              isLoading={isLoading}
+              actions={actions}
+              isExportPermitted={isExportPermitted}
+            />
 
             <ExportSection
-              title="Latest released state allocation results"
-              description="Includes the funding line, template calculation and profile values for the latest released version of the provider allocations."
-              exportStatusMessage={exportJobStatusMessage}
-              fundingStatusMessage={fundingJobStatusMessage}
-              hasRunningFundingJobs={hasRunningFundingJobs}
-              isAnotherUserRunningExportJob={isAnotherUserRunningSqlJob}
-              showAdditionalDetails={specification?.isSelectedForFunding}
-              lastExportJob={lastReleasedAllocationJob}
-              lastChangeDate={latestPublishedDate?.value ?? undefined}
-            >
-              {specification?.isSelectedForFunding === false ? (
-                <div className="govuk-inset-text">
-                  This specification has not been chosen for funding therefore you are unable to create the
-                  SQL data.
-                </div>
-              ) : isLatestReleaseDataAlreadyExported ? (
-                <div className="govuk-inset-text">SQL data up to date</div>
-              ) : (
-                <button
-                  className="govuk-button"
-                  onClick={triggerReleasedResultsExport}
-                  disabled={isLoading || isLatestAllocationStateBlockedByJob || !isExportPermitted}
-                >
-                  {lastReleasedAllocationJob ? "Refresh " : "Create "} SQL data
-                </button>
-              )}
-            </ExportSection>
+              type={ExportType.LastReleasedData}
+              exportState={exportState}
+              jobsInfo={jobsInfo}
+              latestPublishedDate={latestPublishedDate}
+              isSelectedForFunding={!!specification?.isSelectedForFunding}
+              isLoading={isLoading}
+              actions={actions}
+              isExportPermitted={isExportPermitted}
+            />
           </>
         )
       )}
@@ -190,28 +128,62 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
 }
 
 const ExportSection = ({
-  title,
-  description,
-  lastChangeDate,
-  lastExportJob,
-  isAnotherUserRunningExportJob,
-  showAdditionalDetails,
-  exportStatusMessage,
-  fundingStatusMessage,
-  hasRunningFundingJobs,
-  children,
+  type,
+  exportState,
+  isSelectedForFunding,
+  latestPublishedDate,
+  jobsInfo,
+  actions,
+  isLoading,
+  isExportPermitted,
 }: {
-  title: string;
-  description: string;
-  lastChangeDate: Date | undefined;
-  lastExportJob: JobDetails | undefined;
-  exportStatusMessage: string;
-  fundingStatusMessage: string;
-  isAnotherUserRunningExportJob: boolean;
-  showAdditionalDetails: boolean;
-  hasRunningFundingJobs: boolean;
-  children: any;
+  type: ExportType;
+  isSelectedForFunding?: boolean | undefined;
+  exportState: SqlExportState;
+  jobsInfo: JobsInfo;
+  actions: SqlExportActions;
+  isLoading: boolean;
+  isExportPermitted: boolean;
+  latestPublishedDate?: LatestPublishedDate | undefined;
 }) => {
+  const { title, description, lastExportJob, lastChangeText, lastChangeDate, isDataAlreadyExported } =
+    useMemo(() => {
+      switch (type) {
+        case ExportType.CalculationsData:
+          return {
+            title: "Latest calculation results",
+            description:
+              "Includes funding line, template calculation and additional calculation values for providers from the latest specification calculation run.",
+            lastExportJob: jobsInfo.latestCalcResultsExportJob,
+            lastChangeText: "Last calculation run",
+            lastChangeDate: jobsInfo.latestCalcEngineRunJob?.lastUpdated,
+            isDataAlreadyExported: exportState.isLatestCalcResultsAlreadyExported,
+          };
+        case ExportType.LatestFundingData:
+          return {
+            title: "Current state allocation results",
+            description:
+              "Includes funding line, template calculation and profile values for draft, approved, updated and released provider allocations.",
+            lastExportJob: jobsInfo.latestExportAllocationDataJob,
+            lastChangeText: "Last funding data change",
+            lastChangeDate: jobsInfo.lastSuccessfulFundingChangeJob?.lastUpdated,
+            isDataAlreadyExported: exportState.isLatestAllocationDataAlreadyExported,
+          };
+        case ExportType.LastReleasedData:
+          return {
+            title: "Latest released state allocation results",
+            description:
+              "Includes the funding line, template calculation and profile values for the latest released version of the provider allocations.",
+            lastExportJob: jobsInfo.latestReleasedAllocationJob,
+            lastChangeText: "Last published",
+            lastChangeDate: latestPublishedDate?.value ?? undefined,
+            isDataAlreadyExported: exportState.isLatestReleaseDataAlreadyExported,
+          };
+        default:
+          throw Error("Unknown export type");
+      }
+    }, [type, jobsInfo, exportState, latestPublishedDate, isSelectedForFunding]);
+
   const titleId = `${convertToSlug(title)}-title`;
   return (
     <section className="govuk-main-wrapper" aria-describedby={titleId}>
@@ -219,57 +191,87 @@ const ExportSection = ({
         {title}
       </h2>
       <p className="govuk-body">{description}</p>
-      {showAdditionalDetails && (
-        <details
-          hidden={!showAdditionalDetails}
-          className="govuk-details govuk-!-margin-bottom-4"
-          data-module="govuk-details"
+      <details
+        hidden={type !== ExportType.CalculationsData && !isSelectedForFunding}
+        className="govuk-details govuk-!-margin-bottom-4"
+        data-module="govuk-details"
+      >
+        <summary className="govuk-details__summary">
+          <span className="govuk-details__summary-text">Additional details</span>
+        </summary>
+        <div className="govuk-details__text">
+          <dl className="govuk-summary-list govuk-summary-list--no-border">
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">Last export to SQL</dt>
+              <dd className="govuk-summary-list__value">
+                {lastExportJob?.isActive ? (
+                  <LoadingFieldStatus title={exportState.exportJobStatusMessage} />
+                ) : !lastExportJob?.lastUpdated ? (
+                  <span className="govuk-body">N/A</span>
+                ) : type === ExportType.CalculationsData && jobsInfo.hasRunningCalcEngineJob ? (
+                  <LoadingFieldStatus title="Calculation engine job in progress. Please wait." />
+                ) : type !== ExportType.CalculationsData && jobsInfo.hasRunningFundingJobs ? (
+                  <LoadingFieldStatus
+                    title={`Funding job in progress. Please wait. ${exportState.fundingJobStatusMessage}`}
+                  />
+                ) : exportState.isAnotherUserExporting ? (
+                  <LoadingFieldStatus
+                    title={`Another export in progress. Please wait. ${exportState.exportJobStatusMessage}`}
+                  />
+                ) : (
+                  <>
+                    <DateTimeFormatter date={lastExportJob.lastUpdated} />
+                    <span className="govuk-body">{lastExportJob.isFailed ? " (Failed)" : ""}</span>
+                  </>
+                )}
+              </dd>
+            </div>
+            <div className="govuk-summary-list__row">
+              <dt className="govuk-summary-list__key">{lastChangeText}</dt>
+              <dd className="govuk-summary-list__value">
+                {jobsInfo.hasRunningFundingJobs ? (
+                  <LoadingFieldStatus title={exportState.fundingJobStatusMessage} />
+                ) : !lastChangeDate ? (
+                  <span className="govuk-body">N/A</span>
+                ) : (
+                  <DateTimeFormatter date={lastChangeDate} />
+                )}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </details>
+      {!isSelectedForFunding && type !== ExportType.CalculationsData ? (
+        <div className="govuk-inset-text">
+          This specification has not been chosen for funding therefore you are unable to create the SQL data.
+        </div>
+      ) : isDataAlreadyExported ? (
+        <div className="govuk-inset-text">SQL data up to date</div>
+      ) : type === ExportType.CalculationsData ? (
+        <button
+          className="govuk-button"
+          onClick={actions.triggerCalcResultsExport}
+          disabled={isLoading || exportState.isExportBlockedByJob || !isExportPermitted}
         >
-          <summary className="govuk-details__summary">
-            <span className="govuk-details__summary-text">Additional details</span>
-          </summary>
-          <div className="govuk-details__text">
-            <dl className="govuk-summary-list govuk-summary-list--no-border">
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Last export to SQL</dt>
-                <dd className="govuk-summary-list__value">
-                  {lastExportJob?.isActive ? (
-                    <LoadingFieldStatus title={exportStatusMessage} />
-                  ) : !lastExportJob?.lastUpdated ? (
-                    <span className="govuk-body">N/A</span>
-                  ) : hasRunningFundingJobs ? (
-                    <LoadingFieldStatus
-                      title={`Funding release in progress. Please wait. ${fundingStatusMessage}`}
-                    />
-                  ) : isAnotherUserRunningExportJob ? (
-                    <LoadingFieldStatus
-                      title={`Calculation run in progress. Please wait. ${exportStatusMessage}`}
-                    />
-                  ) : (
-                    <>
-                      <DateTimeFormatter date={lastExportJob.lastUpdated} />
-                      <span className="govuk-body">{lastExportJob.isFailed ? " (Failed)" : ""}</span>
-                    </>
-                  )}
-                </dd>
-              </div>
-              <div className="govuk-summary-list__row">
-                <dt className="govuk-summary-list__key">Last funding data change</dt>
-                <dd className="govuk-summary-list__value">
-                  {hasRunningFundingJobs ? (
-                    <LoadingFieldStatus title={fundingStatusMessage} />
-                  ) : !lastChangeDate ? (
-                    <span className="govuk-body">N/A</span>
-                  ) : (
-                    <DateTimeFormatter date={lastChangeDate} />
-                  )}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </details>
-      )}
-      {children}
+          {jobsInfo.latestCalcResultsExportJob ? "Refresh " : "Create "} SQL data
+        </button>
+      ) : type === ExportType.LatestFundingData ? (
+        <button
+          className="govuk-button"
+          onClick={actions.triggerCurrentAllocationResultsExport}
+          disabled={isLoading || exportState.isCurrentAllocationStateBlockedByJob || !isExportPermitted}
+        >
+          {jobsInfo.latestExportAllocationDataJob ? "Refresh " : "Create "} SQL data
+        </button>
+      ) : type === ExportType.LastReleasedData ? (
+        <button
+          className="govuk-button"
+          onClick={actions.triggerReleasedResultsExport}
+          disabled={isLoading || exportState.isLatestAllocationStateBlockedByJob || !isExportPermitted}
+        >
+          {jobsInfo.latestReleasedAllocationJob ? "Refresh " : "Create "} SQL data
+        </button>
+      ) : null}
     </section>
   );
 };

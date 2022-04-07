@@ -78,31 +78,13 @@ const useRunExportToSqlSpy = jest.spyOn(useExportToSqlJobsHook, "useExportToSqlJ
 const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>) => {
   useRunExportToSqlSpy.mockImplementation(() => {
     return {
-      exportJob: undefined,
-      hasRunningSqlJob: false,
-      isExportingReleasedResults: false,
-      lastCalcResultsExportJob: undefined,
-      lastExportAllocationDataJob: undefined,
-      lastReleasedAllocationJob: undefined,
-      triggerCalcResultsExport: mockTriggerCalcResultsExport,
-      triggerCurrentAllocationResultsExport: mockTriggerCurrentAllocationResultsExport,
-      triggerReleasedResultsExport: mockTriggerReleasedResultsExport,
+      ...withExportSqlJobs(),
+      actions: {
+        triggerCalcResultsExport: mockTriggerCalcResultsExport,
+        triggerCurrentAllocationResultsExport: mockTriggerCurrentAllocationResultsExport,
+        triggerReleasedResultsExport: mockTriggerReleasedResultsExport,
+      },
       latestPublishedDate: { value: null },
-      isLoadingLatestPublishedDate: false,
-      hasRunningFundingJobs: false,
-      isExporting: false,
-      isAnotherUserRunningSqlJob: false,
-      exportJobId: "",
-      exportJobStatusMessage: "",
-      fundingJobStatusMessage: "",
-      isExportBlockedByJob: false,
-      isExportingCurrentResults: false,
-      isExportingCalcResults: false,
-      isLatestAllocationDataAlreadyExported: false,
-      isLatestCalcResultsAlreadyExported: false,
-      isLatestReleaseDataAlreadyExported: false,
-      isCurrentAllocationStateBlockedByJob: false,
-      isLatestAllocationStateBlockedByJob: false,
       ...overrides,
     } as UseExportToSqlJobsHookResults;
   });

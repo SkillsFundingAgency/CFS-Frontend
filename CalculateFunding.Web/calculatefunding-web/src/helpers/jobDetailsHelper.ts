@@ -1,4 +1,4 @@
-﻿import { chain, descend, filter, head, sort, uniqBy } from "ramda";
+﻿import * as R from "ramda";
 import { compose } from "redux";
 
 import { JobTypeNotificationSetting } from "../components/Jobs/JobNotificationSection";
@@ -7,11 +7,36 @@ import { JobDetails, JobFailure, JobOutcomeType, JobResponse } from "../types/jo
 import { JobNotification } from "../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../types/jobType";
 import { RunningStatus } from "../types/RunningStatus";
-import { convertCamelCaseToSpaceDelimited } from "./stringHelper";
 
-export const sortByLatest = sort<JobDetails>(descend((job) => job?.lastUpdated ?? new Date(0)));
+export const sortByLatest = R.sort<JobDetails>(R.descend((job) => job?.lastUpdated ?? new Date(0)));
 
-export const getLatestJob = compose<JobDetails | undefined>(head, sortByLatest);
+export const getLatestJob = compose<JobDetails | undefined>(R.head, sortByLatest);
+
+export const isJobTypeIn =
+  (validJobTypes: JobType[]) =>
+  (jobTypeString: string): boolean =>
+    validJobTypes.includes(getJobType(jobTypeString));
+
+export const isJobWithTypeIn =
+  (validJobTypes: JobType[]) =>
+  (job: JobDetails): boolean =>
+    !!job?.jobType &&
+    isJobTypeIn(validJobTypes)(getJobType(job.jobType));
+
+export const hasJobWithJobTypeIn =
+    (validJobTypes: JobType[]) =>
+      (notification: JobNotification) =>
+        !!notification.latestJob?.jobType?.length &&
+    isJobTypeIn(validJobTypes)(notification.latestJob.jobType as string);
+
+export const isSuccessfulJob = (job: JobDetails | undefined): boolean =>
+  !!job?.isSuccessful;
+
+export const isActiveJob = (job: JobDetails | undefined): boolean =>
+  !!job?.isActive;
+
+export const hasSuccessfulJob = (notification: JobNotification): boolean =>
+  !!notification.latestJob?.isSuccessful;
 
 export const isJobEnabledForNotification = (
   job: JobDetails,
@@ -28,20 +53,34 @@ export const isJobEnabledForNotification = (
   return !!setting;
 };
 
-export const removeDuplicateJobsById = uniqBy<JobDetails, string>((j) => j?.jobId);
+export const firstSuccessfulJob = (jobs: JobDetails[]) => (jobTypes: JobType[]) =>
+  R.head(jobs.filter(isJobWithTypeIn(jobTypes)).filter(isSuccessfulJob));
 
-export const removeInvalidJobs = filter<JobDetails>((a): a is JobDetails => !!a);
+export const firstActiveJob = (jobs: JobDetails[]) => (jobTypes: JobType[]) =>
+  R.head(jobs.filter(isJobWithTypeIn(jobTypes)).filter(isActiveJob));
 
-export const activeJobs = filter<JobDetails>((j) => j.isActive);
+export const firstJobWithType = (jobs: JobDetails[]) => (jobTypes: JobType[]) =>
+  jobs.find((job) => isJobTypeIn(jobTypes)(job.jobType as string));
 
-export const failedJobs = filter<JobDetails>((j) => j.isFailed);
+export const findJobWithId = (jobs: JobDetails[]) => (jobId: string) =>
+  jobs.find((job) => job.jobId === jobId);
 
-export const successfulJobs = filter<JobDetails>((j) => j.isSuccessful);
+export const extractJobsSortedByLatest = (notifications: JobNotification[]) => sortByLatest(extractJobsFromNotifications(notifications));
+
+export const removeDuplicateJobsById = R.uniqBy<JobDetails, string>((j) => j?.jobId);
+
+export const removeInvalidJobs = R.filter<JobDetails>((a): a is JobDetails => !!a);
+
+export const activeJobs = R.filter<JobDetails>((j) => j.isActive);
+
+export const failedJobs = R.filter<JobDetails>((j) => j.isFailed);
+
+export const successfulJobs = R.filter<JobDetails>((j) => j.isSuccessful);
 
 export const extractJobsFromNotification = (n: JobNotification): JobDetails[] =>
   n.latestJob ? [n.latestJob] : ([] as JobDetails[]);
 
-export const extractJobsFromNotifications = chain<JobNotification, JobDetails>(extractJobsFromNotification);
+export const extractJobsFromNotifications = R.chain<JobNotification, JobDetails>(extractJobsFromNotification);
 
 export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobDetails | undefined {
   if (!job) return undefined;
@@ -95,7 +134,7 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
   return result;
 }
 
-function getJobType(jobTypeString: string): JobType | undefined {
+export function getJobType(jobTypeString: string): JobType {
   return JobType[jobTypeString as keyof typeof JobType];
 }
 
@@ -169,7 +208,9 @@ function setStatusFields(job: JobDetails) {
   return job;
 }
 
-function getJobProgressMessage(jobTypeString: string) {
+export const unrecognisedJobTypeDescription = "Unknown";
+
+export function getJobProgressMessage(jobTypeString: string) {
   switch (getJobType(jobTypeString)) {
     case JobType.MapDatasetJob:
       return "Mapping dataset";
@@ -273,9 +314,19 @@ function getJobProgressMessage(jobTypeString: string) {
       return "Generating Converter Wizard Activity CSV";
     case JobType.ReleaseProvidersToChannelsJob:
       return "Releasing providers to channels";
-    case undefined:
-      return "";
+    case JobType.TrackLatestJob:
+      return "Tracking latest";
+    case JobType.ReleaseManagementDataMigrationJob:
+      return "Migrating data for publishing funding";
+    case JobType.ReferencedSpecificationReMapJob:
+      return "Remapping referenced specification";
+    case JobType.ProcessDatasetObsoleteItemsJob:
+      return "Processing dataset for obsolete items";
+    case JobType.PopulateCalculationResultsQaDatabaseJob:
+      return "Exporting calculation results to SQL database";
+    case JobType.RunReleasedSqlImportJob:
+      return "Exporting released data to SQL";
     default:
-      return jobTypeString ? convertCamelCaseToSpaceDelimited(jobTypeString) : "";
+      return unrecognisedJobTypeDescription;
   }
 }
