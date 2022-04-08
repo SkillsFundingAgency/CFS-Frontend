@@ -92,7 +92,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
   });
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isDirty, setIsDirty] = useState<boolean>(false);
-  // const [pageTitle, setPageTitle] = useState<string>();
   const [canEditCustomProfile, setCanEditCustomProfile] = useState<boolean>(false);
   const [canChangeToRuleBasedProfile, setCanChangeToRuleBasedProfile] = useState<boolean>(false);
   const [isContractedProvider, setIsContractedProvider] = useState<boolean>(false);
@@ -143,6 +142,28 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
   const { fundingConfiguration } = useFundingConfiguration(fundingStreamId, fundingPeriodId, (err) =>
     addError({ error: err, description: "Error while loading funding configuration" })
   );
+
+  const { pageTitle, remainingAmount, profilingAmount } = useMemo(() => {
+    if (!fundingLineProfile) {
+      return {
+        pageTitle: `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile`,
+        remainingAmount: 0,
+        profilingAmount: 0,
+      };
+    }
+    const remainingAmount = !fundingLineProfile?.remainingAmount ? 0 : fundingLineProfile.remainingAmount;
+    const profilingAmount =
+      !fundingLineProfile?.fundingLineAmount || editMode !== ProfileEditMode.EditAll
+        ? remainingAmount
+        : fundingLineProfile.fundingLineAmount;
+    return {
+      remainingAmount,
+      profilingAmount,
+      pageTitle: `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile${
+        fundingLineProfile ? " for " + fundingLineProfile.fundingLineName : ""
+      }`,
+    };
+  }, [fundingLineProfile, editMode]);
 
   const isFormValid = (totalAllocationAmount: number, totalAllocationPercent: number) => {
     let isErrors = false;
@@ -207,7 +228,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
       totalAllocationAmount: calculateTotalPaidAndUnpaidAllocationAmount(),
       newCarryForwardAmount: calculateNewCarryForwardAmount(totalProfilingAllocationAmount),
     };
-  }, [editedFundingLineProfile]);
+  }, [editedFundingLineProfile, editMode, profilingAmount]);
 
   const handleEditProfileClick = async () => {
     if (editMode === ProfileEditMode.View) {
@@ -270,6 +291,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
 
   const handleCancelAndBack = () => {
     clearErrorMessages();
+    console.log("hello pete");
     history.push(providerFundingOverviewUrl);
   };
 
@@ -333,28 +355,6 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
       }
     }
   }, [match.params.editMode]);
-
-  const { pageTitle, remainingAmount, profilingAmount } = useMemo(() => {
-    if (!fundingLineProfile) {
-      return {
-        pageTitle: `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile`,
-        remainingAmount: 0,
-        profilingAmount: 0,
-      };
-    }
-    const remainingAmount = !fundingLineProfile?.remainingAmount ? 0 : fundingLineProfile.remainingAmount;
-    const profilingAmount =
-      !fundingLineProfile?.fundingLineAmount || editMode !== ProfileEditMode.EditAll
-        ? remainingAmount
-        : fundingLineProfile.fundingLineAmount;
-    return {
-      remainingAmount,
-      profilingAmount,
-      pageTitle: `${editMode !== ProfileEditMode.View ? "Edit " : ""}Profile${
-        fundingLineProfile ? " for " + fundingLineProfile.fundingLineName : ""
-      }`,
-    };
-  }, [fundingLineProfile, editMode]);
 
   document.title = `${pageTitle} - Calculate funding`;
 
@@ -654,7 +654,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
               </button>
               <button
                 className="govuk-button govuk-button--secondary govuk-!-margin-right-1"
-                onClick={editMode === ProfileEditMode.View ? handleCancelEdit : handleCancelAndBack}
+                onClick={editMode === ProfileEditMode.View ? handleCancelAndBack : handleCancelEdit}
                 data-testid="cancel-btn"
               >
                 Cancel

@@ -249,7 +249,7 @@ export const CloneTemplate = () => {
             <div className="govuk-grid-column-full govuk-body-m">
               {selectedFundingPeriodId && (
                 <button
-                  className="govuk-button"
+                  className="govuk-button govuk-!-padding-right-4"
                   data-testid="save"
                   onClick={handleSaveClick}
                   disabled={!enableSaveButton}
