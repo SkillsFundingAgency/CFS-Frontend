@@ -1,42 +1,40 @@
 import { AxiosError } from "axios";
 import * as React from "react";
 import { ChangeEvent } from "react";
-import { useMutation, useQuery } from "react-query";
-import { useSelector } from "react-redux";
+import { useMutation } from "react-query";
 import { Link } from "react-router-dom";
 
+import { useSpecificationDatasets } from "../../hooks/DataSets/useSpecificationDatasets";
 import { useErrors } from "../../hooks/useErrors";
-import { IStoreState } from "../../reducers/rootReducer";
+import { useFeatureFlags } from "../../hooks/useFeatureFlags";
 import * as datasetService from "../../services/datasetService";
-import { FeatureFlagsState } from "../../states/FeatureFlagsState";
-import { DatasetRelationship } from "../../types/DatasetRelationship";
 import { DatasetRelationshipType } from "../../types/Datasets/DatasetRelationshipType";
 import { ToggleDatasetSchemaRequest } from "../../types/Datasets/ToggleDatasetSchemaRequest";
 import { DateTimeFormatter } from "../DateTimeFormatter";
 import { LoadingStatus } from "../LoadingStatus";
 import { MultipleErrorSummary } from "../MultipleErrorSummary";
+import { TextLink } from "../TextLink";
 
-export function Datasets(props: {
+export function Datasets({
+  specificationId,
+  lastConverterWizardReportDate,
+}: {
   specificationId: string;
   lastConverterWizardReportDate: Date | undefined;
 }) {
-  const featureFlagsState: FeatureFlagsState = useSelector<IStoreState, FeatureFlagsState>(
-    (state) => state.featureFlags
-  );
+  const featureFlags = useFeatureFlags();
 
-  const { data: datasets, isLoading: isLoadingDatasets } = useQuery<DatasetRelationship[], AxiosError>(
-    `spec-datasets-${props.specificationId}`,
-    async () => (await datasetService.getDatasetsBySpecification(props.specificationId)).data,
-    {
-      enabled: !!props.specificationId,
+  const { datasets, isLoadingDatasets, refetchDatasets } = useSpecificationDatasets({
+    specificationId,
+    options: {
       onError: (err) =>
         addError({
           error: err,
           description: "Could not load data sets",
           suggestion: "Please try again later",
         }),
-    }
-  );
+    },
+  });
 
   const { mutate: handleToggleConverter } = useMutation<boolean, AxiosError, ToggleDatasetSchemaRequest>(
     async (request) => (await datasetService.toggleDatasetRelationshipService(request)).data,
@@ -46,6 +44,7 @@ export function Datasets(props: {
           error: err,
           description: "Error whilst setting enable copy data for provider",
         }),
+      onSuccess: () => refetchDatasets(),
     }
   );
 
@@ -54,9 +53,9 @@ export function Datasets(props: {
   return (
     <section className="govuk-tabs__panel" id="datasets">
       <LoadingStatus
-        title={"Loading datasets"}
+        title={"Loading data sets"}
         hidden={!isLoadingDatasets}
-        description={"Please wait whilst datasets are loading"}
+        description={"Please wait whilst data sets are loading"}
       />
       <MultipleErrorSummary errors={errors} />
       <div className="govuk-grid-row" hidden={isLoadingDatasets}>
@@ -67,7 +66,7 @@ export function Datasets(props: {
           <div>
             <Link
               role="link"
-              to={`/Datasets/DataRelationships/${props.specificationId}`}
+              to={`/Datasets/DataRelationships/${specificationId}`}
               id="dataset-specification-relationship-button"
               className="govuk-link govuk-link--no-visited-state"
               data-module="govuk-button"
@@ -76,28 +75,27 @@ export function Datasets(props: {
             </Link>
           </div>
           <div>
-            <Link
-              className="govuk-link govuk-link--no-visited-state"
+            <TextLink
               to={
-                featureFlagsState.specToSpec
-                  ? `/Datasets/Create/SelectDatasetTypeToCreate/${props.specificationId}`
-                  : `/Datasets/CreateDataset/${props.specificationId}`
+                featureFlags.specToSpec
+                  ? `/Datasets/Create/SelectDatasetTypeToCreate/${specificationId}`
+                  : `/Datasets/CreateDataset/${specificationId}`
               }
             >
               Create dataset
-            </Link>
+            </TextLink>
           </div>
-          {props.lastConverterWizardReportDate && (
+          {lastConverterWizardReportDate && (
             <div>
               <a
                 className="govuk-link govuk-link--no-visited-state"
-                href={`/api/datasets/reports/${props.specificationId}/download`}
+                href={`/api/datasets/reports/${specificationId}/download`}
               >
                 Converter wizard report
               </a>
               <br />
               <p className="govuk-body-s">
-                Converter wizard last run: <DateTimeFormatter date={props.lastConverterWizardReportDate} />
+                Converter wizard last run: <DateTimeFormatter date={lastConverterWizardReportDate} />
               </p>
             </div>
           )}
@@ -136,17 +134,12 @@ export function Datasets(props: {
                   {ds.relationshipType === DatasetRelationshipType.Uploaded ? (
                     ds.name
                   ) : (
-                    <Link
-                      className="govuk-link govuk-link--no-visited-state"
-                      to={`/Datasets/${ds.id}/Edit/${props.specificationId}`}
-                    >
-                      {ds.name}
-                    </Link>
+                    <TextLink to={`/Datasets/${ds.id}/Edit/${specificationId}`}>{ds.name}</TextLink>
                   )}
                   <div className="govuk-!-margin-top-2">
                     <details className="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
                       <summary className="govuk-details__summary">
-                        <span className="govuk-details__summary-text">Dataset Description</span>
+                        <span className="govuk-details__summary-text">Data set Description</span>
                       </summary>
                       <div className="govuk-details__text">{ds.relationshipDescription}</div>
                     </details>

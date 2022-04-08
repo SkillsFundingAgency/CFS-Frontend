@@ -3,17 +3,14 @@ import { AxiosError } from "axios";
 import React from "react";
 import * as ReactQuery from "react-query";
 import { UseQueryResult } from "react-query/types/react/types";
-import * as redux from "react-redux";
 import { MemoryRouter, Route, Switch } from "react-router";
 
-import { IStoreState } from "../../../reducers/rootReducer";
-import { FeatureFlagsState } from "../../../states/FeatureFlagsState";
 import { DatasetRelationship } from "../../../types/DatasetRelationship";
 import { DatasetRelationshipType } from "../../../types/Datasets/DatasetRelationshipType";
-import { FundingStreamPermissions } from "../../../types/FundingStreamPermissions";
-import { JobMonitoringFilter } from "../../../types/Jobs/JobMonitoringFilter";
 import { QueryClientProviderTestWrapper } from "../../Hooks/QueryClientProviderTestWrapper";
+import { featureFlagsTestUtils } from "../../testing-utils";
 
+const { setupFeatureFlags } = featureFlagsTestUtils();
 const renderDatasets = async () => {
   const { Datasets } = require("../../../components/Specifications/Datasets");
   const page = render(
@@ -29,7 +26,7 @@ const renderDatasets = async () => {
   );
 
   await waitFor(() => {
-    expect(screen.getByText("Loading datasets")).not.toBeVisible();
+    expect(screen.getByText("Loading data sets")).not.toBeVisible();
   });
 
   return page;
@@ -43,16 +40,7 @@ afterEach(cleanup);
 
 describe("<Datasets /> ", () => {
   beforeEach(async () => {
-    hasReduxState({
-      featureFlags: {
-        specToSpec: false,
-        profilingPatternVisible: false,
-        enableReactQueryDevTool: false,
-        releaseTimetableVisible: false,
-        templateBuilderVisible: false,
-        enableNewFundingManagement: false,
-      },
-    });
+    setupFeatureFlags({ specToSpec: false });
     await renderDatasets();
   });
 
@@ -87,36 +75,8 @@ describe("<Datasets /> ", () => {
   });
 });
 
-const useSelectorSpy = jest.spyOn(redux, "useSelector");
-const hasReduxState = (mocks: {
-  permissions?: FundingStreamPermissions[];
-  jobMonitorFilter?: JobMonitoringFilter;
-  featureFlags?: FeatureFlagsState;
-}) => {
-  const state: IStoreState = {
-    featureFlags: mocks.featureFlags ?? {
-      templateBuilderVisible: false,
-      releaseTimetableVisible: false,
-      enableReactQueryDevTool: false,
-      specToSpec: false,
-      profilingPatternVisible: undefined,
-      enableNewFundingManagement: false,
-    },
-    fundingSearchSelection: { searchCriteria: undefined, selectedProviderIds: [] },
-    userState: {
-      isLoggedIn: true,
-      userName: "test-user",
-      hasConfirmedSkills: true,
-      fundingStreamPermissions: mocks.permissions ?? [],
-    },
-    jobObserverState: { jobFilter: mocks.jobMonitorFilter },
-  };
-  useSelectorSpy.mockImplementation((callback) => {
-    return callback(state);
-  });
-};
+// TODO: refactor to use testing-utils custom hook test helper
 const useQuerySpy = jest.spyOn(ReactQuery, "useQuery");
-
 const hasDatasets = () => {
   useQuerySpy.mockReturnValue({
     data: [
