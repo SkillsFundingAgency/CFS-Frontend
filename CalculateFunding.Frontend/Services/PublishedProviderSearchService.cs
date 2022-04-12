@@ -128,16 +128,23 @@ namespace CalculateFunding.Frontend.Services
 
                 foreach (ProviderFundingStreamStatusResponse providerStats in providerStatusCounts.Content)
                 {
-                    if (isBatchModeEnabled && providerStats.ProviderApprovedCount > 0)
+                    if (isBatchModeEnabled && (providerStats.ProviderApprovedCount > 0 || providerStats.ProviderReleasedCount > 0))
                     {
                         result.CanPublish = true;
                     }
-                    
+
+                    if (providerStats.ProviderDraftCount == 0 &&
+                        (providerStats.ProviderApprovedCount > 0 || providerStats.ProviderReleasedCount > 0) &&
+                        providerStats.ProviderUpdatedCount == 0)
+                    {
+                        result.CanPublish = true;
+                    }
+
+                    // this is not required when RM feature has been enabled
                     if (providerStats.ProviderDraftCount == 0 &&
                         providerStats.ProviderApprovedCount > 0 &&
                         providerStats.ProviderUpdatedCount == 0)
                     {
-                        result.CanPublish = true;
                         result.TotalProvidersToPublish += providerStats.ProviderApprovedCount;
                     }
 
