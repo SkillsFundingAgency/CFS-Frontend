@@ -85,9 +85,14 @@ jobs:
         cd '${{ variables.projectFolder }}'
         Write-host "========================= Installing Yarn Packages  ========================="
         yarn install --silent
+      displayName: "Run yarn install"
+      condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
+
+    - powershell: |
+        cd '${{ variables.projectFolder }}'
         Write-host "========================= Audit packages  ========================="
         yarn install --audit
-      displayName: "Run yarn install"
+      displayName: "Audit packages"
       condition: and(succeeded(), ne(variables['SkipBuildReactApp'], 'true'))
 
     - powershell: |
