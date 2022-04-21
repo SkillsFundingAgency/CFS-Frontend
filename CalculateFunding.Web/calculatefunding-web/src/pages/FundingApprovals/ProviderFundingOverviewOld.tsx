@@ -142,7 +142,7 @@ export function ProviderFundingOverviewOld({ match }: RouteComponentProps<Provid
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Approvals"} />
         <Breadcrumb name={"Select specification"} url={"/Approvals/Select"} />
         <Breadcrumb

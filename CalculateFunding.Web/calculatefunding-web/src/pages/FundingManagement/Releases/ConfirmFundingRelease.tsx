@@ -112,7 +112,7 @@ export function ConfirmFundingRelease({
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
         <FundingSelectionBreadcrumb actionType={actionType} />
         <Breadcrumb

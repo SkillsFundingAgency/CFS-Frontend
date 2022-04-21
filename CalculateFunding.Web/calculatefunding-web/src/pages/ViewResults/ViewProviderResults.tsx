@@ -134,7 +134,7 @@ export function ViewProviderResults({
   return (
     <Main location={Section.Results}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View results"} url={"/Results"} />
         <Breadcrumb name={"Select funding stream"} url={"/ViewResults/ViewProvidersFundingStreamSelection"} />
       </Breadcrumbs>

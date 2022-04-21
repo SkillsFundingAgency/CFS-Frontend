@@ -170,7 +170,7 @@ export function EditDatasetReferencingReleased({
   return (
     <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
         <Breadcrumb
           name={relationshipMetadata ? relationshipMetadata.currentSpecificationName : "Specification"}

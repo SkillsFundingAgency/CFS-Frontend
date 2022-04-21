@@ -128,7 +128,7 @@ export const ListVersions = () => {
   return (
     <Main location={Section.Templates}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate Funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Templates"} url={"/Templates/List"} />
         <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`} />
       </Breadcrumbs>

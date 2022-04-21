@@ -182,7 +182,7 @@ export function CompareCalculationVersions({
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />

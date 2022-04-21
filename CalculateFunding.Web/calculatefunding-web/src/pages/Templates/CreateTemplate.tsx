@@ -170,7 +170,7 @@ export const CreateTemplate = () => {
   return (
     <Main location={Section.Templates}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate Funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Templates"} url={"/Templates/List"} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={isLoading} />

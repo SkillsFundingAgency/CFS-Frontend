@@ -74,7 +74,7 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
     <Main location={Section.FundingManagement}>
       {!isLoadingFundingConfiguration && !isLoadingSpecification && (
         <Breadcrumbs>
-          <Breadcrumb name="Calculate funding" url="/" />
+          <Breadcrumb name="Home" url="/" />
           <Breadcrumb name="Funding management" url="/FundingManagement" />
           <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
           <Breadcrumb

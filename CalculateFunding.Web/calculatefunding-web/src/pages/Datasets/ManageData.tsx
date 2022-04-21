@@ -10,7 +10,7 @@ export function ManageData() {
   return (
     <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Home" url="/" />
       </Breadcrumbs>
       <nav aria-label="Data management" aria-describedby="title-caption">
         <Title title="Manage data" titleCaption="Upload new or updated data source files" />

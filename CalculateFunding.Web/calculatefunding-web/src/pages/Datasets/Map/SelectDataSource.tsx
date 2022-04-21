@@ -254,7 +254,7 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
   return (
     <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
         <Breadcrumb
           name={"Map data source files to datasets for a specification"}

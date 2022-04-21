@@ -587,14 +587,14 @@ export function EditTemplate() {
     <Main location={Section.Templates}>
       {!version && (
         <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
+          <Breadcrumb name="Home" url="/" />
           <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid="template-listing-link" />
           <Breadcrumb name={template ? template.name : ""} />
         </Breadcrumbs>
       )}
       {version && (
         <Breadcrumbs>
-          <Breadcrumb name={"Calculate funding"} url={"/"} />
+          <Breadcrumb name="Home" url="/" />
           <Breadcrumb name={"Templates"} url={"/Templates/List"} data-testid="template-listing-link" />
           <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`} />
           <Breadcrumb name={"Versions"} url={`/Templates/${templateId}/Versions`} />

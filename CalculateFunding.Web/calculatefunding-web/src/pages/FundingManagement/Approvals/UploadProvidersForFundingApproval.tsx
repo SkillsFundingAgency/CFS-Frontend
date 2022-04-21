@@ -191,7 +191,7 @@ export function UploadProvidersForFundingApproval({ match }: RouteComponentProps
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Funding management" url="/FundingManagement" />
         <FundingSelectionBreadcrumb actionType={FundingActionType.Approve} />
         <Breadcrumb name={currentPage.title} />

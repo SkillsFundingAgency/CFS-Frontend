@@ -36,7 +36,7 @@ describe("<DownloadDataSchema />", () => {
         <DownloadDataSchema />
       </MemoryRouter>
     );
-    expect(wrapper.find("Breadcrumb").at(0).text()).toBe("Calculate funding");
+    expect(wrapper.find("Breadcrumb").at(0).text()).toBe("Home");
   });
 
   it("will have the correct <Breadcrumb /> for Manage data", () => {

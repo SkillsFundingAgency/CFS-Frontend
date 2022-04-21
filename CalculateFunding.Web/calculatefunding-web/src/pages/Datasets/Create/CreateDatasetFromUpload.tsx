@@ -198,7 +198,7 @@ export function CreateDatasetFromUpload({
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
         <Breadcrumb
           name={specification ? specification.name : "specification"}

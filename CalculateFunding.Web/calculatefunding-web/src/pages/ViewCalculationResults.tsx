@@ -274,7 +274,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   return (
     <Main location={Section.Results}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View results"} url={"/results"} />
         <Breadcrumb name={"Select specification"} url={"/SelectSpecification"} />
       </Breadcrumbs>

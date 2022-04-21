@@ -364,7 +364,7 @@ export function CreateSpecification(): JSX.Element {
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
         <Breadcrumb name={"Create specification"} />
       </Breadcrumbs>

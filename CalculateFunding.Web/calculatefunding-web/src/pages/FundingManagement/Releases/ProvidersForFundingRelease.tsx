@@ -308,7 +308,7 @@ export const ProvidersForFundingRelease = ({
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Funding management" url={"/FundingManagement"} />
         <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
         <Breadcrumb name={specification?.fundingStreams[0].name ?? ""} />

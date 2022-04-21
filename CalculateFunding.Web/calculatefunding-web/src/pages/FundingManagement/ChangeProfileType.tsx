@@ -284,7 +284,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Funding Management" url="/FundingManagement" />
         <FundingSelectionBreadcrumb actionType={actionType} />
         <FundingResultsBreadcrumb

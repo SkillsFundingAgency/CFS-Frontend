@@ -296,7 +296,7 @@ export function SelectReferenceSpecification({
   return (
     <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
         <Breadcrumb name={forSpec ? forSpec.name : "Specification"} url={`/ViewSpecification/${forSpecId}`} />
       </Breadcrumbs>

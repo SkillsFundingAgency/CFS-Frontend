@@ -241,7 +241,7 @@ describe("<ViewProvidersByFundingStream /> ", () => {
     const { container } = renderComponent();
     await waitFor(() =>
       expect(container.querySelectorAll(".govuk-breadcrumbs__list-item")[0].textContent).toBe(
-        "Calculate funding"
+        "Home"
       )
     );
   });

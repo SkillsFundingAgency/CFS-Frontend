@@ -77,7 +77,7 @@ export function CalculationVersionHistory({ match }: RouteComponentProps<Calcula
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Specifications"} url={"/SpecificationsList"} />
         {specification && (
           <Breadcrumb name={specification.name} url={`/ViewSpecification/${specification.id}`} />

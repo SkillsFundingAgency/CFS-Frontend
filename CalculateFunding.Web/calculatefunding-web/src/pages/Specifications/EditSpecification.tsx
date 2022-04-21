@@ -389,7 +389,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
       </Breadcrumbs>
       <PermissionStatus

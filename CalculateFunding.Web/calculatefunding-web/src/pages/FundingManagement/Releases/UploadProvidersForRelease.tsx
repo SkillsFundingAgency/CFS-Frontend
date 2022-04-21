@@ -219,7 +219,7 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url="/" />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Funding management" url="/FundingManagement" />
         <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
         <Breadcrumb name={currentPage.title} />

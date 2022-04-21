@@ -69,7 +69,7 @@ export function SelectSpecificationForFundingRelease(): JSX.Element {
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
         <Breadcrumb name={"Release management"} />
       </Breadcrumbs>

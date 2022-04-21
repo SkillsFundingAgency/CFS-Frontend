@@ -45,7 +45,7 @@ export function ViewProvidersFundingStreamSelection() {
   return (
     <Main location={Section.Results}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View results"} url={"/results"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />

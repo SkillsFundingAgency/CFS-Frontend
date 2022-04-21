@@ -135,7 +135,7 @@ export function ConfirmDatasetToEdit({
   return (
     <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name="Calculate funding" url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Specifications" url="/SpecificationsList" />
         <Breadcrumb
           name={settings?.relationshipMetadata?.currentSpecificationName || "Specification"}

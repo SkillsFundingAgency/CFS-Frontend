@@ -88,7 +88,7 @@ describe("<SpecificationsList />", () => {
         const items = getAllByRole("listitem");
 
         expect(items.length).toBe(1);
-        expect(items[0]).toHaveTextContent(/Calculate funding/i);
+        expect(items[0]).toHaveTextContent(/Home/i);
     });
 
     it("renders the correct heading", async () => {

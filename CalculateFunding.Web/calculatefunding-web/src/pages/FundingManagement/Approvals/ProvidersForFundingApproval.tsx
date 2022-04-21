@@ -381,7 +381,7 @@ export const ProvidersForFundingApproval = ({
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Funding management"} url={"/FundingManagement"} />
         <FundingSelectionBreadcrumb actionType={FundingActionType.Approve} />
         <Breadcrumb name={specification?.fundingStreams[0].name ?? ""} />

@@ -103,7 +103,7 @@ export function ViewSpecification({ match }: RouteComponentProps<ViewSpecificati
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
       </Breadcrumbs>
       <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />

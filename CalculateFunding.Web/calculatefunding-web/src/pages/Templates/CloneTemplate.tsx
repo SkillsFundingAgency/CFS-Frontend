@@ -183,7 +183,7 @@ export const CloneTemplate = () => {
   return (
     <Main location={Section.Templates}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate Funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Templates"} url={"/Templates/List"} />
         <Breadcrumb
           name={isLoading ? "Loading..." : templateToClone ? templateToClone.name : "Template"}

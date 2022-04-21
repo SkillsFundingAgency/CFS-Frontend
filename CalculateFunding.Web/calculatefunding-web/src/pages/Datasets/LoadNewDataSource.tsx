@@ -546,7 +546,7 @@ export function LoadNewDataSource() {
   return (
     <Main location={Section.Datasets}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Manage data"} url={"/Datasets/ManageData"} />
         <Breadcrumb name={"Manage data source files"} url={"/Datasets/ManageDataSourceFiles"} />
       </Breadcrumbs>

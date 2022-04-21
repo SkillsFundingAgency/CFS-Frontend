@@ -68,7 +68,7 @@ export function FundingApprovalSelection() {
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"Approvals"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />

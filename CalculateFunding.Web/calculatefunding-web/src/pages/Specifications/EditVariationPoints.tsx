@@ -164,7 +164,7 @@ export function EditVariationPoints({ match }: RouteComponentProps<EditVariation
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name={"Calculate funding"} url={"/"} />
+        <Breadcrumb name="Home" url="/" />
         <Breadcrumb name={"View specifications"} url={"/SpecificationsList"} />
         <Breadcrumb
           name={specification ? specification.name : ""}
