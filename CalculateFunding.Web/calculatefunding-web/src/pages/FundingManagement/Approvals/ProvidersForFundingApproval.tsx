@@ -104,6 +104,7 @@ export const ProvidersForFundingApproval = ({
       jobNotifications
         .filter(
           (n) =>
+            n.latestJob?.jobType === JobType.ProviderSnapshotDataLoadJob ||
             n.latestJob?.jobType === JobType.RefreshFundingJob ||
             n.latestJob?.jobType === JobType.ApproveAllProviderFundingJob ||
             n.latestJob?.jobType === JobType.ApproveBatchProviderFundingJob ||
@@ -178,6 +179,7 @@ export const ProvidersForFundingApproval = ({
       JobType.ReleaseProvidersToChannelsJob,
       JobType.ReIndexPublishedProvidersJob,
     ]);
+    addJobTypeSubscription([JobType.ProviderSnapshotDataLoadJob]);
     addJobTypeSubscription([
       JobType.CreateInstructAllocationJob,
       JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
@@ -427,6 +429,19 @@ export const ProvidersForFundingApproval = ({
                 showSuccessful: false,
                 activeDescription: "Calculation run in progress",
                 failDescription: "Calculation run failed",
+              },
+            ]}
+          />
+          <JobNotificationSection
+            jobNotifications={jobNotifications}
+            showOnlyMostRecent={true}
+            notificationSettings={[
+              {
+                jobTypes: [JobType.ProviderSnapshotDataLoadJob],
+                showActive: false,
+                showFailed: true,
+                showSuccessful: false,
+                failDescription: "Provider version loading failed",
               },
             ]}
           />
