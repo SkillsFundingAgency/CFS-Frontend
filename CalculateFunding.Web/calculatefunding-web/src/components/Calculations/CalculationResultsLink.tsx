@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { getCalculationProvidersService } from "../../services/calculationService";
-import { CalculationProviderResultList } from "../../types/CalculationProviderResult";
+import { searchCalculationProviders } from "../../services/calculationService";
+import { CalculationProviderSearchResponse } from "../../types/CalculationProviderResult";
 import { SearchMode } from "../../types/SearchMode";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 
 export function CalculationResultsLink(props: { calculationId: string }) {
-  const [calculationProvidersResult, setCalculationProvidersResult] = useState<CalculationProviderResultList>(
-    {
+  const [calculationProvidersResult, setCalculationProvidersResult] =
+    useState<CalculationProviderSearchResponse>({
       calculationProviderResults: [],
       currentPage: 0,
       endItemNumber: 0,
@@ -24,14 +24,13 @@ export function CalculationResultsLink(props: { calculationId: string }) {
       startItemNumber: 0,
       totalErrorResults: 0,
       totalResults: -1,
-    }
-  );
+    });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (props.calculationId !== "") {
-      getCalculationProvidersService({
-        calculationValueType: "",
+      searchCalculationProviders({
+        calculationValueType: undefined,
         errorToggle: "",
         facetCount: 0,
         includeFacets: false,
@@ -47,7 +46,9 @@ export function CalculationResultsLink(props: { calculationId: string }) {
         searchFields: [],
       })
         .then((calculationProvidersResponse) => {
-          setCalculationProvidersResult(calculationProvidersResponse.data as CalculationProviderResultList);
+          setCalculationProvidersResult(
+            calculationProvidersResponse.data as CalculationProviderSearchResponse
+          );
           setIsLoading(false);
         })
         .catch(() => {

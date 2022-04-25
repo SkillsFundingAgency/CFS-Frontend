@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 
 import { CalculationDetails, CalculationSummary } from "../types/CalculationDetails";
-import { CalculationProviderResultList } from "../types/CalculationProviderResult";
-import { CalculationProviderSearchRequestViewModel } from "../types/calculationProviderSearchRequestViewModel";
+import { CalculationProviderSearchResponse } from "../types/CalculationProviderResult";
+import { CalculationProviderSearchRequest } from "../types/calculationProviderSearchRequest";
 import { AdditionalCalculationSearchResultViewModel } from "../types/Calculations/AdditionalCalculation";
 import {
   CalculationCompilePreviewResponse,
@@ -86,13 +86,13 @@ export async function getCalculationSummaryBySpecificationId(
   );
 }
 
-export async function getCalculationProvidersService(
-  calculationProviderSearchRequestViewModel: CalculationProviderSearchRequestViewModel
-): Promise<AxiosResponse<CalculationProviderResultList>> {
-  return axios("/api/results/calculationproviderresultssearch", {
+export async function searchCalculationProviders(
+  searchRequest: CalculationProviderSearchRequest
+): Promise<AxiosResponse<CalculationProviderSearchResponse>> {
+  return axios("/api/results/calculationProviderResultsSearch", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    data: calculationProviderSearchRequestViewModel,
+    data: searchRequest,
   });
 }
 

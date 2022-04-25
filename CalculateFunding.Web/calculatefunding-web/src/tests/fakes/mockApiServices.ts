@@ -93,6 +93,16 @@ const makeRefreshSpecSpy = (): JestSpy => {
   return spy;
 };
 
+const makeCalcProviderSearchSpy = (): JestSpy => {
+  const spy: jest.SpyInstance<Promise<unknown>> = jest.spyOn(
+    calculationService,
+    "searchCalculationProviders"
+  );
+  spy.mockResolvedValue(fakeAxiosResponse.successWithoutResult());
+
+  return spy;
+};
+
 const makeUpdateSpecSpy = (): JestSpy => {
   const updateSpecSpy: jest.SpyInstance<Promise<unknown>> = jest.spyOn(
     specificationService,
@@ -122,5 +132,6 @@ export const mockApiService = {
   makeProfilePatternsSpy,
   makeUpdateSpecSpy,
   makeRefreshSpecSpy,
+  makeCalcProviderSearchSpy,
   makeApproveAllCalcsSpy,
 };

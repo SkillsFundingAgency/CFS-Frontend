@@ -131,6 +131,7 @@ const mockRoute: match<CalculationVersionHistoryRoute> = {
 const mockCalculation = () =>
   jest.spyOn(calcHook, "useCalculation").mockImplementation(() => ({
     calculation: testCalc,
+    specificationId: testCalc.specificationId,
     isLoadingCalculation: false,
   }));
 const mockSpecResult: SpecificationSummaryQueryResult = {

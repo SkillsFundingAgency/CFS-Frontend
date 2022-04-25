@@ -1,6 +1,7 @@
 ﻿import { SearchMode } from "./SearchMode";
+import { ValueType } from "./ValueType";
 
-export interface CalculationProviderSearchRequestViewModel {
+export interface CalculationProviderSearchRequest {
   pageNumber: number;
   searchTerm: string;
   errorToggle: string;
@@ -12,7 +13,7 @@ export interface CalculationProviderSearchRequestViewModel {
   pageSize: number;
   facetCount: number;
   searchMode: SearchMode;
-  calculationValueType: string;
+  calculationValueType: ValueType | undefined;
   calculationId: string;
   searchFields: string[];
 }

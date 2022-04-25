@@ -1,5 +1,6 @@
+import { debounce } from "lodash";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
@@ -15,15 +16,18 @@ import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
 import { Pagination } from "../components/Pagination";
 import { TagTypes } from "../components/Tag";
 import { TextLink } from "../components/TextLink";
+import { extractJobsFromNotifications, isActiveJob } from "../helpers/jobDetailsHelper";
 import { useCalculation } from "../hooks/Calculations/useCalculation";
+import { useCalculationProviderSearch } from "../hooks/Calculations/useCalculationProviderSearch";
 import { useJobSubscription } from "../hooks/Jobs/useJobSubscription";
 import { useErrors } from "../hooks/useErrors";
 import { useSpecificationSummary } from "../hooks/useSpecificationSummary";
-import { getCalculationProvidersService } from "../services/calculationService";
-import { CalculationProviderResultList } from "../types/CalculationProviderResult";
-import { CalculationProviderSearchRequestViewModel } from "../types/calculationProviderSearchRequestViewModel";
+import { CalculationProviderSearchResponse } from "../types/CalculationProviderResult";
+import { CalculationProviderSearchRequest } from "../types/calculationProviderSearchRequest";
 import { FacetValue } from "../types/Facet";
+import { JobDetails } from "../types/jobDetails";
 import { JobType } from "../types/jobType";
+import { PublishedProviderSearchFacet } from "../types/publishedProviderSearchRequest";
 import { SearchMode } from "../types/SearchMode";
 import { Section } from "../types/Sections";
 import { FundingStream } from "../types/viewFundingTypes";
@@ -33,13 +37,11 @@ export interface ViewCalculationResultsRoute {
 }
 
 export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalculationResultsRoute>) {
+  const { calculationId } = match.params;
   document.title = "Calculation Results - Calculate funding";
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [singleFire, setSingleFire] = useState(false);
   const [autoExpand, setAutoExpand] = useState(false);
-  const [filterProviderTypes, setProviderTypes] = useState<FacetValue[]>([]);
-  const [filterProviderSubTypes, setProviderSubTypes] = useState<FacetValue[]>([]);
-  const [filterResultsStatus] = useState([
+  const runningJobs = useRef<JobDetails[]>([]);
+  const filterResultsStatus = [
     {
       name: "With exceptions",
       selected: false,
@@ -48,12 +50,9 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
       name: "Without exceptions",
       selected: false,
     },
-  ]);
-  const [filterLocalAuthority, setLocalAuthority] = useState<FacetValue[]>([]);
-  const calculationId = match.params.calculationId;
-  const [specificationId, setSpecificationId] = useState<string>("");
+  ];
   const { errors, addErrorMessage, addError } = useErrors();
-  const { calculation } = useCalculation(calculationId, (err) =>
+  const { calculation, specificationId } = useCalculation(calculationId, (err) =>
     addErrorMessage(err.message, "Error while loading calculation")
   );
   const { specification } = useSpecificationSummary(specificationId, (err) =>
@@ -74,48 +73,53 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     onError: (err) =>
       addError({ error: err, description: "An error occurred while monitoring background jobs" }),
   });
-  const [initialSearch, setInitialSearch] = useState<CalculationProviderSearchRequestViewModel>({
-    calculationValueType: "",
-    errorToggle: "",
-    facetCount: 0,
-    includeFacets: true,
-    localAuthority: [],
-    pageNumber: 1,
-    pageSize: 50,
-    providerSubType: [],
-    providerType: [],
-    resultsStatus: [],
-    searchMode: SearchMode.All,
-    searchTerm: "",
-    calculationId: "",
-    searchFields: [],
-  });
+
   const [calculationProviderSearchRequest, setCalculationProviderSearchRequest] =
-    useState<CalculationProviderSearchRequestViewModel>(initialSearch);
+    useState<CalculationProviderSearchRequest>({
+      calculationValueType: undefined,
+      errorToggle: "",
+      facetCount: 0,
+      includeFacets: true,
+      localAuthority: [],
+      pageNumber: 1,
+      pageSize: 50,
+      providerSubType: [],
+      providerType: [],
+      resultsStatus: [],
+      searchMode: SearchMode.All,
+      searchTerm: "",
+      calculationId: "",
+      searchFields: [],
+    });
   const fundingStream: FundingStream = {
     name: "",
     id: "",
   };
-  const [providers, setProviders] = useState<CalculationProviderResultList>({
-    calculationProviderResults: [],
-    currentPage: 0,
-    endItemNumber: 0,
-    facets: [],
-    pagerState: {
-      currentPage: 0,
-      displayNumberOfPages: 0,
-      lastPage: 0,
-      nextPage: 0,
-      pages: [],
-      previousPage: 0,
-    },
-    startItemNumber: 0,
-    totalErrorResults: 0,
-    totalResults: 0,
-  });
+
+  const {
+    calculationProvidersData: providers,
+    isLoadingCalculationProviders,
+    refetchCalculationProviders,
+  } = useCalculationProviderSearch(calculationProviderSearchRequest);
+
+  const { providerTypes, providerSubTypes, localAuthorities } = useMemo(() => {
+    const getFacetValues = (
+      data: CalculationProviderSearchResponse,
+      facetKey: PublishedProviderSearchFacet
+    ): FacetValue[] => data.facets.find((f) => f.name === facetKey)?.facetValues ?? [];
+
+    return {
+      providerTypes: !providers ? [] : getFacetValues(providers, PublishedProviderSearchFacet.ProviderType),
+      providerSubTypes: !providers
+        ? []
+        : getFacetValues(providers, PublishedProviderSearchFacet.ProviderSubType),
+      localAuthorities: !providers
+        ? []
+        : getFacetValues(providers, PublishedProviderSearchFacet.LocalAuthority),
+    };
+  }, [providers]);
 
   function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
-    setIsLoading(true);
     const filterUpdate = calculationProviderSearchRequest.providerType;
     if (e.target.checked) {
       filterUpdate.push(e.target.value);
@@ -129,7 +133,6 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   }
 
   function filterByProviderSubTypes(e: React.ChangeEvent<HTMLInputElement>) {
-    setIsLoading(true);
     const filterUpdate = calculationProviderSearchRequest.providerSubType;
     if (e.target.checked) {
       filterUpdate.push(e.target.value);
@@ -143,7 +146,6 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   }
 
   function filterByResultStatus(e: React.ChangeEvent<HTMLInputElement>) {
-    setIsLoading(true);
     let filterUpdate = calculationProviderSearchRequest.errorToggle;
 
     if (e.target.value === "With exceptions") {
@@ -155,13 +157,9 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     setCalculationProviderSearchRequest((prevState) => {
       return { ...prevState, errorToggle: filterUpdate, pageNumber: 1 };
     });
-
-    const request = calculationProviderSearchRequest;
-    request.errorToggle = filterUpdate;
   }
 
   function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
-    setIsLoading(true);
     const filterUpdate = calculationProviderSearchRequest.localAuthority;
 
     if (e.target.checked) {
@@ -177,8 +175,6 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
 
   function filterBySearchTerm(searchField: string, searchTerm: string) {
     if (searchTerm.length === 0 || searchTerm.length > 2) {
-      setIsLoading(true);
-
       const searchFields: string[] = [];
       if (searchField != null && searchField !== "") {
         searchFields.push(searchField);
@@ -189,9 +185,9 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
       });
     }
   }
+  const debounceFilterBySearchTerm = useRef(debounce(filterBySearchTerm, 500)).current;
 
   function clearFilters() {
-    setIsLoading(true);
     setCalculationProviderSearchRequest((prevState) => {
       return {
         ...prevState,
@@ -209,24 +205,9 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   }
 
   function setPagination(e: number) {
-    const request = calculationProviderSearchRequest;
-    request.pageNumber = e;
     setCalculationProviderSearchRequest((prevState) => {
       return { ...prevState, pageNumber: e };
     });
-  }
-
-  function getCalculationResults(searchRequestViewModel: CalculationProviderSearchRequestViewModel) {
-    getCalculationProvidersService(searchRequestViewModel)
-      .then((response) => {
-        setProviders(response.data);
-        if (!singleFire && response.data.totalResults > 0) {
-          setSingleFire(true);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
   }
 
   useEffect(() => {
@@ -235,14 +216,13 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
 
   useEffect(() => {
     if (calculation) {
-      setSpecificationId(calculation.specificationId);
-      const searchParams = {
-        ...initialSearch,
-        calculationValueType: calculation.valueType,
-        calculationId: calculation.id,
-      };
-      setInitialSearch(searchParams);
-      setCalculationProviderSearchRequest(searchParams);
+      setCalculationProviderSearchRequest((prevState) => {
+        return {
+          ...prevState,
+          calculationValueType: calculation.valueType,
+          calculationId: calculationId,
+        };
+      });
       addSub({
         filterBy: {
           specificationId: calculation.specificationId,
@@ -255,21 +235,16 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   }, [calculation]);
 
   useEffect(() => {
-    if (providers.facets.length > 0) {
-      setProviderTypes(providers.facets[5].facetValues);
-      setProviderSubTypes(providers.facets[6].facetValues);
-      setLocalAuthority(providers.facets[8].facetValues);
-    }
-  }, [singleFire]);
+    if (!jobNotifications?.length) return;
 
-  useEffect(() => {
-    if (
-      calculationProviderSearchRequest.calculationId != null &&
-      calculationProviderSearchRequest.calculationId !== ""
-    ) {
-      getCalculationResults(calculationProviderSearchRequest);
+    const activeJobs = extractJobsFromNotifications(jobNotifications).filter(isActiveJob);
+
+    // let's refresh data if any job has just completed
+    if (runningJobs.current.length > activeJobs.length) {
+      refetchCalculationProviders();
     }
-  }, [calculationProviderSearchRequest]);
+    runningJobs.current = activeJobs;
+  }, [jobNotifications]);
 
   return (
     <Main location={Section.Results}>
@@ -279,7 +254,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
         <Breadcrumb name={"Select specification"} url={"/SelectSpecification"} />
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
-      {specificationId.length > 0 && (
+      {!!specificationId?.length && (
         <JobNotificationSection
           jobNotifications={jobNotifications}
           notificationSettings={[
@@ -322,7 +297,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
             <CollapsiblePanel title={"Search"} isExpanded={true}>
               <fieldset className="govuk-fieldset">
                 <span className="govuk-hint sidebar-search-span">Select one option.</span>
-                <CollapsibleSearchBox searchTerm={""} callback={filterBySearchTerm} />
+                <CollapsibleSearchBox searchTerm={""} callback={debounceFilterBySearchTerm} />
               </fieldset>
             </CollapsiblePanel>
             <CollapsiblePanel
@@ -334,21 +309,21 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
             >
               <fieldset className="govuk-fieldset">
                 <div className="govuk-checkboxes">
-                  {filterProviderTypes.map((pt, index) => (
-                    <div className="govuk-checkboxes__item" key={index}>
+                  {providerTypes.map((providerType) => (
+                    <div className="govuk-checkboxes__item" key={providerType.name}>
                       <input
                         className="govuk-checkboxes__input"
-                        id={`providerTypes-${pt.name}`}
-                        name={`providerTypes-${pt.name}`}
+                        id={`providerTypes-${providerType.name}`}
+                        name={`providerTypes-${providerType.name}`}
                         type="checkbox"
-                        value={pt.name}
+                        value={providerType.name}
                         onChange={filterByProviderTypes}
                       />
                       <label
                         className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`providerTypes-${pt.name}`}
+                        htmlFor={`providerTypes-${providerType.name}`}
                       >
-                        {pt.name}
+                        {providerType.name}
                       </label>
                     </div>
                   ))}
@@ -364,46 +339,49 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
             >
               <fieldset className="govuk-fieldset">
                 <div className="govuk-checkboxes">
-                  {filterProviderSubTypes.map((pt, index) => (
-                    <div className="govuk-checkboxes__item" key={index}>
-                      <input
-                        className="govuk-checkboxes__input"
-                        id={`providerSubTypes-${pt.name}`}
-                        name={`providerSubTypes-${pt.name}`}
-                        type="checkbox"
-                        value={pt.name}
-                        onChange={filterByProviderSubTypes}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`providerSubTypes-${pt.name}`}
-                      >
-                        {pt.name}
-                      </label>
-                    </div>
-                  ))}
+                  {providerSubTypes.map((providerSubType) => {
+                    const key = `providerSubTypes-${providerSubType.name}`;
+                    return (
+                      <div className="govuk-checkboxes__item" key={key}>
+                        <input
+                          className="govuk-checkboxes__input"
+                          id={key}
+                          name={key}
+                          type="checkbox"
+                          value={providerSubType.name}
+                          onChange={filterByProviderSubTypes}
+                        />
+                        <label className="govuk-label govuk-checkboxes__label" htmlFor={key}>
+                          {providerSubType.name}
+                        </label>
+                      </div>
+                    );
+                  })}
                 </div>
               </fieldset>
             </CollapsiblePanel>
             <CollapsiblePanel title="Filter by results status" isExpanded={true} isCollapsible={true}>
               <fieldset className="govuk-fieldset">
                 <div className="govuk-radios">
-                  {filterResultsStatus.map((pt, index) => (
-                    <div key={index} className="govuk-radios__item">
-                      <input
-                        className="govuk-radios__input"
-                        id={`resultsStatus-${pt.name}`}
-                        name="resultsStatus"
-                        type="radio"
-                        value={pt.name}
-                        defaultChecked={pt.name === "Without exceptions"}
-                        onChange={filterByResultStatus}
-                      />
-                      <label className="govuk-label govuk-radios__label" htmlFor="resultsStatus">
-                        {pt.name}
-                      </label>
-                    </div>
-                  ))}
+                  {filterResultsStatus.map((status) => {
+                    const key = `resultsStatus-${status.name}`;
+                    return (
+                      <div key={key} className="govuk-radios__item">
+                        <input
+                          className="govuk-radios__input"
+                          id={key}
+                          name={key}
+                          type="radio"
+                          value={status.name}
+                          defaultChecked={status.name === "Without exceptions"}
+                          onChange={filterByResultStatus}
+                        />
+                        <label className="govuk-label govuk-radios__label" htmlFor={key}>
+                          {status.name}
+                        </label>
+                      </div>
+                    );
+                  })}
                 </div>
               </fieldset>
             </CollapsiblePanel>
@@ -416,28 +394,28 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
             >
               <fieldset className="govuk-fieldset">
                 <div className="govuk-checkboxes">
-                  {filterLocalAuthority.map((pt, index) => (
+                  {localAuthorities.map((localAuthority, index) => (
                     <div className="govuk-checkboxes__item" key={index}>
                       <input
                         className="govuk-checkboxes__input"
-                        id={`localAuthorities-${pt.name}`}
+                        id={`localAuthorities-${localAuthority.name}`}
                         name="localAuthorities"
                         type="checkbox"
-                        value={pt.name}
+                        value={localAuthority.name}
                         onChange={filterByLocalAuthority}
                       />
                       <label
                         className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`localAuthorities-${pt.name}`}
+                        htmlFor={`localAuthorities-${localAuthority.name}`}
                       >
-                        {pt.name}
+                        {localAuthority.name}
                       </label>
                     </div>
                   ))}
                 </div>
               </fieldset>
             </CollapsiblePanel>
-            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
+            <button type="button" className="govuk-button" onClick={clearFilters}>
               Clear filters
             </button>
           </form>
@@ -446,79 +424,73 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
           <LoadingStatus
             title={"Updating search results"}
             description={"Please wait whilst search results are updated"}
-            hidden={!isLoading}
+            hidden={!isLoadingCalculationProviders}
           />
-          <div
-            className="govuk-accordion"
-            data-module="govuk-accordion"
-            id="accordion-default "
-            hidden={providers.totalResults === 0 || isLoading}
-          >
-            <div className="govuk-accordion__controls">
-              <button
-                type="button"
-                className="govuk-accordion__open-all"
-                onClick={() => setAutoExpand(!autoExpand)}
-              >
-                {autoExpand ? "Close" : "Open"} all
-                <span className="govuk-visually-hidden"> sections</span>
-              </button>
-            </div>
-            {providers.calculationProviderResults.map((cpr) => {
-              const value = cpr.calculationResultDisplay;
-              return (
-                <AccordionPanel
-                  id={cpr.id}
-                  expanded={false}
-                  title={cpr.providerName}
-                  subtitle={"Value:"}
-                  boldSubtitle={` ${value}`}
-                  tagVisible={cpr.isIndicativeProvider}
-                  tagText={"Indicative"}
-                  tagType={TagTypes.grey}
-                  key={cpr.id}
-                  autoExpand={autoExpand}
+          {!!providers?.totalResults && !isLoadingCalculationProviders && (
+            <div className="govuk-accordion" data-module="govuk-accordion" id="accordion-default">
+              <div className="govuk-accordion__controls">
+                <button
+                  type="button"
+                  className="govuk-accordion__open-all"
+                  onClick={() => setAutoExpand(!autoExpand)}
                 >
-                  <div
-                    id={"accordion-default-content-" + cpr.id}
-                    className="govuk-accordion__section-content"
+                  {autoExpand ? "Close" : "Open"} all
+                  <span className="govuk-visually-hidden"> sections</span>
+                </button>
+              </div>
+              {providers.calculationProviderResults.map((provider) => {
+                return (
+                  <AccordionPanel
+                    id={provider.id}
+                    expanded={false}
+                    title={provider.providerName}
+                    subtitle={"Value:"}
+                    boldSubtitle={` ${provider.calculationResultDisplay}`}
+                    tagVisible={provider.isIndicativeProvider}
+                    tagText={"Indicative"}
+                    tagType={TagTypes.grey}
+                    key={provider.id}
+                    autoExpand={autoExpand}
                   >
-                    {calculation && (
-                      <TextLink
-                        to={`/ViewResults/ViewProviderResults/${cpr.providerId}/${calculation.fundingStreamId}/?specificationId=${cpr.specificationId}`}
-                      >
-                        View provider calculations
-                      </TextLink>
-                    )}
-                    <dl className="govuk-summary-list govuk-!-margin-top-5">
-                      <div className="govuk-summary-list__row">
-                        <dt className="govuk-summary-list__key">Updated</dt>
-                        <dd className="govuk-summary-list__value">{cpr.lastUpdatedDateDisplay}</dd>
-                      </div>
-                      <div className="govuk-summary-list__row">
-                        <dt className="govuk-summary-list__key">UKPRN</dt>
-                        <dd className="govuk-summary-list__value">{cpr.ukprn}</dd>
-                      </div>
-                      <div className="govuk-summary-list__row">
-                        <dt className="govuk-summary-list__key">Provider type</dt>
-                        <dd className="govuk-summary-list__value">{cpr.providerType}</dd>
-                      </div>
-                      <div className="govuk-summary-list__row">
-                        <dt className="govuk-summary-list__key">Local authority</dt>
-                        <dd className="govuk-summary-list__value">{cpr.localAuthority}</dd>
-                      </div>
-                    </dl>
-                  </div>
-                </AccordionPanel>
-              );
-            })}
-          </div>
-          {providers.totalResults === 0 && singleFire && !isLoading ? (
-            <h2 className="govuk-heading-m">There are no results available</h2>
-          ) : (
-            ""
+                    <div
+                      id={"accordion-default-content-" + provider.id}
+                      className="govuk-accordion__section-content"
+                    >
+                      {calculation && (
+                        <TextLink
+                          to={`/ViewResults/ViewProviderResults/${provider.providerId}/${calculation.fundingStreamId}/?specificationId=${provider.specificationId}`}
+                        >
+                          View provider calculations
+                        </TextLink>
+                      )}
+                      <dl className="govuk-summary-list govuk-!-margin-top-5">
+                        <div className="govuk-summary-list__row">
+                          <dt className="govuk-summary-list__key">Updated</dt>
+                          <dd className="govuk-summary-list__value">{provider.lastUpdatedDateDisplay}</dd>
+                        </div>
+                        <div className="govuk-summary-list__row">
+                          <dt className="govuk-summary-list__key">UKPRN</dt>
+                          <dd className="govuk-summary-list__value">{provider.ukprn}</dd>
+                        </div>
+                        <div className="govuk-summary-list__row">
+                          <dt className="govuk-summary-list__key">Provider type</dt>
+                          <dd className="govuk-summary-list__value">{provider.providerType}</dd>
+                        </div>
+                        <div className="govuk-summary-list__row">
+                          <dt className="govuk-summary-list__key">Local authority</dt>
+                          <dd className="govuk-summary-list__value">{provider.localAuthority}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </AccordionPanel>
+                );
+              })}
+            </div>
           )}
-          {providers.totalResults > 0 && !isLoading && (
+          {!!providers && providers.totalResults === 0 && !isLoadingCalculationProviders && (
+            <h2 className="govuk-heading-m">There are no results available</h2>
+          )}
+          {!!providers?.totalResults && !isLoadingCalculationProviders && (
             <div className="govuk-grid-row">
               <div className="govuk-grid-column-two-thirds">
                 <Pagination

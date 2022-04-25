@@ -1,7 +1,7 @@
 import { Facet } from "./Facet";
 import { PagerState } from "./PagerState";
 
-export interface CalculationProviderResultList {
+export interface CalculationProviderSearchResponse {
   calculationProviderResults: CalculationProviderResult[];
   totalResults: number;
   totalErrorResults: number;

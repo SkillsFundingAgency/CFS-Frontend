@@ -16,7 +16,7 @@ export type SpecificationSummaryQueryResult = {
 };
 
 export const useSpecificationSummary = (
-  specificationId: string,
+  specificationId: string | undefined,
   onError?: (err: AxiosError) => void,
   staleTime = 0
 ): SpecificationSummaryQueryResult => {
@@ -33,7 +33,7 @@ export const useSpecificationSummary = (
   const { data, error, isFetching, isLoading, isError, isFetched } = useQuery<
     SpecificationSummary,
     AxiosError
-  >(key, async () => (await getSpecificationSummaryService(specificationId))?.data, config);
+  >(key, async () => (await getSpecificationSummaryService(specificationId as string))?.data, config);
 
   const clearSpecificationFromCache = async () => {
     await queryClient.invalidateQueries(key);

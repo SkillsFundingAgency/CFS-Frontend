@@ -6,6 +6,7 @@ import { CalculationDetails } from "../../types/CalculationDetails";
 
 export type CalculationQueryResult = {
   calculation: CalculationDetails | undefined;
+  specificationId: string | undefined;
   isLoadingCalculation: boolean;
 };
 
@@ -27,6 +28,7 @@ export const useCalculation = (
 
   return {
     calculation: data,
+    specificationId: data?.specificationId,
     isLoadingCalculation: isLoading,
   };
 };
