@@ -125,7 +125,7 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
 
   const redirectToFundingLineProfile = () => {
     history.push(
-      `/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${providerVersionId}/FundingLine/${fundingLineId}/edit`
+      `/FundingManagement/${actionType}/Provider/${providerId}/Specification/${specificationId}/Version/${providerVersionId}/FundingLine/${fundingLineId}/view`
     );
   };
 
