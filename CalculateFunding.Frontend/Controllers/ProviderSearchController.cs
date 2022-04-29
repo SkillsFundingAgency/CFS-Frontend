@@ -127,13 +127,19 @@ namespace CalculateFunding.Frontend.Controllers
 				});
             }
 
-            CalculationProviderResultSearchResultViewModel searchResults = await _calculationProviderResultsSearchService.PerformSearch(request);
+            CalculationProviderResultSearchResultViewModel results = await _calculationProviderResultsSearchService.PerformSearch(request);
 
-            CalculationProviderResultSearchResultViewModel result = searchResults;
+            SearchFacetViewModel localAuthorityFacets = results?.Facets?.Where(_ => _.Name == "localAuthority")
+                                            ?.FirstOrDefault();
 
-            if (result != null)
+            if(localAuthorityFacets != null)
             {
-                return Ok(result);
+                localAuthorityFacets.FacetValues = localAuthorityFacets.FacetValues.OrderBy(_ => _.Name);
+            }
+            
+            if (results != null)
+            {
+                return Ok(results);
             }
 
             return new InternalServerErrorResult($"Find provider results HTTP request failed");
