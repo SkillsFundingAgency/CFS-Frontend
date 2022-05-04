@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.FundingDataZone;
@@ -87,6 +88,14 @@ namespace CalculateFunding.Frontend.Controllers
                     StartItemNumber = startNumber,
                     EndItemNumber = endNumber
                 };
+
+                Facet localAuthorityFacets = searchPagedResult?.Facets?.Where(_ => _.Name == "authority")
+                                            ?.FirstOrDefault();
+
+                if (localAuthorityFacets != null)
+                {
+                    localAuthorityFacets.FacetValues = localAuthorityFacets.FacetValues.OrderBy(_ => _.Name);
+                }
 
                 return Ok(searchPagedResult);
             }
