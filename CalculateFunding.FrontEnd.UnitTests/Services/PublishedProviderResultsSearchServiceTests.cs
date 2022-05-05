@@ -67,7 +67,7 @@ namespace CalculateFunding.Frontend.UnitTests.Services
                 .Setup(x => x.GetProviderStatusCounts(It.IsAny<string>(), 
                     It.IsAny<string>(), 
                     It.IsAny<string>(), 
-                    It.IsAny<string>(),
+                    It.IsAny<IEnumerable<string>>(),
                     isIndicativeQueryFlag,
                     monthYearOpened))
                 .ReturnsAsync(new ApiResponse<IEnumerable<ProviderFundingStreamStatusResponse>>(HttpStatusCode.OK, new []

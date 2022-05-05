@@ -121,7 +121,7 @@ namespace CalculateFunding.Frontend.Services
                         result.Providers.First().SpecificationId,
                         providerTypes.FirstOrDefault(),
                         localAuthorities.FirstOrDefault(),
-                        fundingStatuses.FirstOrDefault(),
+                        fundingStatuses,
                         isIndicative,
                         monthYearOpened.FirstOrDefault()
                     );
