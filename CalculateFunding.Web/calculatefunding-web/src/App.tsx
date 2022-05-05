@@ -47,12 +47,12 @@ import { RunExportToSql } from "./pages/Datasets/SqlDataExport/RunExportToSql";
 import { SelectSpecificationForExport } from "./pages/Datasets/SqlDataExport/SelectSpecificationForExport";
 import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
 import { ChangeProfileTypeOld } from "./pages/FundingApprovals/ChangeProfileTypeOld";
-import { ConfirmFunding } from "./pages/FundingApprovals/ConfirmFunding";
-import { FundingApprovalSelection } from "./pages/FundingApprovals/FundingApprovalSelection";
+import { ConfirmFundingOld } from "./pages/FundingApprovals/ConfirmFundingOld";
+import { FundingApprovalSelectionOld } from "./pages/FundingApprovals/FundingApprovalSelectionOld";
 import { ProfileHistoryOld } from "./pages/FundingApprovals/ProfileHistoryOld";
 import { ProviderFundingOverviewOld } from "./pages/FundingApprovals/ProviderFundingOverviewOld";
-import { SpecificationFundingApproval } from "./pages/FundingApprovals/SpecificationFundingApproval";
-import { UploadBatch } from "./pages/FundingApprovals/UploadBatch";
+import { SpecificationFundingApprovalOld } from "./pages/FundingApprovals/SpecificationFundingApprovalOld";
+import { UploadBatchOld } from "./pages/FundingApprovals/UploadBatchOld";
 import { ViewEditFundingLineProfileOld } from "./pages/FundingApprovals/ViewEditFundingLineProfileOld";
 import { ConfirmApprovalOfFunding } from "./pages/FundingManagement/Approvals/ConfirmApprovalOfFunding";
 import { ProvidersForFundingApproval } from "./pages/FundingManagement/Approvals/ProvidersForFundingApproval";
@@ -310,19 +310,19 @@ const fundingManagementRoutes = (
 
 const oldFundingApprovalRoutes = (
   <Route path="/Approvals">
-    <Route path="/Approvals/Select" component={FundingApprovalSelection} />
-    <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelection} />
+    <Route path="/Approvals/Select" component={FundingApprovalSelectionOld} />
+    <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelectionOld} />
     <Route
       path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={SpecificationFundingApproval}
+      component={SpecificationFundingApprovalOld}
     />
     <Route
       path="/Approvals/ConfirmFunding/:fundingStreamId/:fundingPeriodId/:specificationId/:mode"
-      component={ConfirmFunding}
+      component={ConfirmFundingOld}
     />
     <Route
       path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={UploadBatch}
+      component={UploadBatchOld}
     />
     <Route
       exact

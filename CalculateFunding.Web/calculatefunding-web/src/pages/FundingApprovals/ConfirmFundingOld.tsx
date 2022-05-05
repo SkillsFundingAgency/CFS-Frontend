@@ -42,7 +42,7 @@ export interface ConfirmFundingRouteProps {
   mode: Exclude<FundingActionType, FundingActionType.Refresh>;
 }
 
-export function ConfirmFunding({ match }: RouteComponentProps<ConfirmFundingRouteProps>) {
+export function ConfirmFundingOld({ match }: RouteComponentProps<ConfirmFundingRouteProps>) {
   const history = useHistory();
   const dispatch = useDispatch();
   const { specificationId, fundingStreamId, fundingPeriodId, mode: actionType } = match.params;

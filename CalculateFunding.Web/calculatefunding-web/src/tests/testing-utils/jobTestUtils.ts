@@ -71,7 +71,7 @@ export const jobSubscriptionTestUtils = ({ mockSpecId }: { mockSpecId?: string |
         jobId: "job-id",
         jobType: jobOverrides?.jobType || JobType.RunConverterDatasetMergeJob,
         statusDescription: "Job is in progress",
-        jobDescription: "Job",
+        jobDescription: "Job description",
         outcome: "",
         ...jobOverrides,
         runningStatus: RunningStatus.InProgress,

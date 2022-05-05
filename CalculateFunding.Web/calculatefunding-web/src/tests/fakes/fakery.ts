@@ -15,6 +15,7 @@ import { JobType } from "../../types/jobType";
 import { UpdateCoreProviderVersion } from "../../types/Provider/UpdateCoreProviderVersion";
 import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import { ProviderSummary, ProviderTransactionSummary } from "../../types/ProviderSummary";
+import { PublishedProviderResult } from "../../types/PublishedProvider/PublishedProviderSearchResults";
 import { PublishStatus } from "../../types/PublishStatusModel";
 import { RunningStatus } from "../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
@@ -269,6 +270,34 @@ const makeCalcProviderSearchResult = (
     ...overrides,
   } as CalculationProviderResult;
 };
+
+const makePublishedProviderResult = (
+  overrides: Partial<PublishedProviderResult>
+): PublishedProviderResult => {
+  return {
+    isIndicative: false,
+    errors: [],
+    fundingPeriodId: "Period-111",
+    fundingStatus: PublishStatus.Updated,
+    fundingStreamId: "Stream-111",
+    fundingValue: 3456.43,
+    hasErrors: false,
+    localAuthority: "East London LA",
+    providerName: "East London School",
+    providerSubType: "What sup?",
+    providerType: "whatever",
+    publishedProviderVersionId: "aa123",
+    specificationId: "spec1111",
+    ukprn: "23932035",
+    upin: "43634",
+    urn: "851305",
+    majorVersion: 1,
+    minorVersion: 1,
+    releaseChannels: [],
+    ...overrides,
+  } as PublishedProviderResult;
+};
+
 const makeCalcProviderSearchResponse = (
   results: CalculationProviderResult[],
   overrides?: Partial<CalculationProviderSearchResponse>
@@ -609,5 +638,6 @@ export const fakery = {
   makeProviderTransactionSummary,
   makeProviderSummary,
   makePublishedFundingTemplate,
+  makePublishedProviderResult,
   makeMatch,
 };

@@ -7,7 +7,7 @@ import { Provider } from "react-redux";
 import { match, MemoryRouter } from "react-router";
 import { createStore, Store } from "redux";
 
-import { UploadBatchRouteProps } from "../../../pages/FundingApprovals/UploadBatch";
+import { UploadBatchRouteProps } from "../../../pages/FundingApprovals/UploadBatchOld";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FundingApprovalTestSetup } from "./FundingApprovalTestSetup";
 
@@ -26,13 +26,13 @@ const mockRoute: match<UploadBatchRouteProps> = {
   isExact: true,
 };
 const renderPage = () => {
-  const { UploadBatch } = require("../../../pages/FundingApprovals/UploadBatch");
+  const { UploadBatchOld } = require("../../../pages/FundingApprovals/UploadBatchOld");
   store.dispatch = jest.fn();
   return render(
     <MemoryRouter>
       <QueryClientProvider client={new QueryClient()}>
         <Provider store={store}>
-          <UploadBatch location={location} history={mockHistory} match={mockRoute} />
+          <UploadBatchOld location={location} history={mockHistory} match={mockRoute} />
         </Provider>
       </QueryClientProvider>
     </MemoryRouter>

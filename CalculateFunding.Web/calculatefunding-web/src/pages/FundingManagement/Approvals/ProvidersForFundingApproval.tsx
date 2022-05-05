@@ -1,6 +1,5 @@
 import { AxiosError } from "axios";
 import React, { useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
 
@@ -18,7 +17,8 @@ import { MultipleErrorSummary } from "../../../components/MultipleErrorSummary";
 import { PermissionStatus } from "../../../components/PermissionStatus";
 import { TextLink } from "../../../components/TextLink";
 import { Title } from "../../../components/Title";
-import { activeJobs, getJobDetailsFromJobResponse } from "../../../helpers/jobDetailsHelper";
+import { activeJobs } from "../../../helpers/jobDetailsHelper";
+import { useLastSuccessfulJobRun } from "../../../hooks/FundingApproval/useLastSuccessfulJobRun";
 import { usePublishedProviderErrorSearch } from "../../../hooks/FundingApproval/usePublishedProviderErrorSearch";
 import { usePublishedProviderSearch } from "../../../hooks/FundingApproval/usePublishedProviderSearch";
 import { useJobObserver } from "../../../hooks/Jobs/useJobObserver";
@@ -28,7 +28,6 @@ import { useErrors } from "../../../hooks/useErrors";
 import { useFundingConfiguration } from "../../../hooks/useFundingConfiguration";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import { IStoreState } from "../../../reducers/rootReducer";
-import { getLatestSuccessfulJob } from "../../../services/jobService";
 import * as publishService from "../../../services/publishService";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
@@ -49,6 +48,7 @@ export const ProvidersForFundingApproval = ({
   match,
 }: RouteComponentProps<ProvidersForFundingApprovalProps>): JSX.Element => {
   const { fundingStreamId, fundingPeriodId, specificationId } = match.params;
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
@@ -99,6 +99,29 @@ export const ProvidersForFundingApproval = ({
     }
   );
 
+  /*const {
+    isLoadingCanRefreshSpec,
+    refetchCanRefreshSpec: runRefreshChecks,
+  } = useCanRefreshSpec({
+    specificationId: specificationId,
+    options: {
+      enabled: false, // we only trigger this through the refetch
+      onSuccess: () => ConfirmationModal(<ConfirmRefreshModelBody />, refreshFunding, "Confirm", "Cancel"),
+      onError: (error) => {
+        window.scrollTo(0, 0);
+        const axiosError = error as AxiosError;
+        if (axiosError && axiosError.response && axiosError.response.status === 400) {
+          addValidationErrors({
+            validationErrors: axiosError.response.data,
+            message: "Error trying to refresh funding",
+          });
+        } else {
+          addError({ error: error, description: "Error trying to refresh funding" });
+        }
+      },
+    },
+  });*/
+
   const actionJobs: JobDetails[] = useMemo(
     () =>
       jobNotifications
@@ -124,22 +147,6 @@ export const ProvidersForFundingApproval = ({
     specificationId,
     [Permission.CanRefreshFunding, Permission.CanApproveFunding]
   );
-  useQuery<JobDetails | undefined, AxiosError>(
-    `last-spec-${specificationId}-refresh`,
-    async () =>
-      getJobDetailsFromJobResponse(
-        (await getLatestSuccessfulJob(specificationId, JobType.RefreshFundingJob)).data
-      ),
-    {
-      cacheTime: 0,
-      refetchOnWindowFocus: false,
-      enabled: specificationId !== undefined && specificationId.length > 0,
-      onSettled: (data) => setLastRefresh(data?.lastUpdated),
-      onError: (err) => addError({ error: err, description: "Error while loading last refresh date" }),
-    }
-  );
-  const [isLoadingRefresh, setIsLoadingRefresh] = useState<boolean>(false);
-  const [lastRefresh, setLastRefresh] = useState<Date | undefined>();
   const { errors, addErrorMessage, addError, addValidationErrors, clearErrorMessages } = useErrors();
   const hasPermissionToRefresh: boolean = useMemo(
     () => hasPermission && !!hasPermission(Permission.CanRefreshFunding),
@@ -149,6 +156,17 @@ export const ProvidersForFundingApproval = ({
     () => hasPermission && !!hasPermission(Permission.CanApproveFunding),
     [isPermissionsFetched]
   );
+  const {
+    lastSuccessfulJobRun: lastRefresh,
+    isLoadingLastSuccessfulJobRun: isLoadingLastRefresh,
+    refetchLastSuccessfulJobRun: refetchLastRefresh,
+  } = useLastSuccessfulJobRun({
+    specificationId,
+    jobType: JobType.RefreshFundingJob,
+    options: {
+      onError: (err) => addError({ error: err, description: "Error while loading last refresh date" }),
+    },
+  });
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -222,8 +240,8 @@ export const ProvidersForFundingApproval = ({
       (n) => n.latestJob?.isComplete && n.latestJob.jobType === JobType.RefreshFundingJob
     )?.latestJob;
     if (refreshJobComplete) {
-      setLastRefresh(refreshJobComplete.lastUpdated);
-      setIsLoadingRefresh(false);
+      refetchLastRefresh();
+      setIsRefreshing(false);
       if (refreshJobComplete.isSuccessful) {
         refetchSearchResults();
       }
@@ -288,10 +306,11 @@ export const ProvidersForFundingApproval = ({
     clearErrorMessages();
 
     try {
-      setIsLoadingRefresh(true);
+      setIsRefreshing(true);
+      console.log("Calling publishService.preValidateForRefreshFundingService");
       await publishService.preValidateForRefreshFundingService(specificationId);
-      setIsLoadingRefresh(false);
-
+      setIsRefreshing(false);
+      console.log("confirm modal...");
       ConfirmationModal(<ConfirmRefreshModelBody />, refreshFunding, "Confirm", "Cancel");
     } catch (error: any) {
       window.scrollTo(0, 0);
@@ -305,17 +324,18 @@ export const ProvidersForFundingApproval = ({
         addError({ error: error, description: "Error trying to refresh funding" });
       }
     }
-    setIsLoadingRefresh(false);
+    setIsRefreshing(false);
   }
 
   async function refreshFunding() {
-    setIsLoadingRefresh(true);
+    setIsRefreshing(true);
     try {
+      console.log("Calling publishService.refreshSpecificationFundingService");
       await publishService.refreshSpecificationFundingService(specificationId);
     } catch (e) {
       addErrorMessage(e, "Error trying to refresh funding");
     } finally {
-      setIsLoadingRefresh(false);
+      setIsRefreshing(false);
     }
   }
 
@@ -359,7 +379,7 @@ export const ProvidersForFundingApproval = ({
     isLoadingFundingConfiguration ||
     isLoadingSearchResults ||
     isObserving ||
-    isLoadingRefresh;
+    isRefreshing;
 
   const haveAnyProviderErrors =
     isLoadingPublishedProviderErrors ||
@@ -371,14 +391,15 @@ export const ProvidersForFundingApproval = ({
   const activeActionJobs = activeJobs(actionJobs);
   const hasActiveActionJobs = !!activeActionJobs.length;
 
-  const canRefresh: boolean = hasPermissionToRefresh && !isLoadingRefresh && !hasActiveActionJobs;
-  const canApprove: boolean =
+  const enableRefresh: boolean = hasPermissionToRefresh && !isRefreshing && !hasActiveActionJobs;
+  const enableApproval: boolean =
     !hasActiveActionJobs &&
     !!publishedProviderSearchResults?.canApprove &&
     hasPermissionToApprove &&
-    !isLoadingRefresh;
+    !isRefreshing;
 
-  const showApproveBatchAction = canApprove && fundingConfiguration?.approvalMode === ApprovalMode.Batches;
+  const showApproveBatchAction =
+    enableApproval && fundingConfiguration?.approvalMode === ApprovalMode.Batches;
 
   return (
     <Main location={Section.FundingManagement}>
@@ -461,7 +482,7 @@ export const ProvidersForFundingApproval = ({
             />
           </div>
           <div className="govuk-grid-column-one-third govuk-right-align">
-            {(showApproveBatchAction || canRefresh) && (
+            {(showApproveBatchAction || enableRefresh) && (
               <nav className="govuk-!-margin-bottom-0" aria-label="Funding Management action links">
                 <ul className="govuk-list">
                   <li>Actions:</li>
@@ -474,14 +495,14 @@ export const ProvidersForFundingApproval = ({
                       </TextLink>
                     </li>
                   )}
-                  {canRefresh && (
+                  {enableRefresh && (
                     <>
                       <li>
                         <TextLink handleOnClick={handleRefresh}>Refresh funding</TextLink>
                       </li>
-                      {lastRefresh && (
+                      {lastRefresh && !isLoadingLastRefresh && (
                         <p className="govuk-body-s govuk-!-margin-bottom-0">
-                          Last refresh <DateTimeFormatter date={lastRefresh as Date} />
+                          Last refresh <DateTimeFormatter date={lastRefresh?.lastUpdated as Date} />
                         </p>
                       )}
                     </>
@@ -516,7 +537,7 @@ export const ProvidersForFundingApproval = ({
       )}
 
       <div className="govuk-grid-row">
-        {!hasActiveActionJobs && !isLoadingRefresh && (
+        {!hasActiveActionJobs && !isRefreshing && (
           <div className="govuk-grid-column-one-third">
             <PublishedProviderSearchFilters
               facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
@@ -536,7 +557,7 @@ export const ProvidersForFundingApproval = ({
                     description: "Updating, please wait",
                   },
                   {
-                    isActive: isLoadingRefresh,
+                    isActive: isRefreshing,
                     title: "Requesting refresh of funding...",
                     description: "Updating, please wait",
                   },
@@ -561,7 +582,7 @@ export const ProvidersForFundingApproval = ({
             </div>
           )}
           {!hasActiveActionJobs &&
-            !isLoadingRefresh &&
+            !isRefreshing &&
             !isLoadingSearchResults &&
             !isLoadingSpecification &&
             specification && (
@@ -588,14 +609,14 @@ export const ProvidersForFundingApproval = ({
           <div className="right-align">
             <button
               className="govuk-button govuk-!-margin-right-1"
-              disabled={!canRefresh}
+              disabled={!enableRefresh}
               onClick={handleRefresh}
             >
               Refresh funding
             </button>
             <button
               className="govuk-button"
-              disabled={!canApprove || blockActionBasedOnProviderErrors}
+              disabled={!enableApproval || blockActionBasedOnProviderErrors}
               onClick={handleApprove}
             >
               Approve funding

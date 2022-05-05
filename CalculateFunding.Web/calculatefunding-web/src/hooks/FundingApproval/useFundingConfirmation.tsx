@@ -10,7 +10,9 @@ import { publishedProviderService } from "../../services/publishedProviderServic
 import * as publishService from "../../services/publishService";
 import { FundingSearchSelectionState } from "../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../types/ApprovalMode";
-import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
+import { FundingConfiguration } from "../../types/FundingConfiguration";
+import { JobDetails } from "../../types/jobDetails";
+import { JobNotification, MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionModels";
 import { JobType } from "../../types/jobType";
 import { Permission } from "../../types/Permission";
 import {
@@ -18,11 +20,28 @@ import {
   PublishedProviderFundingCount,
 } from "../../types/PublishedProvider/PublishedProviderFundingCount";
 import { buildInitialPublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
+import { SpecificationSummary } from "../../types/SpecificationSummary";
 import { useJobSubscription } from "../Jobs/useJobSubscription";
 import { useSpecificationPermissions } from "../Permissions/useSpecificationPermissions";
 import { useFundingConfiguration } from "../useFundingConfiguration";
 import { useSpecificationSummary } from "../useSpecificationSummary";
 
+export interface UseFundingConfirmationResult {
+  specification: SpecificationSummary | undefined;
+  isLoadingSpecification: boolean;
+  fundingConfiguration: FundingConfiguration | undefined;
+  isLoadingFundingConfiguration: boolean;
+  fundingSummary: PublishedProviderFundingCount | undefined;
+  clearFundingSearchSelection: () => void;
+  latestJob: JobDetails | undefined;
+  isWaitingForJob: boolean;
+  isPermissionsFetched: boolean;
+  hasPermissionToApprove: boolean;
+  hasPermissionToRelease: boolean;
+  selectedProviderIds: string[];
+  notifications: JobNotification[];
+  specificationLastUpdatedDate: Date | undefined;
+}
 export const useFundingConfirmation = ({
   specificationId,
   fundingStreamId,
@@ -33,7 +52,7 @@ export const useFundingConfirmation = ({
   fundingPeriodId: string;
   specificationId: string;
   actionType: Exclude<FundingActionType, FundingActionType.Refresh>;
-}) => {
+}): UseFundingConfirmationResult => {
   const dispatch = useDispatch();
   const { addErrorToContext, clearErrorsFromContext } = useErrorContext();
   const { selectedProviderIds } = useSelector<IStoreState, FundingSearchSelectionState>(
@@ -201,5 +220,5 @@ export const useFundingConfirmation = ({
     selectedProviderIds,
     notifications,
     specificationLastUpdatedDate,
-  };
+  } as UseFundingConfirmationResult;
 };

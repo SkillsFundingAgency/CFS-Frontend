@@ -28,9 +28,7 @@ export async function getFundingSummaryForReleasingService(
   });
 }
 
-export async function preValidateForRefreshFundingService(
-  specificationId: string
-): Promise<AxiosResponse<string[]>> {
+export async function preValidateForRefreshFundingService(specificationId: string): Promise<AxiosResponse> {
   return axios(`/api/specs/${specificationId}/validate-for-refresh`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

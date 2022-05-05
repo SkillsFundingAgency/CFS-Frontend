@@ -9,7 +9,7 @@ import { initialiseFundingSearchSelection } from "../../actions/FundingSearchSel
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { PublishedProviderResults } from "../../components/Funding/ProviderFundingSearch/PublishedProviderResults";
+import { PublishedProviderResultsOld } from "../../components/Funding/ProviderFundingSearch/PublishedProviderResultsOld";
 import { PublishedProviderSearchFilters } from "../../components/Funding/ProviderFundingSearch/PublishedProviderSearchFilters";
 import JobNotificationSection from "../../components/Jobs/JobNotificationSection";
 import { LoadingNotification, LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
@@ -43,7 +43,7 @@ export interface SpecificationFundingApprovalRouteProps {
   specificationId: string;
 }
 
-export const SpecificationFundingApproval = ({
+export const SpecificationFundingApprovalOld = ({
   match,
 }: RouteComponentProps<SpecificationFundingApprovalRouteProps>): JSX.Element => {
   const fundingStreamId = match.params.fundingStreamId;
@@ -530,7 +530,7 @@ export const SpecificationFundingApproval = ({
             !isLoadingSearchResults &&
             !isLoadingSpecification &&
             specification && (
-              <PublishedProviderResults
+              <PublishedProviderResultsOld
                 specificationId={specificationId}
                 fundingStreamId={fundingStreamId}
                 fundingPeriodId={fundingPeriodId}

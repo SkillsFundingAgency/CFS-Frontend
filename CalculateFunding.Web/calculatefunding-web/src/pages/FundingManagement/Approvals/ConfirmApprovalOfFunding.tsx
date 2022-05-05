@@ -79,6 +79,7 @@ export function ConfirmApprovalOfFunding({
       return;
     }
     if (!fundingConfiguration) {
+      console.error("missing funding config");
       return;
     }
     setIsConfirming(true);
@@ -152,6 +153,10 @@ export function ConfirmApprovalOfFunding({
             isActive: !isPermissionsFetched,
             title: "Loading permissions",
           },
+          {
+            isActive: isLoading,
+            title: "Updating",
+          },
         ]}
       />
 
@@ -160,7 +165,7 @@ export function ConfirmApprovalOfFunding({
         titleCaption="Check the information below carefully before approving the funding"
       />
 
-      {fundingConfiguration && specification && (
+      {!!fundingConfiguration && !!specification && (
         <section>
           <FundingApprovalSummary
             approvalMode={fundingConfiguration.approvalMode}

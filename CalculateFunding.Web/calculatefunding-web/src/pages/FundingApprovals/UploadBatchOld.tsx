@@ -28,7 +28,7 @@ export interface UploadBatchRouteProps {
   specificationId: string;
 }
 
-export function UploadBatch({ match }: RouteComponentProps<UploadBatchRouteProps>) {
+export function UploadBatchOld({ match }: RouteComponentProps<UploadBatchRouteProps>) {
   const fundingStreamId = match.params.fundingStreamId;
   const fundingPeriodId = match.params.fundingPeriodId;
   const specificationId = match.params.specificationId;

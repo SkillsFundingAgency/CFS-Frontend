@@ -15,7 +15,7 @@ import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguratio
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
-import { SpecificationFundingApprovalRouteProps } from "../../../pages/FundingApprovals/SpecificationFundingApproval";
+import { SpecificationFundingApprovalRouteProps } from "../../../pages/FundingApprovals/SpecificationFundingApprovalOld";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
@@ -243,14 +243,14 @@ export function FundingApprovalTestData() {
 
   const renderPage = async () => {
     const {
-      SpecificationFundingApproval,
-    } = require("../../../pages/FundingApprovals/SpecificationFundingApproval");
+      SpecificationFundingApprovalOld,
+    } = require("../../../pages/FundingApprovals/SpecificationFundingApprovalOld");
     store.dispatch = jest.fn();
     render(
       <MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
           <Provider store={store}>
-            <SpecificationFundingApproval location={location} history={history} match={matchMock} />
+            <SpecificationFundingApprovalOld location={location} history={history} match={matchMock} />
           </Provider>
         </QueryClientProvider>
       </MemoryRouter>
@@ -258,14 +258,14 @@ export function FundingApprovalTestData() {
   };
   const loadPage = async () => {
     const {
-      SpecificationFundingApproval,
-    } = require("../../../pages/FundingApprovals/SpecificationFundingApproval");
+      SpecificationFundingApprovalOld,
+    } = require("../../../pages/FundingApprovals/SpecificationFundingApprovalOld");
     store.dispatch = jest.fn();
     render(
       <MemoryRouter>
         <QueryClientProvider client={new QueryClient()}>
           <Provider store={store}>
-            <SpecificationFundingApproval location={location} history={history} match={matchMock} />
+            <SpecificationFundingApprovalOld location={location} history={history} match={matchMock} />
           </Provider>
         </QueryClientProvider>
       </MemoryRouter>

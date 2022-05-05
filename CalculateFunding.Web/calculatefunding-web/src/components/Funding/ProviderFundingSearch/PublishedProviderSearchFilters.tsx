@@ -54,9 +54,6 @@ export const PublishedProviderSearchFilters = React.memo(function (
     array.sort((a: FacetValue, b: FacetValue) => new Date(a.name).getTime() - new Date(b.name).getTime());
 
   const updateSearchText = (searchTerm: string, searchField: string | undefined) => {
-    console.log(
-      `ProviderSearchBox.updateSearchText... Dispatching: Field: ${searchField}. Text: ${searchTerm}`
-    );
     dispatch(
       actions.updateSearchTextFilter({
         searchTerm: searchTerm,

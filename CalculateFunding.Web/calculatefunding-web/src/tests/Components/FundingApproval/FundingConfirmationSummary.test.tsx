@@ -5,7 +5,7 @@ import { MemoryRouter } from "react-router";
 import { createStore, Store } from "redux";
 
 import { FundingConfirmationSummary } from "../../../components/Funding/FundingConfirmationSummary";
-import { ConfirmFundingRouteProps } from "../../../pages/FundingApprovals/ConfirmFunding";
+import { ConfirmFundingRouteProps } from "../../../pages/FundingApprovals/ConfirmFundingOld";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { ApprovalMode } from "../../../types/ApprovalMode";
 import {

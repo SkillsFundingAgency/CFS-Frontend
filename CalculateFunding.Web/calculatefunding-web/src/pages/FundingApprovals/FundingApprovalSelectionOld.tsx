@@ -16,7 +16,7 @@ import {
   FundingStreamWithSpecificationSelectedForFunding,
 } from "../../types/SpecificationSelectedForFunding";
 
-export function FundingApprovalSelection() {
+export function FundingApprovalSelectionOld() {
   const [selectedFundingStream, setSelectedFundingStream] =
     useState<FundingStreamWithSpecificationSelectedForFunding>();
   const [selectedFundingPeriod, setSelectedFundingPeriod] =

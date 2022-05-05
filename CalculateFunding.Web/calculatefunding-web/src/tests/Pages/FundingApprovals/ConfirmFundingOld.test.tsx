@@ -17,7 +17,7 @@ import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguratio
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
-import { ConfirmFundingRouteProps } from "../../../pages/FundingApprovals/ConfirmFunding";
+import { ConfirmFundingRouteProps } from "../../../pages/FundingApprovals/ConfirmFundingOld";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
@@ -57,13 +57,13 @@ jest.mock("react-router", () => ({
 }));
 
 const renderPageAndWaitUntilLoaded = async () => {
-  const { ConfirmFunding } = require("../../../pages/FundingApprovals/ConfirmFunding");
+  const { ConfirmFundingOld } = require("../../../pages/FundingApprovals/ConfirmFundingOld");
   store.dispatch = jest.fn();
   const result = render(
     <MemoryRouter>
       <QueryClientProvider client={new QueryClient()}>
         <Provider store={store}>
-          <ConfirmFunding location={location} history={history} match={config.mockConfirmApprovalRoute} />
+          <ConfirmFundingOld location={location} history={history} match={config.mockConfirmApprovalRoute} />
         </Provider>
       </QueryClientProvider>
     </MemoryRouter>

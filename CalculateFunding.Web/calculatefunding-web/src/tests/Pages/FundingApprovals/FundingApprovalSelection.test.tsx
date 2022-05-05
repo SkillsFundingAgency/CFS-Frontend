@@ -1,19 +1,18 @@
-import "@testing-library/jest-dom/extend-expect";
-
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import { MemoryRouter } from "react-router";
 
 import * as hook from "../../../hooks/FundingApproval/useOptionsForSpecificationsSelectedForFunding";
-import { FundingApprovalSelection } from "../../../pages/FundingApprovals/FundingApprovalSelection";
 import { FundingApprovalTestSetup } from "./FundingApprovalTestSetup";
 
 const renderPage = () => {
-  const { FundingApprovalSelection } = require("../../../pages/FundingApprovals/FundingApprovalSelection");
+  const {
+    FundingApprovalSelectionOld,
+  } = require("../../../pages/FundingApprovals/FundingApprovalSelectionOld");
   return render(
     <MemoryRouter>
-      <FundingApprovalSelection />
+      <FundingApprovalSelectionOld />
     </MemoryRouter>
   );
 };

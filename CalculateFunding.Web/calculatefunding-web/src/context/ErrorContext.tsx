@@ -72,9 +72,8 @@ export const useErrorContext = () => {
   // clear up on unmount
   useEffect(() => {
     return () => {
-      console.log("useErrorContext: unmounting: context.clearErrorsFromContext()");
       context.clearErrorsFromContext();
-    }
+    };
   }, []);
 
   return { ...context };

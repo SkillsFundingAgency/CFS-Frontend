@@ -26,7 +26,7 @@ export interface IPublishedProviderResultsProps {
 }
 
 // Note: used by old funding provider search page
-export function PublishedProviderResults(props: IPublishedProviderResultsProps) {
+export function PublishedProviderResultsOld(props: IPublishedProviderResultsProps) {
   const state: FundingSearchSelectionState = useSelector<IStoreState, FundingSearchSelectionState>(
     (state) => state.fundingSearchSelection
   );
