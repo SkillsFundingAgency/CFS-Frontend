@@ -20,20 +20,15 @@ export const isJobTypeIn =
 export const isJobWithTypeIn =
   (validJobTypes: JobType[]) =>
   (job: JobDetails): boolean =>
-    !!job?.jobType &&
-    isJobTypeIn(validJobTypes)(getJobType(job.jobType));
+    !!job?.jobType && isJobTypeIn(validJobTypes)(getJobType(job.jobType));
 
-export const hasJobWithJobTypeIn =
-    (validJobTypes: JobType[]) =>
-      (notification: JobNotification) =>
-        !!notification.latestJob?.jobType?.length &&
-    isJobTypeIn(validJobTypes)(notification.latestJob.jobType as string);
+export const hasJobWithJobTypeIn = (validJobTypes: JobType[]) => (notification: JobNotification) =>
+  !!notification.latestJob?.jobType?.length &&
+  isJobTypeIn(validJobTypes)(notification.latestJob.jobType as string);
 
-export const isSuccessfulJob = (job: JobDetails | undefined): boolean =>
-  !!job?.isSuccessful;
+export const isSuccessfulJob = (job: JobDetails | undefined): boolean => !!job?.isSuccessful;
 
-export const isActiveJob = (job: JobDetails | undefined): boolean =>
-  !!job?.isActive;
+export const isActiveJob = (job: JobDetails | undefined): boolean => !!job?.isActive;
 
 export const hasSuccessfulJob = (notification: JobNotification): boolean =>
   !!notification.latestJob?.isSuccessful;
@@ -65,7 +60,8 @@ export const firstJobWithType = (jobs: JobDetails[]) => (jobTypes: JobType[]) =>
 export const findJobWithId = (jobs: JobDetails[]) => (jobId: string) =>
   jobs.find((job) => job.jobId === jobId);
 
-export const extractJobsSortedByLatest = (notifications: JobNotification[]) => sortByLatest(extractJobsFromNotifications(notifications));
+export const extractJobsSortedByLatest = (notifications: JobNotification[]) =>
+  sortByLatest(extractJobsFromNotifications(notifications));
 
 export const removeDuplicateJobsById = R.uniqBy<JobDetails, string>((j) => j?.jobId);
 
@@ -108,9 +104,9 @@ export function getJobDetailsFromJobResponse(job: JobResponse | undefined): JobD
     trigger: job.trigger,
   };
 
-  if (job.outcomes && job.outcomes.length > 0) {
+  if (job.outcomes?.length) {
     result.failures = job.outcomes
-      .filter((j) => !j.isSuccessful)
+      .filter((j) => !j.isSuccessful && j.type?.length)
       .map<JobFailure>((x) => {
         return {
           description: x.description,
@@ -176,11 +172,11 @@ function setStatusFields(job: JobDetails) {
       break;
     default:
       job.isComplete = true;
+
       switch (job.completionStatus) {
         case CompletionStatus.Succeeded:
-          job.statusDescription =
-            job.failures.length > 0 ? "completed with error(s)" : "completed successfully";
-          job.isSuccessful = job.failures.length === 0;
+          job.statusDescription = "completed successfully";
+          job.isSuccessful = true;
           break;
         case CompletionStatus.Superseded:
           job.statusDescription = "superseded";

@@ -11,7 +11,21 @@ export function toDecimal(amount: number, places: number) {
   return +amount.toFixed(places);
 }
 
+export function isNullOrUndefined(value: any) {
+  return value === undefined || value === null;
+}
+
+export function isNumeric(value: any): value is number {
+  return !isNullOrUndefined(value) && !isNaN(value) && !isNaN(parseFloat(value));
+}
+
+export function isBoolean(value: any): value is boolean {
+  return !isNullOrUndefined(value) && (value.toString() === "true" || value.toString() === "false");
+}
+
 export function formatNumber(value: number, type: NumberType, decimalPlaces: number, includeSymbol: boolean) {
+  if (!isNumeric(value)) return `${value}`;
+
   const decimalPointedNumber = new Decimal(value).toFixed(decimalPlaces);
 
   const formattedNumber = decimalPointedNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -24,7 +38,7 @@ export function formatNumber(value: number, type: NumberType, decimalPlaces: num
 
   if (type === NumberType.FormattedPercentage) {
     let formattedPercentage = decimalPointedNumber.toString();
-    formattedPercentage = formattedPercentage + (includeSymbol ? "%" : "");
+    formattedPercentage = formattedPercentage + (isBoolean(includeSymbol) && includeSymbol ? "%" : "");
     return formattedPercentage;
   }
 
@@ -37,13 +51,11 @@ export function FormattedNumber(props: {
   decimalPlaces?: number | null;
   includeSymbol?: boolean | undefined;
 }) {
-  if (props.value === undefined || props.value === null) return <span></span>;
+  if (!isNumeric(props.value)) return <span></span>;
 
-  const decimalPoint =
-    props.decimalPlaces != null && props.decimalPlaces !== undefined ? props.decimalPlaces : 2;
+  const decimalPoint = isNumeric(props.decimalPlaces) ? props.decimalPlaces : 2;
 
-  const includeSymbol =
-    props.includeSymbol != null && props.includeSymbol !== undefined ? props.includeSymbol : true;
+  const includeSymbol = isBoolean(props.includeSymbol) ? props.includeSymbol : true;
 
   const formattedNumber = formatNumber(props.value, props.type, decimalPoint, includeSymbol);
 
