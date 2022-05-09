@@ -225,7 +225,7 @@ export function CalculationsTab({ specification, providerId, transactions }: Cal
         const providerResultsResponse = await getFundingStructureResultsForProviderAndSpecification(
           specification.id,
           providerId,
-          true
+          false
         );
         setProviderResults(providerResultsResponse.data);
       }
