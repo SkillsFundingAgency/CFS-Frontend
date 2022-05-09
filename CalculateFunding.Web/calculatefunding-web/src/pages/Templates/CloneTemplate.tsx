@@ -249,7 +249,7 @@ export const CloneTemplate = () => {
             <div className="govuk-grid-column-full govuk-body-m">
               {selectedFundingPeriodId && (
                 <button
-                  className="govuk-button govuk-!-padding-right-4"
+                  className="govuk-button govuk-!-margin-right-2"
                   data-testid="save"
                   onClick={handleSaveClick}
                   disabled={!enableSaveButton}
@@ -258,7 +258,7 @@ export const CloneTemplate = () => {
                 </button>
               )}
               {saveMessage.length > 0 ? <span className="govuk-error-message">{saveMessage}</span> : null}
-              <CancelLink to={`/Templates/${templateId}/Edit?version=${version}`} />
+              <CancelLink to={`/Templates/${templateId}/Edit?version=${version}`} className="govuk-button govuk-button--secondary" />
             </div>
           </div>
         </form>
