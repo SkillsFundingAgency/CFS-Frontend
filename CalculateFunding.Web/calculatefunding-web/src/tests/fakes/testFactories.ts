@@ -1,5 +1,6 @@
 ﻿import { UseExportToSqlJobsHookResults } from "hooks/ExportToSql/useExportToSqlJobs";
 import { SpecificationSummaryQueryResult } from "hooks/useSpecificationSummary";
+import { JobDetails } from "types/jobDetails";
 import { SpecificationSummary } from "types/SpecificationSummary";
 
 import { PublishedProviderErrorSearchQueryResult } from "../../hooks/FundingApproval/usePublishedProviderErrorSearch";
@@ -91,14 +92,14 @@ export const withSpecification = (specification: SpecificationSummary): Specific
   };
 };
 
-export const withExportSqlJobs = (): UseExportToSqlJobsHookResults => {
+export const withExportSqlJobs = (jobDetails: JobDetails | undefined): UseExportToSqlJobsHookResults => {
   return {
     jobsInfo: {
       latestExportAllocationDataJob: undefined,
       latestCalcResultsExportJob: undefined,
       latestReleasedAllocationJob: undefined,
       latestCalcEngineRunJob: undefined,
-      lastSuccessfulFundingChangeJob: undefined,
+      lastSuccessfulFundingChangeJob: jobDetails,
       latestReleasedAllocationExportJob: undefined,
       hasRunningSqlJob: false,
       hasRunningFundingJobs: false,

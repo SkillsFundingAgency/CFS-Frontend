@@ -20,9 +20,7 @@ import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpeci
 import { useErrors } from "../../../hooks/useErrors";
 import { useSpecificationSummary } from "../../../hooks/useSpecificationSummary";
 import { JobDetails } from "../../../types/jobDetails";
-import { JobType } from "../../../types/jobType";
 import { Permission } from "../../../types/Permission";
-import { LatestPublishedDate } from "../../../types/PublishedProvider/LatestPublishedDate";
 import { Section } from "../../../types/Sections";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 
@@ -114,7 +112,6 @@ export function RunExportToSql({ match }: RouteComponentProps<{ specificationId:
               type={ExportType.LastReleasedData}
               exportState={exportState}
               jobsInfo={jobsInfo}
-              latestPublishedDate={latestPublishedDate}
               isSelectedForFunding={!!specification?.isSelectedForFunding}
               isLoading={isLoading}
               actions={actions}
@@ -131,7 +128,6 @@ const ExportSection = ({
   type,
   exportState,
   isSelectedForFunding,
-  latestPublishedDate,
   jobsInfo,
   actions,
   isLoading,
@@ -144,7 +140,6 @@ const ExportSection = ({
   actions: SqlExportActions;
   isLoading: boolean;
   isExportPermitted: boolean;
-  latestPublishedDate?: LatestPublishedDate | undefined;
 }) => {
   const { title, description, lastExportJob, lastChangeText, lastChangeDate, isDataAlreadyExported } =
     useMemo(() => {
@@ -174,15 +169,15 @@ const ExportSection = ({
             title: "Latest released state allocation results",
             description:
               "Includes the funding line, template calculation and profile values for the latest released version of the provider allocations.",
-            lastExportJob: jobsInfo.latestReleasedAllocationJob,
+            lastExportJob: jobsInfo.latestReleasedAllocationExportJob,
             lastChangeText: "Last published",
-            lastChangeDate: latestPublishedDate?.value ?? undefined,
+            lastChangeDate: jobsInfo.latestReleasedAllocationJob?.lastUpdated ?? undefined,
             isDataAlreadyExported: exportState.isLatestReleaseDataAlreadyExported,
           };
         default:
           throw Error("Unknown export type");
       }
-    }, [type, jobsInfo, exportState, latestPublishedDate, isSelectedForFunding]);
+    }, [type, jobsInfo, exportState, isSelectedForFunding]);
 
   const titleId = `${convertToSlug(title)}-title`;
   return (
@@ -269,7 +264,7 @@ const ExportSection = ({
           onClick={actions.triggerReleasedResultsExport}
           disabled={isLoading || exportState.isLatestAllocationStateBlockedByJob || !isExportPermitted}
         >
-          {jobsInfo.latestReleasedAllocationJob ? "Refresh " : "Create "} SQL data
+          {jobsInfo.latestReleasedAllocationExportJob ? "Refresh " : "Create "} SQL data
         </button>
       ) : null}
     </section>

@@ -43,7 +43,6 @@ describe("<RunExportToSql /> tests", () => {
       await waitFor(() => expect(getSpecSpy).toBeCalled());
       await waitForLoadingToFinish();
 
-      expect(screen.getAllByText(/23 November 2020/i)).toHaveLength(1);
       expect(screen.getAllByText("N/A", { exact: false })).toBeTruthy();
 
       const buttons = screen.getAllByRole("button", { name: /Create SQL data/ });
@@ -59,6 +58,9 @@ describe("<RunExportToSql /> tests", () => {
       await renderPage();
 
       await waitForLoadingToFinish();
+
+      expect(screen.getAllByText(/23 November 2020/i)).toHaveLength(1);
+      expect(screen.getAllByText("N/A", { exact: false })).toBeTruthy();
 
       const buttons = screen.getAllByRole("button");
       expect(buttons[0]).toBeEnabled();
@@ -78,7 +80,7 @@ const useRunExportToSqlSpy = jest.spyOn(useExportToSqlJobsHook, "useExportToSqlJ
 const mockSpyImplementation = (overrides: Partial<UseExportToSqlJobsHookResults>) => {
   useRunExportToSqlSpy.mockImplementation(() => {
     return {
-      ...withExportSqlJobs(),
+      ...withExportSqlJobs(undefined),
       actions: {
         triggerCalcResultsExport: mockTriggerCalcResultsExport,
         triggerCurrentAllocationResultsExport: mockTriggerCurrentAllocationResultsExport,
@@ -105,7 +107,11 @@ const hasSpecificationChosenForFunding = (specification: SpecificationSummary) =
 };
 
 const hasExportSqlJobs = () => {
-  jest.spyOn(useExportToSqlJobsHook, "useExportToSqlJobs").mockImplementation(() => withExportSqlJobs());
+  jest
+    .spyOn(useExportToSqlJobsHook, "useExportToSqlJobs")
+    .mockImplementation(() =>
+      withExportSqlJobs(fakery.makeSuccessfulJob({ lastUpdated: new Date(latestPublishedDate) }))
+    );
 };
 
 const mockHistoryPush = jest.fn();

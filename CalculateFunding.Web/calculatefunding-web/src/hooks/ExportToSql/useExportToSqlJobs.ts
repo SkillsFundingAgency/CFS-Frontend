@@ -144,14 +144,14 @@ export const useExportToSqlJobs = ({
     const findJobById = findJobWithId(jobsSortedByLatest);
     return {
       latestExportAllocationDataJob: findLatestByJobType([JobType.RunSqlImportJob]),
-      latestReleasedAllocationJob: findLatestByJobType([JobType.RunReleasedSqlImportJob]),
+      latestReleasedAllocationJob: findLatestByJobType(releaseFundingJobTypes),
       latestCalcResultsExportJob: findLatestByJobType([JobType.PopulateCalculationResultsQaDatabaseJob]),
       latestCalcEngineRunJob: findLatestByJobType([JobType.CreateInstructAllocationJob]),
-      latestReleasedAllocationExportJob: findLatestByJobType(releaseFundingJobTypes),
+      latestReleasedAllocationExportJob: findLatestByJobType([JobType.RunReleasedSqlImportJob]),
       lastSuccessfulFundingChangeJob: findLatestSuccessfulByJobType([
-        ...approveFundingJobTypes,
         ...releaseFundingJobTypes,
-        ...calcRunJobTypes,
+        ...approveFundingJobTypes,
+        ...refreshFundingJobTypes,
       ]),
       hasRunningCalcEngineJob: !!findActiveByJobType(calcRunJobTypes),
       hasRunningFundingJobs: !!findActiveByJobType([
@@ -358,10 +358,11 @@ export const useExportToSqlJobs = ({
       jobsInfo.latestCalcEngineRunJob
     );
     const isReleasedAllocationDataInSqlOutdated =
-      !jobsInfo.latestReleasedAllocationJob?.lastUpdated ||
-      (!!latestPublishedDate?.value &&
+      !jobsInfo.latestReleasedAllocationExportJob?.lastUpdated ||
+      (!!jobsInfo.latestReleasedAllocationJob?.lastUpdated &&
         (jobsInfo.latestReleasedAllocationExportJob?.lastUpdated !== undefined
-          ? latestPublishedDate.value > jobsInfo.latestReleasedAllocationExportJob?.lastUpdated
+          ? jobsInfo.latestReleasedAllocationJob.lastUpdated >
+            jobsInfo.latestReleasedAllocationExportJob?.lastUpdated
           : true));
     return {
       isAnotherUserExporting: jobsInfo.hasRunningSqlJob && !isExporting,
