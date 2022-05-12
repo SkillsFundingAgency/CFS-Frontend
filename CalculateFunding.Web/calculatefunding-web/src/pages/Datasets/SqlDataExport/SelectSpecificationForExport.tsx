@@ -43,7 +43,7 @@ export const SelectSpecificationForExport = (): JSX.Element => {
   }
 
   return (
-    <Main location={Section.Results}>
+    <Main location={Section.Datasets}>
       <Breadcrumbs>
         <Breadcrumb name="Home" url="/" />
         <Breadcrumb name="Manage data" url="/Datasets/ManageData" />
