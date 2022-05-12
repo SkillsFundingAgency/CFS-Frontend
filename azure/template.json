@@ -783,52 +783,120 @@
         },
         {
             "type": "Microsoft.Web/sites/config",
-            "apiVersion": "2018-02-01",
-            "name": "[concat(variables('webSiteName'), '/authsettings')]",
+            "apiVersion": "2020-12-01",
+            "name": "[concat(variables('webSiteName'), '/authsettingsV2')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "Deploy_Frontend_App",
                 "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
-                "enabled": "[parameters('enablePlatformAuth')]",
-                "unauthenticatedClientAction": "RedirectToLoginPage",
-                "tokenStoreEnabled": true,
-                "defaultProvider": "AzureActiveDirectory",
-                "clientId": "[parameters('aadClientId')]",
-                "clientSecret": "[parameters('aadClientSecret')]",
-                "issuer": "[parameters('aadAuthIssuer')]",
-                "allowedAudiences": null,
-                "isAadAutoProvisioned": false,
-                "additionalLoginParams": [
-                    "response_type=code id_token",
-                    "[concat('resource=', parameters('aadClientId'))]"
-                ]
+                "platform": {
+                    "enabled": "[parameters('enablePlatformAuth')]",
+                    "runtimeVersion": "~1"
+                },
+                "identityProviders": {
+                    "azureActiveDirectory": {
+                        "isAutoProvisioned": false,
+                        "registration": {
+                            "clientId": "[parameters('aadClientId')]",
+                            "clientSecret": "[parameters('aadClientSecret')]",
+                            "openIdIssuer": "[parameters('aadAuthIssuer')]"
+                        },
+                        "validation": {
+                            "allowedAudiences": null
+                        }
+                    }
+                },
+                "login": {
+                    "routes": {},
+                    "tokenStore": {
+                        "enabled": true,
+                        "tokenRefreshExtensionHours": 72
+                    },
+                    "preserveUrlFragmentsForLogins": false,
+                    "allowedExternalRedirectUrls": [],
+                    "cookieExpiration": {
+                        "convention": "FixedTime",
+                        "timeToExpiration": "08:00:00"
+                    },
+                    "nonce": {
+                        "validateNonce": true,
+                        "nonceExpirationInterval": "00:05:00"
+                    }
+                },
+                "globalValidation": {
+                    "redirectToProvider": "azureactivedirectory",
+                    "unauthenticatedClientAction": "RedirectToLoginPage"
+                },
+                "httpSettings": {
+                    "requireHttps": true,
+                    "routes": {
+                        "apiPrefix": "/.auth"
+                    },
+                    "forwardProxy": {
+                        "convention": "NoProxy"
+                    }
+                } 
             }
         },
         {
             "type": "Microsoft.Web/sites/slots/config",
-            "apiVersion": "2018-02-01",
-            "name": "[concat(variables('webSiteName'), '/staging/authsettings')]",
+            "apiVersion": "2020-12-01",
+            "name": "[concat(variables('webSiteName'), '/staging/authsettingsV2')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "Deploy_Frontend_App",
                 "[resourceId('Microsoft.Web/sites/slots/siteextensions', variables('webSiteName'), 'staging', 'Microsoft.AspNetCore.AzureAppServices.SiteExtension')]"
             ],
             "properties": {
-                "enabled": "[parameters('enablePlatformAuth')]",
-                "unauthenticatedClientAction": "RedirectToLoginPage",
-                "tokenStoreEnabled": true,
-                "defaultProvider": "AzureActiveDirectory",
-                "clientId": "[parameters('aadClientId')]",
-                "clientSecret": "[parameters('aadClientSecret')]",
-                "issuer": "[parameters('aadAuthIssuer')]",
-                "allowedAudiences": null,
-                "isAadAutoProvisioned": false,
-                "additionalLoginParams": [
-                    "response_type=code id_token",
-                    "[concat('resource=', parameters('aadClientId'))]"
-                ]
+                "platform": {
+                    "enabled": "[parameters('enablePlatformAuth')]",
+                    "runtimeVersion": "~1"
+                },
+                "identityProviders": {
+                    "azureActiveDirectory": {
+                        "isAutoProvisioned": false,
+                        "registration": {
+                            "clientId": "[parameters('aadClientId')]",
+                            "clientSecret": "[parameters('aadClientSecret')]",
+                            "openIdIssuer": "[parameters('aadAuthIssuer')]"
+                        },
+                        "validation": {
+                            "allowedAudiences": null
+                        }
+                    }
+                },
+                "login": {
+                    "routes": {},
+                    "tokenStore": {
+                        "enabled": true,
+                        "tokenRefreshExtensionHours": 72
+                    },
+                    "preserveUrlFragmentsForLogins": false,
+                    "allowedExternalRedirectUrls": [],
+                    "cookieExpiration": {
+                        "convention": "FixedTime",
+                        "timeToExpiration": "08:00:00"
+                    },
+                    "nonce": {
+                        "validateNonce": true,
+                        "nonceExpirationInterval": "00:05:00"
+                    }
+                },
+                "globalValidation": {
+                    "redirectToProvider": "azureactivedirectory",
+                    "unauthenticatedClientAction": "RedirectToLoginPage"
+                },
+                "httpSettings": {
+                    "requireHttps": true,
+                    "routes": {
+                        "apiPrefix": "/.auth"
+                    },
+                    "forwardProxy": {
+                        "convention": "NoProxy"
+                    }
+                } 
             }
         },
         {
