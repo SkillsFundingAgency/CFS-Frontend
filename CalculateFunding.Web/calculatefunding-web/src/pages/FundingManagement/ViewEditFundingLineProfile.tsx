@@ -257,7 +257,7 @@ export function ViewEditFundingLineProfile({ match }: RouteComponentProps<ViewEd
           fundingLineCode: fundingLineId,
           providerId: providerId,
           customProfileName: `${providerId}-${fundingStreamId}-${fundingPeriodId}-${fundingLineId}`,
-          carryOver: newCarryForwardAmount > 0 ? newCarryForwardAmount : null,
+          carryOver: newCarryForwardAmount != 0 ? newCarryForwardAmount : null,
           profilePeriods: editedFundingLineProfile
             ? editedFundingLineProfile.profileTotals.map((pt) => ({
                 type: pt.periodType as ProfilePeriodType,
