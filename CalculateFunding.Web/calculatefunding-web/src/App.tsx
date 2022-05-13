@@ -412,7 +412,7 @@ const templateRoutes = (
     <Route path="/Templates/List" component={ListTemplates} />
     <Route path="/Templates/:templateId/Edit" component={EditTemplate} />
     <Route path="/Templates/:templateId/Versions/:version" component={EditTemplate} />
-    <Route path="/Templates/:templateId/Versions" component={ListVersions} />
+    <Route path="/Templates/:templateId/Versions" exact={true} component={ListVersions} />
     <Route path="/Templates/Create" component={CreateTemplate} />
     <Route path="/Templates/:templateId/Clone/:version" component={CloneTemplate} />
     <Route path="/Templates/Publish/:templateId" component={PublishTemplate} />
