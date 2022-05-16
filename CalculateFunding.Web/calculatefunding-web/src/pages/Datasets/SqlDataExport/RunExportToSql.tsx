@@ -180,6 +180,8 @@ const ExportSection = ({
     }, [type, jobsInfo, exportState, isSelectedForFunding]);
 
   const titleId = `${convertToSlug(title)}-title`;
+  const hasReleasedAllocations = jobsInfo.latestReleasedAllocationJob === undefined ? false : true;
+
   return (
     <section className="govuk-main-wrapper" aria-describedby={titleId}>
       <h2 id={titleId} className="govuk-heading-l">
@@ -259,13 +261,20 @@ const ExportSection = ({
           {jobsInfo.latestExportAllocationDataJob ? "Refresh " : "Create "} SQL data
         </button>
       ) : type === ExportType.LastReleasedData ? (
-        <button
-          className="govuk-button"
-          onClick={actions.triggerReleasedResultsExport}
-          disabled={isLoading || exportState.isLatestAllocationStateBlockedByJob || !isExportPermitted}
-        >
-          {jobsInfo.latestReleasedAllocationExportJob ? "Refresh " : "Create "} SQL data
-        </button>
+        !hasReleasedAllocations ? (
+          <div className="govuk-inset-text">
+            This specification has no released allocations therefore you are unable to export the latest
+            released results to SQL.
+          </div>
+        ) : (
+          <button
+            className="govuk-button"
+            onClick={actions.triggerReleasedResultsExport}
+            disabled={isLoading || exportState.isLatestAllocationStateBlockedByJob || !isExportPermitted}
+          >
+            {jobsInfo.latestReleasedAllocationExportJob ? "Refresh " : "Create "} SQL data
+          </button>
+        )
       ) : null}
     </section>
   );
