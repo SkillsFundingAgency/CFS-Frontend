@@ -395,13 +395,13 @@ export function DownloadableReports(props: {
                         >
                           <h1 className="govuk-heading-s govuk-!-margin-bottom-3">
                             {groupLevel === ReportGroupingLevel.All
-                              ? "All versions "
+                              ? `All versions ${group.toLowerCase()} level reports`
                               : groupLevel === ReportGroupingLevel.Current
-                              ? "Current state "
+                              ? `Current state ${group.toLowerCase()} level funding line reports`
                               : groupLevel === ReportGroupingLevel.Released
-                              ? "Released only "
-                              : ""}
-                            {group.toLowerCase()} level funding line reports
+                              ? `Released only ${group.toLowerCase()} level funding line reports`
+                              : `${group.toLowerCase()} level reports`}
+
                           </h1>
                           {downloadableReports
                             .filter((dlr) => dlr.grouping === group && dlr.groupingLevel === groupLevel)
