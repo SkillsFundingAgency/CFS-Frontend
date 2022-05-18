@@ -10,6 +10,8 @@ using CalculateFunding.Common.ApiClient.Providers.Models;
 using CalculateFunding.Common.ApiClient.Providers.Models.Search;
 using CalculateFunding.Common.ApiClient.Results;
 using CalculateFunding.Common.ApiClient.Results.Models;
+using CalculateFunding.Common.ApiClient.Specifications;
+using CalculateFunding.Common.ApiClient.Specifications.Models;
 using CalculateFunding.Common.Models.Search;
 using CalculateFunding.Common.Utility;
 using CalculateFunding.Frontend.Extensions;
@@ -23,9 +25,12 @@ namespace CalculateFunding.Frontend.Controllers
     {
         private IProvidersApiClient _providersApiClient;
         private IResultsApiClient _resultsApiClient;
+        private ISpecificationsApiClient _specificationApiClient;
         private readonly IFundingDataZoneApiClient _fundingDataZoneApiClient;
 
-        public ProviderController(IProvidersApiClient providersApiClient, IResultsApiClient resultsApiClient,
+        public ProviderController(IProvidersApiClient providersApiClient, 
+            IResultsApiClient resultsApiClient,
+            ISpecificationsApiClient specificationApiClient,
             IFundingDataZoneApiClient fundingDataZoneApiClient)
         {
             Guard.ArgumentNotNull(providersApiClient, nameof(providersApiClient));
@@ -34,6 +39,7 @@ namespace CalculateFunding.Frontend.Controllers
 
             _providersApiClient = providersApiClient;
             _resultsApiClient = resultsApiClient;
+            _specificationApiClient = specificationApiClient;
             _fundingDataZoneApiClient = fundingDataZoneApiClient;
         }
 
@@ -119,7 +125,30 @@ namespace CalculateFunding.Frontend.Controllers
 
             if (result.StatusCode == HttpStatusCode.OK)
             {
-                return new OkObjectResult(result.Content);
+                List<string> specificationsToRemove = new List<string>();
+
+                foreach (SpecificationInformation specificationInformation in result.Content)
+                {
+                    ApiResponse<SpecificationSummary> specificationResult = await _specificationApiClient.GetSpecificationSummaryById(specificationInformation.Id);
+
+                    if (specificationResult.StatusCode == HttpStatusCode.OK)
+                    {
+                        SpecificationSummary specificationSummary = specificationResult.Content;
+
+                        if (!string.IsNullOrWhiteSpace(specificationSummary.ProviderVersionId))
+                        {
+                            ApiResponse<ProviderVersionSearchResult> providerResult = await _providersApiClient.GetProviderByIdFromProviderVersion(specificationSummary.ProviderVersionId, providerId);
+
+                            // if the provider no longer in scope of specification then we don't want to give the users the ability to select it from the drop down
+                            if (providerResult.StatusCode == HttpStatusCode.NotFound)
+                            {
+                                specificationsToRemove.Add(specificationSummary.Id);
+                            }
+                        }
+                    }
+                }
+
+                return new OkObjectResult(result.Content.Where(_ => !specificationsToRemove.Contains(_.Id)));
             }
 
             if (result.StatusCode == HttpStatusCode.BadRequest)
