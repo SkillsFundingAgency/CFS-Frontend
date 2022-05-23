@@ -1,7 +1,7 @@
 ﻿import React from "react";
 
 import { ErrorProps } from "../../hooks/useErrors";
-import { ConfirmFundingRouteProps } from "../../pages/FundingApprovals/ConfirmFundingOld";
+import { ConfirmFundingRouteProps } from "../../pages/FundingManagement/ConfirmFundingRouteProps";
 import { ApprovalMode } from "../../types/ApprovalMode";
 import {
   FundingActionType,

@@ -9,7 +9,7 @@ import { ProviderFundingProfilingPatternsProps } from "../../../components/Fundi
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FeatureFlagsState } from "../../../states/FeatureFlagsState";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
-import { FundingApprovalTestData } from "../../Pages/FundingApprovals/FundingApprovalTestData";
+import { FundingApprovalTestData } from "../../Pages/FundingManagement/FundingApprovalTestData";
 
 const useSelectorSpy = jest.spyOn(redux, "useSelector");
 const store: Store<IStoreState> = createStore(rootReducer);

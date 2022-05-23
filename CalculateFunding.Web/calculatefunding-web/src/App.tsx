@@ -46,14 +46,6 @@ import { MapDataSourceFiles } from "./pages/Datasets/MapDataSourceFiles";
 import { RunExportToSql } from "./pages/Datasets/SqlDataExport/RunExportToSql";
 import { SelectSpecificationForExport } from "./pages/Datasets/SqlDataExport/SelectSpecificationForExport";
 import { UpdateDataSourceFile } from "./pages/Datasets/UpdateDataSourceFile";
-import { ChangeProfileTypeOld } from "./pages/FundingApprovals/ChangeProfileTypeOld";
-import { ConfirmFundingOld } from "./pages/FundingApprovals/ConfirmFundingOld";
-import { FundingApprovalSelectionOld } from "./pages/FundingApprovals/FundingApprovalSelectionOld";
-import { ProfileHistoryOld } from "./pages/FundingApprovals/ProfileHistoryOld";
-import { ProviderFundingOverviewOld } from "./pages/FundingApprovals/ProviderFundingOverviewOld";
-import { SpecificationFundingApprovalOld } from "./pages/FundingApprovals/SpecificationFundingApprovalOld";
-import { UploadBatchOld } from "./pages/FundingApprovals/UploadBatchOld";
-import { ViewEditFundingLineProfileOld } from "./pages/FundingApprovals/ViewEditFundingLineProfileOld";
 import { ConfirmApprovalOfFunding } from "./pages/FundingManagement/Approvals/ConfirmApprovalOfFunding";
 import { ProvidersForFundingApproval } from "./pages/FundingManagement/Approvals/ProvidersForFundingApproval";
 import { SelectSpecificationForFundingApproval } from "./pages/FundingManagement/Approvals/SelectSpecificationForFundingApproval";
@@ -176,9 +168,7 @@ const App: React.FunctionComponent = () => {
 
               {datasetRoutes(featureFlagsState)}
 
-              {featureFlagsState.enableNewFundingManagement
-                ? fundingManagementRoutes
-                : oldFundingApprovalRoutes}
+              {fundingManagementRoutes}
 
               <Route path="/Results" component={ViewResults} />
 
@@ -304,44 +294,6 @@ const fundingManagementRoutes = (
       exact={true}
       path="/FundingManagement/:actionType/Provider/:providerId/Specification/:specificationId/Version/:providerVersionId/FundingLine/:fundingLineId/view/ProfilingHistory"
       component={ProfileHistory}
-    />
-  </Route>
-);
-
-const oldFundingApprovalRoutes = (
-  <Route path="/Approvals">
-    <Route path="/Approvals/Select" component={FundingApprovalSelectionOld} />
-    <Route path="/Approvals/FundingApprovalSelection/" component={FundingApprovalSelectionOld} />
-    <Route
-      path="/Approvals/SpecificationFundingApproval/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={SpecificationFundingApprovalOld}
-    />
-    <Route
-      path="/Approvals/ConfirmFunding/:fundingStreamId/:fundingPeriodId/:specificationId/:mode"
-      component={ConfirmFundingOld}
-    />
-    <Route
-      path="/Approvals/UploadBatch/:fundingStreamId/:fundingPeriodId/:specificationId"
-      component={UploadBatchOld}
-    />
-    <Route
-      exact
-      path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/edit/change-profile-type"
-      component={ChangeProfileTypeOld}
-    />
-    <Route
-      exact
-      path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineId/:editMode"
-      component={ViewEditFundingLineProfileOld}
-    />
-    <Route
-      exact
-      path="/Approvals/ProviderFundingOverview/:specificationId/:providerId/:specCoreProviderVersionId/:fundingStreamId/:fundingPeriodId"
-      component={ProviderFundingOverviewOld}
-    />
-    <Route
-      path="/Approvals/ProfilingHistory/:specificationId/:providerId/:providerVersionId/:fundingStreamId/:fundingPeriodId/:fundingLineCode"
-      component={ProfileHistoryOld}
     />
   </Route>
 );

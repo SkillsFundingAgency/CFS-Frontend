@@ -1,4 +1,6 @@
-﻿import { render, screen, waitFor } from "@testing-library/react";
+﻿// noinspection ES6UnusedImports
+
+import { render, screen, waitFor } from "@testing-library/react";
 import { DateTime } from "luxon";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -15,7 +17,6 @@ import * as fundingConfigurationHook from "../../../hooks/useFundingConfiguratio
 import { FundingConfigurationQueryResult } from "../../../hooks/useFundingConfiguration";
 import * as specHook from "../../../hooks/useSpecificationSummary";
 import { SpecificationSummaryQueryResult } from "../../../hooks/useSpecificationSummary";
-import { SpecificationFundingApprovalRouteProps } from "../../../pages/FundingApprovals/SpecificationFundingApprovalOld";
 import { IStoreState, rootReducer } from "../../../reducers/rootReducer";
 import { FundingSearchSelectionState } from "../../../states/FundingSearchSelectionState";
 import { ApprovalMode } from "../../../types/ApprovalMode";
@@ -228,52 +229,6 @@ export function FundingApprovalTestData() {
     }),
   };
 
-  const matchMock: match<SpecificationFundingApprovalRouteProps> = {
-    params: {
-      specificationId: testSpec.id,
-      fundingStreamId: fundingStream.id,
-      fundingPeriodId: fundingPeriod.id,
-    },
-    url: "",
-    path: "",
-    isExact: true,
-  };
-
-  const store: Store<IStoreState> = createStore(rootReducer);
-
-  const renderPage = async () => {
-    const {
-      SpecificationFundingApprovalOld,
-    } = require("../../../pages/FundingApprovals/SpecificationFundingApprovalOld");
-    store.dispatch = jest.fn();
-    render(
-      <MemoryRouter>
-        <QueryClientProvider client={new QueryClient()}>
-          <Provider store={store}>
-            <SpecificationFundingApprovalOld location={location} history={history} match={matchMock} />
-          </Provider>
-        </QueryClientProvider>
-      </MemoryRouter>
-    );
-  };
-  const loadPage = async () => {
-    const {
-      SpecificationFundingApprovalOld,
-    } = require("../../../pages/FundingApprovals/SpecificationFundingApprovalOld");
-    store.dispatch = jest.fn();
-    render(
-      <MemoryRouter>
-        <QueryClientProvider client={new QueryClient()}>
-          <Provider store={store}>
-            <SpecificationFundingApprovalOld location={location} history={history} match={matchMock} />
-          </Provider>
-        </QueryClientProvider>
-      </MemoryRouter>
-    );
-
-    await waitFor(() => expect(screen.queryByTestId("loader")).not.toBeInTheDocument());
-  };
-
   let notification: JobNotification | undefined;
   let subscription: JobSubscription = {
     filterBy: {
@@ -482,7 +437,6 @@ export function FundingApprovalTestData() {
       );
 
   return {
-    matchMock,
     fundingStream,
     fundingPeriod,
     hasFullSpecPermissions,
@@ -508,7 +462,5 @@ export function FundingApprovalTestData() {
     hasProviderIds,
     hasSearchResults,
     hasSearchResultsWithProviderIds,
-    renderPage,
-    loadPage,
   };
 }
