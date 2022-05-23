@@ -66,7 +66,7 @@ describe("<DownloadableReports /> ", () => {
   });
 
   it("renders group level titles of published reports ", async () => {
-    expect(await screen.getByText("Current state group level funding line reports")).toBeInTheDocument();
+    expect(await screen.getByText("Current state group level reports")).toBeInTheDocument();
     expect(await screen.getByText("Released only provider level funding line reports")).toBeInTheDocument();
     expect(await screen.getByText("All versions profiling level reports")).toBeInTheDocument();
   });

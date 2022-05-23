@@ -397,7 +397,7 @@ export function DownloadableReports(props: {
                             {groupLevel === ReportGroupingLevel.All
                               ? `All versions ${group.toLowerCase()} level reports`
                               : groupLevel === ReportGroupingLevel.Current
-                              ? `Current state ${group.toLowerCase()} level funding line reports`
+                              ? `Current state ${group.toLowerCase()} level reports`
                               : groupLevel === ReportGroupingLevel.Released
                               ? `Released only ${group.toLowerCase()} level funding line reports`
                               : `${group.toLowerCase()} level reports`}
