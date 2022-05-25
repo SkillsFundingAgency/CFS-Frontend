@@ -315,6 +315,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                         className="govuk-checkboxes__input"
                         id={`providerTypes-${providerType.name}`}
                         name={`providerTypes-${providerType.name}`}
+                        checked={!!calculationProviderSearchRequest.providerType.find((name) => name == providerType.name)}
                         type="checkbox"
                         value={providerType.name}
                         onChange={filterByProviderTypes}
@@ -347,6 +348,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                           className="govuk-checkboxes__input"
                           id={key}
                           name={key}
+                          checked={!!calculationProviderSearchRequest.providerSubType.find((name) => name == providerSubType.name)}
                           type="checkbox"
                           value={providerSubType.name}
                           onChange={filterByProviderSubTypes}
@@ -400,6 +402,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
                         className="govuk-checkboxes__input"
                         id={`localAuthorities-${localAuthority.name}`}
                         name="localAuthorities"
+                        checked={!!calculationProviderSearchRequest.localAuthority.find((name) => name == localAuthority.name)}
                         type="checkbox"
                         value={localAuthority.name}
                         onChange={filterByLocalAuthority}
