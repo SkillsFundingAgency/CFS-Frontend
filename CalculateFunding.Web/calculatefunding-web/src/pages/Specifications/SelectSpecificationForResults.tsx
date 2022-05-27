@@ -32,7 +32,7 @@ export function SelectSpecificationForResults() {
     },
   });
 
-  document.title = "Select specification - Calculate funding";
+  document.title = "Specification results - Calculate funding";
 
   useEffectOnce(() => {
     getFundingStreamsService(false).then((response) => {
@@ -92,8 +92,8 @@ export function SelectSpecificationForResults() {
       </Breadcrumbs>
 
       <Title
-        title="Select specification"
-        titleCaption="You can select the specification and funding period."
+        title="Specification results"
+        titleCaption="Select a specification to view the specification results."
       />
 
       <div className="govuk-main-wrapper govuk-main-wrapper--l">
