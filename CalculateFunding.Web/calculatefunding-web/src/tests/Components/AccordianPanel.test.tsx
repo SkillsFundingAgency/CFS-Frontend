@@ -1,4 +1,4 @@
-import { queryByTestId, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import React from "react";
 
 import { AccordionPanel } from "../../components/AccordionPanel";
@@ -9,12 +9,11 @@ describe("<AccordianPanel />", () => {
       <AccordionPanel
         autoExpand={true}
         id="testPanel"
-        children={null}
         boldSubtitle="Bold Test Subtitle"
         expanded={false}
         subtitle="Test Subtitle"
         title="Test Title"
-      />
+      >{null}</AccordionPanel>
     );
 
     expect(container.querySelector(".govuk-accordion__section")).toBeInTheDocument();
@@ -25,12 +24,11 @@ describe("<AccordianPanel />", () => {
       <AccordionPanel
         autoExpand={true}
         id="testPanel"
-        children={null}
         boldSubtitle="Bold Test Subtitle"
         expanded={true}
         subtitle="Test Subtitle"
         title="Test Title"
-      />
+      >{null}</AccordionPanel>
     );
 
     expect(container.querySelector(".govuk-accordion__section--expanded")).toBeInTheDocument();
@@ -41,12 +39,11 @@ describe("<AccordianPanel />", () => {
       <AccordionPanel
         autoExpand={false}
         id="testPanel"
-        children={null}
         boldSubtitle="Bold Test Subtitle"
         expanded={true}
         subtitle="Test Subtitle"
         title="Test Title"
-      />
+      >{null}</AccordionPanel>
     );
 
     expect(container.querySelector(".govuk-accordion__section--expanded")).toBeInTheDocument();
@@ -57,12 +54,11 @@ describe("<AccordianPanel />", () => {
       <AccordionPanel
         autoExpand={false}
         id="testPanel"
-        children={null}
         boldSubtitle="Bold Test Subtitle"
         expanded={true}
         subtitle="Test Subtitle"
         title="Test Title"
-      />
+      >{null}</AccordionPanel>
     );
 
     expect(screen.getByText(/Test Title/)).toBeInTheDocument();
@@ -73,12 +69,11 @@ describe("<AccordianPanel />", () => {
       <AccordionPanel
         autoExpand={false}
         id="testPanel"
-        children={null}
         boldSubtitle="Bold Test Subtitle"
         expanded={true}
         subtitle="Test Subtitle"
         title="Test Title"
-      />
+      >{null}</AccordionPanel>
     );
 
     expect(screen.getByText(/Test Subtitle/)).toBeInTheDocument();
@@ -89,12 +84,11 @@ describe("<AccordianPanel />", () => {
       <AccordionPanel
         autoExpand={false}
         id="testPanel"
-        children={null}
         boldSubtitle="Bold Test Subtitle"
         expanded={true}
         subtitle="Test Subtitle"
         title="Test Title"
-      />
+      >{null}</AccordionPanel>
     );
 
     expect(screen.getByText(/Bold Test Subtitle/)).toBeInTheDocument();

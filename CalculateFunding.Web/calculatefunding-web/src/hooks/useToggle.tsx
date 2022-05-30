@@ -1,9 +1,12 @@
 ﻿import { useCallback, useState } from "react";
 
-export const useToggle = (initialState = false): [boolean, () => void] => {
-  const [state, setState] = useState(initialState);
+export const useToggle = () => {
 
-  const toggle = useCallback(() => setState((state) => !state), []);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const toggleExpanded = useCallback((e?: React.MouseEvent<HTMLElement, MouseEvent> | undefined): void => {
+    e?.preventDefault();
+    setIsExpanded(state => !state);
+  }, []);
 
-  return [state, toggle];
-};
+  return { isExpanded, toggleExpanded, setExpanded: setIsExpanded };
+}

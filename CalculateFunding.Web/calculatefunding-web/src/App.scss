@@ -1,4 +1,5 @@
 @import "styles/govuk-frontend";
+
 @font-face {
   font-family: "Material Icons";
   font-style: normal;
@@ -363,6 +364,437 @@ ul.autocomplete {
   float: right;
 }
 
+.nobr {
+  white-space: nowrap;
+}
+
+aside.search-filters  {
+  padding-left: 0.03em;
+}
+
+.search-filters {
+  .selected-filters-background {
+    background-color: #f3f2f1;
+    padding-bottom: 20px;
+  }
+
+  .filterContainer .govuk-accordion__section-button {
+    padding-bottom: 0px;
+  }
+
+  .filterContainer .govuk-accordion__section--expanded .govuk-accordion__section-button {
+    padding-bottom: 0px;
+  }
+
+  .filterContainer .js-enabled .govuk-accordion__section--expanded .govuk-accordion__section-button {
+    padding-bottom: 0px;
+  }
+
+  .filterContainer .govuk-form-group {
+    margin-bottom: 0px;
+  }
+
+  .filterLabel {
+    font-size: 16px;
+    color: grey;
+    margin-top: 10px;
+  }
+
+  .filtersSelected .filter__tag:link, .filter__tag:visited {
+    color: #0b0c0c;
+  }
+
+  .filtersSelected .filter__tag {
+    background-color: #fff;
+    border: 1px solid #0b0c0c;
+    display: inline-block;
+    margin-top: 5px;
+    padding: 5px;
+    text-decoration: none;
+  }
+
+  .filtersSelected .filter__tag:link, .filter__tag:visited {
+    color: #0b0c0c;
+  }
+
+  .filterContainer .govuk-form-group .govuk-form-group:last-of-type {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 0px;
+  }
+
+  .filterContainer .filterLabel {
+    margin-top: 5px;
+  }
+
+  .filterContainer .govuk-accordion__section-content {
+    padding-bottom: 0px;
+  }
+
+  .filterContainer .filterSearch {
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .filterContainer .govuk-accordion__controls {
+    padding-top: 10px;
+  }
+
+  .filtersSelected .filter__tag:link, .filter__tag:visited {
+    color: #0b0c0c;
+  }
+
+  .filtersSelected .filter__tag {
+    background-color: #fff;
+    border: 1px solid #0b0c0c;
+    display: inline-block;
+    margin-top: 5px;
+    padding: 5px;
+    text-decoration: none;
+  }
+
+  .filtersSelected a:hover {
+    cursor: default;
+    background: lightgray;
+  }
+
+  .filtersSelected .filter-tags {
+    padding-left: 0px;
+    margin-top: 0;
+  }
+
+  ul.filter-tags {
+    list-style-type: none;
+  }
+
+  .filtersSelected .filter__tag:after {
+    width: 10px;
+    height: 10px;
+    margin-left: 7px;
+    vertical-align: baseline;
+    font-weight: bold;
+    display: inline-block;
+    background-image: url("/app/assets/images/icon-tag-remove-cross.svg");
+    content: "";
+  }
+
+  .filtersSelected .filter__tag:link, .filter__tag:visited {
+    color: #0b0c0c;
+  }
+
+  .filtersSelected .clearTags {
+    display: none;
+  }
+
+  .filterSelected .hidden {
+    display: none;
+  }
+
+  .filtersSelected .selectedText {
+    margin-left: 40px;
+  }
+
+  .filtersSelected .govuk-accordion__section-summary {
+    margin-bottom: 12px;
+  }
+
+  $search-filters-base-colour: govuk-colour("black");
+  $search-filters-hover-colour: govuk-colour("light-grey", $legacy: "grey-3");
+  $search-filters-icon-focus-colour: govuk-colour("yellow");
+  $search-filters-bottom-border-width: 1px;
+
+  .search-filters--greyed {
+    background-color: #f3f2f1;
+    padding-bottom: 0.7em;
+  }
+
+  .search-filters--filterScroll {
+    overflow: scroll;
+    height: calc(95vh);
+  }
+
+  .search-filters__controls {
+    padding: 0.7em 0.7em 0.7em 0.2em;
+  }
+
+  .search-filters__show-all {
+    font-family: "GDS Transport", arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    font-size: 1.0rem;
+    line-height: 1.25;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 9px;
+    border-width: 0;
+    color: #1d70b8;
+    background: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    padding: 0.3em 0.4em 0.2em 0.3em;
+
+    &:hover {
+      color: $search-filters-base-colour;
+      background: $search-filters-hover-colour;
+      // The GOV.UK Design System focus state adds a box-shadow to the top and bottom of the
+      // button. We add a grey box-shadow on hover too, to make the height of the hover state
+      // match the height of the focus state.
+      box-shadow: 0 -2px $search-filters-hover-colour, 0 4px $search-filters-hover-colour;
+
+      .search-filters__section-toggle-text {
+        color: $search-filters-base-colour;
+      }
+
+      .search-filters-nav__chevron {
+        color: $search-filters-base-colour;
+        background: $search-filters-base-colour;
+      }
+
+      .search-filters-nav__chevron:after {
+        color: $search-filters-hover-colour;
+      }
+    }
+
+
+    &.search-filters__section-summary-focus {
+      @include govuk-focused-text;
+      display: inline;
+    }
+  }
+
+  .search-filters__show-all-text, .search-filters__show-all-toggle-text {
+    vertical-align: middle;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    cursor: inherit;
+  }
+
+  .search-filters-nav__chevron {
+    box-sizing: border-box;
+    display: inline-block;
+    position: relative;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 0.06rem solid;
+    border-radius: 50%;
+    vertical-align: middle;
+    margin-right: 6px;
+
+    &:after {
+      content: "";
+      box-sizing: border-box;
+      display: block;
+      position: absolute;
+      bottom: 0.3rem;
+      left: 0.32rem;
+      width: 0.32rem;
+      height: 0.32rem;
+      -webkit-transform: rotate(-45deg);
+      -ms-transform: rotate(-45deg);
+      transform: rotate(-45deg);
+      border-top: 0.135rem solid;
+      border-right: 0.135rem solid;
+    }
+  }
+
+  // Create Chevron icon aligned with text
+  .search-filters-nav__chevron {
+    box-sizing: border-box;
+    display: inline-block;
+
+    position: relative;
+
+    // Set size using rems to make the icon scale with text if user resizes text in their browser
+    width: govuk-px-to-rem(20px);
+    height: govuk-px-to-rem(20px);
+
+    border: govuk-px-to-rem(1px) solid;
+    border-radius: 50%;
+
+    vertical-align: middle;
+    margin-right: 7px;
+
+    // IE8 fallback of icon
+    @include govuk-if-ie8 {
+      display: inline-block;
+      max-height: 20px;
+      line-height: 1;
+    }
+
+    // Create inner chevron arrow
+    &:after {
+      content: "";
+      box-sizing: border-box;
+      display: block;
+
+      position: absolute;
+      bottom: govuk-px-to-rem(5px);
+      left: govuk-px-to-rem(6px);
+
+      width: govuk-px-to-rem(6px);
+      height: govuk-px-to-rem(6px);
+
+      -webkit-transform: rotate(-45deg);
+
+      -ms-transform: rotate(-45deg);
+
+      transform: rotate(-45deg);
+
+      border-top: govuk-px-to-rem(2px) solid;
+      border-right: govuk-px-to-rem(2px) solid;
+
+      // IE8 fallback of icon with HTML symbol
+      @include govuk-if-ie8 {
+        content: "\25B2"; // "▲"
+        position: relative;
+        border: 0;
+      }
+    }
+  }
+
+
+  // Rotate icon to create "Down" version
+  .search-filters-nav__chevron--down {
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg);
+
+    // IE8 fallback of arrow icon
+    @include govuk-if-ie8 {
+      &:after {
+        content: "\25BC"; // "▼"
+        -webkit-transform: none;
+        -ms-transform: none;
+        transform: none;
+      }
+    }
+  }
+
+  $govuk-accordion-base-colour: govuk-colour("black");
+  $govuk-accordion-hover-colour: govuk-colour("light-grey", $legacy: "grey-3");
+  $govuk-accordion-icon-focus-colour: govuk-colour("yellow");
+  $govuk-accordion-bottom-border-width: 1px;
+
+  .search-filters__section-label {
+    @include govuk-font($size: 24, $weight: bold);
+    color: $govuk-text-colour;
+    display: block;
+    margin-bottom: 0;
+    padding-top: 0.4em;
+    padding-left: 7px;
+    width: 100%;
+
+    border: 0;
+    border-top: $govuk-accordion-bottom-border-width solid $govuk-border-colour;
+
+    // Visually separate the section from the one underneath when user changes colours in their
+    // browser. See https://github.com/alphagov/govuk-frontend/issues/2321#issuecomment-924201488
+    border-bottom: govuk-spacing(2) solid transparent;
+
+    background: none;
+
+    text-align: left;
+    // Section headers have a pointer cursor as an additional affordance
+    cursor: pointer;
+    -webkit-appearance: none;
+
+    @include govuk-media-query($from: tablet) {
+      padding-bottom: govuk-spacing(2);
+    }
+
+    &:active {
+      color: $govuk-link-active-colour;
+      background: none;
+    }
+
+    &:hover {
+      color: $govuk-accordion-base-colour;
+      background: $govuk-accordion-hover-colour;
+
+      .search-filters__section-toggle-text {
+        color: $govuk-accordion-base-colour;
+      }
+
+      .search-filters-nav__chevron {
+        color: $govuk-accordion-base-colour;
+        background: $govuk-accordion-base-colour;
+      }
+
+      .search-filters-nav__chevron:after {
+        color: $govuk-accordion-hover-colour;
+      }
+    }
+
+    &:focus {
+      // Remove default focus border around button as
+      // styling is being applied to inner text elements that receive focus
+      outline: 0;
+
+      .search-filters__section-heading-text-focus,
+      .search-filters__section-summary-focus,
+      .search-filters__section-toggle-focus {
+        @include govuk-focused-text;
+      }
+
+      .search-filters-nav__chevron {
+        color: $govuk-accordion-base-colour;
+        background: $govuk-accordion-base-colour;
+      }
+
+      .search-filters-nav__chevron:after {
+        color: $govuk-accordion-icon-focus-colour;
+      }
+    }
+
+    // Remove default button focus outline in Firefox
+    &::-moz-focus-inner {
+      padding: 0;
+      border: 0;
+    }
+  }
+}
+
+// For devices that can't hover such as touch devices,
+// remove hover state as it can be stuck in that state (iOS).
+@media (hover: none) {
+  .search-filters__section-label:hover {
+    text-decoration: none;
+  }
+}
+
+.search-filters__section-heading {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.search-filters__section-heading-text, .search-filters__section-summary {
+  display: block;
+  margin-bottom: 0;
+  padding-bottom: 0.5em;
+}
+
+.search-filters__section__content {
+  padding-left: 5px;
+  .govuk-fieldset {
+    padding-left: 0.4em;
+  }
+  label.govuk-checkboxes__label {
+    font-size: 1.1rem;
+    padding: 0.5em 0 0.7em 0;
+  }
+}
+
+.search-filters__section-toggle {
+  font-size: 1.0rem;
+  line-height: 1.31579;
+  font-weight: 400;
+  color: #1d70b8;
+}
+
 .collapsible-steps {
   padding: 0;
   margin: 0;
@@ -425,7 +857,7 @@ ul.autocomplete {
 
   .collapsible-step-circle-background {
     text-shadow: 0 -0.1em 0 govuk-colour("white"), 0.1em 0 0 govuk-colour("white"),
-      0 0.1em 0 govuk-colour("white"), -0.1em 0 0 govuk-colour("white");
+    0 0.1em 0 govuk-colour("white"), -0.1em 0 0 govuk-colour("white");
   }
 
   .collapsible-step-circle-step-label,
@@ -517,7 +949,7 @@ ul.autocomplete {
 
   .collapsible-step-panel-button {
     width: 30px;
-    float:right;
+    float: right;
   }
 
   .collapsible-step-panel-button:hover {
@@ -538,6 +970,7 @@ ul.autocomplete {
       line-height: 12px;
     }
   }
+
   .govuk-collapsiblepanel-heading-collapser {
     &:after {
       content: "\2212";
@@ -706,7 +1139,7 @@ a.govuk-link-red {
   white-space: nowrap;
 }
 
-.govuk-scroll-window{
+.govuk-scroll-window {
   overflow-y: auto;
   min-height: 60px;
   max-height: 400px;

@@ -1,15 +1,16 @@
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
 import { Pagination } from "../../components/Pagination";
+import { SpecificationsSearchFilters } from "../../components/Specifications/SpecificationsSearchFilters";
+import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { getAllSpecificationsService } from "../../services/specificationService";
@@ -42,15 +43,92 @@ export function SpecificationsList() {
     pageSize: 50,
     page: 1,
   };
-  const [searchCriteria, setSearchCriteria] = useState<SpecificationSearchRequestViewModel>(initialSearch);
-  const [filterFundingPeriods, setFundingPeriods] = useState<FacetValue[]>([]);
-  const [filterFundingStreams, setFundingStreams] = useState<FacetValue[]>([]);
-  const [filterStatus, setStatus] = useState<FacetValue[]>([]);
+  const [searchCriteria, setSearchCriteria] = React.useState<SpecificationSearchRequestViewModel>(initialSearch);
+  const [fundingPeriodFacets, setFundingPeriodFacets] = useState<FacetValue[]>([]);
+  const [fundingStreamFacets, setFundingStreamFacets] = useState<FacetValue[]>([]);
+  const [statusFacets, setStatusFacets] = useState<FacetValue[]>([]);
   const [initialFundingPeriods, setInitialFundingPeriods] = useState<FacetValue[]>([]);
   const [initialFundingStreams, setInitialFundingStreams] = useState<FacetValue[]>([]);
-  const [initialStatus, setInitialStatus] = useState<FacetValue[]>([]);
+  const [initialStatuses, setInitialStatuses] = useState<FacetValue[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { errors, addError, clearErrorMessages } = useErrors();
+
+  const addFundingStreamFilter = useCallback(
+    (fundingStream: string) => {
+      setSearchCriteria((prevState) => {
+        return {
+          ...prevState,
+          fundingStreams: [...prevState.fundingStreams.filter(fs => fs !== fundingStream), fundingStream]
+        };
+      });
+    }, []);
+
+  const removeFundingStreamFilter = useCallback((fundingStream: string) => {
+    setSearchCriteria((prevState) => {
+      return { ...prevState, fundingStreams: prevState.fundingStreams.filter(fs => fs !== fundingStream) };
+    });
+  }, []);
+
+  const addFundingPeriodFilter = useCallback((fundingPeriod: string) => {
+    setSearchCriteria((prevState) => {
+      return {
+        ...prevState,
+        fundingPeriods: [...prevState.fundingPeriods.filter(fp => fp !== fundingPeriod), fundingPeriod]
+      };
+    });
+  }, []);
+
+  const removeFundingPeriodFilter = useCallback((fundingPeriod: string) => {
+    setSearchCriteria((prevState) => {
+      return { ...prevState, fundingPeriods: prevState.fundingPeriods.filter(fp => fp !== fundingPeriod) };
+    });
+  }, []);
+
+  const addStatusFilter = useCallback((status: string) => {
+    setSearchCriteria((prevState) => {
+      return { ...prevState, status: [...prevState.status.filter(fp => fp !== status), status] };
+    });
+  }, []);
+
+  const removeStatusFilter = useCallback((status: string) => {
+    setSearchCriteria((prevState) => {
+      return { ...prevState, status: prevState.status.filter(fp => fp !== status) };
+    });
+  }, []);
+
+
+  const filterBySearchTerm = useCallback((searchText: string) => {
+    if (searchText.length > 2 || (searchText.length && searchCriteria.searchText.length !== 0)) {
+      setSearchCriteria((prevState) => {
+        return { ...prevState, searchText: searchText };
+      });
+    }
+  }, []);
+
+  const clearFilters = useCallback(() => {
+    // @ts-ignore
+    document.getElementById("searchSpecifications").reset();
+    setFundingPeriodFacets(initialFundingPeriods);
+    setFundingStreamFacets(initialFundingStreams);
+    setStatusFacets(initialStatuses);
+    setSearchCriteria(initialSearch);
+  }, [initialFundingStreams, initialFundingPeriods, initialSearch, initialStatuses]);
+
+  const filterByFundingStreams = useCallback((searchTerm: string) => {
+    setFundingStreamFacets(
+      initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [initialFundingStreams]);
+
+  const filterByFundingPeriods = useCallback((searchTerm: string) => {
+    setFundingPeriodFacets(
+      initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [initialFundingPeriods]);
+
+  const filterBySearchStatus = useCallback((searchTerm: string) => {
+    setStatusFacets(initialStatuses.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
+  }, [initialStatuses]);
 
   useEffect(() => {
     const populateSpecifications = async (criteria: SpecificationSearchRequestViewModel) => {
@@ -63,10 +141,10 @@ export function SpecificationsList() {
         }
         setSpecificationListResults(results);
         if (results.facets.length > 0) {
-          setStatus(results.facets[0].facetValues);
-          setFundingPeriods(results.facets[1].facetValues);
-          setFundingStreams(results.facets[2].facetValues);
-          setInitialStatus(results.facets[0].facetValues);
+          setStatusFacets(results.facets[0].facetValues);
+          setFundingPeriodFacets(results.facets[1].facetValues);
+          setFundingStreamFacets(results.facets[2].facetValues);
+          setInitialStatuses(results.facets[0].facetValues);
           setInitialFundingPeriods(results.facets[1].facetValues);
           setInitialFundingStreams(results.facets[2].facetValues);
         }
@@ -91,85 +169,13 @@ export function SpecificationsList() {
     });
   }
 
-  function filterByFundingPeriod(e: React.ChangeEvent<HTMLInputElement>) {
-    const filterUpdate = searchCriteria.fundingPeriods;
-    if (e.target.checked) {
-      filterUpdate.push(e.target.value);
-    } else {
-      const position = filterUpdate.indexOf(e.target.value);
-      filterUpdate.splice(position, 1);
-    }
-    setSearchCriteria((prevState) => {
-      return { ...prevState, fundingPeriods: filterUpdate };
-    });
-  }
-
-  function filterByFundingStream(e: React.ChangeEvent<HTMLInputElement>) {
-    const filterUpdate = searchCriteria.fundingStreams;
-    if (e.target.checked) {
-      filterUpdate.push(e.target.value);
-    } else {
-      const position = filterUpdate.indexOf(e.target.value);
-      filterUpdate.splice(position, 1);
-    }
-    setSearchCriteria((prevState) => {
-      return { ...prevState, fundingStreams: filterUpdate };
-    });
-  }
-
-  function filterByStatus(e: React.ChangeEvent<HTMLInputElement>) {
-    const filterUpdate = searchCriteria.status;
-    if (e.target.checked) {
-      filterUpdate.push(e.target.value);
-    } else {
-      const position = filterUpdate.indexOf(e.target.value);
-      filterUpdate.splice(position, 1);
-    }
-    setSearchCriteria((prevState) => {
-      return { ...prevState, status: filterUpdate };
-    });
-  }
-
-  function filterBySearchTerm(e: React.ChangeEvent<HTMLInputElement>) {
-    const searchText = e.target.value;
-    if (searchText.length > 2 || (searchText.length && searchCriteria.searchText.length !== 0)) {
-      setSearchCriteria((prevState) => {
-        return { ...prevState, searchText: searchText };
-      });
-    }
-  }
-
-  function clearFilters() {
-    // @ts-ignore
-    document.getElementById("searchSpecifications").reset();
-    setFundingPeriods(initialFundingPeriods);
-    setFundingStreams(initialFundingStreams);
-    setStatus(initialStatus);
-    setSearchCriteria(initialSearch);
-  }
-
-  function searchFundingPeriods(e: React.ChangeEvent<HTMLInputElement>) {
-    setFundingPeriods(
-      initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(e.target.value.toLowerCase()))
-    );
-  }
-
-  function searchFundingStreams(e: React.ChangeEvent<HTMLInputElement>) {
-    setFundingStreams(
-      initialFundingStreams.filter((x) => x.name.toLowerCase().includes(e.target.value.toLowerCase()))
-    );
-  }
-
-  function searchStatus(e: React.ChangeEvent<HTMLInputElement>) {
-    setStatus(initialStatus.filter((x) => x.name.toLowerCase().includes(e.target.value.toLowerCase())));
-  }
 
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name="Home" url="/" />
+        <Breadcrumb name="Home" url="/"/>
       </Breadcrumbs>
-      <MultipleErrorSummary errors={errors} />
+      <MultipleErrorSummary errors={errors}/>
       <LoadingStatusNotifier
         notifications={[
           {
@@ -200,120 +206,25 @@ export function SpecificationsList() {
             </div>
           </div>
           <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-third">
-              <form id="searchSpecifications">
-                <CollapsiblePanel title="Search" isExpanded={true}>
-                  <fieldset className="govuk-fieldset">
-                    <label className="govuk-label">Search</label>
-                    <input className="govuk-input" onChange={filterBySearchTerm} />
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel
-                  title={"Filter by funding period"}
-                  isExpanded={true}
-                  isCollapsible={true}
-                  showFacetCount={true}
-                  facetCount={searchCriteria.fundingPeriods.length}
-                >
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-form-group">
-                      <label className="govuk-label">Search</label>
-                      <input className="govuk-input" type="text" onChange={searchFundingPeriods} />
-                    </div>
-                    <div className="govuk-checkboxes govuk-scroll-window">
-                      {filterFundingPeriods.map((fp, index) => (
-                        <div key={index} className="govuk-checkboxes__item">
-                          <input
-                            className="govuk-checkboxes__input"
-                            id={`fundingPeriods-${fp.name}`}
-                            name={`fundingPeriods-${fp.name}`}
-                            type="checkbox"
-                            value={fp.name}
-                            onChange={filterByFundingPeriod}
-                          />
-                          <label
-                            className="govuk-label govuk-checkboxes__label"
-                            htmlFor={`fundingPeriods-${fp.name}`}
-                          >
-                            {fp.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel
-                  title={"Filter by funding streams"}
-                  isExpanded={true}
-                  isCollapsible={true}
-                  showFacetCount={true}
-                  facetCount={searchCriteria.fundingStreams.length}
-                >
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-form-group">
-                      <label className="govuk-label">Search</label>
-                      <input className="govuk-input" type="text" onChange={searchFundingStreams} />
-                    </div>
-                    <div className="govuk-checkboxes govuk-scroll-window">
-                      {filterFundingStreams.map((fs, index) => (
-                        <div key={index} className="govuk-checkboxes__item">
-                          <input
-                            className="govuk-checkboxes__input"
-                            id={`fundingPeriods-${fs.name}`}
-                            name={`fundingPeriods-${fs.name}`}
-                            type="checkbox"
-                            value={fs.name}
-                            onChange={filterByFundingStream}
-                          />
-                          <label
-                            className="govuk-label govuk-checkboxes__label"
-                            htmlFor={`fundingPeriods-${fs.name}`}
-                          >
-                            {fs.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <CollapsiblePanel
-                  title={"Filter by status"}
-                  isExpanded={true}
-                  isCollapsible={true}
-                  showFacetCount={true}
-                  facetCount={searchCriteria.status.length}
-                >
-                  <fieldset className="govuk-fieldset">
-                    <div className="govuk-form-group">
-                      <label className="govuk-label">Search</label>
-                      <input className="govuk-input" type="text" onChange={searchStatus} />
-                    </div>
-                    <div className="govuk-checkboxes">
-                      {filterStatus.map((s, index) => (
-                        <div key={index} className="govuk-checkboxes__item">
-                          <input
-                            className="govuk-checkboxes__input"
-                            id={`fundingPeriods-${s.name}`}
-                            name={`fundingPeriods-${s.name}`}
-                            type="checkbox"
-                            value={s.name}
-                            onChange={filterByStatus}
-                          />
-                          <label
-                            className="govuk-label govuk-checkboxes__label"
-                            htmlFor={`fundingPeriods-${s.name}`}
-                          >
-                            {s.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </fieldset>
-                </CollapsiblePanel>
-                <button type="button" className="govuk-button" onClick={clearFilters}>
-                  Clear filters
-                </button>
-              </form>
+            <div className="govuk-grid-column-one-third position-sticky">
+              <SpecificationsSearchFilters
+                searchCriteria={searchCriteria}
+                initialSearch={initialSearch}
+                addFundingStreamFilter={addFundingStreamFilter}
+                removeFundingStreamFilter={removeFundingStreamFilter}
+                addFundingPeriodFilter={addFundingPeriodFilter}
+                removeFundingPeriodFilter={removeFundingPeriodFilter}
+                addStatusFilter={addStatusFilter}
+                removeStatusFilter={removeStatusFilter}
+                filterBySearchTerm={filterBySearchTerm}
+                filterByFundingStreams={filterByFundingStreams}
+                filterByFundingPeriods={filterByFundingPeriods}
+                filterBySearchStatus={filterBySearchStatus}
+                fundingStreamFacets={fundingStreamFacets}
+                fundingPeriodFacets={fundingPeriodFacets}
+                statusFacets={statusFacets}
+                clearFilters={clearFilters}
+              />
             </div>
             <div className="govuk-grid-column-two-thirds">
               <table
@@ -322,36 +233,43 @@ export function SpecificationsList() {
                 hidden={specificationListResults.items.length < 1}
               >
                 <thead className="govuk-table__head">
-                  <tr className="govuk-table__row">
-                    <th scope="col" className="govuk-table__header">
-                      Specification
-                    </th>
-                    <th scope="col" className="govuk-table__header govuk-!-width-one-half">
-                      Last edited data
-                    </th>
-                    <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
-                      Specification status
-                    </th>
-                  </tr>
+                <tr className="govuk-table__row">
+                  <th scope="col" className="govuk-table__header govuk-!-width-two-thirds">
+                    Specification
+                  </th>
+                  <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
+                    Chosen for funding
+                  </th>
+                  <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
+                    Last edited data
+                  </th>
+                  <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
+                    Status
+                  </th>
+                </tr>
                 </thead>
                 <tbody className="govuk-table__body" id="mainContentResults">
-                  {specificationListResults.items.map((s) => (
-                    <tr key={s.id} className="govuk-table__row">
-                      <th scope="row" className="govuk-table__header">
-                        <Link to={`/ViewSpecification/${s.id}`}>{s.name}</Link>
-                        {s.isSelectedForFunding && (
-                          <strong className="govuk-tag govuk-!-margin-top-2">Chosen for funding</strong>
-                        )}
-                      </th>
-                      <td className="govuk-table__cell">
-                        {s.lastUpdatedDate && <DateTimeFormatter date={s.lastUpdatedDate} />}
-                      </td>
-                      <td className="govuk-table__cell">{s.status}</td>
-                    </tr>
-                  ))}
+                {specificationListResults.items.map((s) => (
+                  <tr key={s.id} className="govuk-table__row">
+                    <th scope="row" className="govuk-table__header">
+                      <TextLink to={`/ViewSpecification/${s.id}`}>{s.name}</TextLink>
+                    </th>
+                    <td className="govuk-table__cell">
+                      {s.isSelectedForFunding ? (
+                        <strong className="govuk-tag" aria-label="Chosen for funding">Yes</strong>
+                      ) : (
+                        <span className="govuk-visually-hidden">Not chosen for funding</span>
+                      )}
+                    </td>
+                    <td className="govuk-table__cell nobr">
+                      {s.lastUpdatedDate && <DateTimeFormatter date={s.lastUpdatedDate} format={"d MMM yyyy h:mma"}/>}
+                    </td>
+                    <td className="govuk-table__cell">{s.status}</td>
+                  </tr>
+                ))}
                 </tbody>
               </table>
-              <NoData hidden={specificationListResults.items.length > 0} />
+              <NoData hidden={specificationListResults.items.length > 0}/>
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-two-thirds">
                   <Pagination
