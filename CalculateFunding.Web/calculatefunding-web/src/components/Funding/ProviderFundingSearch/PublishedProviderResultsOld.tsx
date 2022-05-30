@@ -8,7 +8,7 @@ import { PublishedProviderSearchResults } from "../../../types/PublishedProvider
 import { BackToTop } from "../../BackToTop";
 import { FormattedNumber, NumberType } from "../../FormattedNumber";
 import { NoData } from "../../NoData";
-import { Pagination } from "../../Pagination";
+import { TableNavBottom } from "../../TableNavBottom";
 import { ProviderResultRow } from "./ProviderResultRow";
 
 export interface IPublishedProviderResultsProps {
@@ -138,21 +138,13 @@ export function PublishedProviderResultsOld(props: IPublishedProviderResultsProp
       <BackToTop id="top" />
 
       {props.totalResults > 0 && props.providerSearchResults && (
-        <nav
-          className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
-          role="navigation"
-          aria-label="Pagination"
-        >
-          <div className="pagination__summary">
-            Showing {props.providerSearchResults.startItemNumber} -{" "}
-            {props.providerSearchResults.endItemNumber} of {props.totalResults} results
-          </div>
-          <Pagination
-            callback={handlePageChange}
-            currentPage={props.providerSearchResults.pagerState.currentPage}
-            lastPage={props.providerSearchResults.pagerState.lastPage}
-          />
-        </nav>
+          <TableNavBottom
+              totalCount={props.totalResults}
+              startItemNumber={props.providerSearchResults.startItemNumber}
+              endItemNumber={props.providerSearchResults.endItemNumber}
+              currentPage={props.providerSearchResults.pagerState.currentPage}
+              lastPage={props.providerSearchResults.pagerState.lastPage}
+              onPageChange={handlePageChange} />
       )}
     </>
   );

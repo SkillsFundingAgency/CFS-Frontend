@@ -13,6 +13,6 @@ describe("<TableResultsSummary /> ", () => {
     const { container } = render(
       <TableResultsSummary totalResults={100} startItemNumber={1} endItemNumber={10} />
     );
-    expect(container.querySelector(".pagination__summary")).toBeInTheDocument();
+    expect(container.querySelector(".hods-pagination__summary")).toBeInTheDocument();
   });
 });

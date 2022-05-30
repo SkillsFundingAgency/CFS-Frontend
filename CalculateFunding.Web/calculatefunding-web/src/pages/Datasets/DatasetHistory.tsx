@@ -5,7 +5,7 @@ import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { Pagination } from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { Title } from "../../components/Title";
 import { convertCamelCaseToSpaceDelimited } from "../../helpers/stringHelper";
 import { useErrors } from "../../hooks/useErrors";
@@ -138,19 +138,14 @@ export function DatasetHistory({ match }: RouteComponentProps<DatasetHistoryRout
       </div>
       <section className="govuk-grid-row">
         {datasetHistory?.pagerState && datasetHistory.totalResults > 0 && datasetHistory.startItemNumber > 0 && (
-          <nav className="govuk-!-margin-top-9" role="navigation" aria-label="Pagination">
-            <div className="pagination__summary">
-              <p className="govuk-body right-align">
-                {`Showing ${datasetHistory.startItemNumber} - ${datasetHistory.endItemNumber} of 
-                        ${datasetHistory.totalResults} results`}
-              </p>
-            </div>
-            <Pagination
-              currentPage={datasetHistory.currentPage}
-              lastPage={datasetHistory.pagerState.lastPage}
-              callback={setPageNumber}
-            />
-          </nav>
+         <TableNavBottom
+             totalCount={datasetHistory.totalResults}
+             startItemNumber={datasetHistory.startItemNumber}
+             endItemNumber={datasetHistory.endItemNumber}
+             currentPage={datasetHistory.currentPage}
+             lastPage={datasetHistory.pagerState.lastPage}
+             onPageChange={setPageNumber}
+         />
         )}
       </section>
     </Main>

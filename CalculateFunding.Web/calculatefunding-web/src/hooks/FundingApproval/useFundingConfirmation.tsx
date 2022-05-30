@@ -130,7 +130,7 @@ export const useFundingConfirmation = ({
   }, []);
 
   useEffect(() => {
-    if (!fundingConfiguration || fundingSummary || actionType == FundingActionType.Release) return;
+    if (!fundingConfiguration || fundingSummary || actionType === FundingActionType.Release) return;
 
     async function loadBatchFundingSummary() {
       const response = await publishService.getFundingSummaryForApprovingService(

@@ -8,7 +8,7 @@ import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import { Pagination } from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { Title } from "../../components/Title";
 import { convertToSlug } from "../../helpers/stringHelper";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
@@ -393,17 +393,13 @@ export function ManageDataSourceFiles() {
             </a>
           </div>
           {searchResults.totalResults > 0 && (
-            <nav role="navigation" aria-label="Pagination">
-              <div className="pagination__summary">
-                Showing {searchResults.startItemNumber} - {searchResults.endItemNumber} of{" "}
-                {searchResults.totalResults} results
-              </div>
-              <Pagination
-                currentPage={searchResults.pagerState.currentPage}
-                lastPage={searchResults.pagerState.lastPage}
-                callback={setPagination}
-              />
-            </nav>
+              <TableNavBottom
+                  totalCount={searchResults.totalResults}
+                  startItemNumber={searchResults.startItemNumber}
+                  endItemNumber={searchResults.endItemNumber}
+                  currentPage={searchResults.pagerState.currentPage}
+                  lastPage={searchResults.pagerState.lastPage}
+                  onPageChange={setPagination} />
           )}
         </div>
       </div>

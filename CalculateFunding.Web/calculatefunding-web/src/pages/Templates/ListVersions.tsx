@@ -9,7 +9,7 @@ import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { Pagination } from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { Title } from "../../components/Title";
 import { useEffectOnce } from "../../hooks/useEffectOnce";
 import { getTemplateById, getVersionsOfTemplate } from "../../services/templateBuilderDatasourceService";
@@ -251,18 +251,14 @@ export const ListVersions = () => {
                 </table>
 
                 <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-two-thirds">
-                    <Pagination
-                      callback={onChangePage}
-                      currentPage={page}
-                      lastPage={Math.ceil(totalResultCount / itemsPerPage)}
-                    />
-                  </div>
-                  <div className="govuk-grid-column-one-third">
-                    <p className="govuk-body-s">
-                      Showing {(page - 1) * itemsPerPage + 1} - {(page - 1) * itemsPerPage + results.length}{" "}
-                      of {totalResultCount} results
-                    </p>
+                  <div className="govuk-grid-column-full">
+                    <TableNavBottom
+                        totalCount={totalResultCount}
+                        startItemNumber={(page - 1) * itemsPerPage + 1}
+                        endItemNumber={(page - 1) * itemsPerPage + results.length}
+                        currentPage={page}
+                        lastPage={Math.ceil(totalResultCount / itemsPerPage)}
+                        onPageChange={onChangePage} />
                   </div>
                 </div>
               </div>

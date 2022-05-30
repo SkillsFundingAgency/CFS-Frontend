@@ -5,7 +5,6 @@ import { RouteComponentProps, useHistory } from "react-router";
 import { Link } from "react-router-dom";
 
 import * as action from "../../actions/jobObserverActions";
-import { BackLink } from "../../components/BackLink";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
@@ -183,16 +182,16 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
     clearErrorMessages();
     let isValid = true;
 
-    if (!selectedName || selectedName.length == 0) {
+    if (!selectedName || selectedName.length === 0) {
       addError({ error: "Invalid specification name", fieldName: "name" });
       isValid = false;
     }
-    if (!selectedDescription || selectedDescription.length == 0) {
+    if (!selectedDescription || selectedDescription.length === 0) {
       addError({ error: "Missing description", fieldName: "description" });
       isValid = false;
     }
     if (providerSource) {
-      if (
+      if(
         providerSource === ProviderSource.CFS &&
         (!selectedProviderVersionId || selectedProviderVersionId.length == 0)
       ) {
@@ -214,14 +213,14 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
         providerSource === ProviderSource.FDZ &&
         (fundingConfiguration?.updateCoreProviderVersion === UpdateCoreProviderVersion.Manual ||
           enableTrackProviderData === ProviderDataTrackingMode.Manual) &&
-        (!selectedProviderSnapshotId || selectedProviderSnapshotId.length == 0)
+        (!selectedProviderSnapshotId || selectedProviderSnapshotId.length === 0)
       ) {
         addError({ error: "Missing core provider version", fieldName: "selectCoreProvider" });
         isValid = false;
       }
     }
 
-    if (!selectedTemplateVersion || selectedTemplateVersion.length == 0) {
+    if (!selectedTemplateVersion || selectedTemplateVersion.length === 0) {
       addError({ error: "Missing template version", fieldName: "selectTemplateVersion" });
       isValid = false;
     }

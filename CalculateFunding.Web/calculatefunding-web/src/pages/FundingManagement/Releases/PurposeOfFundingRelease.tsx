@@ -66,7 +66,7 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
     if (e.target.checked) {
       setReleaseActions((prevState) => [...prevState, rac]);
     } else {
-      setReleaseActions(releaseActions.filter((x) => x.name != rac.name));
+      setReleaseActions(releaseActions.filter((x) => x.name !== rac.name));
     }
   }
 

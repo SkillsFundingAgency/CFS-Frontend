@@ -7,7 +7,7 @@ import { DateTimeFormatter } from "../DateTimeFormatter";
 import { InlineFieldset } from "../Fieldset";
 import { LoadingFieldStatus } from "../LoadingFieldStatus";
 import { NoData } from "../NoData";
-import { Pagination } from "../Pagination";
+import { TableNavBottom } from "../TableNavBottom";
 
 export interface DatasetVersionSelectorProps {
   dataset: DatasetWithVersions;
@@ -94,16 +94,13 @@ export const DataSetVersionSelector: React.FunctionComponent<DatasetVersionSelec
           </button>
         )}
         {isViewingAllVersions && versionSearchResult && setPage && (
-          <div className="govuk-form-group">
-            <div className="pagination__summary">
-              Showing {versionSearchResult.startItemNumber} - {versionSearchResult.endItemNumber} of{" "}
-              {versionSearchResult.totalResults} results
-            </div>
-            <Pagination
-              currentPage={versionSearchResult.pagerState.currentPage}
-              lastPage={versionSearchResult.pagerState.lastPage}
-              callback={setPage}
-            />
+            <div className="govuk-form-group">
+            <TableNavBottom totalCount={versionSearchResult.totalResults}
+                            startItemNumber={versionSearchResult.startItemNumber}
+                            endItemNumber={versionSearchResult.endItemNumber}
+                            currentPage={versionSearchResult.pagerState.currentPage}
+                            lastPage={versionSearchResult.pagerState.lastPage}
+                            onPageChange={setPage} />
           </div>
         )}
       </div>

@@ -9,7 +9,7 @@ import { PublishedProviderSearchResults } from "../../../types/PublishedProvider
 import { BackToTop } from "../../BackToTop";
 import { FormattedNumber, NumberType } from "../../FormattedNumber";
 import { NoData } from "../../NoData";
-import { Pagination } from "../../Pagination";
+import { TableNavBottom } from "../../TableNavBottom";
 import { ProviderResultRow } from "./ProviderResultRow";
 
 export interface ProviderResultsForFundingProps {
@@ -142,21 +142,13 @@ export function ProviderResultsTable({
       <BackToTop id="top" />
 
       {totalResults > 0 && providerSearchResults && (
-        <nav
-          className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
-          role="navigation"
-          aria-label="Pagination"
-        >
-          <div className="pagination__summary">
-            Showing {providerSearchResults.startItemNumber} - {providerSearchResults.endItemNumber} of{" "}
-            {totalResults} results
-          </div>
-          <Pagination
-            callback={handlePageChange}
-            currentPage={providerSearchResults.pagerState.currentPage}
-            lastPage={providerSearchResults.pagerState.lastPage}
-          />
-        </nav>
+          <TableNavBottom
+              totalCount={totalResults}
+              startItemNumber={providerSearchResults.startItemNumber}
+              endItemNumber={providerSearchResults.endItemNumber}
+              currentPage={providerSearchResults.pagerState.currentPage}
+              lastPage={providerSearchResults.pagerState.lastPage}
+              onPageChange={handlePageChange} />
       )}
     </>
   );

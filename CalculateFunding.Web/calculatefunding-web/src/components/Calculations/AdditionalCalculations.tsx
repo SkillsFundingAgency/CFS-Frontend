@@ -341,7 +341,6 @@ export function AdditionalCalculations({
         currentPage={additionalCalculations?.currentPage}
         lastPage={additionalCalculations?.pagerState.lastPage}
         totalCount={additionalCalculations?.totalResults}
-        totalResults={additionalCalculations?.totalResults}
         startItemNumber={additionalCalculations?.startItemNumber}
         endItemNumber={additionalCalculations?.endItemNumber}
         onPageChange={movePage}

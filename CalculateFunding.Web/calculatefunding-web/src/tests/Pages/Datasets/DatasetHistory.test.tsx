@@ -92,7 +92,7 @@ describe("<DatasetHistory />", () => {
     });
 
     it("renders paging correctly", async () => {
-      const paging = screen.getByRole("navigation", { name: /Pagination/ });
+      const paging = screen.getByRole("navigation", { name: "Pagination Navigation" });
       expect(paging).toBeInTheDocument();
       expect(within(paging).getByText(/Showing 3 - 4 of 6 results/)).toBeInTheDocument();
     });

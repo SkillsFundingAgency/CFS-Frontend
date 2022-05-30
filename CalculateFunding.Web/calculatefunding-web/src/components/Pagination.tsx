@@ -1,3 +1,5 @@
+import "../styles/pagination.scss";
+
 import React from "react";
 
 interface PaginationProps {
@@ -8,33 +10,33 @@ interface PaginationProps {
 
 export const Pagination = ({ currentPage, lastPage, callback }: PaginationProps): JSX.Element => {
   return (
-    <ul className="pagination" hidden={currentPage === 1 && lastPage === 0}>
+    <ul className="hods-pagination__list-items" hidden={currentPage === 1 && lastPage === 0}>
       {currentPage - 1 < 1 ? (
         ""
       ) : (
-        <li className="pagination__item">
-          <button className="pagination__link" id="btnPreviousPage" onClick={() => callback(currentPage - 1)}>
+        <li className="hods-pagination__item">
+          <a className="hods-pagination__link" id="btnPreviousPage" onClick={() => callback(currentPage - 1)}>
             <span aria-hidden="true" role="presentation">
               «
             </span>{" "}
-            Previous Page
-          </button>
+            Previous
+          </a>
         </li>
       )}
       {currentPage - 2 >= 1 ? (
-        <li className="pagination__item">
-          <button className="pagination__link" onClick={() => callback(currentPage - 2)}>
+        <li className="hods-pagination__item">
+          <a className="hods-pagination__link" onClick={() => callback(currentPage - 2)}>
             {currentPage - 2}
-          </button>
+          </a>
         </li>
       ) : (
         ""
       )}
       {currentPage - 1 >= 1 ? (
-        <li className="pagination__item">
-          <button className="pagination__link" onClick={() => callback(currentPage - 1)}>
+        <li className="hods-pagination__item">
+          <a className="hods-pagination__link" onClick={() => callback(currentPage - 1)}>
             {currentPage - 1}
-          </button>
+          </a>
         </li>
       ) : (
         ""
@@ -42,26 +44,26 @@ export const Pagination = ({ currentPage, lastPage, callback }: PaginationProps)
       {lastPage === 1 || currentPage === 0 ? (
         ""
       ) : (
-        <li className="pagination__item">
-          <button className="pagination__link current" aria-current="true">
+        <li className="hods-pagination__item">
+          <a className="hods-pagination__link hods-pagination__link--current" aria-current="true">
             {currentPage}
-          </button>
+          </a>
         </li>
       )}
       {currentPage + 1 <= lastPage ? (
-        <li className="pagination__item">
-          <button className="pagination__link" onClick={() => callback(currentPage + 1)}>
+        <li className="hods-pagination__item">
+          <a className="hods-pagination__link" onClick={() => callback(currentPage + 1)}>
             {currentPage + 1}
-          </button>
+          </a>
         </li>
       ) : (
         ""
       )}
       {currentPage + 2 <= lastPage ? (
-        <li className="pagination__item">
-          <button className="pagination__link" onClick={() => callback(currentPage + 2)}>
+        <li className="hods-pagination__item">
+          <a className="hods-pagination__link" onClick={() => callback(currentPage + 2)}>
             {currentPage + 2}
-          </button>
+          </a>
         </li>
       ) : (
         ""
@@ -69,18 +71,18 @@ export const Pagination = ({ currentPage, lastPage, callback }: PaginationProps)
       {currentPage + 1 > lastPage ? (
         ""
       ) : (
-        <li className="pagination__item">
-          <button
-            className="pagination__link"
+        <li className="hods-pagination__item">
+          <a
+            className="hods-pagination__link"
             id="btnNextPage"
             title="View Next Page"
             onClick={() => callback(currentPage + 1)}
           >
-            Next Page{" "}
+            Next {" "}
             <span aria-hidden="true" role="presentation">
               »
             </span>
-          </button>
+          </a>
         </li>
       )}
     </ul>

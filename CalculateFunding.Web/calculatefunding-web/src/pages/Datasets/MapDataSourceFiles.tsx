@@ -9,7 +9,7 @@ import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import { Pagination } from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
@@ -131,7 +131,7 @@ export function MapDataSourceFiles() {
 
   function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
     const filters: string[] =
-      searchRequest.filters[filterKey] != undefined ? searchRequest.filters[filterKey] : [];
+      searchRequest.filters[filterKey] !== undefined ? searchRequest.filters[filterKey] : [];
     if (enableFilter) {
       if (filters.indexOf(filterValue) === -1) {
         filters.push(filterValue);
@@ -374,21 +374,12 @@ export function MapDataSourceFiles() {
           </table>
           <BackToTop id={"top"} />
           {!isLoading && datasetRelationships.totalCount > 0 && (
-            <nav
-              className="govuk-!-margin-top-5 govuk-!-margin-bottom-9"
-              role="navigation"
-              aria-label="Pagination"
-            >
-              <div className="pagination__summary">
-                Showing {datasetRelationships.startItemNumber} - {datasetRelationships.endItemNumber} of{" "}
-                {datasetRelationships.totalCount} results
-              </div>
-              <Pagination
-                currentPage={datasetRelationships.pagerState.currentPage}
-                lastPage={datasetRelationships.pagerState.lastPage}
-                callback={pageChange}
-              />
-            </nav>
+              <TableNavBottom totalCount={datasetRelationships.totalCount}
+                              startItemNumber={datasetRelationships.startItemNumber}
+                              endItemNumber={datasetRelationships.endItemNumber}
+                              currentPage={datasetRelationships.pagerState.currentPage}
+                              lastPage={datasetRelationships.pagerState.lastPage}
+                              onPageChange={pageChange} />
           )}
         </div>
       </div>

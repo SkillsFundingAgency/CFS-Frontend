@@ -13,7 +13,7 @@ import { LoadingFieldStatus } from "../components/LoadingFieldStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
 import { Main } from "../components/Main";
 import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
-import { Pagination } from "../components/Pagination";
+import { TableNavBottom } from "../components/TableNavBottom";
 import { TagTypes } from "../components/Tag";
 import { TextLink } from "../components/TextLink";
 import { extractJobsFromNotifications, isActiveJob } from "../helpers/jobDetailsHelper";
@@ -495,17 +495,14 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
           )}
           {!!providers?.totalResults && !isLoadingCalculationProviders && (
             <div className="govuk-grid-row">
-              <div className="govuk-grid-column-two-thirds">
-                <Pagination
-                  currentPage={providers.pagerState.currentPage}
-                  lastPage={providers.pagerState.lastPage}
-                  callback={setPagination}
-                />
-              </div>
-              <div className="govuk-grid-column-one-third">
-                <p className="govuk-body-s">
-                  Showing {providers.startItemNumber} - {providers.endItemNumber} of {providers.totalResults}
-                </p>
+              <div className="govuk-grid-column-full">
+                <TableNavBottom
+                    totalCount={providers.totalResults}
+                    startItemNumber={providers.startItemNumber}
+                    endItemNumber={providers.endItemNumber}
+                    currentPage={providers.pagerState.currentPage}
+                    lastPage={providers.pagerState.lastPage}
+                    onPageChange={setPagination} />
               </div>
             </div>
           )}

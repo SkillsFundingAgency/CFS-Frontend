@@ -11,9 +11,7 @@ export const TableResultsSummary = ({
   endItemNumber,
   totalResults,
 }: TableResultsProps): JSX.Element => {
-  return (
-    <div className="pagination__summary">
+  return <div className="hods-pagination__summary">
       Showing {startItemNumber} - {endItemNumber} of {totalResults} results
-    </div>
-  );
+    </div>;
 };

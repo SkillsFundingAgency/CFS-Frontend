@@ -229,13 +229,13 @@ export function EditCalculation({
       <fieldset className="govuk-fieldset" hidden={updateCalculation.isLoading || isApproving}>
         <legend className="govuk-fieldset__legend govuk-fieldset__legend--xl">
           <span className="govuk-caption-xl">{subtitle}</span>
-          {calculation?.calculationType == CalculationType.Template && (
+          {calculation?.calculationType === CalculationType.Template && (
             <h2 id="calculation-name-title" className={"govuk-heading-l"}>
               {calculation ? calculation.name : <LoadingFieldStatus title="Loading..." />}
             </h2>
           )}
         </legend>
-        {calculation?.calculationType == CalculationType.Additional && (
+        {calculation?.calculationType === CalculationType.Additional && (
           <div className="govuk-form-group">
             <input
               className="govuk-input"

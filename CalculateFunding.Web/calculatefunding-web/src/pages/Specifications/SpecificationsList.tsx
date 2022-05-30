@@ -8,7 +8,7 @@ import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import { Pagination } from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { SpecificationsSearchFilters } from "../../components/Specifications/SpecificationsSearchFilters";
 import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
@@ -271,18 +271,14 @@ export function SpecificationsList() {
               </table>
               <NoData hidden={specificationListResults.items.length > 0}/>
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                  <Pagination
-                    callback={movePage}
-                    currentPage={specificationListResults.pagerState.currentPage}
-                    lastPage={specificationListResults.pagerState.lastPage}
-                  />
-                </div>
-                <div className="govuk-grid-column-one-third">
-                  <p className="govuk-body-s">
-                    Showing {specificationListResults.startItemNumber} -{" "}
-                    {specificationListResults.endItemNumber} of {specificationListResults.totalCount} results
-                  </p>
+                <div className="govuk-grid-column-full">
+
+                  <TableNavBottom totalCount={specificationListResults.totalCount}
+                                  startItemNumber={specificationListResults.startItemNumber}
+                                  endItemNumber={specificationListResults.endItemNumber}
+                                  currentPage={specificationListResults.pagerState.currentPage}
+                                  lastPage={specificationListResults.pagerState.lastPage}
+                                  onPageChange={movePage} />
                 </div>
               </div>
             </div>

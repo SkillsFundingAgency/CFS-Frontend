@@ -226,7 +226,6 @@ export const ListTemplates = () => {
             currentPage={templateListResults?.pagerState?.currentPage}
             lastPage={templateListResults?.pagerState?.lastPage}
             totalCount={templateListResults?.totalCount}
-            totalResults={templateListResults?.totalCount}
             startItemNumber={templateListResults?.startItemNumber}
             endItemNumber={templateListResults?.endItemNumber}
             onPageChange={setPagination}

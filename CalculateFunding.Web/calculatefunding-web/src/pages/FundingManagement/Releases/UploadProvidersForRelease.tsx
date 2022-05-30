@@ -179,7 +179,7 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
         return;
       }
 
-      if (fundingConfiguration.releaseActionGroups.length == 1) {
+      if (fundingConfiguration.releaseActionGroups.length === 1) {
         history.push(
           `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}?${fundingConfiguration.releaseActionGroups[0].channelCodes
             .map((r) => `purposes=${r}`)

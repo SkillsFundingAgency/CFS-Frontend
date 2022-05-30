@@ -477,7 +477,6 @@ export function ViewProvidersByFundingStream({
               currentPage={providerVersionSearchResults?.pagerState?.currentPage}
               lastPage={providerVersionSearchResults?.pagerState?.lastPage}
               totalCount={providerVersionSearchResults?.totalCount}
-              totalResults={providerVersionSearchResults?.totalCount}
               startItemNumber={providerVersionSearchResults?.startItemNumber}
               endItemNumber={providerVersionSearchResults?.endItemNumber}
               onPageChange={pageChange}

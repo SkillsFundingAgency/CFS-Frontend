@@ -8,7 +8,7 @@ import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import { Pagination } from "../../components/Pagination";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { searchDatasetDefinitionsService } from "../../services/datasetService";
@@ -295,17 +295,13 @@ export function DownloadDataSchema() {
           </table>
           <BackToTop id={"top"} />
           {datasetDefinitions.totalResults > 0 && (
-            <nav role="navigation" aria-label="Pagination">
-              <div className="pagination__summary">
-                Showing {datasetDefinitions.startItemNumber} - {datasetDefinitions.endItemNumber} of{" "}
-                {datasetDefinitions.totalResults} results
-              </div>
-              <Pagination
-                currentPage={datasetDefinitions.currentPage}
-                lastPage={datasetDefinitions.pagerState.lastPage}
-                callback={setPagination}
-              />
-            </nav>
+              <TableNavBottom
+                  totalCount={datasetDefinitions.totalResults}
+                  startItemNumber={datasetDefinitions.startItemNumber}
+                  endItemNumber={datasetDefinitions.endItemNumber}
+                  currentPage={datasetDefinitions.currentPage}
+                  lastPage={datasetDefinitions.pagerState.lastPage}
+                  onPageChange={setPagination} />
           )}
         </div>
       </div>
