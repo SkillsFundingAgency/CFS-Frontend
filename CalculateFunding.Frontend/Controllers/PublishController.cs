@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using CalculateFunding.Common.ApiClient.Graph.Models;
+using CalculateFunding.Common.ApiClient.Jobs.Models;
 using CalculateFunding.Common.ApiClient.Models;
 using CalculateFunding.Common.ApiClient.Publishing;
 using CalculateFunding.Common.ApiClient.Publishing.Models;
@@ -684,8 +685,8 @@ namespace CalculateFunding.Frontend.Controllers
         {
             ApiResponse<IEnumerable<AvailableVariationPointerFundingLine>> response =
                 await _publishingApiClient.GetAvailableFundingLineProfilePeriodsForVariationPointers(specificationId);
-            
-            if(response.StatusCode == HttpStatusCode.OK)
+
+            if (response.StatusCode == HttpStatusCode.OK)
             {
                 return new OkObjectResult(response.Content);
             }
@@ -706,6 +707,26 @@ namespace CalculateFunding.Frontend.Controllers
 
             return response.Handle(nameof(GetApprovedPublishedProvidersReleaseFundingSummary),
                 onSuccess: x => Ok(x.Content));
+        }
+
+        [HttpGet("api/specifications/{specificationId}/queue-report-jobs")]
+        public async Task<IActionResult> QueueReportJobs(
+            [FromRoute] string specificationId)
+        {
+            Guard.IsNullOrWhiteSpace(specificationId, nameof(specificationId));
+
+            ApiResponse<Job> queueAllCsvJobsResponse =
+                await _publishingApiClient.QueueAllCsvJobs(specificationId);
+
+            if (queueAllCsvJobsResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new BadRequestResult();
+            }
+
+            return new OkObjectResult(new JobCreationResponse
+            {
+                JobId = queueAllCsvJobsResponse.Content.Id
+            });
         }
 
         private async Task<IActionResult> ChooseRefresh(string specificationId, SpecificationActionTypes specificationActionType)

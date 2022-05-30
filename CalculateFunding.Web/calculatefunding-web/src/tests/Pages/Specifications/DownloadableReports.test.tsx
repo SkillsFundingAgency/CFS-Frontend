@@ -34,6 +34,7 @@ describe("<DownloadableReports /> ", () => {
     setupJobSpy();
     mockSpecificationService();
     mockCalculationService();
+    mockPublishService();
     await renderDownloadableReports();
   });
 
@@ -47,10 +48,19 @@ describe("<DownloadableReports /> ", () => {
   it("should call the refresh function successfully", async () => {
     const { runGenerateCalculationCsvResultsJob } = require("../../../services/calculationService");
 
-    const refreshButton = await screen.findByTestId("refresh-button");
+    const refreshButton = await screen.findByRole("button", { name: "Refresh" });
     userEvent.click(refreshButton);
 
     await waitFor(() => expect(runGenerateCalculationCsvResultsJob).toHaveBeenCalledTimes(1));
+  });
+
+  it("should call the refresh publishing function successfully", async () => {
+    const { queueReportsJob } = require("../../../services/publishService");
+
+    const refreshButton = await screen.findByRole("button", { name: "Refresh Publishing" });
+    userEvent.click(refreshButton);
+
+    await waitFor(() => expect(queueReportsJob).toHaveBeenCalledTimes(1));
   });
 
   it("renders live reports ", async () => {
@@ -145,7 +155,7 @@ const mockValidateDownloadableReports = jest.fn(() =>
       {
         specificationReportIdentifier: "4",
         name: "Report 4",
-        category: "Category2",
+        category: "History",
         lastModified: "2020-12-31",
         format: "Draft",
         size: "123",
@@ -173,6 +183,20 @@ const mockCalculationService = () => {
     return {
       ...service,
       runGenerateCalculationCsvResultsJob: jest.fn(() =>
+        Promise.resolve({
+          data: true,
+        })
+      ),
+    };
+  });
+};
+
+const mockPublishService = () => {
+  jest.mock("../../../services/publishService", () => {
+    const service = jest.requireActual("../../../services/publishService");
+    return {
+      ...service,
+      queueReportsJob: jest.fn(() =>
         Promise.resolve({
           data: true,
         })

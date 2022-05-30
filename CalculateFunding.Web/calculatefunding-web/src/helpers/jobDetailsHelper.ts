@@ -180,6 +180,7 @@ function setStatusFields(job: JobDetails) {
           break;
         case CompletionStatus.Superseded:
           job.statusDescription = "superseded";
+          job.isSuccessful = true;
           break;
         case CompletionStatus.Cancelled:
           job.statusDescription = "cancelled";
@@ -322,6 +323,8 @@ export function getJobProgressMessage(jobTypeString: string) {
       return "Exporting calculation results to SQL database";
     case JobType.RunReleasedSqlImportJob:
       return "Exporting released data to SQL";
+    case JobType.PublishingReportsJob:
+      return "Publishing reports job";
     default:
       return unrecognisedJobTypeDescription;
   }

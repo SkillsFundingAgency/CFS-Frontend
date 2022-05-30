@@ -121,6 +121,13 @@ export async function getLatestPublishedDate(fundingStreamId: string, fundingPer
   });
 }
 
+export async function queueReportsJob(specificationId: string): Promise<AxiosResponse<JobCreatedResponse>> {
+  return axios(`/api/specifications/${specificationId}/queue-report-jobs`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 export async function generateCsvForReleaseBatch(
   specificationId: string,
   publishedProviderIds: string[]

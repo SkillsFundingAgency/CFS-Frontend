@@ -30,6 +30,7 @@
   DeleteTestResultsJob = "DeleteTestResultsJob",
   GeneratePublishedFundingCsvJob = "GeneratePublishedFundingCsvJob",
   GeneratePublishedProviderEstateCsvJob = "GeneratePublishedProviderEstateCsvJob",
+  PublishingReportsJob = "PublishingReportsJob",
   PopulateScopedProvidersJob = "PopulateScopedProvidersJob",
   PublishedFundingUndoJob = "PublishedFundingUndoJob",
   ReIndexTemplatesJob = "ReIndexTemplatesJob",
