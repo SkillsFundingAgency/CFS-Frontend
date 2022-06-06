@@ -42,7 +42,7 @@ export const ListTemplates = () => {
     startItemNumber: 0,
     endItemNumber: 0,
   });
-  const initialSearch: { pageNumber: number; top: number } = { pageNumber: 1, top: 20 };
+  const initialSearch: { pageNumber: number; top: number } = { pageNumber: 1, top: 50 };
   const [searchCriteria, setSearchCriteria] = useState<TemplateSearchRequest>(
     initialSearch as TemplateSearchRequest
   );
@@ -220,8 +220,6 @@ export const ListTemplates = () => {
             </table>
           )}
           {!haveResults && <p className="govuk-body">There are no records to match your search</p>}
-          <BackToTop id={"listTemplates"} />
-
           <TableNavBottom
             currentPage={templateListResults?.pagerState?.currentPage}
             lastPage={templateListResults?.pagerState?.lastPage}
@@ -230,6 +228,8 @@ export const ListTemplates = () => {
             endItemNumber={templateListResults?.endItemNumber}
             onPageChange={setPagination}
           />
+
+          <BackToTop id={"listTemplates"} />
         </div>
       </div>
     </Main>
