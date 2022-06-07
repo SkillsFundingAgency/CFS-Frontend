@@ -22,6 +22,7 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
+            enableTextSearch={true}
             searchCriteria={searchCriteria}
             filterByFundingStreams={jest.fn()}
             filterByFundingPeriods={jest.fn()}
@@ -59,6 +60,7 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
+            enableTextSearch={true}
             searchCriteria={initSearchCriteria}
             filterByFundingStreams={jest.fn()}
             filterByFundingPeriods={jest.fn()}
@@ -98,6 +100,7 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
+            enableTextSearch={true}
             searchCriteria={{ ...initSearchCriteria, fundingStreams: ["Sorcery"] }}
             filterByFundingStreams={mockFilterByFundingStreams}
             filterByFundingPeriods={jest.fn()}
@@ -128,12 +131,12 @@ describe("<SpecificationsSearchFilters />", () => {
       expect(result.getByText(/Hide all sections/)).toBeVisible();
       expect(result.queryByText(/Show/)).not.toBeInTheDocument();
       expect(result.getAllByText(/Hide/)).toHaveLength(4);
-      
+
       expect(result.getByRole("checkbox", { name: /Sorcery/ })).toBeChecked();
       expect(result.getByRole("checkbox", { name: /Magic Potions/ })).not.toBeChecked();
     });
   });
-  
+
   describe("when a filter section 'show this section' is clicked on", () => {
     it("expands section to reveal filter options", () => {
       const mockFilterByFundingStreams = jest.fn();
@@ -143,6 +146,7 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
+            enableTextSearch={true}
             searchCriteria={{ ...initSearchCriteria, fundingStreams: ["Sorcery"] }}
             filterByFundingStreams={mockFilterByFundingStreams}
             filterByFundingPeriods={jest.fn()}
@@ -195,6 +199,7 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
+            enableTextSearch={true}
             searchCriteria={{ ...initSearchCriteria, fundingStreams: ["Sorcery"] }}
             filterByFundingStreams={mockFilterByFundingStreams}
             filterByFundingPeriods={mockFilterByFundingPeriods}

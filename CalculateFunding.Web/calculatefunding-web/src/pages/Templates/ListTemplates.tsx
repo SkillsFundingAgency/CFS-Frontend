@@ -95,6 +95,7 @@ export const ListTemplates = () => {
           <SearchSidebar
             updateSearchText={filterBySearchTerm}
             enableStickyScroll={false}
+            enableTextSearch={true}
           />
         </div>
         <div className="govuk-grid-column-two-thirds">

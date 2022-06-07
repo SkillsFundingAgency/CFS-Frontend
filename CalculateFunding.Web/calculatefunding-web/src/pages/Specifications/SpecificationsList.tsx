@@ -8,8 +8,8 @@ import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
 import { NoData } from "../../components/NoData";
-import { TableNavBottom } from "../../components/TableNavBottom";
 import { SpecificationsSearchFilters } from "../../components/Specifications/SpecificationsSearchFilters";
+import { TableNavBottom } from "../../components/TableNavBottom";
 import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
@@ -208,6 +208,7 @@ export function SpecificationsList() {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-third position-sticky">
               <SpecificationsSearchFilters
+                enableTextSearch={false}
                 searchCriteria={searchCriteria}
                 initialSearch={initialSearch}
                 addFundingStreamFilter={addFundingStreamFilter}

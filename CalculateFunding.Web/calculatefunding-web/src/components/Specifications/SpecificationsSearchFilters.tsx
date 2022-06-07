@@ -12,6 +12,7 @@ import {
 } from "../SearchFilterContainer";
 
 export const SpecificationsSearchFilters = ({
+                                              enableTextSearch,
                                               searchCriteria,
                                               addFundingStreamFilter,
                                               removeFundingStreamFilter,
@@ -28,6 +29,7 @@ export const SpecificationsSearchFilters = ({
                                               statusFacets,
                                               clearFilters
                                             }: {
+  enableTextSearch: boolean,
   searchCriteria: SpecificationSearchRequestViewModel,
   initialSearch: SpecificationSearchRequestViewModel,
   addFundingStreamFilter: (filter: string) => void,
@@ -86,7 +88,7 @@ export const SpecificationsSearchFilters = ({
 
 
   return (
-    <SearchSidebar updateSearchText={filterBySearchTerm}>
+    <SearchSidebar updateSearchText={filterBySearchTerm} enableTextSearch={enableTextSearch}>
       <SearchFilterSelectionPanel title="Selected filters"
                                   selectedFundingStreamFilters={searchCriteria.fundingStreams}
                                   selectedFundingPeriodFilters={searchCriteria.fundingPeriods}

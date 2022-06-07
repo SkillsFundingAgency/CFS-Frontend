@@ -335,9 +335,10 @@ export const SearchFiltersOuterContainer = React.memo((
   );
 });
 
-export const SearchSidebar = ({updateSearchText, enableStickyScroll = true, children}: {
+export const SearchSidebar = ({updateSearchText, enableStickyScroll = true, enableTextSearch, children}: {
   updateSearchText: (searchText: string) => void,
   enableStickyScroll?: boolean,
+  enableTextSearch: boolean,
   children?: any
 }) => {
   const debounceUpdateSearchText = useRef(debounce(updateSearchText, 500)).current;
@@ -345,7 +346,7 @@ export const SearchSidebar = ({updateSearchText, enableStickyScroll = true, chil
     <aside className="govuk-form-group filterSearch search-filters">
       <div className={`${enableStickyScroll ? "search-filters--filterScroll" : ""}`}>
         <form id="searchSpecifications">
-          <TextSearchPanel handleTextSearchChange={debounceUpdateSearchText}/>
+            {enableTextSearch && <TextSearchPanel handleTextSearchChange={debounceUpdateSearchText}/>}
           {!!children && (
             <div className="govuk-form-group filterbyContainer">
               {children}
