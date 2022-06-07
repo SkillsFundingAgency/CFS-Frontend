@@ -154,7 +154,12 @@ export const TextSearchPanel = ({
   clearSearchTitle?: string,
   handleTextSearchChange: (text: string) => void
 }) => {
-  const handleClearSearch = () => handleTextSearchChange("");
+  const inputRef = useRef<any>();
+  const handleClearSearch = (e: any) => {
+    e.preventDefault();
+    handleTextSearchChange("");
+    inputRef.current.value = "";
+  }
   const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => handleTextSearchChange(e.target.value);
 
   return (
@@ -176,6 +181,7 @@ export const TextSearchPanel = ({
                  autoComplete="off"
                  name="searchBox"
                  type="text"
+                 ref={inputRef}
                  onChange={handleTextChange}
           />
         </div>
@@ -329,19 +335,22 @@ export const SearchFiltersOuterContainer = React.memo((
   );
 });
 
-export const SearchSidebar = ({updateSearchText, children}: {
+export const SearchSidebar = ({updateSearchText, enableStickyScroll = true, children}: {
   updateSearchText: (searchText: string) => void,
-  children: any
+  enableStickyScroll?: boolean,
+  children?: any
 }) => {
   const debounceUpdateSearchText = useRef(debounce(updateSearchText, 500)).current;
   return (
     <aside className="govuk-form-group filterSearch search-filters">
-      <div className="search-filters--filterScroll">
+      <div className={`${enableStickyScroll ? "search-filters--filterScroll" : ""}`}>
         <form id="searchSpecifications">
           <TextSearchPanel handleTextSearchChange={debounceUpdateSearchText}/>
-          <div className="govuk-form-group filterbyContainer">
-            {children}
-          </div>
+          {!!children && (
+            <div className="govuk-form-group filterbyContainer">
+              {children}
+            </div>
+          )}
         </form>
       </div>
     </aside>

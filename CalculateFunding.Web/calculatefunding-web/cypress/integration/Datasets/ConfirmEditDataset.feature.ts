@@ -13,7 +13,6 @@ context("Confirm changes when editing a dataset from released data", () => {
     server.get(
       "/specifications/*",
       (schema, request): ReferencedSpecificationRelationshipMetadata | Record<string, unknown> => {
-        console.log("GET", request);
         if (request.url.includes("/dataset-relationship/")) {
           return data.relationshipMetadata1;
         } else {

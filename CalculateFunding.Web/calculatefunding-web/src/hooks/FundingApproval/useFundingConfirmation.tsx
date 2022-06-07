@@ -191,7 +191,6 @@ export const useFundingConfirmation = ({
       loadFullFundingSummary();
     }
     if (fundingConfiguration.approvalMode === ApprovalMode.Batches) {
-      console.log("selectedProviderIds", selectedProviderIds);
       if (selectedProviderIds.length > 0) {
         loadBatchFundingSummary();
       }

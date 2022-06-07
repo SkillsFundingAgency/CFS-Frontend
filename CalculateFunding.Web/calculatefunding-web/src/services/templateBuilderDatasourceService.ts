@@ -23,7 +23,7 @@ import {
   TemplateCalculation,
   TemplateContentUpdateCommand,
   TemplateFundingLine,
-  TemplateResponse,
+  TemplateResponse, TemplateSearchResponse,
   TemplateStatus,
   ValueFormatType,
 } from "../types/TemplateBuilderDefinitions";
@@ -152,7 +152,8 @@ export const cloneNode = async (
     cloneChildNodes(draggedItemData.children, dropTargetDsKey);
   }
 
-  await addNode(ds, dropTargetId, cloneDeep(draggedItemData), () => {});
+  await addNode(ds, dropTargetId, cloneDeep(draggedItemData), () => {
+  });
 };
 
 export const cloneCalculation = async (
@@ -216,7 +217,8 @@ export const moveNode = async (
     ds.splice(fundingLineKeyIndex, 1);
   } else {
     await removeNode(ds, draggedItemData.id);
-    await addNode(ds, dropTargetId, draggedItemData, () => {});
+    await addNode(ds, dropTargetId, draggedItemData, () => {
+    });
   }
 };
 
@@ -678,12 +680,10 @@ export async function restoreTemplateContent(
   });
 }
 
-export async function searchForTemplates(searchRequest: TemplateSearchRequest) {
-  return await axios("/api/templates/build/search", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    data: searchRequest,
-  });
+export const searchForTemplates = (searchRequest: TemplateSearchRequest) => {
+  return axios.post<TemplateSearchResponse>(
+    "/api/templates/build/search",
+    searchRequest);
 }
 
 export async function getTemplateById(templateId: string): Promise<AxiosResponse<TemplateResponse>> {
@@ -696,9 +696,7 @@ export async function getTemplateById(templateId: string): Promise<AxiosResponse
   });
 }
 
-export async function getAllFundingStreamsWithAvailablePeriods(): Promise<
-  AxiosResponse<FundingStreamWithPeriodsResponse[]>
-> {
+export async function getAllFundingStreamsWithAvailablePeriods(): Promise<AxiosResponse<FundingStreamWithPeriodsResponse[]>> {
   return await axios.get("/api/templates/build/available-stream-periods", {
     method: "GET",
     headers: {

@@ -272,7 +272,6 @@ const Actions = (props: {
 }) => {
   const onClickHandler = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log("Actions.onClick");
     props.onSave(e);
   };
   return (

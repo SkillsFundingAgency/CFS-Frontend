@@ -33,6 +33,7 @@ export const TextLink = ({
     <Link
       className={`govuk-link govuk-link--no-visited-state ${additionalCss ?? ""}`}
       id={id ?? ""}
+      data-testid={id ?? ""}
       to={to ?? ""}
       aria-label={label ?? renderToString(children)}
       aria-describedby={describedBy}
