@@ -124,7 +124,7 @@ export function ViewSpecificationResults({ match }: RouteComponentProps<ViewSpec
             </ul>
           </div>
         </div>
-        {initialTab.length > 0 && (
+        {initialTab.length > 0 && !isLoadingSpecification && (
           <div className="govuk-grid-row govuk-!-padding-top-5">
             <div className="govuk-grid-column-full" hidden={isLoadingSpecification}>
               <Tabs initialTab={initialTab}>

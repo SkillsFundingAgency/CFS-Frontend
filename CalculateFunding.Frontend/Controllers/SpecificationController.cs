@@ -468,7 +468,7 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
 
-        [Route("api/specs/{specificationId}/get-report-metadata/{fundingPeriodId}")]
+        [Route("api/specs/{specificationId}/get-report-metadata/{fundingPeriodId?}")]
         [HttpGet]
         public async Task<IActionResult> GetReportMetadata(string specificationId, string fundingPeriodId = null)
         {
