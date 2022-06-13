@@ -21,10 +21,12 @@ import { RunningStatus } from "../../types/RunningStatus";
 import { ProviderDataTrackingMode } from "../../types/Specifications/ProviderDataTrackingMode";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
 import {
+  GetTemplateVersionsResponse,
   PublishedFundingTemplate,
+  TemplateResponse,
   TemplateSearchResponse,
   TemplateSearchResult,
-  TemplateStatus
+  TemplateStatus, TemplateVersionSummary
 } from "../../types/TemplateBuilderDefinitions";
 import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
 
@@ -338,6 +340,49 @@ const makeTemplateSearchResponse = (overrides: Partial<TemplateSearchResponse>):
   ...overrides
 });
 
+const makeTemplateVersion = (overrides: Partial<TemplateVersionSummary>): TemplateVersionSummary => ({
+  authorName: "Bob",
+  lastModificationDate: new Date(),
+  fundingStreamId: "arch",
+  fundingStreamName: "Archery",
+  fundingPeriodId: "fp1",
+  fundingPeriodName: "Period 1",
+  status: "Draft",
+  version: 1,
+  isCurrentVersion: true,
+  majorVersion: 0,
+  minorVersion: 1,
+  ...overrides
+});
+
+const makeTemplate = (overrides: Partial<TemplateResponse>): TemplateResponse => ({
+  templateId: "templateId",
+  authorId: "testid",
+  authorName: "testuser",
+  comments: "",
+  description: "testing 1 2 3",
+  fundingPeriodId: "AY-2021",
+  fundingPeriodName: "Period 2021",
+  fundingStreamId: "arch",
+  fundingStreamName: "Archery",
+  lastModificationDate: new Date("2020-06-30T11:40:46.1025319"),
+  majorVersion: 0,
+  minorVersion: 1,
+  version: 1,
+  name: "PSG AY-2021",
+  schemaVersion: "1.1",
+  status: "Draft",
+  templateJson: "",
+  isCurrentVersion: true,
+  ...overrides
+});
+
+const makeTemplateVersionsResponse = (overrides: Partial<GetTemplateVersionsResponse>): GetTemplateVersionsResponse => ({
+  pageResults: [],
+  totalCount: 0,
+  ...overrides
+});
+
 const makeTemplateSearchResult = (overrides: Partial<TemplateSearchResult>): TemplateSearchResult => ({
   id: "1111111",
   name: "template name",
@@ -470,4 +515,7 @@ export const fakery = {
   makeMatch,
   makeTemplateSearchResponse,
   makeTemplateSearchResult,
+  makeTemplateVersionsResponse,
+  makeTemplateVersion,
+  makeTemplate,
 };

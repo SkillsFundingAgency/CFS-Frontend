@@ -1,26 +1,21 @@
-﻿import { AxiosError } from "axios";
-import React, { useEffect, useState } from "react";
-// @ts-ignore
-import { Link, useParams } from "react-router-dom";
+﻿import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
+import { SearchFilterContainer, SearchFilterSection, SearchSidebar } from "../../components/SearchFilterContainer";
 import { TableNavBottom } from "../../components/TableNavBottom";
+import { TextLink } from "../../components/TextLink";
 import { Title } from "../../components/Title";
-import { useEffectOnce } from "../../hooks/useEffectOnce";
-import { getTemplateById, getVersionsOfTemplate } from "../../services/templateBuilderDatasourceService";
-import { ErrorMessage } from "../../types/ErrorMessage";
+import { useTemplate } from "../../hooks/TemplateBuilder/useTemplate";
+import { useTemplateVersions } from "../../hooks/TemplateBuilder/useTemplateVersions";
+import { useErrors } from "../../hooks/useErrors";
+import { useToggle } from "../../hooks/useToggle";
 import { Section } from "../../types/Sections";
-import {
-  GetTemplateVersionsResponse,
-  TemplateResponse,
-  TemplateStatus,
-  TemplateVersionSummary,
-} from "../../types/TemplateBuilderDefinitions";
+import { TemplateStatus, TemplateVersionSearchQuery, } from "../../types/TemplateBuilderDefinitions";
 
 export interface TemplateRoute {
   templateId: string;
@@ -28,243 +23,172 @@ export interface TemplateRoute {
 
 export const ListVersions = () => {
   const { templateId } = useParams<TemplateRoute>();
-  const [isLoadingVersions, setIsLoadingVersions] = useState<boolean>(true);
-  const [isLoadingTemplate, setIsLoadingTemplate] = useState<boolean>(true);
-  const [template, setTemplate] = useState<TemplateResponse>();
-  const [totalResultCount, setTotalResults] = useState<number>(0);
-  const [results, setResults] = useState<TemplateVersionSummary[]>();
-  const [page, setPage] = useState<number>(1);
-  const [includeDrafts, setIncludeDrafts] = useState<boolean>(true);
-  const [includePublished, setIncludePublished] = useState<boolean>(true);
-  const [errors, setErrors] = useState<ErrorMessage[]>([]);
   const itemsPerPage = 10;
-  const [statusCount, setStatusCount] = useState<number>(0);
-
-  function loadTemplate() {
-    const getTemplate = async () => {
-      const result = await getTemplateById(templateId);
-      return result.data as TemplateResponse;
-    };
-    setIsLoadingTemplate(true);
-    getTemplate()
-      .then((result) => {
-        setTemplate(result);
-        setIsLoadingTemplate(false);
-      })
-      .catch((error: AxiosError) => {
-        addErrorMessage(`Error whilst fetching template: ${error.code}: ${error.message}`);
-      })
-      .finally(() => setIsLoadingTemplate(false));
-  }
-
-  useEffectOnce(() => {
-    loadTemplate();
+  const [searchCriteria, setSearchCriteria] = useState<TemplateVersionSearchQuery>({
+    templateId,
+    page: 1,
+    itemsPerPage,
   });
+  const { errors, addError } = useErrors();
+  const { template, isLoadingTemplate } = useTemplate(
+    templateId,
+    {
+      onError: err => addError({
+        error: err,
+        description: "Error whilst fetching template"
+      })
+    });
+  const { templateVersions, isLoadingTemplateVersions } = useTemplateVersions(
+    searchCriteria,
+    {
+      onError: err => addError({
+        error: err,
+        description: "Error whilst searching template versions"
+      })
+    });
 
-  useEffect(() => {
-    let count = 0;
-    if (includeDrafts) {
-      count++;
-    }
+  const {
+    isExpanded,
+    toggleExpanded,
+  } = useToggle();
 
-    if (includePublished) {
-      count++;
-    }
 
-    setStatusCount(count);
-  }, [includeDrafts, includePublished]);
-
-  useEffect(() => {
-    function loadTemplateVersions() {
-      setIsLoadingVersions(true);
-      const getVersions = async () => {
-        const statuses: TemplateStatus[] = [
-          ...(includeDrafts ? [TemplateStatus.Draft] : []),
-          ...(includePublished ? [TemplateStatus.Published] : []),
-        ];
-        const result = await getVersionsOfTemplate(templateId, page, itemsPerPage, statuses);
-        return result.data as GetTemplateVersionsResponse;
-      };
-      if (!includeDrafts && !includePublished) {
-        setResults([]);
-        setTotalResults(0);
-        setIsLoadingVersions(false);
-      } else {
-        getVersions()
-          .then((result) => {
-            setResults(result.pageResults);
-            setTotalResults(result.totalCount);
-          })
-          .catch((error: AxiosError) => {
-            addErrorMessage(`Error whilst fetching versions: ${error.code}: ${error.message}`);
-          })
-          .finally(() => setIsLoadingVersions(false));
-      }
-    }
-
-    loadTemplateVersions();
-  }, [page, includeDrafts, includePublished, templateId]);
-
-  function onStatusFilterChanged(e: React.ChangeEvent<HTMLInputElement>) {
-    setPage(1);
-    const status = e.target.value as TemplateStatus;
-    if (status === TemplateStatus.Draft) {
-      setIncludeDrafts(e.target.checked);
-    } else if (status === TemplateStatus.Published) {
-      setIncludePublished(e.target.checked);
-    }
+  const isTemplateStatus = (arg: any): arg is TemplateStatus => {
+    return !!(arg as TemplateStatus)?.length;
   }
 
-  const onChangePage = async (newPage: number) => {
-    setPage(newPage);
+  const onStatusAdded = (extraStatus: string) => {
+    if (isTemplateStatus(extraStatus)) {
+      setSearchCriteria(prev => ({
+        ...prev,
+        page: 1,
+        statuses: [...(prev.statuses ?? []).filter(s => s !== extraStatus).concat([extraStatus])]
+      }));
+    }
   };
 
-  function addErrorMessage(errorMessage: string, fieldName?: string) {
-    const errorCount: number = errors.length;
-    const error: ErrorMessage = { id: errorCount + 1, fieldName: fieldName, message: errorMessage };
-    setErrors((errors) => [...errors, error]);
-  }
+  const onStatusRemoved = (removedStatus: string) => {
+    if (isTemplateStatus(removedStatus)) {
+      setSearchCriteria(prev => ({
+        ...prev,
+        page: 1,
+        statuses: [...(prev.statuses ?? []).filter(s => s !== removedStatus)]
+      }));
+    }
+  };
+
+  const onChangePage = async (newPage: number) => {
+    setSearchCriteria(prev => ({
+      ...prev,
+      page: newPage
+    }));
+  };
+
+  const statusFilters = searchCriteria.statuses?.map(s => s.toString()) ?? [];
 
   return (
     <Main location={Section.Templates}>
       <Breadcrumbs>
-        <Breadcrumb name="Home" url="/" />
-        <Breadcrumb name={"Templates"} url={"/Templates/List"} />
-        <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`} />
+        <Breadcrumb name="Home" url="/"/>
+        <Breadcrumb name={"Templates"} url={"/Templates/List"}/>
+        <Breadcrumb name={template ? template.name : "Template"} url={`/Templates/${templateId}/Edit`}/>
       </Breadcrumbs>
-      <MultipleErrorSummary errors={errors} />
-      <LoadingStatus
-        title={"Loading"}
-        description={"Please wait whilst the template versions are loading"}
-        hidden={!isLoadingTemplate && !isLoadingVersions}
-      />
+      <MultipleErrorSummary errors={errors}/>
+      {isLoadingTemplate && isLoadingTemplateVersions && (
+        <LoadingStatus
+          title="Loading"
+          description="Please wait whilst the template versions are loading"
+        />
+      )}
       <Title
         title={template?.name ?? ""}
         titleCaption={template && `${template.fundingStreamName} for ${template.fundingPeriodName}`}
       />
 
-      {results && template && (
+      {!!template && (
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-one-third">
-            <form id="filters">
-              <CollapsiblePanel
-                title={"Filter by status"}
-                isExpanded={true}
-                isCollapsible={true}
-                facetCount={statusCount}
-                showFacetCount={true}
-              >
-                <fieldset className="govuk-fieldset">
-                  <div className="govuk-checkboxes">
-                    <div className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        id={`status-${TemplateStatus.Draft}`}
-                        name={`status-${TemplateStatus.Draft}`}
-                        type="checkbox"
-                        checked={includeDrafts}
-                        value={TemplateStatus.Draft}
-                        onChange={(e) => onStatusFilterChanged(e)}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`status-${TemplateStatus.Draft}`}
-                      >
-                        {TemplateStatus.Draft}
-                      </label>
-                    </div>
-                    <div className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        id={`status-${TemplateStatus.Published}`}
-                        name={`status-${TemplateStatus.Published}`}
-                        type="checkbox"
-                        checked={includePublished}
-                        value={TemplateStatus.Published}
-                        onChange={(e) => onStatusFilterChanged(e)}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`status-${TemplateStatus.Published}`}
-                      >
-                        {TemplateStatus.Published}
-                      </label>
-                    </div>
-                  </div>
-                </fieldset>
-              </CollapsiblePanel>
-            </form>
+            <SearchSidebar enableStickyScroll={false}>
+              <SearchFilterContainer>
+                <SearchFilterSection title="Status"
+                                     facets={[TemplateStatus.Draft, TemplateStatus.Published]}
+                                     isExpanded={isExpanded}
+                                     toggleExpanded={toggleExpanded}
+                                     enableStandalone={true}
+                                     addFilter={onStatusAdded}
+                                     removeFilter={onStatusRemoved}
+                                     selectedFilters={statusFilters}/>
+              </SearchFilterContainer>
+            </SearchSidebar>
           </div>
           <div className="govuk-grid-column-two-thirds">
-            {totalResultCount > 0 && results && template && (
-              <div>
+            {templateVersions?.totalCount ? (
+              <>
                 <table className="govuk-table" id="templates-table">
                   <thead className="govuk-table__head">
-                    <tr className="govuk-table__row">
-                      <th scope="col" className="govuk-table__header">
-                        Template version
-                      </th>
-                      <th scope="col" className="govuk-table__header">
-                        Status
-                      </th>
-                      <th scope="col" className="govuk-table__header">
-                        Last Updated
-                      </th>
-                    </tr>
+                  <tr className="govuk-table__row">
+                    <th scope="col" className="govuk-table__header">
+                      Template version
+                    </th>
+                    <th scope="col" className="govuk-table__header">
+                      Status
+                    </th>
+                    <th scope="col" className="govuk-table__header">
+                      Last Updated
+                    </th>
+                  </tr>
                   </thead>
                   <tbody className="govuk-table__body" id="mainContentResults">
-                    {results.map((item) => (
+                  {templateVersions.pageResults.map((item) => {
+                    const label = `Version ${item.majorVersion}.${item.minorVersion}`;
+                    return (
                       <tr key={item.version} className="govuk-table__row">
                         <th scope="row" className="govuk-table__header">
-                          <Link
+                          <TextLink
                             to={`/Templates/${template.templateId}/Versions/${item.version}`}
-                            data-testid={"version-" + item.version}
+                            id={"version-" + item.version}
+                            label={label}
                           >
-                            Version {item.majorVersion}.{item.minorVersion}
-                          </Link>
+                            {label}
+                          </TextLink>
                         </th>
                         <td className="govuk-table__cell" data-testid={"status-" + item.version}>
                           {item.status === TemplateStatus.Draft && item.version === template.version && (
                             <span>
-                              <strong className="govuk-tag govuk-tag--blue">In Progress</strong>
-                            </span>
+                            <strong className="govuk-tag govuk-tag--blue">In Progress</strong>
+                          </span>
                           )}
                           {item.status === TemplateStatus.Draft && item.version !== template.version && (
                             <span>
-                              <strong className="govuk-tag govuk-tag--grey">Draft</strong>
-                            </span>
+                            <strong className="govuk-tag govuk-tag--grey">Draft</strong>
+                          </span>
                           )}
                           {item.status === TemplateStatus.Published && (
                             <span>
-                              <strong className="govuk-tag govuk-tag--green">Published</strong>
-                            </span>
+                            <strong className="govuk-tag govuk-tag--green">Published</strong>
+                          </span>
                           )}
                         </td>
                         <td className="govuk-table__cell">
-                          <DateTimeFormatter date={item.lastModificationDate} />
-                          <br />
+                          <DateTimeFormatter date={item.lastModificationDate}/>
+                          <br/>
                           by {item.authorName}
                         </td>
                       </tr>
-                    ))}
+                    )
+                  })}
                   </tbody>
                 </table>
-
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-full">
-                    <TableNavBottom
-                        totalCount={totalResultCount}
-                        startItemNumber={(page - 1) * itemsPerPage + 1}
-                        endItemNumber={(page - 1) * itemsPerPage + results.length}
-                        currentPage={page}
-                        lastPage={Math.ceil(totalResultCount / itemsPerPage)}
-                        onPageChange={onChangePage} />
-                  </div>
-                </div>
-              </div>
-            )}
-            {!isLoadingVersions && totalResultCount === 0 && (
-              <div className="govuk-grid-column-full" data-testid="no-results">
+                <TableNavBottom
+                  totalCount={templateVersions.totalCount}
+                  startItemNumber={(searchCriteria.page - 1) * itemsPerPage + 1}
+                  endItemNumber={(searchCriteria.page - 1) * itemsPerPage + templateVersions.pageResults.length}
+                  currentPage={searchCriteria.page}
+                  lastPage={Math.ceil(templateVersions.totalCount / itemsPerPage)}
+                  onPageChange={onChangePage}/>
+              </>
+            ) : (
+              <div className="govuk-grid-column-two-thirds" data-testid="no-results">
                 <p className="govuk-body">There are no records to match your search</p>
               </div>
             )}

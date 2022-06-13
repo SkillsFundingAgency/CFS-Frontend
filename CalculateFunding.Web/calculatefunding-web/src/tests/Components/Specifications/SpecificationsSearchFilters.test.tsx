@@ -22,7 +22,6 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
-            enableTextSearch={true}
             searchCriteria={searchCriteria}
             filterByFundingStreams={jest.fn()}
             filterByFundingPeriods={jest.fn()}
@@ -60,7 +59,6 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
-            enableTextSearch={true}
             searchCriteria={initSearchCriteria}
             filterByFundingStreams={jest.fn()}
             filterByFundingPeriods={jest.fn()}
@@ -100,7 +98,6 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
-            enableTextSearch={true}
             searchCriteria={{ ...initSearchCriteria, fundingStreams: ["Sorcery"] }}
             filterByFundingStreams={mockFilterByFundingStreams}
             filterByFundingPeriods={jest.fn()}
@@ -146,7 +143,6 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
-            enableTextSearch={true}
             searchCriteria={{ ...initSearchCriteria, fundingStreams: ["Sorcery"] }}
             filterByFundingStreams={mockFilterByFundingStreams}
             filterByFundingPeriods={jest.fn()}
@@ -199,7 +195,6 @@ describe("<SpecificationsSearchFilters />", () => {
       const result = render(
         <MemoryRouter>
           <SpecificationsSearchFilters
-            enableTextSearch={true}
             searchCriteria={{ ...initSearchCriteria, fundingStreams: ["Sorcery"] }}
             filterByFundingStreams={mockFilterByFundingStreams}
             filterByFundingPeriods={mockFilterByFundingPeriods}

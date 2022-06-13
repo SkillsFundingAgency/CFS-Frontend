@@ -1,3 +1,5 @@
+// @ts-nocheck
+// eslint-disable
 import axios from "axios";
 import { AxiosResponse } from "axios";
 import JSONDigger from "json-digger";
@@ -23,8 +25,7 @@ import {
   TemplateCalculation,
   TemplateContentUpdateCommand,
   TemplateFundingLine,
-  TemplateResponse, TemplateSearchResponse,
-  TemplateStatus,
+  TemplateResponse, TemplateSearchResponse, TemplateVersionSearchQuery,
   ValueFormatType,
 } from "../types/TemplateBuilderDefinitions";
 import { TemplateSearchRequest } from "../types/templateSearchRequest";
@@ -745,17 +746,13 @@ export async function publishTemplate(templateId: string, note: string): Promise
   });
 }
 
-export async function getVersionsOfTemplate(
-  templateId: string,
-  page: number,
-  itemsPerPage: number,
-  statuses?: TemplateStatus[]
-): Promise<AxiosResponse<GetTemplateVersionsResponse>> {
-  let uri = `/api/templates/build/${templateId}/versions?page=${page}&itemsPerPage=${itemsPerPage}`;
-  if (statuses) {
-    uri += statuses.map((x) => `&statuses=${x}`).join("");
+export const getVersionsOfTemplate = (searchCriteria: TemplateVersionSearchQuery):
+  Promise<AxiosResponse<GetTemplateVersionsResponse>> => {
+  let uri = `/api/templates/build/${searchCriteria.templateId}/versions?page=${searchCriteria.page}&itemsPerPage=${searchCriteria.itemsPerPage}`;
+  if (searchCriteria.statuses) {
+    uri += searchCriteria.statuses.map((x) => `&statuses=${x}`).join("");
   }
-  return await axios(uri, {
+  return axios(uri, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

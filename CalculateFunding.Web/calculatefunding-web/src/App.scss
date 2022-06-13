@@ -685,11 +685,14 @@ aside.search-filters  {
     display: block;
     margin-bottom: 0;
     padding-top: 0.4em;
-    padding-left: 7px;
-    width: 100%;
+    padding-left: 10px;
+    padding-right: 0;
+    width: auto;
 
     border: 0;
-    border-top: $govuk-accordion-bottom-border-width solid $govuk-border-colour;
+    &:not(.search-filters__standalone) {
+      border-top: $govuk-accordion-bottom-border-width solid $govuk-border-colour;
+    }
 
     // Visually separate the section from the one underneath when user changes colours in their
     // browser. See https://github.com/alphagov/govuk-frontend/issues/2321#issuecomment-924201488
@@ -778,7 +781,7 @@ aside.search-filters  {
 }
 
 .search-filters__section__content {
-  padding-left: 5px;
+  padding-left: 0;
   .govuk-fieldset {
     padding-left: 0.4em;
   }

@@ -12,63 +12,63 @@ import {
 } from "../SearchFilterContainer";
 
 export const SpecificationsSearchFilters = ({
-                                              enableTextSearch,
-                                              searchCriteria,
-                                              addFundingStreamFilter,
-                                              removeFundingStreamFilter,
-                                              addFundingPeriodFilter,
-                                              removeFundingPeriodFilter,
-                                              addStatusFilter,
-                                              removeStatusFilter,
-                                              filterBySearchTerm,
-                                              filterByFundingStreams,
-                                              filterByFundingPeriods,
-                                              filterBySearchStatus,
-                                              fundingStreamFacets,
-                                              fundingPeriodFacets,
-                                              statusFacets,
-                                              clearFilters
-                                            }: {
-  enableTextSearch: boolean,
-  searchCriteria: SpecificationSearchRequestViewModel,
-  initialSearch: SpecificationSearchRequestViewModel,
-  addFundingStreamFilter: (filter: string) => void,
-  removeFundingStreamFilter: (filter: string) => void,
-  addFundingPeriodFilter: (filter: string) => void,
-  removeFundingPeriodFilter: (filter: string) => void,
-  addStatusFilter: (filter: string) => void,
-  removeStatusFilter: (filter: string) => void,
-  filterBySearchTerm: (filter: string) => void,
-  filterByFundingStreams: (filter: string) => void,
-  filterByFundingPeriods: (filter: string) => void,
-  filterBySearchStatus: (filter: string) => void,
-  fundingStreamFacets: FacetValue[],
-  fundingPeriodFacets: FacetValue[],
-  statusFacets: FacetValue[],
-  clearFilters: () => void
+  searchCriteria,
+  addFundingStreamFilter,
+  removeFundingStreamFilter,
+  addFundingPeriodFilter,
+  removeFundingPeriodFilter,
+  addStatusFilter,
+  removeStatusFilter,
+  filterBySearchTerm,
+  filterByFundingStreams,
+  filterByFundingPeriods,
+  fundingStreamFacets,
+  fundingPeriodFacets,
+  statusFacets,
+  clearFilters,
+}: {
+  searchCriteria: SpecificationSearchRequestViewModel;
+  initialSearch: SpecificationSearchRequestViewModel;
+  addFundingStreamFilter: (filter: string) => void;
+  removeFundingStreamFilter: (filter: string) => void;
+  addFundingPeriodFilter: (filter: string) => void;
+  removeFundingPeriodFilter: (filter: string) => void;
+  addStatusFilter: (filter: string) => void;
+  removeStatusFilter: (filter: string) => void;
+  filterBySearchTerm?: (filter: string) => void;
+  filterByFundingStreams: (filter: string) => void;
+  filterByFundingPeriods: (filter: string) => void;
+  filterBySearchStatus: (filter: string) => void;
+  fundingStreamFacets: FacetValue[];
+  fundingPeriodFacets: FacetValue[];
+  statusFacets: FacetValue[];
+  clearFilters: () => void;
 }) => {
   const {
     isExpanded: isFundingStreamExpanded,
     toggleExpanded: toggleFundingStreamExpanded,
-    setExpanded: setFundingStreamExpanded
+    setExpanded: setFundingStreamExpanded,
   } = useToggle();
 
   const {
     isExpanded: isFundingPeriodExpanded,
     toggleExpanded: toggleFundingPeriodExpanded,
-    setExpanded: setFundingPeriodExpanded
+    setExpanded: setFundingPeriodExpanded,
   } = useToggle();
   const {
     isExpanded: isStatusExpanded,
     toggleExpanded: toggleStatusExpanded,
-    setExpanded: setStatusExpanded
+    setExpanded: setStatusExpanded,
   } = useToggle();
 
-
-  const allExpanded = useMemo(() => isFundingStreamExpanded && isFundingPeriodExpanded,
-    [isFundingStreamExpanded, isFundingPeriodExpanded]);
-  const allCollapsed = useMemo(() => !isFundingStreamExpanded && !isFundingPeriodExpanded,
-    [isFundingStreamExpanded, isFundingPeriodExpanded]);
+  const allExpanded = useMemo(
+    () => isFundingStreamExpanded && isFundingPeriodExpanded,
+    [isFundingStreamExpanded, isFundingPeriodExpanded]
+  );
+  const allCollapsed = useMemo(
+    () => !isFundingStreamExpanded && !isFundingPeriodExpanded,
+    [isFundingStreamExpanded, isFundingPeriodExpanded]
+  );
   const expandAllFilters = useCallback(() => {
     setFundingStreamExpanded(true);
     setFundingPeriodExpanded(true);
@@ -86,47 +86,54 @@ export const SpecificationsSearchFilters = ({
     clearFilters();
   }, [clearFilters]);
 
-
   return (
-    <SearchSidebar updateSearchText={filterBySearchTerm} enableTextSearch={enableTextSearch}>
-      <SearchFilterSelectionPanel title="Selected filters"
-                                  selectedFundingStreamFilters={searchCriteria.fundingStreams}
-                                  selectedFundingPeriodFilters={searchCriteria.fundingPeriods}
-                                  selectedStatusFilters={searchCriteria.status}
-                                  handleRemoveFundingStreamFilter={removeFundingStreamFilter}
-                                  handleRemoveFundingPeriodFilter={removeFundingPeriodFilter}
-                                  handleRemoveStatusFilter={removeStatusFilter}
-                                  handleClearSearch={handleClearFilters}/>
-      <SearchFiltersOuterContainer expandAllFilters={expandAllFilters}
-                                   collapseAllFilters={collapseAllFilters}
-                                   allExpanded={allExpanded}
-                                   allCollapsed={allCollapsed}
+    <SearchSidebar updateSearchText={filterBySearchTerm}>
+      <SearchFilterSelectionPanel
+        title="Selected filters"
+        selectedFundingStreamFilters={searchCriteria.fundingStreams}
+        selectedFundingPeriodFilters={searchCriteria.fundingPeriods}
+        selectedStatusFilters={searchCriteria.status}
+        handleRemoveFundingStreamFilter={removeFundingStreamFilter}
+        handleRemoveFundingPeriodFilter={removeFundingPeriodFilter}
+        handleRemoveStatusFilter={removeStatusFilter}
+        handleClearSearch={handleClearFilters}
+      />
+      <SearchFiltersOuterContainer
+        expandAllFilters={expandAllFilters}
+        collapseAllFilters={collapseAllFilters}
+        allExpanded={allExpanded}
+        allCollapsed={allCollapsed}
       >
         <SearchFilterContainer>
-          <SearchFilterSection title="Funding streams"
-                               facets={fundingStreamFacets}
-                               isExpanded={isFundingStreamExpanded}
-                               toggleExpanded={toggleFundingStreamExpanded}
-                               addFilter={addFundingStreamFilter}
-                               removeFilter={removeFundingStreamFilter}
-                               searchForFilter={filterByFundingStreams}
-                               selectedFilters={searchCriteria.fundingStreams}/>
-          <SearchFilterSection title="Funding periods"
-                               facets={fundingPeriodFacets}
-                               isExpanded={isFundingPeriodExpanded}
-                               toggleExpanded={toggleFundingPeriodExpanded}
-                               addFilter={addFundingPeriodFilter}
-                               removeFilter={removeFundingPeriodFilter}
-                               searchForFilter={filterByFundingPeriods}
-                               selectedFilters={searchCriteria.fundingPeriods}/>
-          <SearchFilterSection title="Status"
-                               facets={statusFacets}
-                               isExpanded={isStatusExpanded}
-                               toggleExpanded={toggleStatusExpanded}
-                               addFilter={addStatusFilter}
-                               removeFilter={removeStatusFilter}
-                               searchForFilter={filterBySearchStatus}
-                               selectedFilters={searchCriteria.status}/>
+          <SearchFilterSection
+            title="Funding streams"
+            facets={fundingStreamFacets}
+            isExpanded={isFundingStreamExpanded}
+            toggleExpanded={toggleFundingStreamExpanded}
+            addFilter={addFundingStreamFilter}
+            removeFilter={removeFundingStreamFilter}
+            searchForFilter={filterByFundingStreams}
+            selectedFilters={searchCriteria.fundingStreams}
+          />
+          <SearchFilterSection
+            title="Funding periods"
+            facets={fundingPeriodFacets}
+            isExpanded={isFundingPeriodExpanded}
+            toggleExpanded={toggleFundingPeriodExpanded}
+            addFilter={addFundingPeriodFilter}
+            removeFilter={removeFundingPeriodFilter}
+            searchForFilter={filterByFundingPeriods}
+            selectedFilters={searchCriteria.fundingPeriods}
+          />
+          <SearchFilterSection
+            title="Status"
+            facets={statusFacets}
+            isExpanded={isStatusExpanded}
+            toggleExpanded={toggleStatusExpanded}
+            addFilter={addStatusFilter}
+            removeFilter={removeStatusFilter}
+            selectedFilters={searchCriteria.status}
+          />
         </SearchFilterContainer>
       </SearchFiltersOuterContainer>
     </SearchSidebar>

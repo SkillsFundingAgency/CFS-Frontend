@@ -158,6 +158,13 @@ export interface GetTemplateVersionsResponse {
   totalCount: number;
 }
 
+export interface TemplateVersionSearchQuery {
+  templateId: string,
+  page: number,
+  itemsPerPage: number,
+  statuses?: TemplateStatus[]
+}
+
 export interface TemplateVersionSummary {
   authorName: string;
   lastModificationDate: Date;

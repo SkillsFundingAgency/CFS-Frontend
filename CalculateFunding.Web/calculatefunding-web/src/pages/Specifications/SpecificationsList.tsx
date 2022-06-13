@@ -96,7 +96,6 @@ export function SpecificationsList() {
     });
   }, []);
 
-
   const filterBySearchTerm = useCallback((searchText: string) => {
     if (searchText.length > 2 || (searchText.length && searchCriteria.searchText.length !== 0)) {
       setSearchCriteria((prevState) => {
@@ -208,16 +207,15 @@ export function SpecificationsList() {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-one-third position-sticky">
               <SpecificationsSearchFilters
-                enableTextSearch={false}
                 searchCriteria={searchCriteria}
                 initialSearch={initialSearch}
+                filterBySearchTerm={filterBySearchTerm}
                 addFundingStreamFilter={addFundingStreamFilter}
                 removeFundingStreamFilter={removeFundingStreamFilter}
                 addFundingPeriodFilter={addFundingPeriodFilter}
                 removeFundingPeriodFilter={removeFundingPeriodFilter}
                 addStatusFilter={addStatusFilter}
                 removeStatusFilter={removeStatusFilter}
-                filterBySearchTerm={filterBySearchTerm}
                 filterByFundingStreams={filterByFundingStreams}
                 filterByFundingPeriods={filterByFundingPeriods}
                 filterBySearchStatus={filterBySearchStatus}
