@@ -43,7 +43,8 @@ export function SpecificationsList() {
     pageSize: 50,
     page: 1,
   };
-  const [searchCriteria, setSearchCriteria] = React.useState<SpecificationSearchRequestViewModel>(initialSearch);
+  const [searchCriteria, setSearchCriteria] =
+    React.useState<SpecificationSearchRequestViewModel>(initialSearch);
   const [fundingPeriodFacets, setFundingPeriodFacets] = useState<FacetValue[]>([]);
   const [fundingStreamFacets, setFundingStreamFacets] = useState<FacetValue[]>([]);
   const [statusFacets, setStatusFacets] = useState<FacetValue[]>([]);
@@ -53,19 +54,18 @@ export function SpecificationsList() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { errors, addError, clearErrorMessages } = useErrors();
 
-  const addFundingStreamFilter = useCallback(
-    (fundingStream: string) => {
-      setSearchCriteria((prevState) => {
-        return {
-          ...prevState,
-          fundingStreams: [...prevState.fundingStreams.filter(fs => fs !== fundingStream), fundingStream]
-        };
-      });
-    }, []);
+  const addFundingStreamFilter = useCallback((fundingStream: string) => {
+    setSearchCriteria((prevState) => {
+      return {
+        ...prevState,
+        fundingStreams: [...prevState.fundingStreams.filter((fs) => fs !== fundingStream), fundingStream],
+      };
+    });
+  }, []);
 
   const removeFundingStreamFilter = useCallback((fundingStream: string) => {
     setSearchCriteria((prevState) => {
-      return { ...prevState, fundingStreams: prevState.fundingStreams.filter(fs => fs !== fundingStream) };
+      return { ...prevState, fundingStreams: prevState.fundingStreams.filter((fs) => fs !== fundingStream) };
     });
   }, []);
 
@@ -73,31 +73,35 @@ export function SpecificationsList() {
     setSearchCriteria((prevState) => {
       return {
         ...prevState,
-        fundingPeriods: [...prevState.fundingPeriods.filter(fp => fp !== fundingPeriod), fundingPeriod]
+        fundingPeriods: [...prevState.fundingPeriods.filter((fp) => fp !== fundingPeriod), fundingPeriod],
       };
     });
   }, []);
 
   const removeFundingPeriodFilter = useCallback((fundingPeriod: string) => {
     setSearchCriteria((prevState) => {
-      return { ...prevState, fundingPeriods: prevState.fundingPeriods.filter(fp => fp !== fundingPeriod) };
+      return { ...prevState, fundingPeriods: prevState.fundingPeriods.filter((fp) => fp !== fundingPeriod) };
     });
   }, []);
 
   const addStatusFilter = useCallback((status: string) => {
     setSearchCriteria((prevState) => {
-      return { ...prevState, status: [...prevState.status.filter(fp => fp !== status), status] };
+      return { ...prevState, status: [...prevState.status.filter((fp) => fp !== status), status] };
     });
   }, []);
 
   const removeStatusFilter = useCallback((status: string) => {
     setSearchCriteria((prevState) => {
-      return { ...prevState, status: prevState.status.filter(fp => fp !== status) };
+      return { ...prevState, status: prevState.status.filter((fp) => fp !== status) };
     });
   }, []);
 
   const filterBySearchTerm = useCallback((searchText: string) => {
-    if (searchText.length > 2 || (searchText.length && searchCriteria.searchText.length !== 0)) {
+    if (
+      searchText.length === 0 ||
+      searchText.length > 1 ||
+      (searchText.length && searchCriteria.searchText.length !== 0)
+    ) {
       setSearchCriteria((prevState) => {
         return { ...prevState, searchText: searchText };
       });
@@ -113,24 +117,43 @@ export function SpecificationsList() {
     setSearchCriteria(initialSearch);
   }, [initialFundingStreams, initialFundingPeriods, initialSearch, initialStatuses]);
 
-  const filterByFundingStreams = useCallback((searchTerm: string) => {
-    setFundingStreamFacets(
-      initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [initialFundingStreams]);
+  const filterByFundingStreams = useCallback(
+    (searchTerm: string) => {
+      setFundingStreamFacets(
+        initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    },
+    [initialFundingStreams]
+  );
 
-  const filterByFundingPeriods = useCallback((searchTerm: string) => {
-    setFundingPeriodFacets(
-      initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [initialFundingPeriods]);
+  const filterByFundingPeriods = useCallback(
+    (searchTerm: string) => {
+      setFundingPeriodFacets(
+        initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    },
+    [initialFundingPeriods]
+  );
 
-  const filterBySearchStatus = useCallback((searchTerm: string) => {
-    setStatusFacets(initialStatuses.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
-  }, [initialStatuses]);
+  const filterBySearchStatus = useCallback(
+    (searchTerm: string) => {
+      setStatusFacets(initialStatuses.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
+    },
+    [initialStatuses]
+  );
+
+  const movePage = (pageNumber: number) => {
+    setSearchCriteria((prevState) => {
+      return {
+        ...prevState,
+        page: pageNumber,
+      };
+    });
+  };
 
   useEffect(() => {
     const populateSpecifications = async (criteria: SpecificationSearchRequestViewModel) => {
+      setIsLoading(true);
       try {
         clearErrorMessages();
         const results = (await getAllSpecificationsService(criteria)).data;
@@ -159,131 +182,126 @@ export function SpecificationsList() {
     }
   }, [searchCriteria]);
 
-  function movePage(pageNumber: number) {
-    setSearchCriteria((prevState) => {
-      return {
-        ...prevState,
-        page: pageNumber,
-      };
-    });
-  }
-
-
   return (
     <Main location={Section.Specifications}>
       <Breadcrumbs>
-        <Breadcrumb name="Home" url="/"/>
+        <Breadcrumb name="Home" url="/" />
       </Breadcrumbs>
-      <MultipleErrorSummary errors={errors}/>
-      <LoadingStatusNotifier
-        notifications={[
-          {
-            isActive: isLoading,
-            title: "Loading specification list",
-            description: "Please wait whilst the specification list is loading",
-          },
-        ]}
+      <MultipleErrorSummary errors={errors} />
+
+      <Title
+        title="Specifications"
+        titleCaption="Create and manage the specifications used to calculate funding."
       />
 
-      {!isLoading && (
-        <>
-          <Title
-            title="Specifications"
-            titleCaption="Create and manage the specifications used to calculate funding."
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third">
+          <Link
+            to="/Specifications/CreateSpecification"
+            id={"create-specification-link"}
+            className="govuk-button govuk-button--primary"
+            data-module="govuk-button"
+          >
+            Create a new specification
+          </Link>
+        </div>
+      </div>
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-one-third position-sticky">
+          <SpecificationsSearchFilters
+            searchCriteria={searchCriteria}
+            initialSearch={initialSearch}
+            filterBySearchTerm={filterBySearchTerm}
+            addFundingStreamFilter={addFundingStreamFilter}
+            removeFundingStreamFilter={removeFundingStreamFilter}
+            addFundingPeriodFilter={addFundingPeriodFilter}
+            removeFundingPeriodFilter={removeFundingPeriodFilter}
+            addStatusFilter={addStatusFilter}
+            removeStatusFilter={removeStatusFilter}
+            filterByFundingStreams={filterByFundingStreams}
+            filterByFundingPeriods={filterByFundingPeriods}
+            filterBySearchStatus={filterBySearchStatus}
+            fundingStreamFacets={fundingStreamFacets}
+            fundingPeriodFacets={fundingPeriodFacets}
+            statusFacets={statusFacets}
+            clearFilters={clearFilters}
           />
-
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-third">
-              <Link
-                to="/Specifications/CreateSpecification"
-                id={"create-specification-link"}
-                className="govuk-button govuk-button--primary"
-                data-module="govuk-button"
-              >
-                Create a new specification
-              </Link>
-            </div>
-          </div>
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-one-third position-sticky">
-              <SpecificationsSearchFilters
-                searchCriteria={searchCriteria}
-                initialSearch={initialSearch}
-                filterBySearchTerm={filterBySearchTerm}
-                addFundingStreamFilter={addFundingStreamFilter}
-                removeFundingStreamFilter={removeFundingStreamFilter}
-                addFundingPeriodFilter={addFundingPeriodFilter}
-                removeFundingPeriodFilter={removeFundingPeriodFilter}
-                addStatusFilter={addStatusFilter}
-                removeStatusFilter={removeStatusFilter}
-                filterByFundingStreams={filterByFundingStreams}
-                filterByFundingPeriods={filterByFundingPeriods}
-                filterBySearchStatus={filterBySearchStatus}
-                fundingStreamFacets={fundingStreamFacets}
-                fundingPeriodFacets={fundingPeriodFacets}
-                statusFacets={statusFacets}
-                clearFilters={clearFilters}
-              />
-            </div>
-            <div className="govuk-grid-column-two-thirds">
+        </div>
+        <div className="govuk-grid-column-two-thirds">
+          <LoadingStatusNotifier
+            notifications={[
+              {
+                isActive: isLoading,
+                title: "Loading specification list",
+                description: "Please wait whilst the specification list is loading",
+              },
+            ]}
+          />
+          {!isLoading && !!specificationListResults && (
+            <>
               <table
                 className="govuk-table"
                 id="specification-table"
                 hidden={specificationListResults.items.length < 1}
               >
                 <thead className="govuk-table__head">
-                <tr className="govuk-table__row">
-                  <th scope="col" className="govuk-table__header govuk-!-width-two-thirds">
-                    Specification
-                  </th>
-                  <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
-                    Chosen for funding
-                  </th>
-                  <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
-                    Last edited data
-                  </th>
-                  <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
-                    Status
-                  </th>
-                </tr>
+                  <tr className="govuk-table__row">
+                    <th scope="col" className="govuk-table__header govuk-!-width-two-thirds">
+                      Specification
+                    </th>
+                    <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
+                      Chosen for funding
+                    </th>
+                    <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
+                      Last edited data
+                    </th>
+                    <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
+                      Status
+                    </th>
+                  </tr>
                 </thead>
                 <tbody className="govuk-table__body" id="mainContentResults">
-                {specificationListResults.items.map((s) => (
-                  <tr key={s.id} className="govuk-table__row">
-                    <th scope="row" className="govuk-table__header">
-                      <TextLink to={`/ViewSpecification/${s.id}`}>{s.name}</TextLink>
-                    </th>
-                    <td className="govuk-table__cell">
-                      {s.isSelectedForFunding ? (
-                        <strong className="govuk-tag" aria-label="Chosen for funding">Yes</strong>
-                      ) : (
-                        <span className="govuk-visually-hidden">Not chosen for funding</span>
-                      )}
-                    </td>
-                    <td className="govuk-table__cell nobr">
-                      {s.lastUpdatedDate && <DateTimeFormatter date={s.lastUpdatedDate} format={"d MMM yyyy h:mma"}/>}
-                    </td>
-                    <td className="govuk-table__cell">{s.status}</td>
-                  </tr>
-                ))}
+                  {specificationListResults.items.map((s) => (
+                    <tr key={s.id} className="govuk-table__row">
+                      <th scope="row" className="govuk-table__header">
+                        <TextLink to={`/ViewSpecification/${s.id}`}>{s.name}</TextLink>
+                      </th>
+                      <td className="govuk-table__cell">
+                        {s.isSelectedForFunding ? (
+                          <strong className="govuk-tag" aria-label="Chosen for funding">
+                            Yes
+                          </strong>
+                        ) : (
+                          <span className="govuk-visually-hidden">Not chosen for funding</span>
+                        )}
+                      </td>
+                      <td className="govuk-table__cell nobr">
+                        {s.lastUpdatedDate && (
+                          <DateTimeFormatter date={s.lastUpdatedDate} format={"d MMM yyyy h:mma"} />
+                        )}
+                      </td>
+                      <td className="govuk-table__cell">{s.status}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
-              <NoData hidden={specificationListResults.items.length > 0}/>
+              <NoData hidden={specificationListResults.items.length > 0} />
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
-
-                  <TableNavBottom totalCount={specificationListResults.totalCount}
-                                  startItemNumber={specificationListResults.startItemNumber}
-                                  endItemNumber={specificationListResults.endItemNumber}
-                                  currentPage={specificationListResults.pagerState.currentPage}
-                                  lastPage={specificationListResults.pagerState.lastPage}
-                                  onPageChange={movePage} />
+                  <TableNavBottom
+                    totalCount={specificationListResults.totalCount}
+                    startItemNumber={specificationListResults.startItemNumber}
+                    endItemNumber={specificationListResults.endItemNumber}
+                    currentPage={specificationListResults.pagerState.currentPage}
+                    lastPage={specificationListResults.pagerState.lastPage}
+                    onPageChange={movePage}
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-        </>
-      )}
+            </>
+          )}
+        </div>
+      </div>
     </Main>
   );
 }

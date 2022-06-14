@@ -79,7 +79,6 @@ export const SpecificationsSearchFilters = ({
     setFundingPeriodExpanded(false);
     setStatusExpanded(false);
   }, []);
-
   const handleClearFilters = useCallback(() => {
     // @ts-ignore
     document.getElementById("searchSpecifications").reset();

@@ -229,7 +229,8 @@ export const TextSearchPanel = ({
     handleTextSearchChange("");
     inputRef.current.value = "";
   };
-  const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => handleTextSearchChange(e.target.value);
+  const debounceUpdateSearchText = useRef(debounce(handleTextSearchChange, 500)).current;
+  const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => debounceUpdateSearchText(e.target.value);
 
   return (
     <div className="govuk-form-group filterbyContainer">
@@ -432,12 +433,11 @@ const isTextSearchEnabled = (arg: any): arg is SearchSidebarWithTextSearchProps 
 
 export const SearchSidebar = (props: SearchSidebarProps | SearchSidebarWithTextSearchProps) => {
   if (isTextSearchEnabled(props)) {
-    const debounceUpdateSearchText = useRef(debounce(props.updateSearchText, 500)).current;
     return (
       <aside className="govuk-form-group filterSearch search-filters">
         <div className={`${props.enableStickyScroll ? "search-filters--filterScroll" : ""}`}>
           <form id="searchSpecifications">
-            <TextSearchPanel handleTextSearchChange={debounceUpdateSearchText} />
+            <TextSearchPanel handleTextSearchChange={props.updateSearchText} />
             {!!props.children && <div className="govuk-form-group filterbyContainer">{props.children}</div>}
           </form>
         </div>
