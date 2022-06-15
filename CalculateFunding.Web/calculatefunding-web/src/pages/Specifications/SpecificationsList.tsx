@@ -239,10 +239,9 @@ export function SpecificationsList() {
           />
           {!isLoading && !!specificationListResults && (
             <>
-              <table
+            {specificationListResults.items.length > 0 ? <table
                 className="govuk-table"
                 id="specification-table"
-                hidden={specificationListResults.items.length < 1}
               >
                 <thead className="govuk-table__head">
                   <tr className="govuk-table__row">
@@ -284,8 +283,8 @@ export function SpecificationsList() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-              <NoData hidden={specificationListResults.items.length > 0} />
+              </table> :
+              <NoData />}
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                   <TableNavBottom
