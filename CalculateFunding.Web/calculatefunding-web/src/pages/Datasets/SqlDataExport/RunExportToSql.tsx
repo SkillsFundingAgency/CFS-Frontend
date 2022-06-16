@@ -294,7 +294,7 @@ function SuccessMessage({
   const history = useHistory();
 
   function handleContinueClick() {
-    history.push("/");
+    history.push(`/Datasets/Export/RunExportToSql/${specification.id}`);
   }
 
   return (
