@@ -92,7 +92,6 @@ export function EditableProfileTotal({
       const newValue = (newPercent / 100) * remainingAmount;
       setValueAndPercent(newValue, newPercent);
       validatePercent(newPercent);
-      validateValue(newValue);
     }
   };
 
@@ -102,16 +101,7 @@ export function EditableProfileTotal({
     }
   };
 
-  const validateValue = (newValue: number) => {
-    if (newValue > remainingAmount) {
-      addError({
-        error: "Cannot be greater than balance available",
-        fieldName: `value-${installmentNumber}`,
-      });
-    }
-  };
-
-  const handleValueBlur = () => {
+    const handleValueBlur = () => {
     clearErrorMessages([`value-${installmentNumber}`, `percent-${installmentNumber}`]);
     if (!value || value.length === 0) {
       setValueAndPercent(0, 0);
@@ -120,7 +110,6 @@ export function EditableProfileTotal({
       const newValue = getCurrentValueAsNumber();
       const newPercent = (newValue / remainingAmount) * 100;
       setValueAndPercent(newValue, newPercent);
-      validateValue(newValue);
       validatePercent(newPercent);
     }
   };
