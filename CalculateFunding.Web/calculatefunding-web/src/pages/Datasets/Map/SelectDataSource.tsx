@@ -269,6 +269,7 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
         hidden={isCheckingForPermissions || !isPermissionsFetched || !hasMissingPermissions}
       />
       <MultipleErrorSummary errors={errors} />
+      {specification && <Title title={specification.name} titleCaption={specification.fundingPeriod?.name} />}
       <JobNotifications jobNotifications={jobNotifications} />
       <LoadingStatusNotifier
         notifications={[
@@ -288,9 +289,6 @@ export const SelectDataSource: React.FunctionComponent<RouteComponentProps<Selec
         ]}
       />
       <section>
-        {specification && (
-          <Title title={specification.name} titleCaption={specification.fundingPeriod?.name} />
-        )}
         {!isBusy && (relationshipData?.datasets?.length === 1 || isViewingAllVersions) && (
           <h3 className="govuk-heading-m govuk-!-margin-top-2">
             {selection.dataset?.name}
