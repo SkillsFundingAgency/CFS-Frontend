@@ -18,7 +18,7 @@
     "material-design-icons": "^3.0.1",
     "monaco-editor": "^0.16.1",
     "rimraf": "^2.6.2",
-    "select2": "^4.0.6-rc.1"
+    "select2": "^4.0.6"
   },
   "devDependencies": {
     "@types/jasmine": "^2.8.6",
