@@ -138,6 +138,11 @@ const App: React.FunctionComponent = () => {
         return <Redirect to={"/AccessDenied"} />;
       }
 
+      if (rejection.response?.status == 401 && !window.location.href.includes("localhost"))
+      {        
+        return window.location.replace(window.location.origin.toString());
+      }
+
       return Promise.reject(rejection);
     }
   );
