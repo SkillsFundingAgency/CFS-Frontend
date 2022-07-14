@@ -224,6 +224,8 @@ export function ChangeProfileType({ match }: RouteComponentProps<ChangeProfileTy
 
   useEffect(() => {
     if (ruleBasedPatterns.length > 0) {
+      setNoRuleBasedPatterns(false);
+      setMissingData(false);
       return;
     }
     setNoRuleBasedPatterns(true);
