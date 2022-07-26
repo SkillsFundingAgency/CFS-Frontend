@@ -371,6 +371,67 @@ export const SearchFilterSelectionPanel = ({
   );
 };
 
+export const ManageDataSourceFilesSearchFilterSelectionPanel = ({
+  title,
+  selectedFundingStreamFilters,
+  selectedDataSchemaFilters,
+  handleRemoveFundingStreamFilter,
+  handleRemoveDataSchemaFilter,
+  clearSearchTitle = "Clear search",
+  handleClearSearch,
+}: {
+  title: string;
+  selectedFundingStreamFilters: string[];
+  selectedDataSchemaFilters: string[];
+  clearSearchTitle?: string;
+  handleRemoveFundingStreamFilter: (fundingStream: string) => void;
+  handleRemoveDataSchemaFilter: (fundingPeriod: string) => void;
+  handleClearSearch: () => void;
+}) => {
+  const haveFilters =
+    !!selectedFundingStreamFilters.length ||
+    !!selectedDataSchemaFilters.length;
+
+  return (
+    <fieldset className="govuk-fieldset search-filters--greyed selected-filters-background">
+      <div className="govuk-form-group filterSearch">
+        <h2 className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+          {title}
+        </h2>
+        <TextLink
+          handleOnClick={handleClearSearch}
+          additionalCss={"govuk-!-margin-top-2 govuk-!-margin-bottom-2 right-align"}
+        >
+          {clearSearchTitle}
+        </TextLink>
+
+        {!haveFilters ? (
+          <div id="showHideText">
+            <p className="govuk-body-s">No filters selected</p>
+          </div>
+        ) : (
+          <div className="filtersSelected">
+            {selectedFundingStreamFilters.length > 0 && (
+              <SelectedFilters
+                title="Funding streams"
+                selectedFilters={selectedFundingStreamFilters}
+                handleRemoveFilter={handleRemoveFundingStreamFilter}
+              />
+            )}
+            {selectedDataSchemaFilters.length > 0 && (
+              <SelectedFilters
+                title="Data schema"
+                selectedFilters={selectedDataSchemaFilters}
+                handleRemoveFilter={handleRemoveDataSchemaFilter}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    </fieldset>
+  );
+};
+
 export const SearchFiltersOuterContainer = React.memo(
   ({
     expandAllFilters,
@@ -421,6 +482,7 @@ export const SearchFiltersOuterContainer = React.memo(
 export interface SearchSidebarProps {
   enableStickyScroll?: boolean;
   children?: any;
+  formId?: string;
 }
 
 export interface SearchSidebarWithTextSearchProps extends SearchSidebarProps {
@@ -436,7 +498,7 @@ export const SearchSidebar = (props: SearchSidebarProps | SearchSidebarWithTextS
     return (
       <aside className="govuk-form-group filterSearch search-filters">
         <div className={`${props.enableStickyScroll ? "search-filters--filterScroll" : ""}`}>
-          <form id="searchSpecifications">
+          <form id={props.formId}>
             <TextSearchPanel handleTextSearchChange={props.updateSearchText} />
             {!!props.children && <div className="govuk-form-group filterbyContainer">{props.children}</div>}
           </form>
@@ -447,7 +509,7 @@ export const SearchSidebar = (props: SearchSidebarProps | SearchSidebarWithTextS
     return (
       <aside className="govuk-form-group filterSearch search-filters">
         <div className={`${props.enableStickyScroll ? "search-filters--filterScroll" : ""}`}>
-          <form id="searchSpecifications">
+          <form id={props.formId}>
             {!!props.children && <div className="govuk-form-group filterbyContainer">{props.children}</div>}
           </form>
         </div>

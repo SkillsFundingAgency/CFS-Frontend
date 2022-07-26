@@ -86,7 +86,7 @@ export const SpecificationsSearchFilters = ({
   }, [clearFilters]);
 
   return (
-    <SearchSidebar updateSearchText={filterBySearchTerm}>
+    <SearchSidebar formId={"searchSpecifications"} updateSearchText={filterBySearchTerm}>
       <SearchFilterSelectionPanel
         title="Selected filters"
         selectedFundingStreamFilters={searchCriteria.fundingStreams}
