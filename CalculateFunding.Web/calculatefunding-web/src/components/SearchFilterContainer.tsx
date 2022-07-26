@@ -432,6 +432,55 @@ export const ManageDataSourceFilesSearchFilterSelectionPanel = ({
   );
 };
 
+export const DownloadDataSchemaSearchFilterSelectionPanel = ({
+  title,
+  selectedFundingStreamFilters,
+  handleRemoveFundingStreamFilter,
+  clearSearchTitle = "Clear search",
+  handleClearSearch,
+}: {
+  title: string;
+  selectedFundingStreamFilters: string[];
+  clearSearchTitle?: string;
+  handleRemoveFundingStreamFilter: (fundingStream: string) => void;
+  handleClearSearch: () => void;
+}) => {
+  const haveFilters =
+    !!selectedFundingStreamFilters.length;
+
+  return (
+    <fieldset className="govuk-fieldset search-filters--greyed selected-filters-background">
+      <div className="govuk-form-group filterSearch">
+        <h2 className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+          {title}
+        </h2>
+        <TextLink
+          handleOnClick={handleClearSearch}
+          additionalCss={"govuk-!-margin-top-2 govuk-!-margin-bottom-2 right-align"}
+        >
+          {clearSearchTitle}
+        </TextLink>
+
+        {!haveFilters ? (
+          <div id="showHideText">
+            <p className="govuk-body-s">No filters selected</p>
+          </div>
+        ) : (
+          <div className="filtersSelected">
+            {selectedFundingStreamFilters.length > 0 && (
+              <SelectedFilters
+                title="Funding streams"
+                selectedFilters={selectedFundingStreamFilters}
+                handleRemoveFilter={handleRemoveFundingStreamFilter}
+              />
+            )}           
+          </div>
+        )}
+      </div>
+    </fieldset>
+  );
+};
+
 export const SearchFiltersOuterContainer = React.memo(
   ({
     expandAllFilters,

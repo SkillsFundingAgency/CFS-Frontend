@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
-
+import React, { useCallback, useEffect, useState } from "react";
 import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
-import { LoadingStatus } from "../../components/LoadingStatus";
+import { DownloadDataSchemaSearchFilters } from "../../components/Datasets/DownloadDataSchemaSearchFilters";
 import { LoadingStatusNotifier } from "../../components/LoadingStatusNotifier";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
@@ -20,18 +18,7 @@ import { Section } from "../../types/Sections";
 import { SearchFacetValue } from "../../types/TemplateBuilderDefinitions";
 
 export function DownloadDataSchema() {
-    const initialSearchRequest: DatasetDefinitionRequestViewModel = {
-        errorToggle: "",
-        facetCount: 10,
-        filters: { "": [""] },
-        includeFacets: true,
-        pageNumber: 1,
-        pageSize: 50,
-        searchMode: SearchMode.All,
-        searchTerm: "",
-    };
-    const [searchRequest, setSearchRequest] = useState<DatasetDefinitionRequestViewModel>(initialSearchRequest);
-    const [datasetDefinitions, setDatasetDefinitions] = useState<DatasetDefinitionResponseViewModel>({
+    const [datasetDefinitionsResults, setDatasetDefinitionsResults] = useState<DatasetDefinitionResponseViewModel>({
         currentPage: 0,
         datasetDefinitions: [],
         endItemNumber: 0,
@@ -48,119 +35,122 @@ export function DownloadDataSchema() {
         totalErrorResults: 0,
         totalResults: 0,
     });
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    const initialSearch: DatasetDefinitionRequestViewModel = {
+        errorToggle: "",
+        facetCount: 10,
+        filters: { "": [""] },
+        includeFacets: true,
+        pageNumber: 1,
+        pageSize: 50,
+        searchMode: SearchMode.All,
+        searchTerm: "",
+    };
+    const [searchCriteria, setSearchCriteria] = useState<DatasetDefinitionRequestViewModel>(initialSearch);     
     const initialFacets: SearchFacetValue[] = [];
-    const [filterFundingStreams, setFilterFundingStreams] = useState<SearchFacetValue[]>(initialFacets);
-    const [filterFundingStreamsInitialResult, setFilterFundingStreamsInitialResult] =
-        useState<SearchFacetValue[]>(initialFacets);
-    const { errors, addError } = useErrors();
+    const [fundingStreamFacets, setFundingStreamFacets] = useState<SearchFacetValue[]>(initialFacets);
+    const [initialFundingStreams, setInitialFundingStreams] = useState<SearchFacetValue[]>(initialFacets);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const { errors, addError, clearErrorMessages } = useErrors();
+    let filters: string[] =
+    searchCriteria.filters["fundingStreamName"] != undefined ? searchCriteria.filters["fundingStreamName"] : [];    
 
-    useEffect(() => {
-        searchDatasetDefinitions(searchRequest);
-    }, [searchRequest]);
-
-    function searchDatasetDefinitions(searchRequestViewModel: DatasetDefinitionRequestViewModel) {
-        setIsLoading(true);
-        searchDatasetDefinitionsService(searchRequestViewModel)
-            .then((response) => {
-                const datasetDefinitionResponse = response.data as DatasetDefinitionResponseViewModel;
-                setDatasetDefinitions(datasetDefinitionResponse);
-                if (datasetDefinitionResponse.facets.length >= 2) {
-                    setFilterFundingStreams(datasetDefinitionResponse.facets[2].facetValues);
-                    setFilterFundingStreamsInitialResult(datasetDefinitionResponse.facets[2].facetValues);
-                }
-            })
-            .catch((err) => {
-                addError({ error: err, description: "Error while searching dataset definitions" });
-            })
-            .finally(() => {
-                setIsLoading(false);
+    const addFundingStreamFilter = useCallback((fundingStream: string) => {
+        
+        if (filters.indexOf(fundingStream) === -1) {
+            filters.push(fundingStream);
+            const newFiltersValue: any = {};
+            newFiltersValue["fundingStreamName"] = filters;
+            setSearchCriteria((prevState) => {
+                return { ...prevState, filters: newFiltersValue, pageNumber: 1 };
             });
-    }
+        }
 
-    function setPagination(e: number) {
-        searchRequest.pageNumber = e;
-        setSearchRequest((prevState) => {
-            return { ...prevState, pageNumber: e };
-        });
-    }
+      }, []);
 
-    function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-        const filters: string[] =
-            searchRequest.filters[filterKey] != undefined ? searchRequest.filters[filterKey] : [];
-        if (enableFilter) {
-            if (filters.indexOf(filterValue) === -1) {
-                filters.push(filterValue);
+      const removeFundingStreamFilter = useCallback((fundingStream: string) => {             
+        const index = filters.indexOf(fundingStream);
+        if (index !== -1) {
+            filters.splice(index, 1);
+            if (filters.length === 0) {
+                setSearchCriteria((prevState) => {
+                    return { ...prevState, filters: initialSearch.filters, pageNumber: 1 };
+                });
+            } else {
                 const newFiltersValue: any = {};
-                newFiltersValue[filterKey] = filters;
-                setSearchRequest((prevState) => {
+                newFiltersValue["fundingStreamName"] = filters;
+                setSearchCriteria((prevState) => {
                     return { ...prevState, filters: newFiltersValue, pageNumber: 1 };
                 });
             }
-        } else {
-            const index = filters.indexOf(filterValue);
-            if (index !== -1) {
-                filters.splice(index, 1);
-                if (filters.length === 0) {
-                    setSearchRequest((prevState) => {
-                        return { ...prevState, filters: initialSearchRequest.filters, pageNumber: 1 };
-                    });
-                } else {
-                    const newFiltersValue: any = {};
-                    newFiltersValue[filterKey] = filters;
-                    setSearchRequest((prevState) => {
-                        return { ...prevState, filters: newFiltersValue, pageNumber: 1 };
-                    });
-                }
-            }
+        }     
+      }, []);
+
+      const filterBySearchTerm = useCallback((searchText: string) => {
+        if (
+          searchText.length === 0 ||
+          searchText.length > 1 ||
+          (searchText.length && searchCriteria.searchTerm.length !== 0)
+        ) {
+          setSearchCriteria((prevState) => {
+            return { ...prevState, searchTerm: searchText };
+          });
         }
-    }
+      }, []);
 
-    function searchFundingStreamFilters(e: React.ChangeEvent<HTMLInputElement>) {
-        setFilterFundingStreams(
-            filterSearch(e.target.value, filterFundingStreamsInitialResult, filterFundingStreams)
-        );
-    }
-
-    function filterByFundingStream(e: React.ChangeEvent<HTMLInputElement>) {
-        filterResults("fundingStreamName", e.target.value, e.target.checked);
-    }
-
-    function clearFilters() {
+      const clearFilters = useCallback(() => {
         // @ts-ignore
-        document.getElementById("searchDatasources").reset();
-        setFilterFundingStreams(filterFundingStreamsInitialResult);
-        setSearchRequest(initialSearchRequest);
-    }
+        document.getElementById("searchDatasources").reset();   
+        filters.splice(0,filters.length);  
+        setFundingStreamFacets(initialFundingStreams);         
+        setSearchCriteria(initialSearch);
+      }, [initialFundingStreams, initialSearch]);
 
-    function searchText(e: React.ChangeEvent<HTMLInputElement>) {
-        const term = e.target.value;
-        if (term.length >= 3) {
-            setSearchRequest((prevState) => {
-                return { ...prevState, searchTerm: term };
-            });
-        }
-        if (term.length === 0) {
-            setSearchRequest((prevState) => {
-                return { ...prevState, searchTerm: "" };
-            });
-        }
-    }
+      const filterByFundingStreams = useCallback(
+        (searchTerm: string) => {
+          setFundingStreamFacets(
+            initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+          );
+        },
+        [initialFundingStreams]
+      );
 
-    function filterSearch(
-        keywords: string,
-        originalFilters: SearchFacetValue[],
-        currentFilters: SearchFacetValue[]
-    ) {
-        if (keywords.length >= 3) {
-            const copyOfFilters: SearchFacetValue[] = originalFilters as SearchFacetValue[];
-            return copyOfFilters.filter((x) => x.name.toLowerCase().includes(keywords.toLowerCase()));
+      const movePage = (pageNumber: number) => {
+       
+        setSearchCriteria((prevState) => {
+          return {
+            ...prevState,
+            pageNumber: pageNumber
+          };
+        });
+      };
+
+      useEffect(() => {
+        const populateDownloadDataSchemas = async (criteria: DatasetDefinitionRequestViewModel) => {
+          setIsLoading(true);
+          try {
+            clearErrorMessages();
+            const results = (await searchDatasetDefinitionsService(criteria)).data;
+            if (!results) {
+              addError({ error: "Unexpected error occured whilst looking up dataset definitions" });
+              return;
+            }
+            setDatasetDefinitionsResults(results);
+            if (results.facets.length >= 2) {
+              setFundingStreamFacets(results.facets[2].facetValues);
+              setInitialFundingStreams(results.facets[2].facetValues);             
+            }
+          } catch (e: any) {
+            addError({ error: e, description: "Unexpected error occured" });
+          } finally {
+            setIsLoading(false);
+          }
+        };
+    
+        if (searchCriteria) {
+            populateDownloadDataSchemas(searchCriteria);
         }
-        if (keywords.length === 0) {
-            return originalFilters;
-        }
-        return currentFilters;
-    }
+      }, [searchCriteria]);
 
     return (
         <Main location={Section.Datasets}>
@@ -174,68 +164,17 @@ export function DownloadDataSchema() {
                 titleCaption="Download the data schemas for data source files and datasets"
             />
             <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-third">
-                    <form id="searchDatasources">
-                        <CollapsiblePanel title={"Search"} isExpanded={true} isCollapsible={false}>
-                            <fieldset className="govuk-fieldset">
-                                <div className="govuk-form-group">
-                                    <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                                        Search data schema templates
-                                    </label>
-                                    <input
-                                        className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
-                                        id="mainContentSearch"
-                                        autoComplete="off"
-                                        name="search"
-                                        type="text"
-                                        onChange={(e) => searchText(e)}
-                                    />
-                                </div>
-                            </fieldset>
-                        </CollapsiblePanel>
-                        <CollapsiblePanel
-                            title={"Filter by funding stream"}
-                            isExpanded={true}
-                            isCollapsible={true}
-                            showFacetCount={true}
-                            facetCount={searchRequest.filters["fundingStreamName"]?.length}
-                        >
-                            <fieldset className="govuk-fieldset">
-                                <div className="govuk-form-group">
-                                    <label className="govuk-label">Search</label>
-                                    <input
-                                        className="govuk-input"
-                                        type="text"
-                                        onChange={(e) => searchFundingStreamFilters(e)}
-                                    />
-                                </div>
-                                <div className="govuk-checkboxes">
-                                    {filterFundingStreams.map((f, index) => (
-                                        <div key={index} className="govuk-checkboxes__item">
-                                            <input
-                                                className="govuk-checkboxes__input"
-                                                key={`fundingstream-${f.name}`}
-                                                id={`fundingstream-${f.name}`}
-                                                name={`fundingstream-${f.name}`}
-                                                type="checkbox"
-                                                value={f.name}
-                                                onChange={(e) => filterByFundingStream(e)}
-                                            />
-                                            <label
-                                                className="govuk-label govuk-checkboxes__label"
-                                                htmlFor={`fundingstream-${f.name}`}
-                                            >
-                                                {f.name}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </fieldset>
-                        </CollapsiblePanel>
-                        <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-                            Clear filters
-                        </button>
-                    </form>
+                <div className="govuk-grid-column-one-third position-sticky">
+                <DownloadDataSchemaSearchFilters
+                    searchCriteria={searchCriteria}
+                    initialSearch={initialSearch}
+                    filterBySearchTerm={filterBySearchTerm}
+                    addFundingStreamFilter={addFundingStreamFilter}
+                    removeFundingStreamFilter={removeFundingStreamFilter}   
+                    filterByFundingStreams={filterByFundingStreams}                 
+                    fundingStreamFacets={fundingStreamFacets}     
+                    clearFilters={clearFilters}
+                />                
                 </div>
                 <div className="govuk-grid-column-two-thirds">
                     <LoadingStatusNotifier notifications={
@@ -245,7 +184,7 @@ export function DownloadDataSchema() {
                                 isActive: isLoading
                             }
                         ]}/>
-                    {!isLoading ? (datasetDefinitions.totalResults > 0) ?
+                    {!isLoading ? (datasetDefinitionsResults.totalResults > 0) ?
                         <table className="govuk-table">
                             <thead className="govuk-table__head">
                             <tr className="govuk-table__row">
@@ -261,7 +200,7 @@ export function DownloadDataSchema() {
                             </tr>
                             </thead>
                             <tbody className="govuk-table__body">
-                            {datasetDefinitions.datasetDefinitions.map((d, index) => (
+                            {datasetDefinitionsResults.datasetDefinitions.map((d, index) => (
                                 <tr className="govuk-table__row" key={index}>
                                     <th scope="row" className="govuk-table__header">
                                         <p>{d.name}</p>
@@ -303,14 +242,14 @@ export function DownloadDataSchema() {
                         <NoData/> : <></>
                     }
                     <BackToTop id={"top"}/>
-                    {(!isLoading || datasetDefinitions.totalResults > 0) && (
+                    {(!isLoading || datasetDefinitionsResults.totalResults > 0) && (
                         <TableNavBottom
-                            totalCount={datasetDefinitions.totalResults}
-                            startItemNumber={datasetDefinitions.startItemNumber}
-                            endItemNumber={datasetDefinitions.endItemNumber}
-                            currentPage={datasetDefinitions.currentPage}
-                            lastPage={datasetDefinitions.pagerState.lastPage}
-                            onPageChange={setPagination}/>
+                            totalCount={datasetDefinitionsResults.totalResults}
+                            startItemNumber={datasetDefinitionsResults.startItemNumber}
+                            endItemNumber={datasetDefinitionsResults.endItemNumber}
+                            currentPage={datasetDefinitionsResults.currentPage}
+                            lastPage={datasetDefinitionsResults.pagerState.lastPage}
+                            onPageChange={movePage}/>
                     )}
                 </div>
             </div>
