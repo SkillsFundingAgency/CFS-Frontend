@@ -5,6 +5,7 @@ namespace CalculateFunding.Frontend.Services
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using AutoMapper;
     using Common.Utility;
     using Common.ApiClient.Models;
     using Common.ApiClient.Specifications;
@@ -20,27 +21,30 @@ namespace CalculateFunding.Frontend.Services
 
         private readonly ISpecificationsApiClient _specsClient;
         private readonly ILogger _logger;
+        private IMapper _mapper;
 
-        public DatasetRelationshipsSearchService(ISpecificationsApiClient specsClient, ILogger logger)
+        public DatasetRelationshipsSearchService(ISpecificationsApiClient specsClient, ILogger logger, IMapper mapper)
         {
             Guard.ArgumentNotNull(specsClient, nameof(specsClient));
             Guard.ArgumentNotNull(logger, nameof(logger));
+            Guard.ArgumentNotNull(mapper, nameof(mapper));
 
             _specsClient = specsClient;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public async Task<SpecificationDatasourceRelationshipSearchResultViewModel> PerformSearch(SearchRequestViewModel request)
         {
             Guard.ArgumentNotNull(request, nameof(request));
 
-	        IDictionary<string, string[]> filters = request.Filters.IsNullOrEmpty()
-		        ? new ConcurrentDictionary<string, string[]>()
-		        : request.Filters;
-	        if (filters.ContainsKey(""))
-	        {
-		        filters.Remove("");
-	        }
+            IDictionary<string, string[]> filters = request.Filters.IsNullOrEmpty()
+                ? new ConcurrentDictionary<string, string[]>()
+                : request.Filters;
+            if (filters.ContainsKey(""))
+            {
+                filters.Remove("");
+            }
 
             SearchFilterRequest requestOptions = new SearchFilterRequest
             {
@@ -56,7 +60,7 @@ namespace CalculateFunding.Frontend.Services
                 requestOptions.Page = request.PageNumber.Value;
             }
 
-            PagedResult<SpecificationDatasourceRelationshipSearchResultItem> pagedResult = 
+            PagedResult<SpecificationDatasourceRelationshipSearchResultItem> pagedResult =
                 await _specsClient.FindSpecificationAndRelationships(requestOptions);
 
             if (pagedResult == null)
@@ -71,6 +75,15 @@ namespace CalculateFunding.Frontend.Services
                 endNumber = pagedResult.TotalItems;
             }
 
+            List<SearchFacetViewModel> searchFacets = new List<SearchFacetViewModel>();
+            if (pagedResult.Facets != null)
+            {
+                foreach (SearchFacet facet in pagedResult.Facets)
+                {
+                    searchFacets.Add(_mapper.Map<SearchFacetViewModel>(facet));
+                }
+            }
+
             SpecificationDatasourceRelationshipSearchResultViewModel viewModel =
                 new SpecificationDatasourceRelationshipSearchResultViewModel
                 {
@@ -78,7 +91,8 @@ namespace CalculateFunding.Frontend.Services
                     PagerState = new PagerState(pagedResult.PageNumber, pagedResult.TotalPages),
                     TotalCount = pagedResult.TotalItems,
                     StartItemNumber = startNumber,
-                    EndItemNumber = endNumber
+                    EndItemNumber = endNumber,
+                    Facets = searchFacets.AsEnumerable()
                 };
 
             return viewModel;

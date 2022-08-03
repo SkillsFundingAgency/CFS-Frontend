@@ -119,25 +119,40 @@ export function SpecificationsList() {
 
   const filterByFundingStreams = useCallback(
     (searchTerm: string) => {
-      setFundingStreamFacets(
-        initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+      if (
+        searchTerm.length === 0 ||
+        searchTerm.length > 1
+      ) { 
+        setFundingStreamFacets(
+          initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
     },
     [initialFundingStreams]
   );
 
   const filterByFundingPeriods = useCallback(
     (searchTerm: string) => {
-      setFundingPeriodFacets(
-        initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
+      if (
+        searchTerm.length === 0 ||
+        searchTerm.length > 1
+      ) { 
+        setFundingPeriodFacets(
+          initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
     },
     [initialFundingPeriods]
   );
 
   const filterBySearchStatus = useCallback(
     (searchTerm: string) => {
-      setStatusFacets(initialStatuses.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
+      if (
+        searchTerm.length === 0 ||
+        searchTerm.length > 1
+      ) { 
+         setStatusFacets(initialStatuses.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
+      }
     },
     [initialStatuses]
   );

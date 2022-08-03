@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
 import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
+import { MapDataSourceFilesSearchFilters } from "../../components/Datasets/MapDataSourceFilesSearchFilters";
 import { NoData } from "../../components/NoData";
 import { TableNavBottom } from "../../components/TableNavBottom";
 import { TextLink } from "../../components/TextLink";
@@ -18,20 +18,10 @@ import { DatasetDefinitionRequestViewModel } from "../../types/Datasets/DatasetD
 import { SpecificationDatasourceRelationshipViewModel } from "../../types/Datasets/SpecificationDatasourceRelationshipViewModel";
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
+import { SearchFacetValue } from "types/TemplateBuilderDefinitions";
+import { FacetValue } from "../../types/Facet";
 
 export function MapDataSourceFiles() {
-  const initialSearchRequest: DatasetDefinitionRequestViewModel = {
-    errorToggle: "",
-    facetCount: 10,
-    filters: { "": [""] },
-    includeFacets: true,
-    pageNumber: 1,
-    pageSize: 50,
-    searchMode: SearchMode.All,
-    searchTerm: "",
-  };
-  const [searchRequest, setSearchRequest] = useState<DatasetDefinitionRequestViewModel>(initialSearchRequest);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const initialDatasetRelationships: SpecificationDatasourceRelationshipViewModel = {
     items: [
       {
@@ -56,154 +46,180 @@ export function MapDataSourceFiles() {
       previousPage: 0,
     },
   };
+  const initialSearch: DatasetDefinitionRequestViewModel = {
+    errorToggle: "",
+    facetCount: 10,
+    filters: { "": [""] },
+    includeFacets: true,
+    pageNumber: 1,
+    pageSize: 50,
+    searchMode: SearchMode.All,
+    searchTerm: "",
+  };
 
-  const initialFacets: string[] = [""];
-  const [filterFundingStreams, setFilterFundingStreams] = useState<string[]>([]);
-  const [filterFundingStreamsInitialResult, setFilterFundingStreamsInitialResult] =
-    useState<string[]>(initialFacets);
-  const [filterFundingPeriods, setFilterFundingPeriods] = useState<string[]>([]);
-  const [filterFundingPeriodsInitialResult, setFilterFundingPeriodsInitialResult] =
-    useState<string[]>(initialFacets);
+  const [searchCriteria, setSearchCriteria] = useState<DatasetDefinitionRequestViewModel>(initialSearch);
+  const initialFacets: SearchFacetValue[] = [];
+  const [fundingStreamFacets, setFundingStreamFacets] = useState<FacetValue[]>(initialFacets);
+  const [initialFundingStreams, setInitialFundingStreams] = useState<FacetValue[]>(initialFacets);
+  const [fundingPeriodFacets, setFundingPeriodFacets] = useState<FacetValue[]>(initialFacets);
+  const [initialFundingPeriods, setInitialFundingPeriods] = useState<FacetValue[]>(initialFacets);
   const [datasetRelationships, setDatasetRelationships] =
     useState<SpecificationDatasourceRelationshipViewModel>(initialDatasetRelationships);
-  const { errors, addError } = useErrors();
+  const { errors, addError, clearErrorMessages } = useErrors();
+  const [isLoading, setIsLoading] = useState<boolean>(false);  
+  const filterOptions: string[] = ["fundingStreamNames", "fundingPeriodName"]
+  let filters: any = [];
+  for(let i=0; i<filterOptions.length; i++){
+    filters[filterOptions[i]] =
+    searchCriteria.filters[filterOptions[i]] != undefined ? searchCriteria.filters[filterOptions[i]] : [];
+  }  
 
-  useEffect(() => {
-    searchDatasetRelationships(searchRequest);
-  }, [searchRequest]);
-
-  function searchDatasetRelationships(searchRequestViewModel: DatasetDefinitionRequestViewModel) {
-    setIsLoading(true);
-    searchDatasetRelationshipsService(searchRequestViewModel)
-      .then((response) => {
-        const result = response.data as SpecificationDatasourceRelationshipViewModel;
-        setDatasetRelationships(result);
-
-        if (result.items.length > 0) {
-          const items = result.items;
-          let fundingStreamsResult: string[] = [];
-          items.map((item) => {
-            if (item.fundingStreamNames != null) {
-              item.fundingStreamNames.map((f) => {
-                fundingStreamsResult.push(f);
-              });
-            }
-          });
-          fundingStreamsResult = [...new Set(fundingStreamsResult)];
-          setFilterFundingStreamsInitialResult(fundingStreamsResult);
-          setFilterFundingStreams(fundingStreamsResult);
-
-          let fundingPeriodsResult: string[] = [];
-          items.map((item) => {
-            if (item.fundingPeriodName != null) {
-              fundingPeriodsResult.push(item.fundingPeriodName);
-            }
-          });
-          fundingPeriodsResult.filter((value, index, self) => {
-            return self.indexOf(value) === index;
-          });
-          fundingPeriodsResult = [...new Set(fundingPeriodsResult)];
-          setFilterFundingPeriodsInitialResult(fundingPeriodsResult);
-          setFilterFundingPeriods(fundingPeriodsResult);
-        }
-      })
-      .catch((err) => {
-        addError({ error: err, description: "Error while searching dataset relationships" });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-
-  function pageChange(page: number) {
-    setSearchRequest((prevState) => {
-      return { ...prevState, pageNumber: page };
-    });
-  }
-
-  function clearFilters() {
-    // @ts-ignore
-    document.getElementById("searchDatasources").reset();
-    setFilterFundingPeriods(filterFundingPeriodsInitialResult);
-    setFilterFundingStreams(filterFundingStreamsInitialResult);
-    setSearchRequest(initialSearchRequest);
-  }
-
-  function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-    const filters: string[] =
-      searchRequest.filters[filterKey] !== undefined ? searchRequest.filters[filterKey] : [];
-    if (enableFilter) {
-      if (filters.indexOf(filterValue) === -1) {
-        filters.push(filterValue);
-        const newFiltersValue: any = {};
-        newFiltersValue[filterKey] = filters;
-        setSearchRequest((prevState) => {
-          return { ...prevState, filters: newFiltersValue, pageNumber: 1 };
+  function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {   
+    let filtersValues: any = {}; 
+    if(enableFilter) {     
+      if (filters[filterKey].indexOf(filterValue) === -1) {
+        filters[filterKey].push(filterValue);       
+        filtersValues = getFilterValues();        
+        setSearchCriteria((prevState) => {
+            return { ...prevState, filters: filtersValues, pageNumber: 1 };
         });
       }
     } else {
-      const index = filters.indexOf(filterValue);
+      const index = filters[filterKey].indexOf(filterValue);         
       if (index !== -1) {
-        filters.splice(index, 1);
-        if (filters.length === 0) {
-          setSearchRequest((prevState) => {
-            return { ...prevState, filters: initialSearchRequest.filters, pageNumber: 1 };
-          });
-        } else {
-          const newFiltersValue: any = {};
-          newFiltersValue[filterKey] = filters;
-          setSearchRequest((prevState) => {
-            return { ...prevState, filters: newFiltersValue, pageNumber: 1 };
-          });
-        }
+          filters[filterKey].splice(index, 1);               
+          filtersValues = getFilterValues(); 
+          setSearchCriteria((prevState) => {
+            return { ...prevState, filters: (filtersValues == undefined || filtersValues.length === 0) ? initialSearch.filters : filtersValues, pageNumber: 1 };
+          });        
+      } else {
+        setSearchCriteria((prevState) => {
+          return { ...prevState, filters: initialSearch.filters, pageNumber: 1 };
+        });
       }
-    }
+    }    
   }
 
-  function filterSearch(keywords: string, originalFilters: string[], currentFilters: string[]) {
-    if (keywords.length >= 3) {
-      const copyOfFilters: string[] = originalFilters as string[];
-      return copyOfFilters.filter((x) => x.toLowerCase().includes(keywords.toLowerCase()));
-    }
-    if (keywords.length === 0) {
-      return originalFilters;
-    }
-    return currentFilters;
+  const getFilterValues = function () {
+    const newFiltersValue: any = {};       
+    for(let i=0; i<filterOptions.length; i++){
+      if(filters[filterOptions[i]].length != 0){
+        newFiltersValue[filterOptions[i]] = filters[filterOptions[i]];
+      }
+    } 
+    return newFiltersValue;
   }
 
-  function searchText(e: React.ChangeEvent<HTMLInputElement>) {
-    const term = e.target.value;
-    if (term.length > 3) {
-      setSearchRequest((prevState) => {
-        return { ...prevState, searchTerm: term };
+  const addFundingStreamFilter = useCallback((fundingStream: string) => {
+    filterResults("fundingStreamNames", fundingStream, true);
+  }, []);
+  
+  const removeFundingStreamFilter = useCallback((fundingStream: string) => {    
+    filterResults("fundingStreamNames", fundingStream, false);
+  }, []);
+
+  const addFundingPeriodFilter = useCallback((fundingPeriod: string) => { 
+    filterResults("fundingPeriodName", fundingPeriod, true);
+  }, []);
+
+  const removeFundingPeriodFilter = useCallback((fundingPeriod: string) => {       
+    filterResults("fundingPeriodName", fundingPeriod, false);
+  }, []);
+
+  const filterBySearchTerm = useCallback((searchText: string) => {
+    if (
+      searchText.length === 0 ||
+      searchText.length > 1 ||
+      (searchText.length && searchCriteria.searchTerm.length !== 0)
+    ) {
+      setSearchCriteria((prevState) => {
+        return { ...prevState, searchTerm: searchText, pageNumber: 1 };
       });
     }
-    if (term.length === 0) {
-      setSearchRequest((prevState) => {
-        return { ...prevState, searchTerm: "" };
-      });
+  }, []);
+
+  const clearFilterValues = function() {
+    for(let i=0; i<filterOptions.length; i++){
+      filters[filterOptions[i]].splice(0,filters[filterOptions[i]].length);  
+    }   
+  }
+
+  const clearFilters = useCallback(() => {
+    // @ts-ignore
+    document.getElementById("searchDatasources").reset();   
+    clearFilterValues();
+    setFundingPeriodFacets(initialFundingPeriods);
+    setFundingStreamFacets(initialFundingStreams);    
+    setSearchCriteria(initialSearch);
+  }, [initialFundingStreams, initialFundingPeriods, initialSearch]);  
+
+  const filterByFundingPeriods = useCallback(
+    (searchTerm: string) => {
+      if (
+        searchTerm.length === 0 ||
+        searchTerm.length > 1
+      ) {
+        setFundingPeriodFacets(
+          initialFundingPeriods.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
+    },
+    [initialFundingPeriods]
+  );
+
+  const filterByFundingStreams = useCallback(
+    (searchTerm: string) => {
+      if (
+        searchTerm.length === 0 ||
+        searchTerm.length > 1
+      ) { 
+        setFundingStreamFacets(
+          initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
+    },
+    [initialFundingStreams]
+  );
+
+  const movePage = (pageNumber: number) => {
+    setSearchCriteria((prevState) => {
+      return {
+        ...prevState,
+        pageNumber: pageNumber,
+      };
+    });
+  }; 
+
+  useEffect(() => {
+    const populateMapDataSourceFiles = async (criteria: DatasetDefinitionRequestViewModel) => {
+      setIsLoading(true);
+      try {
+        clearErrorMessages();
+        const resultset = (await searchDatasetRelationshipsService(criteria)).data;
+        const results = resultset as SpecificationDatasourceRelationshipViewModel;
+        if (!results) {
+          addError({ error: "Unexpected error occured whilst looking up dataset relationships" });
+          return;
+        }
+        setDatasetRelationships(results);      
+        if(resultset.facets.length >= 2){         
+          setFundingPeriodFacets(resultset.facets[0].facetValues);
+          setInitialFundingPeriods(resultset.facets[0].facetValues);
+          setFundingStreamFacets(resultset.facets[1].facetValues);
+          setInitialFundingStreams(resultset.facets[1].facetValues);
+        }       
+      } catch (e: any) {
+        addError({ error: e, description: "Unexpected error occured" });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (searchCriteria) {
+      populateMapDataSourceFiles(searchCriteria);
     }
-  }
+  }, [searchCriteria]);
 
-  function searchFundingStreamFilters(e: React.ChangeEvent<HTMLInputElement>) {
-    setFilterFundingStreams(
-      filterSearch(e.target.value, filterFundingStreamsInitialResult, filterFundingStreams)
-    );
-  }
-
-  function filterByFundingStream(e: React.ChangeEvent<HTMLInputElement>) {
-    filterResults("fundingStreamNames", e.target.value, e.target.checked);
-  }
-
-  function searchFundingPeriodFilters(e: React.ChangeEvent<HTMLInputElement>) {
-    setFilterFundingPeriods(
-      filterSearch(e.target.value, filterFundingPeriodsInitialResult, filterFundingPeriods)
-    );
-  }
-
-  function filterByFundingPeriod(e: React.ChangeEvent<HTMLInputElement>) {
-    filterResults("fundingPeriodName", e.target.value, e.target.checked);
-  }
 
   return (
     <Main location={Section.Datasets}>
@@ -218,108 +234,20 @@ export function MapDataSourceFiles() {
       />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
-          <form id="searchDatasources">
-            <CollapsiblePanel title={"Search"} isExpanded={true}>
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <label className="govuk-label filterLabel" htmlFor="filter-by-type">
-                    Search
-                  </label>
-                  <input
-                    className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
-                    id="mainContentSearch"
-                    autoComplete="off"
-                    name="search"
-                    type="text"
-                    onChange={(e) => searchText(e)}
-                  />
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title={"Filter by funding stream"}
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={searchRequest.filters["fundingStreamNames"]?.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <label className="govuk-label">Search</label>
-                  <input
-                    className="govuk-input"
-                    type="text"
-                    onChange={(e) => searchFundingStreamFilters(e)}
-                  />
-                </div>
-                <div className="govuk-checkboxes">
-                  {filterFundingStreams.map((f, index) => (
-                    <div key={index} className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        key={`fundingstream-${f}`}
-                        id={`fundingstream-${f}`}
-                        name={`fundingstream-${f}`}
-                        type="checkbox"
-                        value={f}
-                        checked={
-                          searchRequest.filters["fundingStreamNames"] !== undefined &&
-                          searchRequest.filters["fundingStreamNames"].includes(f)
-                        }
-                        onChange={(e) => filterByFundingStream(e)}
-                      />
-                      <label className="govuk-label govuk-checkboxes__label" htmlFor={`fundingstream-${f}`}>
-                        {f}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title={"Filter by funding period"}
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={searchRequest.filters["fundingPeriodName"]?.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <label className="govuk-label">Search</label>
-                  <input
-                    className="govuk-input"
-                    type="text"
-                    onChange={(e) => searchFundingPeriodFilters(e)}
-                  />
-                </div>
-                <div className="govuk-checkboxes">
-                  {filterFundingPeriods.map((f, index) => (
-                    <div key={index} className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        key={`fundingperiod-${f}`}
-                        id={`fundingperiod-${f}`}
-                        name={`fundingperiod-${f}`}
-                        type="checkbox"
-                        value={f}
-                        checked={
-                          searchRequest.filters["fundingPeriodName"] !== undefined &&
-                          searchRequest.filters["fundingPeriodName"].includes(f)
-                        }
-                        onChange={(e) => filterByFundingPeriod(e)}
-                      />
-                      <label className="govuk-label govuk-checkboxes__label" htmlFor={`fundingperiod-${f}`}>
-                        {f}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-              Clear filters
-            </button>
-          </form>
+          <MapDataSourceFilesSearchFilters
+              searchCriteria={searchCriteria}
+              initialSearch={initialSearch}
+              filterBySearchTerm={filterBySearchTerm}
+              addFundingStreamFilter={addFundingStreamFilter}
+              removeFundingStreamFilter={removeFundingStreamFilter}
+              addFundingPeriodFilter={addFundingPeriodFilter}
+              removeFundingPeriodFilter={removeFundingPeriodFilter}              
+              filterByFundingStreams={filterByFundingStreams}
+              filterByFundingPeriods={filterByFundingPeriods}             
+              fundingStreamFacets={fundingStreamFacets}
+              fundingPeriodFacets={fundingPeriodFacets}
+              clearFilters={clearFilters}
+            />
         </div>
 
         <div className="govuk-grid-column-two-thirds">
@@ -379,7 +307,7 @@ export function MapDataSourceFiles() {
                               endItemNumber={datasetRelationships.endItemNumber}
                               currentPage={datasetRelationships.pagerState.currentPage}
                               lastPage={datasetRelationships.pagerState.lastPage}
-                              onPageChange={pageChange} />
+                              onPageChange={movePage} />
           )}
         </div>
       </div>

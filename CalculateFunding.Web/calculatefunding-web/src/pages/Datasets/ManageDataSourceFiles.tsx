@@ -96,18 +96,28 @@ export function ManageDataSourceFiles() {
 
     const filterByFundingStreams = useCallback(
     (searchTerm: string) => {
+        if (
+            searchTerm.length === 0 ||
+            searchTerm.length > 1
+          ) { 
             setFundingStreamFacets(
                 initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
             );
+          }
         },
         [initialFundingStreams]
     );
 
     const filterByDataSchemas = useCallback(
     (searchTerm: string) => {
+        if (
+            searchTerm.length === 0 ||
+            searchTerm.length > 1
+          ) { 
             setDataSchemasFacets(
                 initialDataSchemas.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
             );
+          }
         },
         [initialDataSchemas]
     );

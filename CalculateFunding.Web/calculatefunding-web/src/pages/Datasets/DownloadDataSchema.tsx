@@ -108,9 +108,14 @@ export function DownloadDataSchema() {
 
       const filterByFundingStreams = useCallback(
         (searchTerm: string) => {
-          setFundingStreamFacets(
-            initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
-          );
+         if (
+            searchTerm.length === 0 ||
+            searchTerm.length > 1
+            ) { 
+            setFundingStreamFacets(
+                initialFundingStreams.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+            }
         },
         [initialFundingStreams]
       );

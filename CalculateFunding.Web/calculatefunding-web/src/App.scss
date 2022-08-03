@@ -514,7 +514,7 @@ aside.search-filters  {
   }
 
   .search-filters__controls {
-    padding: 0.7em 0.7em 0.7em 0.2em;
+    padding: 0.7em 0.7em 0.7em 0.2em;  
   }
 
   .search-filters__show-all {
@@ -553,6 +553,23 @@ aside.search-filters  {
 
       .search-filters-nav__chevron:after {
         color: $search-filters-hover-colour;
+      }
+    }    
+
+    &:focus {
+      // Remove default focus border around button as
+      // styling is being applied to inner text elements that receive focus
+      outline: 0;
+
+      @include govuk-focused-text;      
+
+      .search-filters-nav__chevron {
+        color: $search-filters-base-colour;
+        background: $search-filters-base-colour
+      }
+
+      .search-filters-nav__chevron:after {
+        color:  $search-filters-icon-focus-colour;
       }
     }
 
@@ -741,6 +758,7 @@ aside.search-filters  {
       .search-filters__section-summary-focus,
       .search-filters__section-toggle-focus {
         @include govuk-focused-text;
+        padding-bottom: 2px;
       }
 
       .search-filters-nav__chevron {

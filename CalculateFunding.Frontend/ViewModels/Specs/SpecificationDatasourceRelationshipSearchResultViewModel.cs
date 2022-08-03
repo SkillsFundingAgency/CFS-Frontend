@@ -11,5 +11,6 @@ namespace CalculateFunding.Frontend.ViewModels.Specs
 		public int TotalCount { get; set; }
 		public int StartItemNumber { get; set; }
 		public int EndItemNumber { get; set; }
+        public IEnumerable<SearchFacetViewModel> Facets { get; set; }
     }
 }

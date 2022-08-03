@@ -30,6 +30,7 @@ export const SearchFilterSectionHeader = ({
     >
       <h2 className="search-filters__section-heading">
         <label
+          tabIndex={0}
           className="search-filters__section-label govuk-body govuk-!-font-size-19"
           htmlFor={id}
           onClick={handleToggleExpand}
@@ -51,7 +52,7 @@ export const SearchFilterSectionHeader = ({
             <span className="search-filters__section-toggle-focus">
               <span
                 className={`search-filters-nav__chevron search-filters-nav__chevron--${
-                  !isExpanded ? "up" : "down"
+                  isExpanded ? "up" : "down"
                 }`}
               >
                 &nbsp;
@@ -371,6 +372,55 @@ export const SearchFilterSelectionPanel = ({
   );
 };
 
+export const DownloadDataSchemaSearchFilterSelectionPanel = ({
+  title,
+  selectedFundingStreamFilters,
+  handleRemoveFundingStreamFilter,
+  clearSearchTitle = "Clear search",
+  handleClearSearch,
+}: {
+  title: string;
+  selectedFundingStreamFilters: string[];
+  clearSearchTitle?: string;
+  handleRemoveFundingStreamFilter: (fundingStream: string) => void;
+  handleClearSearch: () => void;
+}) => {
+  const haveFilters =
+    !!selectedFundingStreamFilters.length;
+
+  return (
+    <fieldset className="govuk-fieldset search-filters--greyed selected-filters-background">
+      <div className="govuk-form-group filterSearch">
+        <h2 className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+          {title}
+        </h2>
+        <TextLink
+          handleOnClick={handleClearSearch}
+          additionalCss={"govuk-!-margin-top-2 govuk-!-margin-bottom-2 right-align"}
+        >
+          {clearSearchTitle}
+        </TextLink>
+
+        {!haveFilters ? (
+          <div id="showHideText">
+            <p className="govuk-body-s">No filters selected</p>
+          </div>
+        ) : (
+          <div className="filtersSelected">
+            {selectedFundingStreamFilters.length > 0 && (
+              <SelectedFilters
+                title="Funding streams"
+                selectedFilters={selectedFundingStreamFilters}
+                handleRemoveFilter={handleRemoveFundingStreamFilter}
+              />
+            )}           
+          </div>
+        )}
+      </div>
+    </fieldset>
+  );
+};
+
 export const ManageDataSourceFilesSearchFilterSelectionPanel = ({
   title,
   selectedFundingStreamFilters,
@@ -432,21 +482,26 @@ export const ManageDataSourceFilesSearchFilterSelectionPanel = ({
   );
 };
 
-export const DownloadDataSchemaSearchFilterSelectionPanel = ({
+export const MapDataSourceFileDatasetFilterSelectionPanel = ({
   title,
   selectedFundingStreamFilters,
+  selectedFundingPeriodFilters,
   handleRemoveFundingStreamFilter,
+  handleRemoveFundingPeriodFilter,
   clearSearchTitle = "Clear search",
   handleClearSearch,
 }: {
   title: string;
   selectedFundingStreamFilters: string[];
+  selectedFundingPeriodFilters: string[];
   clearSearchTitle?: string;
   handleRemoveFundingStreamFilter: (fundingStream: string) => void;
+  handleRemoveFundingPeriodFilter: (fundingPeriod: string) => void;
   handleClearSearch: () => void;
 }) => {
   const haveFilters =
-    !!selectedFundingStreamFilters.length;
+    !!selectedFundingStreamFilters.length ||
+    !!selectedFundingPeriodFilters.length ;
 
   return (
     <fieldset className="govuk-fieldset search-filters--greyed selected-filters-background">
@@ -473,7 +528,14 @@ export const DownloadDataSchemaSearchFilterSelectionPanel = ({
                 selectedFilters={selectedFundingStreamFilters}
                 handleRemoveFilter={handleRemoveFundingStreamFilter}
               />
-            )}           
+            )}
+            {selectedFundingPeriodFilters.length > 0 && (
+              <SelectedFilters
+                title="Funding periods"
+                selectedFilters={selectedFundingPeriodFilters}
+                handleRemoveFilter={handleRemoveFundingPeriodFilter}
+              />
+            )}
           </div>
         )}
       </div>
@@ -508,10 +570,10 @@ export const SearchFiltersOuterContainer = React.memo(
       <div className="govuk-form-group filterSearch filterbyContainer">
         <div className="filterContainer">
           <div className="search-filters__controls">
-            <label onClick={(e) => handleClick(e)} className="search-filters__show-all">
+            <label tabIndex={0} onClick={(e) => handleClick(e)} className="search-filters__show-all">
               <span
                 className={`search-filters-nav__chevron search-filters-nav__chevron--${
-                  !allExpanded ? "up" : "down"
+                  allExpanded ? "up" : "down"
                 }`}
               >
                 &nbsp;
