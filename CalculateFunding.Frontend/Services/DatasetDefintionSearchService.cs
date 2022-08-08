@@ -47,7 +47,8 @@ namespace CalculateFunding.Frontend.Services
                 SearchTerm = request.SearchTerm,
                 IncludeFacets = request.IncludeFacets,
                 Filters = request.Filters,
-                SearchMode = request.SearchMode.AsMatchingEnum<SearchMode>()
+                SearchMode = request.SearchMode.AsMatchingEnum<SearchMode>(),
+                FacetCount = request.FacetCount
             };
 
 	        ApiResponse<SearchResults<DatasetDefinitionIndex>> searchRequestResult = await _datasetsClient.SearchDatasetDefinitions(requestOptions);

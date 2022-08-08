@@ -38,7 +38,7 @@ export function DownloadDataSchema() {
 
     const initialSearch: DatasetDefinitionRequestViewModel = {
         errorToggle: "",
-        facetCount: 10,
+        facetCount: 100,
         filters: { "": [""] },
         includeFacets: true,
         pageNumber: 1,
