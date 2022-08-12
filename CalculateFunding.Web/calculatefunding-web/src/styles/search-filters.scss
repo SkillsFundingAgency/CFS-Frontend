@@ -98,3 +98,8 @@ div.filter-content {
   top: 1rem;
   z-index: 1020;
 }
+
+.filterScroll {
+	overflow: scroll; 
+	height: calc(95vh);
+}

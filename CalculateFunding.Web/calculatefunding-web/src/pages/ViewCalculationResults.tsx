@@ -1,13 +1,10 @@
-import { debounce } from "lodash";
 import * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { RouteComponentProps } from "react-router";
 import { Link } from "react-router-dom";
 
 import { AccordionPanel } from "../components/AccordionPanel";
 import { Breadcrumb, Breadcrumbs } from "../components/Breadcrumbs";
-import { CollapsiblePanel } from "../components/CollapsiblePanel";
-import { CollapsibleSearchBox } from "../components/CollapsibleSearchBox";
 import JobNotificationSection from "../components/Jobs/JobNotificationSection";
 import { LoadingFieldStatus } from "../components/LoadingFieldStatus";
 import { LoadingStatus } from "../components/LoadingStatus";
@@ -16,6 +13,7 @@ import { MultipleErrorSummary } from "../components/MultipleErrorSummary";
 import { TableNavBottom } from "../components/TableNavBottom";
 import { TagTypes } from "../components/Tag";
 import { TextLink } from "../components/TextLink";
+import { ViewCalculationResultsSearchFilters } from "../components/Calculations/ViewCalculationResultsSearchFilter"
 import { extractJobsFromNotifications, isActiveJob } from "../helpers/jobDetailsHelper";
 import { useCalculation } from "../hooks/Calculations/useCalculation";
 import { useCalculationProviderSearch } from "../hooks/Calculations/useCalculationProviderSearch";
@@ -41,16 +39,22 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   document.title = "Calculation Results - Calculate funding";
   const [autoExpand, setAutoExpand] = useState(false);
   const runningJobs = useRef<JobDetails[]>([]);
-  const filterResultsStatus = [
-    {
-      name: "With exceptions",
-      selected: false,
-    },
-    {
-      name: "Without exceptions",
-      selected: false,
-    },
-  ];
+  const [providerTypeFacets, setProviderTypeFacets] = useState<FacetValue[]>([]);
+  const [providerSubTypeFacets, setProviderSubTypeFacets] = useState<FacetValue[]>([]);
+  const [localAuthorityFacets, setLocalAuthorityFacets] = useState<FacetValue[]>([]);
+  const [resultStatusFacets, setResultStatusFacets] = useState<FacetValue[]>([ {
+    name: "With exceptions",
+    count: 0
+  },
+  {
+    name: "Without exceptions",
+    count: 0
+  }]);
+
+  const [initialProviderTypeFacets, setInitialProviderTypeFacets] = useState<FacetValue[]>([]);
+  const [initialProviderSubTypeFacets, setInitialProviderSubTypeFacets] = useState<FacetValue[]>([]);
+  const [initialLocalAuthorityFacets, setInitialLocalAuthorityFacets] = useState<FacetValue[]>([]);
+
   const { errors, addErrorMessage, addError } = useErrors();
   const { calculation, specificationId } = useCalculation(calculationId, (err) =>
     addErrorMessage(err.message, "Error while loading calculation")
@@ -102,79 +106,130 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     refetchCalculationProviders,
   } = useCalculationProviderSearch(calculationProviderSearchRequest);
 
-  const { providerTypes, providerSubTypes, localAuthorities } = useMemo(() => {
+  var { providerTypes, providerSubTypes, localAuthorities } = useMemo(() => {
     const getFacetValues = (
       data: CalculationProviderSearchResponse,
       facetKey: PublishedProviderSearchFacet
     ): FacetValue[] => data.facets.find((f) => f.name === facetKey)?.facetValues ?? [];
-
+    const types = !providers ? [] 
+      : getFacetValues(providers, PublishedProviderSearchFacet.ProviderType);
+    const subTypes = !providers
+    ? []
+      : getFacetValues(providers, PublishedProviderSearchFacet.ProviderSubType);
+    const localAuthorities = !providers ? []
+     : getFacetValues(providers, PublishedProviderSearchFacet.LocalAuthority);
+     setProviderTypeFacets(types);
+     setProviderSubTypeFacets(subTypes);
+     setLocalAuthorityFacets(localAuthorities);
+     setInitialProviderTypeFacets(types);
+     setInitialProviderSubTypeFacets(subTypes);
+     setInitialLocalAuthorityFacets(localAuthorities);
     return {
-      providerTypes: !providers ? [] : getFacetValues(providers, PublishedProviderSearchFacet.ProviderType),
-      providerSubTypes: !providers
-        ? []
-        : getFacetValues(providers, PublishedProviderSearchFacet.ProviderSubType),
-      localAuthorities: !providers
-        ? []
-        : getFacetValues(providers, PublishedProviderSearchFacet.LocalAuthority),
+      providerTypes: types,
+      providerSubTypes: subTypes,
+      localAuthorities:localAuthorities,
     };
   }, [providers]);
 
-  function filterByProviderTypes(e: React.ChangeEvent<HTMLInputElement>) {
-    const filterUpdate = calculationProviderSearchRequest.providerType;
-    if (e.target.checked) {
-      filterUpdate.push(e.target.value);
-    } else {
-      const position = filterUpdate.indexOf(e.target.value);
-      filterUpdate.splice(position, 1);
+const addProviderTypeFilter = useCallback((providerType: string) => {
+  setCalculationProviderSearchRequest((prevState) => {
+    return {
+      ...prevState,
+      providerType: [...prevState.providerType.filter((fs) => fs !== providerType), providerType],
+    };
+  });
+}, []);
+
+const removeProviderTypeFilter = useCallback((providerType: string) => {
+  setCalculationProviderSearchRequest((prevState) => {
+    return { ...prevState, providerType: prevState.providerType.filter((fs) => fs !== providerType) };
+  });
+}, []);
+
+const addProviderSubTypeFilter = useCallback((providerSubType: string) => {
+  setCalculationProviderSearchRequest((prevState) => {
+    return {
+      ...prevState,
+      providerSubType: [...prevState.providerSubType.filter((fs) => fs !== providerSubType), providerSubType],
+    };
+  });
+}, []);
+
+const removeProviderSubTypeFilter = useCallback((providerSubType: string) => {
+  setCalculationProviderSearchRequest((prevState) => {
+    return { ...prevState, providerSubType: prevState.providerSubType.filter((fs) => fs !== providerSubType) };
+  });
+}, []);
+const addLocalAuthorityFilter = useCallback((localAuthority: string) => {
+  setCalculationProviderSearchRequest((prevState) => {
+    return {
+      ...prevState,
+      localAuthority: [...prevState.localAuthority.filter((fs) => fs !== localAuthority), localAuthority],
+    };
+  });
+}, []);
+
+const removeLocalAuthorityFilter = useCallback((localAuthority: string) => {
+  setCalculationProviderSearchRequest((prevState) => {
+    return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority) };
+  });
+}, []);
+
+const filterByProviderType = useCallback(
+  (searchTerm: string) => {
+    if (
+      searchTerm.length === 0 ||
+      searchTerm.length > 1
+    ) { 
+      setProviderTypeFacets(
+        initialProviderTypeFacets.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
     }
-    setCalculationProviderSearchRequest((prevState) => {
-      return { ...prevState, providerType: filterUpdate, pageNumber: 1 };
-    });
-  }
-
-  function filterByProviderSubTypes(e: React.ChangeEvent<HTMLInputElement>) {
-    const filterUpdate = calculationProviderSearchRequest.providerSubType;
-    if (e.target.checked) {
-      filterUpdate.push(e.target.value);
-    } else {
-      const position = filterUpdate.indexOf(e.target.value);
-      filterUpdate.splice(position, 1);
+  },
+  [initialProviderTypeFacets]
+);
+const filterByProviderSubType = useCallback(
+  (searchTerm: string) => {
+    if (
+      searchTerm.length === 0 ||
+      searchTerm.length > 1
+    ) { 
+      setProviderSubTypeFacets(
+        initialProviderSubTypeFacets.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
     }
-    setCalculationProviderSearchRequest((prevState) => {
-      return { ...prevState, providerSubType: filterUpdate, pageNumber: 1 };
-    });
-  }
-
-  function filterByResultStatus(e: React.ChangeEvent<HTMLInputElement>) {
-    let filterUpdate = calculationProviderSearchRequest.errorToggle;
-
-    if (e.target.value === "With exceptions") {
-      filterUpdate = "Errors";
-    } else {
-      filterUpdate = "";
+  },
+  [initialProviderSubTypeFacets]
+);
+const filterResultsStatus = useCallback(
+  (searchTerm: string) => {
+    if (
+      searchTerm.length === 0 ||
+      searchTerm.length > 1
+    ) { 
+      setResultStatusFacets(
+        resultStatusFacets.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
     }
-
-    setCalculationProviderSearchRequest((prevState) => {
-      return { ...prevState, errorToggle: filterUpdate, pageNumber: 1 };
-    });
-  }
-
-  function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
-    const filterUpdate = calculationProviderSearchRequest.localAuthority;
-
-    if (e.target.checked) {
-      filterUpdate.push(e.target.value);
-    } else {
-      const position = filterUpdate.indexOf(e.target.value);
-      filterUpdate.splice(position, 1);
+  },
+  [resultStatusFacets]
+);
+const filterByLocalAuthority = useCallback(
+  (searchTerm: string) => {
+    if (
+      searchTerm.length === 0 ||
+      searchTerm.length > 1
+    ) { 
+      setLocalAuthorityFacets(
+        initialLocalAuthorityFacets.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
     }
-    setCalculationProviderSearchRequest((prevState) => {
-      return { ...prevState, localAuthority: filterUpdate, pageNumber: 1 };
-    });
-  }
+  },
+  [initialLocalAuthorityFacets]
+);
 
-  function filterBySearchTerm(searchField: string, searchTerm: string) {
-    if (searchTerm.length === 0 || searchTerm.length > 2) {
+  const filterBySearchTerm = useCallback((searchField: string, searchTerm: string) => {
+    if (searchTerm.length === 0 || searchTerm.length > 1) {
       const searchFields: string[] = [];
       if (searchField != null && searchField !== "") {
         searchFields.push(searchField);
@@ -184,10 +239,9 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
         return { ...prevState, searchTerm: searchTerm, searchFields: searchFields, pageNumber: 1 };
       });
     }
-  }
-  const debounceFilterBySearchTerm = useRef(debounce(filterBySearchTerm, 500)).current;
+  },[]);
 
-  function clearFilters() {
+  const clearFilters = useCallback(()=> {
     setCalculationProviderSearchRequest((prevState) => {
       return {
         ...prevState,
@@ -199,10 +253,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
         pageNumber: 1,
       };
     });
-
-    // @ts-ignore
-    document.getElementById("searchProviders").reset();
-  }
+  }, []);
 
   function setPagination(e: number) {
     setCalculationProviderSearchRequest((prevState) => {
@@ -292,137 +343,33 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
         </div>
       </div>
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
-          <form id="searchProviders">
-            <CollapsiblePanel title={"Search"} isExpanded={true}>
-              <fieldset className="govuk-fieldset">
-                <span className="govuk-hint sidebar-search-span">Select one option.</span>
-                <CollapsibleSearchBox searchTerm={""} callback={debounceFilterBySearchTerm} />
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title="Filter by provider type"
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={calculationProviderSearchRequest.providerType.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-checkboxes">
-                  {providerTypes.map((providerType) => (
-                    <div className="govuk-checkboxes__item" key={providerType.name}>
-                      <input
-                        className="govuk-checkboxes__input"
-                        id={`providerTypes-${providerType.name}`}
-                        name={`providerTypes-${providerType.name}`}
-                        checked={!!calculationProviderSearchRequest.providerType.find((name) => name == providerType.name)}
-                        type="checkbox"
-                        value={providerType.name}
-                        onChange={filterByProviderTypes}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`providerTypes-${providerType.name}`}
-                      >
-                        {providerType.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title="Filter by provider sub type"
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={calculationProviderSearchRequest.providerSubType.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-checkboxes">
-                  {providerSubTypes.map((providerSubType) => {
-                    const key = `providerSubTypes-${providerSubType.name}`;
-                    return (
-                      <div className="govuk-checkboxes__item" key={key}>
-                        <input
-                          className="govuk-checkboxes__input"
-                          id={key}
-                          name={key}
-                          checked={!!calculationProviderSearchRequest.providerSubType.find((name) => name == providerSubType.name)}
-                          type="checkbox"
-                          value={providerSubType.name}
-                          onChange={filterByProviderSubTypes}
-                        />
-                        <label className="govuk-label govuk-checkboxes__label" htmlFor={key}>
-                          {providerSubType.name}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel title="Filter by results status" isExpanded={true} isCollapsible={true}>
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-radios">
-                  {filterResultsStatus.map((status) => {
-                    const key = `resultsStatus-${status.name}`;
-                    return (
-                      <div key={key} className="govuk-radios__item">
-                        <input
-                          className="govuk-radios__input"
-                          id={key}
-                          name={key}
-                          type="radio"
-                          value={status.name}
-                          defaultChecked={status.name === "Without exceptions"}
-                          onChange={filterByResultStatus}
-                        />
-                        <label className="govuk-label govuk-radios__label" htmlFor={key}>
-                          {status.name}
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title="Filter by local authority(LA)"
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={calculationProviderSearchRequest.localAuthority.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-checkboxes">
-                  {localAuthorities.map((localAuthority, index) => (
-                    <div className="govuk-checkboxes__item" key={index}>
-                      <input
-                        className="govuk-checkboxes__input"
-                        id={`localAuthorities-${localAuthority.name}`}
-                        name="localAuthorities"
-                        checked={!!calculationProviderSearchRequest.localAuthority.find((name) => name == localAuthority.name)}
-                        type="checkbox"
-                        value={localAuthority.name}
-                        onChange={filterByLocalAuthority}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`localAuthorities-${localAuthority.name}`}
-                      >
-                        {localAuthority.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <button type="button" className="govuk-button" onClick={clearFilters}>
-              Clear filters
-            </button>
-          </form>
+      <div className="govuk-grid-column-one-third position-sticky">
+        <div className="filterScroll">
+          <ViewCalculationResultsSearchFilters
+            searchCriteria={calculationProviderSearchRequest}
+            initialSearch={calculationProviderSearchRequest}
+            filterBySearchTerm={filterBySearchTerm}
+            addProviderTypeFilter = {addProviderTypeFilter} 
+            removeProviderTypeFilter = {removeProviderTypeFilter} 
+            addProviderSubTypeFilter = {addProviderSubTypeFilter} 
+            removeProviderSubTypeFilter = {removeProviderSubTypeFilter}
+            addResultStatusFilter = {addProviderTypeFilter} 
+            removeResultStatusFilter = {removeProviderTypeFilter}
+            addLocalAuthorityFilter = {addLocalAuthorityFilter} 
+            removeLocalAuthorityFilter = {removeLocalAuthorityFilter} 
+            filterByProviderType = {filterByProviderType} 
+            filterByProviderSubType = {filterByProviderSubType} 
+            filterByResultStatus = {filterResultsStatus} 
+            filterByLocalauthority = {filterByLocalAuthority} 
+            providerTypeFacets = {providerTypeFacets} 
+            providerSubTypeFacets = {providerSubTypeFacets} 
+            resultStatusFacets = {resultStatusFacets} 
+            localAuthorityFacets = {localAuthorityFacets} 
+            clearFilters={clearFilters}
+          />
+          </div>
         </div>
+        
         <div className="govuk-grid-column-two-thirds">
           <LoadingStatus
             title={"Updating search results"}

@@ -98,8 +98,8 @@ describe("<ViewCalculationResults />", () => {
     it("search value changes when searching for providerName", async () => {
       const { container } = renderViewCalculationResultsPage();
       // (first call is with default search which will be ignored by the hook internally)
-      await waitFor(() => expect(useCalcProviderSearchUtils.spy).toBeCalledTimes(2));
-      const secondCall: CalculationProviderSearchRequest = useCalcProviderSearchUtils.spy.mock.calls[1][0];
+      await waitFor(() => expect(useCalcProviderSearchUtils.spy).toBeCalledTimes(3));
+      const secondCall: CalculationProviderSearchRequest = useCalcProviderSearchUtils.spy.mock.calls[2][0];
       expect(secondCall.calculationId).toBe(testCalc1.id);
       expect(secondCall.calculationValueType).toBe(testCalc1.valueType);
       useCalcProviderSearchUtils.spy.mockClear();

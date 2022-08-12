@@ -668,3 +668,87 @@ const Accordion = ({
     </div>
   );
 };
+
+export const ViewCalculationResultsSearchFilterSelectionPanel = ({
+  title,
+  selectedProviderTypeFilters,
+  selectedProviderSubTypeFilters,
+  selectedResultStatusFilters,
+  selectedLocalAuthorityFilters,
+  handleRemoveProviderTypeFilter,
+  handleRemoveProviderSubTypeFilter,
+  handleRemoveResultStatusFilter,
+  handleRemoveLocalAuthorityFilter,
+  clearSearchTitle = "Clear filters",
+  handleClearSearch,
+}: {
+  title: string;
+  selectedProviderTypeFilters: string[];
+  selectedProviderSubTypeFilters: string[];
+  selectedResultStatusFilters: string[];
+  selectedLocalAuthorityFilters: string[];
+  clearSearchTitle?: string;
+  handleRemoveProviderTypeFilter: (providerType: string) => void;
+  handleRemoveProviderSubTypeFilter: (providerSubType: string) => void;
+  handleRemoveResultStatusFilter: (resultStatus: string) => void;
+  handleRemoveLocalAuthorityFilter: (localAuthority: string) => void;
+  handleClearSearch: () => void;
+}) => {
+  const haveFilters =
+    !!selectedProviderTypeFilters.length ||
+    !!selectedProviderSubTypeFilters.length ||
+    !!selectedLocalAuthorityFilters.length;
+
+  return (
+    <fieldset className="govuk-fieldset search-filters--greyed selected-filters-background">
+      <div className="govuk-form-group filterSearch">
+        <h2 className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+          {title}
+        </h2>
+        <TextLink
+          handleOnClick={handleClearSearch}
+          additionalCss={"govuk-!-margin-top-2 govuk-!-margin-bottom-2 right-align"}
+        >
+          {clearSearchTitle}
+        </TextLink>
+
+        {!haveFilters ? (
+          <div id="showHideText">
+            <p className="govuk-body-s">No filters selected</p>
+          </div>
+        ) : (
+          <div className="filtersSelected">
+            {selectedProviderTypeFilters.length > 0 && (
+              <SelectedFilters
+                title="Provider type"
+                selectedFilters={selectedProviderTypeFilters}
+                handleRemoveFilter={handleRemoveProviderTypeFilter}
+              />
+            )}
+            {selectedProviderSubTypeFilters.length > 0 && (
+              <SelectedFilters
+                title="Provider sub type"
+                selectedFilters={selectedProviderSubTypeFilters}
+                handleRemoveFilter={handleRemoveProviderSubTypeFilter}
+              />
+            )}
+            {selectedResultStatusFilters.length > 0 && (
+              <SelectedFilters
+                title="Result status"
+                selectedFilters={selectedResultStatusFilters}
+                handleRemoveFilter={handleRemoveResultStatusFilter}
+              />
+            )}
+            {selectedLocalAuthorityFilters.length > 0 && (
+              <SelectedFilters
+                title="Local authority"
+                selectedFilters={selectedLocalAuthorityFilters}
+                handleRemoveFilter={handleRemoveLocalAuthorityFilter}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    </fieldset>
+  );
+};
