@@ -697,6 +697,7 @@ export const ViewCalculationResultsSearchFilterSelectionPanel = ({
   const haveFilters =
     !!selectedProviderTypeFilters.length ||
     !!selectedProviderSubTypeFilters.length ||
+    !!selectedResultStatusFilters.length ||
     !!selectedLocalAuthorityFilters.length;
 
   return (

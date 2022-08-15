@@ -1,6 +1,6 @@
 import "../styles/Accordion.scss";
 
-import React, { ChangeEvent, useRef } from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import { TextLink } from "./TextLink";
 import { debounce } from "lodash";

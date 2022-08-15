@@ -42,14 +42,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
   const [providerTypeFacets, setProviderTypeFacets] = useState<FacetValue[]>([]);
   const [providerSubTypeFacets, setProviderSubTypeFacets] = useState<FacetValue[]>([]);
   const [localAuthorityFacets, setLocalAuthorityFacets] = useState<FacetValue[]>([]);
-  const [resultStatusFacets, setResultStatusFacets] = useState<FacetValue[]>([ {
-    name: "With exceptions",
-    count: 0
-  },
-  {
-    name: "Without exceptions",
-    count: 0
-  }]);
+  const [resultStatusFacets, setResultStatusFacets] = useState<FacetValue[]>([]);
 
   const [initialProviderTypeFacets, setInitialProviderTypeFacets] = useState<FacetValue[]>([]);
   const [initialProviderSubTypeFacets, setInitialProviderSubTypeFacets] = useState<FacetValue[]>([]);
@@ -69,6 +62,10 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     JobType.CreateInstructGenerateAggregationsAllocationJob,
     JobType.GenerateGraphAndInstructGenerateAggregationAllocationJob,
   ];
+  const enum Exceptions {
+    WithException = "With exceptions",
+    WithoutException = "Without exceptions"
+  }
   const {
     addSub,
     removeAllSubs,
@@ -106,7 +103,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     refetchCalculationProviders,
   } = useCalculationProviderSearch(calculationProviderSearchRequest);
 
-  var { providerTypes, providerSubTypes, localAuthorities } = useMemo(() => {
+  useMemo(() => {
     const getFacetValues = (
       data: CalculationProviderSearchResponse,
       facetKey: PublishedProviderSearchFacet
@@ -124,6 +121,24 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
      setInitialProviderTypeFacets(types);
      setInitialProviderSubTypeFacets(subTypes);
      setInitialLocalAuthorityFacets(localAuthorities);
+
+    let resultFacets:FacetValue[] = [];
+    let totalResults = !providers ? 0 : providers.totalResults;
+    let totalExceptions = (!providers ? 0 : providers.totalErrorResults)
+    let totalWithoutExceptions = totalResults - totalExceptions;
+    if(totalExceptions > 0){
+    resultFacets.push( {
+      name: Exceptions.WithException,
+      count: totalExceptions
+    })
+    }
+    if(totalWithoutExceptions > 0){
+    resultFacets.push( {
+      name: Exceptions.WithoutException,
+      count: totalWithoutExceptions
+    })
+    }
+    setResultStatusFacets(resultFacets);
     return {
       providerTypes: types,
       providerSubTypes: subTypes,
@@ -174,7 +189,33 @@ const removeLocalAuthorityFilter = useCallback((localAuthority: string) => {
     return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority) };
   });
 }, []);
+const addResultStatusFilter = useCallback((resultsStatus: string) => {
+  let filterUpdate = calculationProviderSearchRequest.errorToggle;
+  if ((resultsStatus === Exceptions.WithException) && (resultsStatus.includes(Exceptions.WithException))){
+    filterUpdate = "Errors";
+  } else {
+    filterUpdate = "";
+  }
+  setCalculationProviderSearchRequest((prevState) => {
+    return {
+      ...prevState,
+      errorToggle: filterUpdate,
+      resultsStatus: [...prevState.resultsStatus.filter((fs) => fs !== resultsStatus), resultsStatus],
+    };
+  });
+}, []);
 
+const removeResultStatusFilter = useCallback((resultsStatus: string) => {
+  let filterUpdate = calculationProviderSearchRequest.errorToggle;
+  if ((resultsStatus === Exceptions.WithException) || (!resultsStatus.includes(Exceptions.WithException))){
+    filterUpdate = "";
+  } else {
+    filterUpdate = "Errors";
+  }
+  setCalculationProviderSearchRequest((prevState) => {
+    return { ...prevState, errorToggle: filterUpdate, resultsStatus: prevState.resultsStatus.filter((fs) => fs !== resultsStatus) };
+  });
+}, []);
 const filterByProviderType = useCallback(
   (searchTerm: string) => {
     if (
@@ -227,7 +268,6 @@ const filterByLocalAuthority = useCallback(
   },
   [initialLocalAuthorityFacets]
 );
-
   const filterBySearchTerm = useCallback((searchField: string, searchTerm: string) => {
     if (searchTerm.length === 0 || searchTerm.length > 1) {
       const searchFields: string[] = [];
@@ -248,6 +288,7 @@ const filterByLocalAuthority = useCallback(
         localAuthority: [],
         providerType: [],
         providerSubType: [],
+        resultsStatus: [],
         errorToggle: "",
         searchTerm: "",
         pageNumber: 1,
@@ -353,8 +394,8 @@ const filterByLocalAuthority = useCallback(
             removeProviderTypeFilter = {removeProviderTypeFilter} 
             addProviderSubTypeFilter = {addProviderSubTypeFilter} 
             removeProviderSubTypeFilter = {removeProviderSubTypeFilter}
-            addResultStatusFilter = {addProviderTypeFilter} 
-            removeResultStatusFilter = {removeProviderTypeFilter}
+            addResultStatusFilter = {addResultStatusFilter} 
+            removeResultStatusFilter = {removeResultStatusFilter}
             addLocalAuthorityFilter = {addLocalAuthorityFilter} 
             removeLocalAuthorityFilter = {removeLocalAuthorityFilter} 
             filterByProviderType = {filterByProviderType} 

@@ -243,6 +243,56 @@ describe("<ViewCalculationResultsSearchFilters />", () => {
     });
   });
 
+  describe("when a result status filter section 'show this section' is clicked on", () => {
+    it("expands section to reveal filter options", () => {
+
+      const resultStatus: FacetValue[] = [{ name: "With exceptions", count: 111 }, { name: "Without exceptions", count: 222 }];
+
+      const result = render(
+        <MemoryRouter>
+            <ViewCalculationResultsSearchFilters
+                searchCriteria={{...searchCriteria, resultsStatus:["With exceptions"]}}
+                initialSearch={searchCriteria}
+                filterBySearchTerm={jest.fn()}
+                addProviderTypeFilter = {jest.fn()}
+                removeProviderTypeFilter = {jest.fn()}
+                addProviderSubTypeFilter = {jest.fn()}
+                removeProviderSubTypeFilter = {jest.fn()}
+                addResultStatusFilter = {jest.fn()}
+                removeResultStatusFilter = {jest.fn()}
+                addLocalAuthorityFilter = {jest.fn()}
+                removeLocalAuthorityFilter = {jest.fn()}
+                filterByProviderType = {jest.fn()}
+                filterByProviderSubType = {jest.fn()}
+                filterByResultStatus = {jest.fn()}
+                filterByLocalauthority = {jest.fn()}
+                providerTypeFacets = {[]}
+                providerSubTypeFacets = {[]}
+                resultStatusFacets = {resultStatus}
+                localAuthorityFacets = {[]}
+                clearFilters = {jest.fn()}
+            />
+        </MemoryRouter>
+      );
+
+      const resultStatusSection = result.getByTestId("result-status-filters");
+      const showResultStatusLabel = within(resultStatusSection).getByText(/Result status/);
+      expect(showResultStatusLabel).toBeInTheDocument();
+      expect(result.queryByText(/Hide/)).not.toBeInTheDocument();
+      expect(result.getByRole("heading", { name: /Selected filters/ })).toBeInTheDocument();
+      const resultStatusSummary = result.getByRole("heading", { name: /Result status/, level: 3 });
+      expect(resultStatusSummary).toBeInTheDocument();
+      expect(within(resultStatusSummary.parentElement as HTMLElement).getByText(/With exceptions/)).toBeInTheDocument();
+
+      userEvent.click(showResultStatusLabel);
+
+      expect(result.getByText(/Hide/)).toBeVisible();
+      expect(result.getByRole("checkbox", { name: /With exceptions/ })).toBeChecked();
+      expect(result.getByRole("checkbox", { name: /Without exceptions/ })).not.toBeChecked();
+      expect(result.queryByText(/No filters selected/)).not.toBeInTheDocument();
+    });
+  });
+
   describe("when a provider type filter option is selected", () => {
     it("sends updated filters to parent", () => {
       const mockAddProviderTypeFilter = jest.fn();
@@ -378,6 +428,52 @@ describe("<ViewCalculationResultsSearchFilters />", () => {
       userEvent.click(secondFilter);
 
       expect(mockLocalauthorityFilter).toHaveBeenCalledWith("Magic Potions");
+    });
+  });
+
+  describe("when a Result Status filter option is selected", () => {
+    it("sends updated filters to parent", () => {
+      const mockResultStatusFilter = jest.fn();
+      const resultStatus: FacetValue[] = [{ name: "With exceptions", count: 111 }, { name: "Without exceptions", count: 222 }];
+
+      const result = render(
+        <MemoryRouter>
+            <ViewCalculationResultsSearchFilters
+                searchCriteria={{...searchCriteria, providerType:["With exceptions"]}}
+                initialSearch={searchCriteria}
+                filterBySearchTerm={jest.fn()}
+                addProviderTypeFilter = {jest.fn()}
+                removeProviderTypeFilter = {jest.fn()}
+                addProviderSubTypeFilter = {jest.fn()}
+                removeProviderSubTypeFilter = {jest.fn()}
+                addResultStatusFilter = {mockResultStatusFilter}
+                removeResultStatusFilter = {jest.fn()}
+                addLocalAuthorityFilter = {jest.fn()}
+                removeLocalAuthorityFilter = {jest.fn()}
+                filterByProviderType = {jest.fn()}
+                filterByProviderSubType = {jest.fn()}
+                filterByResultStatus = {jest.fn()}
+                filterByLocalauthority = {jest.fn()}
+                providerTypeFacets = {[]}
+                providerSubTypeFacets = {[]}
+                resultStatusFacets = {resultStatus}
+                localAuthorityFacets = {[]}
+                clearFilters = {jest.fn()}
+            />
+        </MemoryRouter>
+      );    
+      // first, click to show filter options
+      const providerTypeSection = result.getByTestId("result-status-filters");
+      const showProviderTypeLabel = within(providerTypeSection).getByText(/Result status/);
+      userEvent.click(showProviderTypeLabel);
+
+      // select option
+      const secondFilter = result.getByRole("checkbox", { name: /With exceptions/ });
+      expect(secondFilter).toBeInTheDocument();
+      expect(secondFilter).not.toBeChecked();
+      userEvent.click(secondFilter);
+
+      expect(mockResultStatusFilter).toHaveBeenCalledWith("With exceptions");
     });
   });
 
