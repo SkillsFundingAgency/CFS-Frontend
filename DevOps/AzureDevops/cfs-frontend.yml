@@ -195,7 +195,7 @@ jobs:
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       inputs:
         SourceFolder: DevOps
-        Contents: '**/*.ps1'
+        Contents: '**/*.*'
         TargetFolder: '$(build.artifactstagingdirectory)/DevOps'
 
     - task: CopyFiles@2

@@ -1,0 +1,18 @@
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <system.webServer xdt:Transform="InsertIfMissing">
+    <security xdt:Transform="InsertIfMissing">
+        <requestFiltering removeServerHeader="true" xdt:Transform="SetAttributes(removeServerHeader)" />
+    </security>
+    <httpProtocol xdt:Transform="InsertIfMissing">
+      <customHeaders xdt:Transform="Remove" />
+      <customHeaders xdt:Transform="InsertIfMissing" >
+        <remove name="Server" />
+        <remove name="X-Powered-By" />
+        <add name="Strict-Transport-Security" value="max-age=31536000; includeSubDomains" />
+        <add name="X-Content-Type-Options" value="nosniff" />
+        <add name="X-Frame-Options" value="sameorigin" />
+        <add name="X-XSS-Protection" value="0" />
+      </customHeaders>
+    </httpProtocol>
+  </system.webServer>
+</configuration>
