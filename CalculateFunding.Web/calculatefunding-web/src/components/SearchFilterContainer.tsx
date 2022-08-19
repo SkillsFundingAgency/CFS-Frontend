@@ -118,8 +118,8 @@ export const SearchFilterSelection = ({
         )}
         {isFacetValueArray(facets) ? (
           <div className="govuk-checkboxes govuk-checkboxes--small filterbyCheckboxNew">
-            {facets?.map((f) => {
-              const key = `checkbox-${id}-${convertToSlug(f.name)}`;
+            {facets?.map((f, i) => {
+              const key = `checkbox-${id}-${convertToSlug(f.name)}-${i}`;
               const isSelected = selectedFilters.includes(f.name);
               const handleFilterChange = () => (isSelected ? removeFilter(f.name) : addFilter(f.name));
               return (

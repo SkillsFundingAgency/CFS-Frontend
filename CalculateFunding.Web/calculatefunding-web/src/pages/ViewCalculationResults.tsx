@@ -79,7 +79,7 @@ export function ViewCalculationResults({ match }: RouteComponentProps<ViewCalcul
     useState<CalculationProviderSearchRequest>({
       calculationValueType: undefined,
       errorToggle: "",
-      facetCount: 0,
+      facetCount: 100,
       includeFacets: true,
       localAuthority: [],
       pageNumber: 1,
@@ -150,14 +150,14 @@ const addProviderTypeFilter = useCallback((providerType: string) => {
   setCalculationProviderSearchRequest((prevState) => {
     return {
       ...prevState,
-      providerType: [...prevState.providerType.filter((fs) => fs !== providerType), providerType],
+      providerType: [...prevState.providerType.filter((fs) => fs !== providerType), providerType], pageNumber: 1
     };
   });
 }, []);
 
 const removeProviderTypeFilter = useCallback((providerType: string) => {
   setCalculationProviderSearchRequest((prevState) => {
-    return { ...prevState, providerType: prevState.providerType.filter((fs) => fs !== providerType) };
+    return { ...prevState, providerType: prevState.providerType.filter((fs) => fs !== providerType) , pageNumber: 1};
   });
 }, []);
 
@@ -165,55 +165,47 @@ const addProviderSubTypeFilter = useCallback((providerSubType: string) => {
   setCalculationProviderSearchRequest((prevState) => {
     return {
       ...prevState,
-      providerSubType: [...prevState.providerSubType.filter((fs) => fs !== providerSubType), providerSubType],
+      providerSubType: [...prevState.providerSubType.filter((fs) => fs !== providerSubType), providerSubType], pageNumber: 1
     };
   });
 }, []);
 
 const removeProviderSubTypeFilter = useCallback((providerSubType: string) => {
   setCalculationProviderSearchRequest((prevState) => {
-    return { ...prevState, providerSubType: prevState.providerSubType.filter((fs) => fs !== providerSubType) };
+    return { ...prevState, providerSubType: prevState.providerSubType.filter((fs) => fs !== providerSubType), pageNumber: 1 };
   });
 }, []);
 const addLocalAuthorityFilter = useCallback((localAuthority: string) => {
   setCalculationProviderSearchRequest((prevState) => {
     return {
       ...prevState,
-      localAuthority: [...prevState.localAuthority.filter((fs) => fs !== localAuthority), localAuthority],
+      localAuthority: [...prevState.localAuthority.filter((fs) => fs !== localAuthority), localAuthority], pageNumber: 1
     };
   });
 }, []);
 
 const removeLocalAuthorityFilter = useCallback((localAuthority: string) => {
   setCalculationProviderSearchRequest((prevState) => {
-    return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority) };
+    return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority), pageNumber: 1 };
   });
 }, []);
 const addResultStatusFilter = useCallback((resultsStatus: string) => {
-  let filterUpdate = calculationProviderSearchRequest.errorToggle;
-  if ((resultsStatus === Exceptions.WithException) && (resultsStatus.includes(Exceptions.WithException))){
-    filterUpdate = "Errors";
-  } else {
-    filterUpdate = "";
-  }
   setCalculationProviderSearchRequest((prevState) => {
+    let status = [...prevState.resultsStatus.filter((fs) => fs !== resultsStatus), resultsStatus]
     return {
       ...prevState,
-      errorToggle: filterUpdate,
-      resultsStatus: [...prevState.resultsStatus.filter((fs) => fs !== resultsStatus), resultsStatus],
+      errorToggle: (status.includes(Exceptions.WithoutException) || status.length === 0 ? "" : "Errors"), pageNumber: 1,
+      resultsStatus: status,
     };
   });
 }, []);
 
 const removeResultStatusFilter = useCallback((resultsStatus: string) => {
-  let filterUpdate = calculationProviderSearchRequest.errorToggle;
-  if ((resultsStatus === Exceptions.WithException) || (!resultsStatus.includes(Exceptions.WithException))){
-    filterUpdate = "";
-  } else {
-    filterUpdate = "Errors";
-  }
   setCalculationProviderSearchRequest((prevState) => {
-    return { ...prevState, errorToggle: filterUpdate, resultsStatus: prevState.resultsStatus.filter((fs) => fs !== resultsStatus) };
+    let status = prevState.resultsStatus.filter((fs) => fs !== resultsStatus);
+    return { ...prevState, 
+      errorToggle: (status.includes(Exceptions.WithoutException) || status.length === 0 ? "" : "Errors"), 
+      resultsStatus: status, pageNumber: 1 };
   });
 }, []);
 const filterByProviderType = useCallback(
@@ -384,8 +376,7 @@ const filterByLocalAuthority = useCallback(
         </div>
       </div>
       <div className="govuk-grid-row">
-      <div className="govuk-grid-column-one-third position-sticky">
-        <div className="filterScroll">
+      <div className="govuk-grid-column-one-third position-sticky filterScroll">
           <ViewCalculationResultsSearchFilters
             searchCriteria={calculationProviderSearchRequest}
             initialSearch={calculationProviderSearchRequest}
@@ -409,8 +400,6 @@ const filterByLocalAuthority = useCallback(
             clearFilters={clearFilters}
           />
           </div>
-        </div>
-        
         <div className="govuk-grid-column-two-thirds">
           <LoadingStatus
             title={"Updating search results"}

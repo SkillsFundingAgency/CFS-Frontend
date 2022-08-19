@@ -55,7 +55,8 @@ namespace CalculateFunding.Frontend.Services
                 IncludeFacets = request.IncludeFacets,
                 ErrorToggle = string.IsNullOrWhiteSpace(request.ErrorToggle) ? (bool?)null : (request.ErrorToggle == "Errors"),
                 Filters = request.Filters,
-                SearchFields = request.SearchFields
+                SearchFields = request.SearchFields,
+                FacetCount = request.FacetCount
             });
 
             if (searchRequestResult?.Content == null)
