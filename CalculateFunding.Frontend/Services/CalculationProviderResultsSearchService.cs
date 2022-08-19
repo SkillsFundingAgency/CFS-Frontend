@@ -89,6 +89,7 @@ namespace CalculateFunding.Frontend.Services
             List<CalculationProviderResultSearchResultItemViewModel> itemResults = new List<CalculationProviderResultSearchResultItemViewModel>();
 
             Dictionary<string, CalculationValueTypeViewModel> calcTypes = new Dictionary<string, CalculationValueTypeViewModel>();
+            int totalErrorCount = 0;
 
             foreach (CalculationProviderResultSearchResult searchresult in calculationProviderResultSearchResults.Results)
             {
@@ -107,10 +108,14 @@ namespace CalculateFunding.Frontend.Services
 
                 vmResult.SetCalculationResultDisplay(calcTypes[searchresult.CalculationId]);
                 itemResults.Add(vmResult);
+                if (!String.IsNullOrEmpty(searchresult.CalculationExceptionType))
+                {
+                    totalErrorCount++;
+                }
             }
 
             result.CalculationProviderResults = itemResults.AsEnumerable();
-
+            result.TotalErrorResults = totalErrorCount;
             if (result.TotalResults == 0)
             {
                 result.StartItemNumber = 0;

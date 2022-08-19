@@ -189,12 +189,29 @@ const removeLocalAuthorityFilter = useCallback((localAuthority: string) => {
     return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority), pageNumber: 1 };
   });
 }, []);
+function getErrorStatus(status: string[])
+{
+  let err = "";
+  if(status.includes(Exceptions.WithoutException) && status.includes(Exceptions.WithException)){
+    err = "";
+  } else if(status.length == 1){
+    if(status.includes(Exceptions.WithoutException)) {
+      err = "WithoutError";
+    } else{
+      err = "Errors";
+    }
+  } else{
+    err = "";
+  }
+  return err;
+}
 const addResultStatusFilter = useCallback((resultsStatus: string) => {
   setCalculationProviderSearchRequest((prevState) => {
     let status = [...prevState.resultsStatus.filter((fs) => fs !== resultsStatus), resultsStatus]
+
     return {
       ...prevState,
-      errorToggle: (status.includes(Exceptions.WithoutException) || status.length === 0 ? "" : "Errors"), pageNumber: 1,
+      errorToggle: getErrorStatus(status), pageNumber: 1,
       resultsStatus: status,
     };
   });
@@ -204,7 +221,7 @@ const removeResultStatusFilter = useCallback((resultsStatus: string) => {
   setCalculationProviderSearchRequest((prevState) => {
     let status = prevState.resultsStatus.filter((fs) => fs !== resultsStatus);
     return { ...prevState, 
-      errorToggle: (status.includes(Exceptions.WithoutException) || status.length === 0 ? "" : "Errors"), 
+      errorToggle:getErrorStatus(status),
       resultsStatus: status, pageNumber: 1 };
   });
 }, []);

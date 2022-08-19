@@ -93,12 +93,16 @@ namespace CalculateFunding.Frontend.Controllers
             {
                 request.SearchTerm = viewModel.SearchTerm;
             }
-
+            
             if (!string.IsNullOrEmpty(viewModel.ErrorToggle))
             {
 	            request.ErrorToggle = "Errors";
+                if(viewModel.ErrorToggle != "Errors")
+                {
+                    request.ErrorToggle = "WithoutError";
+                }
             }
-
+            
             if (viewModel.ProviderType != null && viewModel.ProviderType.Any())
             {
                 request.Filters.Add("providerType", viewModel.ProviderType);
