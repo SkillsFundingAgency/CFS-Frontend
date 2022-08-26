@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { ProviderResultsSearchFilters } from "components/Providers/ProviderResultsSearchFilters";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
-
 import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
-import { CollapsiblePanel } from "../../components/CollapsiblePanel";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
 import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
@@ -14,7 +13,6 @@ import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { getFundingStreamByIdService } from "../../services/policyService";
 import { getProvidersByFundingStreamService } from "../../services/providerService";
-import { CharacterRestrictions } from "../../types/CharacterRestrictions";
 import { FacetValue } from "../../types/Facet";
 import {
   PagedProviderVersionSearchResults,
@@ -23,7 +21,6 @@ import {
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
 import { FundingStream } from "../../types/viewFundingTypes";
-import { RadioSearch } from "./RadioSearch";
 
 export interface ViewProvidersByFundingStreamRouteProps {
   fundingStreamId: string;
@@ -40,7 +37,7 @@ export function ViewProvidersByFundingStream({
     orderBy: [],
     filters: {},
     includeFacets: true,
-    facetCount: 100,
+    facetCount: 200,
     countOnly: false,
     searchMode: SearchMode.All,
     searchFields: [],
@@ -61,19 +58,41 @@ export function ViewProvidersByFundingStream({
     startItemNumber: 0,
     totalCount: 0,
   };
+  const enum FilterBy {
+    ProviderType = "providerType",
+    ProviderSubType = "providerSubType",
+    LocalAuthority = "authority",
+  }
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchRequest, setSearchRequest] = useState<ProviderVersionSearchModel>(initialSearchRequest);
   const [providerVersionSearchResults, setProviderVersionSearchResults] =
     useState<PagedProviderVersionSearchResults>(initialProviderVersionSearchResults);
   const [fundingStreamName, setFundingStreamName] = useState<string>("");
+
   const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([]);
   const [resultsProviderType, setResultsProviderType] = useState<FacetValue[]>([]);
   const [filterProviderSubType, setFilterProviderSubType] = useState<FacetValue[]>([]);
   const [resultsProviderSubType, setResultsProviderSubType] = useState<FacetValue[]>([]);
   const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([]);
   const [resultsLocalAuthority, setResultsLocalAuthority] = useState<FacetValue[]>([]);
-  const [searchType, setSearchType] = useState<string>();
   const { errors, addErrorMessage, clearErrorMessages } = useErrors();
+  
+  const filterOptions: string[] = [FilterBy.ProviderType, FilterBy.ProviderSubType, FilterBy.LocalAuthority]
+  let filters: any = [];
+  for(let i=0; i<filterOptions.length; i++){
+    filters[filterOptions[i]] =
+    searchRequest.filters[filterOptions[i]] != undefined ? searchRequest.filters[filterOptions[i]] : [];
+  }
+
+  const getFilterValues = function () {
+    const newFiltersValue: any = {};       
+    for(let i=0; i<filterOptions.length; i++){
+      if(filters[filterOptions[i]].length != 0){
+        newFiltersValue[filterOptions[i]] = filters[filterOptions[i]];
+      }
+    } 
+    return newFiltersValue;
+  }
 
   useEffect(() => {
     getProvidersByFundingStream(searchRequest);
@@ -96,49 +115,80 @@ export function ViewProvidersByFundingStream({
           const result = response.data as PagedProviderVersionSearchResults;
           setProviderVersionSearchResults(result);
 
-          if (result.facets.length >= 3 && resultsProviderType.length === 0) {
-            setResultsProviderType(result.facets[0].facetValues);
-            setFilterProviderType(result.facets[0].facetValues);
+          setResultsProviderType(result.facets[0].facetValues);
+          setFilterProviderType(result.facets[0].facetValues);
 
-            setFilterProviderSubType(result.facets[1].facetValues);
-            setResultsProviderSubType(result.facets[1].facetValues);
+          setFilterProviderSubType(result.facets[1].facetValues);
+          setResultsProviderSubType(result.facets[1].facetValues);
 
-            setFilterLocalAuthority(result.facets[2].facetValues);
-            setResultsLocalAuthority(result.facets[2].facetValues);
-          }
+          setFilterLocalAuthority(result.facets[2].facetValues);
+          setResultsLocalAuthority(result.facets[2].facetValues);
 
           setIsLoading(false);
         }
       })
       .catch((err) => {
         addErrorMessage(`A problem occurred while loading funding line structure: ${err}`);
-
         setIsLoading(false);
       });
   }
 
-  function clearFilters() {
+  const clearSearchFilterOptions = function() {
+    for(let i=0; i<filterOptions.length; i++){
+      filters[filterOptions[i]].splice(0,filters[filterOptions[i]].length);  
+    }   
+  }
+
+  const clearFilters = useCallback(() => {
     // @ts-ignore
     document.getElementById("searchProviders").reset();
+    clearSearchFilterOptions();
     setFilterProviderType(resultsProviderType);
     setFilterProviderSubType(resultsProviderSubType);
     setFilterLocalAuthority(resultsLocalAuthority);
     setSearchRequest(initialSearchRequest);
+  },[resultsProviderType, resultsProviderSubType, resultsLocalAuthority, initialSearchRequest]);
+ 
+  const filterBySearchTerm = useCallback((searchField: string, searchTerm: string) => {
+    if(searchField === "providerName"){
+      searchField = "name";
+    }
+    searchText(searchField, searchTerm);
+  },[]);
+
+  function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {   
+    let filtersValues: any = {}; 
+    if(enableFilter) {     
+      if (filters[filterKey].indexOf(filterValue) === -1) {
+        filters[filterKey].push(filterValue);       
+        filtersValues = getFilterValues();        
+        setSearchRequest((prevState) => {
+            return { ...prevState, filters: filtersValues, pageNumber: 1 };
+        });
+      }
+    } else {
+      const index = filters[filterKey].indexOf(filterValue);         
+      if (index !== -1) {
+          filters[filterKey].splice(index, 1);               
+          filtersValues = getFilterValues(); 
+          setSearchRequest((prevState) => {
+            return { ...prevState, filters: (filtersValues == undefined || filtersValues.length === 0) ? initialSearchRequest.filters : filtersValues, pageNumber: 1 };
+          });        
+      } else {
+        setSearchRequest((prevState) => {
+          return { ...prevState, filters: initialSearchRequest.filters, pageNumber: 1 };
+        });
+      }
+    }    
   }
 
   function searchText(searchType: string, searchText?: string) {
     const term = searchText;
-    setSearchType(searchType);
-    if (term !== null && term !== undefined && term.length > 3) {
+    if (term !== null && term !== undefined) {
       setSearchRequest((prevState) => {
-        return { ...prevState, searchTerm: term, searchFields: [searchType] };
+        return { ...prevState, searchTerm: term.length > 1 ? term : "", searchFields: term.length > 1 ? [searchType] : [], pageNumber: 1 };
       });
-    }
-    if (term !== null && term !== undefined && term.length === 0) {
-      setSearchRequest((prevState) => {
-        return { ...prevState, searchTerm: "", searchFields: [] };
-      });
-    }
+    }   
   }
 
   function pageChange(pageNumber: number) {
@@ -147,60 +197,52 @@ export function ViewProvidersByFundingStream({
     });
   }
 
-  function filterByProviderType(e: React.ChangeEvent<HTMLInputElement>) {
-    filterResults("providerType", e.target.value, e.target.checked);
-  }
+  const addProviderTypeFilter = useCallback((type: string) => {
+    filterResults(FilterBy.ProviderType, type, true);
+  }, []);
 
-  function searchProviderTypeFilters(e: React.ChangeEvent<HTMLInputElement>) {
-    setFilterProviderType(filterSearch(e.target.value, resultsProviderType, filterProviderType));
-  }
+  const removeProviderTypeFilter = useCallback((type: string) => {
+    filterResults(FilterBy.ProviderType, type, false);
+  }, []);
+  const addProviderSubTypeFilter = useCallback((type: string) => {
+    filterResults(FilterBy.ProviderSubType, type, true);
+  }, []);
 
-  function filterByProviderSubType(e: React.ChangeEvent<HTMLInputElement>) {
-    filterResults("providerSubType", e.target.value, e.target.checked);
-  }
+  const removeProviderSubTypeFilter = useCallback((type: string) => {
+    filterResults(FilterBy.ProviderSubType, type, false);
+  }, []);
+  const addLocalAuthorityFilter = useCallback((type: string) => {
+    filterResults(FilterBy.LocalAuthority, type, true);
+  }, []);
 
-  function searchProviderSubTypeFilters(e: React.ChangeEvent<HTMLInputElement>) {
-    setFilterProviderSubType(filterSearch(e.target.value, resultsProviderSubType, filterProviderSubType));
-  }
-
-  function filterByLocalAuthority(e: React.ChangeEvent<HTMLInputElement>) {
-    filterResults("authority", e.target.value, e.target.checked);
-  }
-
-  function searchLocalAuthorityFilters(e: React.ChangeEvent<HTMLInputElement>) {
-    setFilterLocalAuthority(filterSearch(e.target.value, resultsLocalAuthority, filterLocalAuthority));
-  }
-
-  function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {
-    const filters: string[] =
-      searchRequest.filters[filterKey] !== undefined ? searchRequest.filters[filterKey] : [];
-    if (enableFilter) {
-      if (filters.indexOf(filterValue) === -1) {
-        filters.push(filterValue);
+  const removeLocalAuthorityFilter = useCallback((providerType: string) => {
+    filterResults(FilterBy.LocalAuthority, providerType, false);
+  }, []);
+  
+  const filterByProviderType = useCallback(
+    (searchTerm: string) => {
+      if ( searchTerm.length === 0 || searchTerm.length > 1 ){     
+        setFilterProviderType(resultsProviderType.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
       }
-    } else {
-      const index = filters.indexOf(filterValue);
-      if (index !== -1) {
-        filters.splice(index, 1);
+    },
+    [resultsProviderType]
+  );
+  const filterByProviderSubType = useCallback(
+    (searchTerm: string) => {
+      if (searchTerm.length === 0 ||  searchTerm.length > 1 ){
+        setFilterProviderSubType(resultsProviderSubType.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
       }
-    }
-    const newFiltersValue: any = {};
-    newFiltersValue[filterKey] = filters;
-    setSearchRequest((prevState) => {
-      return { ...prevState, filters: newFiltersValue, pageNumber: 1 };
-    });
-  }
-
-  function filterSearch(keywords: string, originalFilters: FacetValue[], currentFilters: FacetValue[]) {
-    if (keywords.length >= 3) {
-      const copyOfFilters: FacetValue[] = originalFilters as FacetValue[];
-      return copyOfFilters.filter((x) => x.name.toLowerCase().includes(keywords.toLowerCase()));
-    }
-    if (keywords.length === 0) {
-      return resultsProviderType;
-    }
-    return currentFilters;
-  }
+    },
+    [resultsProviderSubType]
+  );
+  const filterByLocalAuthority = useCallback(
+    (searchTerm: string) => {
+      if (searchTerm.length === 0 || searchTerm.length > 1){
+        setFilterLocalAuthority(resultsLocalAuthority.filter((x) => x.name.toLowerCase().includes(searchTerm.toLowerCase())));
+      }
+    },
+    [resultsLocalAuthority]
+  ); 
 
   return (
     <Main location={Section.Results}>
@@ -214,181 +256,27 @@ export function ViewProvidersByFundingStream({
       <Title title="View provider results" titleCaption={fundingStreamName} />
 
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third">
-          <form id="searchProviders">
-            <CollapsiblePanel title={"Search"} isExpanded={true}>
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <span className="govuk-caption-m govuk-!-margin-bottom-4">Select one option</span>
-                  <div className="radios">
-                    <RadioSearch
-                      text="Provider name"
-                      timeout={900}
-                      radioId={"provider-name"}
-                      characterRestrictions={CharacterRestrictions.AlphaNumeric}
-                      radioName={"search-providers-radios"}
-                      searchType={"name"}
-                      minimumChars={3}
-                      callback={searchText}
-                      selectedSearchType={searchType}
-                    />
-                    <RadioSearch
-                      text="UKPRN"
-                      timeout={900}
-                      radioId={"ukprn"}
-                      characterRestrictions={CharacterRestrictions.NumericOnly}
-                      radioName={"search-providers-radios"}
-                      searchType={"ukprn"}
-                      minimumChars={3}
-                      maximumChars={8}
-                      callback={searchText}
-                      selectedSearchType={searchType}
-                    />
-                    <RadioSearch
-                      text="UPIN"
-                      timeout={900}
-                      radioId={"upin"}
-                      characterRestrictions={CharacterRestrictions.NumericOnly}
-                      radioName={"search-providers-radios"}
-                      searchType={"upin"}
-                      minimumChars={3}
-                      maximumChars={6}
-                      callback={searchText}
-                      selectedSearchType={searchType}
-                    />
-                    <RadioSearch
-                      text="URN"
-                      timeout={900}
-                      radioId={"urn"}
-                      characterRestrictions={CharacterRestrictions.NumericOnly}
-                      radioName={"search-providers-radios"}
-                      searchType={"urn"}
-                      minimumChars={3}
-                      maximumChars={6}
-                      callback={searchText}
-                      selectedSearchType={searchType}
-                    />
-                  </div>
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title={"Filter by provider type"}
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={searchRequest.filters["providerType"]?.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <label className="govuk-label">Search</label>
-                  <input className="govuk-input" type="text" onChange={(e) => searchProviderTypeFilters(e)} />
-                </div>
-                <div className="govuk-checkboxes">
-                  {filterProviderType.map((s, index) => (
-                    <div key={index} className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        key={`providerType-${s.name}`}
-                        id={`providerType-${s.name}`}
-                        name={`providerType-${s.name}`}
-                        type="checkbox"
-                        value={s.name}
-                        onChange={(e) => filterByProviderType(e)}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`providerType-${s.name}`}
-                      >
-                        {s.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title={"Filter by provider sub type"}
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={searchRequest.filters["providerSubType"]?.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <label className="govuk-label">Search</label>
-                  <input
-                    className="govuk-input"
-                    type="text"
-                    onChange={(e) => searchProviderSubTypeFilters(e)}
-                  />
-                </div>
-                <div className="govuk-checkboxes">
-                  {filterProviderSubType.map((s, index) => (
-                    <div key={index} className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        key={`providerSubType-${s.name}`}
-                        id={`providerSubType-${s.name}`}
-                        name={`providerSubType-${s.name}`}
-                        type="checkbox"
-                        value={s.name}
-                        onChange={(e) => filterByProviderSubType(e)}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`providerType-${s.name}`}
-                      >
-                        {s.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <CollapsiblePanel
-              title={"Filter by local authority (LA)"}
-              isExpanded={true}
-              isCollapsible={true}
-              showFacetCount={true}
-              facetCount={searchRequest.filters["authority"]?.length}
-            >
-              <fieldset className="govuk-fieldset">
-                <div className="govuk-form-group">
-                  <label className="govuk-label">Search</label>
-                  <input
-                    className="govuk-input"
-                    type="text"
-                    onChange={(e) => searchLocalAuthorityFilters(e)}
-                  />
-                </div>
-                <div className="govuk-checkboxes">
-                  {filterLocalAuthority.map((s, index) => (
-                    <div key={index} className="govuk-checkboxes__item">
-                      <input
-                        className="govuk-checkboxes__input"
-                        key={`authority-${s.name}`}
-                        id={`authority-${s.name}`}
-                        name={`authority-${s.name}`}
-                        type="checkbox"
-                        value={s.name}
-                        onChange={(e) => filterByLocalAuthority(e)}
-                      />
-                      <label
-                        className="govuk-label govuk-checkboxes__label"
-                        htmlFor={`providerType-${s.name}`}
-                      >
-                        {s.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
-            </CollapsiblePanel>
-            <button type="button" className="govuk-button" onClick={() => clearFilters()}>
-              Clear filters
-            </button>
-          </form>
+        <div className="govuk-grid-column-one-third position-sticky">
+        <div className="filterScroll">
+          <ProviderResultsSearchFilters
+            searchCriteria={searchRequest}
+            initialSearch={searchRequest}
+            filterBySearchTerm={filterBySearchTerm}
+            addProviderTypeFilter = {addProviderTypeFilter} 
+            removeProviderTypeFilter = {removeProviderTypeFilter} 
+            addProviderSubTypeFilter = {addProviderSubTypeFilter} 
+            removeProviderSubTypeFilter = {removeProviderSubTypeFilter}
+            addLocalAuthorityFilter = {addLocalAuthorityFilter} 
+            removeLocalAuthorityFilter = {removeLocalAuthorityFilter} 
+            filterByProviderType = {filterByProviderType} 
+            filterByProviderSubType = {filterByProviderSubType} 
+            filterByLocalauthority = {filterByLocalAuthority} 
+            providerTypeFacets = {filterProviderType} 
+            providerSubTypeFacets = {filterProviderSubType} 
+            localAuthorityFacets = {filterLocalAuthority} 
+            clearFilters={clearFilters}
+          />
+          </div>
         </div>
         <div className="govuk-grid-column-two-thirds">
           {!isLoading ? (

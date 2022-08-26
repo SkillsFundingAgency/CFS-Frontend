@@ -1,104 +1,224 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useHistory } from "react-router";
 
-import { AutoComplete } from "../../components/AutoComplete";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
-import { LoadingStatus } from "../../components/LoadingStatus";
 import { Main } from "../../components/Main";
-import { MultipleErrorSummary } from "../../components/MultipleErrorSummary";
-import { useErrors } from "../../hooks/useErrors";
-import { useFundingStreams } from "../../hooks/useFundingStreams";
+import { Title } from "../../components/Title";
+import { useEffectOnce } from "../../hooks/useEffectOnce";
+import { getFundingStreamsService } from "../../services/policyService";
+import {
+  getFundingPeriodsByFundingStreamIdService,
+  getSpecificationsWithResultsService,
+} from "../../services/specificationService";
 import { Section } from "../../types/Sections";
-import { FundingStream } from "../../types/viewFundingTypes";
+import { SpecificationSummary } from "../../types/SpecificationSummary";
+import { FundingPeriod, FundingStream } from "../../types/viewFundingTypes";
 
 export function ViewProvidersFundingStreamSelection() {
-  const { errors, addError } = useErrors();
+  const [selectedFundingStreamId, setSelectedFundingStreamId] = useState("");
+  const [selectedSpecificationId, setSpecificationId] = useState("");
+  const [selectedFundingPeriodIdGll, setFundingPeriodId] = useState("");
   const [selectedFundingStream, setSelectedFundingStream] = useState<FundingStream | undefined>();
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
+
+  const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
+  const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
+  const [specifications, setSpecifications] = useState<SpecificationSummary[]>([]);
+
   const history = useHistory();
 
-  const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(false, {
-    onError: (err) => addError({ error: err, description: "Error while getting funding streams" }),
+  const specificationNameKey = "specificationNameKey";
+
+  const [loadingState, setLoadingState] = useState({
+    specification: {
+      loading: false,
+      loaded: false,
+      data: false,
+    },
   });
 
-  function updateFundingStreamSelection(e: string) {
-    if (!fundingStreams) return;
+  document.title = "Provider Results- Calculate funding";
 
-    const result = fundingStreams.filter((x) => x.name === e)[0];
-    if (result) {
-      setSelectedFundingStream(result);
-      setIsFormValid(true);
-    } else {
-      setSelectedFundingStream(undefined);
-    }
+  useEffectOnce(() => {
+    getFundingStreamsService(false).then((response) => {
+      setFundingStreams(response.data as FundingStream[]);
+    });
+  });
+
+  function updateFundingPeriods(event: React.ChangeEvent<HTMLSelectElement>) {
+    setFundingPeriods([]);
+    const filter = event.target.value;
+    setSelectedFundingStreamId(filter);
+    setLoadingState({
+      specification: {
+        data: false,
+        loaded: false,
+        loading: false,
+      },
+    });
+    setSpecificationId("");
+
+    getFundingPeriodsByFundingStreamIdService(filter).then((response) => {
+      setFundingPeriods(response.data as FundingPeriod[]);
+    });
   }
 
+  function updateSpecifications(event: React.ChangeEvent<HTMLSelectElement>) {
+    const selectedFundingPeriodId =event.target.value;
+    setFundingPeriodId(event.target.value);
+    setLoadingState({
+      specification: {
+        data: false,
+        loaded: false,
+        loading: true,
+      },
+    });
+    setSpecificationId("");
+    getSpecificationsWithResultsService(selectedFundingStreamId, selectedFundingPeriodId).then((response) => {
+      setSpecifications(response.data as SpecificationSummary[]);
+      setLoadingState({
+        specification: {
+          data: response.data.length > 0,
+          loaded: true,
+          loading: false,
+        },
+      });
+    });
+  }
+
+  function setSpecification(event: React.ChangeEvent<HTMLSelectElement>) {
+    setSpecificationId(event.target.value);
+    sessionStorage.setItem(specificationNameKey, event.target.selectedOptions[0].text);
+  }
+
+  
   function submit() {
-    if (selectedFundingStream) {
-      history.push(`/viewresults/ViewProvidersByFundingStream/${selectedFundingStream.id}`);
+    if (selectedFundingStreamId) {
+      history.push(`/viewresults/ViewProvidersByFundingStream/${selectedFundingStreamId}/${selectedFundingPeriodIdGll}/${selectedSpecificationId}`);
     } else {
       setIsFormValid(false);
     }
   }
-
   return (
     <Main location={Section.Results}>
       <Breadcrumbs>
         <Breadcrumb name="Home" url="/" />
-        <Breadcrumb name={"View results"} url={"/results"} />
+        <Breadcrumb name="View results" url="/results" />
       </Breadcrumbs>
-      <MultipleErrorSummary errors={errors} />
-      <LoadingStatus
-        title={"Loading funding streams"}
-        description={"Please wait whilst funding streams are loading"}
-        hidden={!isLoadingFundingStreams}
+
+      <Title
+        title="Provider results"
+        titleCaption="Select a specification to view the provider results."
       />
-      {!isLoadingFundingStreams && (
-        <div className="govuk-main-wrapper">
-          <div className={"govuk-form-group" + (!isFormValid ? " govuk-form-group--error" : "")}>
-            <fieldset className="govuk-fieldset">
-              <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-                <h1 className="govuk-heading-xl govuk-!-margin-bottom-2">Select funding stream</h1>
-                <span className="govuk-caption-xl govuk-!-margin-bottom-6">
-                  Select the funding you wish to view providers for
-                </span>
-              </legend>
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-third">
-                  <label className="govuk-label">Select a funding stream</label>
-                  {isLoadingFundingStreams || !fundingStreams ? (
-                    <div className="loader-inline">
-                      <LoadingFieldStatus title="loading funding streams" />
-                    </div>
-                  ) : (
-                    <AutoComplete
-                      suggestions={fundingStreams.map((fs) => fs.name)}
-                      callback={updateFundingStreamSelection}
-                      disabled={isLoadingFundingStreams}
-                    />
-                  )}
-                  {!isFormValid && (
-                    <span className="govuk-error-message govuk-!-margin-bottom-1">
-                      <span data-testid="validation-error" className="govuk-visually-hidden">
-                        Error:
-                      </span>{" "}
-                      Select a funding stream
-                    </span>
-                  )}
-                </div>
-              </div>
-            </fieldset>
+
+      <div className="govuk-main-wrapper govuk-main-wrapper--l">
+        <fieldset className="govuk-fieldset">
+          <div className="govuk-form-group">
+            <label htmlFor="select-funding-stream" className="govuk-label">
+              Select funding stream:
+            </label>
+            <select
+              id="select-funding-stream"
+              className="govuk-select"
+              disabled={fundingStreams.length === 0}
+              onChange={(e) => {
+                updateFundingPeriods(e);
+              }}
+            >
+              <option>Please select a funding stream</option>
+              {fundingStreams.map((fs) => (
+                <option key={fs.id} value={fs.id}>
+                  {fs.name}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="govuk-grid-row govuk-body-m">
-            <div className="govuk-grid-column-one-third">
-              <button className="govuk-button" type="button" aria-label="Continue" onClick={submit}>
-                Continue
-              </button>
-            </div>
+        </fieldset>
+        <fieldset className="govuk-fieldset">
+          <div className="govuk-form-group">
+            <label htmlFor="select-funding-period" className="govuk-label">
+              Select funding period:
+            </label>
+            <select
+              id="select-funding-period"
+              className="govuk-select"
+              placeholder="Please select"
+              disabled={fundingPeriods.length === 0}
+              onChange={(e) => {
+                updateSpecifications(e);
+              }}
+            >
+              <option>Please select a funding period</option>
+              {fundingPeriods.map((fp) => (
+                <option key={fp.id} value={fp.id}>
+                  {fp.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </fieldset>
+        <LoadingFieldStatus title="Loading specifications" hidden={!loadingState.specification.loading} />
+        <div
+          className="govuk-form-group"
+          hidden={
+            !(loadingState.specification.loaded && !loadingState.specification.data) ||
+            loadingState.specification.loading
+          }
+        >
+          <label className="govuk-label">Specification</label>
+          <div className="govuk-error-summary">
+            <span className="govuk-body-m">There are no specifications available for the selection</span>
           </div>
         </div>
-      )}
+        <fieldset
+          className="govuk-fieldset"
+          hidden={
+            !(loadingState.specification.loaded && loadingState.specification.data) ||
+            loadingState.specification.loading
+          }
+        >
+          <div className="govuk-form-group">
+            <label htmlFor="select-specification" className="govuk-label">
+              Select specification:
+            </label>
+            <select
+              id="select-specification"
+              className="govuk-select"
+              placeholder="Please select"
+              disabled={specifications.length === 0}
+              onChange={(e) => {
+                setSpecification(e);
+              }}
+            >
+              <option key={""} value={""} >
+                Please select a specification
+              </option>
+              {specifications.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </fieldset>
+        <div
+          className="govuk-grid-row"
+          hidden={
+            !(loadingState.specification.loaded && loadingState.specification.data) ||
+            loadingState.specification.loading
+          }
+        >
+          <div className="govuk-grid-column-full">
+            
+ <button className="govuk-button" type="button" aria-label="Continue" onClick={submit}>
+                Continue
+              </button>
+          </div>
+        </div>
+      </div>
     </Main>
   );
 }

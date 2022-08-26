@@ -127,6 +127,7 @@ export function FundingApprovalTestData() {
     majorVersion: 1,
     minorVersion: 1,
     releaseChannels: [],
+    dateOpened : new Date()
   };
   const providerWithError1: PublishedProviderResult = {
     isIndicative: false,
@@ -148,6 +149,7 @@ export function FundingApprovalTestData() {
     majorVersion: 1,
     minorVersion: 1,
     releaseChannels: [],
+    dateOpened : new Date()
   };
   const profileTotal: ProfileTotal = {
     distributionPeriodId: "",

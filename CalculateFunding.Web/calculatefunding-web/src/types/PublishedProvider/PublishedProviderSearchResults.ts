@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { Facet } from "../Facet";
 import { PagerState } from "../PagerState";
 import { PublishStatus } from "../PublishStatusModel";
@@ -22,6 +23,7 @@ export interface PublishedProviderResult {
   majorVersion: number;
   minorVersion: number;
   releaseChannels: PublishedProviderRelease[];
+  dateOpened: Date;
 }
 
 export interface PublishedProviderSearchResults {

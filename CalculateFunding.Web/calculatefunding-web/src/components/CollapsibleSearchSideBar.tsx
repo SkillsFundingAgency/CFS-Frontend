@@ -5,7 +5,12 @@ import { useState } from "react";
 import { TextLink } from "./TextLink";
 import { debounce } from "lodash";
 
-
+const enum SearchOptions {
+  ProviderName = "providerName",
+  UKPRN = "ukprn",
+  UPIN= "upin",
+  URN = "urn",
+}
 export const TextSearchPanel = ({
     title = "Search",
     handleTextSearchChange,
@@ -15,14 +20,28 @@ export const TextSearchPanel = ({
     clearSearchTitle?: string;
     handleTextSearchChange: (searchField: string, searchTerm: string)  => void;
   }) => {
-    const inputRef = useRef<any>();
+    const [searchFieldSet, setSearchFieldSet] = useState<string[]>(["", "", "", ""]);
     const handleClearSearch = (e: any) => {
       e.preventDefault();
       handleTextSearchChange("", "");
-      inputRef.current.value = "";
+      setSearchFieldSet(["", "", "", ""]);
     };
+    
     const debounceUpdateSearchText = useRef(debounce(handleTextSearchChange, 500)).current;
-    const handleTextChange = (searchField: string, searchTerm: string) => debounceUpdateSearchText(searchField, searchTerm);
+    const handleTextChange = (searchField: string, searchTerm: string) => {
+      var n = 0;
+      switch(searchField){
+        case SearchOptions.ProviderName:
+          n = 0; break;
+        case SearchOptions.UKPRN:
+          n = 1; break;
+        case SearchOptions.UPIN:
+          n = 2; break;
+        case SearchOptions.URN:
+          n = 3; break;
+      }
+      setSearchFieldSet(p=>{return {...p,[n]: searchTerm}});
+      debounceUpdateSearchText(searchField, searchTerm)};
   
     return (
       <div className="govuk-form-group filterbyContainer">
@@ -44,7 +63,7 @@ export const TextSearchPanel = ({
             <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span govuk-!-margin-left-0 govuk-!-margin-top-0">
                 Select one option
             </span>
-            <CollapsibleSearchBox searchTerm={""} callback={handleTextChange} refer={inputRef}/>
+            <CollapsibleSearchBox searchfieldset={searchFieldSet} callback={handleTextChange} />
           </div>
         </fieldset>
       </div>
@@ -93,17 +112,15 @@ export interface SearchSidebarProps {
 
   
 export function CollapsibleSearchBox(props: {
-    searchTerm: string;
+    searchfieldset: string[];
     callback: (searchField: string, searchTerm: string) => void;
-    refer:any;
   }) {
     const callback = props.callback;
-    const refer = props.refer;
+    const searchFieldSet = props.searchfieldset;
     const [expandedProvider, setExpandedProvider] = useState(true);
     const [expandedUKPRN, setExpandedUKPRN] = useState(false);
     const [expandedUPIN, setExpandedUPIN] = useState(false);
     const [expandedURN, setExpandedURN] = useState(false);
-  
     function expandSearchProvider() {
       setExpandedUKPRN(false);
       setExpandedUPIN(false);
@@ -158,11 +175,11 @@ export function CollapsibleSearchBox(props: {
             <div className="govuk-form-group">
               <input
                 className="govuk-input sidebar-search-input"
-                id={"providerName"}
-                data-testid={"providerName"}
+                id={SearchOptions.ProviderName}
+                data-testid={SearchOptions.ProviderName}
                 type="text"
-                ref={refer}
-                onChange={(e) => callback("providerName", e.target.value)}
+                value={searchFieldSet[0]}
+                onChange={(e) => {callback(SearchOptions.ProviderName, e.target.value)}}
               />
             </div>
           </div>
@@ -191,11 +208,11 @@ export function CollapsibleSearchBox(props: {
             <div className="govuk-form-group">
               <input
                 className="govuk-input sidebar-search-input"
-                id={"ukprn"}
-                data-testid={"ukprn"}
+                id={SearchOptions.UKPRN}
+                data-testid={SearchOptions.UKPRN}
                 type="number"
-                ref={refer}
-                onChange={(e) => callback("ukprn", e.target.value)}
+                value={searchFieldSet[1]}
+                onChange={(e) => {callback(SearchOptions.UKPRN, e.target.value)}}
               />
             </div>
           </div>
@@ -224,11 +241,11 @@ export function CollapsibleSearchBox(props: {
             <div className="govuk-form-group">
               <input
                 className="govuk-input sidebar-search-input"
-                id={"upin"}
-                data-testid={"upin"}
+                id={SearchOptions.UPIN}
+                data-testid={SearchOptions.UPIN}
                 type="number"
-                ref={refer}
-                onChange={(e) => callback("upin", e.target.value)}
+                value={searchFieldSet[2]}
+                onChange={(e) => callback(SearchOptions.UPIN, e.target.value)}
               />
             </div>
           </div>
@@ -257,11 +274,11 @@ export function CollapsibleSearchBox(props: {
             <div className="govuk-form-group">
               <input
                 className="govuk-input sidebar-search-input"
-                id={"urn"}
-                data-testid={"urn"}
+                id={SearchOptions.URN}
+                data-testid={SearchOptions.URN}
                 type="number"
-                ref={refer}
-                onChange={(e) => callback("urn", e.target.value)}
+                value={searchFieldSet[3]}
+                onChange={(e) => callback(SearchOptions.URN, e.target.value)}
               />
             </div>
           </div>

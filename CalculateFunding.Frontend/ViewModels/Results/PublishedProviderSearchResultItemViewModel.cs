@@ -46,5 +46,7 @@ namespace CalculateFunding.Frontend.ViewModels.Results
         public int? MinorVersion { get; set; }
 
         public IEnumerable<ReleaseChannel> ReleaseChannels { get; set; }
+
+        public System.DateTimeOffset? DateOpened { get; set; }
     }
 }

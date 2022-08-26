@@ -322,7 +322,7 @@ const resultsRoutes = (
       component={ViewProvidersFundingStreamSelection}
     />
     <Route
-      path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId"
+      path="/ViewResults/ViewProvidersByFundingStream/:fundingStreamId/:fundingPeriodId/:specificationId"
       component={ViewProvidersByFundingStream}
     />
     <Route
