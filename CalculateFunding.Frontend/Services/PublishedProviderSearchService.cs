@@ -54,7 +54,8 @@ namespace CalculateFunding.Frontend.Services
                 Top = int.MaxValue,
                 SearchTerm = request.SearchTerm,
                 Filters = request.Filters,
-                SearchMode = Common.Models.Search.SearchMode.All
+                SearchMode = Common.Models.Search.SearchMode.All,
+                FacetCount = request.FacetCount,
             };
 
             Task<double?> fundingTotalSearchTask = null;

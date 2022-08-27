@@ -1,6 +1,10 @@
-import { ProviderResultsSearchFilters } from "components/Providers/ProviderResultsSearchFilters";
+import { ProviderResultsSearchFilters } from "../../components/Providers/ProviderResultsSearchFilters";
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, RouteComponentProps } from "react-router-dom";
+import { publishedProviderService } from "../../services/publishedProviderService";
+import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
+import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
+import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
@@ -12,40 +16,44 @@ import { TableNavBottom } from "../../components/TableNavBottom";
 import { Title } from "../../components/Title";
 import { useErrors } from "../../hooks/useErrors";
 import { getFundingStreamByIdService } from "../../services/policyService";
-import { getProvidersByFundingStreamService } from "../../services/providerService";
 import { FacetValue } from "../../types/Facet";
-import {
-  PagedProviderVersionSearchResults,
-  ProviderVersionSearchModel,
-} from "../../types/Provider/ProviderVersionSearchResults";
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
 import { FundingStream } from "../../types/viewFundingTypes";
 
 export interface ViewProvidersByFundingStreamRouteProps {
   fundingStreamId: string;
+  fundingPeriodId: string;
+  specificationId: string;
 }
 
 export function ViewProvidersByFundingStream({
   match,
 }: RouteComponentProps<ViewProvidersByFundingStreamRouteProps>): JSX.Element {
-  const initialSearchRequest: ProviderVersionSearchModel = {
+  const initialSearchRequest: PublishedProviderSearchRequest = {
     pageNumber: 1,
-    top: 50,
+    pageSize: 50,
     searchTerm: "",
-    errorToggle: false,
-    orderBy: [],
-    filters: {},
+    errorToggle: "",
+    fundingStreamId: match.params.fundingStreamId,
+    fundingPeriodId: match.params.fundingPeriodId,
+    specificationId: match.params.specificationId,
+    hasErrors:undefined,
+    providerType:[],
+    providerSubType:[],
+    localAuthority:[],
+    monthYearOpened:[],
+    status:[],
     includeFacets: true,
     facetCount: 200,
-    countOnly: false,
     searchMode: SearchMode.All,
     searchFields: [],
-    overrideFacetFields: [],
+    indicative:[],
+    fundingAction:FundingActionType.Release,
   };
-  const initialProviderVersionSearchResults: PagedProviderVersionSearchResults = {
+  const initialProviderVersionSearchResults: PublishedProviderSearchResults = {
     facets: [],
-    items: [],
+    providers: [],
     endItemNumber: 0,
     pagerState: {
       lastPage: 0,
@@ -56,17 +64,20 @@ export function ViewProvidersByFundingStream({
       currentPage: 0,
     },
     startItemNumber: 0,
-    totalCount: 0,
+    totalResults: 0,
+    filteredFundingAmount: 0,
+  canPublish: false,
+  canApprove: false,
+  totalFundingAmount: 0,
+  totalProvidersToApprove: 0,
+  totalProvidersToPublish: 0,
+  currentPage: 0,
   };
-  const enum FilterBy {
-    ProviderType = "providerType",
-    ProviderSubType = "providerSubType",
-    LocalAuthority = "authority",
-  }
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [searchRequest, setSearchRequest] = useState<ProviderVersionSearchModel>(initialSearchRequest);
+  const [searchRequest, setSearchRequest] = useState<PublishedProviderSearchRequest>(initialSearchRequest);
   const [providerVersionSearchResults, setProviderVersionSearchResults] =
-    useState<PagedProviderVersionSearchResults>(initialProviderVersionSearchResults);
+    useState<PublishedProviderSearchResults>(initialProviderVersionSearchResults);
   const [fundingStreamName, setFundingStreamName] = useState<string>("");
 
   const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([]);
@@ -76,29 +87,27 @@ export function ViewProvidersByFundingStream({
   const [filterLocalAuthority, setFilterLocalAuthority] = useState<FacetValue[]>([]);
   const [resultsLocalAuthority, setResultsLocalAuthority] = useState<FacetValue[]>([]);
   const { errors, addErrorMessage, clearErrorMessages } = useErrors();
-  
-  const filterOptions: string[] = [FilterBy.ProviderType, FilterBy.ProviderSubType, FilterBy.LocalAuthority]
-  let filters: any = [];
-  for(let i=0; i<filterOptions.length; i++){
-    filters[filterOptions[i]] =
-    searchRequest.filters[filterOptions[i]] != undefined ? searchRequest.filters[filterOptions[i]] : [];
-  }
-
-  const getFilterValues = function () {
-    const newFiltersValue: any = {};       
-    for(let i=0; i<filterOptions.length; i++){
-      if(filters[filterOptions[i]].length != 0){
-        newFiltersValue[filterOptions[i]] = filters[filterOptions[i]];
-      }
-    } 
-    return newFiltersValue;
-  }
+  const specificationName = sessionStorage.getItem("specificationNameKey");
 
   useEffect(() => {
-    getProvidersByFundingStream(searchRequest);
+    getProvidersByFundingStream();
+    getProviderListPerSpecification();
   }, [searchRequest]);
-
-  function getProvidersByFundingStream(searchModel: ProviderVersionSearchModel) {
+  
+  const getDefaultFundingStatusFilters = (action: FundingActionType) => {
+    switch (action) {
+      case FundingActionType.Approve: {
+        return ["Updated", "Draft"];
+      }
+      case FundingActionType.Release: {
+        return ["Approved"];
+      }
+      default: {
+        return [];
+      }
+    }
+  };
+  function getProvidersByFundingStream() {
     clearErrorMessages();
     setIsLoading(true);
     getFundingStreamByIdService(match.params.fundingStreamId).then((fundingStreamResponse) => {
@@ -109,78 +118,41 @@ export function ViewProvidersByFundingStream({
         }
       }
     });
-    getProvidersByFundingStreamService(match.params.fundingStreamId, searchModel)
-      .then((response) => {
-        if (response.status === 200 || response.status === 201) {
-          const result = response.data as PagedProviderVersionSearchResults;
-          setProviderVersionSearchResults(result);
+  }
 
-          setResultsProviderType(result.facets[0].facetValues);
-          setFilterProviderType(result.facets[0].facetValues);
+  async function getProviderListPerSpecification() {
+    try {
+    const { data: result } = await publishedProviderService.searchForPublishedProviderResults(searchRequest);
+      setProviderVersionSearchResults(result);
 
-          setFilterProviderSubType(result.facets[1].facetValues);
-          setResultsProviderSubType(result.facets[1].facetValues);
+      setResultsProviderType(result.facets[0].facetValues);
+      setFilterProviderType(result.facets[0].facetValues);
 
-          setFilterLocalAuthority(result.facets[2].facetValues);
-          setResultsLocalAuthority(result.facets[2].facetValues);
+      setFilterProviderSubType(result.facets[1].facetValues);
+      setResultsProviderSubType(result.facets[1].facetValues);
 
-          setIsLoading(false);
-        }
-      })
-      .catch((err) => {
-        addErrorMessage(`A problem occurred while loading funding line structure: ${err}`);
+      setFilterLocalAuthority(result.facets[2].facetValues);
+      setResultsLocalAuthority(result.facets[2].facetValues);
         setIsLoading(false);
-      });
-  }
+      }
+      catch (err: any) {
+        addErrorMessage(`A problem occurred while loading Providers ${err}`);
 
-  const clearSearchFilterOptions = function() {
-    for(let i=0; i<filterOptions.length; i++){
-      filters[filterOptions[i]].splice(0,filters[filterOptions[i]].length);  
-    }   
+        setIsLoading(false);
+      }
   }
-
   const clearFilters = useCallback(() => {
     // @ts-ignore
     document.getElementById("searchProviders").reset();
-    clearSearchFilterOptions();
     setFilterProviderType(resultsProviderType);
     setFilterProviderSubType(resultsProviderSubType);
     setFilterLocalAuthority(resultsLocalAuthority);
-    setSearchRequest(initialSearchRequest);
+    setSearchRequest({...initialSearchRequest});
   },[resultsProviderType, resultsProviderSubType, resultsLocalAuthority, initialSearchRequest]);
  
   const filterBySearchTerm = useCallback((searchField: string, searchTerm: string) => {
-    if(searchField === "providerName"){
-      searchField = "name";
-    }
     searchText(searchField, searchTerm);
   },[]);
-
-  function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {   
-    let filtersValues: any = {}; 
-    if(enableFilter) {     
-      if (filters[filterKey].indexOf(filterValue) === -1) {
-        filters[filterKey].push(filterValue);       
-        filtersValues = getFilterValues();        
-        setSearchRequest((prevState) => {
-            return { ...prevState, filters: filtersValues, pageNumber: 1 };
-        });
-      }
-    } else {
-      const index = filters[filterKey].indexOf(filterValue);         
-      if (index !== -1) {
-          filters[filterKey].splice(index, 1);               
-          filtersValues = getFilterValues(); 
-          setSearchRequest((prevState) => {
-            return { ...prevState, filters: (filtersValues == undefined || filtersValues.length === 0) ? initialSearchRequest.filters : filtersValues, pageNumber: 1 };
-          });        
-      } else {
-        setSearchRequest((prevState) => {
-          return { ...prevState, filters: initialSearchRequest.filters, pageNumber: 1 };
-        });
-      }
-    }    
-  }
 
   function searchText(searchType: string, searchText?: string) {
     const term = searchText;
@@ -196,27 +168,48 @@ export function ViewProvidersByFundingStream({
       return { ...prevState, pageNumber: pageNumber };
     });
   }
-
-  const addProviderTypeFilter = useCallback((type: string) => {
-    filterResults(FilterBy.ProviderType, type, true);
+  const addProviderTypeFilter = useCallback((providerType: string) => {
+    setSearchRequest((prevState) => {
+      return {
+        ...prevState,
+        providerType: [...prevState.providerType.filter((fs) => fs !== providerType), providerType], pageNumber: 1
+      };
+    });
   }, []);
 
-  const removeProviderTypeFilter = useCallback((type: string) => {
-    filterResults(FilterBy.ProviderType, type, false);
+  const removeProviderTypeFilter = useCallback((providerType: string) => {
+    setSearchRequest((prevState) => {
+      return { ...prevState, providerType: prevState.providerType.filter((fs) => fs !== providerType) , pageNumber: 1};
+    });
   }, []);
-  const addProviderSubTypeFilter = useCallback((type: string) => {
-    filterResults(FilterBy.ProviderSubType, type, true);
+  
+  const addProviderSubTypeFilter = useCallback((providerSubType: string) => {
+    setSearchRequest((prevState) => {
+      return {
+        ...prevState,
+        providerSubType: [...prevState.providerSubType.filter((fs) => fs !== providerSubType), providerSubType], pageNumber: 1
+      };
+    });
   }, []);
-
-  const removeProviderSubTypeFilter = useCallback((type: string) => {
-    filterResults(FilterBy.ProviderSubType, type, false);
+  
+  const removeProviderSubTypeFilter = useCallback((providerSubType: string) => {
+    setSearchRequest((prevState) => {
+      return { ...prevState, providerSubType: prevState.providerSubType.filter((fs) => fs !== providerSubType), pageNumber: 1 };
+    });
   }, []);
-  const addLocalAuthorityFilter = useCallback((type: string) => {
-    filterResults(FilterBy.LocalAuthority, type, true);
+  const addLocalAuthorityFilter = useCallback((localAuthority: string) => {
+    setSearchRequest((prevState) => {
+      return {
+        ...prevState,
+        localAuthority: [...prevState.localAuthority.filter((fs) => fs !== localAuthority), localAuthority], pageNumber: 1
+      };
+    });
   }, []);
-
-  const removeLocalAuthorityFilter = useCallback((providerType: string) => {
-    filterResults(FilterBy.LocalAuthority, providerType, false);
+  
+  const removeLocalAuthorityFilter = useCallback((localAuthority: string) => {
+    setSearchRequest((prevState) => {
+      return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority), pageNumber: 1 };
+    });
   }, []);
   
   const filterByProviderType = useCallback(
@@ -253,7 +246,7 @@ export function ViewProvidersByFundingStream({
       </Breadcrumbs>
       <MultipleErrorSummary errors={errors} />
 
-      <Title title="View provider results" titleCaption={fundingStreamName} />
+      <Title title={specificationName??""} titleCaption={fundingStreamName +" "+ match.params.fundingPeriodId} />
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third position-sticky">
@@ -280,14 +273,14 @@ export function ViewProvidersByFundingStream({
         </div>
         <div className="govuk-grid-column-two-thirds">
           {!isLoading ? (
-            providerVersionSearchResults.items.map((providerVersionSearchResult) => (
-              <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
+            providerVersionSearchResults.providers.map((providerVersionSearchResult) => (
+              <div key={`provider-${providerVersionSearchResult.publishedProviderVersionId}`} className="providerResults-details">
                 <h3 className="govuk-heading-m">
                   <Link
                     className="govuk-link govuk-link--no-visited-state"
-                    to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.providerId}/${match.params.fundingStreamId}`}
+                    to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.ukprn}/${match.params.fundingStreamId}`}
                   >
-                    {providerVersionSearchResult.name}
+                    {providerVersionSearchResult.providerName}
                   </Link>
                 </h3>
                 <p className="govuk-body-s govuk-!-margin-bottom-3govuk-!-margin-top-2">
@@ -335,11 +328,11 @@ export function ViewProvidersByFundingStream({
                   </p>
                   <p className="govuk-body-s govuk-!-margin-bottom-2">
                     <span>
-                      Local authority: <strong>{providerVersionSearchResult.authority}</strong>
+                      Local authority: <strong>{providerVersionSearchResult.localAuthority}</strong>
                     </span>
                     <span>
-                      Date opened:{" "}
-                      <strong>
+                      Date opened:
+                       <strong>
                         {providerVersionSearchResult.dateOpened ? (
                           <DateTimeFormatter date={providerVersionSearchResult.dateOpened} />
                         ) : (
@@ -356,7 +349,7 @@ export function ViewProvidersByFundingStream({
             <LoadingStatus title={"Loading providers"} />
           )}
 
-          <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading} />
+          <NoData hidden={providerVersionSearchResults.providers.length > 0 || isLoading} />
 
           <BackToTop id="top" />
 
@@ -364,7 +357,7 @@ export function ViewProvidersByFundingStream({
             <TableNavBottom
               currentPage={providerVersionSearchResults?.pagerState?.currentPage}
               lastPage={providerVersionSearchResults?.pagerState?.lastPage}
-              totalCount={providerVersionSearchResults?.totalCount}
+              totalCount={providerVersionSearchResults?.totalResults}
               startItemNumber={providerVersionSearchResults?.startItemNumber}
               endItemNumber={providerVersionSearchResults?.endItemNumber}
               onPageChange={pageChange}
