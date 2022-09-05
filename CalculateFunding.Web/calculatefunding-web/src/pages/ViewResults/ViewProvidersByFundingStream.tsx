@@ -249,8 +249,7 @@ export function ViewProvidersByFundingStream({
       <Title title={specificationName??""} titleCaption={fundingStreamName +" "+ match.params.fundingPeriodId} />
 
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third position-sticky">
-        <div className="filterScroll">
+        <div className="govuk-grid-column-one-third position-sticky filterScroll">
           <ProviderResultsSearchFilters
             searchCriteria={searchRequest}
             initialSearch={searchRequest}
@@ -269,7 +268,6 @@ export function ViewProvidersByFundingStream({
             localAuthorityFacets = {filterLocalAuthority} 
             clearFilters={clearFilters}
           />
-          </div>
         </div>
         <div className="govuk-grid-column-two-thirds">
           {!isLoading ? (
