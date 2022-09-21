@@ -312,6 +312,30 @@
             "metadata": {
                 "description": "Resource name for the shared log analytics workspace"
             }
+        },
+        "intFrontEndAStoVNet": {
+            "type": "bool",
+            "metadata": {
+                "description": "Integrate FrontEnd to Virtual Network"
+            }
+        },
+        "dfeT1VNetResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "DfE T1 VNet Resource Group"
+            }
+        },
+        "dfeT1VirtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "DfE T1 Virtual Network"
+            }
+        },
+        "appSrvSubnetName": {
+            "type": "string",
+            "metadata": {
+                "description": "CFS App Service Subnet on DfE T1 VNet"
+            }
         }
     },
     "variables": {
@@ -898,6 +922,34 @@
                     }
                 } 
             }
+        },
+        {
+            "condition": "[parameters('intFrontEndAStoVNet')]",
+            "type": "Microsoft.Web/sites/networkConfig",
+            "name": "[concat(variables('webSiteName'), '/VirtualNetwork')]",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "subnetResourceid": "[resourceId(parameters('dfeT1VNetResourceGroupName') , 'Microsoft.Network/virtualNetworks/subnets', parameters('dfeT1VirtualNetworkName'), parameters('appSrvSubnetName'))]",
+                "swiftSupported": true
+            },
+            "dependsOn": [
+                "Deploy_Frontend_App"
+            ]
+        },
+        {
+            "condition": "[parameters('intFrontEndAStoVNet')]",
+            "type": "Microsoft.Web/sites/slots/networkConfig",
+            "name": "[concat(variables('webSiteName'), '/staging/VirtualNetwork')]",
+            "apiVersion": "2018-02-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "subnetResourceid": "[resourceId(parameters('dfeT1VNetResourceGroupName') , 'Microsoft.Network/virtualNetworks/subnets', parameters('dfeT1VirtualNetworkName'), parameters('appSrvSubnetName'))]",
+                "swiftSupported": true
+            },
+            "dependsOn": [
+                "Deploy_Frontend_App"
+            ]
         },
         {
             "apiVersion": "2017-05-10",
