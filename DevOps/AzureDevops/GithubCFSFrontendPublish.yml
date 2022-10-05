@@ -1,5 +1,5 @@
 pool:
-  name: Hosted Ubuntu 1604
+  vmImage: ubuntu-22.04
 
 trigger:
 - master
