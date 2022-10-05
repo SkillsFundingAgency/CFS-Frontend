@@ -209,14 +209,17 @@ export function ViewProvidersFundingStreamSelection() {
           hidden={
             !(loadingState.specification.loaded && loadingState.specification.data) ||
             loadingState.specification.loading
-          }
-        >
-          <div className="govuk-grid-column-full">
-            
- <button className="govuk-button" type="button" aria-label="Continue" onClick={submit}>
-                Continue
-              </button>
-          </div>
+          }>
+        <div className="govuk-grid-column-full">
+          <button
+            type="button" aria-label="Continue" onClick={submit} 
+            className={`govuk-button govuk-button ${
+              selectedSpecificationId === "" ? "govuk-button--disabled" : "govuk-button govuk-button"
+            }`}
+            data-module="govuk-button"  disabled = {selectedSpecificationId === "" ? true :false}>
+            Continue
+          </button>
+        </div>
         </div>
       </div>
     </Main>
