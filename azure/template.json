@@ -422,6 +422,9 @@
                     "appServiceHTTPLogsSetting": {
                         "value": true
                     },
+                    "http20Enabled": {
+                        "value": true
+                    },
                     "appServiceConsoleLogsSetting": {
                         "value": true
                     },
