@@ -87,7 +87,7 @@
     "lint-staged": "^11.1.4",
     "lodash": "^4.17.21",
     "luxon": "^1.27.0",
-    "moment": "^2.28.0",
+    "moment": "^2.29.4",
     "monaco-editor": "^0.20.0",
     "monaco-editor-webpack-plugin": "^1.9.1",
     "msal": "^1.4.15",
