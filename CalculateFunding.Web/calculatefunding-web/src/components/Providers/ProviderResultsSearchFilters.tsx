@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
+import { ProviderVersionSearchModel } from "types/Provider/ProviderVersionSearchResults";
 
 import { useToggle } from "../../hooks/useToggle";
 import { FacetValue } from "../../types/Facet";
@@ -28,8 +28,8 @@ export const ProviderResultsSearchFilters = ({
   localAuthorityFacets,
   clearFilters,
 }: {
-  searchCriteria: PublishedProviderSearchRequest;
-  initialSearch: PublishedProviderSearchRequest;
+  searchCriteria: ProviderVersionSearchModel;
+  initialSearch: ProviderVersionSearchModel;
   addProviderTypeFilter: (filter: string) => void;
   removeProviderTypeFilter: (filter: string) => void;
   addProviderSubTypeFilter: (filter: string) => void;
@@ -86,15 +86,22 @@ export const ProviderResultsSearchFilters = ({
     document.getElementById("searchProviders").reset();
     clearFilters();
   }, []);
- 
+  const providerTypes: string[] =
+  searchCriteria.filters["providerType"] != undefined ? searchCriteria.filters["providerType"] : [];
+
+  const providerSubTypes: string[] =
+  searchCriteria.filters["providerSubType"] != undefined ? searchCriteria.filters["providerSubType"] : [];
+
+  const localAuthority: string[] =
+  searchCriteria.filters["authority"] != undefined ? searchCriteria.filters["authority"] : [];
 
   return (
     <CollapsibleSearchSideBar formId={"searchProviders"} updateSearch={filterBySearchTerm} >
       <ProviderResultsSearchFilterSelectionPanel
         title="Selected filters"
-        selectedProviderTypeFilters={searchCriteria.providerType}
-        selectedProviderSubTypeFilters={searchCriteria.providerSubType}
-        selectedLocalAuthorityFilters={searchCriteria.localAuthority}
+        selectedProviderTypeFilters={providerTypes}
+        selectedProviderSubTypeFilters={providerSubTypes}
+        selectedLocalAuthorityFilters={localAuthority}
         handleRemoveProviderTypeFilter={removeProviderTypeFilter}
         handleRemoveProviderSubTypeFilter={removeProviderSubTypeFilter}
         handleRemoveLocalAuthorityFilter={removeLocalAuthorityFilter}
@@ -115,7 +122,7 @@ export const ProviderResultsSearchFilters = ({
             addFilter={addProviderTypeFilter}
             removeFilter={removeProviderTypeFilter}
             searchForFilter={filterByProviderType}
-            selectedFilters={searchCriteria.providerType}
+            selectedFilters={providerTypes}
           />
           <SearchFilterSection
             title="Provider sub type"
@@ -125,7 +132,7 @@ export const ProviderResultsSearchFilters = ({
             addFilter={addProviderSubTypeFilter}
             removeFilter={removeProviderSubTypeFilter}
             searchForFilter={filterByProviderSubType}
-            selectedFilters={searchCriteria.providerSubType}
+            selectedFilters={providerSubTypes}
           />
           <SearchFilterSection
             title="Local authority"
@@ -135,7 +142,7 @@ export const ProviderResultsSearchFilters = ({
             addFilter={addLocalAuthorityFilter}
             removeFilter={removeLocalAuthorityFilter}
             searchForFilter={filterByLocalauthority}
-            selectedFilters={searchCriteria.localAuthority}
+            selectedFilters={localAuthority}
           />
         </SearchFilterContainer>
       </SearchFiltersOuterContainer>

@@ -1,8 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useHistory } from "react-router";
-
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { LoadingFieldStatus } from "../../components/LoadingFieldStatus";
 import { Main } from "../../components/Main";
@@ -27,6 +25,7 @@ export function ViewProvidersFundingStreamSelection() {
   const [fundingStreams, setFundingStreams] = useState<FundingStream[]>([]);
   const [fundingPeriods, setFundingPeriods] = useState<FundingPeriod[]>([]);
   const [specifications, setSpecifications] = useState<SpecificationSummary[]>([]);
+  const [providerVersionId, setProviderVersionId] = useState<string>();
 
   const history = useHistory();
 
@@ -91,13 +90,14 @@ export function ViewProvidersFundingStreamSelection() {
 
   function setSpecification(event: React.ChangeEvent<HTMLSelectElement>) {
     setSpecificationId(event.target.value);
+    setProviderVersionId(specifications.find(p=>p.id === event.target.value)?.providerVersionId);
     sessionStorage.setItem(specificationNameKey, event.target.selectedOptions[0].text);
   }
 
   
   function submit() {
     if (selectedFundingStreamId) {
-      history.push(`/viewresults/ViewProvidersByFundingStream/${selectedFundingStreamId}/${selectedFundingPeriodIdGll}/${selectedSpecificationId}`);
+      history.push(`/viewresults/ViewProvidersByFundingStream/${selectedFundingStreamId}/${selectedFundingPeriodIdGll}/${selectedSpecificationId}`, providerVersionId);
     } else {
       setIsFormValid(false);
     }

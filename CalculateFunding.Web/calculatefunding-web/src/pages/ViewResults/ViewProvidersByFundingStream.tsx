@@ -1,10 +1,7 @@
 import { ProviderResultsSearchFilters } from "../../components/Providers/ProviderResultsSearchFilters";
 import React, { useEffect, useState, useCallback } from "react";
+import { useLocation } from 'react-router-dom';
 import { Link, RouteComponentProps } from "react-router-dom";
-import { publishedProviderService } from "../../services/publishedProviderService";
-import { FundingActionType } from "../../types/PublishedProvider/PublishedProviderFundingCount";
-import { PublishedProviderSearchResults } from "../../types/PublishedProvider/PublishedProviderSearchResults";
-import { PublishedProviderSearchRequest } from "../../types/publishedProviderSearchRequest";
 import { BackToTop } from "../../components/BackToTop";
 import { Breadcrumb, Breadcrumbs } from "../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../components/DateTimeFormatter";
@@ -20,6 +17,8 @@ import { FacetValue } from "../../types/Facet";
 import { SearchMode } from "../../types/SearchMode";
 import { Section } from "../../types/Sections";
 import { FundingStream } from "../../types/viewFundingTypes";
+import { getProvidersByFundingStreamServiceUsingProviderVersionId } from "../../services/providerService";
+import { PagedProviderVersionSearchResults, ProviderVersionSearchModel } from "types/Provider/ProviderVersionSearchResults";
 
 export interface ViewProvidersByFundingStreamRouteProps {
   fundingStreamId: string;
@@ -30,30 +29,23 @@ export interface ViewProvidersByFundingStreamRouteProps {
 export function ViewProvidersByFundingStream({
   match,
 }: RouteComponentProps<ViewProvidersByFundingStreamRouteProps>): JSX.Element {
-  const initialSearchRequest: PublishedProviderSearchRequest = {
+  const initialSearchRequest: ProviderVersionSearchModel = {
     pageNumber: 1,
-    pageSize: 50,
+    top: 50,
     searchTerm: "",
-    errorToggle: "",
-    fundingStreamId: match.params.fundingStreamId,
-    fundingPeriodId: match.params.fundingPeriodId,
-    specificationId: match.params.specificationId,
-    hasErrors:undefined,
-    providerType:[],
-    providerSubType:[],
-    localAuthority:[],
-    monthYearOpened:[],
-    status:[],
+    errorToggle: false,
+    orderBy: [],
+    filters: {},
     includeFacets: true,
-    facetCount: 200,
+    facetCount: 100,
+    countOnly: false,
     searchMode: SearchMode.All,
     searchFields: [],
-    indicative:[],
-    fundingAction:FundingActionType.Release,
+    overrideFacetFields: [],
   };
-  const initialProviderVersionSearchResults: PublishedProviderSearchResults = {
+  const initialProviderVersionSearchResults: PagedProviderVersionSearchResults = {
     facets: [],
-    providers: [],
+    items: [],
     endItemNumber: 0,
     pagerState: {
       lastPage: 0,
@@ -64,20 +56,13 @@ export function ViewProvidersByFundingStream({
       currentPage: 0,
     },
     startItemNumber: 0,
-    totalResults: 0,
-    filteredFundingAmount: 0,
-  canPublish: false,
-  canApprove: false,
-  totalFundingAmount: 0,
-  totalProvidersToApprove: 0,
-  totalProvidersToPublish: 0,
-  currentPage: 0,
+    totalCount: 0,
   };
-
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [searchRequest, setSearchRequest] = useState<PublishedProviderSearchRequest>(initialSearchRequest);
+  const [searchRequest, setSearchRequest] = useState<ProviderVersionSearchModel>(initialSearchRequest);
   const [providerVersionSearchResults, setProviderVersionSearchResults] =
-    useState<PublishedProviderSearchResults>(initialProviderVersionSearchResults);
+    useState<PagedProviderVersionSearchResults>(initialProviderVersionSearchResults);
   const [fundingStreamName, setFundingStreamName] = useState<string>("");
 
   const [filterProviderType, setFilterProviderType] = useState<FacetValue[]>([]);
@@ -89,24 +74,18 @@ export function ViewProvidersByFundingStream({
   const { errors, addErrorMessage, clearErrorMessages } = useErrors();
   const specificationName = sessionStorage.getItem("specificationNameKey");
 
+  const filterOptions: string[] = ["providerType", "providerSubType", "authority"];
+  let filters: any = [];
+  for(let i=0; i<filterOptions.length; i++){
+    filters[filterOptions[i]] =
+    searchRequest.filters[filterOptions[i]] != undefined ? searchRequest.filters[filterOptions[i]] : [];
+  }  
+
   useEffect(() => {
     getProvidersByFundingStream();
     getProviderListPerSpecification();
   }, [searchRequest]);
   
-  const getDefaultFundingStatusFilters = (action: FundingActionType) => {
-    switch (action) {
-      case FundingActionType.Approve: {
-        return ["Updated", "Draft"];
-      }
-      case FundingActionType.Release: {
-        return ["Approved"];
-      }
-      default: {
-        return [];
-      }
-    }
-  };
   function getProvidersByFundingStream() {
     clearErrorMessages();
     setIsLoading(true);
@@ -122,7 +101,7 @@ export function ViewProvidersByFundingStream({
 
   async function getProviderListPerSpecification() {
     try {
-    const { data: result } = await publishedProviderService.searchForPublishedProviderResults(searchRequest);
+    const { data: result } = await getProvidersByFundingStreamServiceUsingProviderVersionId(location.state as string, searchRequest);
       setProviderVersionSearchResults(result);
 
       setResultsProviderType(result.facets[0].facetValues);
@@ -144,6 +123,7 @@ export function ViewProvidersByFundingStream({
   const clearFilters = useCallback(() => {
     // @ts-ignore
     document.getElementById("searchProviders").reset();
+    clearFilterValues();
     setFilterProviderType(resultsProviderType);
     setFilterProviderSubType(resultsProviderSubType);
     setFilterLocalAuthority(resultsLocalAuthority);
@@ -155,6 +135,9 @@ export function ViewProvidersByFundingStream({
   },[]);
 
   function searchText(searchType: string, searchText?: string) {
+    if(searchType === "providerName") {
+      searchType = "name";
+    }
     const term = searchText;
     if (term !== null && term !== undefined) {
       setSearchRequest((prevState) => {
@@ -168,48 +151,68 @@ export function ViewProvidersByFundingStream({
       return { ...prevState, pageNumber: pageNumber };
     });
   }
+
+  function filterResults(filterKey: string, filterValue: string, enableFilter: boolean) {   
+    let filtersValues: any = {}; 
+    if(enableFilter) {     
+      if (filters[filterKey].indexOf(filterValue) === -1) {
+        filters[filterKey].push(filterValue);       
+        filtersValues = getFilterValues();        
+        setSearchRequest((prevState) => {
+            return { ...prevState, filters: filtersValues, pageNumber: 1 };
+        });
+      }
+    } else {
+      const index = filters[filterKey].indexOf(filterValue);         
+      if (index !== -1) {
+          filters[filterKey].splice(index, 1);               
+          filtersValues = getFilterValues(); 
+          setSearchRequest((prevState) => {
+            return { ...prevState, filters: (filtersValues == undefined || filtersValues.length === 0) ? initialSearchRequest.filters : filtersValues, pageNumber: 1 };
+          });        
+      } else {
+        setSearchRequest((prevState) => {
+          return { ...prevState, filters: initialSearchRequest.filters, pageNumber: 1 };
+        });
+      }
+    }    
+  }
+
+  const getFilterValues = function () {
+    const newFiltersValue: any = {};       
+    for(let i=0; i<filterOptions.length; i++){
+      if(filters[filterOptions[i]].length != 0){
+        newFiltersValue[filterOptions[i]] = filters[filterOptions[i]];
+      }
+    } 
+    return newFiltersValue;
+  }
+  const clearFilterValues = function() {
+    for(let i=0; i<filterOptions.length; i++){
+      filters[filterOptions[i]].splice(0,filters[filterOptions[i]].length);  
+    }   
+  }
   const addProviderTypeFilter = useCallback((providerType: string) => {
-    setSearchRequest((prevState) => {
-      return {
-        ...prevState,
-        providerType: [...prevState.providerType.filter((fs) => fs !== providerType), providerType], pageNumber: 1
-      };
-    });
+    filterResults(filterOptions[0], providerType, true);
   }, []);
 
   const removeProviderTypeFilter = useCallback((providerType: string) => {
-    setSearchRequest((prevState) => {
-      return { ...prevState, providerType: prevState.providerType.filter((fs) => fs !== providerType) , pageNumber: 1};
-    });
+    filterResults(filterOptions[0], providerType, false);
   }, []);
   
   const addProviderSubTypeFilter = useCallback((providerSubType: string) => {
-    setSearchRequest((prevState) => {
-      return {
-        ...prevState,
-        providerSubType: [...prevState.providerSubType.filter((fs) => fs !== providerSubType), providerSubType], pageNumber: 1
-      };
-    });
+    filterResults(filterOptions[1], providerSubType, true);
   }, []);
   
   const removeProviderSubTypeFilter = useCallback((providerSubType: string) => {
-    setSearchRequest((prevState) => {
-      return { ...prevState, providerSubType: prevState.providerSubType.filter((fs) => fs !== providerSubType), pageNumber: 1 };
-    });
+    filterResults(filterOptions[1], providerSubType, false);
   }, []);
   const addLocalAuthorityFilter = useCallback((localAuthority: string) => {
-    setSearchRequest((prevState) => {
-      return {
-        ...prevState,
-        localAuthority: [...prevState.localAuthority.filter((fs) => fs !== localAuthority), localAuthority], pageNumber: 1
-      };
-    });
+    filterResults(filterOptions[2], localAuthority, true);
   }, []);
   
   const removeLocalAuthorityFilter = useCallback((localAuthority: string) => {
-    setSearchRequest((prevState) => {
-      return { ...prevState, localAuthority: prevState.localAuthority.filter((fs) => fs !== localAuthority), pageNumber: 1 };
-    });
+    filterResults(filterOptions[2], localAuthority, false);
   }, []);
   
   const filterByProviderType = useCallback(
@@ -271,14 +274,14 @@ export function ViewProvidersByFundingStream({
         </div>
         <div className="govuk-grid-column-two-thirds">
           {!isLoading ? (
-            providerVersionSearchResults.providers.map((providerVersionSearchResult) => (
-              <div key={`provider-${providerVersionSearchResult.publishedProviderVersionId}`} className="providerResults-details">
+            providerVersionSearchResults.items.map((providerVersionSearchResult) => (
+              <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
                 <h3 className="govuk-heading-m">
                   <Link
                     className="govuk-link govuk-link--no-visited-state"
                     to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.ukprn}/${match.params.fundingStreamId}`}
                   >
-                    {providerVersionSearchResult.providerName}
+                    {providerVersionSearchResult.name}
                   </Link>
                 </h3>
                 <p className="govuk-body-s govuk-!-margin-bottom-3govuk-!-margin-top-2">
@@ -326,7 +329,7 @@ export function ViewProvidersByFundingStream({
                   </p>
                   <p className="govuk-body-s govuk-!-margin-bottom-2">
                     <span>
-                      Local authority: <strong>{providerVersionSearchResult.localAuthority}</strong>
+                      Local authority: <strong>{providerVersionSearchResult.authority}</strong>
                     </span>
                     <span>
                       Date opened:
@@ -347,7 +350,7 @@ export function ViewProvidersByFundingStream({
             <LoadingStatus title={"Loading providers"} />
           )}
 
-          <NoData hidden={providerVersionSearchResults.providers.length > 0 || isLoading} />
+          <NoData hidden={providerVersionSearchResults.items.length > 0 || isLoading} />
 
           <BackToTop id="top" />
 
@@ -355,7 +358,7 @@ export function ViewProvidersByFundingStream({
             <TableNavBottom
               currentPage={providerVersionSearchResults?.pagerState?.currentPage}
               lastPage={providerVersionSearchResults?.pagerState?.lastPage}
-              totalCount={providerVersionSearchResults?.totalResults}
+              totalCount={providerVersionSearchResults?.totalCount}
               startItemNumber={providerVersionSearchResults?.startItemNumber}
               endItemNumber={providerVersionSearchResults?.endItemNumber}
               onPageChange={pageChange}

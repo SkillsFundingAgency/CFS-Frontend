@@ -95,6 +95,16 @@ export async function getProvidersByFundingStreamService(
   });
 }
 
+export async function getProvidersByFundingStreamServiceUsingProviderVersionId(
+  providerVersionId: string,
+  search: ProviderVersionSearchModel
+): Promise<AxiosResponse<PagedProviderVersionSearchResults>> {
+  return axios(`${baseURL}/providerversions/${providerVersionId}/current/search`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: search,
+  });
+}
 export async function getProviderResultsService(
   providerId: string
 ): Promise<AxiosResponse<SpecificationInformation[]>> {

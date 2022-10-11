@@ -114,6 +114,63 @@ namespace CalculateFunding.Frontend.Controllers
             return new InternalServerErrorResult("There was an error processing your request. Please try again.");
         }
 
+
+        [HttpPost]
+        [Route("api/provider/providerversions/{providerVersionId}/current/search")]
+        public async Task<IActionResult> GetProvidersForSpecification(
+            [FromRoute] string providerVersionId,
+            [FromBody] SearchModel search)
+        {
+            Guard.IsNullOrWhiteSpace(providerVersionId, nameof(providerVersionId));
+            Guard.ArgumentNotNull(search, nameof(search));
+
+            ApiResponse<ProviderVersionSearchResults> result =
+                await _providersApiClient.SearchProvidersForSpecification(providerVersionId, search);
+
+            if (result.StatusCode == HttpStatusCode.OK)
+            {
+                int totalPages = result.Content.TotalCount / search.Top;
+                if (result.Content.TotalCount % search.Top > 0)
+                {
+                    totalPages++;
+                }
+
+                int startNumber = ((search.Top * search.PageNumber) - search.Top) + 1;
+                int endNumber = (search.Top * search.PageNumber);
+                if (endNumber > result.Content.TotalCount)
+                {
+                    endNumber = result.Content.TotalCount;
+                }
+
+                PagedProviderVersionSearchResults searchPagedResult = new PagedProviderVersionSearchResults
+                {
+                    Facets = result.Content.Facets,
+                    Items = result.Content.Results,
+                    TotalCount = result.Content.TotalCount,
+                    PagerState = new PagerState(search.PageNumber, totalPages),
+                    StartItemNumber = startNumber,
+                    EndItemNumber = endNumber
+                };
+
+                Facet localAuthorityFacets = searchPagedResult?.Facets?.Where(_ => _.Name == "authority")
+                                            ?.FirstOrDefault();
+
+                if (localAuthorityFacets != null)
+                {
+                    localAuthorityFacets.FacetValues = localAuthorityFacets.FacetValues.OrderBy(_ => _.Name);
+                }
+
+                return Ok(searchPagedResult);
+            }
+
+            if (result.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return BadRequest(result.Content);
+            }
+
+            return new InternalServerErrorResult("There was an error processing your request. Please try again.");
+        }
+
         [HttpGet]
         [Route("/api/provider/getproviderresults/{providerId}")]
         public async Task<IActionResult> GetProviderResults(string providerId)

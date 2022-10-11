@@ -6,9 +6,9 @@ import { SearchMode } from "types/SearchMode";
 
 import { ProviderResultsSearchFilters } from "../../../components/Providers/ProviderResultsSearchFilters";
 import { FacetValue } from "../../../types/Facet";
-import { ProviderVersionSearchModel } from "types/Provider/ProviderVersionSearchResults";
 import { PublishedProviderSearchRequest } from "types/publishedProviderSearchRequest";
 import { FundingActionType } from "types/PublishedProvider/PublishedProviderFundingCount";
+import { ProviderVersionSearchModel } from "types/Provider/ProviderVersionSearchResults";
 
 
 describe("<ProviderResultsSearchFilters />", () => {
@@ -339,25 +339,18 @@ describe("<ProviderResultsSearchFilters />", () => {
     });
   }); 
 
-  const searchCriteria: PublishedProviderSearchRequest = {
+  const searchCriteria: ProviderVersionSearchModel = {
     pageNumber: 1,
-    pageSize: 50,
+    top: 50,
     searchTerm: "",
-    errorToggle: "",
-    fundingStreamId: "1619",
-    fundingPeriodId: "AS-2223",
-    specificationId: "d82cd692-f21f-44b3-8218-b7a97824826d",
-    hasErrors:undefined,
-    providerType:[],
-    providerSubType:[],
-    localAuthority:[],
-    monthYearOpened:[],
-    status:[],
+    errorToggle: false,
+    orderBy: [],
+    filters: {},
     includeFacets: true,
-    facetCount: 200,
+    facetCount: 100,
+    countOnly: false,
     searchMode: SearchMode.All,
     searchFields: [],
-    indicative:[],
-    fundingAction:FundingActionType.Approve,
+    overrideFacetFields: [],
   };
 });
