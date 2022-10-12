@@ -184,7 +184,7 @@ export function ConfirmFundingRelease({
       )}
 
       <ButtonControlsSection
-        isDisabled={isLoading || isWaitingForJob || !releaseSummaryData || !hasPermissionToRelease}
+        isDisabled={isLoading || isWaitingForJob || !releaseSummaryData || !hasPermissionToRelease || (releaseSummaryData.totalProviders<=0)}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
