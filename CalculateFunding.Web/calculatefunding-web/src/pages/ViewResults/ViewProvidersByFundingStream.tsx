@@ -278,9 +278,11 @@ export function ViewProvidersByFundingStream({
               <div key={`provider-${providerVersionSearchResult.id}`} className="providerResults-details">
                 <h3 className="govuk-heading-m">
                   <Link
-                    className="govuk-link govuk-link--no-visited-state"
-                    to={`/ViewResults/ViewProviderResults/${providerVersionSearchResult.ukprn}/${match.params.fundingStreamId}`}
-                  >
+                    className="govuk-link govuk-link--no-visited-state" 
+                    to={{
+                      pathname: '/ViewResults/ViewProviderResults/' + providerVersionSearchResult.ukprn +'/' + match.params.fundingStreamId,
+                      search: 'specificationId=' + match.params.specificationId,
+                   }}>
                     {providerVersionSearchResult.name}
                   </Link>
                 </h3>
