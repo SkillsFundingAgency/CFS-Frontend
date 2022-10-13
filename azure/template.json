@@ -425,6 +425,12 @@
                     "http20Enabled": {
                         "value": true
                     },
+                    "clientCertEnabled": {
+                        "value": true
+                    },
+                    "clientCertMode": {
+                        "value": "OptionalInteractiveUser"
+                    },
                     "appServiceConsoleLogsSetting": {
                         "value": true
                     },
