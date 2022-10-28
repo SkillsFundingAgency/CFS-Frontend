@@ -458,7 +458,7 @@ export function UpdateDataSourceFile({
               </span>
             </dd>
           </div>
-          <div className="govuk-summary-list__row">
+          <div className="hidden"> {/*govuk-summary-list__row*/}
             <dt className="govuk-summary-list__key">Core provider data version to upload against</dt>
             <dd className="govuk-summary-list__value" data-testid="provider-target-date">
               <DateFormatter date={coreProviderTargetDate} />

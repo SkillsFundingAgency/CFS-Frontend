@@ -591,7 +591,7 @@ export function LoadNewDataSource() {
                 )}
               </div>
               {coreProviderTargetDate && (
-                <div className={"govuk-form-group"}>
+                <div className={"govuk-form-group hidden"}>
                   <dl className="govuk-summary-list govuk-summary-list--no-border core-provider-dataversion">
                     <div className="govuk-summary-list__row">
                       <dt className="govuk-summary-list__key">
