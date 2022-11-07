@@ -416,6 +416,10 @@ namespace CalculateFunding.Frontend.Controllers
                 return BadRequest(ModelState);
             }
 
+            var ProviderId = await _publishingApiClient.CheckAndGetApprovedProviderIds(providers.ProviderIds, specificationId);
+
+            providers.ProviderIds = ProviderId.Content;
+
             ValidatedApiResponse<JobCreationResponse> response = await _publishingApiClient.QueueReleaseProviderVersions(specificationId, providers);
 
             return response.Handle(nameof(Specification),
