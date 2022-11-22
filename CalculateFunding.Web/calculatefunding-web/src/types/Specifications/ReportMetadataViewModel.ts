@@ -29,6 +29,7 @@ export enum ReportGroupingLevel {
   Current = "Current",
   All = "All",
   Released = "Released",
+  Channel = "Channel",
 }
 
 export enum ReportType {

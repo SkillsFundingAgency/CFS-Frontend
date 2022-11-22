@@ -507,7 +507,10 @@ export function DownloadableReports(props: {
                                 ? `Current state ${group.toLowerCase()} level reports`
                                 : groupLevel === ReportGroupingLevel.Released
                                 ? `Released only ${group.toLowerCase()} level funding line reports`
-                                : `${group.toLowerCase()} level reports`}
+                                :groupLevel === ReportGroupingLevel.Channel
+                                ? `${groupLevel} level released reports`
+                                : `${group.toLowerCase()} level reports`
+                                }
                             </h1>
                             {downloadableReports
                               .filter((dlr) => dlr.grouping === group && dlr.groupingLevel === groupLevel)
