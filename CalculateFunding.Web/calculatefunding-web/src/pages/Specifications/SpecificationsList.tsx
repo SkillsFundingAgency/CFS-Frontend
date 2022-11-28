@@ -222,7 +222,7 @@ export function SpecificationsList() {
         </div>
       </div>
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-one-third position-sticky">
+        <div className="govuk-grid-column-one-third position-sticky filterScroll">
           <SpecificationsSearchFilters
             searchCriteria={searchCriteria}
             initialSearch={initialSearch}
