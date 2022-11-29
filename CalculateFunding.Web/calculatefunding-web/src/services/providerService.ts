@@ -115,9 +115,10 @@ export async function getProviderResultsService(
 }
 
 export async function getProviderSnapshotsByFundingStream(
-  fundingStreamId: string
+  fundingStreamId: string,
+  fundingPeriodId: string
 ): Promise<AxiosResponse<ProviderSnapshot[]>> {
-  return axios(`/api/providers/fundingStreams/${fundingStreamId}/snapshots`, {
+  return axios(`/api/providers/fundingStreams/${fundingStreamId}/${fundingPeriodId}/snapshots`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
   });

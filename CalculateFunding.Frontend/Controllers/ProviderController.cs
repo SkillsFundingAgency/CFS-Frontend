@@ -222,13 +222,13 @@ namespace CalculateFunding.Frontend.Controllers
         }
 
         [HttpGet]
-        [Route("api/providers/fundingStreams/{fundingStreamId}/snapshots")]
-        public async Task<IActionResult> GetProviderSnapshotsForFundingStream(string fundingStreamId)
+        [Route("api/providers/fundingStreams/{fundingStreamId}/{fundingPeriodId}/snapshots")]
+        public async Task<IActionResult> GetProviderSnapshotsForFundingStream(string fundingStreamId, string fundingPeriodId)
         {
             Guard.IsNullOrWhiteSpace(fundingStreamId, nameof(fundingStreamId));
 
             ApiResponse<IEnumerable<ProviderSnapshot>> providerSnapshotsResponse =
-                await _fundingDataZoneApiClient.GetProviderSnapshotsForFundingStream(fundingStreamId);
+                await _fundingDataZoneApiClient.GetProviderSnapshotsForFundingStream(fundingStreamId, fundingPeriodId);
 
             IActionResult providerSnapshotsErrorResult =
                 providerSnapshotsResponse.IsSuccessOrReturnFailureResult("GetFundingStructuresByProviderId");

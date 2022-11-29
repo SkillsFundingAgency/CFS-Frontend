@@ -11,14 +11,15 @@ export interface GetProviderSnapshotsQueryResult {
 
 export const useGetProviderSnapshots = (
   fundingStreamId: string | undefined,
-  providerSource: ProviderSource | undefined,
+  fundingPeriodId: string | undefined,
+  providerSource: ProviderSource | undefined,  
   options: Partial<UseQueryOptions<ProviderSnapshot[], AxiosError>> = {}
 ): GetProviderSnapshotsQueryResult => {
   const { data, isLoading } = useQuery<ProviderSnapshot[], AxiosError>(
-    `coreProviderSummary-for-${fundingStreamId}`,
-    async () => (await providerService.getProviderSnapshotsByFundingStream(fundingStreamId as string)).data,
+    `coreProviderSummary-for-${fundingStreamId}-${fundingPeriodId}`,
+    async () => (await providerService.getProviderSnapshotsByFundingStream(fundingStreamId as string, fundingPeriodId as string)).data,
     {
-      enabled: !!fundingStreamId?.length && providerSource === ProviderSource.FDZ,
+        enabled: !!fundingStreamId?.length && !!fundingPeriodId?.length && providerSource === ProviderSource.FDZ,
       ...options,
     }
   );

@@ -131,9 +131,9 @@ export function CreateSpecification(): JSX.Element {
   >(
     `coreProviderSummary-for-${selectedFundingStreamId}`,
     async () =>
-      (await providerService.getProviderSnapshotsByFundingStream(selectedFundingStreamId as string)).data,
+      (await providerService.getProviderSnapshotsByFundingStream(selectedFundingStreamId as string,selectedFundingPeriodId as string)).data,
     {
-      enabled: (selectedFundingStreamId && providerSource === ProviderSource.FDZ) === true,
+      enabled: (selectedFundingStreamId && selectedFundingPeriodId && providerSource === ProviderSource.FDZ) === true,
       retry: false,
       onError: (err) =>
         err.response?.status !== 404 &&

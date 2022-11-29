@@ -97,6 +97,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
 
   const { providerSnapshots, isLoadingProviderSnapshots } = useGetProviderSnapshots(
     fundingStreamId,
+    fundingPeriodId,
     providerSource,
     {
       onError: (err) =>
