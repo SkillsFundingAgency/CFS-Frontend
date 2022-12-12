@@ -532,9 +532,11 @@ describe("<CalculationItem />", () => {
     );
 
     wrapper.find("#calculation-type").simulate("change", { target: { value: "Number" } });
-
-    expect(wrapper.find("#calculation-value-format").props().value).toBe("Number");
-    expect(wrapper.find("#calculation-value-format").children().length).toBe(1);
+    
+    expect(wrapper.find("#calculation-value-format").children().length).toBe(3);
+    expect(wrapper.find("#calculation-value-format").childAt(0).text()).toBe("Please select");
+    expect(wrapper.find("#calculation-value-format").childAt(1).text()).toBe("Number");
+    expect(wrapper.find("#calculation-value-format").childAt(2).text()).toBe("Currency");
   });
 
   it("restricts valueFormats when type PupilNumber selected", () => {

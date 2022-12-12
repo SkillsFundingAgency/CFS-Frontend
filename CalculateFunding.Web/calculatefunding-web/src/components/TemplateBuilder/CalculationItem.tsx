@@ -113,15 +113,20 @@ export function CalculationItem({
       case CalculationType.Adjustment:
       case CalculationType.Cash:
         setValueFormat(ValueFormatType.Currency);
-        break;
-      case CalculationType.Number:
+        break;    
       case CalculationType.PupilNumber:
         setValueFormat(ValueFormatType.Number);
+        break;
+      case CalculationType.Number:
+        setValueFormat(ValueFormatType["" as keyof typeof ValueFormatType]);
         break;
       default:
         setValueFormat(ValueFormatType[e.target.value as keyof typeof ValueFormatType]);
         break;
     }
+
+    const fieldName = "calculation-value-format";
+    clearErrorMessages(fieldName);
 
     setType(newType);
   };
@@ -131,6 +136,8 @@ export function CalculationItem({
   };
 
   const handleValueFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const fieldName = "calculation-value-format";
+    clearErrorMessages(fieldName);
     setValueFormat(ValueFormatType[e.target.value as keyof typeof ValueFormatType]);
   };
 
@@ -314,9 +321,17 @@ export function CalculationItem({
           </>
         );
 
-      case CalculationType.PupilNumber:
-      case CalculationType.Number:
+      case CalculationType.PupilNumber:      
         return <option value={ValueFormatType.Number}>Number</option>;
+
+      case CalculationType.Number:
+        return (
+          <>
+            <option value="">Please select</option>
+            <option value={ValueFormatType.Number}>Number</option>
+            <option value={ValueFormatType.Currency}>Currency</option>
+          </>
+        );
 
       case CalculationType.Weighting:
         return (
@@ -420,7 +435,7 @@ export function CalculationItem({
     const fieldName = "calculation-value-format";
     clearErrorMessages(fieldName);
 
-    if (value.length === 0) {
+    if (value === undefined || value.length === 0) {
       addErrorMessage("Please select a value format", fieldName);
       return false;
     }
