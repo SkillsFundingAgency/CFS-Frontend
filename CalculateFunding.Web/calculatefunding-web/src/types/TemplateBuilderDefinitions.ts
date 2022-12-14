@@ -43,6 +43,14 @@ export enum ValueFormatType {
   String = "String",
 }
 
+export enum TemplateCalculationType{
+  Cash = "Cash",
+  PupilNumber = "PupilNumber",
+  Rate = "Rate",
+  Weighting = "Weighting",
+  Number = "Number",
+}
+
 export enum TemplatePermissions {
   Create = "create",
   Edit = "edit",

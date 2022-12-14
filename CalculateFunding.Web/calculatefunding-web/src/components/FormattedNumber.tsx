@@ -5,6 +5,7 @@ export enum NumberType {
   FormattedDecimalNumber,
   FormattedMoney,
   FormattedPercentage,
+  WeightedNumber
 }
 
 export function toDecimal(amount: number, places: number) {
@@ -41,7 +42,10 @@ export function formatNumber(value: number, type: NumberType, decimalPlaces: num
     formattedPercentage = formattedPercentage + (isBoolean(includeSymbol) && includeSymbol ? "%" : "");
     return formattedPercentage;
   }
-
+  
+  if (type === NumberType.WeightedNumber) {
+    return decimalPointedNumber.toString();
+  }
   return formattedNumber;
 }
 

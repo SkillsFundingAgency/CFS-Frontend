@@ -13,7 +13,7 @@ import { MonitorFallback, MonitorMode } from "../../types/Jobs/JobSubscriptionMo
 import { JobType } from "../../types/jobType";
 import { ProviderResultForSpecification } from "../../types/Provider/ProviderResultForSpecification";
 import { SpecificationSummary } from "../../types/SpecificationSummary";
-import { ValueFormatType } from "../../types/TemplateBuilderDefinitions";
+import { TemplateCalculationType, ValueFormatType } from "../../types/TemplateBuilderDefinitions";
 import { BackToTop } from "../BackToTop";
 import { CollapsibleSteps, setCollapsibleStepsAllStepsStatus } from "../CollapsibleSteps";
 import { formatNumber, NumberType } from "../FormattedNumber";
@@ -138,14 +138,16 @@ export function FundingLineResults({
     }
   }
 
-  function renderValue(value: number, calculationType: ValueFormatType): string {
+  function renderValue(value: number, calculationType: ValueFormatType, templateCalculationType: string): string {
     switch (calculationType) {
       case ValueFormatType.Currency:
         return formatNumber(value, NumberType.FormattedMoney, 2, true);
       case ValueFormatType.Percentage:
         return formatNumber(value, NumberType.FormattedPercentage, 0, true);
       case ValueFormatType.Number:
-        return formatNumber(value, NumberType.FormattedDecimalNumber, 0, true);
+        return ((templateCalculationType == TemplateCalculationType.Weighting) 
+            ? formatNumber(value, NumberType.WeightedNumber, 5, true)
+            : formatNumber(value, NumberType.FormattedDecimalNumber, 0, true));
     }
     return `${value}`;
   }
@@ -186,7 +188,7 @@ export function FundingLineResults({
           );
           node.value =
             templateCalculationResult.value !== null
-              ? renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat)
+              ? renderValue(templateCalculationResult.value, templateCalculationResult.valueFormat, templateCalculationResult.templateCalculationType)
               : providerId
               ? "Excluded"
               : "";
@@ -208,7 +210,7 @@ export function FundingLineResults({
           fundingLineResult.exceptionMessage !== null ? fundingLineResult.exceptionMessage : undefined;
         node.value =
           fundingLineResult.value !== null
-            ? renderValue(fundingLineResult.value, ValueFormatType.Currency)
+            ? renderValue(fundingLineResult.value, ValueFormatType.Currency, "")
             : providerId
             ? "Excluded"
             : "";
