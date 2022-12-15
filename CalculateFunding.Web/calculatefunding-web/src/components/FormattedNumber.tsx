@@ -26,7 +26,6 @@ export function isBoolean(value: any): value is boolean {
 
 export function formatNumber(value: number, type: NumberType, decimalPlaces: number, includeSymbol: boolean) {
   if (!isNumeric(value)) return `${value}`;
-
   const decimalPointedNumber = new Decimal(value).toFixed(decimalPlaces);
 
   const formattedNumber = decimalPointedNumber.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -44,7 +43,7 @@ export function formatNumber(value: number, type: NumberType, decimalPlaces: num
   }
   
   if (type === NumberType.WeightedNumber) {
-    return decimalPointedNumber.toString();
+    return parseFloat(decimalPointedNumber).toString();
   }
   return formattedNumber;
 }
