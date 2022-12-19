@@ -13,7 +13,7 @@ import { PermissionStatus } from "../../components/PermissionStatus";
 import { useJobSubscription } from "../../hooks/Jobs/useJobSubscription";
 import { usePermittedFundingStreams } from "../../hooks/Permissions/usePermittedFundingStreams";
 import { useErrors } from "../../hooks/useErrors";
-import { useFundingConfiguration } from "../../hooks/useFundingConfiguration";
+import { useFundingConfigurationSpecification } from "../../hooks/useFundingConfigurationSpecification";
 import { useFundingPeriodsByFundingStreamId } from "../../hooks/useFundingPeriodsByFundingStreamId";
 import { useFundingStreams } from "../../hooks/useFundingStreams";
 import * as policyService from "../../services/policyService";
@@ -33,7 +33,7 @@ import { UserPermission } from "../../types/UserPermission";
 export function CreateSpecification(): JSX.Element {
   const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(true);
   const [selectedName, setSelectedName] = useState<string>("");
-  const [selectedFundingStreamId, setSelectedFundingStreamId] = useState<string | undefined>();
+  const [selectedFundingStreamId, setSelectedFundingStreamId] = useState<string>();
   const [selectedFundingPeriodId, setSelectedFundingPeriodId] = useState<string | undefined>();
   const [selectedProviderVersionId, setSelectedProviderVersionId] = useState<string | undefined>();
   const [selectedProviderSnapshotId, setSelectedProviderSnapshotId] = useState<string | undefined>();
@@ -62,7 +62,14 @@ export function CreateSpecification(): JSX.Element {
           : clearErrorMessages(["funding-period"]),
     }
   );
-
+  const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfigurationSpecification(
+    selectedFundingStreamId,
+    selectedFundingPeriodId,
+    (err) => addError({ error: err, description: "Error while loading funding configuration" }),
+    async (result) => {
+      setProviderSource(result.providerSource);
+    }
+  );
   const { data: publishedFundingTemplates, isLoading: isLoadingPublishedFundingTemplates } = useQuery<
     PublishedFundingTemplate[],
     AxiosError
@@ -129,7 +136,7 @@ export function CreateSpecification(): JSX.Element {
     ProviderSnapshot[],
     AxiosError
   >(
-    `coreProviderSummary-for-${selectedFundingStreamId}`,
+    [`coreProviderSummary-for-${selectedFundingStreamId}`, selectedFundingPeriodId],
     async () =>
       (await providerService.getProviderSnapshotsByFundingStream(selectedFundingStreamId as string,selectedFundingPeriodId as string)).data,
     {
@@ -147,14 +154,7 @@ export function CreateSpecification(): JSX.Element {
           : clearErrorMessages(["selectCoreProvider"]),
     }
   );
-  const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
-    selectedFundingStreamId,
-    selectedFundingPeriodId,
-    (err) => addError({ error: err, description: "Error while loading funding configuration" }),
-    async (result) => {
-      setProviderSource(result.providerSource);
-    }
-  );
+  
   const [isSaving, setIsSaving] = useState(false);
   const [newSpecificationId, setNewSpecificationId] = useState<string>();
   const history = useHistory();
@@ -205,7 +205,7 @@ export function CreateSpecification(): JSX.Element {
     clearErrorMessages();
     setSelectedTemplateVersion(undefined);
     setSelectedProviderVersionId(undefined);
-    setSelectedFundingPeriodId(fundingPeriodId);
+    setSelectedFundingPeriodId(fundingPeriodId);   
     clearErrorMessages(["funding-period", "selectCoreProvider", "selectTemplateVersion"]);
   }
 
@@ -560,8 +560,8 @@ export function CreateSpecification(): JSX.Element {
                 !selectedFundingStreamId ||
                 !selectedFundingPeriodId ||
                 !fundingPeriods ||
-                !coreProviders ||
-                !providerSnapshots ||
+                (providerSource === ProviderSource.CFS && coreProviders?.length == 0) ||
+                (providerSource === ProviderSource.FDZ && providerSnapshots?.length == 0) ||
                 isLoadingCoreProviders
               }
               onChange={handleProviderDataChange}
