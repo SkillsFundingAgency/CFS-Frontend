@@ -60,8 +60,8 @@ describe("<EditSpecification /> CFS", () => {
       ).not.toBeInTheDocument();
     });
 
-    it("does not render any errors", async () => {
-      expect(await screen.queryByTestId("error-summary")).not.toBeInTheDocument();
+    it("does render any errors", async () => {
+      expect(await screen.queryByTestId("error-summary")).toBeInTheDocument();
     });
 
     it("will have the correct breadcrumbs", async () => {

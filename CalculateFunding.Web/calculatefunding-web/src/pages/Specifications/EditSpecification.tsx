@@ -354,6 +354,14 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
         setSelectedProviderSnapshotId(selectedProviderSnapshot.value);
       }
     }
+
+    if((providerSource === ProviderSource.FDZ && providerSnapshots?.length == 0) || (providerSource === ProviderSource.CFS && coreProviderData?.length == 0))
+    {
+      addError({
+        error: "No provider data sources exist for your selections",
+        fieldName: "selectCoreProvider",
+      })
+    }
   }, [providerSource, coreProviders, providerSnapshots]);
 
   useEffect(() => {
