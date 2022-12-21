@@ -198,14 +198,6 @@ jobs:
         Contents: '**/*.*'
         TargetFolder: '$(build.artifactstagingdirectory)/DevOps'
 
-    - task: CopyFiles@2
-      displayName: 'Copy Azure Template Files to: $(build.artifactstagingdirectory)/azure'
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-      inputs:
-        SourceFolder: azure
-        Contents: '**/*.*'
-        TargetFolder: '$(build.artifactstagingdirectory)/azure'
-
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact'
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
