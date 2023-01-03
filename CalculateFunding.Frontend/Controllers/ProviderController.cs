@@ -203,6 +203,11 @@ namespace CalculateFunding.Frontend.Controllers
                             }
                         }
                     }
+                    // if the specification no longer in scope then we don't want to give the users the ability to select it from the drop down
+                    if (specificationResult.StatusCode == HttpStatusCode.NotFound)                   
+                    {
+                        specificationsToRemove.Add(specificationInformation.Id);
+                    }
                 }
 
                 return new OkObjectResult(result.Content.Where(_ => !specificationsToRemove.Contains(_.Id)));
