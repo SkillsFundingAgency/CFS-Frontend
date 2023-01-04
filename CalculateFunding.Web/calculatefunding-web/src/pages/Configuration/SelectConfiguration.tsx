@@ -13,7 +13,7 @@ import { useFundingStreams } from "../../hooks/useFundingStreams";
 import { Section } from "../../types/Sections";
 
 export function SelectConfiguration() {
-  const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(true);
+  const { fundingStreams, isLoadingFundingStreams } = useFundingStreams(false);
   const [selectedFundingStreamId, setSelectedFundingStreamId] = useState<string | undefined>();
   const [selectedFundingPeriodId, setSelectedFundingPeriodId] = useState<string | undefined>();
 
