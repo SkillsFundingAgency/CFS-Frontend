@@ -355,7 +355,7 @@ export function EditSpecification({ match }: RouteComponentProps<EditSpecificati
       }
     }
 
-    if((providerSource === ProviderSource.FDZ && providerSnapshots?.length == 0) || (providerSource === ProviderSource.CFS && coreProviderData?.length == 0))
+    if((providerSource === ProviderSource.FDZ && providerSnapshots?.length == 0) || (providerSource === ProviderSource.CFS && coreProviders?.length == 0))
     {
       addError({
         error: "No provider data sources exist for your selections",
