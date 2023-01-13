@@ -9,6 +9,8 @@
   CanRefreshFunding = "Can refresh funding",
   CanApproveFunding = "Can approve funding",
   CanReleaseFunding = "Can release funding",
+  CanReleaseFundingForStatement = "Can release allocations for statement",
+  CanReleaseFundingForPaymentOrContract = "Can release allocations for payment or contract",
   CanCreateTemplates = "Can create templates",
   CanEditTemplates = "Can edit templates",
   CanApproveTemplates = "Can approve templates",
@@ -41,6 +43,8 @@ export const PermissionsCategories: { [key: string]: Permission[] } = {
     Permission.CanChooseFunding,
     Permission.CanRefreshFunding,
     Permission.CanReleaseFunding,
+    Permission.CanReleaseFundingForStatement,
+    Permission.CanReleaseFundingForPaymentOrContract
   ],
   "Profile permissions": [
     Permission.CanApplyCustomProfilePattern,

@@ -23,6 +23,7 @@ export function MyPermissions(): JSX.Element {
   const [adminUsers, setAdminUsers] = useState<string[] | undefined>(undefined);
   const permitted: Permission[] = useFundingStreamPermissions(currentFundingStream);
   const { errors, addError } = useErrors();
+  const childPermissions: string[] = [Permission.CanReleaseFundingForStatement.toString(), Permission.CanReleaseFundingForPaymentOrContract.toString()];
 
   function onFundingStreamChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const fundingStreamId = e.target.value;
@@ -134,6 +135,7 @@ export function MyPermissions(): JSX.Element {
                   categoryName={cat}
                   categoryPermissions={PermissionsCategories[cat]}
                   enabledPermissions={permitted}
+                  childPermissions = {childPermissions}
                 />
               ))}
             </div>
@@ -150,10 +152,12 @@ const PermissionCategoryContainer = ({
   categoryName,
   categoryPermissions,
   enabledPermissions,
+  childPermissions
 }: {
   categoryName: string;
   categoryPermissions: Permission[];
-  enabledPermissions: Permission[];
+  enabledPermissions: Permission[];  
+  childPermissions: string[]
 }) => {
   return (
     <table className="govuk-table govuk-!-margin-top-5">
@@ -165,7 +169,7 @@ const PermissionCategoryContainer = ({
           <th scope="col" className="govuk-table__header ">
             Permission
           </th>
-          <th scope="col" className="govuk-table__header">
+          <th scope="col" className={`${categoryName === "Funding permissions" ? "govuk-table__header w-15" : "govuk-table__header"}`}>
             My permissions
           </th>
           <th scope="col" className="govuk-table__header govuk-!-width-one-half">
@@ -176,7 +180,7 @@ const PermissionCategoryContainer = ({
       <tbody className="govuk-table__body">
         {categoryPermissions.map((p, index) => (
           <tr key={index} className="govuk-table__row">
-            <th scope="row" className="govuk-table__header">
+            <th scope="row" className={`${childPermissions.includes(p.toString()) ? "govuk-table__header pl-30" : "govuk-table__header" }`}>
               {p}
             </th>
             {enabledPermissions.includes(p) ? (

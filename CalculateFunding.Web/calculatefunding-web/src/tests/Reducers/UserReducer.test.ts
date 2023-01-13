@@ -5,6 +5,8 @@ import { FundingStreamPermissions } from "../../types/FundingStreamPermissions";
 const payload: [FundingStreamPermissions] = [
   {
     canReleaseFunding: false,
+    canReleaseFundingForStatement: false,
+    canReleaseFundingForPaymentOrContract: false,
     canApproveFunding: false,
     canRefreshFunding: false,
     canChooseFunding: false,
@@ -32,6 +34,8 @@ const payload: [FundingStreamPermissions] = [
 ];
 export const fundingStreamPermissionsDsgState: FundingStreamPermissions = {
   canReleaseFunding: false,
+  canReleaseFundingForStatement: false,
+  canReleaseFundingForPaymentOrContract: false,
   canApproveFunding: false,
   canRefreshFunding: false,
   canChooseFunding: false,

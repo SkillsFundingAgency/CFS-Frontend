@@ -87,6 +87,11 @@ export function IndividualPermissionsAdmin(): JSX.Element {
   const [originalPermissions, setOriginalPermissions] = useState<Permission[]>();
   const [editedPermissions, setEditedPermissions] = useState<Permission[]>();
   const history = useHistory();
+  const parentPermissions: string[] = [Permission.CanReleaseFunding.toString()];
+  const childPermissions: string[] = [Permission.CanReleaseFundingForStatement.toString(), Permission.CanReleaseFundingForPaymentOrContract.toString()];
+  const parentChildPermissions = [
+    { parent: Permission.CanReleaseFunding.toString(), child:[Permission.CanReleaseFundingForStatement.toString(), Permission.CanReleaseFundingForPaymentOrContract.toString()] }
+  ];
   useConfirmLeavePage(!equals(originalPermissions, editedPermissions));
 
   const onUserSelected = (name: string) => {
@@ -150,19 +155,93 @@ export function IndividualPermissionsAdmin(): JSX.Element {
   const onChangePermission = (e: React.ChangeEvent<HTMLInputElement>) => {
     clearErrorMessages();
     setNotification(undefined);
-    if (!editedPermissions || !selectedUserFundingStreamPermissions) return;
-
+    if (!editedPermissions || !selectedUserFundingStreamPermissions) return;    
+    
     const permissionName = e.target.value;
     const permission: Permission | undefined = permissionsToShow.find((p) => p.toString() == permissionName);
     if (!permission) return;
 
     const enabledBefore = editedPermissions.includes(permission);
-    if (enabledBefore) {
-      setEditedPermissions(editedPermissions.filter((p) => p !== permission));
-    } else {
-      setEditedPermissions([...editedPermissions, permission]);
+
+    if(parentPermissions.includes(permissionName))
+    {
+      handleParentPermission(permission, editedPermissions, selectedUserFundingStreamPermissions, enabledBefore);
     }
-    const updated = applyPermission(selectedUserFundingStreamPermissions, permission, !enabledBefore);
+    else if (childPermissions.includes(permissionName))
+    {
+      handleChildPermission(permission, editedPermissions, selectedUserFundingStreamPermissions, enabledBefore);
+    }
+    else {    
+      if (enabledBefore) {
+        setEditedPermissions(editedPermissions.filter((p) => p !== permission));
+      } else {
+        setEditedPermissions([...editedPermissions, permission]);
+      }
+      selectedApplyPermission(selectedUserFundingStreamPermissions, permission, !enabledBefore);      
+    }    
+  };
+
+  const handleParentPermission = (permission: Permission, editedPermissions: Permission[], userFundingStreamPermissions: FundingStreamPermissions, enabledBefore: boolean) => {
+    const childPermissions: string[] | undefined  =  parentChildPermissions.find((p) => p.parent == permission.toString())?.child;
+    if(childPermissions)
+    {
+        const newPermissions:Permission[] = editedPermissions;
+        childPermissions.push(permission.toString());
+        childPermissions.forEach((per) => {
+          const childPermission: Permission | undefined = permissionsToShow.find((p) => p.toString() == per);
+          if(childPermission){
+            newPermissions.push(childPermission);
+            selectedApplyPermission(userFundingStreamPermissions, childPermission, !enabledBefore);  
+          }
+        });
+        if (enabledBefore) { 
+          setEditedPermissions(editedPermissions.filter((p) => childPermissions.indexOf(p) === -1));            
+        } else {
+          setEditedPermissions(editedPermissions.concat(newPermissions));   
+        }        
+    }
+  };
+
+  const handleChildPermission = (permission: Permission, editedPermissions: Permission[], userFundingStreamPermissions: FundingStreamPermissions, enabledBefore: boolean) => {
+    const parentPermission: string | undefined =  parentChildPermissions.find((p) => p.child.includes(permission.toString()))?.parent;
+    const childPermissions: string[] | undefined  =  parentChildPermissions.find((p) => p.parent == parentPermission)?.child;
+    if(parentPermission && childPermissions)
+    {
+      const parPermission: Permission | undefined = permissionsToShow.find((p) => p.toString() == parentPermission);
+      if (!parPermission) return;
+      if (enabledBefore) {        
+        let atLeastOneEnabled = false;
+        childPermissions.forEach((per) => {
+          const childPermission: Permission | undefined = permissionsToShow.find((p) => p.toString() == per);
+          if (!childPermission) return;
+          if(childPermission != permission && editedPermissions.includes(childPermission)){          
+            atLeastOneEnabled = true;
+          }
+        });
+        if(!atLeastOneEnabled)
+        {
+          setEditedPermissions(editedPermissions.filter((p) => p !== permission && p !== parPermission)); 
+          //Parent Permission
+          selectedApplyPermission(userFundingStreamPermissions, parPermission, !enabledBefore);   
+        }
+        else{
+          setEditedPermissions(editedPermissions.filter((p) => p !== permission)); 
+        }
+      }  
+      else{
+        const newPermissions:Permission[] = editedPermissions;
+        newPermissions.push(permission);
+        newPermissions.push(parPermission);
+        setEditedPermissions(editedPermissions.concat(newPermissions));   
+        //Parent Permission
+        selectedApplyPermission(userFundingStreamPermissions, parPermission, !enabledBefore);          
+      }
+      selectedApplyPermission(userFundingStreamPermissions, permission, !enabledBefore);     
+    }
+  };
+
+  const selectedApplyPermission = (userFundingStreamPermissions: FundingStreamPermissions, permission: Permission, checked: boolean) => {
+    const updated = applyPermission(userFundingStreamPermissions, permission, checked);
     setSelectedUserFundingStreamPermissions(updated);
   };
 
@@ -315,30 +394,31 @@ export function IndividualPermissionsAdmin(): JSX.Element {
   }) => {
     const permissionTitle = props.permission.toString();
     const slug = convertToSlug(permissionTitle);
-    const permissionDescription = getPermissionDescription(props.permission);
-    return (
-      <div className="govuk-checkboxes govuk-checkboxes--small">
-        <div className="govuk-checkboxes__item">
-          <input
-            className="govuk-checkboxes__input"
-            id={slug}
-            name={slug}
-            type="checkbox"
-            defaultChecked={props.enabledPermissions?.includes(props.permission)}
-            onChange={onChangePermission}
-            value={permissionTitle}
-            title={permissionTitle}
-            aria-describedby={`permissions-hint-${slug}`}
-          />
-          <label className="govuk-label govuk-checkboxes__label" htmlFor={`permissions-hint-${slug}`}>
-            {permissionTitle}
-          </label>
-          <div id={`permissions-hint-${slug}`} className="govuk-hint govuk-checkboxes__hint">
-            {permissionDescription}
+    const permissionDescription = getPermissionDescription(props.permission);   
+      return (
+        <div className="govuk-checkboxes govuk-checkboxes--small">
+          <div className={`${childPermissions.includes(permissionTitle)
+              ? "govuk-checkboxes__item ml-35" : "govuk-checkboxes__item"}`}>
+            <input
+              className="govuk-checkboxes__input"
+              id={slug}
+              name={slug}
+              type="checkbox"
+              defaultChecked={props.enabledPermissions?.includes(props.permission)}
+              onChange={onChangePermission}
+              value={permissionTitle}
+              title={permissionTitle}
+              aria-describedby={`permissions-hint-${slug}`}
+            />
+            <label className="govuk-label govuk-checkboxes__label" htmlFor={`permissions-hint-${slug}`}>
+              {permissionTitle}
+            </label>
+            <div id={`permissions-hint-${slug}`} className="govuk-hint govuk-checkboxes__hint">
+              {permissionDescription}
+            </div>
           </div>
         </div>
-      </div>
-    );
+      );
   };
 
   return (

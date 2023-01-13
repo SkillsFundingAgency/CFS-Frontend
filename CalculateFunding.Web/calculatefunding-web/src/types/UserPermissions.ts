@@ -1,6 +1,8 @@
 ﻿export interface UserPermissions {
   userId: string;
   canReleaseFunding: boolean;
+  canReleaseFundingForStatement: boolean;
+  canReleaseFundingForPaymentOrContract: boolean;
   canApproveFunding: boolean;
   canRefreshFunding: boolean;
   canChooseFunding: boolean;
