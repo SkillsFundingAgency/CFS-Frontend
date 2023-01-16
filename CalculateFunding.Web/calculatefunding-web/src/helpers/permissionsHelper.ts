@@ -27,9 +27,9 @@ export function getPermissionDescription(permission: Permission): string {
     case Permission.CanReleaseFunding:
       return "Can release funding allocation values to downstream services for a specification for the funding stream that has been chosen for funding";
     case Permission.CanReleaseFundingForStatement:
-      return "Can release funding allocation values to the service that creates statements for providers";
+      return "Can release funding allocation values to the service that manages statements for providers";
     case Permission.CanReleaseFundingForPaymentOrContract:
-      return "Can release funding allocation values to the services that create contracts or make payments";
+      return "Can release funding allocation values to the services that manage contracts or payments for providers";
     case Permission.CanCreateTemplates:
       return "Can create templates for the funding stream";
     case Permission.CanEditTemplates:
