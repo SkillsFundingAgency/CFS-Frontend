@@ -508,7 +508,7 @@ export function DownloadableReports(props: {
                                 : groupLevel === ReportGroupingLevel.Released
                                 ? `Released only ${group.toLowerCase()} level funding line reports`
                                 :groupLevel === ReportGroupingLevel.Channel
-                                ? `${groupLevel} level released reports`
+                                ? `${groupLevel} level released group reports`
                                 : `${group.toLowerCase()} level reports`
                                 }
                             </h1>
