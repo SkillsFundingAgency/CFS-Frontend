@@ -113,7 +113,7 @@ export const PurposeOfFundingRelease = ({ match }: RouteComponentProps<PurposeOf
               <div className="govuk-grid-row">
                 <div className="govuk-grid-column-full">
                   <div className="govuk-checkboxes">
-                    {releaseGroups.map((rac, index) => (
+                    {releaseGroups && releaseGroups.map((rac, index) => (
                       <div key={index} className="govuk-checkboxes__item">
                         <input
                           type="checkbox"

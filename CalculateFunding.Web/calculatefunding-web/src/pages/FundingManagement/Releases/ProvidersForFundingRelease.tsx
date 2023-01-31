@@ -125,9 +125,20 @@ export const ProvidersForFundingRelease = ({
     match.params.specificationId,
     [Permission.CanReleaseFunding]
   );
+  let fundingStreamMissingPermissions = missingPermissions;
   const { errors, addErrorMessage, addError, clearErrorMessages } = useErrors();
   const hasPermissionToRelease = useMemo(
     () => hasPermission && hasPermission(Permission.CanReleaseFunding),
+    [isPermissionsFetched]
+  );
+
+  const hasPermissionToReleaseForStatement = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFundingForStatement),
+    [isPermissionsFetched]
+  );
+
+  const hasPermissionToReleaseForContractorPayments = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFundingForPaymentOrContract),
     [isPermissionsFetched]
   );
 
@@ -256,6 +267,7 @@ export const ProvidersForFundingRelease = ({
 
   const activeActionJobs = activeJobs(actionJobs);
   const hasActiveActionJobs = !!activeActionJobs.length;
+  const releaseGroups = fundingConfiguration?.releaseActionGroups;
 
   async function handleRelease() {
     if (
@@ -270,9 +282,7 @@ export const ProvidersForFundingRelease = ({
         window.scrollTo(0, 0);
         addError({ error: "There are no selected providers to release", fieldName: "selected-providers" });
         return;
-      }
-
-      const releaseGroups = fundingConfiguration?.releaseActionGroups;
+      }    
 
       if (releaseGroups && releaseGroups.length === 1) {
         const releaseChannels = releaseGroups.map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
@@ -294,15 +304,61 @@ export const ProvidersForFundingRelease = ({
           "Please filter by error status to identify affected providers"
         );
       } else {
-        history.push(
-          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
-        );
+        if(hasPermissionToReleaseForStatement && hasPermissionToReleaseForContractorPayments) {
+            history.push(
+              `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
+            );
+        }
+        else 
+        {
+          if (!releaseGroups) return;
+          let releaseChannels : string[];
+          if(hasPermissionToReleaseForStatement) {
+            releaseChannels = releaseGroups.filter((p) => p.name.toLowerCase() === "statement").map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+          }
+          else {
+            releaseChannels = releaseGroups.filter((p) => p.name.toLowerCase() !== "statement").map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+          }          
+          history.push(
+            `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseChannels
+              .map((r) => `purposes=${r}`)
+              .join("&")}`
+          );
+        }         
       }
     }
   }
 
-  const canRelease =
+  let canRelease =
     !hasActiveActionJobs && publishedProviderSearchResults?.canPublish && hasPermissionToRelease;
+
+  if ((!hasPermissionToReleaseForStatement || !hasPermissionToReleaseForContractorPayments) && releaseGroups && releaseGroups.length === 1){
+    releaseGroups.forEach((rg) => {
+      if(rg.name.toLowerCase() == "statement"){          
+        canRelease = canRelease && hasPermissionToReleaseForStatement;
+        if(!hasPermissionToReleaseForStatement) {
+            if(fundingStreamMissingPermissions){
+            fundingStreamMissingPermissions.push(Permission.CanReleaseFundingForStatement);
+            }else{
+              fundingStreamMissingPermissions = [Permission.CanReleaseFundingForStatement]
+            }
+        }
+        return;
+      }
+      if(rg.name.toLowerCase() == "contract" || rg.name.toLowerCase() == "payment"){        
+        canRelease = canRelease && hasPermissionToReleaseForContractorPayments;
+        if(!hasPermissionToReleaseForContractorPayments) {
+          if(fundingStreamMissingPermissions){
+            fundingStreamMissingPermissions.push(Permission.CanReleaseFundingForPaymentOrContract);
+          }else{
+            fundingStreamMissingPermissions = [Permission.CanReleaseFundingForPaymentOrContract]
+          }
+        }
+        return;
+      }
+    });
+  }
+  
   const showUploadBatchAction = canRelease && fundingConfiguration?.approvalMode === ApprovalMode.Batches;
 
   return (
@@ -314,7 +370,7 @@ export const ProvidersForFundingRelease = ({
         <Breadcrumb name={specification?.fundingStreams[0].name ?? ""} />
       </Breadcrumbs>
 
-      <PermissionStatus requiredPermissions={missingPermissions} hidden={!isPermissionsFetched} />
+      <PermissionStatus requiredPermissions={fundingStreamMissingPermissions} hidden={!isPermissionsFetched} />
       <MultipleErrorSummary errors={errors} specificationId={specificationId} />
 
       {!isLoading && !activeActionJobs?.length && (
@@ -471,7 +527,7 @@ export const ProvidersForFundingRelease = ({
               />
               <div className="right-align">
                 <button
-                  className="govuk-button govuk-button--warning govuk-!-margin-right-1 govuk-!-margin-top-4"
+                  className="govuk-button govuk-!-margin-right-1 govuk-!-margin-top-4"
                   disabled={!canRelease || blockActionBasedOnProviderErrors}
                   onClick={handleRelease}
                 >

@@ -7,22 +7,19 @@ import { ApprovalMode } from "../../../types/ApprovalMode";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { SpecificationSummary } from "../../../types/SpecificationSummary";
 import { FormattedNumber, NumberType } from "../../FormattedNumber";
-import { ChangeUploadBatch } from "../ChangeUploadBatch";
 import { CsvDownloadPublishedProviders } from "../CsvDownloadPublishedProviders";
 
 export interface FundingReleaseSummaryProps {
   approvalMode: ApprovalMode;
   specification: SpecificationSummary;
-  isWaitingForJob: boolean;
   releaseSummary: ReleaseFundingPublishedProvidersSummary | undefined;
-  isLoadingSummaryData: boolean;
+  isLoadingSummaryData: boolean;  
 }
 
 export function FundingReleaseSummary({
   specification,
   approvalMode,
   releaseSummary,
-  isWaitingForJob,
   isLoadingSummaryData,
 }: FundingReleaseSummaryProps) {
   const actionType = FundingActionType.Release;
@@ -155,11 +152,7 @@ export function FundingReleaseSummary({
               </tbody>
             </table>
           </div>
-        </div>
-
-        {approvalMode === ApprovalMode.Batches && !isWaitingForJob && (
-          <ChangeUploadBatch actionType={actionType} specification={specification} />
-        )}
+        </div>      
       </>
     );
   }

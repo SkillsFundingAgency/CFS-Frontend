@@ -1,6 +1,9 @@
 ﻿import { useReleaseFundingSummaryData } from "hooks/FundingApproval/useReleaseFundingSummaryData";
 import React, { useMemo, useState } from "react";
 import { RouteComponentProps, useHistory } from "react-router";
+import { Link } from "react-router-dom";
+import { FundingConfiguration } from "../../../types/FundingConfiguration";
+import { SpecificationSummary } from "../../../types/SpecificationSummary";
 
 import { Breadcrumb, Breadcrumbs } from "../../../components/Breadcrumbs";
 import { DateTimeFormatter } from "../../../components/DateTimeFormatter";
@@ -35,7 +38,9 @@ export function ConfirmFundingRelease({
   const history = useHistory();
   const params = new URLSearchParams(history.location.search);
   const channelCodes = params.getAll("purposes");
+  const isChannelCodeAvailable = channelCodes.includes("Statement" || "Payment" || "Contract")
   const actionType = FundingActionType.Release;
+  const [acknowledge, setAcknowledge] = useState<boolean>(false);
 
   const { state: errors, clearErrorsFromContext, addErrorToContext } = useErrorContext();
   const {
@@ -48,6 +53,8 @@ export function ConfirmFundingRelease({
     isWaitingForJob,
     isPermissionsFetched,
     hasPermissionToRelease,
+    hasPermissionToReleaseForStatement,
+    hasPermissionToReleaseForContractorPayments,
     selectedProviderIds,
     notifications,
     specificationLastUpdatedDate,
@@ -72,12 +79,44 @@ export function ConfirmFundingRelease({
     channelCodes,
     selectedProviderIds
   );
-
-  const handleCancel = () => {
+  
+  const handleUploadButtonChange = (specification: SpecificationSummary) => {
+    const fundingActionType = FundingActionType.Release;
     history.push(
-      `/FundingManagement/Release/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`
+      `/FundingManagement/${fundingActionType}/UploadBatch/${specification.fundingStreams[0].id}/${specification.fundingPeriod.id}/${specification.id}`
     );
   };
+
+  let title = "Confirm funding release";
+  let initialConfirmButtonState = isLoading || isWaitingForJob || !releaseSummaryData || !hasPermissionToRelease || (releaseSummaryData.totalProviders<=0); 
+  let isConfirmButtonDisabled = initialConfirmButtonState;
+  if((!hasPermissionToReleaseForStatement || !hasPermissionToReleaseForContractorPayments) && isChannelCodeAvailable)
+  {
+    title = title + (hasPermissionToReleaseForStatement ?  " for statements" : " for payments or contract");
+
+    if(!initialConfirmButtonState) {
+      isConfirmButtonDisabled = !acknowledge;
+    }
+  }
+  const handleAcknowledge = async () => {    
+    setAcknowledge(!acknowledge);
+    if(!initialConfirmButtonState) {
+      isConfirmButtonDisabled = !acknowledge;
+    }
+    else {
+      isConfirmButtonDisabled = initialConfirmButtonState;
+    }
+  };
+
+  const acknowledgeText = () => {
+    if(hasPermissionToReleaseForStatement)
+    {
+      return "By selecting this checkbox,you confirm that you understand this release is for statements only."
+    }
+    else if(hasPermissionToReleaseForContractorPayments) {
+      return "By selecting this checkbox,you confirm that you understand this release is for payments or contract only."
+    }
+  }; 
 
   const handleConfirm = async () => {
     clearErrorsFromContext();
@@ -122,14 +161,31 @@ export function ConfirmFundingRelease({
         <Breadcrumb name={"Confirm release"} />
       </Breadcrumbs>
 
-      <PermissionStatus
-        requiredPermissions={hasPermissionToRelease ? [] : [Permission.CanReleaseFunding]}
-        hidden={!isPermissionsFetched}
-      />
+      {!hasPermissionToRelease && (
+        <PermissionStatus
+          requiredPermissions={[Permission.CanReleaseFunding]}
+          hidden={!isPermissionsFetched}
+        />        
+      )}
+
+      {hasPermissionToRelease && !hasPermissionToReleaseForStatement && isChannelCodeAvailable &&  (
+        <PermissionStatus
+          requiredPermissions={[Permission.CanReleaseFundingForStatement]}
+          hidden={!isPermissionsFetched}
+        />
+      )}
+
+      {hasPermissionToRelease && !hasPermissionToReleaseForContractorPayments && isChannelCodeAvailable && (
+          <PermissionStatus
+            requiredPermissions={[Permission.CanReleaseFundingForPaymentOrContract]}
+            hidden={!isPermissionsFetched}
+          />
+        )}
+      
       <MultipleErrorSummary errors={errors} />
 
       <Title
-        title="Confirm funding release"
+        title={title}
         titleCaption="Check the information below carefully before releasing the funding"
       />
 
@@ -177,16 +233,39 @@ export function ConfirmFundingRelease({
             approvalMode={fundingConfiguration.approvalMode}
             specification={specification}
             releaseSummary={releaseSummaryData}
-            isWaitingForJob={isWaitingForJob}
             isLoadingSummaryData={isLoadingReleaseSummaryData}
           />
+
+          {(!hasPermissionToReleaseForStatement || !hasPermissionToReleaseForContractorPayments) && isChannelCodeAvailable && (releaseSummaryData || !isLoadingReleaseSummaryData) &&(
+            <div className="govuk-checkboxes govuk-!-margin-bottom-7 govuk-!-margin-top-1">
+              <div className="govuk-checkboxes__item">
+                <input
+                  className="govuk-checkboxes__input"
+                  name="acknowledgementCheckbox"
+                  id="acknowledgementCheckbox"
+                  type="checkbox"            
+                  checked={acknowledge}
+                  onChange={handleAcknowledge}
+                />
+                <label className="govuk-label govuk-checkboxes__label" htmlFor="acknowledgementCheckbox">
+                    {acknowledgeText()}
+                </label>
+              </div>
+            </div>
+          )}
         </section>
       )}
 
       <ButtonControlsSection
-        isDisabled={isLoading || isWaitingForJob || !releaseSummaryData || !hasPermissionToRelease || (releaseSummaryData.totalProviders<=0)}
+        isDisabled={isConfirmButtonDisabled}
         onConfirm={handleConfirm}
-        onCancel={handleCancel}
+        onUploadButtonChange={handleUploadButtonChange}
+        specificationId = {specificationId}
+        fundingStreamId = {fundingStreamId}
+        fundingPeriodId = {fundingPeriodId}
+        isWaitingForJob = {isWaitingForJob}
+        fundingConfiguration = {fundingConfiguration}
+        specification = {specification}        
       />
     </Main>
   );
@@ -195,15 +274,27 @@ export function ConfirmFundingRelease({
 const ButtonControlsSection = ({
   isDisabled,
   onConfirm,
-  onCancel,
+  onUploadButtonChange,
+  specificationId,
+  fundingStreamId,
+  fundingPeriodId,
+  isWaitingForJob,
+  fundingConfiguration,
+  specification
 }: {
   isDisabled: boolean;
   onConfirm: () => void;
-  onCancel: () => void;
+  onUploadButtonChange: (specification: SpecificationSummary) => void;
+  specificationId: string;
+  fundingStreamId: string;
+  fundingPeriodId: string;
+  isWaitingForJob: boolean;
+  fundingConfiguration: FundingConfiguration | undefined;
+  specification: SpecificationSummary | undefined;
 }) => (
   <section aria-label="action controls">
     <div className="govuk-grid-row">
-      <div className="govuk-grid-column-full">
+      <div className="govuk-grid-column-full govuk-button-group">
         <button
           data-prevent-double-click="true"
           className="govuk-button govuk-!-margin-right-1"
@@ -213,9 +304,21 @@ const ButtonControlsSection = ({
         >
           Confirm release
         </button>
-        <a className="govuk-button govuk-button--secondary" data-module="govuk-button" onClick={onCancel}>
+        {fundingConfiguration && specification && fundingConfiguration.approvalMode === ApprovalMode.Batches && !isWaitingForJob && (
+          <button 
+          data-prevent-double-click="true"
+          className="govuk-button govuk-button--secondary" 
+          data-module="govuk-button"
+          onClick={() => onUploadButtonChange(specification)}>
+            Change selection
+          </button> 
+        )}
+        <Link
+          to={`/FundingManagement/Release/Results/${fundingStreamId}/${fundingPeriodId}/${specificationId}`}
+          className="govuk-link govuk-link--no-visited-state"
+        >
           Cancel
-        </a>
+        </Link>       
       </div>
     </div>
   </section>

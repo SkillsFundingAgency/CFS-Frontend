@@ -38,6 +38,8 @@ export interface UseFundingConfirmationResult {
   isPermissionsFetched: boolean;
   hasPermissionToApprove: boolean;
   hasPermissionToRelease: boolean;
+  hasPermissionToReleaseForStatement: boolean;
+  hasPermissionToReleaseForContractorPayments: boolean;
   selectedProviderIds: string[];
   notifications: JobNotification[];
   specificationLastUpdatedDate: Date | undefined;
@@ -91,6 +93,16 @@ export const useFundingConfirmation = ({
   );
   const hasPermissionToRelease = useMemo(
     () => hasPermission && hasPermission(Permission.CanReleaseFunding),
+    [isPermissionsFetched]
+  );
+
+  const hasPermissionToReleaseForStatement = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFundingForStatement),
+    [isPermissionsFetched]
+  );
+
+  const hasPermissionToReleaseForContractorPayments = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFundingForPaymentOrContract),
     [isPermissionsFetched]
   );
 
@@ -216,6 +228,8 @@ export const useFundingConfirmation = ({
     isPermissionsFetched,
     hasPermissionToApprove,
     hasPermissionToRelease,
+    hasPermissionToReleaseForStatement,
+    hasPermissionToReleaseForContractorPayments,
     selectedProviderIds,
     notifications,
     specificationLastUpdatedDate,

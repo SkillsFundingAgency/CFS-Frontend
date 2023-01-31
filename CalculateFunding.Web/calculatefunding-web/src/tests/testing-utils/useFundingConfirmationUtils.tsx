@@ -30,6 +30,8 @@ const createResult = (overrides: Partial<UseFundingConfirmationResult> = {}) =>
     isPermissionsFetched: true,
     hasPermissionToApprove: true,
     hasPermissionToRelease: true,
+    hasPermissionToReleaseForStatement: true,
+    hasPermissionToReleaseForContractorPayments: true,
     selectedProviderIds: [],
     notifications: [],
     specificationLastUpdatedDate: undefined,
