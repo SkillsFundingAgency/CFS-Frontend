@@ -38,7 +38,7 @@ export function ConfirmFundingRelease({
   const history = useHistory();
   const params = new URLSearchParams(history.location.search);
   const channelCodes = params.getAll("purposes");
-  const isChannelCodeAvailable = channelCodes.includes("Statement" || "Payment" || "Contract")
+  const isChannelCodeAvailable = channelCodes.includes("Statement") || channelCodes.includes("Payment") || channelCodes.includes("Contracting");
   const actionType = FundingActionType.Release;
   const [acknowledge, setAcknowledge] = useState<boolean>(false);
 
