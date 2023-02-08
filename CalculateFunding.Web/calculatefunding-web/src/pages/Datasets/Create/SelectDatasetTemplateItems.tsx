@@ -232,31 +232,47 @@ const ReferenceSpecificationDetails = (props: {
   </div>
 );
 
-const SearchBox = (props: { onSearchTextChange: (text: string) => void }) => {
-  function onChange(e: ChangeEvent<HTMLInputElement>) {
-    const text = e.target.value;
+const SearchBox = (props: { onSearchTextChange: (text: string) => void }, ) => { 
+  const [value, setValue] = useState("");   
+  function onChange(e: ChangeEvent<HTMLInputElement>) {     
+    const text = e.target.value;     
+    setValue(text)
     if (!text?.length || text.length > 2) {
       props.onSearchTextChange(text);
-    }
+    }  
   }
+  const onClear = () => {
+    setValue("");
+    props.onSearchTextChange("");   
+  };
 
   return (
     <div className="govuk-form-group filterbyContainer">
       <fieldset className="govuk-fieldset">
-        <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
-          <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Search</h4>
-        </legend>
-        <div className="govuk-form-group filterSearch">
+        <div className="govuk-!-margin-bottom-0">
+          <label          
+            className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-1 govuk-!-margin-bottom-2 govuk-!-padding-1 "> 
+            Search
+          </label> 
+          <a 
+            type="link"          
+            onClick={onClear}
+            className="govuk-link govuk-link--no-visited-state govuk-!-margin-top-2 govuk-!-margin-bottom-2 govuk-!-padding-1 right-align"  
+            >Clear search
+          </a>        
+        </div>           
+        <div className="govuk-form-group filterSearch">          
           <label className="filterLabel" htmlFor="filter-by-type">
-            Search added funding lines or calculations
-          </label>
+            Search added funding lines or calculations 
+          </label>         
           <input
             className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
-            onChange={onChange}
+            onChange={(e) => onChange(e)} 
             id="searchSelected"
             autoComplete={"off"}
             name="searchSelected"
             type="text"
+            value={value}            
           />
         </div>
       </fieldset>
