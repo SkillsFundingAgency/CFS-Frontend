@@ -24,6 +24,7 @@ import { BatchUploadResponse } from "../../../types/PublishedProvider/BatchUploa
 import { BatchValidationRequest } from "../../../types/PublishedProvider/BatchValidationRequest";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
+import { useFundingConfirmation } from "../../../hooks/FundingApproval/useFundingConfirmation";
 
 export interface UploadBatchRouteProps {
   fundingStreamId: string;
@@ -47,11 +48,23 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
     path: history.location.pathname,
   };
 
+  const actionType = FundingActionType.Release;
+
   const { fundingConfiguration, isLoadingFundingConfiguration } = useFundingConfiguration(
     fundingStreamId,
     fundingPeriodId,
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
+
+  const {   
+    hasPermissionToReleaseForStatement,
+    hasPermissionToReleaseForContractorPayments,    
+  } = useFundingConfirmation({
+    specificationId: specificationId,
+    fundingStreamId: fundingStreamId,
+    fundingPeriodId: fundingPeriodId,
+    actionType
+  });
 
   const { addSub, results: jobNotifications } = useJobSubscription({
     isEnabled: true,
@@ -187,11 +200,30 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
           { previousPage: currentPage }
         );
       } else {
-        history.push(
-          `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}/`,
-          { previousPage: currentPage }
-        );
-      }
+        if(hasPermissionToReleaseForStatement && hasPermissionToReleaseForContractorPayments) {
+          history.push(
+            `/FundingManagement/Release/Purpose/${fundingStreamId}/${fundingPeriodId}/${specificationId}`,
+            { previousPage: currentPage }
+          );
+        }
+        else 
+        {
+          if (!fundingConfiguration.releaseActionGroups) return;
+          let releaseChannels : string[];
+          if(hasPermissionToReleaseForStatement) {
+            releaseChannels = fundingConfiguration.releaseActionGroups.filter((p) => p.name.toLowerCase() === "statement").map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+          }
+          else {
+            releaseChannels = fundingConfiguration.releaseActionGroups.filter((p) => p.name.toLowerCase() !== "statement").map((rc) => rc.channelCodes).reduce((a, b) => a.concat(b));
+          }          
+          history.push(
+            `/FundingManagement/Release/Confirm/${fundingStreamId}/${fundingPeriodId}/${specificationId}/?${releaseChannels
+              .map((r) => `purposes=${r}`)
+              .join("&")}`,
+              { previousPage: currentPage }
+          );
+        }  
+        }
     }
   }, [jobNotifications, publishedProviderIds]);
 
