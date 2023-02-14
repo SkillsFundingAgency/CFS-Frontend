@@ -254,12 +254,11 @@ const SearchBox = (props: { onSearchTextChange: (text: string) => void }, ) => {
             className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-1 govuk-!-margin-bottom-2 govuk-!-padding-1 "> 
             Search
           </label> 
-          <a 
-            type="link"          
+          <button          
             onClick={onClear}
             className="govuk-link govuk-link--no-visited-state govuk-!-margin-top-2 govuk-!-margin-bottom-2 govuk-!-padding-1 right-align"  
             >Clear search
-          </a>        
+          </button>        
         </div>           
         <div className="govuk-form-group filterSearch">          
           <label className="filterLabel" htmlFor="filter-by-type">
@@ -367,7 +366,7 @@ const TemplateItemRow = (props: {
     props.onToggle(props.item);
   }
 
-  return (
+  return (    
     <tr className="govuk-table__row">
       <td className="govuk-table__cell">
         <div className="govuk-checkboxes govuk-checkboxes--small">
