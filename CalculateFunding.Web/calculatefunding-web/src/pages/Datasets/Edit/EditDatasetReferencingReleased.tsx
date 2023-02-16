@@ -310,30 +310,46 @@ const ReferencedSpecificationDetails = React.memo(
 );
 
 const SearchBox = React.memo((props: { onSearchTextChange: (text: string) => void }) => {
+  const [value, setValue] = useState("");
   function onChange(e: ChangeEvent<HTMLInputElement>) {
     const text = e.target.value;
+    setValue(text)
     if (!text?.length || text.length > 2) {
       props.onSearchTextChange(text);
     }
   }
 
+  const onClear = () => {
+    setValue("");
+    props.onSearchTextChange("");   
+  };
+
   return (
     <div className="govuk-form-group filterbyContainer">
       <fieldset className="govuk-fieldset">
-        <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
-          <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Search</h4>
-        </legend>
+        <div className="govuk-!-margin-bottom-0">
+          <label          
+            className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-1 govuk-!-margin-bottom-2 govuk-!-padding-1 "> 
+            Search
+          </label> 
+          <button        
+            onClick={onClear}
+            className="govuk-link govuk-link--no-visited-state govuk-!-margin-top-2 govuk-!-margin-bottom-2 govuk-!-padding-1 right-align"  
+            >Clear search
+          </button>  
+        </div>
         <div className="govuk-form-group filterSearch">
           <label className="filterLabel" htmlFor="filter-by-type">
             Search added funding lines or calculations
           </label>
           <input
             className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
-            onChange={onChange}
+            onChange={(e) => onChange(e)}
             id="searchSelected"
             autoComplete={"off"}
             name="searchSelected"
             type="text"
+            value={value}
           />
         </div>
       </fieldset>
@@ -387,13 +403,16 @@ const TemplateItemGrid = React.memo(
       >
         <thead className="govuk-table__head">
           <tr className="govuk-table__row">
-            <th scope="col" className="govuk-table__header govuk-!-width-two-thirds">
+            <th scope="col" className="govuk-table__header">
               Name
             </th>
-            <th scope="col" className="govuk-table__header">
+            <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
+              Status
+            </th>
+            <th scope="col" className="govuk-table__header govuk-!-width-one-quarter">
               Structure
             </th>
-            <th scope="col" className="govuk-table__header">
+            <th scope="col" className="govuk-table__header govuk-!-width-one-sixth">
               ID
             </th>
           </tr>
@@ -442,14 +461,16 @@ const TemplateItemRow = (props: {
               />
             )}
             <label className="govuk-label govuk-checkboxes__label" htmlFor={props.token}>
-              {props.item.name}{" "}
-              {props.item.isObsolete && <strong className="govuk-tag govuk-tag--red">Obsolete</strong>}
-              {props.item.isUsedInCalculation && (
-                <strong className="govuk-tag govuk-tag--red">Used in Calculation</strong>
-              )}
+              {props.item.name}{" "}             
             </label>
           </div>
         </div>
+      </td>
+      <td className="govuk-table__cell">
+        <label className="" htmlFor={props.token}>              
+          {props.item.isObsolete && <strong className="govuk-tag govuk-tag--red">Obsolete</strong>}
+          {props.item.isUsedInCalculation && (<strong className="govuk-tag govuk-tag--red">Used in Calculation</strong>)}
+        </label>
       </td>
       <td className="govuk-table__cell">{convertCamelCaseToSpaceDelimited(props.item.type)}</td>
       <td className="govuk-table__cell">{props.item.templateId}</td>
