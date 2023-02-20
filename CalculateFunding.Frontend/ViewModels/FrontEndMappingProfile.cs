@@ -178,7 +178,9 @@ namespace CalculateFunding.Frontend.ViewModels
                 .ForMember(m => m.SpecificationId, opt => opt.Ignore())
                 .ForMember(m => m.ValueType, opt => opt.Ignore())
                 .ForMember(m => m.Author, opt => opt.Ignore())
-                .ForMember(m => m.Id, opt => opt.Ignore());
+                .ForMember(m => m.Id, opt => opt.Ignore())
+                .ForMember(m => m.FundingStreamId, opt => opt.Ignore())
+                .ForMember(m => m.WasTemplateCalculation, opt => opt.Ignore());
 
             CreateMap<EditAdditionalCalculationViewModel, CalculationEditModel>()
                 .ForMember(m => m.Name, opt => opt.Ignore())
