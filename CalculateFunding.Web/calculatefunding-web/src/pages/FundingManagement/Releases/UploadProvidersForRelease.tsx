@@ -1,5 +1,5 @@
 ﻿import { AxiosError } from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useMutation, useQuery } from "react-query";
 import { useDispatch } from "react-redux";
 import { RouteComponentProps, useHistory } from "react-router";
@@ -24,7 +24,9 @@ import { BatchUploadResponse } from "../../../types/PublishedProvider/BatchUploa
 import { BatchValidationRequest } from "../../../types/PublishedProvider/BatchValidationRequest";
 import { FundingActionType } from "../../../types/PublishedProvider/PublishedProviderFundingCount";
 import { Section } from "../../../types/Sections";
-import { useFundingConfirmation } from "../../../hooks/FundingApproval/useFundingConfirmation";
+import { PermissionStatus } from "../../../components/PermissionStatus";
+import { Permission } from "../../../types/Permission";
+import { useSpecificationPermissions } from "../../../hooks/Permissions/useSpecificationPermissions";
 
 export interface UploadBatchRouteProps {
   fundingStreamId: string;
@@ -56,15 +58,26 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
     (err) => addError({ error: err, description: "Error while loading funding configuration" })
   );
 
-  const {   
-    hasPermissionToReleaseForStatement,
-    hasPermissionToReleaseForContractorPayments,    
-  } = useFundingConfirmation({
-    specificationId: specificationId,
-    fundingStreamId: fundingStreamId,
-    fundingPeriodId: fundingPeriodId,
-    actionType
-  });
+  const { missingPermissions, hasPermission, isPermissionsFetched } = useSpecificationPermissions(
+    match.params.specificationId,
+    [Permission.CanReleaseFunding]
+  );
+  let fundingStreamMissingPermissions = missingPermissions;
+
+  const hasPermissionToRelease = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFunding),
+    [isPermissionsFetched]
+  );
+
+  const hasPermissionToReleaseForStatement = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFundingForStatement),
+    [isPermissionsFetched]
+  );
+
+  const hasPermissionToReleaseForContractorPayments = useMemo(
+    () => hasPermission && hasPermission(Permission.CanReleaseFundingForPaymentOrContract),
+    [isPermissionsFetched]
+  );
 
   const { addSub, results: jobNotifications } = useJobSubscription({
     isEnabled: true,
@@ -229,7 +242,7 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
 
   const { specification } = useSpecificationSummary(specificationId, () =>
     addError({ error: "Error while loading specification" })
-  );
+  );  
 
   const isBlocked =
     isUpdating ||
@@ -248,6 +261,40 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
     isWaitingForJob ||
     hasUsersValidationJobActive;
 
+  const releaseGroups = fundingConfiguration?.releaseActionGroups;
+
+  const handleContinueButton = (fileName: number) => { 
+   let isDisableButton =  fileName === 0 || isBlocked || !hasPermissionToRelease;  
+
+   if ((!hasPermissionToReleaseForStatement || !hasPermissionToReleaseForContractorPayments) && releaseGroups && releaseGroups.length === 1){
+    releaseGroups.forEach((rg) => {
+      if(rg.name.toLowerCase() == "statement"){          
+        isDisableButton = isDisableButton || !hasPermissionToReleaseForStatement;
+        if(!hasPermissionToReleaseForStatement) {
+            if(fundingStreamMissingPermissions){
+            fundingStreamMissingPermissions.push(Permission.CanReleaseFundingForStatement);
+            }else{
+              fundingStreamMissingPermissions = [Permission.CanReleaseFundingForStatement]
+            }
+        }
+        return isDisableButton;
+      }
+      if(rg.name.toLowerCase() == "contract" || rg.name.toLowerCase() == "payment"){        
+        isDisableButton = isDisableButton || !hasPermissionToReleaseForContractorPayments;
+        if(!hasPermissionToReleaseForContractorPayments) {
+          if(fundingStreamMissingPermissions){
+            fundingStreamMissingPermissions.push(Permission.CanReleaseFundingForPaymentOrContract);
+          }else{
+            fundingStreamMissingPermissions = [Permission.CanReleaseFundingForPaymentOrContract]
+          }
+        }
+        return isDisableButton;
+      }
+    });
+  }
+    return isDisableButton;
+  }; 
+
   return (
     <Main location={Section.FundingManagement}>
       <Breadcrumbs>
@@ -256,6 +303,8 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
         <FundingSelectionBreadcrumb actionType={FundingActionType.Release} />
         <Breadcrumb name={currentPage.title} />
       </Breadcrumbs>
+
+      <PermissionStatus requiredPermissions={fundingStreamMissingPermissions} hidden={!isPermissionsFetched} />
 
       <MultipleErrorSummary errors={errors} />
 
@@ -343,11 +392,12 @@ export function UploadProvidersForRelease({ match }: RouteComponentProps<UploadB
                 onChange={getFileToUpload}
               />
             </div>
+           <div>{hasPermissionToRelease}</div> 
             <button
               className="govuk-button govuk-!-margin-right-1"
               type="button"
               onClick={uploadForApprove}
-              disabled={fileName.length === 0 || isBlocked}
+              disabled={handleContinueButton(fileName.length)}
               data-module="govuk-button"
             >
               Continue
