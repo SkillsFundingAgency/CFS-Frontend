@@ -38,6 +38,8 @@ export function EditDatasetReferencingReleased({
   const [selectedItems, setSelectedItems] = useState<DatasetTemplateMetadataWithType[]>([]);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [hideUnselected, setHideUnselected] = useState<boolean>(true);
+  const [showObsolete, setShowObsolete] = useState<boolean>(false);  
+  const [showUsedInCalculation, setShowUsedInCalculation] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string | undefined>(undefined);
   const [relationshipDescription, setRelationshipDescription] = useState<string | undefined>();
   const { data: relationshipMetadata, isLoading: isLoadingRelationshipMetadata } = useQuery<
@@ -108,12 +110,12 @@ export function EditDatasetReferencingReleased({
       if (!hideSelected) return items;
 
       return items.filter((i) => selectedItems.some((s) => s.templateId === i.templateId));
-    };
+    };    
 
     const searchFiltered = filterItemsBySelectedStatus(
       hideUnselected,
       filterItemsByName(searchText, templateItems)
-    );
+    );    
 
     return sortBy(prop("name"))(searchFiltered);
   }, [hideUnselected, templateItems, searchText, selectedItems]);
@@ -161,6 +163,14 @@ export function EditDatasetReferencingReleased({
     setHideUnselected((prev) => !prev);
   }
 
+  function onToggleObsolete(){     
+    setShowObsolete((prev) => !prev);
+  }
+
+  function onToggleUsedInCalculation(){       
+    setShowUsedInCalculation((prev) => !prev);
+  }
+
   const onRelationshipDescriptionChange = async (description: string) => {
     clearErrorMessages(["relationship-description"]);
     setRelationshipDescription(description);
@@ -201,10 +211,17 @@ export function EditDatasetReferencingReleased({
               <div className="govuk-grid-column-one-third position-sticky">
                 <SearchBox onSearchTextChange={filterByName} />
                 <FilterSelection onToggleHideUnselected={onToggleHideUnselected} isChecked={hideUnselected} />
+                <StatusSelection 
+                  onToggleObsolete = {onToggleObsolete} 
+                  onToggleUsedInCalculation={onToggleUsedInCalculation}
+                  isObsoleteChecked={showObsolete}
+                  isUsedInCalculationChecked = {showUsedInCalculation}/>
                 <Actions onContinue={onSubmit} />
               </div>
               <div className="govuk-grid-column-two-thirds">
                 <TemplateItemGrid
+                  showObsolete = {showObsolete}
+                  showUsedInCalculation = {showUsedInCalculation}
                   items={filteredItems}
                   hideSelected={hideUnselected}
                   selectedItems={selectedItems}
@@ -383,17 +400,89 @@ const FilterSelection = React.memo((props: { isChecked: boolean; onToggleHideUns
   </div>
 ));
 
+const StatusSelection = React.memo((props:{isObsoleteChecked: boolean, isUsedInCalculationChecked: boolean, onToggleObsolete: () => void, onToggleUsedInCalculation: () => void }) => {  
+  return(  
+  <div className="govuk-form-group filterbyContainer">
+    <fieldset className="govuk-fieldset">
+      <legend className="govuk-fieldset__legend govuk-fieldset__legend--m filterbyHeading govuk-!-margin-bottom-0">
+        <h4 className="govuk-heading-s govuk-!-padding-1 govuk-!-margin-bottom-0"> Status selection</h4>
+      </legend>
+      <div className="govuk-checkboxes govuk-checkboxes--small govuk-!-padding-2">
+        <div className="govuk-checkboxes__item">
+          <input
+            className="govuk-checkboxes__input table-filter-jq"           
+            type="checkbox" 
+            id="show-Obsolete-only"
+            name="show-Obsolete-only"
+            checked={props.isObsoleteChecked}
+            onChange={props.onToggleObsolete}   
+            value=""          
+          />
+          <label className="govuk-label govuk-checkboxes__label" htmlFor="filter">
+            Obsolete
+          </label>
+        </div>
+        <div className="govuk-checkboxes__item">
+          <input
+            className="govuk-checkboxes__input table-filter-jq"            
+            type="checkbox"
+            id="show-UsedInCalculation-only"
+            name="show-UsedInCalculation-only"
+            checked={props.isUsedInCalculationChecked}
+            onChange={props.onToggleUsedInCalculation}
+          />
+          <label className="govuk-label govuk-checkboxes__label" htmlFor="filter">
+            Used in Calculation
+          </label>
+        </div>       
+      </div>
+    </fieldset>
+  </div>
+)});
+
 const TemplateItemGrid = React.memo(
   (props: {
     items: DatasetTemplateMetadataWithType[] | undefined;
     hideSelected: boolean;
     selectedItems: DatasetTemplateMetadataWithType[] | undefined;
     onItemToggle: (item: DatasetTemplateMetadataWithType) => void;
+    showObsolete : boolean;
+    showUsedInCalculation: boolean;
   }) => {
     if (!props.items?.length)
       return (
         <p className="govuk-body-m">{props.hideSelected ? "You have no items selected." : "No results"}</p>
       );
+
+      let newItems = props.items;
+
+      if(props.showObsolete && props.showUsedInCalculation){
+        newItems = props.items.filter((i) => i.isObsolete || i.isUsedInCalculation);       
+
+        if (!newItems?.length)
+        return (
+          <p className="govuk-body-m">{props.showObsolete && props.showUsedInCalculation ? "No items with Obsolete and UsedInCalculation status available." : "No results"}</p>
+        ); 
+      }
+      else {
+        if(props.showObsolete){
+          newItems = props.items.filter((i) => i.isObsolete);       
+
+          if (!newItems?.length)
+          return (
+            <p className="govuk-body-m">{props.showObsolete ? "No items with Obsolete status is available." : "No results"}</p>
+          );
+        }
+
+        if(props.showUsedInCalculation){
+          newItems = props.items.filter((i) => i.isUsedInCalculation);       
+
+          if (!newItems?.length)
+          return (
+            <p className="govuk-body-m">{props.showUsedInCalculation ? "You have no items with UsedInCalculation status." : "No results"}</p>
+          );
+        }
+    }      
 
     return (
       <table
@@ -418,7 +507,7 @@ const TemplateItemGrid = React.memo(
           </tr>
         </thead>
         <tbody className="govuk-table__body">
-          {props.items.map((item, idx) => (
+          {newItems.map((item, idx) => (
             <TemplateItemRow
               key={idx}
               item={item}
