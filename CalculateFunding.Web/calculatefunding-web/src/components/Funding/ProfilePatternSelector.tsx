@@ -1,6 +1,5 @@
 import React from "react";
 
-import { FundingStreamPeriodProfilePattern } from "../../types/ProviderProfileTotalsForStreamAndPeriod";
 import {
   AvailableVariationPointerFundingLine,
   Period,
@@ -20,16 +19,16 @@ export default function ProfilePatternSelector(props: {
 
   return (
     <select
-      name="variationPointerSelect"
-      id="variationPointerSelect"
-      className="govuk-select"
+      name={`variationPointerSelect-${props.pointer?.fundingLineCode}`}
+      id={`variationPointerSelect-${props.pointer?.fundingLineCode}`}
+      className="govuk-select govuk-!-width-full"
       onChange={(e) => setVariationPointer(e)}
     >
       <option key={-1} value=""></option>
       {props.profilePatternList &&
         props.profilePatternList.map((pp, index) => (
           <option key={index} value={`${pp.year}-${pp.period}-${pp.occurrence}`}>
-            {pp.period} {pp.year} Installment {pp.occurrence}
+            {pp.period} {pp.year} Instalment {pp.occurrence}
           </option>
         ))}
     </select>

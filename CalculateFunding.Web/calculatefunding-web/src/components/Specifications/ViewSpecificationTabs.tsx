@@ -71,7 +71,7 @@ export const ViewSpecificationTabs = ({
               data-testid={"variations-tab"}
               label="variations"
             >
-              Variations
+              Set a variation
             </Tabs.Tab>
           </ul>
           <Tabs.Panel label="fundingline-structure">

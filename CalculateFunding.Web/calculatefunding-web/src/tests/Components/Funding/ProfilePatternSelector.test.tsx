@@ -48,17 +48,17 @@ describe("<ProfilePatternSelector ", () => {
 
     expect(
       screen.getByRole("option", {
-        name: "January 2020 Installment 1",
+        name: "January 2020 Instalment 1",
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole("option", {
-        name: "February 2020 Installment 2",
+        name: "February 2020 Instalment 2",
       })
     ).toBeInTheDocument();
     expect(
       screen.getByRole("option", {
-        name: "March 2020 Installment 3",
+        name: "March 2020 Instalment 3",
       })
     ).toBeInTheDocument();
   });
