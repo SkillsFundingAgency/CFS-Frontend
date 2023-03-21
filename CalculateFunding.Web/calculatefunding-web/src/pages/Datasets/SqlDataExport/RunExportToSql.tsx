@@ -152,7 +152,7 @@ const ExportSection = ({
             lastExportJob: jobsInfo.latestCalcResultsExportJob,
             lastChangeText: "Last calculation run",
             lastChangeDate: jobsInfo.latestCalcEngineRunJob?.lastUpdated,
-            isDataAlreadyExported: exportState.isLatestCalcResultsAlreadyExported,
+            isDataAlreadyExported: exportState.isLatestCalcResultsAlreadyExported && !jobsInfo.latestCalcResultsExportJob?.isFailed,
           };
         case ExportType.LatestFundingData:
           return {
@@ -162,7 +162,7 @@ const ExportSection = ({
             lastExportJob: jobsInfo.latestExportAllocationDataJob,
             lastChangeText: "Last funding data change",
             lastChangeDate: jobsInfo.lastSuccessfulFundingChangeJob?.lastUpdated,
-            isDataAlreadyExported: exportState.isLatestAllocationDataAlreadyExported,
+            isDataAlreadyExported: exportState.isLatestAllocationDataAlreadyExported && !jobsInfo.latestExportAllocationDataJob?.isFailed,
           };
         case ExportType.LastReleasedData:
           return {
@@ -172,7 +172,7 @@ const ExportSection = ({
             lastExportJob: jobsInfo.latestReleasedAllocationExportJob,
             lastChangeText: "Last published",
             lastChangeDate: jobsInfo.latestReleasedAllocationJob?.lastUpdated ?? undefined,
-            isDataAlreadyExported: exportState.isLatestReleaseDataAlreadyExported,
+            isDataAlreadyExported: exportState.isLatestReleaseDataAlreadyExported && !jobsInfo.latestReleasedAllocationExportJob?.isFailed,
           };
         default:
           throw Error("Unknown export type");
