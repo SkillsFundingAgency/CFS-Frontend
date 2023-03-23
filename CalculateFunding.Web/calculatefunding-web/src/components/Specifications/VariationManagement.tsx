@@ -299,11 +299,27 @@ export function VariationManagement({ specificationId, fundingPeriodId, fundingS
               <li className="govuk-body govuk-list--bullet">individual funding lines</li>
               <li className="govuk-body govuk-list--bullet">all funding lines</li>
             </div>          
-            <p className="govuk-heading-s">Select an instalment for individual funding lines</p>
-            <p className="govuk-body">Select an option from the future instalment drop-down next to the funding line.</p>
-            <p className="govuk-body">If you do not select a future instalment for a funding line, the currently set instalment will stay the same.</p>
-            <p className="govuk-heading-s">Select an instalment for all funding lines</p>
-            <p className="govuk-body">You must check the select all box before you select a future instalment for all funding lines.</p>
+            <div className="govuk-!-padding-top-1">
+              <details className="govuk-details" data-module="govuk-details" >
+                <summary className="govuk-details__summary">
+                  <span className="govuk-details__summary-text">Select an instalment for individual funding lines</span>
+                </summary>
+                <div className="govuk-details__text">
+                  <p className="govuk-body">Select an option from the future instalment drop-down next to the funding line.</p>
+                  <p className="govuk-body">If you do not select a future instalment for a funding line, the currently set instalment will stay the same.</p> 
+                </div>
+              </details>
+            </div>
+            <div className="govuk-!-padding-top-1">
+              <details className="govuk-details" data-module="govuk-details" >
+                <summary className="govuk-details__summary">
+                  <span className="govuk-details__summary-text">Select an instalment for all funding lines</span>
+                </summary>
+                <div className="govuk-details__text">
+                  <p className="govuk-body">You must check the select all box before you select a future instalment for all funding lines.</p>
+                </div>
+              </details>
+            </div>
             <p className="govuk-caption-m">Select a future instalment for all funding lines</p>
           </div>
       )}
