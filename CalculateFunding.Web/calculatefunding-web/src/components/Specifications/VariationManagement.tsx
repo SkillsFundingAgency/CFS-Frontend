@@ -85,10 +85,10 @@ export function VariationManagement({ specificationId, fundingPeriodId, fundingS
     clearSelection();   
     setShowWarningMessage(false); 
     setSucessMessage(false);
-    const bulkActionSelectedOption = e.target.value;
-    if(bulkActionSelectedOption == "" ){      
-      setUpdatedPointers(undefined);
-    }
+    const bulkActionSelectedOption = e.target.value;  
+
+    setUpdatedPointers(undefined);
+
     if(bulkActionSelectedOption !== "" && checkedFundlingLines.length) {
       let updatedCollection: ProfileVariationPointer[] = [];
       let setPointerCount = 0;
