@@ -103,7 +103,7 @@ export const SearchFilterSelection = ({
         {searchForFilter && (
           <div className="govuk-form-group filterSearch">
             <label id={`label-search-${id}`} className="govuk-label filterLabel" htmlFor={`search-${id}`}>
-              Search for {title.toLowerCase()}
+              Search for {title}
             </label>
             <input
               className="govuk-input filterSearchInput govuk-!-margin-bottom-2"
@@ -818,6 +818,128 @@ export const ProviderResultsSearchFilterSelectionPanel = ({
                 title="Local authority"
                 selectedFilters={selectedLocalAuthorityFilters}
                 handleRemoveFilter={handleRemoveLocalAuthorityFilter}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    </fieldset>
+  );
+};
+
+
+export const ApproveProvidersSearchFilterSelectionPanel = ({
+  title,
+  selectedProviderTypeFilters,
+  selectedProviderSubTypeFilters,
+  selectedLocalAuthorityFilters,
+  selectedStatusFilters,
+  selectedErrorStateFilters,
+  selectedAllocationFilters,
+  selectedDatefilters,
+  handleRemoveProviderTypeFilter,
+  handleRemoveProviderSubTypeFilter,
+  handleRemoveLocalAuthorityFilter,
+  handleRemoveStatusFilter,
+  handleRemoveErrorStateFilter,
+  handleRemoveAllocationFilter,
+  handleRemoveDatefilter,
+  clearSearchTitle = "Clear filters",
+  handleClearSearch,
+}: {
+  title: string;
+  selectedProviderTypeFilters: string[];
+  selectedProviderSubTypeFilters: string[];
+  selectedLocalAuthorityFilters: string[];
+  selectedStatusFilters: string[],
+  selectedErrorStateFilters: string[],
+  selectedAllocationFilters: string[],
+  selectedDatefilters: string[],
+  clearSearchTitle?: string;
+  handleRemoveProviderTypeFilter: (providerType: string) => void;
+  handleRemoveProviderSubTypeFilter: (providerSubType: string) => void;
+  handleRemoveLocalAuthorityFilter: (localAuthority: string) => void;
+  handleRemoveStatusFilter: (filter: string) => void;
+  handleRemoveErrorStateFilter: (filter: string) => void;
+  handleRemoveAllocationFilter: (filter: string) => void;
+  handleRemoveDatefilter: (filter: string) => void;
+  handleClearSearch: () => void;
+}) => {
+  const haveFilters =
+    !!selectedProviderTypeFilters.length ||
+    !!selectedProviderSubTypeFilters.length ||
+    !!selectedStatusFilters.length ||
+    !!selectedErrorStateFilters.length ||
+    !!selectedAllocationFilters.length ||
+    !!selectedDatefilters.length ||
+    !!selectedLocalAuthorityFilters.length;
+
+  return (
+    <fieldset className="govuk-fieldset search-filters--greyed selected-filters-background">
+      <div className="govuk-form-group filterSearch">
+        <h2 className="govuk-heading-s govuk-!-display-inline-block govuk-!-margin-top-2 govuk-!-margin-bottom-2">
+          {title}
+        </h2>
+        <TextLink
+          handleOnClick={handleClearSearch}
+          additionalCss={"govuk-!-margin-top-2 govuk-!-margin-bottom-2 right-align"}
+        >
+          {clearSearchTitle}
+        </TextLink>
+
+        {!haveFilters ? (
+          <div id="showHideText">
+            <p className="govuk-body-s">No filters selected</p>
+          </div>
+        ) : (
+          <div className="filtersSelected">
+            {selectedProviderTypeFilters.length > 0 && (
+              <SelectedFilters
+                title="Provider type"
+                selectedFilters={selectedProviderTypeFilters}
+                handleRemoveFilter={handleRemoveProviderTypeFilter}
+              />
+            )}
+            {selectedProviderSubTypeFilters.length > 0 && (
+              <SelectedFilters
+                title="Provider sub type"
+                selectedFilters={selectedProviderSubTypeFilters}
+                handleRemoveFilter={handleRemoveProviderSubTypeFilter}
+              />
+            )}
+            {selectedLocalAuthorityFilters.length > 0 && (
+              <SelectedFilters
+                title="Local authority"
+                selectedFilters={selectedLocalAuthorityFilters}
+                handleRemoveFilter={handleRemoveLocalAuthorityFilter}
+              />
+            )}
+            {selectedStatusFilters.length > 0 && (
+              <SelectedFilters
+                title="Status"
+                selectedFilters={selectedStatusFilters}
+                handleRemoveFilter={handleRemoveStatusFilter}
+              />
+            )}
+            {selectedErrorStateFilters.length > 0 && (
+              <SelectedFilters
+                title="Error status"
+                selectedFilters={selectedErrorStateFilters}
+                handleRemoveFilter={handleRemoveErrorStateFilter}
+              />
+            )}
+            {selectedAllocationFilters.length > 0 && (
+              <SelectedFilters
+                title="Allocation type"
+                selectedFilters={selectedAllocationFilters}
+                handleRemoveFilter={handleRemoveAllocationFilter}
+              />
+            )}
+            {selectedDatefilters.length > 0 && (
+              <SelectedFilters
+                title="Open date"
+                selectedFilters={selectedDatefilters}
+                handleRemoveFilter={handleRemoveDatefilter}
               />
             )}
           </div>

@@ -9,6 +9,7 @@ export enum PublishedProviderSearchFacet {
   LocalAuthority = "localAuthority",
   FundingStatus = "fundingStatus",
   MonthYearOpened = "monthYearOpened",
+  Indicative = "indicative",
 }
 
 export interface PublishedProviderSearchRequest {
