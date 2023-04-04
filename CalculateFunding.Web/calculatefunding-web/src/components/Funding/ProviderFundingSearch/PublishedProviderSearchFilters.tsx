@@ -66,12 +66,14 @@ export const PublishedProviderSearchFilters = React.memo(function (
     array.sort((a: FacetValue, b: FacetValue) => new Date(a.name).getTime() - new Date(b.name).getTime());
 
   const updateSearchText = (searchField : string, searchTerm: string | undefined) => {
+    if ( searchTerm == undefined || searchTerm.length === 0 || searchTerm.length > 1 ){
     dispatch(
       actions.updateSearchTextFilter({
         searchTerm: searchTerm,
         searchFields: [searchField],
       })
     );
+    }
   };
 
   const debounceUpdateSearchText = useRef(debounce(updateSearchText, 500)).current;
