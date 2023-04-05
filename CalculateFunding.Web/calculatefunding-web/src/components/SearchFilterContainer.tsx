@@ -566,7 +566,7 @@ export const SearchFiltersOuterContainer = React.memo(
       }
     };
     return (
-      <div className="govuk-form-group filterSearch filterbyContainer filterScroll">
+      <div className="govuk-form-group filterSearch filterbyContainer">
         <div className="filterContainer">
           <div className="search-filters__controls">
             <label tabIndex={0} onClick={(e) => handleClick(e)} className="search-filters__show-all">
