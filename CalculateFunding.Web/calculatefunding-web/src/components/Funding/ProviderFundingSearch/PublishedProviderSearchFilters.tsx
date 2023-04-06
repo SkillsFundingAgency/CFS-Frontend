@@ -134,14 +134,14 @@ export const PublishedProviderSearchFilters = React.memo(function (
 
   useEffect(() => {
     setSelectedTextSearch({
-      searchTerm: state.searchCriteria?.searchTerm,
-      searchField: state.searchCriteria?.searchFields[0],
+      searchTerm: state.searchCriteria?.searchFields[0],
+      searchField: state.searchCriteria?.searchTerm,
       isSelected: true,
     });
   }, []);
 
 
-  const addProviderTypeFilter = useCallback((value: string) => {
+    const addProviderTypeFilter = useCallback((value: string) => {
     const isSelected = true;
     dispatch(actions.updateProviderTypeFilters({ value, isSelected }));
   }, []);
