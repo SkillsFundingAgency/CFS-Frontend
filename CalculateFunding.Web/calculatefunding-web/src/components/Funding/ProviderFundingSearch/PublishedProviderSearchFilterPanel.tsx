@@ -111,12 +111,12 @@ export const ProviderResultsSearchFilterPanel = ({
   } = useToggle();
 
   const allExpanded = useMemo(
-    () => isProviderTypeExpanded && isProviderSubTypeExpanded && isLocalAuthorityExpanded,
-    [isProviderTypeExpanded, isProviderSubTypeExpanded, isLocalAuthorityExpanded]
+    () => isProviderTypeExpanded && isProviderSubTypeExpanded && isLocalAuthorityExpanded && isStatusExpanded && isErrorsExpanded && isOpenDateExpanded && isAllocationTypeExpanded,
+    [isProviderTypeExpanded, isProviderSubTypeExpanded, isLocalAuthorityExpanded, isStatusExpanded, isErrorsExpanded, isOpenDateExpanded, isAllocationTypeExpanded]
   );
   const allCollapsed = useMemo(
-    () => !isProviderTypeExpanded && !isProviderSubTypeExpanded && !isLocalAuthorityExpanded,
-    [isProviderTypeExpanded, isProviderSubTypeExpanded, isLocalAuthorityExpanded]
+    () => !isProviderTypeExpanded && !isProviderSubTypeExpanded && !isLocalAuthorityExpanded && !isStatusExpanded && !isErrorsExpanded && !isOpenDateExpanded && !isAllocationTypeExpanded,
+    [isProviderTypeExpanded, isProviderSubTypeExpanded, isLocalAuthorityExpanded, isStatusExpanded, isErrorsExpanded, isOpenDateExpanded, isAllocationTypeExpanded]
   );
   const expandAllFilters = useCallback(() => {
     setProviderTypeExpanded(true);
@@ -154,101 +154,103 @@ export const ProviderResultsSearchFilterPanel = ({
 
   return (
     <CollapsibleSearchSideBar formId={"approvedProviderSearch"} updateSearch={filterBySearchTerm} >
-      <ApproveProvidersSearchFilterSelectionPanel
-        title="Selected filters"
-        selectedProviderTypeFilters={providerTypes}
-        selectedProviderSubTypeFilters={providerSubTypes}
-        selectedLocalAuthorityFilters={localAuthority}
-        selectedStatusFilters={status}
-        selectedErrorStateFilters={selectedErrorState}
-        selectedAllocationFilters={selectedAllocationType}
-        selectedDatefilters={openDate}
-        handleRemoveProviderTypeFilter={removeProviderTypeFilter}
-        handleRemoveProviderSubTypeFilter={removeProviderSubTypeFilter}
-        handleRemoveLocalAuthorityFilter={removeLocalAuthorityFilter}
-        handleRemoveStatusFilter={removeStatusFilter}
-        handleRemoveErrorStateFilter={removeErrorStateFilter}
-        handleRemoveAllocationFilter={removeAllocationTypeFilter}
-        handleRemoveDatefilter= {removeOpenDateFilter}
-        handleClearSearch={clearFilters}
-      />
-      <SearchFiltersOuterContainer
-        expandAllFilters={expandAllFilters}
-        collapseAllFilters={collapseAllFilters}
-        allExpanded={allExpanded}
-        allCollapsed={allCollapsed}
-      >
-        <SearchFilterContainer>
-          <SearchFilterSection
-            title="Provider type"
-            facets={providerTypeFacets}
-            isExpanded={isProviderTypeExpanded}
-            toggleExpanded={toggleProviderTypeExpanded}
-            addFilter={addProviderTypeFilter}
-            removeFilter={removeProviderTypeFilter}
-            searchForFilter={filterByProviderType}
-            selectedFilters={providerTypes}
-          />
-          <SearchFilterSection
-            title="Provider sub type"
-            facets={providerSubTypeFacets}
-            isExpanded={isProviderSubTypeExpanded}
-            toggleExpanded={toggleProviderSubTypeExpanded}
-            addFilter={addProviderSubTypeFilter}
-            removeFilter={removeProviderSubTypeFilter}
-            searchForFilter={filterByProviderSubType}
-            selectedFilters={providerSubTypes}
-          />
-          <SearchFilterSection
-            title="Status"
-            facets={statusFacets}
-            isExpanded={isStatusExpanded}
-            toggleExpanded={toggleStatusExpanded}
-            addFilter={addStatusFilter}
-            removeFilter={removeStatusFilter}
-            selectedFilters={status} 
+      <div className="position-sticky filterScroll">
+        <ApproveProvidersSearchFilterSelectionPanel
+          title="Selected filters"
+          selectedProviderTypeFilters={providerTypes}
+          selectedProviderSubTypeFilters={providerSubTypes}
+          selectedLocalAuthorityFilters={localAuthority}
+          selectedStatusFilters={status}
+          selectedErrorStateFilters={selectedErrorState}
+          selectedAllocationFilters={selectedAllocationType}
+          selectedDatefilters={openDate}
+          handleRemoveProviderTypeFilter={removeProviderTypeFilter}
+          handleRemoveProviderSubTypeFilter={removeProviderSubTypeFilter}
+          handleRemoveLocalAuthorityFilter={removeLocalAuthorityFilter}
+          handleRemoveStatusFilter={removeStatusFilter}
+          handleRemoveErrorStateFilter={removeErrorStateFilter}
+          handleRemoveAllocationFilter={removeAllocationTypeFilter}
+          handleRemoveDatefilter= {removeOpenDateFilter}
+          handleClearSearch={clearFilters}
+        />
+        <SearchFiltersOuterContainer
+          expandAllFilters={expandAllFilters}
+          collapseAllFilters={collapseAllFilters}
+          allExpanded={allExpanded}
+          allCollapsed={allCollapsed}
+        >
+          <SearchFilterContainer>
+            <SearchFilterSection
+              title="Provider type"
+              facets={providerTypeFacets}
+              isExpanded={isProviderTypeExpanded}
+              toggleExpanded={toggleProviderTypeExpanded}
+              addFilter={addProviderTypeFilter}
+              removeFilter={removeProviderTypeFilter}
+              searchForFilter={filterByProviderType}
+              selectedFilters={providerTypes}
             />
-          <SearchFilterSection
-            title="Local authority"
-            facets={localAuthorityFacets}
-            isExpanded={isLocalAuthorityExpanded}
-            toggleExpanded={toggleLocalAuthorityExpanded}
-            addFilter={addLocalAuthorityFilter}
-            removeFilter={removeLocalAuthorityFilter}
-            searchForFilter={filterByLocalAuthority}
-            selectedFilters={localAuthority}
-          />
-          <SearchFilterSection
-            title="Error status"
-            facets={errorStatusFacets}
-            selectedFilters={selectedErrorState} 
-            isExpanded={isErrorsExpanded} 
-            toggleExpanded={toggleErrorsExpanded}        
-            addFilter={addErrorStateFilter}
-            removeFilter={removeErrorStateFilter}
+            <SearchFilterSection
+              title="Provider sub type"
+              facets={providerSubTypeFacets}
+              isExpanded={isProviderSubTypeExpanded}
+              toggleExpanded={toggleProviderSubTypeExpanded}
+              addFilter={addProviderSubTypeFilter}
+              removeFilter={removeProviderSubTypeFilter}
+              searchForFilter={filterByProviderSubType}
+              selectedFilters={providerSubTypes}
             />
+            <SearchFilterSection
+              title="Status"
+              facets={statusFacets}
+              isExpanded={isStatusExpanded}
+              toggleExpanded={toggleStatusExpanded}
+              addFilter={addStatusFilter}
+              removeFilter={removeStatusFilter}
+              selectedFilters={status} 
+              />
+            <SearchFilterSection
+              title="Local authority"
+              facets={localAuthorityFacets}
+              isExpanded={isLocalAuthorityExpanded}
+              toggleExpanded={toggleLocalAuthorityExpanded}
+              addFilter={addLocalAuthorityFilter}
+              removeFilter={removeLocalAuthorityFilter}
+              searchForFilter={filterByLocalAuthority}
+              selectedFilters={localAuthority}
+            />
+            <SearchFilterSection
+              title="Error status"
+              facets={errorStatusFacets}
+              selectedFilters={selectedErrorState} 
+              isExpanded={isErrorsExpanded} 
+              toggleExpanded={toggleErrorsExpanded}        
+              addFilter={addErrorStateFilter}
+              removeFilter={removeErrorStateFilter}
+              />
 
-          <SearchFilterSection
-            title="Allocation type"
-            facets={allocationTypeFacets}
-            isExpanded={isAllocationTypeExpanded}
-            toggleExpanded={toggleAllocationTypeExpanded}       
-            addFilter={addAllocationTypeFilter} 
-            removeFilter={removeAllocationTypeFilter} 
-            selectedFilters={selectedAllocationType}         
-          />
-          <SearchFilterSection
-            title="Open date"
-            facets={openDateFacets}
-            isExpanded={isOpenDateExpanded}
-            toggleExpanded={toggleOpenDateExpanded}
-            addFilter={addOpenDateFilter}
-            removeFilter={removeOpenDateFilter}
-            searchForFilter={filterByOpenDate}
-            selectedFilters={openDate}
-          />
-        </SearchFilterContainer>
-      </SearchFiltersOuterContainer>
+            <SearchFilterSection
+              title="Allocation type"
+              facets={allocationTypeFacets}
+              isExpanded={isAllocationTypeExpanded}
+              toggleExpanded={toggleAllocationTypeExpanded}       
+              addFilter={addAllocationTypeFilter} 
+              removeFilter={removeAllocationTypeFilter} 
+              selectedFilters={selectedAllocationType}         
+            />
+            <SearchFilterSection
+              title="Open date"
+              facets={openDateFacets}
+              isExpanded={isOpenDateExpanded}
+              toggleExpanded={toggleOpenDateExpanded}
+              addFilter={addOpenDateFilter}
+              removeFilter={removeOpenDateFilter}
+              searchForFilter={filterByOpenDate}
+              selectedFilters={openDate}
+            />
+          </SearchFilterContainer>
+        </SearchFiltersOuterContainer>
+      </div>
     </CollapsibleSearchSideBar>
   );
 };

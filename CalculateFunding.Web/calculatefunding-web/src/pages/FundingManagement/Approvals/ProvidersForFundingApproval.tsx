@@ -538,7 +538,7 @@ export const ProvidersForFundingApproval = ({
 
       <div className="govuk-grid-row">
         {!hasActiveActionJobs && !isRefreshing && (
-          <div className="govuk-grid-column-one-third position-sticky filterScroll" >
+          <div className="govuk-grid-column-one-third" >
             <PublishedProviderSearchFilters
               facets={publishedProviderSearchResults ? publishedProviderSearchResults.facets : []}
               numberOfProvidersWithErrors={0}
