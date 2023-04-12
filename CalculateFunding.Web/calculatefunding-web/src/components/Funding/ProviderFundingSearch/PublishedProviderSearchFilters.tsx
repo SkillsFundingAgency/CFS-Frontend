@@ -135,7 +135,6 @@ export const PublishedProviderSearchFilters = React.memo(function (
   useEffect(() => {
     setSelectedTextSearch({
       searchTerm: state.searchCriteria?.searchFields[0],
-      searchField: state.searchCriteria?.searchTerm,
       isSelected: true,
     });
   }, []);
