@@ -99,6 +99,11 @@ div.filter-content {
   z-index: 1020;
 }
 
+.position-sticky-no-index {
+  position: sticky;
+  top: 1rem;
+}
+
 .filterScroll {
 	overflow: scroll; 
 	height: calc(95vh);
