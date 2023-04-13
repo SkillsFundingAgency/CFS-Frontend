@@ -154,7 +154,6 @@ export const ProviderResultsSearchFilterPanel = ({
 
   return (
     <CollapsibleSearchSideBar formId={"approvedProviderSearch"} updateSearch={filterBySearchTerm} >
-      <div className="position-sticky filterScroll">
         <ApproveProvidersSearchFilterSelectionPanel
           title="Selected filters"
           selectedProviderTypeFilters={providerTypes}
@@ -250,7 +249,6 @@ export const ProviderResultsSearchFilterPanel = ({
             />
           </SearchFilterContainer>
         </SearchFiltersOuterContainer>
-      </div>
     </CollapsibleSearchSideBar>
   );
 };
