@@ -160,10 +160,10 @@ export const PublishedProviderSearchFilters = React.memo(function (
   );
   const addErrorStateFilter = useCallback((value: string) => {
     const hasErrorsoptions:string[] = selectedErrorState;
-    if(value === "With errors"){
+    if(value === "With errors" && !hasErrorsoptions.includes("With errors")){
       hasErrorsoptions.push("With errors");
     }
-    if(value === "Without errors"){
+    if(value === "Without errors" && !hasErrorsoptions.includes("Without errors")){
       hasErrorsoptions.push("Without errors");
     }
     const errValue : any = (hasErrorsoptions.length > 1) ? undefined 
@@ -256,10 +256,10 @@ export const PublishedProviderSearchFilters = React.memo(function (
 
   const addAllocationTypeFilter = useCallback((value: string) => {
     const allocationTypeOptions:string[] = selectedAllocationType;
-    if(value === "Indicative allocations"){
+    if(value === "Indicative allocations" && !allocationTypeOptions.includes("Indicative allocations")){
       allocationTypeOptions.push("Indicative allocations");
     }
-    if(value === "Non-Indicative allocations"){
+    if(value === "Non-Indicative allocations" && !allocationTypeOptions.includes("Non-Indicative allocations")){
       allocationTypeOptions.push("Non-Indicative allocations");
     }
     const allocationValue : any = (allocationTypeOptions.length > 1) ? "Show all allocation types" 
@@ -282,6 +282,10 @@ export const PublishedProviderSearchFilters = React.memo(function (
     setSelectedAllocationType(allocationTypeOptions);
   }, []);
 
+    const clearSelectedArrayState = (selectedArray: string[]) => {
+        (selectedArray.length != 0 && selectedArray.length == 1) ? selectedArray.splice(0, 1) : selectedArray.splice(0, 2);
+    };
+
   const clearFilters = useCallback(() => {
     // @ts-ignore
     document.getElementById("approvedProviderSearch").reset();
@@ -289,12 +293,14 @@ export const PublishedProviderSearchFilters = React.memo(function (
     setProviderSubTypeFacets(resultsProviderSubType);
     setLocalAuthorityFacets(resultsLocalAuthorityType);
     setErrorStatusFacets(resutErrorStatusFacets);
-    setSelectedErrorState([]);
-    setSelectedAllocationType([]);
     setResultsStatusType(resultsStatusType);
     setAllocationTypeFacets(resultsAllocationType);
+    setSelectedErrorState([])
+    setSelectedAllocationType([])
+    clearSelectedArrayState(selectedAllocationType)
+    clearSelectedArrayState(selectedErrorState)
     props.clearFundingSearchSelection();
-  },[resultsProviderType, resultsProviderSubType, resultsLocalAuthorityType, resutErrorStatusFacets, resultsStatusType, resultsAllocationType]);
+  },[resultsProviderType, resultsProviderSubType, resultsLocalAuthorityType, resutErrorStatusFacets, resultsStatusType, resultsAllocationType, selectedErrorState, selectedAllocationType]);
 
   function filterByErrorStatus(value: any) {
     const withErrors = value === "With errors" ? true : filterWithErrors;

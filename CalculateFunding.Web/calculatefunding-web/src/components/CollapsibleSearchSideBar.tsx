@@ -63,7 +63,7 @@ export const TextSearchPanel = ({
             <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span govuk-!-margin-left-0 govuk-!-margin-top-0">
                 Select one option
             </span>
-            <CollapsibleSearchBox searchfieldset={searchFieldSet} callback={handleTextChange} />
+            <CollapsibleSearchBox searchfieldset={searchFieldSet} callback={handleTextChange}/>
           </div>
         </fieldset>
       </div>
@@ -81,11 +81,11 @@ export interface SearchSidebarProps {
     updateSearch: (searchField: string, searchTerm: string)  => void;
   }
   
-   const isTextSearchEnabled = (arg: any): arg is SearchSidebarWithTextSearchProps => {
+  const isTextSearchEnabled = (arg: any): arg is SearchSidebarWithTextSearchProps => {
     return !!(arg as SearchSidebarWithTextSearchProps)?.updateSearch;
   }; 
   
-  export const CollapsibleSearchSideBar = (props: SearchSidebarProps | SearchSidebarWithTextSearchProps) => {
+  export const CollapsibleSearchSideBar = (props: SearchSidebarProps | SearchSidebarWithTextSearchProps ) => {
     if (isTextSearchEnabled(props)){
       return (
         <aside className="govuk-form-group filterSearch search-filters">
