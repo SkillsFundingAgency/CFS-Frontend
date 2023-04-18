@@ -147,7 +147,7 @@ export function FundingLineResults({
       case ValueFormatType.Number:
         return ((templateCalculationType == TemplateCalculationType.Weighting) 
             ? formatNumber(value, NumberType.WeightedNumber, 5, true)
-            : formatNumber(value, NumberType.FormattedDecimalNumber, 0, true));
+            : formatNumber(value, NumberType.FormattedValue, 5, true));
     }
     return `${value}`;
   }
