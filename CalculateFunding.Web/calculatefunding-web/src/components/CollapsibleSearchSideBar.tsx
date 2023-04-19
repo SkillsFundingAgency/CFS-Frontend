@@ -63,7 +63,7 @@ export const TextSearchPanel = ({
             <span id="how-contacted-conditional-hint" className="govuk-hint sidebar-search-span govuk-!-margin-left-0 govuk-!-margin-top-0">
                 Select one option
             </span>
-            <CollapsibleSearchBox searchfieldset={searchFieldSet} callback={handleTextChange}/>
+            <CollapsibleSearchBox searchfieldset={searchFieldSet} callback={handleTextChange}  handleOnClick={handleClearSearch}/>
           </div>
         </fieldset>
       </div>
@@ -112,6 +112,7 @@ export interface SearchSidebarProps {
 
   
 export function CollapsibleSearchBox(props: {
+    handleOnClick : (e : any) => void;
     searchfieldset: string[];
     callback: (searchField: string, searchTerm: string) => void;
   }) {
@@ -161,6 +162,7 @@ export function CollapsibleSearchBox(props: {
             checked={expandedProvider}
             aria-controls="conditional-search-options-provider"
             aria-expanded="false"
+            onClick={props.handleOnClick}
           ></input>
           <label
             onClick={expandSearchProvider}
@@ -194,6 +196,7 @@ export function CollapsibleSearchBox(props: {
             checked={expandedUKPRN}
             aria-controls="conditional-search-options-UKPRN"
             aria-expanded="true"
+            onClick={props.handleOnClick}
           ></input>
           <label
             onClick={expandSearchUKPRN}
@@ -227,6 +230,7 @@ export function CollapsibleSearchBox(props: {
             checked={expandedUPIN}
             aria-controls="conditional-search-options-UPIN"
             aria-expanded="false"
+            onClick={props.handleOnClick}
           ></input>
           <label
             onClick={expandSearchUPIN}
@@ -260,6 +264,7 @@ export function CollapsibleSearchBox(props: {
             checked={expandedURN}
             aria-controls="conditional-search-options-URN"
             aria-expanded="false"
+            onClick={props.handleOnClick}
           ></input>
           <label
             onClick={expandSearchURN}
