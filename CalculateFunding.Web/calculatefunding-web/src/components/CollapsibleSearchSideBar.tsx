@@ -22,7 +22,6 @@ export const TextSearchPanel = ({
   }) => {
     const [searchFieldSet, setSearchFieldSet] = useState<string[]>(["", "", "", ""]);
     const handleClearSearch = (e: any) => {
-      e.preventDefault();
       handleTextSearchChange("", "");
       setSearchFieldSet(["", "", "", ""]);
     };
