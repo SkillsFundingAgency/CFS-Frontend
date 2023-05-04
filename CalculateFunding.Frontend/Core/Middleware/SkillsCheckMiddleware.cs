@@ -8,57 +8,77 @@ using CalculateFunding.Frontend.Constants;
 using CalculateFunding.Frontend.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using System.Net.Sockets;
 
 namespace CalculateFunding.Frontend.Core.Middleware
 {
     public class SkillsCheckMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger _logger;
 
-        public SkillsCheckMiddleware(RequestDelegate next)
+        public SkillsCheckMiddleware(RequestDelegate next, ILogger logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.User.Identity.IsAuthenticated)
+            try
             {
-                bool haveCookieForConfirmedSkills = context.Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName);
-
-                if (!haveCookieForConfirmedSkills && DoesRequestRequireSkills(context.Request))
+                if (context.User.Identity.IsAuthenticated)
                 {
-                    IUsersApiClient usersApiClient = context.RequestServices.GetService<IUsersApiClient>();
+                    bool haveCookieForConfirmedSkills = context.Request.Cookies.ContainsKey(UserConstants.SkillsConfirmationCookieName);
 
-                    UserProfile profile = context.User.GetUserProfile();
-
-                    ApiResponse<User> apiResponse = await usersApiClient.GetUserByUserId(profile.Id);
-
-                    if (apiResponse.StatusCode != HttpStatusCode.OK)
+                    if (!haveCookieForConfirmedSkills && DoesRequestRequireSkills(context.Request))
                     {
-                        context.Response.StatusCode = (int) apiResponse.StatusCode;
-                        context.Response.WriteAsync("Could not verify that user has confirmed skills").Wait();
-                        return;
+                        IUsersApiClient usersApiClient = context.RequestServices.GetService<IUsersApiClient>();
+
+                        UserProfile profile = context.User.GetUserProfile();
+
+                        ApiResponse<User> apiResponse = await usersApiClient.GetUserByUserId(profile.Id);
+
+                        if (apiResponse.StatusCode != HttpStatusCode.OK)
+                        {
+                            context.Response.StatusCode = (int)apiResponse.StatusCode;
+                            context.Response.WriteAsync("Could not verify that user has confirmed skills").Wait();
+                            return;
+                        }
+
+                        if (!apiResponse.Content.HasConfirmedSkills)
+                        {
+                            context.Response.StatusCode = 451;
+                            context.Response.WriteAsync("User has not confirmed skills").Wait();
+                            return;
+                        }
+
+                        CookieOptions option = new CookieOptions
+                        {
+                            Expires = DateTime.Now.AddDays(1),
+                            Secure = true,
+                            HttpOnly = true
+                        };
+                        context.Response.Cookies.Append(UserConstants.SkillsConfirmationCookieName, "true", option);
                     }
-
-                    if (!apiResponse.Content.HasConfirmedSkills)
-                    {
-                        context.Response.StatusCode = 451;
-                        context.Response.WriteAsync("User has not confirmed skills").Wait();
-                        return;
-                    }
-
-                    CookieOptions option = new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddDays(1),
-                        Secure = true,
-                        HttpOnly = true
-                    };
-                    context.Response.Cookies.Append(UserConstants.SkillsConfirmationCookieName, "true", option);
                 }
-            }
 
-            await _next(context);
+                await _next(context);
+            }
+            catch(SocketException socEx)
+            {
+                _logger.Error(socEx.Source.ToString());
+                _logger.Error(socEx.InnerException.ToString());
+                _logger.Error(socEx.SocketErrorCode.ToString());
+                _logger.Error(socEx.StackTrace);
+                _logger.Error(socEx.ToString());
+                _logger.Error(socEx.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex.ToString());
+            }
         }
 
         private bool DoesRequestRequireSkills(HttpRequest request)
